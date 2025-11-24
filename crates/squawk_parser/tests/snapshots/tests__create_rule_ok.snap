@@ -183,15 +183,16 @@ SOURCE_FILE
         SET_KW "set"
         WHITESPACE " "
         SET_COLUMN_LIST
-          SET_COLUMN
+          SET_SINGLE_COLUMN
             COLUMN
               NAME_REF
                 IDENT "foo"
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            SET_EXPR
+              LITERAL
+                INT_NUMBER "1"
     SEMICOLON ";"
     WHITESPACE "\n    "
     NOTIFY
@@ -351,15 +352,16 @@ SOURCE_FILE
       SET_KW "SET"
       WHITESPACE " "
       SET_COLUMN_LIST
-        SET_COLUMN
+        SET_SINGLE_COLUMN
           COLUMN
             NAME_REF
               NAME_KW "name"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            STRING "'foo'"
+          SET_EXPR
+            LITERAL
+              STRING "'foo'"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"

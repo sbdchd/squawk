@@ -821,16 +821,19 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+    FUNCTION_SIG_LIST
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+      COMMA ","
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -846,71 +849,75 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
-        WHITESPACE " "
-        NAME
-          IDENT "a"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
+    FUNCTION_SIG_LIST
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PARAM_IN
+              IN_KW "in"
+            WHITESPACE " "
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          COMMA ","
+          WHITESPACE " "
+          PARAM
+            PARAM_OUT
+              OUT_KW "out"
+            WHITESPACE " "
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          COMMA ","
+          WHITESPACE " "
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      PARAM
-        PARAM_OUT
-          OUT_KW "out"
-        WHITESPACE " "
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                NUMERIC_KW "numeric"
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        PARAM_LIST
+          L_PAREN "("
+          R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                BIGINT_KW "bigint"
-      R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
-    PARAM_LIST
-      L_PAREN "("
-      R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "z"
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                INT_KW "int"
-      R_PAREN ")"
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "z"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+          R_PAREN ")"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -926,10 +933,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "r"
+    FUNCTION_SIG_LIST
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1024,53 +1033,56 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
-        WHITESPACE " "
-        NAME
-          IDENT "a"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
+    FUNCTION_SIG_LIST
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PARAM_IN
+              IN_KW "in"
+            WHITESPACE " "
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          COMMA ","
+          WHITESPACE " "
+          PARAM
+            PARAM_OUT
+              OUT_KW "out"
+            WHITESPACE " "
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          COMMA ","
+          WHITESPACE " "
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      PARAM
-        PARAM_OUT
-          OUT_KW "out"
-        WHITESPACE " "
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                NUMERIC_KW "numeric"
-      COMMA ","
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                BIGINT_KW "bigint"
-      R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "

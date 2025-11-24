@@ -67,7 +67,7 @@ ArgList =
 | '(' args:(Expr (',' Expr)*)? ')'
 
 CallExpr =
-  Expr ArgList
+  Expr ArgList WithinClause? FilterClause? OverClause?
 
 CastExpr =
   'cast' '(' Expr 'as' Type ')'
@@ -332,8 +332,9 @@ Column =
       NotEnforced? Enforced?
   | Name Type Storage? CompressionMethod? Collate? constraint:ColumnConstraint?
       DeferrableConstraintOption? NotDeferrableConstraintOption?
-      InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption? 
+      InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
       NotEnforced? Enforced?
+  | NameRef
   | IndexExpr
   )
 ColumnConstraint =
@@ -482,8 +483,8 @@ AlterTableAction =
 | NotOf
 | ForceRls
 | NoForceRls
-| Inherit
-| NoInherit
+| InheritTable
+| NoInheritTable
 | EnableTrigger
 | EnableReplicaTrigger
 | EnableReplicaRule
@@ -630,19 +631,26 @@ TableArgList =
   '(' args:((TableArg (',' TableArg)*)?) ')'
 
 WhenClause =
-  'when' Expr 'then' Expr
+  'when' condition:Expr 'then' then:Expr
 
 ElseClause =
   'else' Expr
 
 UsingClause =
-  'using'
+  'using' (FromItem (',' FromItem)*)
+
+UsingOnClause =
+  'using' FromItem? 'on' Expr
 
 Alias =
-  'as'? ColumnList?
+  'as'? Name ColumnList?
 
 SequenceOptionList =
-  '(' ')'
+  '(' (SequenceOption (',' SequenceOption)*) ')'
+
+SequenceOption =
+  'cycle'
+| 'no' ('minvalue' | 'cycle' | 'maxvalue')
 
 ColumnList =
   '(' (Column (',' Column)*) ')'
@@ -690,10 +698,9 @@ Join =
 JoinExpr =
   (FromItem | JoinExpr) Join
 
-// TODO: do we even want this in the AST?
 ParenSelect =
  '('
-  Select
+  select:SelectVariant
  ')'
 
 Select =
@@ -813,13 +820,23 @@ UsingMethod =
   'using' NameRef
 
 PartitionBy =
-  'partition' 'by'
+  'partition' 'by' (
+      'range' 
+      | '#ident'  // list | hash
+  ) PartitionItemList
 
 CreateTable =
   'create' 'table' IfNotExists? Path PartitionOf? OfType? TableArgList Inherits? PartitionBy? UsingMethod? (WithParams | WithoutOids)? OnCommit? Tablespace?
 
 CreateIndex =
-  'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName
+  'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName 
+  UsingMethod?
+  PartitionItemList
+  ConstraintIncludeClause?
+  (NullsNotDistinct | NullsDistinct)?
+  WithParams?
+  Tablespace?
+  WhereClause?
 
 OrReplace =
   'or' 'replace'
@@ -949,19 +966,58 @@ Table =
   'table' RelationName
 
 Insert =
-  'insert' 'into' RelationName Alias? ColumnList?
+  'insert' 'into' Path Alias? ColumnList?
   ('overriding' ('system' | 'user') 'value')?
   ('default' 'values' | Values | Stmt)
-  ('on' 'conflict')?
+  OnConflictClause?
+  ReturningClause?
+
+OnConflictClause =
+  'on' 'conflict' ConflictTarget? ConflictAction
+
+ConflictTarget =
+  ConflictOnConstraint
+| ConflictOnIndex
+
+ConflictOnIndex =
+  ConflictIndexItemList WhereClause?
+
+ConflictOnConstraint =
+  'on' 'constraint' NameRef
+
+ConflictIndexItemList =
+  '(' (ConflictIndexItem (',' ConflictIndexItem)*) ')'
+
+ConflictIndexItem =
+  Expr Collate? '#ident'?
+
+ConflictAction =
+  ConflictDoNothing
+| ConflictDoUpdateSet
+
+ConflictDoUpdateSet =
+  'do' 'update' SetClause WhereClause?
+
+ConflictDoNothing =
+  'do' 'nothing'
 
 SetClause =
   'set' SetColumnList
 
 SetColumnList =
-  SetColumn (',' SetColumn)
+  (SetColumn (',' SetColumn)*)
 
-SetColumn = 
-  (Column | ColumnList) 
+SetColumn =
+  SetSingleColumn
+| SetMultipleColumns
+
+SetSingleColumn = 
+  Column
+  '='
+  SetExpr
+
+SetMultipleColumns =
+  ColumnList 
   '=' 
   (SetExprList | ParenSelect)
 
@@ -974,7 +1030,11 @@ SetExpr =
 
 Update =
   'update'
+  RelationName
+  Alias?
   SetClause
+  FromClause?
+  WhereClause?
   ReturningClause?
 
 ReturningClause =
@@ -995,15 +1055,15 @@ Notify =
 
 MergeWhenMatched =
   'when' 'matched' 
-  ('and' condition:Expr) 'then' MergeAction
+  ('and' Expr)? 'then' MergeAction
 
 MergeWhenNotMatchedSource =
   'when' 'not' 'matched' 'by' 'source' 
-  ('and' condition:Expr) 'then' MergeAction
+  ('and' Expr)? 'then' MergeAction
 
 MergeWhenNotMatchedTarget =
   'when' 'not' 'matched' ('by' 'target')? 
-  ('and' condition:Expr) 'then' MergeAction
+  ('and' Expr)? 'then' MergeAction
 
 MergeWhenClause =
   MergeWhenMatched
@@ -1014,10 +1074,12 @@ MergeDelete =
  'delete'
 
 MergeUpdate =
-  'update' 'set'
+  'update' 'set' SetClause
 
 MergeInsert =
-  'insert'
+  'insert' ColumnList?
+  ('overriding' ('system' | 'user'))?
+  (Values | 'default' 'values')
 
 MergeDoNothing =
   'do' 'nothing'
@@ -1030,7 +1092,7 @@ MergeAction =
 
 Merge =
   'merge' 'into' RelationName Alias? 
-  UsingClause
+  UsingOnClause
   MergeWhenClause*
 
 Declare =
@@ -1202,8 +1264,13 @@ SelectClause =
   ('all' | DistinctClause)?
   TargetList?
 
+SelectVariant =
+  Select | SelectInto | ParenSelect | Table | Values | CompoundSelect
+
 CompoundSelect =
-  Select
+  lhs:SelectVariant
+  ('union' | 'intersect' | 'except')
+  rhs:SelectVariant
 
 SelectInto =
   SelectClause
@@ -1250,7 +1317,7 @@ SortByList =
   SortBy (',' SortBy)*
 
 FromItem =
-  'only'? NameRef Alias?
+  'only'? (NameRef | FieldExpr) Alias?
 | 'lateral'? ParenSelect Alias?
 | 'lateral'? CallExpr Alias?
 | 'lateral'? 'rows' 'from' '(' CallExpr ')' Alias?
@@ -1542,7 +1609,13 @@ DropGroup =
   'drop' 'group' IfExists? NameRef
 
 DropFunction =
-  'drop' 'function' IfExists?
+  'drop' 'function' IfExists? FunctionSigList
+
+FunctionSigList =
+  (FunctionSig (',' FunctionSig)*)
+
+FunctionSig =
+  Path ParamList?
 
 DropForeignDataWrapper =
   'drop' 'foreign' 'data' 'wrapper' IfExists? NameRef
@@ -1651,6 +1724,23 @@ DropView =
 
 Explain =
   'explain'
+  ExplainStmt
+
+ExplainStmt =
+  Select
+| CompoundSelect
+| SelectInto
+| ParenSelect
+| Table
+| Values
+| Insert
+| Update
+| Delete
+| Merge
+| Execute
+| Declare
+| CreateTableAs
+| CreateMaterializedView
 
 ImportForeignSchema =
   'import' 'foreign' 'schema' NameRef
@@ -1843,11 +1933,18 @@ ForceRls =
 NoForceRls =
   'no' 'force' 'row' 'level' 'security'
 
+
+InheritTable =
+  'inherit' Path
+
+NoInheritTable =
+  'no' 'inherit' Path
+
 Inherit =
-  'inherit'
+  'inherit' Path
 
 NoInherit =
-  'no' 'inherit'
+  'no' 'inherit' Path
 
 EnableTrigger =
   'enable' 'trigger'
@@ -1886,10 +1983,10 @@ DetachPartition =
   'detach' 'partition'
 
 DropColumn =
-  'drop' 'column'? IfExists?
+ 'drop' 'column'? IfExists? NameRef ('restrict' | 'cascade')?
 
 AddColumn =
-  'add' 'column'? IfNotExists? NameRef Type Collate? (Constraint (',' Constraint)*)?
+  'add' 'column'? IfNotExists? Name Type Collate? (Constraint (',' Constraint)*)?
 
 PartitionForValuesWith =
   'for' 'values' 'with' '(' '#ident' Literal ',' '#ident' Literal ')'
@@ -1931,16 +2028,16 @@ SetUnlogged =
   'set' 'unlogged'
 
 SetStorageParams =
-  'set' '(' ')'
+  'set' AttributeList
 
 ResetStorageParams =
-  'reset' '(' ')'
+  'reset' AttributeList
 
 RenameTable =
   'rename' 'to' NameRef
 
 RenameColumn =
-  'rename' 'column'?
+  'rename' 'column'? from:NameRef 'to' to:NameRef
 
 AlterColumnOption =
   DropDefault
@@ -1951,6 +2048,7 @@ AlterColumnOption =
 | AddGenerated
 | ResetOptions
 | SetType
+| SetOptionsList
 | SetGeneratedOptions
 | SetGenerated
 | SetSequenceOption
@@ -1966,7 +2064,7 @@ AlterConstraint =
   'alter' 'constraint' option:AlterColumnOption
 
 AlterColumn =
-  'alter' 'column'? option:AlterColumnOption
+  'alter' 'column'? NameRef option:AlterColumnOption
 
 Restart =
   'restart' 'with'?
@@ -1993,10 +2091,10 @@ SetType =
   'set' 'type' Type Collate?
 
 SetGeneratedOptions =
-  'set'
+  'set' 'generated'
 
 SetOptionsList =
-  'set' '(' ')'
+  'set' 'options' AlterOptionList
 
 SetExpression =
   'set' 'expression' Expr

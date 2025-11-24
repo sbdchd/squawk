@@ -235,77 +235,78 @@ SOURCE_FILE
       SET_KW "SET"
       WHITESPACE " "
       SET_COLUMN_LIST
-        SET_COLUMN
+        SET_SINGLE_COLUMN
           COLUMN
             NAME_REF
               IDENT "embedding"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          CALL_EXPR
-            FIELD_EXPR
-              NAME_REF
-                IDENT "ai"
-              DOT "."
-              NAME_REF
-                IDENT "cohere_embed"
-            ARG_LIST
-              L_PAREN "("
-              WHITESPACE "\n    "
-              LITERAL
-                STRING "'embed-english-v3.0'"
-              WHITESPACE "\n    "
-              COMMA ","
-              WHITESPACE " "
-              CALL_EXPR
+          SET_EXPR
+            CALL_EXPR
+              FIELD_EXPR
                 NAME_REF
-                  IDENT "CONCAT_WS"
-                ARG_LIST
-                  L_PAREN "("
-                  LITERAL
-                    STRING "'. '"
-                  COMMA ","
-                  WHITESPACE "\n        "
+                  IDENT "ai"
+                DOT "."
+                NAME_REF
+                  IDENT "cohere_embed"
+              ARG_LIST
+                L_PAREN "("
+                WHITESPACE "\n    "
+                LITERAL
+                  STRING "'embed-english-v3.0'"
+                WHITESPACE "\n    "
+                COMMA ","
+                WHITESPACE " "
+                CALL_EXPR
                   NAME_REF
-                    IDENT "title"
-                  COMMA ","
-                  WHITESPACE "\n        "
-                  CALL_EXPR
+                    IDENT "CONCAT_WS"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'. '"
+                    COMMA ","
+                    WHITESPACE "\n        "
                     NAME_REF
-                      COALESCE_KW "COALESCE"
-                    ARG_LIST
-                      L_PAREN "("
+                      IDENT "title"
+                    COMMA ","
+                    WHITESPACE "\n        "
+                    CALL_EXPR
                       NAME_REF
-                        IDENT "overview"
-                      COMMA ","
-                      WHITESPACE " "
-                      LITERAL
-                        STRING "''"
-                      R_PAREN ")"
-                  WHITESPACE "\n    "
-                  R_PAREN ")"
-              WHITESPACE "\n    "
-              COMMA ","
-              WHITESPACE " "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "input_type"
-                FAT_ARROW "=>"
-                LITERAL
-                  STRING "'search_document'"
-              WHITESPACE "\n    "
-              COMMENT "-- , api_key=>%s"
-              WHITESPACE "\n    "
-              COMMA ","
-              WHITESPACE " "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "api_key"
-                FAT_ARROW "=>"
-                LITERAL
-                  POSITIONAL_PARAM "$1"
-              WHITESPACE "\n"
-              R_PAREN ")"
+                        COALESCE_KW "COALESCE"
+                      ARG_LIST
+                        L_PAREN "("
+                        NAME_REF
+                          IDENT "overview"
+                        COMMA ","
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "''"
+                        R_PAREN ")"
+                    WHITESPACE "\n    "
+                    R_PAREN ")"
+                WHITESPACE "\n    "
+                COMMA ","
+                WHITESPACE " "
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "input_type"
+                  FAT_ARROW "=>"
+                  LITERAL
+                    STRING "'search_document'"
+                WHITESPACE "\n    "
+                COMMENT "-- , api_key=>%s"
+                WHITESPACE "\n    "
+                COMMA ","
+                WHITESPACE " "
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "api_key"
+                  FAT_ARROW "=>"
+                  LITERAL
+                    POSITIONAL_PARAM "$1"
+                WHITESPACE "\n"
+                R_PAREN ")"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -2056,7 +2057,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "COLUMN"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "vec"
       WHITESPACE " "
       PATH_TYPE
@@ -2081,50 +2082,51 @@ SOURCE_FILE
       SET_KW "SET"
       WHITESPACE " "
       SET_COLUMN_LIST
-        SET_COLUMN
+        SET_SINGLE_COLUMN
           COLUMN
             NAME_REF
               IDENT "vec"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          CAST_EXPR
-            CALL_EXPR
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "openai"
-                DOT "."
-                NAME_REF
-                  IDENT "vector"
-              ARG_LIST
-                L_PAREN "("
-                BIN_EXPR
+          SET_EXPR
+            CAST_EXPR
+              CALL_EXPR
+                FIELD_EXPR
                   NAME_REF
-                    IDENT "title"
-                  WHITESPACE " "
-                  CUSTOM_OP
-                    PIPE "|"
-                    PIPE "|"
-                  WHITESPACE " "
+                    IDENT "openai"
+                  DOT "."
+                  NAME_REF
+                    IDENT "vector"
+                ARG_LIST
+                  L_PAREN "("
                   BIN_EXPR
-                    LITERAL
-                      STRING "' -- '"
+                    NAME_REF
+                      IDENT "title"
                     WHITESPACE " "
                     CUSTOM_OP
                       PIPE "|"
                       PIPE "|"
                     WHITESPACE " "
+                    BIN_EXPR
+                      LITERAL
+                        STRING "' -- '"
+                      WHITESPACE " "
+                      CUSTOM_OP
+                        PIPE "|"
+                        PIPE "|"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "plot"
+                  R_PAREN ")"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
                     NAME_REF
-                      IDENT "plot"
-                R_PAREN ")"
-            COLON_COLON
-              COLON ":"
-              COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    IDENT "vector"
+                      IDENT "vector"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2402,10 +2404,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "events"
     WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "brin"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -2678,10 +2681,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "events_json"
     WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "brin"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -2791,10 +2795,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "events"
     WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "brin"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -5776,10 +5781,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "event_logs"
     WHITESPACE "\n"
-    USING_KW "USING"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "brin"
+    USING_METHOD
+      USING_KW "USING"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "brin"
     PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM

@@ -98,10 +98,11 @@ SOURCE_FILE
     LITERAL
       INT_NUMBER "1"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
     COMMA ","
     WHITESPACE "\n  "
     FUNCTION_KW "function"
@@ -117,25 +118,26 @@ SOURCE_FILE
             IDENT "t"
     R_PAREN ")"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
-        WHITESPACE " "
-        NAME
-          IDENT "a"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
-      R_PAREN ")"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+        R_PAREN ")"
     COMMA ","
     WHITESPACE "\n  "
     FUNCTION_KW "function"
@@ -161,10 +163,11 @@ SOURCE_FILE
         R_PAREN ")"
     R_PAREN ")"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_search"
@@ -296,19 +299,20 @@ SOURCE_FILE
     LITERAL
       INT_NUMBER "1"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
-      R_PAREN ")"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func_with_params"
@@ -352,27 +356,28 @@ SOURCE_FILE
             IDENT "u"
     R_PAREN ")"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "b"
-      R_PAREN ")"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "b"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_op"

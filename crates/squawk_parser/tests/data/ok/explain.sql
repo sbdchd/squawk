@@ -80,3 +80,48 @@ EXPLAIN (COSTS 1) SELECT * FROM foo WHERE i = 4;
 
 -- boolean 0
 EXPLAIN (COSTS 0) SELECT * FROM foo WHERE i = 4;
+
+-- compound select
+explain select 1 union select 2;
+
+-- select into
+explain select a, b, c into t from t2;
+
+-- paren select
+explain (select 1);
+
+-- table
+explain table t;
+
+-- values
+explain values (1), (2);
+
+-- insert
+explain insert into t values (1, 2), (3, 4);
+
+-- update
+explain update t set a = 1 where a > 10;
+
+-- delete
+explain delete from t where x > 1;
+
+-- merge
+explain merge into t
+  using u
+    on t.id = u.id
+  when matched then 
+    do nothing;
+
+-- execute
+explain execute foo;
+
+-- declare
+explain declare c cursor for select 1;
+
+-- create table as
+explain create table t as
+  select * from u where c >= b;
+
+-- create materialized view
+explain create materialized view t
+  as select 1;

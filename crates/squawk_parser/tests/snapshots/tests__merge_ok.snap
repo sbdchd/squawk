@@ -16,7 +16,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -74,7 +74,7 @@ SOURCE_FILE
       NAME
         IDENT "f"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -132,7 +132,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -190,7 +190,7 @@ SOURCE_FILE
       NAME
         IDENT "f"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -248,7 +248,7 @@ SOURCE_FILE
       WHITESPACE " "
       STAR "*"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -302,7 +302,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -356,7 +356,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -424,7 +424,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -533,7 +533,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -605,7 +605,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM

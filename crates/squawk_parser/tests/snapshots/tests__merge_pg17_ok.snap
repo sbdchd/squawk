@@ -17,7 +17,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -101,7 +101,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -204,7 +204,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -295,7 +295,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -423,7 +423,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -479,7 +479,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -558,7 +558,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -654,7 +654,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -694,69 +694,97 @@ SOURCE_FILE
           SET_KW "set"
           WHITESPACE "\n      "
           SET_COLUMN_LIST
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "a"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              DEFAULT_KW "default"
+              SET_EXPR
+                DEFAULT_KW "default"
             COMMA ","
             WHITESPACE "\n      "
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "b"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
+              SET_EXPR
+                LITERAL
+                  INT_NUMBER "1"
             COMMA ","
             WHITESPACE "\n      "
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "c"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              NAME_REF
-                IDENT "d"
+              SET_EXPR
+                NAME_REF
+                  IDENT "d"
             COMMA ","
             WHITESPACE "\n      "
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "e"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              PAREN_EXPR
-                L_PAREN "("
-                SELECT
-                  SELECT_CLAUSE
-                    SELECT_KW "select"
-                    WHITESPACE " "
-                    TARGET_LIST
-                      TARGET
-                        LITERAL
-                          INT_NUMBER "1"
-                R_PAREN ")"
+              SET_EXPR
+                PAREN_EXPR
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "select"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "1"
+                  R_PAREN ")"
             COMMA ","
             WHITESPACE "\n      "
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "f"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              CALL_EXPR
+              SET_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    ROW_KW "row"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "1"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "2"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      DEFAULT_KW "default"
+                    R_PAREN ")"
+            COMMA ","
+            WHITESPACE "\n      "
+            SET_SINGLE_COLUMN
+              COLUMN
                 NAME_REF
-                  ROW_KW "row"
-                ARG_LIST
+                  IDENT "g"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              SET_EXPR
+                TUPLE_EXPR
                   L_PAREN "("
                   LITERAL
                     INT_NUMBER "1"
@@ -771,40 +799,19 @@ SOURCE_FILE
                   R_PAREN ")"
             COMMA ","
             WHITESPACE "\n      "
-            SET_COLUMN
-              COLUMN
-                NAME_REF
-                  IDENT "g"
-              WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              TUPLE_EXPR
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  DEFAULT_KW "default"
-                R_PAREN ")"
-            COMMA ","
-            WHITESPACE "\n      "
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "h"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              PAREN_EXPR
-                L_PAREN "("
-                LITERAL
-                  DEFAULT_KW "default"
-                R_PAREN ")"
+              SET_EXPR
+                PAREN_EXPR
+                  L_PAREN "("
+                  LITERAL
+                    DEFAULT_KW "default"
+                  R_PAREN ")"
     WHITESPACE "\n  "
     MERGE_WHEN_NOT_MATCHED_SOURCE
       WHEN_KW "when"
@@ -826,15 +833,16 @@ SOURCE_FILE
           SET_KW "set"
           WHITESPACE " "
           SET_COLUMN_LIST
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "foo"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              NAME_REF
-                IDENT "bar"
+              SET_EXPR
+                NAME_REF
+                  IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_delete"
@@ -850,7 +858,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -946,7 +954,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "u"
     WHITESPACE "\n  "
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
       FROM_ITEM
@@ -1002,7 +1010,7 @@ SOURCE_FILE
       NAME
         IDENT "ca"
     WHITESPACE "\n"
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
       FROM_ITEM
@@ -1046,21 +1054,22 @@ SOURCE_FILE
           SET_KW "SET"
           WHITESPACE " "
           SET_COLUMN_LIST
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "balance"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "balance"
-                WHITESPACE " "
-                PLUS "+"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "transaction_value"
+              SET_EXPR
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "balance"
+                  WHITESPACE " "
+                  PLUS "+"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "transaction_value"
     WHITESPACE "\n"
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "WHEN"
@@ -1126,7 +1135,7 @@ SOURCE_FILE
       NAME
         IDENT "ca"
     WHITESPACE "\n"
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
       FROM_ITEM
@@ -1193,21 +1202,22 @@ SOURCE_FILE
           SET_KW "SET"
           WHITESPACE " "
           SET_COLUMN_LIST
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "balance"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "balance"
-                WHITESPACE " "
-                PLUS "+"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "transaction_value"
+              SET_EXPR
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "balance"
+                  WHITESPACE " "
+                  PLUS "+"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "transaction_value"
     WHITESPACE "\n"
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "WHEN"
@@ -1273,7 +1283,7 @@ SOURCE_FILE
       NAME
         IDENT "w"
     WHITESPACE "\n"
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
       FROM_ITEM
@@ -1390,29 +1400,30 @@ SOURCE_FILE
           SET_KW "SET"
           WHITESPACE " "
           SET_COLUMN_LIST
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "stock"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              BIN_EXPR
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "w"
-                  DOT "."
-                  NAME_REF
-                    IDENT "stock"
-                WHITESPACE " "
-                PLUS "+"
-                WHITESPACE " "
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "s"
-                  DOT "."
-                  NAME_REF
-                    IDENT "stock_delta"
+              SET_EXPR
+                BIN_EXPR
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "w"
+                    DOT "."
+                    NAME_REF
+                      IDENT "stock"
+                  WHITESPACE " "
+                  PLUS "+"
+                  WHITESPACE " "
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "s"
+                    DOT "."
+                    NAME_REF
+                      IDENT "stock_delta"
     WHITESPACE "\n"
     MERGE_WHEN_MATCHED
       WHEN_KW "WHEN"
@@ -1462,7 +1473,7 @@ SOURCE_FILE
       NAME
         IDENT "w"
     WHITESPACE "\n"
-    USING_CLAUSE
+    USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
       FROM_ITEM
@@ -1562,19 +1573,20 @@ SOURCE_FILE
           SET_KW "SET"
           WHITESPACE " "
           SET_COLUMN_LIST
-            SET_COLUMN
+            SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
                   IDENT "stock"
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "s"
-                DOT "."
-                NAME_REF
-                  IDENT "stock"
+              SET_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "s"
+                  DOT "."
+                  NAME_REF
+                    IDENT "stock"
     WHITESPACE "\n"
     MERGE_WHEN_NOT_MATCHED_SOURCE
       WHEN_KW "WHEN"

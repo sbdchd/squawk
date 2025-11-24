@@ -106,6 +106,28 @@ impl ast::SliceExpr {
     }
 }
 
+impl ast::RenameColumn {
+    #[inline]
+    pub fn from(&self) -> Option<ast::NameRef> {
+        support::children(&self.syntax).nth(0)
+    }
+    #[inline]
+    pub fn to(&self) -> Option<ast::NameRef> {
+        support::children(&self.syntax).nth(1)
+    }
+}
+
+impl ast::ForeignKeyConstraint {
+    #[inline]
+    pub fn from_columns(&self) -> Option<ast::ColumnList> {
+        support::children(&self.syntax).nth(0)
+    }
+    #[inline]
+    pub fn to_columns(&self) -> Option<ast::ColumnList> {
+        support::children(&self.syntax).nth(1)
+    }
+}
+
 impl ast::BetweenExpr {
     #[inline]
     pub fn target(&self) -> Option<ast::Expr> {
@@ -118,6 +140,28 @@ impl ast::BetweenExpr {
     #[inline]
     pub fn end(&self) -> Option<ast::Expr> {
         support::children(&self.syntax).nth(2)
+    }
+}
+
+impl ast::WhenClause {
+    #[inline]
+    pub fn condition(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).next()
+    }
+    #[inline]
+    pub fn then(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(1)
+    }
+}
+
+impl ast::CompoundSelect {
+    #[inline]
+    pub fn lhs(&self) -> Option<ast::SelectVariant> {
+        support::children(&self.syntax).next()
+    }
+    #[inline]
+    pub fn rhs(&self) -> Option<ast::SelectVariant> {
+        support::children(&self.syntax).nth(1)
     }
 }
 

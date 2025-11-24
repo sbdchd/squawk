@@ -28,7 +28,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "t"
           WHITESPACE "\n    "
-          USING_CLAUSE
+          USING_ON_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             FROM_ITEM
@@ -1421,15 +1421,16 @@ SOURCE_FILE
       SET_KW "SET"
       WHITESPACE " "
       SET_COLUMN_LIST
-        SET_COLUMN
+        SET_SINGLE_COLUMN
           COLUMN
             NAME_REF
               IDENT "dismissed_at"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          NAME_REF
-            CURRENT_TIMESTAMP_KW "current_timestamp"
+          SET_EXPR
+            NAME_REF
+              CURRENT_TIMESTAMP_KW "current_timestamp"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"

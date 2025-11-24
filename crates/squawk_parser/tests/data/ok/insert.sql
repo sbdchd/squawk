@@ -69,6 +69,9 @@ INSERT INTO distributors (did, dname)
 INSERT INTO distributors (did, dname) VALUES (7, 'Redline GmbH')
     ON CONFLICT (did) DO NOTHING;
 
+insert into t (a, b, c) values (1, 2, 3)
+    on conflict (a, b) do nothing;
+
 -- Don't update existing distributors based in a certain ZIP code
 INSERT INTO distributors AS d (did, dname) VALUES (8, 'Anvil Distribution')
     ON CONFLICT (did) DO UPDATE

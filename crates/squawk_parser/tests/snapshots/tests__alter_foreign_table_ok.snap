@@ -174,7 +174,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "c"
       WHITESPACE " "
       PATH_TYPE
@@ -200,7 +200,7 @@ SOURCE_FILE
     ADD_COLUMN
       ADD_KW "add"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "c"
       WHITESPACE " "
       PATH_TYPE
@@ -339,7 +339,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_TYPE
         TYPE_KW "type"
@@ -369,7 +370,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_TYPE
         SET_KW "set"
@@ -413,7 +415,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_DEFAULT
         SET_KW "set"
@@ -446,7 +449,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_DEFAULT
         SET_KW "set"
@@ -483,7 +487,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       DROP_DEFAULT
         DROP_KW "drop"
@@ -507,7 +512,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       DROP_DEFAULT
         DROP_KW "drop"
@@ -535,7 +541,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       DROP_NOT_NULL
         DROP_KW "drop"
@@ -561,7 +568,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_NOT_NULL
         SET_KW "set"
@@ -591,7 +599,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
         SET_KW "set"
@@ -618,7 +627,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
         SET_KW "set"
@@ -649,7 +659,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_OPTIONS
         SET_KW "set"
@@ -688,7 +699,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_OPTIONS
         SET_KW "set"
@@ -731,7 +743,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       RESET_OPTIONS
         RESET_KW "reset"
@@ -765,7 +778,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       RESET_OPTIONS
         RESET_KW "reset"
@@ -798,7 +812,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -824,7 +839,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -850,7 +866,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -876,7 +893,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -902,7 +920,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -932,7 +951,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_OPTIONS_LIST
         ALTER_OPTION_LIST
@@ -990,7 +1010,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_OPTIONS_LIST
         ALTER_OPTION_LIST
@@ -1321,7 +1342,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    INHERIT
+    INHERIT_TABLE
       INHERIT_KW "inherit"
       WHITESPACE " "
       PATH
@@ -1348,7 +1369,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    INHERIT
+    INHERIT_TABLE
       INHERIT_KW "inherit"
       WHITESPACE " "
       PATH
@@ -1377,7 +1398,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    NO_INHERIT
+    NO_INHERIT_TABLE
       NO_KW "no"
       WHITESPACE " "
       INHERIT_KW "inherit"
@@ -1406,7 +1427,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    NO_INHERIT
+    NO_INHERIT_TABLE
       NO_KW "no"
       WHITESPACE " "
       INHERIT_KW "inherit"
@@ -1486,7 +1507,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "c"
       WHITESPACE " "
       PATH_TYPE
@@ -1512,7 +1533,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "e"
+      NAME_REF
+        IDENT "e"
       WHITESPACE " "
       SET_NOT_NULL
         SET_KW "set"

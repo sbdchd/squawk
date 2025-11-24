@@ -10,8 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION
@@ -25,8 +28,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     RENAME_KW "rename"
     WHITESPACE " "
@@ -43,8 +49,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     OWNER_KW "owner"
     WHITESPACE " "
@@ -60,8 +69,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     SET_KW "set"
     WHITESPACE " "
@@ -78,8 +90,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     DEPENDS_KW "depends"
     WHITESPACE " "
@@ -98,8 +113,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     NO_KW "no"
     WHITESPACE " "
@@ -122,8 +140,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     NO_KW "no"
     WHITESPACE " "
@@ -146,37 +167,40 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "f"
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+        COMMA ","
         WHITESPACE " "
-        NAME
-          IDENT "a"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
-      COMMA ","
-      WHITESPACE " "
-      PARAM
-        PARAM_OUT
-          OUT_KW "out"
-        WHITESPACE " "
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                INT_KW "int"
-      R_PAREN ")"
+        PARAM
+          PARAM_OUT
+            OUT_KW "out"
+          WHITESPACE " "
+          NAME
+            IDENT "b"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       PARALLEL_FUNC_OPTION
@@ -192,8 +216,11 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    FUNCTION_SIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION

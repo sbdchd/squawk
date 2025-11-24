@@ -37,71 +37,81 @@ SOURCE_FILE
         NAME
           IDENT "s"
     WHITESPACE "\n "
-    AS_KW "as"
-    WHITESPACE " "
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      ARG_LIST
-        L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "100"
-        R_PAREN ")"
+    SEQUENCE_OPTION
+      AS_KW "as"
+      WHITESPACE " "
+      CHAR_TYPE
+        VARCHAR_KW "varchar"
+        ARG_LIST
+          L_PAREN "("
+          ARG
+            LITERAL
+              INT_NUMBER "100"
+          R_PAREN ")"
     WHITESPACE "\n "
-    INCREMENT_KW "increment"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    SEQUENCE_OPTION
+      INCREMENT_KW "increment"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
     WHITESPACE "\n "
-    MINVALUE_KW "minvalue"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
+    SEQUENCE_OPTION
+      MINVALUE_KW "minvalue"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
     WHITESPACE "\n "
-    NO_KW "no"
-    WHITESPACE " "
-    MINVALUE_KW "minvalue"
+    SEQUENCE_OPTION
+      NO_KW "no"
+      WHITESPACE " "
+      MINVALUE_KW "minvalue"
     WHITESPACE "\n "
-    MAXVALUE_KW "maxvalue"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
+    SEQUENCE_OPTION
+      MAXVALUE_KW "maxvalue"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "100"
     WHITESPACE "\n "
-    NO_KW "no"
-    WHITESPACE " "
-    MAXVALUE_KW "maxvalue"
+    SEQUENCE_OPTION
+      NO_KW "no"
+      WHITESPACE " "
+      MAXVALUE_KW "maxvalue"
     WHITESPACE "\n "
-    START_KW "start"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    SEQUENCE_OPTION
+      START_KW "start"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
     WHITESPACE "\n "
-    CACHE_KW "cache"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    SEQUENCE_OPTION
+      CACHE_KW "cache"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
     WHITESPACE "\n "
-    NO_KW "no"
-    WHITESPACE " "
-    CYCLE_KW "cycle"
+    SEQUENCE_OPTION
+      NO_KW "no"
+      WHITESPACE " "
+      CYCLE_KW "cycle"
     WHITESPACE "\n "
-    OWNED_KW "owned"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    PATH
+    SEQUENCE_OPTION
+      OWNED_KW "owned"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unlogged"
