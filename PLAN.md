@@ -47,11 +47,15 @@ support SQL embedded in other languages
 
 parse and warn, helps with copy pasting examples
 
+https://www.enterprisedb.com/blog/psqls-scripting-language-turing-complete-or-fibonacci-psql
+
 ### Other Dialects
 
 support Trino, BigQuery, Aurora DSLQ, etc.
 
-### Check `format()` calls
+### Validations
+
+#### Check `format()` calls
 
 https://www.postgresql.org/docs/18/functions-string.html#FUNCTIONS-STRING-FORMAT
 
@@ -61,6 +65,47 @@ SELECT format('Hello %s', 'World');
 
 SELECT format('Hello %s %s', 'World');
 -- error                ^^
+```
+
+#### Warn about invalid column notation
+
+```sql
+with t as (select 1 as data)
+select (data).id from t;
+```
+
+postgres says:
+
+```
+Query 1 ERROR at Line 40: : ERROR:  column notation .id applied to type integer, which is not a composite type
+LINE 2: select (data).id from t;
+                ^
+```
+
+#### Warn about invalid missing column notation
+
+```sql
+create type f as (
+  id integer,
+  name text
+);
+with t as (select (1, 'a')::f as data)
+select data.id from t;
+```
+
+postgres says:
+
+```
+Query 1 ERROR at Line 41: : ERROR:  missing FROM-clause entry for table "data"
+LINE 2: select data.id from t;
+               ^
+```
+
+we should suggest an autofix to:
+
+```sql
+with t as (select (1, 'a')::f as data)
+select (data).id from t;
 ```
 
 ### Formatter
@@ -136,6 +181,10 @@ sql for benchmarks maybe?
 - doomql
 
   https://github.com/cedardb/DOOMQL
+
+- rrule_plpgsql
+
+  https://github.com/sirrodgepodge/rrule_plpgsql
 
 ### CLI
 
@@ -589,7 +638,7 @@ via: https://www.postgresql.org/docs/17/sql-createview.html
 
 https://www.postgresql.org/docs/17/sql-dropgroup.html
 
-### Rule: `create table as` to `select into`
+### Rule: `select into` to `create table as`
 
 ```sql
 SELECT * INTO films_recent FROM films WHERE date_prod >= '2002-01-01';

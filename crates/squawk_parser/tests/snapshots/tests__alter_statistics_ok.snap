@@ -15,11 +15,14 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_STATISTICS
@@ -37,11 +40,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -56,12 +61,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "n"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
@@ -76,12 +82,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "n"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- statistics_value"

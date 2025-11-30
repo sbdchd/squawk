@@ -3491,7 +3491,8 @@ SOURCE_FILE
           SORT_USING
             USING_KW "using"
             WHITESPACE " "
-            R_ANGLE ">"
+            OP
+              R_ANGLE ">"
           WHITESPACE " "
           NULLS_LAST
             NULLS_KW "nulls"
@@ -5947,10 +5948,11 @@ SOURCE_FILE
           SORT_USING
             USING_KW "using"
             WHITESPACE " "
-            CUSTOM_OP
-              R_ANGLE ">"
-              R_ANGLE ">"
-              R_ANGLE ">"
+            OP
+              CUSTOM_OP
+                R_ANGLE ">"
+                R_ANGLE ">"
+                R_ANGLE ">"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order_by_regression"

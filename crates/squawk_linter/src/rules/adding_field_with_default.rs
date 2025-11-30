@@ -23,10 +23,10 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
         ast::Expr::Literal(_) => true,
         ast::Expr::ArrayExpr(_) => true,
         ast::Expr::BinExpr(bin_expr) => {
-            if let Some(lhs) = bin_expr.lhs() {
-                if let Some(rhs) = bin_expr.rhs() {
-                    return is_non_volatile_or_const(&lhs) && is_non_volatile_or_const(&rhs);
-                }
+            if let Some(lhs) = bin_expr.lhs()
+                && let Some(rhs) = bin_expr.rhs()
+            {
+                return is_non_volatile_or_const(&lhs) && is_non_volatile_or_const(&rhs);
             }
             false
         }

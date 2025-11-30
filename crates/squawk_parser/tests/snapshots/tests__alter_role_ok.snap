@@ -10,7 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
     ROLE_OPTION_LIST
       WITH_KW "with"
@@ -26,7 +28,9 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE "\n  "
     ROLE_OPTION_LIST
       WITH_KW "with"
@@ -119,14 +123,17 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "newname"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "newname"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_config"
@@ -136,19 +143,22 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "param"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'value'"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "param"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        STRING "'value'"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_ROLE
@@ -156,19 +166,22 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "param"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    LITERAL
-      STRING "'value'"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "param"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      LITERAL
+        STRING "'value'"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_ROLE
@@ -176,18 +189,21 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "param"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    DEFAULT_KW "default"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "param"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_config_from_current"
@@ -197,18 +213,21 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "param"
-    WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    CURRENT_KW "current"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "param"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      CURRENT_KW "current"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_config"
@@ -218,7 +237,9 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
     RESET_KW "reset"
     WHITESPACE " "
@@ -235,7 +256,9 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
     RESET_KW "reset"
     WHITESPACE " "
@@ -249,7 +272,9 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
+    ROLE
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -258,17 +283,18 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "param"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    LITERAL
-      STRING "'value'"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "param"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      LITERAL
+        STRING "'value'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using_current_user"
@@ -278,7 +304,8 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE
+      CURRENT_USER_KW "current_user"
     WHITESPACE " "
     ROLE_OPTION_LIST
       WITH_KW "with"

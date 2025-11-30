@@ -21,12 +21,13 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE "\n  "
-    HANDLER_KW "handler"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "f"
+    HANDLER_CLAUSE
+      HANDLER_KW "handler"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -47,16 +48,17 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE "\n  "
-    HANDLER_KW "handler"
-    WHITESPACE " "
-    PATH
+    HANDLER_CLAUSE
+      HANDLER_KW "handler"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        DOT "."
         PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "f"
+          NAME
+            IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n\n"

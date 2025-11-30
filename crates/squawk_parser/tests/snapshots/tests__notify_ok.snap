@@ -8,14 +8,14 @@ SOURCE_FILE
   NOTIFY
     NOTIFY_KW "NOTIFY"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
   NOTIFY
     NOTIFY_KW "NOTIFY"
     WHITESPACE " "
-    NAME
+    NAME_REF
       VIRTUAL_KW "virtual"
     COMMA ","
     WHITESPACE " "

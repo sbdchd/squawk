@@ -32,13 +32,13 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "foo"
     COMMA ","
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "bar"
     COMMA ","
     WHITESPACE " "
@@ -49,7 +49,7 @@ SOURCE_FILE
             IDENT "a"
       DOT "."
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "b"
     WHITESPACE " "
     IMMEDIATE_KW "immediate"
@@ -62,7 +62,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "bar"
     WHITESPACE " "
     IMMEDIATE_KW "immediate"

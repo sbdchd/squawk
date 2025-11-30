@@ -64,8 +64,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
+          ATTRIBUTE_VALUE
+            LITERAL
+              FALSE_KW "false"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -74,8 +75,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          ATTRIBUTE_VALUE
+            LITERAL
+              TRUE_KW "true"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -84,8 +86,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
+          ATTRIBUTE_VALUE
+            LITERAL
+              FALSE_KW "false"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -94,8 +97,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            STRING "'bar'"
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'bar'"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -104,8 +108,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          ATTRIBUTE_VALUE
+            LITERAL
+              TRUE_KW "true"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -114,8 +119,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          ATTRIBUTE_VALUE
+            LITERAL
+              TRUE_KW "true"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -124,8 +130,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            OFF_KW "off"
+          ATTRIBUTE_VALUE
+            LITERAL
+              OFF_KW "off"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -134,8 +141,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
+          ATTRIBUTE_VALUE
+            LITERAL
+              FALSE_KW "false"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -144,8 +152,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          ATTRIBUTE_VALUE
+            LITERAL
+              TRUE_KW "true"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -154,8 +163,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
+          ATTRIBUTE_VALUE
+            LITERAL
+              FALSE_KW "false"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -164,8 +174,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          ATTRIBUTE_VALUE
+            LITERAL
+              TRUE_KW "true"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -174,8 +185,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            STRING "'foo'"
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'foo'"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -184,8 +196,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
+          ATTRIBUTE_VALUE
+            LITERAL
+              FALSE_KW "false"
         WHITESPACE "\n  "
         R_PAREN ")"
   SEMICOLON ";"

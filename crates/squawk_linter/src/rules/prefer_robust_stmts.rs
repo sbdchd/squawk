@@ -91,15 +91,13 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         }
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
                             let constraint = add_constraint.constraint();
-                            if let Some(constraint_name) = constraint.and_then(|x| x.name()) {
-                                let name_text = constraint_name.text();
-                                let name = Identifier::new(name_text.as_str());
-                                if let Some(constraint) = constraint_names.get_mut(&name) {
-                                    if *constraint == Constraint::Dropped {
-                                        *constraint = Constraint::Added;
-                                        continue;
-                                    }
-                                }
+                            if let Some(constraint_name) = constraint.and_then(|x| x.name())
+                                && let Some(constraint) = constraint_names
+                                    .get_mut(&Identifier::new(constraint_name.text().as_str()))
+                                && *constraint == Constraint::Dropped
+                            {
+                                *constraint = Constraint::Added;
+                                continue;
                             }
                             (ActionErrorMessage::None, None)
                         }

@@ -15,9 +15,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
     WHITESPACE "\n  "
-    REFRESH_KW "refresh"
-    WHITESPACE " "
-    VERSION_KW "version"
+    REFRESH_VERSION
+      REFRESH_KW "refresh"
+      WHITESPACE " "
+      VERSION_KW "version"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -32,12 +33,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "d"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "d"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -52,11 +54,14 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_COLLATION
@@ -74,11 +79,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_ROLE_KW "current_role"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
@@ -93,11 +100,12 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
     WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"

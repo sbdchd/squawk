@@ -17,12 +17,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -47,12 +48,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"
@@ -69,15 +71,16 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -102,17 +105,18 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " \n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    COLUMN_KW "column"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
@@ -129,12 +133,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -154,12 +159,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends_extension"
@@ -176,14 +182,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    DEPENDS_ON_EXTENSION
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -198,16 +205,17 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    NO_DEPENDS_ON_EXTENSION
+      NO_KW "no"
+      WHITESPACE " "
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"
@@ -256,10 +264,14 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "u"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
     WHITESPACE "\n  "
     SET_KW "set"
     WHITESPACE " "
@@ -392,8 +404,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              FLOAT_NUMBER "1.0"
+            ATTRIBUTE_VALUE
+              LITERAL
+                FLOAT_NUMBER "1.0"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -426,8 +439,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              TRUE_KW "true"
+            ATTRIBUTE_VALUE
+              LITERAL
+                TRUE_KW "true"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
@@ -436,8 +450,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "1"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

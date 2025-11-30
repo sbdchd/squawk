@@ -17,7 +17,8 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    IDENT "e"
+    NAME_REF
+      IDENT "e"
     WHITESPACE "\n  "
     EXECUTE_KW "execute"
     WHITESPACE " "
@@ -45,39 +46,43 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    IDENT "e"
+    NAME_REF
+      IDENT "e"
     WHITESPACE "\n  "
-    WHEN_KW "when"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "x"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'foo'"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'bar'"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'buzz'"
-    R_PAREN ")"
-    WHITESPACE "\n    "
-    AND_KW "and"
-    WHITESPACE " "
-    NAME_REF
-      REAL_KW "real"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'a'"
-    R_PAREN ")"
+    EVENT_TRIGGER_WHEN_CLAUSE
+      WHEN_KW "when"
+      WHITESPACE " "
+      EVENT_TRIGGER_WHEN
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        IN_KW "in"
+        WHITESPACE " "
+        L_PAREN "("
+        LITERAL
+          STRING "'foo'"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'buzz'"
+        R_PAREN ")"
+      WHITESPACE "\n    "
+      AND_KW "and"
+      WHITESPACE " "
+      EVENT_TRIGGER_WHEN
+        NAME_REF
+          REAL_KW "real"
+        WHITESPACE " "
+        IN_KW "in"
+        WHITESPACE " "
+        L_PAREN "("
+        LITERAL
+          STRING "'a'"
+        R_PAREN ")"
     WHITESPACE "\n  "
     EXECUTE_KW "execute"
     WHITESPACE " "
@@ -109,7 +114,8 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    IDENT "ddl_command_start"
+    NAME_REF
+      IDENT "ddl_command_start"
     WHITESPACE "\n   "
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "

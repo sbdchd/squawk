@@ -40,15 +40,14 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
         .path()
         .and_then(|x| x.segment())
         .and_then(|x| x.name_ref())
+        && is_char_type(name_ref.text())
     {
-        if is_char_type(name_ref.text()) {
-            let fix = create_fix(name_ref.syntax().text_range(), path_type.arg_list());
-            ctx.report(Violation::for_node(
-                Rule::BanCharField,
-                "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.".into(),
-                path_type.syntax(),
-            ).fix(Some(fix)));
-        }
+        let fix = create_fix(name_ref.syntax().text_range(), path_type.arg_list());
+        ctx.report(Violation::for_node(
+            Rule::BanCharField,
+            "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.".into(),
+            path_type.syntax(),
+        ).fix(Some(fix)));
     }
 }
 

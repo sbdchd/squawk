@@ -79,11 +79,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_current_role"
@@ -98,11 +101,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_ROLE_KW "current_role"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -117,11 +122,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "u"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"

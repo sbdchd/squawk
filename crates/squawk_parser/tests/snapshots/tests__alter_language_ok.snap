@@ -13,12 +13,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "x"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "y"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "y"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_LANGUAGE
@@ -31,12 +32,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "x"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "y"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "y"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -49,11 +51,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "x"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_LANGUAGE
@@ -66,10 +71,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "x"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -19,12 +19,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "u"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
@@ -48,11 +49,12 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"

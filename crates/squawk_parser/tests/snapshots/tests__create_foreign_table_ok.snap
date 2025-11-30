@@ -106,7 +106,7 @@ SOURCE_FILE
         NOT_NULL_CONSTRAINT
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME_REF
+          NAME
             IDENT "c"
           WHITESPACE "\n    "
           NOT_KW "not"

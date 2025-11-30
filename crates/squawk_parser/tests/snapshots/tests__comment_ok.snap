@@ -178,21 +178,22 @@ SOURCE_FILE
     WHITESPACE " "
     CAST_KW "cast"
     WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "s"
-    WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    R_PAREN ")"
+    CAST_SIG
+      L_PAREN "("
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "s"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+      R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -595,9 +596,10 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    CUSTOM_OP
-      AT "@"
-      R_ANGLE ">"
+    OP
+      CUSTOM_OP
+        AT "@"
+        R_ANGLE ">"
     L_PAREN "("
     PATH_TYPE
       PATH
@@ -626,9 +628,10 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    CUSTOM_OP
-      AT "@"
-      R_ANGLE ">"
+    OP
+      CUSTOM_OP
+        AT "@"
+        R_ANGLE ">"
     L_PAREN "("
     CHAR_TYPE
       VARCHAR_KW "varchar"

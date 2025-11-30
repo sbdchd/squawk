@@ -12,17 +12,25 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    SELECT_KW "select"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -38,10 +46,14 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "r"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
     WHITESPACE "\n  "
     IN_KW "in"
     WHITESPACE " "
@@ -58,17 +70,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "s3"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    SELECT_KW "select"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -82,7 +102,9 @@ SOURCE_FILE
     WHITESPACE " "
     USER_KW "user"
     WHITESPACE " "
-    SESSION_USER_KW "session_user"
+    ROLE_LIST
+      ROLE
+        SESSION_USER_KW "session_user"
     WHITESPACE "\n  "
     IN_KW "in"
     WHITESPACE " "
@@ -91,17 +113,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    SELECT_KW "select"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grant_tables"
@@ -113,19 +143,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    SELECT_KW "select"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -135,19 +173,29 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    INSERT_KW "insert"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                INSERT_KW "insert"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -157,31 +205,44 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    UPDATE_KW "update"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "public"
-    COMMA ","
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    SESSION_USER_KW "session_user"
-    WHITESPACE "\n    "
-    WITH_KW "with"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                UPDATE_KW "update"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "public"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          CURRENT_USER_KW "current_user"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            SESSION_USER_KW "session_user"
+      WHITESPACE "\n    "
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -191,17 +252,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    DELETE_KW "delete"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                DELETE_KW "delete"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -211,17 +282,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    TRUNCATE_KW "truncate"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                TRUNCATE_KW "truncate"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -231,17 +312,25 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    REFERENCES_KW "references"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            REFERENCES_KW "references"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -251,17 +340,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    TRIGGER_KW "trigger"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                TRIGGER_KW "trigger"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -271,17 +370,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    IDENT "maintain"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "maintain"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -291,38 +400,65 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    SELECT_KW "select"
-    COMMA ","
-    WHITESPACE " "
-    INSERT_KW "insert"
-    COMMA ","
-    WHITESPACE " "
-    UPDATE_KW "update"
-    COMMA ","
-    WHITESPACE " "
-    DELETE_KW "delete"
-    COMMA ","
-    WHITESPACE " "
-    TRUNCATE_KW "truncate"
-    COMMA ","
-    WHITESPACE " "
-    REFERENCES_KW "references"
-    COMMA ","
-    WHITESPACE " "
-    TRIGGER_KW "trigger"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "maintain"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                INSERT_KW "insert"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                UPDATE_KW "update"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                DELETE_KW "delete"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                TRUNCATE_KW "truncate"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            REFERENCES_KW "references"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                TRIGGER_KW "trigger"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "maintain"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -332,17 +468,23 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -352,19 +494,25 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    WHITESPACE "\n    "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n    "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+        WHITESPACE " "
+        PRIVILEGES_KW "privileges"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n    "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grant_sequences"
@@ -376,44 +524,64 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    IDENT "usage"
-    COMMA ","
-    WHITESPACE " "
-    SELECT_KW "select"
-    COMMA ","
-    WHITESPACE " "
-    UPDATE_KW "update"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SEQUENCES_KW "sequences"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    SESSION_USER_KW "session_user"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
-    WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "usage"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            SELECT_KW "select"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                UPDATE_KW "update"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SEQUENCES_KW "sequences"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "u"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_USER_KW "current_user"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            SESSION_USER_KW "session_user"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_ROLE_KW "current_role"
+      WHITESPACE "\n  "
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -423,17 +591,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    IDENT "usage"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SEQUENCES_KW "sequences"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "usage"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SEQUENCES_KW "sequences"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grant_functions"
@@ -445,17 +623,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    EXECUTE_KW "execute"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    FUNCTIONS_KW "functions"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                EXECUTE_KW "execute"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        FUNCTIONS_KW "functions"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -465,17 +653,23 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    ROUTINES_KW "routines"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        ROUTINES_KW "routines"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -485,25 +679,31 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    ROUTINES_KW "routines"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
-    WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+        WHITESPACE " "
+        PRIVILEGES_KW "privileges"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        ROUTINES_KW "routines"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+      WHITESPACE "\n  "
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grant_types"
@@ -515,17 +715,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    IDENT "usage"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    TYPES_KW "types"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "usage"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TYPES_KW "types"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -535,33 +745,43 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    TYPES_KW "types"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    IDENT "u"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "public"
-    WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+        WHITESPACE " "
+        PRIVILEGES_KW "privileges"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TYPES_KW "types"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "u"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          NAME_REF
+            IDENT "public"
+      WHITESPACE "\n  "
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grant_schemas"
@@ -573,20 +793,31 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    IDENT "usage"
-    COMMA ","
-    WHITESPACE " "
-    CREATE_KW "create"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SCHEMAS_KW "schemas"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "usage"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            CREATE_KW "create"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SCHEMAS_KW "schemas"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -596,33 +827,43 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SCHEMAS_KW "schemas"
-    WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    IDENT "u"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "public"
-    WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+        WHITESPACE " "
+        PRIVILEGES_KW "privileges"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SCHEMAS_KW "schemas"
+      WHITESPACE "\n  "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "u"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          NAME_REF
+            IDENT "public"
+      WHITESPACE "\n  "
+      WITH_KW "with"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- revoke_tables"
@@ -634,51 +875,80 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE "\n  "
-    SELECT_KW "select"
-    COMMA ","
-    WHITESPACE " "
-    INSERT_KW "insert"
-    COMMA ","
-    WHITESPACE " "
-    UPDATE_KW "update"
-    COMMA ","
-    WHITESPACE " "
-    DELETE_KW "delete"
-    COMMA ","
-    WHITESPACE " "
-    TRUNCATE_KW "truncate"
-    COMMA ","
-    WHITESPACE " "
-    REFERENCES_KW "references"
-    COMMA ","
-    WHITESPACE " "
-    TRIGGER_KW "trigger"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "maintain"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    WHITESPACE "\n  "
-    CASCADE_KW "cascade"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
+      WHITESPACE "\n  "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                INSERT_KW "insert"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                UPDATE_KW "update"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                DELETE_KW "delete"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                TRUNCATE_KW "truncate"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            REFERENCES_KW "references"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                TRIGGER_KW "trigger"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "maintain"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_USER_KW "current_user"
+      WHITESPACE "\n  "
+      CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -688,19 +958,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    SELECT_KW "select"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    WHITESPACE "\n  "
-    RESTRICT_KW "restrict"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TABLES_KW "tables"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+      WHITESPACE "\n  "
+      RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- revoke_sequences"
@@ -712,36 +990,52 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE "\n  "
-    IDENT "usage"
-    COMMA ","
-    WHITESPACE " "
-    SELECT_KW "select"
-    COMMA ","
-    WHITESPACE " "
-    UPDATE_KW "update"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SEQUENCES_KW "sequences"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    WHITESPACE "\n  "
-    CASCADE_KW "cascade"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
+      WHITESPACE "\n  "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "usage"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            SELECT_KW "select"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                UPDATE_KW "update"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SEQUENCES_KW "sequences"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_USER_KW "current_user"
+      WHITESPACE "\n  "
+      CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -751,19 +1045,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    SELECT_KW "select"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SEQUENCES_KW "sequences"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    WHITESPACE "\n  "
-    RESTRICT_KW "restrict"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            SELECT_KW "select"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SEQUENCES_KW "sequences"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+      WHITESPACE "\n  "
+      RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- revoke_functions"
@@ -775,30 +1077,42 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE "\n  "
-    EXECUTE_KW "execute"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    FUNCTIONS_KW "functions"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    WHITESPACE "\n  "
-    CASCADE_KW "cascade"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
+      WHITESPACE "\n  "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                EXECUTE_KW "execute"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        FUNCTIONS_KW "functions"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_USER_KW "current_user"
+      WHITESPACE "\n  "
+      CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -808,21 +1122,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    ROUTINES_KW "routines"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    WHITESPACE "\n  "
-    RESTRICT_KW "restrict"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+        WHITESPACE " "
+        PRIVILEGES_KW "privileges"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        ROUTINES_KW "routines"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+      WHITESPACE "\n  "
+      RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- revoke_types"
@@ -834,30 +1154,42 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE "\n  "
-    IDENT "usage"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    TYPES_KW "types"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    WHITESPACE "\n  "
-    CASCADE_KW "cascade"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
+      WHITESPACE "\n  "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "usage"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TYPES_KW "types"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_USER_KW "current_user"
+      WHITESPACE "\n  "
+      CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -867,21 +1199,27 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    TYPES_KW "types"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    WHITESPACE "\n  "
-    RESTRICT_KW "restrict"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+        WHITESPACE " "
+        PRIVILEGES_KW "privileges"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        TYPES_KW "types"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+      WHITESPACE "\n  "
+      RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- revoke_schemas"
@@ -893,33 +1231,46 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    GRANT_KW "grant"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE "\n  "
-    IDENT "usage"
-    COMMA ","
-    WHITESPACE " "
-    CREATE_KW "create"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SCHEMAS_KW "schemas"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    GROUP_KW "group"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    WHITESPACE "\n  "
-    CASCADE_KW "cascade"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      GRANT_KW "grant"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      FOR_KW "for"
+      WHITESPACE "\n  "
+      PRIVILEGES
+        REVOKE_COMMAND_LIST
+          REVOKE_COMMAND
+            ROLE
+              NAME_REF
+                IDENT "usage"
+          COMMA ","
+          WHITESPACE " "
+          REVOKE_COMMAND
+            CREATE_KW "create"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SCHEMAS_KW "schemas"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          GROUP_KW "group"
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_USER_KW "current_user"
+      WHITESPACE "\n  "
+      CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_DEFAULT_PRIVILEGES
@@ -929,20 +1280,26 @@ SOURCE_FILE
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
-    REVOKE_KW "revoke"
-    WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    WHITESPACE "\n  "
-    ON_KW "on"
-    WHITESPACE " "
-    SCHEMAS_KW "schemas"
-    WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    IDENT "r"
-    WHITESPACE "\n  "
-    RESTRICT_KW "restrict"
+    REVOKE_DEFAULT_PRIVILEGES
+      REVOKE_KW "revoke"
+      WHITESPACE " "
+      PRIVILEGES
+        ALL_KW "all"
+        WHITESPACE " "
+        PRIVILEGES_KW "privileges"
+      WHITESPACE "\n  "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET
+        SCHEMAS_KW "schemas"
+      WHITESPACE "\n  "
+      FROM_KW "from"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "r"
+      WHITESPACE "\n  "
+      RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"

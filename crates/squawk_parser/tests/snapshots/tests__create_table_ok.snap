@@ -673,8 +673,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "1"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "1"
         COMMA ","
         WHITESPACE "\n  "
         ATTRIBUTE_OPTION
@@ -686,8 +687,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
+          ATTRIBUTE_VALUE
+            LITERAL
+              FALSE_KW "false"
         WHITESPACE "\n"
         R_PAREN ")"
   SEMICOLON ";"
@@ -1085,8 +1087,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 EQ "="
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "100"
+                ATTRIBUTE_VALUE
+                  LITERAL
+                    INT_NUMBER "100"
               COMMA ","
               WHITESPACE "\n    "
               ATTRIBUTE_OPTION
@@ -1095,8 +1098,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 EQ "="
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "5"
+                ATTRIBUTE_VALUE
+                  LITERAL
+                    INT_NUMBER "5"
               COMMA ","
               WHITESPACE "\n    "
               ATTRIBUTE_OPTION
@@ -1105,8 +1109,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 EQ "="
                 WHITESPACE " "
-                LITERAL
-                  FALSE_KW "false"
+                ATTRIBUTE_VALUE
+                  LITERAL
+                    FALSE_KW "false"
               COMMA ","
               WHITESPACE "\n    "
               ATTRIBUTE_OPTION
@@ -1115,8 +1120,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 EQ "="
                 WHITESPACE " "
-                LITERAL
-                  FLOAT_NUMBER "10.1"
+                ATTRIBUTE_VALUE
+                  LITERAL
+                    FLOAT_NUMBER "10.1"
               WHITESPACE "\n    "
               COMMENT "-- others omitted"
               WHITESPACE "\n  "
@@ -1530,7 +1536,7 @@ SOURCE_FILE
         NULL_CONSTRAINT
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME_REF
+          NAME
             IDENT "foo"
           WHITESPACE " "
           NULL_KW "null"
@@ -1792,8 +1798,9 @@ SOURCE_FILE
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              LITERAL
-                FALSE_KW "false"
+              ATTRIBUTE_VALUE
+                LITERAL
+                  FALSE_KW "false"
             WHITESPACE " "
             R_PAREN ")"
       WHITESPACE "\n"
@@ -1980,19 +1987,20 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            PATH
+            OP
               PATH
                 PATH
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "f"
+                  DOT "."
                   PATH_SEGMENT
                     NAME_REF
-                      IDENT "f"
+                      IDENT "buzz"
                 DOT "."
                 PATH_SEGMENT
-                  NAME_REF
-                    IDENT "buzz"
-              DOT "."
-              PATH_SEGMENT
-            R_ANGLE ">"
+              R_ANGLE ">"
           WHITESPACE " "
           R_PAREN ")"
         WHITESPACE " "
@@ -2070,14 +2078,15 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            PATH
+            OP
               PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "buzz"
+                DOT "."
                 PATH_SEGMENT
-                  NAME_REF
-                    IDENT "buzz"
-              DOT "."
-              PATH_SEGMENT
-            R_ANGLE ">"
+              R_ANGLE ">"
           COMMA ","
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
@@ -2086,7 +2095,8 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            L_ANGLE "<"
+            OP
+              L_ANGLE "<"
           WHITESPACE " "
           R_PAREN ")"
         WHITESPACE " \n    "
@@ -2176,7 +2186,8 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            R_ANGLE ">"
+            OP
+              R_ANGLE ">"
           WHITESPACE " "
           R_PAREN ")"
         WHITESPACE " \n    "
@@ -2206,8 +2217,9 @@ SOURCE_FILE
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "10"
+              ATTRIBUTE_VALUE
+                LITERAL
+                  INT_NUMBER "10"
             COMMA ","
             WHITESPACE " "
             ATTRIBUTE_OPTION
@@ -2455,8 +2467,9 @@ SOURCE_FILE
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              LITERAL
-                FALSE_KW "false"
+              ATTRIBUTE_VALUE
+                LITERAL
+                  FALSE_KW "false"
             WHITESPACE " "
             R_PAREN ")"
       COMMA ","
@@ -2507,14 +2520,15 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            PATH
+            OP
               PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "buzz"
+                DOT "."
                 PATH_SEGMENT
-                  NAME_REF
-                    IDENT "buzz"
-              DOT "."
-              PATH_SEGMENT
-            R_ANGLE ">"
+              R_ANGLE ">"
           WHITESPACE " "
           R_PAREN ")"
         WHITESPACE " "

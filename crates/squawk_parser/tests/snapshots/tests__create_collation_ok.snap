@@ -93,8 +93,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'foo'"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -103,8 +104,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "1"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -113,8 +115,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        ATTRIBUTE_VALUE
+          LITERAL
+            FALSE_KW "false"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -123,8 +126,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'foo'"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -133,8 +137,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        ATTRIBUTE_VALUE
+          LITERAL
+            FALSE_KW "false"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -143,11 +148,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "r"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "r"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -156,8 +162,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'100'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'100'"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

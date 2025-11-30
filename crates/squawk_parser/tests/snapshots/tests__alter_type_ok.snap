@@ -15,11 +15,14 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -32,11 +35,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -51,12 +56,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "u"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
@@ -71,12 +77,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_attribute"
@@ -295,19 +302,21 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "p"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          STRING "'v'"
-      R_PAREN ")"
+    SET_OPTIONS
+      SET_KW "set"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "p"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'v'"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -320,29 +329,32 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "p"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          STRING "'v'"
-      COMMA ","
+    SET_OPTIONS
+      SET_KW "set"
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "q"
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "p"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'v'"
+        COMMA ","
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          STRING "'w'"
-      R_PAREN ")"
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "q"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'w'"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute"

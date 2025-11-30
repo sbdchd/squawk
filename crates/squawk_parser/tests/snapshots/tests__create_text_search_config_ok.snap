@@ -5,7 +5,7 @@ input_file: crates/squawk_parser/tests/data/ok/create_text_search_config.sql
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_TEXT_SEARCH_PARSER
+  CREATE_TEXT_SEARCH_CONFIGURATION
     CREATE_KW "create"
     WHITESPACE " "
     TEXT_KW "text"
@@ -28,18 +28,19 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "parser_name"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "parser_name"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_TEXT_SEARCH_PARSER
+  CREATE_TEXT_SEARCH_CONFIGURATION
     CREATE_KW "create"
     WHITESPACE " "
     TEXT_KW "text"
@@ -67,11 +68,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "source_config"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "source_config"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

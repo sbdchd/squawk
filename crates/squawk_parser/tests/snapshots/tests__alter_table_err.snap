@@ -157,8 +157,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "1"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -202,8 +203,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "1"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"

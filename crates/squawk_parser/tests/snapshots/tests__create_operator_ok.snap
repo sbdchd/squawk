@@ -10,7 +10,8 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    R_ANGLE ">"
+    OP
+      R_ANGLE ">"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -21,11 +22,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "f"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -37,8 +39,9 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    CUSTOM_OP
-      POUND "#"
+    OP
+      CUSTOM_OP
+        POUND "#"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -49,11 +52,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "p"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "p"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -65,23 +69,24 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    PATH
+    OP
       PATH
         PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
           PATH_SEGMENT
             NAME_REF
-              IDENT "foo"
+              IDENT "bar"
         DOT "."
         PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-      DOT "."
-      PATH_SEGMENT
-    CUSTOM_OP
-      R_ANGLE ">"
-      R_ANGLE ">"
-      MINUS "-"
-      POUND "#"
+      CUSTOM_OP
+        R_ANGLE ">"
+        R_ANGLE ">"
+        MINUS "-"
+        POUND "#"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -92,21 +97,22 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
               PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "foo"
+                DOT "."
                 PATH_SEGMENT
                   NAME_REF
-                    IDENT "foo"
+                    IDENT "bar"
               DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "bar"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "f"
+                  IDENT "f"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -115,14 +121,15 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        CHAR_TYPE
-          VARCHAR_KW "varchar"
-          ARG_LIST
-            L_PAREN "("
-            ARG
-              LITERAL
-                INT_NUMBER "100"
-            R_PAREN ")"
+        ATTRIBUTE_VALUE
+          CHAR_TYPE
+            VARCHAR_KW "varchar"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "100"
+              R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -131,16 +138,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                BIGINT_KW "bigint"
+                  BIGINT_KW "bigint"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -149,11 +157,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        CUSTOM_OP
-          AMP "&"
-          AMP "&"
-          AMP "&"
-          AMP "&"
+        ATTRIBUTE_VALUE
+          CUSTOM_OP
+            AMP "&"
+            AMP "&"
+            AMP "&"
+            AMP "&"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -162,10 +171,11 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        CUSTOM_OP
-          L_ANGLE "<"
-          MINUS "-"
-          R_ANGLE ">"
+        ATTRIBUTE_VALUE
+          CUSTOM_OP
+            L_ANGLE "<"
+            MINUS "-"
+            R_ANGLE ">"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -174,11 +184,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "r"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "r"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -187,11 +198,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "j"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "j"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION

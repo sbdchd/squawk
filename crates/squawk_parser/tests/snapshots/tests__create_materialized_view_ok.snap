@@ -89,8 +89,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "10"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "10"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
@@ -104,8 +105,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          ATTRIBUTE_VALUE
+            LITERAL
+              TRUE_KW "true"
         R_PAREN ")"
     WHITESPACE "\n  "
     TABLESPACE
@@ -135,11 +137,12 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "3"
     WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    DATA_KW "data"
+    WITH_NO_DATA
+      WITH_KW "with"
+      WHITESPACE " "
+      NO_KW "no"
+      WHITESPACE " "
+      DATA_KW "data"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"

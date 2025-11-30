@@ -16,12 +16,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "p"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "q"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "q"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -57,12 +58,13 @@ SOURCE_FILE
                   TEXT_KW "text"
         R_PAREN ")"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "q"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "q"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -78,11 +80,14 @@ SOURCE_FILE
           NAME_REF
             IDENT "p"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -96,11 +101,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "p"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
@@ -116,12 +123,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "p"
     WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- security"
@@ -185,29 +193,31 @@ SOURCE_FILE
         INVOKER_KW "invoker"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "d"
-        WHITESPACE " "
-        FROM_KW "from"
-        WHITESPACE " "
-        CURRENT_KW "current"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "d"
+          WHITESPACE " "
+          FROM_KW "from"
+          WHITESPACE " "
+          CURRENT_KW "current"
       WHITESPACE "\n  "
       RESET_FUNC_OPTION
         RESET_KW "reset"
@@ -240,16 +250,17 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        TO_KW "to"
-        WHITESPACE " "
-        IDENT "v"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          TO_KW "to"
+          WHITESPACE " "
+          IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -265,16 +276,17 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        IDENT "v"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -290,16 +302,17 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        DEFAULT_KW "default"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -315,16 +328,17 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        FROM_KW "from"
-        WHITESPACE " "
-        CURRENT_KW "current"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          FROM_KW "from"
+          WHITESPACE " "
+          CURRENT_KW "current"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_param"

@@ -32,56 +32,62 @@ SOURCE_FILE
     NAME
       IDENT "w"
     WHITESPACE "\n  "
-    HANDLER_KW "handler"
-    WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
-    WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    HANDLER_KW "handler"
-    WHITESPACE "\n  "
-    VALIDATOR_KW "validator"
-    WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
-    WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    VALIDATOR_KW "validator"
-    WHITESPACE "\n  "
-    ALTER_OPTION_LIST
-      OPTIONS_KW "options"
-      WHITESPACE " "
-      L_PAREN "("
-      ALTER_OPTION
-        NAME
-          IDENT "a"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        HANDLER_KW "handler"
         WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
-      COMMA ","
-      WHITESPACE " "
-      ALTER_OPTION
-        NAME
-          IDENT "b"
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        NO_KW "no"
         WHITESPACE " "
-        LITERAL
-          STRING "'bar'"
-      R_PAREN ")"
+        HANDLER_KW "handler"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        VALIDATOR_KW "validator"
+        WHITESPACE " "
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "f"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        NO_KW "no"
+        WHITESPACE " "
+        VALIDATOR_KW "validator"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        ALTER_OPTION_LIST
+          OPTIONS_KW "options"
+          WHITESPACE " "
+          L_PAREN "("
+          ALTER_OPTION
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            LITERAL
+              STRING "'foo'"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            LITERAL
+              STRING "'bar'"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

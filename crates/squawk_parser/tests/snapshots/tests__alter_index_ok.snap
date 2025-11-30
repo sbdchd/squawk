@@ -15,14 +15,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "j"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "j"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -45,14 +44,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "j"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "j"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"
@@ -67,14 +65,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    SET_TABLESPACE
+      SET_KW "set"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -97,14 +96,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    SET_TABLESPACE
+      SET_KW "set"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_params"
@@ -119,14 +119,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "a"
-      R_PAREN ")"
+    SET_OPTIONS
+      SET_KW "set"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "a"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -149,25 +150,28 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "a"
-        EQ "="
-        LITERAL
-          INT_NUMBER "1"
-      COMMA ","
+    SET_OPTIONS
+      SET_KW "set"
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "b"
-        EQ "="
-        LITERAL
-          STRING "'v'"
-      R_PAREN ")"
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "a"
+          EQ "="
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "b"
+          EQ "="
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'v'"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_params"
@@ -182,14 +186,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "a"
-      R_PAREN ")"
+    RESET_OPTIONS
+      RESET_KW "reset"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "a"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -212,19 +217,20 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "a"
-      COMMA ","
+    RESET_OPTIONS
+      RESET_KW "reset"
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "b"
-      R_PAREN ")"
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "b"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- attach"
@@ -239,14 +245,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    ATTACH_KW "attach"
-    WHITESPACE " "
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
+    ATTACH_PARTITION
+      ATTACH_KW "attach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -264,19 +271,20 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    ATTACH_KW "attach"
-    WHITESPACE " "
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    PATH
+    ATTACH_PARTITION
+      ATTACH_KW "attach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
+            IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
@@ -291,18 +299,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "e"
+    NO_DEPENDS_ON_EXTENSION
+      NO_KW "no"
+      WHITESPACE " "
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -320,16 +329,17 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "e"
+    DEPENDS_ON_EXTENSION
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_column"
@@ -344,17 +354,18 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    ALTER_KW "alter"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    STATISTICS_KW "statistics"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
+    ALTER_SET_STATISTICS
+      ALTER_KW "alter"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      SET_KW "set"
+      WHITESPACE " "
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "100"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -377,19 +388,20 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE " "
-    ALTER_KW "alter"
-    WHITESPACE " "
-    COLUMN_KW "column"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    STATISTICS_KW "statistics"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
+    ALTER_SET_STATISTICS
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      SET_KW "set"
+      WHITESPACE " "
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "100"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_tablespace"
@@ -438,10 +450,15 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "s"
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "r"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "s"
     WHITESPACE "\n  "
     SET_KW "set"
     WHITESPACE " "

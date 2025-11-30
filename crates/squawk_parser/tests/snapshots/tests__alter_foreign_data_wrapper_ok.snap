@@ -17,12 +17,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    HANDLER_KW "handler"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "h"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        HANDLER_KW "handler"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "h"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_handler"
@@ -39,9 +41,11 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    HANDLER_KW "handler"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        NO_KW "no"
+        WHITESPACE " "
+        HANDLER_KW "handler"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- validator"
@@ -58,12 +62,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    VALIDATOR_KW "validator"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "v"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        VALIDATOR_KW "validator"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_validator"
@@ -80,9 +86,11 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    VALIDATOR_KW "validator"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        NO_KW "no"
+        WHITESPACE " "
+        VALIDATOR_KW "validator"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
@@ -99,36 +107,38 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    ALTER_OPTION_LIST
-      OPTIONS_KW "options"
-      WHITESPACE " "
-      L_PAREN "("
-      ALTER_OPTION
-        ADD_KW "add"
-        WHITESPACE " "
-        NAME
-          IDENT "o"
-        WHITESPACE " "
-        LITERAL
-          STRING "'v'"
-      COMMA ","
-      WHITESPACE " "
-      ALTER_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        NAME
-          IDENT "o"
-        WHITESPACE " "
-        LITERAL
-          STRING "'v'"
-      COMMA ","
-      WHITESPACE " "
-      ALTER_OPTION
-        DROP_KW "drop"
-        WHITESPACE " "
-        NAME
-          IDENT "o"
-      R_PAREN ")"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        ALTER_OPTION_LIST
+          OPTIONS_KW "options"
+          WHITESPACE " "
+          L_PAREN "("
+          ALTER_OPTION
+            ADD_KW "add"
+            WHITESPACE " "
+            NAME
+              IDENT "o"
+            WHITESPACE " "
+            LITERAL
+              STRING "'v'"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            SET_KW "set"
+            WHITESPACE " "
+            NAME
+              IDENT "o"
+            WHITESPACE " "
+            LITERAL
+              STRING "'v'"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            DROP_KW "drop"
+            WHITESPACE " "
+            NAME
+              IDENT "o"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
@@ -145,68 +155,74 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    HANDLER_KW "handler"
-    WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "h"
-    WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    HANDLER_KW "handler"
-    WHITESPACE "\n  "
-    VALIDATOR_KW "validator"
-    WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "v"
-    WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    VALIDATOR_KW "validator"
-    WHITESPACE "\n  "
-    ALTER_OPTION_LIST
-      OPTIONS_KW "options"
-      WHITESPACE " "
-      L_PAREN "("
-      ALTER_OPTION
-        ADD_KW "add"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        HANDLER_KW "handler"
         WHITESPACE " "
-        NAME
-          IDENT "o"
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "s"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "h"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        NO_KW "no"
         WHITESPACE " "
-        LITERAL
-          STRING "'v'"
-      COMMA ","
-      WHITESPACE " "
-      ALTER_OPTION
-        SET_KW "set"
+        HANDLER_KW "handler"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        VALIDATOR_KW "validator"
         WHITESPACE " "
-        NAME
-          IDENT "o"
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "s"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "v"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        NO_KW "no"
         WHITESPACE " "
-        LITERAL
-          STRING "''"
-      COMMA ","
-      WHITESPACE " "
-      ALTER_OPTION
-        DROP_KW "drop"
-        WHITESPACE " "
-        NAME
-          IDENT "d"
-      R_PAREN ")"
+        VALIDATOR_KW "validator"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        ALTER_OPTION_LIST
+          OPTIONS_KW "options"
+          WHITESPACE " "
+          L_PAREN "("
+          ALTER_OPTION
+            ADD_KW "add"
+            WHITESPACE " "
+            NAME
+              IDENT "o"
+            WHITESPACE " "
+            LITERAL
+              STRING "'v'"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            SET_KW "set"
+            WHITESPACE " "
+            NAME
+              IDENT "o"
+            WHITESPACE " "
+            LITERAL
+              STRING "''"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            DROP_KW "drop"
+            WHITESPACE " "
+            NAME
+              IDENT "d"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -223,11 +239,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -244,11 +263,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -37,10 +37,10 @@ fn validate_create_table(it: ast::CreateTable, acc: &mut Vec<SyntaxError>) {
     for arg in arg_list.args() {
         match arg {
             ast::TableArg::Column(column) => {
-                let Some(col_name) = column.name() else {
-                    continue;
-                };
-                if type_required && column.ty().is_none() {
+                if let Some(col_name) = column.name()
+                    && type_required
+                    && column.ty().is_none()
+                {
                     let end = col_name.syntax().text_range().end();
                     acc.push(SyntaxError::new(
                         "Missing column type",

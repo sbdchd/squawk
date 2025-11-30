@@ -10,7 +10,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "x"
     WHITESPACE " "
     COLUMN_LIST

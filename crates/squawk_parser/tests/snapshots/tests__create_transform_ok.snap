@@ -25,34 +25,36 @@ SOURCE_FILE
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    SQL_KW "sql"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+    TRANSFORM_FROM_FUNC
+      FROM_KW "from"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     COMMA ","
     WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    SQL_KW "sql"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "g"
+    TRANSFORM_TO_FUNC
+      TO_KW "to"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "g"
     WHITESPACE "\n"
     R_PAREN ")"
   SEMICOLON ";"
@@ -95,56 +97,58 @@ SOURCE_FILE
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    SQL_KW "sql"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
+    TRANSFORM_FROM_FUNC
+      FROM_KW "from"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
         PATH
           PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "bar"
-          DOT "."
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          NAME
-            IDENT "a"
-          WHITESPACE " "
-          PATH_TYPE
             PATH
               PATH_SEGMENT
                 NAME_REF
-                  TEXT_KW "text"
-        R_PAREN ")"
+                  IDENT "bar"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "f"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          R_PAREN ")"
     COMMA ","
     WHITESPACE "\n  "
-    TO_KW "to"
-    WHITESPACE " "
-    SQL_KW "sql"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "g"
+    TRANSFORM_TO_FUNC
+      TO_KW "to"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "g"
     WHITESPACE "\n"
     R_PAREN ")"
   SEMICOLON ";"

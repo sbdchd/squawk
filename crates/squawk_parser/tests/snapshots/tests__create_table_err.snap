@@ -584,14 +584,15 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            PATH
+            OP
               PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "buzz"
+                DOT "."
                 PATH_SEGMENT
-                  NAME_REF
-                    IDENT "buzz"
-              DOT "."
-              PATH_SEGMENT
-            R_ANGLE ">"
+              R_ANGLE ">"
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
             NAME_REF
@@ -599,7 +600,8 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            L_ANGLE "<"
+            OP
+              L_ANGLE "<"
           R_PAREN ")"
       WHITESPACE " \n"
       R_PAREN ")"

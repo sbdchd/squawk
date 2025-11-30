@@ -11,34 +11,39 @@ SOURCE_FILE
     NAME
       IDENT "fooplan"
     WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            INT_KW "int"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            TEXT_KW "text"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bool"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            NUMERIC_KW "numeric"
-    R_PAREN ")"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bool"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+      R_PAREN ")"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -82,13 +87,15 @@ SOURCE_FILE
     NAME
       IDENT "usrrptplan"
     WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            INT_KW "int"
-    R_PAREN ")"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "

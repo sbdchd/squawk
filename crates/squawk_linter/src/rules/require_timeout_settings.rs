@@ -59,14 +59,14 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                     if path.qualifier().is_some() {
                         continue;
                     }
-                    if let Some(segment) = path.segment() {
-                        if let Some(name_ref) = segment.name_ref() {
-                            let name_ident = Identifier::new(name_ref.text().as_str());
-                            if name_ident == Identifier::new("lock_timeout") {
-                                lock_timeout = ReportOnce::Present;
-                            } else if name_ident == Identifier::new("statement_timeout") {
-                                stmt_timeout = ReportOnce::Present;
-                            }
+                    if let Some(segment) = path.segment()
+                        && let Some(name_ref) = segment.name_ref()
+                    {
+                        let name_ident = Identifier::new(name_ref.text().as_str());
+                        if name_ident == Identifier::new("lock_timeout") {
+                            lock_timeout = ReportOnce::Present;
+                        } else if name_ident == Identifier::new("statement_timeout") {
+                            stmt_timeout = ReportOnce::Present;
                         }
                     }
                 }

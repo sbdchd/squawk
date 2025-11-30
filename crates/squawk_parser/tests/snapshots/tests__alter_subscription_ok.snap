@@ -75,8 +75,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
+        ATTRIBUTE_VALUE
+          LITERAL
+            TRUE_KW "true"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -136,8 +137,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "1"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -197,8 +199,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "1"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -226,8 +229,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        ATTRIBUTE_VALUE
+          LITERAL
+            FALSE_KW "false"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -267,29 +271,32 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "slot_name"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          STRING "'new_slot'"
-      COMMA ","
+    SET_OPTIONS
+      SET_KW "set"
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "synchronous_commit"
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "slot_name"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'new_slot'"
+        COMMA ","
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          STRING "'off'"
-      R_PAREN ")"
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "synchronous_commit"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'off'"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- skip"
@@ -312,8 +319,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'0/12345678'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'0/12345678'"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -327,11 +335,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -342,11 +353,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -359,11 +372,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "t"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"

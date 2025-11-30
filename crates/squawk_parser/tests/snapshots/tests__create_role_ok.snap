@@ -112,25 +112,38 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_KW "role"
         WHITESPACE " "
-        IDENT "foo"
-        COMMA ","
-        WHITESPACE " "
-        IDENT "bar"
-        COMMA ","
-        WHITESPACE " "
-        IDENT "buzz"
+        ROLE_LIST
+          ROLE
+            NAME_REF
+              IDENT "foo"
+          COMMA ","
+          WHITESPACE " "
+          ROLE
+            NAME_REF
+              IDENT "bar"
+          COMMA ","
+          WHITESPACE " "
+          ROLE
+            NAME_REF
+              IDENT "buzz"
       WHITESPACE "\n   "
       ROLE_OPTION
         IN_KW "in"
         WHITESPACE " "
         GROUP_KW "group"
         WHITESPACE " "
-        IDENT "foo"
+        ROLE_LIST
+          ROLE
+            NAME_REF
+              IDENT "foo"
       WHITESPACE "\n   "
       ROLE_OPTION
         ADMIN_KW "admin"
         WHITESPACE " "
-        IDENT "foo"
+        ROLE_LIST
+          ROLE
+            NAME_REF
+              IDENT "foo"
       WHITESPACE "\n   "
       ROLE_OPTION
         SYSID_KW "sysid"

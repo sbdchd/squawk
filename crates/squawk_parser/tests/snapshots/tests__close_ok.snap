@@ -8,7 +8,7 @@ SOURCE_FILE
   CLOSE
     CLOSE_KW "close"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"

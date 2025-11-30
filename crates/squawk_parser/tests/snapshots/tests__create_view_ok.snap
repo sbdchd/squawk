@@ -455,11 +455,12 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "bar"
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "bar"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
