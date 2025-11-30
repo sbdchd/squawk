@@ -40,12 +40,19 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::COLUMN_LIST,
     SyntaxKind::CONFLICT_INDEX_ITEM_LIST,
     SyntaxKind::CONSTRAINT_EXCLUSION_LIST,
+    SyntaxKind::DROP_OP_CLASS_OPTION_LIST,
+    SyntaxKind::FDW_OPTION_LIST,
     SyntaxKind::FUNCTION_SIG_LIST,
     SyntaxKind::GROUP_BY_LIST,
     SyntaxKind::JSON_TABLE_COLUMN_LIST,
+    SyntaxKind::OPERATOR_CLASS_OPTION_LIST,
     SyntaxKind::OPTION_ITEM_LIST,
+    SyntaxKind::OP_SIG_LIST,
     SyntaxKind::PARAM_LIST,
     SyntaxKind::PARTITION_ITEM_LIST,
+    SyntaxKind::RETURNING_OPTION_LIST,
+    SyntaxKind::REVOKE_COMMAND_LIST,
+    SyntaxKind::ROLE_LIST,
     SyntaxKind::ROW_LIST,
     SyntaxKind::SET_COLUMN_LIST,
     SyntaxKind::SET_EXPR_LIST,
@@ -540,9 +547,11 @@ $0
     #[test]
     fn list_variants() {
         let delimited_ws_list_kinds = &[
+            SyntaxKind::CREATE_DATABASE_OPTION_LIST,
             SyntaxKind::FUNC_OPTION_LIST,
             SyntaxKind::ROLE_OPTION_LIST,
             SyntaxKind::SEQUENCE_OPTION_LIST,
+            SyntaxKind::TRIGGER_EVENT_LIST,
             SyntaxKind::XML_COLUMN_OPTION_LIST,
             SyntaxKind::WHEN_CLAUSE_LIST,
         ];
