@@ -22,20 +22,19 @@ fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
     let range = token.text_range();
     if token.kind() == SyntaxKind::COMMENT {
         let text = token.text();
-        if let Some(trimmed) = text.strip_prefix("--") {
-            if let Some(start) = range.start().checked_add(2.into()) {
-                let end = range.end();
-                let updated_range = TextRange::new(start, end);
-                return Some((trimmed, updated_range));
-            }
+        if let Some(trimmed) = text.strip_prefix("--")
+            && let Some(start) = range.start().checked_add(2.into())
+        {
+            let end = range.end();
+            let updated_range = TextRange::new(start, end);
+            return Some((trimmed, updated_range));
         }
-        if let Some(trimmed) = text.strip_prefix("/*").and_then(|x| x.strip_suffix("*/")) {
-            if let Some(start) = range.start().checked_add(2.into()) {
-                if let Some(end) = range.end().checked_sub(2.into()) {
-                    let updated_range = TextRange::new(start, end);
-                    return Some((trimmed, updated_range));
-                }
-            }
+        if let Some(trimmed) = text.strip_prefix("/*").and_then(|x| x.strip_suffix("*/"))
+            && let Some(start) = range.start().checked_add(2.into())
+            && let Some(end) = range.end().checked_sub(2.into())
+        {
+            let updated_range = TextRange::new(start, end);
+            return Some((trimmed, updated_range));
         }
     }
     None
