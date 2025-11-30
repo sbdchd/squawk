@@ -15,17 +15,19 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    FROM_SERVER
+      FROM_KW "from"
+      WHITESPACE " "
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
     WHITESPACE "\n  "
-    INTO_KW "into"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    INTO_SCHEMA
+      INTO_KW "into"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- except"
@@ -40,28 +42,31 @@ SOURCE_FILE
     NAME_REF
       IDENT "some_schema_name"
     WHITESPACE "\n    "
-    EXCEPT_KW "EXCEPT"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "t1"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t2"
-    R_PAREN ")"
+    EXCEPT_TABLES
+      EXCEPT_KW "EXCEPT"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "t1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t2"
+      R_PAREN ")"
     WHITESPACE "\n    "
-    FROM_KW "FROM"
-    WHITESPACE " "
-    SERVER_KW "SERVER"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "server_name"
+    FROM_SERVER
+      FROM_KW "FROM"
+      WHITESPACE " "
+      SERVER_KW "SERVER"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "server_name"
     WHITESPACE "\n    "
-    INTO_KW "INTO"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "local_schema"
+    INTO_SCHEMA
+      INTO_KW "INTO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "local_schema"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
@@ -76,17 +81,19 @@ SOURCE_FILE
     NAME_REF
       IDENT "a"
     WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    FROM_SERVER
+      FROM_KW "from"
+      WHITESPACE " "
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
     WHITESPACE "\n  "
-    INTO_KW "into"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    INTO_SCHEMA
+      INTO_KW "into"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -113,17 +120,19 @@ SOURCE_FILE
     NAME_REF
       IDENT "a"
     WHITESPACE "\n  "
-    FROM_KW "from"
-    WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    FROM_SERVER
+      FROM_KW "from"
+      WHITESPACE " "
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
     WHITESPACE "\n  "
-    INTO_KW "into"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    INTO_SCHEMA
+      INTO_KW "into"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -158,17 +167,19 @@ SOURCE_FILE
     NAME_REF
       IDENT "foreign_films"
     WHITESPACE "\n    "
-    FROM_KW "FROM"
+    FROM_SERVER
+      FROM_KW "FROM"
+      WHITESPACE " "
+      SERVER_KW "SERVER"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "film_server"
     WHITESPACE " "
-    SERVER_KW "SERVER"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "film_server"
-    WHITESPACE " "
-    INTO_KW "INTO"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "films"
+    INTO_SCHEMA
+      INTO_KW "INTO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "films"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
@@ -183,29 +194,32 @@ SOURCE_FILE
     NAME_REF
       IDENT "foreign_films"
     WHITESPACE " "
-    LIMIT_KW "LIMIT"
-    WHITESPACE " "
-    TO_KW "TO"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "actors"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "directors"
-    R_PAREN ")"
+    LIMIT_TO_TABLES
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "actors"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "directors"
+      R_PAREN ")"
     WHITESPACE "\n    "
-    FROM_KW "FROM"
+    FROM_SERVER
+      FROM_KW "FROM"
+      WHITESPACE " "
+      SERVER_KW "SERVER"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "film_server"
     WHITESPACE " "
-    SERVER_KW "SERVER"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "film_server"
-    WHITESPACE " "
-    INTO_KW "INTO"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "films"
+    INTO_SCHEMA
+      INTO_KW "INTO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "films"
   SEMICOLON ";"
   WHITESPACE "\n\n"

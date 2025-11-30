@@ -8,28 +8,50 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SELECT_KW "select"
-    COMMA ","
-    WHITESPACE " "
-    INSERT_KW "insert"
-    COMMA ","
-    WHITESPACE " "
-    UPDATE_KW "update"
-    COMMA ","
-    WHITESPACE " "
-    DELETE_KW "delete"
-    COMMA ","
-    WHITESPACE " "
-    TRUNCATE_KW "truncate"
-    COMMA ","
-    WHITESPACE " "
-    REFERENCES_KW "references"
-    COMMA ","
-    WHITESPACE " "
-    TRIGGER_KW "trigger"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "maintain"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          SELECT_KW "select"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              INSERT_KW "insert"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              UPDATE_KW "update"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              DELETE_KW "delete"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              TRUNCATE_KW "truncate"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          REFERENCES_KW "references"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              TRIGGER_KW "trigger"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "maintain"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -40,7 +62,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_table"
@@ -54,9 +78,10 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " \n  "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -81,16 +106,21 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    COMMA ","
-    WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     GRANTED_KW "granted"
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    IDENT "public"
+    ROLE
+      NAME_REF
+        IDENT "public"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
   SEMICOLON ";"
@@ -104,9 +134,10 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " \n  "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -124,16 +155,21 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
-    COMMA ","
-    WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     GRANTED_KW "granted"
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    IDENT "public"
+    ROLE
+      NAME_REF
+        IDENT "public"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
   SEMICOLON ";"
@@ -147,9 +183,10 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -160,7 +197,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
@@ -172,9 +211,10 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -201,7 +241,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_all_tables"
@@ -215,9 +257,10 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " \n  "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -238,7 +281,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
+    ROLE_LIST
+      ROLE
+        CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     RESTRICT_KW "restrict"
   SEMICOLON ";"
@@ -248,23 +293,26 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SELECT_KW "select"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "c"
-      R_PAREN ")"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          SELECT_KW "select"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "b"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "c"
+            R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -275,29 +323,36 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    INSERT_KW "insert"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "c"
-      R_PAREN ")"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              INSERT_KW "insert"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "b"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "c"
+            R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -308,29 +363,36 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    UPDATE_KW "update"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "c"
-      R_PAREN ")"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              UPDATE_KW "update"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "b"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "c"
+            R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -341,29 +403,34 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    REFERENCES_KW "references"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "c"
-      R_PAREN ")"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          REFERENCES_KW "references"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "b"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "c"
+            R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -374,21 +441,24 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      R_PAREN ")"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
+      COLUMN_LIST
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "a"
+        R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -399,19 +469,22 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      R_PAREN ")"
+    PRIVILEGES
+      ALL_KW "all"
+      COLUMN_LIST
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "a"
+        R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -422,7 +495,9 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
@@ -430,7 +505,10 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SELECT_KW "select"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          SELECT_KW "select"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -443,13 +521,20 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    IDENT "usage"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "usage"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -474,13 +559,20 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    UPDATE_KW "update"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              UPDATE_KW "update"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -493,13 +585,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -516,15 +611,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -549,7 +647,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- database"
@@ -563,7 +663,10 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    CREATE_KW "create"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          CREATE_KW "create"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -582,22 +685,36 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    CREATE_KW "create"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "connect"
-    COMMA ","
-    WHITESPACE " "
-    TEMPORARY_KW "temporary"
-    COMMA ","
-    WHITESPACE " "
-    TEMP_KW "temp"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          CREATE_KW "create"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "connect"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              TEMPORARY_KW "temporary"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              TEMP_KW "temp"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -608,13 +725,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -625,7 +745,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- domain"
@@ -639,7 +761,12 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    IDENT "usage"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -664,15 +791,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -685,7 +815,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data"
@@ -699,7 +831,12 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    IDENT "usage"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -722,15 +859,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -745,7 +885,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_server"
@@ -759,7 +901,12 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    IDENT "usage"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -780,15 +927,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -801,7 +951,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function"
@@ -815,7 +967,12 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    EXECUTE_KW "execute"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              EXECUTE_KW "execute"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -837,13 +994,20 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    EXECUTE_KW "execute"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              EXECUTE_KW "execute"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -921,13 +1085,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -942,13 +1109,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -973,13 +1143,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -996,13 +1169,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1019,15 +1195,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1086,7 +1265,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- language"
@@ -1094,7 +1275,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    IDENT "usage"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "usage"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1113,13 +1299,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1138,15 +1327,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1165,7 +1357,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
@@ -1173,10 +1367,16 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SELECT_KW "select"
-    COMMA ","
-    WHITESPACE " "
-    UPDATE_KW "update"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          SELECT_KW "select"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              UPDATE_KW "update"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1193,15 +1393,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1218,7 +1421,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- param"
@@ -1226,12 +1431,18 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SET_KW "set"
-    COMMA ","
-    WHITESPACE " "
-    ALTER_KW "alter"
-    WHITESPACE " "
-    SYSTEM_KW "system"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              SET_KW "set"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ALTER_KW "alter"
+          WHITESPACE " "
+          SYSTEM_KW "system"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1256,15 +1467,20 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALTER_KW "alter"
-    WHITESPACE " "
-    SYSTEM_KW "system"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ALTER_KW "alter"
+          WHITESPACE " "
+          SYSTEM_KW "system"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1277,13 +1493,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1296,7 +1515,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge_case"
@@ -1310,33 +1531,59 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " \n  "
-    SET_KW "set"
-    COMMA ","
-    WHITESPACE " "
-    SET_KW "set"
-    COMMA ","
-    WHITESPACE " "
-    SET_KW "set"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              SET_KW "set"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              SET_KW "set"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              SET_KW "set"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE " \n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    SET_KW "set"
-    COMMA ","
-    WHITESPACE " "
-    SET_KW "set"
-    COMMA ","
-    WHITESPACE " "
-    SET_KW "set"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              SET_KW "set"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              SET_KW "set"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              SET_KW "set"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE " \n\n"
   COMMENT "-- schema"
@@ -1344,7 +1591,10 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    CREATE_KW "create"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          CREATE_KW "create"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1355,16 +1605,24 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    CREATE_KW "create"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "usage"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          CREATE_KW "create"
+        COMMA ","
+        WHITESPACE " "
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1383,13 +1641,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1408,7 +1669,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
@@ -1416,7 +1679,10 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    CREATE_KW "create"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          CREATE_KW "create"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1435,13 +1701,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1460,7 +1729,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type_"
@@ -1468,7 +1739,12 @@ SOURCE_FILE
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    IDENT "usage"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1496,13 +1772,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1516,13 +1795,16 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    ALL_KW "all"
+    PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1541,7 +1823,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option"
@@ -1555,11 +1839,18 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE "\n  "
-    IDENT "public"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
@@ -1571,11 +1862,18 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE "\n  "
-    IDENT "public"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
@@ -1587,20 +1885,34 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE "\n  "
-    IDENT "public"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
-    IDENT "public"
+    PRIVILEGES
+      REVOKE_COMMAND_LIST
+        REVOKE_COMMAND
+          ROLE
+            NAME_REF
+              IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"

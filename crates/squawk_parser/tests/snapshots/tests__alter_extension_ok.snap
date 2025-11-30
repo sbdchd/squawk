@@ -57,12 +57,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "e"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_access_method"
@@ -199,21 +200,22 @@ SOURCE_FILE
     WHITESPACE " "
     CAST_KW "cast"
     WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            BIGINT_KW "bigint"
-    WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            TEXT_KW "text"
-    R_PAREN ")"
+    CAST_SIG
+      L_PAREN "("
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BIGINT_KW "bigint"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -228,24 +230,25 @@ SOURCE_FILE
     WHITESPACE " "
     CAST_KW "cast"
     WHITESPACE " "
-    L_PAREN "("
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      ARG_LIST
-        L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "100"
-        R_PAREN ")"
-    WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            SMALLINT_KW "smallint"
-    R_PAREN ")"
+    CAST_SIG
+      L_PAREN "("
+      CHAR_TYPE
+        VARCHAR_KW "varchar"
+        ARG_LIST
+          L_PAREN "("
+          ARG
+            LITERAL
+              INT_NUMBER "100"
+          R_PAREN ")"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              SMALLINT_KW "smallint"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_collation"
@@ -871,9 +874,10 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    CUSTOM_OP
-      L_ANGLE "<"
-      L_ANGLE "<"
+    OP
+      CUSTOM_OP
+        L_ANGLE "<"
+        L_ANGLE "<"
     WHITESPACE " "
     L_PAREN "("
     PATH_TYPE
@@ -906,9 +910,10 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    CUSTOM_OP
-      R_ANGLE ">"
-      R_ANGLE ">"
+    OP
+      CUSTOM_OP
+        R_ANGLE ">"
+        R_ANGLE ">"
     WHITESPACE " "
     L_PAREN "("
     PATH_TYPE

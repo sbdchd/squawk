@@ -276,7 +276,7 @@ SOURCE_FILE
   SAVEPOINT
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
-    NAME_REF
+    NAME
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -10,21 +10,22 @@ SOURCE_FILE
     WHITESPACE " "
     CAST_KW "cast"
     WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
+    CAST_SIG
+      L_PAREN "("
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "u"
+      R_PAREN ")"
     WHITESPACE "\n  "
     WITHOUT_KW "without"
     WHITESPACE " "
@@ -38,21 +39,22 @@ SOURCE_FILE
     WHITESPACE " "
     CAST_KW "cast"
     WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
+    CAST_SIG
+      L_PAREN "("
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "u"
+      R_PAREN ")"
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
@@ -70,31 +72,32 @@ SOURCE_FILE
     WHITESPACE " "
     CAST_KW "cast"
     WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
+    CAST_SIG
+      L_PAREN "("
+      PATH_TYPE
         PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
           PATH_SEGMENT
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
+              IDENT "t"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      PATH_TYPE
         PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+          DOT "."
           PATH_SEGMENT
             NAME_REF
-              IDENT "bar"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
+              IDENT "u"
+      R_PAREN ")"
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "

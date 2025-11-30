@@ -13,12 +13,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -37,17 +38,18 @@ SOURCE_FILE
     NAME_REF
       IDENT "r"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t_name"
+            IDENT "t_name"
     WHITESPACE " "
     CASCADE_KW "cascade"
   SEMICOLON ";"
@@ -65,12 +67,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "r"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
   SEMICOLON ";"

@@ -57,7 +57,7 @@ SOURCE_FILE
     LEVEL_KW "level"
   SEMICOLON ";"
   WHITESPACE "\n"
-  SET_SESSION_AUTH
+  RESET_SESSION_AUTH
     RESET_KW "reset"
     WHITESPACE " "
     SESSION_KW "session"

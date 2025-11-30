@@ -171,7 +171,8 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            PRIMARY_KW "primary"
+            ATTRIBUTE_VALUE
+              PRIMARY_KW "primary"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
@@ -180,7 +181,8 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            DEFAULT_KW "default"
+            ATTRIBUTE_VALUE
+              DEFAULT_KW "default"
           R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
@@ -198,7 +200,8 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            PRIMARY_KW "primary"
+            ATTRIBUTE_VALUE
+              PRIMARY_KW "primary"
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
@@ -302,11 +305,12 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "bar"
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "bar"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
@@ -505,8 +509,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            OFF_KW "off"
+          ATTRIBUTE_VALUE
+            LITERAL
+              OFF_KW "off"
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -635,8 +640,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "70"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "70"
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -680,8 +686,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            OFF_KW "off"
+          ATTRIBUTE_VALUE
+            LITERAL
+              OFF_KW "off"
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

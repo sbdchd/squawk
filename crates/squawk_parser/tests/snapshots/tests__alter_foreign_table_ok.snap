@@ -18,12 +18,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "u"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only_and_asterisk"
@@ -43,12 +44,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "u"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -66,12 +68,13 @@ SOURCE_FILE
       WHITESPACE " "
       STAR "*"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "u"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"
@@ -89,17 +92,18 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    COLUMN_KW "column"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "d"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "d"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -115,15 +119,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "d"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "d"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
@@ -146,12 +151,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_add_column"
@@ -678,8 +684,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "1"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -718,8 +725,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "1"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1463,7 +1471,9 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      IDENT "u"
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -1484,7 +1494,8 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      CURRENT_USER_KW "current_user"
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
@@ -1569,6 +1580,8 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      IDENT "u"
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"

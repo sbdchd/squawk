@@ -13,17 +13,21 @@ SOURCE_FILE
     NAME_REF
       IDENT "p"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "q"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "q"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_role"
@@ -36,14 +40,20 @@ SOURCE_FILE
     NAME_REF
       IDENT "p"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
-    IDENT "r"
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "r"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_multiple_roles"
@@ -56,20 +66,29 @@ SOURCE_FILE
     NAME_REF
       IDENT "p"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "public"
-    COMMA ","
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "r"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "public"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using_expr"
@@ -82,10 +101,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "p"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_KW "using"
     WHITESPACE " "
@@ -111,10 +133,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "p"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
@@ -142,17 +167,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "p"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
-    IDENT "r"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "s"
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "r"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "s"
     WHITESPACE "\n  "
     USING_KW "using"
     WHITESPACE " "

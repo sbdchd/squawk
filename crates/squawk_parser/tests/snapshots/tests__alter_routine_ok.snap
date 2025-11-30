@@ -34,12 +34,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -55,11 +56,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
@@ -75,12 +78,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
@@ -96,16 +100,15 @@ SOURCE_FILE
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "e"
+    DEPENDS_ON_EXTENSION
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_ROUTINE
@@ -119,18 +122,17 @@ SOURCE_FILE
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "e"
+    NO_DEPENDS_ON_EXTENSION
+      NO_KW "no"
+      WHITESPACE " "
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_depends"
@@ -146,18 +148,17 @@ SOURCE_FILE
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "e"
+    NO_DEPENDS_ON_EXTENSION
+      NO_KW "no"
+      WHITESPACE " "
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_params"
@@ -292,42 +293,45 @@ SOURCE_FILE
           INT_NUMBER "10"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        DEFAULT_KW "default"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          DEFAULT_KW "default"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
-        SET_KW "set"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "c"
-        WHITESPACE " "
-        TO_KW "to"
-        WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          WHITESPACE " "
+          TO_KW "to"
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
       WHITESPACE "\n  "
       RESET_FUNC_OPTION
         RESET_KW "reset"

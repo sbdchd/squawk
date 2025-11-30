@@ -786,11 +786,12 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    IDENT "bar"
+            ATTRIBUTE_VALUE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "bar"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
@@ -799,11 +800,12 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    IDENT "b"
+            ATTRIBUTE_VALUE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
   SEMICOLON ";"
@@ -920,16 +922,17 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            PATH_TYPE
-              PATH
+            ATTRIBUTE_VALUE
+              PATH_TYPE
                 PATH
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "a"
+                  DOT "."
                   PATH_SEGMENT
                     NAME_REF
-                      IDENT "a"
-                DOT "."
-                PATH_SEGMENT
-                  NAME_REF
-                    IDENT "b"
+                      IDENT "b"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
@@ -938,8 +941,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              STRING "'foo'"
+            ATTRIBUTE_VALUE
+              LITERAL
+                STRING "'foo'"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
@@ -948,8 +952,9 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "10"
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "10"
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
@@ -958,7 +963,8 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            CONSTRAINT_KW "constraint"
+            ATTRIBUTE_VALUE
+              CONSTRAINT_KW "constraint"
           WHITESPACE " "
           R_PAREN ")"
   SEMICOLON ";"
@@ -2308,8 +2314,9 @@ SOURCE_FILE
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              LITERAL
-                FALSE_KW "false"
+              ATTRIBUTE_VALUE
+                LITERAL
+                  FALSE_KW "false"
             COMMA ","
             WHITESPACE " "
             ATTRIBUTE_OPTION
@@ -2318,8 +2325,9 @@ SOURCE_FILE
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              LITERAL
-                TRUE_KW "true"
+              ATTRIBUTE_VALUE
+                LITERAL
+                  TRUE_KW "true"
             R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -2407,8 +2415,9 @@ SOURCE_FILE
               WHITESPACE " "
               EQ "="
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
+              ATTRIBUTE_VALUE
+                LITERAL
+                  INT_NUMBER "1"
             R_PAREN ")"
         WHITESPACE " \n  "
         CONSTRAINT_INDEX_TABLESPACE
@@ -2448,7 +2457,8 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            EQ "="
+            OP
+              EQ "="
           COMMA ","
           WHITESPACE "\n  "
           CONSTRAINT_EXCLUSION
@@ -2467,9 +2477,10 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            CUSTOM_OP
-              AMP "&"
-              AMP "&"
+            OP
+              CUSTOM_OP
+                AMP "&"
+                AMP "&"
           WHITESPACE "\n"
           R_PAREN ")"
   SEMICOLON ";"
@@ -2506,7 +2517,8 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            EQ "="
+            OP
+              EQ "="
           COMMA ","
           WHITESPACE "\n  "
           CONSTRAINT_EXCLUSION
@@ -2525,9 +2537,10 @@ SOURCE_FILE
             WHITESPACE " "
             WITH_KW "with"
             WHITESPACE " "
-            CUSTOM_OP
-              AMP "&"
-              AMP "&"
+            OP
+              CUSTOM_OP
+                AMP "&"
+                AMP "&"
           WHITESPACE "\n"
           R_PAREN ")"
         WHITESPACE " "
@@ -3295,7 +3308,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "product_number"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3327,7 +3340,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "d"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3354,7 +3367,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "d"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3371,12 +3384,12 @@ SOURCE_FILE
           NAME_REF
             IDENT "products"
     WHITESPACE " "
-    RENAME_TABLE
+    RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "items"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3395,12 +3408,12 @@ SOURCE_FILE
             IDENT "a"
       R_PAREN ")"
     WHITESPACE " "
-    RENAME_TABLE
+    RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "b"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3427,7 +3440,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      NAME
         IDENT "b"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3599,7 +3612,9 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      IDENT "new_owner"
+      ROLE
+        NAME_REF
+          IDENT "new_owner"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- default"

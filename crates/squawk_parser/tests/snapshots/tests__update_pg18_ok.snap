@@ -1,0 +1,196 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/update_pg18.sql
+---
+SOURCE_FILE
+  COMMENT "-- returning_with_old_new"
+  WHITESPACE "\n"
+  UPDATE
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "inventory"
+    WHITESPACE "\n"
+    SET_CLAUSE
+      SET_KW "SET"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_SINGLE_COLUMN
+          COLUMN
+            NAME_REF
+              IDENT "quantity"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "quantity"
+              WHITESPACE " "
+              MINUS "-"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "5"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "product_id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "456"
+    WHITESPACE "\n"
+    RETURNING_CLAUSE
+      RETURNING_KW "RETURNING"
+      WHITESPACE " "
+      RETURNING_OPTION_LIST
+        WITH_KW "WITH"
+        WHITESPACE " "
+        L_PAREN "("
+        RETURNING_OPTION
+          OLD_KW "OLD"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            BEFORE_KW "before"
+        COMMA ","
+        WHITESPACE " "
+        RETURNING_OPTION
+          NEW_KW "NEW"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            AFTER_KW "after"
+        R_PAREN ")"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              BEFORE_KW "before"
+            DOT "."
+            NAME_REF
+              IDENT "quantity"
+          WHITESPACE " "
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "previous_quantity"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              AFTER_KW "after"
+            DOT "."
+            NAME_REF
+              IDENT "quantity"
+          WHITESPACE " "
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "current_quantity"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                AFTER_KW "after"
+              DOT "."
+              NAME_REF
+                IDENT "quantity"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                BEFORE_KW "before"
+              DOT "."
+              NAME_REF
+                IDENT "quantity"
+          WHITESPACE " "
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "change"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE
+    UPDATE_KW "update"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "set"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_SINGLE_COLUMN
+          COLUMN
+            NAME_REF
+              IDENT "x"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR
+            LITERAL
+              INT_NUMBER "1"
+    WHITESPACE " \n"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
+      WHITESPACE " "
+      RETURNING_OPTION_LIST
+        WITH_KW "with"
+        WHITESPACE " "
+        L_PAREN "("
+        RETURNING_OPTION
+          OLD_KW "old"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "o"
+        COMMA ","
+        WHITESPACE " "
+        RETURNING_OPTION
+          NEW_KW "new"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "n"
+        R_PAREN ")"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "o"
+            DOT "."
+            STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "n"
+            DOT "."
+            STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n"

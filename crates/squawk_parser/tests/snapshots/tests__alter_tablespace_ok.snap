@@ -15,12 +15,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "u"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -35,11 +36,14 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLESPACE
@@ -52,11 +56,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_option"
@@ -71,22 +77,24 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "o"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "v"
-      R_PAREN ")"
+    SET_OPTIONS
+      SET_KW "set"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "o"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "v"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_multiple_options"
@@ -101,35 +109,38 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "o1"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "v1"
-      COMMA ","
+    SET_OPTIONS
+      SET_KW "set"
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "o2"
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "o1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "v1"
+        COMMA ","
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "v2"
-      R_PAREN ")"
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "o2"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "v2"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_option"
@@ -144,14 +155,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "o"
-      R_PAREN ")"
+    RESET_OPTIONS
+      RESET_KW "reset"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "o"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_multiple_options"
@@ -166,18 +178,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "o1"
-      COMMA ","
+    RESET_OPTIONS
+      RESET_KW "reset"
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "o2"
-      R_PAREN ")"
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "o1"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "o2"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -198,7 +198,7 @@ SOURCE_FILE
     NOTIFY
       NOTIFY_KW "notify"
       WHITESPACE " "
-      NAME
+      NAME_REF
         IDENT "f"
     SEMICOLON ";"
     WHITESPACE "\n  "
@@ -335,7 +335,7 @@ SOURCE_FILE
     NOTIFY
       NOTIFY_KW "NOTIFY"
       WHITESPACE " "
-      NAME
+      NAME_REF
         IDENT "mytable"
   SEMICOLON ";"
   WHITESPACE "\n\n"

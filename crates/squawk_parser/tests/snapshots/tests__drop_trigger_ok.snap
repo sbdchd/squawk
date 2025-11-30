@@ -13,35 +13,37 @@ SOURCE_FILE
         NAME_REF
           IDENT "tr"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-  SEMICOLON ";"
-  WHITESPACE "\n\n"
-  DROP_TRIGGER
-    DROP_KW "drop"
-    WHITESPACE " "
-    TRIGGER_KW "trigger"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "tr"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
       PATH
         PATH_SEGMENT
           NAME_REF
-            IDENT "bar"
-      DOT "."
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TRIGGER
+    DROP_KW "drop"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    PATH
       PATH_SEGMENT
         NAME_REF
-          IDENT "t"
+          IDENT "tr"
+    WHITESPACE " "
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
@@ -59,12 +61,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "tr"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
@@ -82,12 +85,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "tr"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     CASCADE_KW "cascade"
   SEMICOLON ";"
@@ -102,12 +106,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "tr"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     RESTRICT_KW "restrict"
   SEMICOLON ";"

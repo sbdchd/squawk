@@ -13,12 +13,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -31,11 +32,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
@@ -46,11 +50,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
@@ -63,12 +69,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    SET_TABLESPACE
+      SET_KW "set"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
@@ -81,11 +88,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    REFRESH_KW "refresh"
-    WHITESPACE " "
-    COLLATION_KW "collation"
-    WHITESPACE " "
-    VERSION_KW "version"
+    REFRESH_COLLATION_VERSION
+      REFRESH_KW "refresh"
+      WHITESPACE " "
+      COLLATION_KW "collation"
+      WHITESPACE " "
+      VERSION_KW "version"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_param"
@@ -98,16 +106,17 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "v"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
@@ -118,16 +127,17 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    IDENT "v"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
@@ -138,16 +148,17 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    DEFAULT_KW "default"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
@@ -158,16 +169,17 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
-    WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    CURRENT_KW "current"
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      CURRENT_KW "current"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset"
@@ -180,12 +192,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
@@ -196,9 +209,10 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ALL_KW "all"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      ALL_KW "all"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_option"
@@ -211,12 +225,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    IDENT "allow_connections"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
+    CREATE_DATABASE_OPTION_LIST
+      WITH_KW "with"
+      WHITESPACE " "
+      CREATE_DATABASE_OPTION
+        IDENT "allow_connections"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option_connection_limit"
@@ -229,12 +245,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    CONNECTION_KW "connection"
-    WHITESPACE " "
-    LIMIT_KW "limit"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    CREATE_DATABASE_OPTION_LIST
+      CREATE_DATABASE_OPTION
+        CONNECTION_KW "connection"
+        WHITESPACE " "
+        LIMIT_KW "limit"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option_is_template"
@@ -247,10 +265,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    IDENT "is_template"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
+    CREATE_DATABASE_OPTION_LIST
+      CREATE_DATABASE_OPTION
+        IDENT "is_template"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_multiple_options"
@@ -263,23 +283,27 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    IDENT "allow_connections"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    WHITESPACE " "
-    CONNECTION_KW "connection"
-    WHITESPACE " "
-    LIMIT_KW "limit"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
-    WHITESPACE " "
-    IDENT "is_template"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
+    CREATE_DATABASE_OPTION_LIST
+      WITH_KW "with"
+      WHITESPACE " "
+      CREATE_DATABASE_OPTION
+        IDENT "allow_connections"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      WHITESPACE " "
+      CREATE_DATABASE_OPTION
+        CONNECTION_KW "connection"
+        WHITESPACE " "
+        LIMIT_KW "limit"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      WHITESPACE " "
+      CREATE_DATABASE_OPTION
+        IDENT "is_template"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
   SEMICOLON ";"
   WHITESPACE "\n\n"

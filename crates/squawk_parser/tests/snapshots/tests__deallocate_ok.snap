@@ -22,7 +22,7 @@ SOURCE_FILE
   DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"

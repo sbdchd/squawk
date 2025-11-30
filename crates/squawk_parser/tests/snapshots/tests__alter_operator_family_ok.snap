@@ -22,29 +22,33 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE "\n  "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_ANGLE "<"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
+    ADD_OP_CLASS_OPTIONS
+      ADD_KW "add"
+      WHITESPACE "\n  "
+      OPERATOR_CLASS_OPTION_LIST
+        OP_CLASS_OPTION
+          OPERATOR_KW "operator"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          OP
+            L_ANGLE "<"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+          COMMA ","
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "u"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi"
@@ -66,108 +70,120 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE "\n  "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    CUSTOM_OP
-      AMP "&"
-      AMP "&"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-    COMMA ","
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    R_PAREN ")"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PARAM_IN
-            IN_KW "in"
+    ADD_OP_CLASS_OPTIONS
+      ADD_KW "add"
+      WHITESPACE "\n  "
+      OPERATOR_CLASS_OPTION_LIST
+        OP_CLASS_OPTION
+          OPERATOR_KW "operator"
           WHITESPACE " "
-          NAME
-            IDENT "a"
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          OP
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+          COMMA ","
           WHITESPACE " "
           PATH_TYPE
             PATH
               PATH_SEGMENT
                 NAME_REF
-                  TEXT_KW "text"
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      ARG_LIST
-        L_PAREN "("
-        ARG
+                  IDENT "u"
+          R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n  "
+        OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
           LITERAL
-            INT_NUMBER "100"
-        R_PAREN ")"
-    R_PAREN ")"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
+            INT_NUMBER "1"
+          WHITESPACE " "
+          FUNCTION_SIG
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
+        COMMA ","
+        WHITESPACE "\n  "
+        OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            R_PAREN ")"
+          WHITESPACE " "
+          FUNCTION_SIG
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
+            PARAM_LIST
+              L_PAREN "("
+              PARAM
+                PARAM_IN
+                  IN_KW "in"
+                WHITESPACE " "
+                NAME
+                  IDENT "a"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n  "
+        OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              CHAR_TYPE
+                VARCHAR_KW "varchar"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
+                    LITERAL
+                      INT_NUMBER "100"
+                  R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE " "
+          FUNCTION_SIG
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_search"
@@ -189,33 +205,37 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE "\n  "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    R_ANGLE ">"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
-    SEARCH_KW "search"
+    ADD_OP_CLASS_OPTIONS
+      ADD_KW "add"
+      WHITESPACE "\n  "
+      OPERATOR_CLASS_OPTION_LIST
+        OP_CLASS_OPTION
+          OPERATOR_KW "operator"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          OP
+            R_ANGLE ">"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+          COMMA ","
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "u"
+          R_PAREN ")"
+          WHITESPACE " "
+          FOR_KW "for"
+          WHITESPACE " "
+          SEARCH_KW "search"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_order"
@@ -237,40 +257,44 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE "\n  "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    R_ANGLE ">"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
-    ORDER_KW "order"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "s"
+    ADD_OP_CLASS_OPTIONS
+      ADD_KW "add"
+      WHITESPACE "\n  "
+      OPERATOR_CLASS_OPTION_LIST
+        OP_CLASS_OPTION
+          OPERATOR_KW "operator"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          OP
+            R_ANGLE ">"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+          COMMA ","
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "u"
+          R_PAREN ")"
+          WHITESPACE " "
+          FOR_KW "for"
+          WHITESPACE " "
+          ORDER_KW "order"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func"
@@ -292,27 +316,30 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PATH_TYPE
+    ADD_OP_CLASS_OPTIONS
+      ADD_KW "add"
+      WHITESPACE "\n  "
+      OPERATOR_CLASS_OPTION_LIST
+        OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          FUNCTION_SIG
             PATH
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "t"
-        R_PAREN ")"
+                  IDENT "f"
+            PARAM_LIST
+              L_PAREN "("
+              PARAM
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "t"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func_with_params"
@@ -334,50 +361,56 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PATH_TYPE
+    ADD_OP_CLASS_OPTIONS
+      ADD_KW "add"
+      WHITESPACE "\n  "
+      OPERATOR_CLASS_OPTION_LIST
+        OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "u"
+            R_PAREN ")"
+          WHITESPACE " "
+          FUNCTION_SIG
             PATH
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "a"
-        COMMA ","
-        WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "b"
-        R_PAREN ")"
+                  IDENT "f"
+            PARAM_LIST
+              L_PAREN "("
+              PARAM
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              PARAM
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "b"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_op"
@@ -399,27 +432,33 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE "\n  "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
+    DROP_OP_CLASS_OPTIONS
+      DROP_KW "drop"
+      WHITESPACE "\n  "
+      DROP_OP_CLASS_OPTION_LIST
+        DROP_OP_CLASS_OPTION
+          OPERATOR_KW "operator"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "u"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_op_single_param"
@@ -441,20 +480,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE "\n  "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    R_PAREN ")"
+    DROP_OP_CLASS_OPTIONS
+      DROP_KW "drop"
+      WHITESPACE "\n  "
+      DROP_OP_CLASS_OPTION_LIST
+        DROP_OP_CLASS_OPTION
+          OPERATOR_KW "operator"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_func"
@@ -476,27 +520,33 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
+    DROP_OP_CLASS_OPTIONS
+      DROP_KW "drop"
+      WHITESPACE "\n  "
+      DROP_OP_CLASS_OPTION_LIST
+        DROP_OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "u"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_func_single_param"
@@ -518,20 +568,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    R_PAREN ")"
+    DROP_OP_CLASS_OPTIONS
+      DROP_KW "drop"
+      WHITESPACE "\n  "
+      DROP_OP_CLASS_OPTION_LIST
+        DROP_OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_multiple"
@@ -553,41 +608,50 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE "\n  "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
-    R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "2"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    R_PAREN ")"
+    DROP_OP_CLASS_OPTIONS
+      DROP_KW "drop"
+      WHITESPACE "\n  "
+      DROP_OP_CLASS_OPTION_LIST
+        DROP_OP_CLASS_OPTION
+          OPERATOR_KW "operator"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "u"
+            R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n  "
+        DROP_OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -609,12 +673,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE "\n  "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -636,11 +701,14 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_OPERATOR_FAMILY
@@ -660,11 +728,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE "\n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
@@ -691,11 +761,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "i"
     WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -21,14 +21,13 @@ SOURCE_FILE
         STAR "*"
         R_PAREN ")"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "b"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "b"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple_args"
@@ -54,14 +53,13 @@ SOURCE_FILE
                   IDENT "t"
         R_PAREN ")"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complex_args"
@@ -104,11 +102,13 @@ SOURCE_FILE
                   NUMERIC_KW "numeric"
         R_PAREN ")"
     WHITESPACE " \n    "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_order_by"
@@ -145,14 +145,13 @@ SOURCE_FILE
                   IDENT "y"
         R_PAREN ")"
     WHITESPACE " \n    "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "b"
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "b"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- qualified_names"
@@ -194,13 +193,12 @@ SOURCE_FILE
                   IDENT "u"
         R_PAREN ")"
     WHITESPACE " \n    "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "new_schema"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "new_schema"
   SEMICOLON ";"
   WHITESPACE "\n\n"

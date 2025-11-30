@@ -12,7 +12,10 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    IDENT "s"
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -24,13 +27,19 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "c"
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        CURRENT_ROLE_KW "current_role"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "c"
     WHITESPACE " "
     CASCADE_KW "cascade"
   SEMICOLON ";"
@@ -42,10 +51,13 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    SESSION_USER_KW "session_user"
-    COMMA ","
-    WHITESPACE " "
-    CURRENT_USER_KW "current_user"
+    ROLE_LIST
+      ROLE
+        SESSION_USER_KW "session_user"
+      COMMA ","
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
     WHITESPACE " "
     RESTRICT_KW "restrict"
   SEMICOLON ";"

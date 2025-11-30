@@ -10,7 +10,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "do_db_maintenance"
     ARG_LIST
       L_PAREN "("
@@ -29,7 +29,7 @@ SOURCE_FILE
             IDENT "partman"
       DOT "."
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "partition_data_proc"
     ARG_LIST
       L_PAREN "("
@@ -45,7 +45,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "do_db_maintenance"
     ARG_LIST
       L_PAREN "("

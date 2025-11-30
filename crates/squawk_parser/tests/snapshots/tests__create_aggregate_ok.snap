@@ -24,11 +24,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -37,11 +38,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "f"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -50,11 +52,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "u"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "u"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -90,16 +93,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "input_type"
+                  IDENT "input_type"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -108,16 +112,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "state_function"
+                  IDENT "state_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -126,16 +131,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "state_type"
+                  IDENT "state_type"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -144,8 +150,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1024"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "1024"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -154,16 +161,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "final_function"
+                  IDENT "final_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -172,8 +180,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
+        ATTRIBUTE_VALUE
+          LITERAL
+            TRUE_KW "true"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -182,11 +191,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "read_only"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "read_only"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -195,16 +205,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "combine_function"
+                  IDENT "combine_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -213,16 +224,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "serial_function"
+                  IDENT "serial_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -231,16 +243,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "deserial_function"
+                  IDENT "deserial_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -249,8 +262,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'0'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'0'"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -259,16 +273,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "moving_state_function"
+                  IDENT "moving_state_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -277,16 +292,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "moving_inverse_function"
+                  IDENT "moving_inverse_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -295,16 +311,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "moving_state_type"
+                  IDENT "moving_state_type"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -313,8 +330,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "2048"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "2048"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -323,16 +341,17 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
+        ATTRIBUTE_VALUE
+          PATH_TYPE
             PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "moving_final_function"
+                  IDENT "moving_final_function"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -341,8 +360,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
+        ATTRIBUTE_VALUE
+          LITERAL
+            TRUE_KW "true"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -351,11 +371,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "shareable"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "shareable"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -364,8 +385,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'{\"initial\":\"value\"}'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'{\"initial\":\"value\"}'"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -374,7 +396,8 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        L_ANGLE "<"
+        ATTRIBUTE_VALUE
+          L_ANGLE "<"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -409,11 +432,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "f"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -422,11 +446,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -493,11 +518,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "f"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -506,11 +532,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -519,8 +546,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1024"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "1024"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -529,11 +557,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "ff"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "ff"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -547,11 +576,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "read_only"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "read_only"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -560,11 +590,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "cf"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "cf"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -573,11 +604,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "sf"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "sf"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -586,11 +618,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "df"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "df"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -599,8 +632,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'0'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'0'"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -609,11 +643,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "msf"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "msf"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -622,11 +657,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "mif"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "mif"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -635,11 +671,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "mt"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "mt"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -648,8 +685,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "2048"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "2048"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -658,11 +696,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "mff"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "mff"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -676,11 +715,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "shareable"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "shareable"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -689,8 +729,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'{\"initial\":\"value\"}'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'{\"initial\":\"value\"}'"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -699,7 +740,8 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        L_ANGLE "<"
+        ATTRIBUTE_VALUE
+          L_ANGLE "<"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -708,11 +750,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "safe"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "safe"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -795,11 +838,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "percentile_disc_transition"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "percentile_disc_transition"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -808,11 +852,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "internal"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "internal"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -821,8 +866,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1024"
+        ATTRIBUTE_VALUE
+          LITERAL
+            INT_NUMBER "1024"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -831,11 +877,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "percentile_disc_final"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "percentile_disc_final"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -849,11 +896,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "read_only"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "read_only"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -862,8 +910,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'0.5'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'0.5'"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -872,11 +921,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "safe"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "safe"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -917,11 +967,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "array_append"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "array_append"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -930,11 +981,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "anycompatiblearray"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "anycompatiblearray"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -943,8 +995,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'{}'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'{}'"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -980,11 +1033,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "array_agg_transfn"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "array_agg_transfn"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -993,11 +1047,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "internal"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "internal"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1006,11 +1061,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "array_agg_finalfn"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "array_agg_finalfn"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1062,11 +1118,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "ordered_set_transition"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "ordered_set_transition"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1075,11 +1132,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "internal"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "internal"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1088,11 +1146,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "percentile_disc_final"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "percentile_disc_final"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1133,11 +1192,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "complex_add"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "complex_add"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1146,11 +1206,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "complex"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "complex"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1159,8 +1220,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'(0,0)'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'(0,0)'"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1169,11 +1231,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "complex_add"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "complex_add"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1182,11 +1245,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "complex_sub"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "complex_sub"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1195,11 +1259,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "complex"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "complex"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1208,8 +1273,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'(0,0)'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'(0,0)'"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -1245,11 +1311,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "float8"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "float8"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1258,11 +1325,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "float8pl"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "float8pl"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1271,11 +1339,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "float8"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "float8"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1284,11 +1353,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "float8pl"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "float8pl"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -1297,11 +1367,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "float8mi"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "float8mi"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

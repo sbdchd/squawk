@@ -10,35 +10,40 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "p"
-      DOT "."
-      PATH_SEGMENT
-    PLUS "+"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "int4"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "int4"
-    R_PAREN ")"
+    OP_SIG
+      OP
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "p"
+          DOT "."
+          PATH_SEGMENT
+        PLUS "+"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int4"
+      R_PAREN ")"
     WHITESPACE " \n  "
-    OWNER_KW "owner"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    IDENT "u"
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        NAME_REF
+          IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
@@ -48,25 +53,28 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    PLUS "+"
-    WHITESPACE " "
-    L_PAREN "("
-    NONE_KW "none"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            TEXT_KW "text"
-    R_PAREN ")"
+    OP_SIG
+      OP
+        PLUS "+"
+      WHITESPACE " "
+      L_PAREN "("
+      NONE_KW "none"
+      COMMA ","
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+      R_PAREN ")"
     WHITESPACE " \n  "
-    SET_KW "set"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
@@ -76,107 +84,116 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    CUSTOM_OP
-      AMP "&"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bool"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bool"
-    R_PAREN ")"
-    WHITESPACE " \n  "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
+    OP_SIG
+      OP
+        CUSTOM_OP
+          AMP "&"
+      WHITESPACE " "
       L_PAREN "("
-      WHITESPACE "\n    "
-      ATTRIBUTE_OPTION
-        NAME
-          RESTRICT_KW "restrict"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "r"
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bool"
       COMMA ","
-      WHITESPACE "\n    "
-      ATTRIBUTE_OPTION
-        NAME
-          JOIN_KW "join"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "j"
-      COMMA ","
-      WHITESPACE "\n    "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "commutator"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "c"
-      COMMA ","
-      WHITESPACE "\n    "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "negator"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "n"
-      COMMA ","
-      WHITESPACE "\n    "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "hashes"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "enabled"
-      COMMA ","
-      WHITESPACE "\n    "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "merges"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "enabled"
-      WHITESPACE "\n  "
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bool"
       R_PAREN ")"
+    WHITESPACE " \n  "
+    SET_OPTIONS
+      SET_KW "set"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
+            RESTRICT_KW "restrict"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "r"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
+            JOIN_KW "join"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "j"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "commutator"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "c"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "negator"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "n"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "hashes"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "enabled"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "merges"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "enabled"
+        WHITESPACE "\n  "
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- none_options"
@@ -186,43 +203,48 @@ SOURCE_FILE
     WHITESPACE " "
     OPERATOR_KW "operator"
     WHITESPACE " "
-    PERCENT "%"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            INT_KW "int"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            INT_KW "int"
-    R_PAREN ")"
-    WHITESPACE " \n  "
-    SET_KW "set"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
+    OP_SIG
+      OP
+        PERCENT "%"
+      WHITESPACE " "
       L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          RESTRICT_KW "restrict"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        NONE_KW "none"
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
       COMMA ","
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          JOIN_KW "join"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        NONE_KW "none"
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
       R_PAREN ")"
+    WHITESPACE " \n  "
+    SET_OPTIONS
+      SET_KW "set"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            RESTRICT_KW "restrict"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            NONE_KW "none"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
+            JOIN_KW "join"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            NONE_KW "none"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

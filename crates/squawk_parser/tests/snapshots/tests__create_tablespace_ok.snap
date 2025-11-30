@@ -31,7 +31,8 @@ SOURCE_FILE
     WHITESPACE " \n  "
     OWNER_KW "owner"
     WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
+    ROLE
+      CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     LOCATION_KW "location"
     WHITESPACE " "
@@ -50,8 +51,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "10"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "10"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -60,8 +62,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "1"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "1"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -70,8 +73,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "0"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "0"
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
@@ -80,8 +84,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "4"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "4"
         WHITESPACE "\n  "
         R_PAREN ")"
   SEMICOLON ";"

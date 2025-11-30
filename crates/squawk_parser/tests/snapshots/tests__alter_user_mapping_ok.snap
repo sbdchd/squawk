@@ -14,7 +14,8 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    CURRENT_ROLE_KW "current_role"
+    ROLE
+      CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n    "
     SERVER_KW "server"
     WHITESPACE " "

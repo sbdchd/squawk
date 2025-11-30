@@ -5,7 +5,7 @@ input_file: crates/squawk_parser/tests/data/ok/create_text_search_dict.sql
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_TEXT_SEARCH_PARSER
+  CREATE_TEXT_SEARCH_DICTIONARY
     CREATE_KW "create"
     WHITESPACE " "
     TEXT_KW "text"
@@ -28,18 +28,19 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_TEXT_SEARCH_PARSER
+  CREATE_TEXT_SEARCH_DICTIONARY
     CREATE_KW "create"
     WHITESPACE " "
     TEXT_KW "text"
@@ -67,11 +68,12 @@ SOURCE_FILE
         WHITESPACE "  "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -80,11 +82,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "bar"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "bar"
       COMMA ","
       WHITESPACE "\n  "
       ATTRIBUTE_OPTION
@@ -93,11 +96,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "b"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "b"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

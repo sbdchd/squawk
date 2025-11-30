@@ -925,11 +925,12 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "sum_per_hour"
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "sum_per_hour"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -938,14 +939,15 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        ARRAY_TYPE
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "int8"
-          L_BRACK "["
-          R_BRACK "]"
+        ATTRIBUTE_VALUE
+          ARRAY_TYPE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int8"
+            L_BRACK "["
+            R_BRACK "]"
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
@@ -954,8 +956,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
+        ATTRIBUTE_VALUE
+          LITERAL
+            STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -1865,7 +1868,7 @@ SOURCE_FILE
             IDENT "partman"
       DOT "."
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "partition_data_proc"
     ARG_LIST
       L_PAREN "("
@@ -1987,7 +1990,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "tng"
     WHITESPACE " "
     COLUMN_LIST
@@ -3191,19 +3194,22 @@ SOURCE_FILE
     NAME
       IDENT "wasm_wrapper"
     WHITESPACE "\n  "
-    HANDLER_KW "handler"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "wasm_fdw_handler"
-    WHITESPACE "\n  "
-    VALIDATOR_KW "validator"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "wasm_fdw_validator"
+    FDW_OPTION_LIST
+      FDW_OPTION
+        HANDLER_KW "handler"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "wasm_fdw_handler"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        VALIDATOR_KW "validator"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "wasm_fdw_validator"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SERVER
@@ -5804,8 +5810,9 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "128"
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "128"
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

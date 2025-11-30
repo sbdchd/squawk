@@ -39,7 +39,18 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "ROLE"
     WHITESPACE " "
-    IDENT "foo"
+    ROLE
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_ROLE
+    SET_KW "set"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    LITERAL
+      STRING "'fooo'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE

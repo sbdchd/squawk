@@ -34,13 +34,15 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
-    STORAGE_KW "storage"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "s"
+    OPERATOR_CLASS_OPTION_LIST
+      OP_CLASS_OPTION
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -94,227 +96,243 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " \n    "
-    STORAGE_KW "storage"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "s"
-    COMMA ","
-    WHITESPACE "\n    "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    CUSTOM_OP
-      AMP "&"
-      AMP "&"
-    COMMA ","
-    WHITESPACE "\n    "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
-    WHITESPACE " "
-    CUSTOM_OP
-      L_ANGLE "<"
-      L_ANGLE "<"
-      L_ANGLE "<"
-      L_ANGLE "<"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            TEXT_KW "text"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            BIGINT_KW "bigint"
-    R_PAREN ")"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
-    SEARCH_KW "search"
-    COMMA ","
-    WHITESPACE "\n    "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
-    WHITESPACE " "
-    CUSTOM_OP
-      POUND "#"
-    WHITESPACE " "
-    L_PAREN "("
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      ARG_LIST
+    OPERATOR_CLASS_OPTION_LIST
+      OP_CLASS_OPTION
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "s"
+      COMMA ","
+      WHITESPACE "\n    "
+      OP_CLASS_OPTION
+        OPERATOR_KW "operator"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        OP
+          CUSTOM_OP
+            AMP "&"
+            AMP "&"
+      COMMA ","
+      WHITESPACE "\n    "
+      OP_CLASS_OPTION
+        OPERATOR_KW "operator"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+        WHITESPACE " "
+        OP
+          CUSTOM_OP
+            L_ANGLE "<"
+            L_ANGLE "<"
+            L_ANGLE "<"
+            L_ANGLE "<"
+        WHITESPACE " "
         L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "100"
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      ARG_LIST
-        L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "10"
-        R_PAREN ")"
-    R_PAREN ")"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
-    ORDER_KW "order"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
-    COMMA ","
-    WHITESPACE "\n    "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1010"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
-    COMMA ","
-    WHITESPACE "\n    "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1010"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            BIGINT_KW "bigint"
-    R_PAREN ")"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PARAM_IN
-            IN_KW "in"
-          WHITESPACE " "
-          NAME
-            IDENT "b"
-          WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
         COMMA ","
         WHITESPACE " "
-        PARAM
-          PARAM_OUT
-            OUT_KW "out"
-          WHITESPACE " "
-          NAME
-            IDENT "a"
-          WHITESPACE " "
-          PATH_TYPE
+        PATH_TYPE
+          PATH
             PATH
               PATH_SEGMENT
                 NAME_REF
-                  TEXT_KW "text"
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        R_PAREN ")"
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        SEARCH_KW "search"
+      COMMA ","
+      WHITESPACE "\n    "
+      OP_CLASS_OPTION
+        OPERATOR_KW "operator"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+        WHITESPACE " "
+        OP
+          CUSTOM_OP
+            POUND "#"
+        WHITESPACE " "
+        L_PAREN "("
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          ARG_LIST
+            L_PAREN "("
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
         COMMA ","
         WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          ARG_LIST
+            L_PAREN "("
+            ARG
+              LITERAL
+                INT_NUMBER "10"
+            R_PAREN ")"
         R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n    "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1010"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            BIGINT_KW "bigint"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            SMALLINT_KW "smallint"
-    R_PAREN ")"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
         PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
           PATH_SEGMENT
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
-        COMMA ","
+              IDENT "bar"
+      COMMA ","
+      WHITESPACE "\n    "
+      OP_CLASS_OPTION
+        FUNCTION_KW "function"
         WHITESPACE " "
-        PARAM
-          PATH_TYPE
+        LITERAL
+          INT_NUMBER "1010"
+        WHITESPACE " "
+        FUNCTION_SIG
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+      COMMA ","
+      WHITESPACE "\n    "
+      OP_CLASS_OPTION
+        FUNCTION_KW "function"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1010"
+        WHITESPACE " "
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+        WHITESPACE " "
+        FUNCTION_SIG
+          PATH
             PATH
               PATH_SEGMENT
                 NAME_REF
-                  TEXT_KW "text"
-        R_PAREN ")"
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PARAM_IN
+                IN_KW "in"
+              WHITESPACE " "
+              NAME
+                IDENT "b"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              PARAM_OUT
+                OUT_KW "out"
+              WHITESPACE " "
+              NAME
+                IDENT "a"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      OP_CLASS_OPTION
+        FUNCTION_KW "function"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1010"
+        WHITESPACE " "
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          COMMA ","
+          WHITESPACE " "
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    SMALLINT_KW "smallint"
+          R_PAREN ")"
+        WHITESPACE " "
+        FUNCTION_SIG
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COMMA ","
+            WHITESPACE " "
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
