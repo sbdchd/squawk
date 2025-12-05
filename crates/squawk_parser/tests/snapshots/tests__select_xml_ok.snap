@@ -1,0 +1,203 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/select_xml.sql
+---
+SOURCE_FILE
+  COMMENT "-- xmltable"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        XMLTABLE_KW "xmltable"
+        L_PAREN "("
+        WHITESPACE "\n    "
+        XMLNAMESPACES_KW "xmlnamespaces"
+        XML_NAMESPACE_LIST
+          L_PAREN "("
+          XML_NAMESPACE
+            LITERAL
+              STRING "'http://example.com/books'"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "bk"
+          R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n    "
+        XML_ROW_PASSING_CLAUSE
+          LITERAL
+            STRING "'/bk:library/bk:book'"
+          WHITESPACE "\n    "
+          PASSING_KW "passing"
+          WHITESPACE " "
+          CALL_EXPR
+            XML_PARSE_FN
+              XMLPARSE_KW "xmlparse"
+              L_PAREN "("
+              DOCUMENT_KW "document"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<library xmlns=\"http://example.com/books\">\n               <book id=\"1\">\n                 <title>the great gatsby</title>\n                 <author>f. scott fitzgerald</author>\n                 <year>1925</year>\n                 <price>12.99</price>\n               </book>\n               <book id=\"2\">\n                 <title>1984</title>\n                 <author>george orwell</author>\n                 <year>1949</year>\n                 <price>14.99</price>\n               </book>\n               <book id=\"3\">\n                 <title>to kill a mockingbird</title>\n                 <author>harper lee</author>\n                 <year>1960</year>\n                 <price>13.99</price>\n               </book>\n             </library>'"
+              R_PAREN ")"
+        WHITESPACE "\n    "
+        XML_TABLE_COLUMN_LIST
+          COLUMNS_KW "columns"
+          WHITESPACE "\n        "
+          XML_TABLE_COLUMN
+            NAME
+              IDENT "row_num"
+            WHITESPACE " "
+            FOR_KW "for"
+            WHITESPACE " "
+            ORDINALITY_KW "ordinality"
+          COMMA ","
+          WHITESPACE "\n        "
+          XML_TABLE_COLUMN
+            NAME
+              IDENT "book_id"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INTEGER_KW "integer"
+            WHITESPACE " "
+            XML_COLUMN_OPTION_LIST
+              XML_COLUMN_OPTION
+                PATH_KW "path"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'@id'"
+          COMMA ","
+          WHITESPACE "\n        "
+          XML_TABLE_COLUMN
+            NAME
+              IDENT "title"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+            WHITESPACE " "
+            XML_COLUMN_OPTION_LIST
+              XML_COLUMN_OPTION
+                PATH_KW "path"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'bk:title'"
+          COMMA ","
+          WHITESPACE "\n        "
+          XML_TABLE_COLUMN
+            NAME
+              IDENT "author"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+            WHITESPACE " "
+            XML_COLUMN_OPTION_LIST
+              XML_COLUMN_OPTION
+                PATH_KW "path"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'bk:author'"
+          COMMA ","
+          WHITESPACE "\n        "
+          XML_TABLE_COLUMN
+            NAME
+              YEAR_KW "year"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INTEGER_KW "integer"
+            WHITESPACE " "
+            XML_COLUMN_OPTION_LIST
+              XML_COLUMN_OPTION
+                PATH_KW "path"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'bk:year'"
+          COMMA ","
+          WHITESPACE "\n        "
+          XML_TABLE_COLUMN
+            NAME
+              IDENT "price"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
+                COMMA ","
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
+                R_PAREN ")"
+            WHITESPACE " "
+            XML_COLUMN_OPTION_LIST
+              XML_COLUMN_OPTION
+                PATH_KW "path"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'bk:price'"
+              WHITESPACE " "
+              XML_COLUMN_OPTION
+                DEFAULT_KW "default"
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.00"
+          COMMA ","
+          WHITESPACE "\n        "
+          XML_TABLE_COLUMN
+            NAME
+              IDENT "discount"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
+                COMMA ","
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
+                R_PAREN ")"
+            WHITESPACE " "
+            XML_COLUMN_OPTION_LIST
+              XML_COLUMN_OPTION
+                DEFAULT_KW "default"
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.00"
+              WHITESPACE " "
+              XML_COLUMN_OPTION
+                NULL_KW "null"
+        WHITESPACE "\n"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

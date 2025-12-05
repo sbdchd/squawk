@@ -2544,7 +2544,7 @@ SOURCE_FILE
           WHITESPACE "\n"
           R_PAREN ")"
         WHITESPACE " "
-        CONSTRAINT_WHERE_CLAUSE
+        WHERE_CONDITION_CLAUSE
           WHERE_KW "WHERE"
           WHITESPACE " "
           L_PAREN "("

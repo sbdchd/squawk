@@ -477,9 +477,8 @@ SOURCE_FILE
         WHITESPACE "\n  "
         PARTITION_ITEM
           CALL_EXPR
-            NAME_REF
+            EXTRACT_FN
               EXTRACT_KW "extract"
-            ARG_LIST
               L_PAREN "("
               MONTH_KW "month"
               WHITESPACE " "
@@ -2004,7 +2003,7 @@ SOURCE_FILE
           WHITESPACE " "
           R_PAREN ")"
         WHITESPACE " "
-        CONSTRAINT_WHERE_CLAUSE
+        WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
           WHITESPACE " "
           L_PAREN "("
@@ -2100,7 +2099,7 @@ SOURCE_FILE
           WHITESPACE " "
           R_PAREN ")"
         WHITESPACE " \n    "
-        CONSTRAINT_WHERE_CLAUSE
+        WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
           WHITESPACE " "
           L_PAREN "("
@@ -2237,7 +2236,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "foo"
         WHITESPACE "\n    "
-        CONSTRAINT_WHERE_CLAUSE
+        WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
           WHITESPACE " "
           L_PAREN "("
@@ -2532,7 +2531,7 @@ SOURCE_FILE
           WHITESPACE " "
           R_PAREN ")"
         WHITESPACE " "
-        CONSTRAINT_WHERE_CLAUSE
+        WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
           WHITESPACE " "
           L_PAREN "("

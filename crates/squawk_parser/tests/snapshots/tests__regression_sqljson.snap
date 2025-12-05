@@ -2,4 +2,210 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/sqljson.sql
 ---
-
+ERROR@22: expected an expression, found R_PAREN
+ERROR@22: expected expression
+ERROR@1596: expected an expression, found R_PAREN
+ERROR@1596: expected expression
+ERROR@9659: missing comma
+ERROR@9668: expected an expression, found WHERE_KW
+ERROR@9673: expected R_PAREN
+ERROR@9677: missing comma
+ERROR@9681: expected SEMICOLON
+ERROR@9681: expected command, found R_PAREN
+ERROR@9683: expected command, found AS_KW
+ERROR@9686: expected command, found IDENT
+ERROR@9702: expected command, found COMMA
+ERROR@9705: expected command, found JSON_ARRAYAGG_KW
+ERROR@9719: expected R_PAREN
+ERROR@9719: expected SEMICOLON
+ERROR@9719: expected command, found IDENT
+ERROR@9723: expected command, found ORDER_KW
+ERROR@9729: expected command, found BY_KW
+ERROR@9732: expected command, found IDENT
+ERROR@9736: expected command, found RETURNING_KW
+ERROR@9746: expected command, found IDENT
+ERROR@9751: expected command, found R_PAREN
+ERROR@9753: expected command, found FILTER_KW
+ERROR@9761: expected R_PAREN
+ERROR@9761: expected SEMICOLON
+ERROR@9761: expected command, found WHERE_KW
+ERROR@9767: expected command, found IDENT
+ERROR@9771: expected command, found R_ANGLE
+ERROR@9773: expected command, found INT_NUMBER
+ERROR@9774: expected command, found R_PAREN
+ERROR@9776: expected command, found AS_KW
+ERROR@9779: expected command, found IDENT
+ERROR@9812: expected command, found FROM_KW
+ERROR@9882: expected SEMICOLON
+ERROR@9883: expected command, found IDENT
+ERROR@9887: expected R_PAREN
+ERROR@9887: expected SEMICOLON
+ERROR@9887: expected command, found IDENT
+ERROR@9890: expected command, found R_PAREN
+ERROR@9925: missing comma
+ERROR@9934: expected an expression, found WHERE_KW
+ERROR@9939: expected R_PAREN
+ERROR@9943: missing comma
+ERROR@9947: expected SEMICOLON
+ERROR@9947: expected command, found R_PAREN
+ERROR@9949: expected command, found OVER_KW
+ERROR@9955: expected R_PAREN
+ERROR@9955: expected SEMICOLON
+ERROR@9955: expected command, found PARTITION_KW
+ERROR@9965: expected command, found BY_KW
+ERROR@9968: expected command, found IDENT
+ERROR@9971: expected command, found DOT
+ERROR@9972: expected command, found IDENT
+ERROR@9976: expected command, found PERCENT
+ERROR@9978: expected command, found INT_NUMBER
+ERROR@9979: expected command, found R_PAREN
+ERROR@9981: expected command, found FROM_KW
+ERROR@10061: expected SEMICOLON
+ERROR@10062: expected command, found IDENT
+ERROR@10066: expected R_PAREN
+ERROR@10066: expected SEMICOLON
+ERROR@10066: expected command, found IDENT
+ERROR@10069: expected command, found R_PAREN
+ERROR@11936: missing comma
+ERROR@11943: expected an expression, found ORDER_KW
+ERROR@11948: expected R_PAREN
+ERROR@11951: missing comma
+ERROR@11953: expected SEMICOLON
+ERROR@11953: expected command, found R_PAREN
+ERROR@11955: expected command, found FROM_KW
+ERROR@11981: expected SEMICOLON
+ERROR@11982: expected command, found IDENT
+ERROR@11984: expected R_PAREN
+ERROR@11984: expected SEMICOLON
+ERROR@11984: expected command, found IDENT
+ERROR@11985: expected command, found COMMA
+ERROR@11986: expected command, found IDENT
+ERROR@11987: expected command, found R_PAREN
+ERROR@12053: missing comma
+ERROR@12060: expected an expression, found ORDER_KW
+ERROR@12065: expected R_PAREN
+ERROR@12068: missing comma
+ERROR@12070: expected SEMICOLON
+ERROR@12070: expected command, found R_PAREN
+ERROR@12072: expected command, found FROM_KW
+ERROR@12105: expected SEMICOLON
+ERROR@12106: expected command, found IDENT
+ERROR@12108: expected R_PAREN
+ERROR@12108: expected SEMICOLON
+ERROR@12108: expected command, found IDENT
+ERROR@12109: expected command, found COMMA
+ERROR@12110: expected command, found IDENT
+ERROR@12111: expected command, found R_PAREN
+ERROR@12192: missing comma
+ERROR@12202: expected an expression, found ORDER_KW
+ERROR@12207: expected R_PAREN
+ERROR@12210: missing comma
+ERROR@12212: expected SEMICOLON
+ERROR@12212: expected command, found R_PAREN
+ERROR@12214: expected command, found FROM_KW
+ERROR@12250: expected SEMICOLON
+ERROR@12251: expected command, found IDENT
+ERROR@12253: expected R_PAREN
+ERROR@12253: expected SEMICOLON
+ERROR@12253: expected command, found IDENT
+ERROR@12254: expected command, found COMMA
+ERROR@12255: expected command, found IDENT
+ERROR@12256: expected command, found R_PAREN
+ERROR@12320: missing comma
+ERROR@12327: expected an expression, found ORDER_KW
+ERROR@12332: expected R_PAREN
+ERROR@12335: missing comma
+ERROR@12337: expected SEMICOLON
+ERROR@12337: expected command, found R_PAREN
+ERROR@12339: expected command, found FROM_KW
+ERROR@12375: expected SEMICOLON
+ERROR@12376: expected command, found IDENT
+ERROR@12378: expected R_PAREN
+ERROR@12378: expected SEMICOLON
+ERROR@12378: expected command, found IDENT
+ERROR@12379: expected command, found COMMA
+ERROR@12380: expected command, found IDENT
+ERROR@12381: expected command, found R_PAREN
+ERROR@12445: missing comma
+ERROR@12452: expected an expression, found ORDER_KW
+ERROR@12457: expected R_PAREN
+ERROR@12460: missing comma
+ERROR@12468: missing comma
+ERROR@12486: missing comma
+ERROR@12520: expected SEMICOLON
+ERROR@12520: expected command, found R_PAREN
+ERROR@12522: expected command, found FROM_KW
+ERROR@12558: expected SEMICOLON
+ERROR@12559: expected command, found IDENT
+ERROR@12561: expected R_PAREN
+ERROR@12561: expected SEMICOLON
+ERROR@12561: expected command, found IDENT
+ERROR@12562: expected command, found COMMA
+ERROR@12563: expected command, found IDENT
+ERROR@12564: expected command, found R_PAREN
+ERROR@12942: missing comma
+ERROR@12951: expected an expression, found WHERE_KW
+ERROR@12956: expected R_PAREN
+ERROR@12958: missing comma
+ERROR@12962: expected SEMICOLON
+ERROR@12962: expected command, found R_PAREN
+ERROR@12964: expected command, found FROM_KW
+ERROR@12969: expected command, found IDENT
+ERROR@12985: expected R_PAREN
+ERROR@12985: expected SEMICOLON
+ERROR@12985: expected command, found INT_NUMBER
+ERROR@12986: expected command, found COMMA
+ERROR@12987: expected command, found INT_NUMBER
+ERROR@12988: expected command, found R_PAREN
+ERROR@12990: expected command, found IDENT
+ERROR@13107: missing comma
+ERROR@13123: expected COMMA
+ERROR@13126: expected COMMA
+ERROR@13283: missing comma
+ERROR@13292: expected an expression, found WHERE_KW
+ERROR@13297: expected R_PAREN
+ERROR@13299: missing comma
+ERROR@13303: expected SEMICOLON
+ERROR@13303: expected command, found R_PAREN
+ERROR@13305: expected command, found FROM_KW
+ERROR@13310: expected command, found IDENT
+ERROR@13326: expected R_PAREN
+ERROR@13326: expected SEMICOLON
+ERROR@13326: expected command, found INT_NUMBER
+ERROR@13327: expected command, found COMMA
+ERROR@13328: expected command, found INT_NUMBER
+ERROR@13329: expected command, found R_PAREN
+ERROR@13331: expected command, found IDENT
+ERROR@13510: missing comma
+ERROR@13519: expected an expression, found WHERE_KW
+ERROR@13524: expected R_PAREN
+ERROR@13526: missing comma
+ERROR@13530: expected SEMICOLON
+ERROR@13530: expected command, found R_PAREN
+ERROR@13532: expected command, found FROM_KW
+ERROR@13537: expected command, found IDENT
+ERROR@13553: expected R_PAREN
+ERROR@13553: expected SEMICOLON
+ERROR@13553: expected command, found INT_NUMBER
+ERROR@13554: expected command, found COMMA
+ERROR@13555: expected command, found INT_NUMBER
+ERROR@13556: expected command, found R_PAREN
+ERROR@13558: expected command, found IDENT
+ERROR@13672: missing comma
+ERROR@13688: expected COMMA
+ERROR@13691: expected COMMA
+ERROR@13844: missing comma
+ERROR@13853: expected an expression, found WHERE_KW
+ERROR@13858: expected R_PAREN
+ERROR@13860: missing comma
+ERROR@13864: expected SEMICOLON
+ERROR@13864: expected command, found R_PAREN
+ERROR@13866: expected command, found FROM_KW
+ERROR@13871: expected command, found IDENT
+ERROR@13887: expected R_PAREN
+ERROR@13887: expected SEMICOLON
+ERROR@13887: expected command, found INT_NUMBER
+ERROR@13888: expected command, found COMMA
+ERROR@13889: expected command, found INT_NUMBER
+ERROR@13890: expected command, found R_PAREN
+ERROR@13892: expected command, found IDENT
