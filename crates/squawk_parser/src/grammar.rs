@@ -2952,7 +2952,7 @@ const JOIN_TYPE_FIRST: TokenSet =
 //   LEFT [ OUTER ] JOIN
 //   RIGHT [ OUTER ] JOIN
 //   FULL [ OUTER ] JOIN
-fn join_type(p: &mut Parser<'_>) {
+fn join_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     assert!(p.at_ts(JOIN_TYPE_FIRST));
     let m = p.start();
     let kind = match p.current() {
@@ -2987,10 +2987,10 @@ fn join_type(p: &mut Parser<'_>) {
         _ => {
             p.error("expected join type");
             m.abandon(p);
-            return;
+            return None;
         }
     };
-    m.complete(p, kind);
+    Some(m.complete(p, kind))
 }
 
 const JOIN_FIRST: TokenSet = TokenSet::new(&[NATURAL_KW, CROSS_KW]).union(JOIN_TYPE_FIRST);
@@ -3379,10 +3379,10 @@ fn merge_using_clause(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(USING_KW);
     opt_from_item(p);
-    p.expect(ON_KW);
-    // join_condition
-    if expr(p).is_none() {
-        p.error("expected an expression");
+    if p.at(ON_KW) {
+        on_clause(p);
+    } else {
+        p.error("expected on clause");
     }
     m.complete(p, USING_ON_CLAUSE);
 }
@@ -3451,14 +3451,14 @@ fn opt_from_item(p: &mut Parser<'_>) -> bool {
 fn join(p: &mut Parser<'_>) {
     assert!(p.at_ts(JOIN_FIRST));
     let m = p.start();
-    p.eat(NATURAL_KW);
-    join_type(p);
+    let is_natural = p.eat(NATURAL_KW);
+    let result = join_type(p);
+    let join_kind = result.map(|x| x.kind()).unwrap_or(JOIN_INNER);
     if !opt_from_item(p) {
         p.error("expected from_item");
     }
-    // need to check that we're not actually at the on_conflict clause in an
-    // insert/update statement
-    if p.at(ON_KW) && !(p.nth_at(1, CONFLICT_KW) && matches!(p.nth(2), DO_KW | ON_KW | L_PAREN)) {
+    let can_have_on_clause = !is_natural && join_kind != JOIN_CROSS;
+    if p.at(ON_KW) && can_have_on_clause {
         on_clause(p);
     } else if p.at(USING_KW) {
         join_using_clause(p);
@@ -3467,6 +3467,7 @@ fn join(p: &mut Parser<'_>) {
 }
 
 fn on_clause(p: &mut Parser<'_>) {
+    assert!(p.at(ON_KW));
     let m = p.start();
     p.bump(ON_KW);
     if expr(p).is_none() {
