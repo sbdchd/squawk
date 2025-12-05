@@ -3456,7 +3456,9 @@ fn join(p: &mut Parser<'_>) {
     if !opt_from_item(p) {
         p.error("expected from_item");
     }
-    if p.at(ON_KW) && !p.nth_at(1, CONFLICT_KW) {
+    // need to check that we're not actually at the on_conflict clause in an
+    // insert/update statement
+    if p.at(ON_KW) && !(p.nth_at(1, CONFLICT_KW) && matches!(p.nth(2), DO_KW | ON_KW | L_PAREN)) {
         on_clause(p);
     } else if p.at(USING_KW) {
         join_using_clause(p);

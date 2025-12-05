@@ -1508,10 +1508,197 @@ SOURCE_FILE
       ON_KW "ON"
       WHITESPACE " "
       CONFLICT_KW "CONFLICT"
-      WHITESPACE " "
+      WHITESPACE "\n  "
       CONFLICT_DO_NOTHING
         DO_KW "DO"
         WHITESPACE " "
         NOTHING_KW "NOTHING"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " \n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        JOIN_EXPR
+          FROM_ITEM
+            NAME_REF
+              IDENT "u"
+          WHITESPACE " "
+          JOIN
+            JOIN_INNER
+              JOIN_KW "join"
+            WHITESPACE " "
+            FROM_ITEM
+              NAME_REF
+                IDENT "i"
+            WHITESPACE " \n"
+            ON_CLAUSE
+              ON_KW "on"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  CONFLICT_KW "conflict"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                NAME_REF
+                  CONFLICT_KW "conflict"
+    WHITESPACE "\n"
+    ON_CONFLICT_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      CONFLICT_KW "conflict"
+      WHITESPACE "\n  "
+      CONFLICT_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " \n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        JOIN_EXPR
+          FROM_ITEM
+            NAME_REF
+              IDENT "u"
+          WHITESPACE " "
+          JOIN
+            JOIN_INNER
+              JOIN_KW "join"
+            WHITESPACE " "
+            FROM_ITEM
+              NAME_REF
+                IDENT "i"
+            WHITESPACE " \n"
+            ON_CLAUSE
+              ON_KW "on"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  CONFLICT_KW "conflict"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                NAME_REF
+                  CONFLICT_KW "conflict"
+    WHITESPACE "\n"
+    ON_CONFLICT_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      CONFLICT_KW "conflict"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          CONFLICT_INDEX_ITEM
+            NAME_REF
+              IDENT "foo"
+          R_PAREN ")"
+      WHITESPACE "\n  "
+      CONFLICT_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " \n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        JOIN_EXPR
+          FROM_ITEM
+            NAME_REF
+              IDENT "u"
+          WHITESPACE " "
+          JOIN
+            JOIN_INNER
+              JOIN_KW "join"
+            WHITESPACE " "
+            FROM_ITEM
+              NAME_REF
+                IDENT "i"
+            WHITESPACE " \n"
+            ON_CLAUSE
+              ON_KW "on"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  CONFLICT_KW "conflict"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                NAME_REF
+                  CONFLICT_KW "conflict"
+    WHITESPACE "\n"
+    ON_CONFLICT_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      CONFLICT_KW "conflict"
+      WHITESPACE "\n  "
+      CONFLICT_ON_CONSTRAINT
+        ON_KW "on"
+        WHITESPACE " "
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "temporal_rng_pk"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
   SEMICOLON ";"
   WHITESPACE "\n"

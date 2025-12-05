@@ -99,4 +99,23 @@ INSERT INTO t
 SELECT *
 FROM t
 CROSS JOIN f
-ON CONFLICT DO NOTHING;
+ON CONFLICT
+  DO NOTHING;
+
+insert into t 
+select * from u join i 
+on conflict = conflict
+on conflict
+  do nothing;
+
+insert into t 
+select * from u join i 
+on conflict = conflict
+on conflict (foo)
+  do nothing;
+
+insert into t 
+select * from u join i 
+on conflict = conflict
+on conflict
+  on constraint temporal_rng_pk do nothing;
