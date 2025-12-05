@@ -2185,6 +2185,10 @@ impl CallExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn json_scalar_fn(&self) -> Option<JsonScalarFn> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn json_serialize_fn(&self) -> Option<JsonSerializeFn> {
         support::child(&self.syntax)
     }
@@ -9423,6 +9427,29 @@ impl JsonReturningClause {
     #[inline]
     pub fn returning_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RETURNING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonScalarFn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonScalarFn {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn json_scalar_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_SCALAR_KW)
     }
 }
 
@@ -22645,6 +22672,24 @@ impl AstNode for JsonReturningClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JSON_RETURNING_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonScalarFn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_SCALAR_FN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

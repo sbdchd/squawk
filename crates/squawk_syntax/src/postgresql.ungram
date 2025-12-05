@@ -68,9 +68,10 @@ CallExpr =
 | JsonExistsFn
 | JsonArrayFn
 | JsonObjectFn
-| JsonObjectAggFn
-| JsonArrayAggFn
+| JsonObjectAggFn WithinClause? FilterClause? OverClause?
+| JsonArrayAggFn WithinClause? FilterClause? OverClause?
 | JsonQueryFn
+| JsonScalarFn
 | JsonSerializeFn
 | JsonValueFn
 | JsonFn
@@ -98,6 +99,9 @@ JsonArrayFn =
   )
   JsonReturningClause?
  ')'
+
+JsonScalarFn =
+  'json_scalar' '(' Expr ')'
 
 JsonFn =
   'json' '(' JsonExprFormat JsonKeysUniqueClause? ')'

@@ -2384,9 +2384,8 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CALL_EXPR
-            NAME_REF
+            JSON_SCALAR_FN
               JSON_SCALAR_KW "json_scalar"
-            ARG_LIST
               L_PAREN "("
               LITERAL
                 INT_NUMBER "1"

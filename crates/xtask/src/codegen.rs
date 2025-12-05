@@ -628,6 +628,9 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
                 | "base" | "index"
                 // field expr fields
                 | /* "base" | */ "field"
+                | /* case expr  */ "condition" | "then"
+                | /* add foreign key constraint */ "from_columns" | "to_columns"
+                | /* rename column */ "from" | "to"
             );
             if manually_implemented {
                 return;

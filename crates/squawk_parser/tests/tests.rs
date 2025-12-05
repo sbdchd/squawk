@@ -100,6 +100,11 @@ fn regression_suite(fixture: Fixture<&str>) {
     }, {
       assert_snapshot!(snapshot_name, errors.join(""));
     });
+
+    assert!(
+        errors.is_empty(),
+        "tests defined in the regression suite can't have parser errors."
+    );
 }
 
 fn parse_text(text: &str) -> (String, Vec<std::string::String>) {

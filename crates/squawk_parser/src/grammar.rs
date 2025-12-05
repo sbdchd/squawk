@@ -256,7 +256,9 @@ fn extract_fn(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("expected an expression");
     }
     p.expect(R_PAREN);
-    m.complete(p, EXTRACT_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, EXTRACT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // | OVERLAY '(' overlay_list ')'
@@ -289,7 +291,9 @@ fn overlay_fn(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, OVERLAY_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, OVERLAY_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // POSITION '(' position_list ')'
@@ -321,7 +325,9 @@ fn position_fn(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("expected an expression");
     }
     p.expect(R_PAREN);
-    m.complete(p, POSITION_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, POSITION_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
@@ -350,7 +356,9 @@ fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
         }
     };
     p.expect(R_PAREN);
-    m.complete(p, TRIM_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, TRIM_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // SUBSTRING '(' substr_list ')'
@@ -408,9 +416,9 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
         _ => {}
     }
     p.expect(R_PAREN);
-    m.complete(p, SUBSTRING_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, SUBSTRING_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_json_encoding_clause(p: &mut Parser<'_>) {
@@ -561,9 +569,9 @@ fn json_object_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(L_PAREN);
     json_object_fn_arg_list(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_OBJECT_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_OBJECT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn json_objectagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
@@ -576,9 +584,9 @@ fn json_objectagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
     opt_json_keys_unique_clause(p);
     opt_json_returning_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_OBJECT_AGG_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_OBJECT_AGG_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 /// <https://www.postgresql.org/docs/17/functions-json.html#FUNCTIONS-SQLJSON-TABLE>
@@ -746,9 +754,9 @@ fn json_array_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(L_PAREN);
     opt_json_array_fn_arg_list(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_ARRAY_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_ARRAY_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 /// <https://www.postgresql.org/docs/17/functions-comparisons.html#FUNCTIONS-COMPARISONS-ANY-SOME>
@@ -775,7 +783,9 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, kind).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, kind).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // literal, path, tuple, array
@@ -809,6 +819,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         (JSON_OBJECTAGG_KW, L_PAREN) => json_objectagg_fn(p),
         (JSON_ARRAYAGG_KW, L_PAREN) => json_arrayagg_fn(p),
         (JSON_QUERY_KW, L_PAREN) => json_query_fn(p),
+        (JSON_SCALAR_KW, L_PAREN) => json_scalar_fn(p),
         (JSON_SERIALIZE_KW, L_PAREN) => json_serialize_fn(p),
         (JSON_VALUE_KW, L_PAREN) => json_value_fn(p),
         (JSON_KW, L_PAREN) => json_fn(p),
@@ -858,9 +869,9 @@ fn json_arrayagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
     opt_json_null_clause(p);
     opt_json_returning_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_ARRAY_AGG_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_ARRAY_AGG_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
@@ -874,7 +885,9 @@ fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("expected select");
     }
     p.expect(R_PAREN);
-    m.complete(p, EXISTS_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, EXISTS_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLPI '(' NAME_P ColLabel ',' a_expr ')'
@@ -890,7 +903,9 @@ fn xmlpi_fn(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("expected expr");
     }
     p.expect(R_PAREN);
-    m.complete(p, XML_PI_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, XML_PI_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLPARSE '(' document_or_content a_expr xml_whitespace_option ')'
@@ -918,9 +933,9 @@ fn xmlparse_fn(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(WHITESPACE_KW);
     }
     p.expect(R_PAREN);
-    m.complete(p, XML_PARSE_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, XML_PARSE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_xml_passing_mech(p: &mut Parser<'_>) -> bool {
@@ -953,9 +968,9 @@ fn xmlexists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(L_PAREN);
     xml_row_passing_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, XML_EXISTS_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, XML_EXISTS_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLELEMENT '(' NAME_P ColLabel ',' xml_attributes ',' expr_list ')'
@@ -991,9 +1006,9 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, XML_ELEMENT_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, XML_ELEMENT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn xml_attribute_list(p: &mut Parser<'_>) {
@@ -1023,9 +1038,9 @@ fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(L_PAREN);
     xml_attribute_list(p);
     p.expect(R_PAREN);
-    m.complete(p, XML_FOREST_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, XML_FOREST_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename xml_indent_option ')'
@@ -1054,9 +1069,9 @@ fn xmlserialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
         p.eat(INDENT_KW);
     }
     p.expect(R_PAREN);
-    m.complete(p, XML_SERIALIZE_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, XML_SERIALIZE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLROOT '(' a_expr ',' xml_root_version opt_xml_root_standalone ')'
@@ -1092,7 +1107,9 @@ fn xmlroot_fn(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, XML_ROOT_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, XML_ROOT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON '(' json_value_expr json_key_uniqueness_constraint_opt ')'
@@ -1102,13 +1119,26 @@ fn json_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(JSON_KW);
     p.expect(L_PAREN);
     // json_value_expr
-    if expr(p).is_none() {
-        p.error("expected expression");
-    }
+    opt_expr(p);
     opt_json_format_clause(p);
     opt_json_keys_unique_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_FN).precede(p).complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
+}
+
+// JSON_SCALAR '(' json_value_expr_opt ')'
+fn json_scalar_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(JSON_SCALAR_KW));
+    let m = p.start();
+    p.expect(JSON_SCALAR_KW);
+    p.expect(L_PAREN);
+    opt_expr(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_SCALAR_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON_VALUE '('
@@ -1134,9 +1164,9 @@ fn json_value_fn(p: &mut Parser<'_>) -> CompletedMarker {
     opt_json_returning_clause(p);
     opt_json_behavior_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_VALUE_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_VALUE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON_SERIALIZE '(' json_value_expr json_returning_clause_opt ')'
@@ -1145,15 +1175,13 @@ fn json_serialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(JSON_SERIALIZE_KW);
     p.expect(L_PAREN);
-    if expr(p).is_none() {
-        p.error("expected expression");
-    }
+    opt_expr(p);
     opt_json_format_clause(p);
     opt_json_returning_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_SERIALIZE_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_SERIALIZE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON_QUERY (
@@ -1186,9 +1214,9 @@ fn json_query_fn(p: &mut Parser<'_>) -> CompletedMarker {
     opt_json_quotes_clause(p);
     opt_json_behavior_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_QUERY_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_QUERY_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_json_quotes_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -1279,9 +1307,9 @@ fn json_exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     opt_json_passing_clause(p);
     opt_json_on_error_clause(p);
     p.expect(R_PAREN);
-    m.complete(p, JSON_EXISTS_FN)
-        .precede(p)
-        .complete(p, CALL_EXPR)
+    let m = m.complete(p, JSON_EXISTS_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_json_on_error_clause(p: &mut Parser<'_>) {
