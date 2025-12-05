@@ -160,12 +160,6 @@ fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
             }
         }
         NotAllowed => {
-            if let Some(on_clause) = join.on_clause() {
-                acc.push(SyntaxError::new(
-                    format!("Join condition is not allowed for {join_name} joins."),
-                    on_clause.syntax().text_range(),
-                ));
-            }
             if let Some(using_clause) = join.using_clause() {
                 acc.push(SyntaxError::new(
                     format!("Join `using` clause is not allowed for {join_name} joins."),

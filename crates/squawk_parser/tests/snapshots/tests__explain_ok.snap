@@ -1061,24 +1061,25 @@ SOURCE_FILE
           NAME_REF
             IDENT "u"
         WHITESPACE "\n    "
-        ON_KW "on"
-        WHITESPACE " "
-        BIN_EXPR
-          FIELD_EXPR
-            NAME_REF
-              IDENT "t"
-            DOT "."
-            NAME_REF
-              IDENT "id"
+        ON_CLAUSE
+          ON_KW "on"
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          FIELD_EXPR
-            NAME_REF
-              IDENT "u"
-            DOT "."
-            NAME_REF
-              IDENT "id"
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t"
+              DOT "."
+              NAME_REF
+                IDENT "id"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "u"
+              DOT "."
+              NAME_REF
+                IDENT "id"
       WHITESPACE "\n  "
       MERGE_WHEN_MATCHED
         WHEN_KW "when"

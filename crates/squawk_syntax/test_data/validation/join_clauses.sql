@@ -10,12 +10,9 @@ select * from t full join u;
 
 -- err, can't use conditions with natural join
 select * from t natural join u using (id);
-select * from t natural join u on u.id = t.id;
 
 -- err, can't use conditions with cross joins
 select * from t cross join u using (id);
-select * from t cross join u on u.id = t.id;
-select * from t cross join u on true;
 
 -- ok
 select * from t natural join u;

@@ -35,10 +35,11 @@ SOURCE_FILE
               NAME_REF
                 IDENT "u"
             WHITESPACE " "
-            ON_KW "on"
-            WHITESPACE " "
-            LITERAL
-              TRUE_KW "true"
+            ON_CLAUSE
+              ON_KW "on"
+              WHITESPACE " "
+              LITERAL
+                TRUE_KW "true"
           WHITESPACE "\n    "
           MERGE_WHEN_MATCHED
             WHEN_KW "when"

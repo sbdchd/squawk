@@ -24,24 +24,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "when"
@@ -108,10 +109,11 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE " "
-      ON_KW "on"
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
+      ON_CLAUSE
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
     WHITESPACE "\n  "
     MERGE_WHEN_MATCHED
       WHEN_KW "when"
@@ -211,24 +213,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "when"
@@ -302,24 +305,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "when"
@@ -430,24 +434,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "when"
@@ -486,24 +491,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "when"
@@ -565,24 +571,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "when"
@@ -661,24 +668,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_MATCHED
       WHEN_KW "when"
@@ -865,24 +873,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_MATCHED
       WHEN_KW "when"
@@ -961,24 +970,25 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
       WHITESPACE "\n    "
-      ON_KW "on"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+      ON_CLAUSE
+        ON_KW "on"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "u"
-          DOT "."
-          NAME_REF
-            IDENT "id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
     WHITESPACE "\n  "
     MERGE_WHEN_MATCHED
       WHEN_KW "when"
@@ -1021,24 +1031,25 @@ SOURCE_FILE
           NAME
             IDENT "t"
       WHITESPACE "\n"
-      ON_KW "ON"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "customer_id"
+      ON_CLAUSE
+        ON_KW "ON"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "ca"
-          DOT "."
-          NAME_REF
-            IDENT "customer_id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "customer_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "ca"
+            DOT "."
+            NAME_REF
+              IDENT "customer_id"
     WHITESPACE "\n"
     MERGE_WHEN_MATCHED
       WHEN_KW "WHEN"
@@ -1169,24 +1180,25 @@ SOURCE_FILE
           NAME
             IDENT "t"
       WHITESPACE "\n"
-      ON_KW "ON"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "t"
-          DOT "."
-          NAME_REF
-            IDENT "customer_id"
+      ON_CLAUSE
+        ON_KW "ON"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "ca"
-          DOT "."
-          NAME_REF
-            IDENT "customer_id"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "customer_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "ca"
+            DOT "."
+            NAME_REF
+              IDENT "customer_id"
     WHITESPACE "\n"
     MERGE_WHEN_MATCHED
       WHEN_KW "WHEN"
@@ -1294,24 +1306,25 @@ SOURCE_FILE
           NAME
             IDENT "s"
       WHITESPACE "\n"
-      ON_KW "ON"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "s"
-          DOT "."
-          NAME_REF
-            IDENT "winename"
+      ON_CLAUSE
+        ON_KW "ON"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "w"
-          DOT "."
-          NAME_REF
-            IDENT "winename"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "winename"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "w"
+            DOT "."
+            NAME_REF
+              IDENT "winename"
     WHITESPACE "\n"
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "WHEN"
@@ -1484,24 +1497,25 @@ SOURCE_FILE
           NAME
             IDENT "s"
       WHITESPACE "\n"
-      ON_KW "ON"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "s"
-          DOT "."
-          NAME_REF
-            IDENT "winename"
+      ON_CLAUSE
+        ON_KW "ON"
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "w"
-          DOT "."
-          NAME_REF
-            IDENT "winename"
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "winename"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "w"
+            DOT "."
+            NAME_REF
+              IDENT "winename"
     WHITESPACE "\n"
     MERGE_WHEN_NOT_MATCHED_TARGET
       WHEN_KW "WHEN"
@@ -1603,5 +1617,133 @@ SOURCE_FILE
       WHITESPACE "\n  "
       MERGE_DELETE
         DELETE_KW "DELETE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cross_join_data_source"
+  WHITESPACE "\n"
+  MERGE
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    USING_ON_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "u"
+        WHITESPACE " "
+        JOIN
+          JOIN_CROSS
+            CROSS_KW "cross"
+            WHITESPACE " "
+            JOIN_KW "join"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "v"
+      WHITESPACE "\n  "
+      ON_CLAUSE
+        ON_KW "on"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+    WHITESPACE "\n  "
+    MERGE_WHEN_MATCHED
+      WHEN_KW "when"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE "\n    "
+      MERGE_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- natural join"
+  WHITESPACE "\n"
+  MERGE
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    USING_ON_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "u"
+        WHITESPACE " "
+        JOIN
+          NATURAL_KW "natural"
+          WHITESPACE " "
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "v"
+      WHITESPACE "\n  "
+      ON_CLAUSE
+        ON_KW "on"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "u"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+    WHITESPACE "\n  "
+    MERGE_WHEN_MATCHED
+      WHEN_KW "when"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE "\n    "
+      MERGE_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
   SEMICOLON ";"
   WHITESPACE "\n"

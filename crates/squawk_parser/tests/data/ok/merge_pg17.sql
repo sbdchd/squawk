@@ -145,3 +145,17 @@ WHEN MATCHED AND w.stock != s.stock THEN
   UPDATE SET stock = s.stock
 WHEN NOT MATCHED BY SOURCE THEN
   DELETE;
+
+-- cross_join_data_source
+merge into t
+  using u cross join v
+  on t.id = u.id
+  when matched then
+    do nothing;
+
+-- natural join
+merge into t
+  using u natural join v
+  on t.id = u.id
+  when matched then
+    do nothing;
