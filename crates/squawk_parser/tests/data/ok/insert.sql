@@ -91,3 +91,12 @@ INSERT INTO distributors (did, dname) VALUES (10, 'Conrad International')
 
 -- with schema
 insert into s.t (c) values (1);
+
+
+-- regression check for issue #718
+-- we were parsing the `on conflict` as the start of a `join on`
+INSERT INTO t
+SELECT *
+FROM t
+CROSS JOIN f
+ON CONFLICT DO NOTHING;
