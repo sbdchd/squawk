@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.32.0 - 2025-12-04
+
+## Fixed
+
+- parser: fixed issue parsing some `insert`'s with `select`s and `conflict` clauses (#720, #721, #722).
+
+## Added
+
+- parser: special case functions like `extract` are now properly typed in the ast (#719).
+
 ## v2.31.0 - 2025-11-24
 
 ## Added

@@ -330,16 +330,16 @@ cargo xtask new-rule 'prefer big serial'
 
 ### Releasing a New Version
 
-1. Update the `CHANGELOG.md`
-
-   Include a description of any fixes / additions. Make sure to include the PR numbers and credit the authors.
-
-2. Run `s/update-version`
+1. Run `s/update-version`
 
    ```bash
    # update version in squawk/Cargo.toml, package.json, flake.nix to 4.5.3
    s/update-version 4.5.3
    ```
+
+2. Update the `CHANGELOG.md`
+
+   Include a description of any fixes / additions. Make sure to include the PR numbers and credit the authors.
 
 3. Create a new release on GitHub
 
