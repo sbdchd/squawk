@@ -1463,4 +1463,55 @@ SOURCE_FILE
             INT_NUMBER "1"
           R_PAREN ")"
   SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- regression check for issue #718"
+  WHITESPACE "\n"
+  COMMENT "-- we were parsing the `on conflict` as the start of a `join on`"
+  WHITESPACE "\n"
+  INSERT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE "\n"
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        JOIN_EXPR
+          FROM_ITEM
+            NAME_REF
+              IDENT "t"
+          WHITESPACE "\n"
+          JOIN
+            JOIN_CROSS
+              CROSS_KW "CROSS"
+              WHITESPACE " "
+              JOIN_KW "JOIN"
+            WHITESPACE " "
+            FROM_ITEM
+              NAME_REF
+                IDENT "f"
+    WHITESPACE "\n"
+    ON_CONFLICT_CLAUSE
+      ON_KW "ON"
+      WHITESPACE " "
+      CONFLICT_KW "CONFLICT"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "DO"
+        WHITESPACE " "
+        NOTHING_KW "NOTHING"
+  SEMICOLON ";"
   WHITESPACE "\n"

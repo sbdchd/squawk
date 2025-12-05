@@ -3456,7 +3456,7 @@ fn join(p: &mut Parser<'_>) {
     if !opt_from_item(p) {
         p.error("expected from_item");
     }
-    if p.at(ON_KW) {
+    if p.at(ON_KW) && !p.nth_at(1, CONFLICT_KW) {
         on_clause(p);
     } else if p.at(USING_KW) {
         join_using_clause(p);
