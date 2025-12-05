@@ -247,13 +247,18 @@ fn extract_arg(p: &mut Parser<'_>) {
 
 fn extract_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(EXTRACT_KW));
-    custom_fn(p, EXTRACT_KW, |p| {
-        extract_arg(p);
-        p.expect(FROM_KW);
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
-    })
+    let m = p.start();
+    p.expect(EXTRACT_KW);
+    p.expect(L_PAREN);
+    extract_arg(p);
+    p.expect(FROM_KW);
+    if expr(p).is_none() {
+        p.error("expected an expression");
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, EXTRACT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // | OVERLAY '(' overlay_list ')'
@@ -263,10 +268,10 @@ fn extract_fn(p: &mut Parser<'_>) -> CompletedMarker {
 // | OVERLAY '(' func_arg_list_opt ')
 fn overlay_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(OVERLAY_KW));
-    custom_fn(p, OVERLAY_KW, |p| {
-        if p.at(R_PAREN) {
-            return;
-        }
+    let m = p.start();
+    p.expect(OVERLAY_KW);
+    p.expect(L_PAREN);
+    if !p.at(R_PAREN) {
         if expr(p).is_none() {
             p.error("expected an expression");
         }
@@ -282,9 +287,13 @@ fn overlay_fn(p: &mut Parser<'_>) -> CompletedMarker {
                 p.error("expected an expression");
             }
         } else if p.eat(COMMA) {
-            expr_list(p);
+            opt_expr_list(p);
         }
-    })
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, OVERLAY_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // POSITION '(' position_list ')'
@@ -305,41 +314,51 @@ fn position_fn(p: &mut Parser<'_>) -> CompletedMarker {
             },
         )
     }
-    custom_fn(p, POSITION_KW, |p| {
-        if b_expr(p).is_none() {
-            p.error("expected an expression");
-        }
-        p.expect(IN_KW);
-        if b_expr(p).is_none() {
-            p.error("expected an expression");
-        }
-    })
+    let m = p.start();
+    p.expect(POSITION_KW);
+    p.expect(L_PAREN);
+    if b_expr(p).is_none() {
+        p.error("expected an expression");
+    }
+    p.expect(IN_KW);
+    if b_expr(p).is_none() {
+        p.error("expected an expression");
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, POSITION_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(TRIM_KW));
-    custom_fn(p, TRIM_KW, |p| {
-        let _ = p.eat(BOTH_KW) || p.eat(LEADING_KW) || p.eat(TRAILING_KW);
-        // | FROM expr_list
-        // | a_expr FROM expr_list
-        // | expr_list
+    let m = p.start();
+    p.expect(TRIM_KW);
+    p.expect(L_PAREN);
+    let _ = p.eat(BOTH_KW) || p.eat(LEADING_KW) || p.eat(TRAILING_KW);
+    // | FROM expr_list
+    // | a_expr FROM expr_list
+    // | expr_list
+    if p.eat(FROM_KW) {
+        if !opt_expr_list(p) {
+            p.error("expected expression")
+        }
+    } else {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
         if p.eat(FROM_KW) {
-            if !expr_list(p) {
-                p.error("expected expression")
-            }
+            opt_expr_list(p);
         } else {
-            if expr(p).is_none() {
-                p.error("expected expression");
+            if p.eat(COMMA) {
+                opt_expr_list(p);
             }
-            if p.eat(FROM_KW) {
-                expr_list(p);
-            } else {
-                if p.eat(COMMA) {
-                    expr_list(p);
-                }
-            }
-        };
-    })
+        }
+    };
+    p.expect(R_PAREN);
+    let m = m.complete(p, TRIM_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // SUBSTRING '(' substr_list ')'
@@ -353,48 +372,53 @@ fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
 // SUBSTRING '(' func_arg_list_opt ')'
 fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SUBSTRING_KW));
-    custom_fn(p, SUBSTRING_KW, |p| {
-        if expr(p).is_none() {
-            p.error("expected an expression");
+    let m = p.start();
+    p.expect(SUBSTRING_KW);
+    p.expect(L_PAREN);
+    if expr(p).is_none() {
+        p.error("expected an expression");
+    }
+    match p.current() {
+        // FOR a_expr FROM a_expr
+        // FOR a_expr
+        FOR_KW => {
+            p.bump(FOR_KW);
+            if expr(p).is_none() {
+                p.error("expected an expression");
+            }
+            // [ from expr ]
+            if p.eat(FROM_KW) && expr(p).is_none() {
+                p.error("expected an expression");
+            }
         }
-        match p.current() {
-            // FOR a_expr FROM a_expr
-            // FOR a_expr
-            FOR_KW => {
-                p.bump(FOR_KW);
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
-                // [ from expr ]
-                if p.eat(FROM_KW) && expr(p).is_none() {
-                    p.error("expected an expression");
-                }
+        // FROM a_expr
+        // FROM a_expr FOR a_expr
+        FROM_KW => {
+            p.bump(FROM_KW);
+            if expr(p).is_none() {
+                p.error("expected an expression");
             }
-            // FROM a_expr
-            // FROM a_expr FOR a_expr
-            FROM_KW => {
-                p.bump(FROM_KW);
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
-                // [ for expr ]
-                if p.eat(FOR_KW) && expr(p).is_none() {
-                    p.error("expected an expression");
-                }
+            // [ for expr ]
+            if p.eat(FOR_KW) && expr(p).is_none() {
+                p.error("expected an expression");
             }
-            // SIMILAR a_expr ESCAPE a_expr
-            SIMILAR_KW => {
-                p.bump(SIMILAR_KW);
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
-            }
-            _ if p.eat(COMMA) => {
-                expr_list(p);
-            }
-            _ => {}
         }
-    })
+        // SIMILAR a_expr ESCAPE a_expr
+        SIMILAR_KW => {
+            p.bump(SIMILAR_KW);
+            if expr(p).is_none() {
+                p.error("expected an expression");
+            }
+        }
+        _ if p.eat(COMMA) => {
+            opt_expr_list(p);
+        }
+        _ => {}
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, SUBSTRING_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_json_encoding_clause(p: &mut Parser<'_>) {
@@ -469,6 +493,15 @@ pub(crate) fn opt_json_keys_unique_clause(p: &mut Parser<'_>) {
     }
 }
 
+const JSON_OBJECT_FN_ARG_FOLLOW: TokenSet = TokenSet::new(&[
+    R_PAREN,
+    NULL_KW,
+    ABSENT_KW,
+    WITH_KW,
+    WITHOUT_KW,
+    RETURNING_KW,
+]);
+
 // json_object( func_arg_list )
 //   func_arg_list:  func_arg_expr
 //     | func_arg_list ',' func_arg_expr
@@ -506,16 +539,10 @@ fn json_object_fn_arg_list(p: &mut Parser<'_>) {
         // json_object(c_expr ,
         // json_object(a_expr :
         // json_object(a_expr value
-        json_object_arg(p);
+        json_key_value(p);
         // if we're at a the end of the params or the start of the optional
         // null_clause break
-        if p.at(R_PAREN)
-            || p.at(NULL_KW)
-            || p.at(ABSENT_KW)
-            || p.at(WITH_KW)
-            || p.at(WITHOUT_KW)
-            || p.at(RETURNING_KW)
-        {
+        if p.at_ts(JSON_OBJECT_FN_ARG_FOLLOW) {
             break;
         } else if p.at(COMMA) {
             // we're in a function arg
@@ -537,49 +564,40 @@ fn json_object_fn_arg_list(p: &mut Parser<'_>) {
 
 fn json_object_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_OBJECT_KW));
-    custom_fn(p, JSON_OBJECT_KW, |p| {
-        json_object_fn_arg_list(p);
-    })
+    let m = p.start();
+    p.expect(JSON_OBJECT_KW);
+    p.expect(L_PAREN);
+    json_object_fn_arg_list(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_OBJECT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn json_objectagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_OBJECTAGG_KW));
-    custom_fn(p, JSON_OBJECTAGG_KW, |p| {
-        json_object_arg(p);
-        opt_json_null_clause(p);
-        opt_json_keys_unique_clause(p);
-        opt_json_returning_clause(p);
-    })
+    let m = p.start();
+    p.expect(JSON_OBJECTAGG_KW);
+    p.expect(L_PAREN);
+    json_key_value(p);
+    opt_json_null_clause(p);
+    opt_json_keys_unique_clause(p);
+    opt_json_returning_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_OBJECT_AGG_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 /// <https://www.postgresql.org/docs/17/functions-json.html#FUNCTIONS-SQLJSON-TABLE>
 fn json_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
-    custom_fn(p, JSON_TABLE_KW, |p| {
-        json_table_arg_list(p);
-    })
-}
-
-fn custom_fn(
-    p: &mut Parser<'_>,
-    name: SyntaxKind,
-    mut body: impl FnMut(&mut Parser<'_>),
-) -> CompletedMarker {
-    assert!(p.at(name));
+    assert!(p.at(JSON_TABLE_KW));
     let m = p.start();
-    let name_ref = p.start();
-    p.expect(name);
-    name_ref.complete(p, NAME_REF);
-
-    let args = p.start();
+    p.bump(JSON_TABLE_KW);
     p.expect(L_PAREN);
-    if !p.at(R_PAREN) {
-        body(p);
-    }
+    json_table_arg_list(p);
     p.expect(R_PAREN);
-    args.complete(p, ARG_LIST);
-
-    opt_agg_clauses(p);
-    m.complete(p, CALL_EXPR)
+    m.complete(p, JSON_TABLE)
 }
 
 // JSON_TABLE (
@@ -667,22 +685,12 @@ fn opt_json_table_column(p: &mut Parser<'_>) -> bool {
             type_name(p);
             // name type EXISTS [ PATH path_expression ]
             if p.eat(EXISTS_KW) {
-                // [ PATH path_expression ]
-                if p.eat(PATH_KW) {
-                    // path_expression
-                    if expr(p).is_none() {
-                        p.error("expected expression");
-                    }
-                }
+                opt_json_path_clause(p);
                 opt_json_behavior_clause(p);
             } else {
                 // [ FORMAT JSON [ENCODING UTF8]]
                 opt_json_format_clause(p);
-                // [ PATH path_expression ]
-                if p.eat(PATH_KW) {
-                    // path_expression
-                    string_literal(p);
-                }
+                opt_json_path_clause(p);
                 opt_json_wrapper_behavior(p);
                 opt_json_quotes_clause(p);
                 opt_json_behavior_clause(p);
@@ -691,6 +699,18 @@ fn opt_json_table_column(p: &mut Parser<'_>) -> bool {
     }
     m.complete(p, JSON_TABLE_COLUMN);
     true
+}
+
+fn opt_json_path_clause(p: &mut Parser<'_>) {
+    let m = p.start();
+    // [ PATH path_expression ]
+    if p.eat(PATH_KW) {
+        // path_expression
+        string_literal(p);
+        m.complete(p, JSON_PATH_CLAUSE);
+    } else {
+        m.abandon(p);
+    }
 }
 
 // json_array (
@@ -702,7 +722,7 @@ fn opt_json_table_column(p: &mut Parser<'_>) -> bool {
 //  [ query_expression ]
 //  [ RETURNING data_type [ FORMAT JSON [ ENCODING UTF8 ] ] ]
 // )
-fn json_array_fn_arg_list(p: &mut Parser<'_>) {
+fn opt_json_array_fn_arg_list(p: &mut Parser<'_>) {
     // 1, 2, 3, 4
     while !p.at(EOF) && !p.at(R_PAREN) && !p.at(RETURNING_KW) {
         if p.at_ts(SELECT_FIRST) {
@@ -724,17 +744,19 @@ fn json_array_fn_arg_list(p: &mut Parser<'_>) {
         }
     }
     opt_json_null_clause(p);
-    // (RETURNING Typename json_format_clause_opt)
-    if opt_json_returning_clause(p).is_none() && opt_json_format_clause(p).is_none() {
-        opt_json_encoding_clause(p);
-    }
+    opt_json_returning_clause(p);
 }
 
 fn json_array_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_ARRAY_KW));
-    custom_fn(p, JSON_ARRAY_KW, |p| {
-        json_array_fn_arg_list(p);
-    })
+    let m = p.start();
+    p.expect(JSON_ARRAY_KW);
+    p.expect(L_PAREN);
+    opt_json_array_fn_arg_list(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_ARRAY_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 /// <https://www.postgresql.org/docs/17/functions-comparisons.html#FUNCTIONS-COMPARISONS-ANY-SOME>
@@ -743,10 +765,14 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     // TODO: this can only be in the conext of a binary expression, so we should
     // have some validation for that.
-    let m1 = p.start();
     // SOME | ANY | ALL
+    let kind = match p.current() {
+        SOME_KW => SOME_FN,
+        ANY_KW => ANY_FN,
+        ALL_KW => ALL_FN,
+        _ => unreachable!(),
+    };
     p.bump_any();
-    m1.complete(p, NAME_REF);
     // args
     p.expect(L_PAREN);
     if p.at_ts(SELECT_FIRST) {
@@ -757,6 +783,8 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
+    let m = m.complete(p, kind).precede(p);
+    opt_agg_clauses(p);
     m.complete(p, CALL_EXPR)
 }
 
@@ -791,6 +819,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         (JSON_OBJECTAGG_KW, L_PAREN) => json_objectagg_fn(p),
         (JSON_ARRAYAGG_KW, L_PAREN) => json_arrayagg_fn(p),
         (JSON_QUERY_KW, L_PAREN) => json_query_fn(p),
+        (JSON_SCALAR_KW, L_PAREN) => json_scalar_fn(p),
         (JSON_SERIALIZE_KW, L_PAREN) => json_serialize_fn(p),
         (JSON_VALUE_KW, L_PAREN) => json_value_fn(p),
         (JSON_KW, L_PAREN) => json_fn(p),
@@ -829,39 +858,54 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 fn json_arrayagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_ARRAYAGG_KW));
-    custom_fn(p, JSON_ARRAYAGG_KW, |p| {
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_format_clause(p);
-        opt_order_by_clause(p);
-        opt_json_null_clause(p);
-        opt_json_returning_clause(p);
-    })
+    let m = p.start();
+    p.expect(JSON_ARRAYAGG_KW);
+    p.expect(L_PAREN);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_format_clause(p);
+    opt_order_by_clause(p);
+    opt_json_null_clause(p);
+    opt_json_returning_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_ARRAY_AGG_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(EXISTS_KW));
-    custom_fn(p, EXISTS_KW, |p| {
-        if p.at_ts(SELECT_FIRST) {
-            select(p, None, &SelectRestrictions::default());
-        } else {
-            p.error("expected select")
-        }
-    })
+    let m = p.start();
+    p.bump(EXISTS_KW);
+    p.expect(L_PAREN);
+    if p.at_ts(SELECT_FIRST) {
+        select(p, None, &SelectRestrictions::default());
+    } else {
+        p.error("expected select");
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, EXISTS_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLPI '(' NAME_P ColLabel ',' a_expr ')'
 // XMLPI '(' NAME_P ColLabel ')'
 fn xmlpi_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLPI_KW));
-    custom_fn(p, XMLPI_KW, |p| {
-        p.expect(NAME_KW);
-        col_label(p);
-        if p.eat(COMMA) && expr(p).is_none() {
-            p.error("expected expr");
-        }
-    })
+    let m = p.start();
+    p.expect(XMLPI_KW);
+    p.expect(L_PAREN);
+    p.expect(NAME_KW);
+    col_label(p);
+    if p.eat(COMMA) && expr(p).is_none() {
+        p.error("expected expr");
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, XML_PI_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLPARSE '(' document_or_content a_expr xml_whitespace_option ')'
@@ -874,39 +918,38 @@ fn xmlpi_fn(p: &mut Parser<'_>) -> CompletedMarker {
 //     | /*EMPTY*/
 fn xmlparse_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLPARSE_KW));
-    custom_fn(p, XMLPARSE_KW, |p| {
-        if p.at(DOCUMENT_KW) || p.at(CONTENT_KW) {
-            p.bump_any();
-        } else {
-            p.error("expected DOCUMENT or CONTENT");
-        }
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        if p.eat(PRESERVE_KW) || p.eat(STRIP_KW) {
-            p.expect(WHITESPACE_KW);
-        }
-    })
+    let m = p.start();
+    p.expect(XMLPARSE_KW);
+    p.expect(L_PAREN);
+    if p.at(DOCUMENT_KW) || p.at(CONTENT_KW) {
+        p.bump_any();
+    } else {
+        p.error("expected DOCUMENT or CONTENT");
+    }
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    if p.eat(PRESERVE_KW) || p.eat(STRIP_KW) {
+        p.expect(WHITESPACE_KW);
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, XML_PARSE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_xml_passing_mech(p: &mut Parser<'_>) -> bool {
+    let m = p.start();
     if p.eat(BY_KW) {
         if !p.eat(REF_KW) && !p.eat(VALUE_KW) {
             p.error("expected REF or VALUE");
         }
+        m.complete(p, XML_PASSING_MECH);
         true
     } else {
+        m.abandon(p);
         false
     }
-}
-
-fn xmlexists_arg(p: &mut Parser<'_>) {
-    p.expect(PASSING_KW);
-    opt_xml_passing_mech(p);
-    if expr(p).is_none() {
-        p.error("expected expression");
-    }
-    opt_xml_passing_mech(p);
 }
 
 // XMLEXISTS '(' c_expr xmlexists_argument ')'
@@ -920,12 +963,14 @@ fn xmlexists_arg(p: &mut Parser<'_>) {
 //       | BY VALUE_P
 fn xmlexists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLEXISTS_KW));
-    custom_fn(p, XMLEXISTS_KW, |p| {
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        xmlexists_arg(p);
-    })
+    let m = p.start();
+    p.expect(XMLEXISTS_KW);
+    p.expect(L_PAREN);
+    xml_row_passing_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, XML_EXISTS_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLELEMENT '(' NAME_P ColLabel ',' xml_attributes ',' expr_list ')'
@@ -942,46 +987,60 @@ fn xmlexists_fn(p: &mut Parser<'_>) -> CompletedMarker {
 //      | a_expr
 fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLELEMENT_KW));
-    custom_fn(p, XMLELEMENT_KW, |p| {
-        p.expect(NAME_KW);
-        col_label(p);
-        if p.eat(COMMA) {
-            if p.eat(XMLATTRIBUTES_KW) {
-                // TODO: use delimited
-                p.expect(L_PAREN);
-                xml_attribute_list(p);
-                p.expect(R_PAREN);
-                if p.eat(COMMA) && !expr_list(p) {
-                    p.error("expected expression list");
-                }
-            } else if !expr_list(p) {
+    let m = p.start();
+    p.expect(XMLELEMENT_KW);
+    p.expect(L_PAREN);
+    p.expect(NAME_KW);
+    col_label(p);
+    if p.eat(COMMA) {
+        if p.eat(XMLATTRIBUTES_KW) {
+            // TODO: use delimited
+            p.expect(L_PAREN);
+            xml_attribute_list(p);
+            p.expect(R_PAREN);
+            if p.eat(COMMA) && !opt_expr_list(p) {
                 p.error("expected expression list");
             }
+        } else if !opt_expr_list(p) {
+            p.error("expected expression list");
         }
-    })
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, XML_ELEMENT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn xml_attribute_list(p: &mut Parser<'_>) {
+    let m = p.start();
     // TODO: use delimited
     while !p.at(EOF) && !p.at(R_PAREN) {
+        let m = p.start();
         if expr(p).is_none() {
             p.error("expected expression");
         }
         if p.eat(AS_KW) {
             col_label(p);
         }
+        m.complete(p, EXPR_AS_NAME);
         if !p.eat(COMMA) {
             break;
         }
     }
+    m.complete(p, XML_ATTRIBUTE_LIST);
 }
 
 // XMLFOREST '(' xml_attribute_list ')'
 fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLFOREST_KW));
-    custom_fn(p, XMLFOREST_KW, |p| {
-        xml_attribute_list(p);
-    })
+    let m = p.start();
+    p.expect(XMLFOREST_KW);
+    p.expect(L_PAREN);
+    xml_attribute_list(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, XML_FOREST_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename xml_indent_option ')'
@@ -991,23 +1050,28 @@ fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
 //   | /*EMPTY*/
 fn xmlserialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLSERIALIZE_KW));
-    custom_fn(p, XMLSERIALIZE_KW, |p| {
-        if p.at(DOCUMENT_KW) || p.at(CONTENT_KW) {
-            p.bump_any();
-        } else {
-            p.error("expected DOCUMENT or CONTENT");
-        }
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        p.expect(AS_KW);
-        type_name(p);
-        if p.eat(NO_KW) {
-            p.expect(INDENT_KW);
-        } else {
-            p.eat(INDENT_KW);
-        }
-    })
+    let m = p.start();
+    p.expect(XMLSERIALIZE_KW);
+    p.expect(L_PAREN);
+    if p.at(DOCUMENT_KW) || p.at(CONTENT_KW) {
+        p.bump_any();
+    } else {
+        p.error("expected DOCUMENT or CONTENT");
+    }
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    p.expect(AS_KW);
+    type_name(p);
+    if p.eat(NO_KW) {
+        p.expect(INDENT_KW);
+    } else {
+        p.eat(INDENT_KW);
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, XML_SERIALIZE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // XMLROOT '(' a_expr ',' xml_root_version opt_xml_root_standalone ')'
@@ -1021,39 +1085,60 @@ fn xmlserialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
 //     | /*EMPTY*/
 fn xmlroot_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLROOT_KW));
-    custom_fn(p, XMLROOT_KW, |p| {
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        p.expect(COMMA);
-        p.expect(VERSION_KW);
+    let m = p.start();
+    p.expect(XMLROOT_KW);
+    p.expect(L_PAREN);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    p.expect(COMMA);
+    p.expect(VERSION_KW);
+    if p.eat(NO_KW) {
+        p.expect(VALUE_KW);
+    } else if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    if p.eat(COMMA) {
+        p.expect(STANDALONE_KW);
         if p.eat(NO_KW) {
-            p.expect(VALUE_KW);
-        } else if expr(p).is_none() {
-            p.error("expected expression");
+            p.eat(VALUE_KW);
+        } else {
+            p.expect(YES_KW);
         }
-        if p.eat(COMMA) {
-            p.expect(STANDALONE_KW);
-            if p.eat(NO_KW) {
-                p.eat(VALUE_KW);
-            } else {
-                p.expect(YES_KW);
-            }
-        }
-    })
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, XML_ROOT_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON '(' json_value_expr json_key_uniqueness_constraint_opt ')'
 fn json_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_KW));
-    custom_fn(p, JSON_KW, |p| {
-        // json_value_expr
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_format_clause(p);
-        opt_json_keys_unique_clause(p);
-    })
+    let m = p.start();
+    p.expect(JSON_KW);
+    p.expect(L_PAREN);
+    // json_value_expr
+    opt_expr(p);
+    opt_json_format_clause(p);
+    opt_json_keys_unique_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
+}
+
+// JSON_SCALAR '(' json_value_expr_opt ')'
+fn json_scalar_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(JSON_SCALAR_KW));
+    let m = p.start();
+    p.expect(JSON_SCALAR_KW);
+    p.expect(L_PAREN);
+    opt_expr(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_SCALAR_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON_VALUE '('
@@ -1063,32 +1148,40 @@ fn json_fn(p: &mut Parser<'_>) -> CompletedMarker {
 // ')'
 fn json_value_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_VALUE_KW));
-    custom_fn(p, JSON_VALUE_KW, |p| {
-        // json_value_expr
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_format_clause(p);
-        p.expect(COMMA);
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_passing_clause(p);
-        opt_json_returning_clause(p);
-        opt_json_behavior_clause(p);
-    })
+    let m = p.start();
+    p.expect(JSON_VALUE_KW);
+    p.expect(L_PAREN);
+    // json_value_expr
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_format_clause(p);
+    p.expect(COMMA);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_passing_clause(p);
+    opt_json_returning_clause(p);
+    opt_json_behavior_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_VALUE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON_SERIALIZE '(' json_value_expr json_returning_clause_opt ')'
 fn json_serialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_SERIALIZE_KW));
-    custom_fn(p, JSON_SERIALIZE_KW, |p| {
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_format_clause(p);
-        opt_json_returning_clause(p);
-    })
+    let m = p.start();
+    p.expect(JSON_SERIALIZE_KW);
+    p.expect(L_PAREN);
+    opt_expr(p);
+    opt_json_format_clause(p);
+    opt_json_returning_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_SERIALIZE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 // JSON_QUERY (
@@ -1102,23 +1195,28 @@ fn json_serialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
 // )
 fn json_query_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_QUERY_KW));
-    custom_fn(p, JSON_QUERY_KW, |p| {
-        // context_item
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_format_clause(p);
-        p.expect(COMMA);
-        // path_expression
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_passing_clause(p);
-        opt_json_returning_clause(p);
-        opt_json_wrapper_behavior(p);
-        opt_json_quotes_clause(p);
-        opt_json_behavior_clause(p);
-    })
+    let m = p.start();
+    p.expect(JSON_QUERY_KW);
+    p.expect(L_PAREN);
+    // context_item
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_format_clause(p);
+    p.expect(COMMA);
+    // path_expression
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_passing_clause(p);
+    opt_json_returning_clause(p);
+    opt_json_wrapper_behavior(p);
+    opt_json_quotes_clause(p);
+    opt_json_behavior_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_QUERY_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_json_quotes_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -1195,18 +1293,23 @@ fn opt_json_wrapper_behavior(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // )
 fn json_exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_EXISTS_KW));
-    custom_fn(p, JSON_EXISTS_KW, |p| {
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_format_clause(p);
-        p.expect(COMMA);
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_json_passing_clause(p);
-        opt_json_on_error_clause(p);
-    })
+    let m = p.start();
+    p.expect(JSON_EXISTS_KW);
+    p.expect(L_PAREN);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_format_clause(p);
+    p.expect(COMMA);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_passing_clause(p);
+    opt_json_on_error_clause(p);
+    p.expect(R_PAREN);
+    let m = m.complete(p, JSON_EXISTS_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
 }
 
 fn opt_json_on_error_clause(p: &mut Parser<'_>) {
@@ -2260,7 +2363,7 @@ fn bexpr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     )
 }
 
-fn json_object_arg(p: &mut Parser) -> Option<CompletedMarker> {
+fn json_key_value(p: &mut Parser) -> Option<CompletedMarker> {
     let m = p.start();
     if expr(p).is_none() {
         p.error("expected expression");
@@ -2482,7 +2585,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
     Some(lhs)
 }
 
-fn expr_list(p: &mut Parser) -> bool {
+fn opt_expr_list(p: &mut Parser) -> bool {
     let mut found_expr = false;
     while !p.at(COMMA) {
         if expr(p).is_none() {
@@ -2744,7 +2847,7 @@ fn opt_locking_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     lock_strength(p);
     if p.eat(OF_KW) {
-        if !expr_list(p) {
+        if !opt_expr_list(p) {
             p.error("expected an expression");
         }
     }
@@ -3065,17 +3168,7 @@ fn from_item_name(p: &mut Parser<'_>) {
                 // we're at a table_name
                 p.eat(STAR);
                 opt_alias(p);
-                // [ TABLESAMPLE sampling_method ( argument [, ...] ) [ REPEATABLE ( seed ) ] ]
-                if p.eat(TABLESAMPLE_KW) {
-                    call_expr(p);
-                    if p.eat(REPEATABLE_KW) {
-                        p.eat(R_PAREN);
-                        if expr(p).is_none() {
-                            p.error("expected a seed");
-                        }
-                        p.eat(L_PAREN);
-                    }
-                }
+                opt_tablesample_clause(p);
             }
             got => {
                 p.error(format!("expected a name, got {got:?}"));
@@ -3098,20 +3191,7 @@ fn data_source(p: &mut Parser<'_>) {
             opt_alias(p);
         }
         XMLTABLE_KW => {
-            p.bump(XMLTABLE_KW);
-            p.expect(L_PAREN);
-            if p.eat(XMLNAMESPACES_KW) {
-                p.expect(L_PAREN);
-                xml_namespace_list(p);
-                p.expect(R_PAREN);
-                p.expect(COMMA);
-            }
-            if expr(p).is_none() {
-                p.error("expected expression");
-            }
-            xmlexists_arg(p);
-            xmltable_column_list(p);
-            p.expect(R_PAREN);
+            xml_table_fn(p);
             opt_alias(p);
         }
         ROWS_KW if p.nth_at(1, FROM_KW) => {
@@ -3144,6 +3224,34 @@ fn data_source(p: &mut Parser<'_>) {
             p.error("expected table reference");
         }
     }
+}
+
+fn xml_table_fn(p: &mut Parser<'_>) {
+    assert!(p.at(XMLTABLE_KW));
+    p.bump(XMLTABLE_KW);
+    p.expect(L_PAREN);
+    if p.eat(XMLNAMESPACES_KW) {
+        xml_namespace_list(p);
+        p.expect(COMMA);
+    }
+    xml_row_passing_clause(p);
+    xmltable_column_list(p);
+    p.expect(R_PAREN);
+}
+
+fn xml_row_passing_clause(p: &mut Parser<'_>) {
+    let m = p.start();
+    // row_expression PASSING [BY {REF|VALUE}] document_expression [BY {REF|VALUE}]
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    p.expect(PASSING_KW);
+    opt_xml_passing_mech(p);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_xml_passing_mech(p);
+    m.complete(p, XML_ROW_PASSING_CLAUSE);
 }
 
 fn opt_row_from_expr(p: &mut Parser<'_>) -> bool {
@@ -3212,13 +3320,26 @@ fn opt_xmltable_column_option_el(p: &mut Parser<'_>) -> Option<CompletedMarker> 
 }
 
 fn xml_namespace_list(p: &mut Parser<'_>) {
-    xml_namespace_element(p);
-    while !p.at(EOF) && p.eat(COMMA) {
-        xml_namespace_element(p);
-    }
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        XML_NAMESPACE_ELEMENT_FIRST,
+        opt_xml_namespace,
+    );
+    m.complete(p, XML_NAMESPACE_LIST);
 }
 
-fn xml_namespace_element(p: &mut Parser<'_>) {
+const XML_NAMESPACE_ELEMENT_FIRST: TokenSet = EXPR_FIRST.union(TokenSet::new(&[DEFAULT_KW]));
+
+fn opt_xml_namespace(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(XML_NAMESPACE_ELEMENT_FIRST) {
+        return false;
+    }
+    let m = p.start();
     if p.eat(DEFAULT_KW) {
         if expr(p).is_none() {
             p.error("expected expression");
@@ -3230,6 +3351,8 @@ fn xml_namespace_element(p: &mut Parser<'_>) {
         p.expect(AS_KW);
         col_label(p);
     }
+    m.complete(p, XML_NAMESPACE);
+    true
 }
 
 fn paren_data_source(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -4118,7 +4241,7 @@ fn opt_constraint_where_clause(p: &mut Parser<'_>) {
             p.error("expected expr");
         }
         p.expect(R_PAREN);
-        m.complete(p, CONSTRAINT_WHERE_CLAUSE);
+        m.complete(p, WHERE_CONDITION_CLAUSE);
     }
 }
 
@@ -4384,6 +4507,33 @@ fn opt_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, ALIAS))
 }
 
+// [ TABLESAMPLE sampling_method ( argument [, ...] ) [ REPEATABLE ( seed ) ] ]
+fn opt_tablesample_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at(TABLESAMPLE_KW) {
+        return None;
+    }
+    let m = p.start();
+    p.bump(TABLESAMPLE_KW);
+    call_expr(p);
+    opt_repeatable_clause(p);
+    Some(m.complete(p, TABLESAMPLE_CLAUSE))
+}
+
+// [ REPEATABLE ( seed ) ]
+fn opt_repeatable_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at(REPEATABLE_KW) {
+        return None;
+    }
+    let m = p.start();
+    p.bump(REPEATABLE_KW);
+    p.expect(L_PAREN);
+    if expr(p).is_none() {
+        p.error("expected a seed");
+    }
+    p.expect(R_PAREN);
+    Some(m.complete(p, REPEATABLE_CLAUSE))
+}
+
 fn opt_where_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at(WHERE_KW) {
         return None;
@@ -4555,7 +4705,7 @@ fn window_spec(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     opt_ident(p);
     if p.eat(PARTITION_KW) {
         p.expect(BY_KW);
-        if !expr_list(p) {
+        if !opt_expr_list(p) {
             p.error("expected expression")
         }
     }
@@ -8986,21 +9136,16 @@ fn create_procedure(p: &mut Parser<'_>) -> CompletedMarker {
 // TABLES IN SCHEMA { schema_name | CURRENT_SCHEMA } [ WHERE ( expression ) ]
 // CURRENT_SCHEMA
 fn publication_object(p: &mut Parser<'_>) {
+    let m = p.start();
     if p.eat(TABLES_KW) {
         p.expect(IN_KW);
         p.expect(SCHEMA_KW);
         if !p.eat(CURRENT_SCHEMA_KW) {
             name_ref(p);
         }
-        if p.eat(WHERE_KW) {
-            p.expect(L_PAREN);
-            if expr(p).is_none() {
-                p.error("expected expression");
-            }
-            p.expect(R_PAREN);
-        }
+        opt_constraint_where_clause(p);
     } else if p.eat(CURRENT_SCHEMA_KW) {
-        return;
+        // pass
     } else {
         p.eat(TABLE_KW);
         p.eat(ONLY_KW);
@@ -9012,14 +9157,9 @@ fn publication_object(p: &mut Parser<'_>) {
         }
         p.eat(STAR);
         opt_column_list(p);
-        if p.eat(WHERE_KW) {
-            p.expect(L_PAREN);
-            if expr(p).is_none() {
-                p.error("expected expression");
-            }
-            p.expect(R_PAREN);
-        }
+        opt_constraint_where_clause(p);
     }
+    m.complete(p, PUBLICATION_OBJECT);
 }
 
 // CREATE PUBLICATION name
@@ -9203,7 +9343,7 @@ fn create_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     }
     opt_paren_name_ref_list(p);
     if p.eat(ON_KW) {
-        if !expr_list(p) {
+        if !opt_expr_list(p) {
             p.error("expected expression")
         }
     }

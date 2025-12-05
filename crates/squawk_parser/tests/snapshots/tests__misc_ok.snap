@@ -1010,9 +1010,8 @@ SOURCE_FILE
               WHITESPACE " "
               CAST_EXPR
                 CALL_EXPR
-                  NAME_REF
+                  EXTRACT_FN
                     EXTRACT_KW "EXTRACT"
-                  ARG_LIST
                     L_PAREN "("
                     WHITESPACE " "
                     STRING "'hour'"
@@ -1069,9 +1068,8 @@ SOURCE_FILE
               WHITESPACE " "
               CAST_EXPR
                 CALL_EXPR
-                  NAME_REF
+                  EXTRACT_FN
                     EXTRACT_KW "EXTRACT"
-                  ARG_LIST
                     L_PAREN "("
                     WHITESPACE " "
                     STRING "'hour'"

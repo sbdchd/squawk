@@ -628,12 +628,12 @@ SOURCE_FILE
         EQ "="
         WHITESPACE " "
         CALL_EXPR
-          NAME_REF
+          ALL_FN
             ALL_KW "all"
-          L_PAREN "("
-          NAME_REF
-            IDENT "c"
-          R_PAREN ")"
+            L_PAREN "("
+            NAME_REF
+              IDENT "c"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- any"
@@ -663,12 +663,12 @@ SOURCE_FILE
         EQ "="
         WHITESPACE " "
         CALL_EXPR
-          NAME_REF
+          ANY_FN
             ANY_KW "any"
-          L_PAREN "("
-          NAME_REF
-            IDENT "c"
-          R_PAREN ")"
+            L_PAREN "("
+            NAME_REF
+              IDENT "c"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -696,24 +696,24 @@ SOURCE_FILE
         EQ "="
         WHITESPACE " "
         CALL_EXPR
-          NAME_REF
+          ANY_FN
             ANY_KW "any"
-          L_PAREN "("
-          ARRAY_EXPR
-            ARRAY_KW "array"
-            L_BRACK "["
-            LITERAL
-              STRING "'a'"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              STRING "'b'"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              STRING "'c'"
-            R_BRACK "]"
-          R_PAREN ")"
+            L_PAREN "("
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'b'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'c'"
+              R_BRACK "]"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -729,106 +729,106 @@ SOURCE_FILE
             EQ "="
             WHITESPACE " "
             CALL_EXPR
-              NAME_REF
+              ANY_FN
                 ANY_KW "any"
-              L_PAREN "("
-              SELECT
-                SELECT_CLAUSE
-                  SELECT_KW "select"
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CALL_EXPR
+              ANY_FN
+                ANY_KW "any"
+                L_PAREN "("
+                SELECT
+                  WITH_CLAUSE
+                    WITH_KW "with"
+                    WHITESPACE " "
+                    WITH_TABLE
+                      NAME
+                        IDENT "t"
+                      WHITESPACE " "
+                      AS_KW "as"
+                      WHITESPACE " "
+                      L_PAREN "("
+                      SELECT
+                        SELECT_CLAUSE
+                          SELECT_KW "select"
+                          WHITESPACE " "
+                          TARGET_LIST
+                            TARGET
+                              LITERAL
+                                INT_NUMBER "1"
+                      R_PAREN ")"
                   WHITESPACE " "
-                  TARGET_LIST
-                    TARGET
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        STAR "*"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "from"
+                    WHITESPACE " "
+                    FROM_ITEM
+                      NAME_REF
+                        IDENT "t"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CALL_EXPR
+              ANY_FN
+                ANY_KW "any"
+                L_PAREN "("
+                VALUES
+                  VALUES_KW "values"
+                  WHITESPACE " "
+                  ROW_LIST
+                    ROW
+                      L_PAREN "("
                       LITERAL
                         INT_NUMBER "1"
-              R_PAREN ")"
-  SEMICOLON ";"
-  WHITESPACE "\n\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          BIN_EXPR
-            LITERAL
-              INT_NUMBER "1"
-            WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            CALL_EXPR
-              NAME_REF
-                ANY_KW "any"
-              L_PAREN "("
-              SELECT
-                WITH_CLAUSE
-                  WITH_KW "with"
-                  WHITESPACE " "
-                  WITH_TABLE
-                    NAME
-                      IDENT "t"
+                      R_PAREN ")"
+                    COMMA ","
                     WHITESPACE " "
-                    AS_KW "as"
-                    WHITESPACE " "
-                    L_PAREN "("
-                    SELECT
-                      SELECT_CLAUSE
-                        SELECT_KW "select"
-                        WHITESPACE " "
-                        TARGET_LIST
-                          TARGET
-                            LITERAL
-                              INT_NUMBER "1"
-                    R_PAREN ")"
-                WHITESPACE " "
-                SELECT_CLAUSE
-                  SELECT_KW "select"
-                  WHITESPACE " "
-                  TARGET_LIST
-                    TARGET
-                      STAR "*"
-                WHITESPACE " "
-                FROM_CLAUSE
-                  FROM_KW "from"
-                  WHITESPACE " "
-                  FROM_ITEM
-                    NAME_REF
-                      IDENT "t"
-              R_PAREN ")"
-  SEMICOLON ";"
-  WHITESPACE "\n\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          BIN_EXPR
-            LITERAL
-              INT_NUMBER "1"
-            WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            CALL_EXPR
-              NAME_REF
-                ANY_KW "any"
-              L_PAREN "("
-              VALUES
-                VALUES_KW "values"
-                WHITESPACE " "
-                ROW_LIST
-                  ROW
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "1"
-                    R_PAREN ")"
-                  COMMA ","
-                  WHITESPACE " "
-                  ROW
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "3"
-                    R_PAREN ")"
-              R_PAREN ")"
+                    ROW
+                      L_PAREN "("
+                      LITERAL
+                        INT_NUMBER "3"
+                      R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- some"
@@ -846,18 +846,18 @@ SOURCE_FILE
             R_ANGLE ">"
             WHITESPACE " "
             CALL_EXPR
-              NAME_REF
+              SOME_FN
                 SOME_KW "some"
-              L_PAREN "("
-              SELECT
-                SELECT_CLAUSE
-                  SELECT_KW "select"
-                  WHITESPACE " "
-                  TARGET_LIST
-                    TARGET
-                      LITERAL
-                        INT_NUMBER "1"
-              R_PAREN ")"
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
@@ -875,18 +875,95 @@ SOURCE_FILE
             EQ "="
             WHITESPACE " "
             CALL_EXPR
-              NAME_REF
+              ALL_FN
                 ALL_KW "all"
-              L_PAREN "("
-              SELECT
-                SELECT_CLAUSE
-                  SELECT_KW "select"
-                  WHITESPACE " "
-                  TARGET_LIST
-                    TARGET
-                      LITERAL
-                        INT_NUMBER "1"
-              R_PAREN ")"
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- some/all/any with expr"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CALL_EXPR
+              ALL_FN
+                ALL_KW "all"
+                L_PAREN "("
+                ARRAY_EXPR
+                  ARRAY_KW "array"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "1"
+                  R_BRACK "]"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CALL_EXPR
+              SOME_FN
+                SOME_KW "some"
+                L_PAREN "("
+                ARRAY_EXPR
+                  ARRAY_KW "array"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "1"
+                  R_BRACK "]"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CALL_EXPR
+              ANY_FN
+                ANY_KW "any"
+                L_PAREN "("
+                ARRAY_EXPR
+                  ARRAY_KW "array"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "1"
+                  R_BRACK "]"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all with array"
@@ -921,24 +998,24 @@ SOURCE_FILE
             EQ "="
             WHITESPACE " "
             CALL_EXPR
-              NAME_REF
+              ALL_FN
                 ALL_KW "all"
-              L_PAREN "("
-              ARRAY_EXPR
-                ARRAY_KW "array"
-                L_BRACK "["
-                LITERAL
-                  STRING "'a'"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  STRING "'b'"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  STRING "'c'"
-                R_BRACK "]"
-              R_PAREN ")"
+                L_PAREN "("
+                ARRAY_EXPR
+                  ARRAY_KW "array"
+                  L_BRACK "["
+                  LITERAL
+                    STRING "'a'"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'b'"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'c'"
+                  R_BRACK "]"
+                R_PAREN ")"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -969,12 +1046,12 @@ SOURCE_FILE
         EQ "="
         WHITESPACE " "
         CALL_EXPR
-          NAME_REF
+          SOME_FN
             SOME_KW "some"
-          L_PAREN "("
-          NAME_REF
-            IDENT "c"
-          R_PAREN ")"
+            L_PAREN "("
+            NAME_REF
+              IDENT "c"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- any_values"
@@ -992,45 +1069,45 @@ SOURCE_FILE
             EQ "="
             WHITESPACE " "
             CALL_EXPR
-              NAME_REF
+              ANY_FN
                 ANY_KW "any"
-              L_PAREN "("
-              VALUES
-                VALUES_KW "values"
-                WHITESPACE " "
-                ROW_LIST
-                  ROW
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "1"
-                    COMMA ","
-                    WHITESPACE " "
-                    LITERAL
-                      INT_NUMBER "2"
-                    R_PAREN ")"
-                  COMMA ","
+                L_PAREN "("
+                VALUES
+                  VALUES_KW "values"
                   WHITESPACE " "
-                  ROW
-                    L_PAREN "("
-                    NAME_REF
-                      IDENT "b"
+                  ROW_LIST
+                    ROW
+                      L_PAREN "("
+                      LITERAL
+                        INT_NUMBER "1"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "2"
+                      R_PAREN ")"
                     COMMA ","
                     WHITESPACE " "
-                    LITERAL
-                      INT_NUMBER "3"
-                    R_PAREN ")"
-                  COMMA ","
-                  WHITESPACE " "
-                  ROW
-                    L_PAREN "("
-                    NAME_REF
-                      IDENT "c"
+                    ROW
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "b"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "3"
+                      R_PAREN ")"
                     COMMA ","
                     WHITESPACE " "
-                    NAME_REF
-                      IDENT "d"
-                    R_PAREN ")"
-              R_PAREN ")"
+                    ROW
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "c"
+                      COMMA ","
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "d"
+                      R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- field_exprs"
@@ -1625,33 +1702,34 @@ SOURCE_FILE
                 IDENT "c"
             R_PAREN ")"
         WHITESPACE " "
-        TABLESAMPLE_KW "tablesample"
-        WHITESPACE " "
-        CALL_EXPR
-          NAME_REF
-            IDENT "sample_method"
+        TABLESAMPLE_CLAUSE
+          TABLESAMPLE_KW "tablesample"
           WHITESPACE " "
-          ARG_LIST
+          CALL_EXPR
+            NAME_REF
+              IDENT "sample_method"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "23"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "50"
+              R_PAREN ")"
+          WHITESPACE " "
+          REPEATABLE_CLAUSE
+            REPEATABLE_KW "repeatable"
+            WHITESPACE " "
             L_PAREN "("
             LITERAL
-              INT_NUMBER "10"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "23"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "50"
+              INT_NUMBER "42"
             R_PAREN ")"
-        WHITESPACE " "
-        REPEATABLE_KW "repeatable"
-        WHITESPACE " "
-        PAREN_EXPR
-          L_PAREN "("
-          LITERAL
-            INT_NUMBER "42"
-          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from select stmt"

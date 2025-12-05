@@ -17,7 +17,6 @@
 NameRef =
   '#ident'?
 
-
 Name =
   '#ident'?
 
@@ -43,9 +42,6 @@ ParamIn =
 ParamOut =
   'out'
 
-Arg =
-  Expr
-
 ParamMode =
   ParamVariadic
 | ParamInOut
@@ -68,11 +64,275 @@ ArgList =
 
 CallExpr =
   Expr ArgList WithinClause? FilterClause? OverClause?
+| ExtractFn
+| JsonExistsFn
+| JsonArrayFn
+| JsonObjectFn
+| JsonObjectAggFn WithinClause? FilterClause? OverClause?
+| JsonArrayAggFn WithinClause? FilterClause? OverClause?
+| JsonQueryFn
+| JsonScalarFn
+| JsonSerializeFn
+| JsonValueFn
+| JsonFn
+| SubstringFn
+| PositionFn
+| OverlayFn
+| TrimFn
+| XmlRootFn
+| XmlSerializeFn
+| XmlElementFn
+| XmlForestFn
+| XmlExistsFn
+| XmlParseFn
+| XmlPiFn
+| SomeFn
+| AnyFn
+| AllFn
+| ExistsFn
+
+JsonArrayFn =
+ 'json_array' '(' 
+  (
+     (JsonSelectFormat (',' JsonSelectFormat)*) JsonNullClause?
+   | (JsonExprFormat (',' JsonExprFormat)*)
+  )
+  JsonReturningClause?
+ ')'
+
+JsonScalarFn =
+  'json_scalar' '(' Expr ')'
+
+JsonFn =
+  'json' '(' JsonExprFormat JsonKeysUniqueClause? ')'
+
+JsonSelectFormat =
+  SelectVariant JsonFormatClause?
+
+JsonExprFormat =
+  Expr JsonFormatClause?
+
+JsonEncodingClause =
+  'encoding' NameRef
+
+SomeFn = 
+  'some' '(' SelectVariant | Expr ')'
+
+AnyFn = 
+  'any' '(' SelectVariant | Expr ')'
+
+AllFn =
+  'all' '(' SelectVariant | Expr ')'
+
+ExtractFn =
+  'extract' '(' 
+    ('#ident' | 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | '@string')
+    'from'
+    Expr
+  ')'
+
+JsonExistsFn =
+  'json_exists' '('
+    Expr
+    JsonFormatClause?
+    ','
+    Expr
+    JsonPassingClause?
+    JsonOnErrorClause?
+  ')'
+
+JsonObjectFn =
+  'json_object' '('
+    (JsonReturningClause
+    | (JsonKeyValue (',' JsonKeyValue)*) 
+      JsonNullClause?
+      JsonKeysUniqueClause?
+      JsonReturningClause?
+    )
+  
+  ')'
+
+JsonObjectAggFn =
+  'json_objectagg' '('
+    JsonKeyValue?
+    JsonNullClause?
+    JsonKeysUniqueClause?
+    ReturningClause?
+  ')'
+
+JsonArrayAggFn =
+  'json_arrayagg' '('
+    (JsonSelectFormat (',' JsonSelectFormat)*)
+      JsonNullClause?
+      JsonReturningClause?
+    | Expr JsonReturningClause
+  ')'
+
+JsonQueryFn =
+  'json_query' '('
+    Expr
+    JsonFormatClause
+    ','
+    Expr
+    JsonPassingClause?
+    JsonReturningClause?
+    JsonWrapperBehaviorClause?
+    JsonQuotesClause?
+    JsonBehaviorClause?
+  ')'
+
+XmlTable =
+   'xmltable'
+   '(' 
+     ('xmlnamespaces' XmlNamespaceList ',')
+     XmlRowPassingClause
+     XmlTableColumnList
+   ')'
+
+XmlRowPassingClause =
+  Expr 'passing' XmlPassingMech? Expr XmlPassingMech?
+
+XmlNamespaceList = 
+  '(' (XmlNamespace (',' XmlNamespace )*) ')'
+
+XmlNamespace =
+  'default' Expr
+| Expr 'as' Name
+
+XmlPassingMech =
+  'by' 'ref'
+| 'by' 'value'
+
+JsonTable =
+  'json_table' '(' 
+    Expr
+    JsonFormatClause?
+    ','
+    Expr
+    ('as' Name)?
+    JsonPassingClause
+    JsonTableColumnList
+    JsonOnErrorClause
+  ')'
+
+JsonSerializeFn =
+  'json_serialize' '('
+    Expr
+    JsonFormatClause?
+    JsonReturningClause?
+  ')'
+
+JsonValueFn =
+  'json_value' '('
+    Expr
+    JsonFormatClause?
+    ','
+    Expr
+    JsonPassingClause?
+    JsonReturningClause?
+    JsonBehaviorClause?
+  ')'
+
+SubstringFn =
+  'substring' '('
+    Expr 'for' Expr ('from' Expr)
+  | Expr 'from' Expr ('for' Expr)
+  | Expr 'similar' Expr
+  | (Expr (',' Expr)*)
+  ')'
+
+PositionFn =
+  'position' '(' Expr 'in' Expr ')'
+
+OverlayFn =
+  'overlay' '('
+    (
+      Expr 'placing' Expr 'from' Expr ('for' Expr)?
+    | (Expr (',' Expr)*)?
+    )
+  ')'
+
+TrimFn =
+  'trim' '('
+    'from' (Expr (',' Expr)*)
+   | Expr 'from' Expr
+   | (Expr (',' Expr)*)?
+  ')'
+
+XmlRootFn =
+  'xmlroot' '('
+    Expr ',' 
+    ('version' 'no' 'value' | 'version' Expr)
+    (
+      ',' 'standalone' 'yes'
+    | ',' 'standalone' 'no'
+    | ',' 'standalone' 'no' 'value'
+    )?
+  ')'
+
+XmlSerializeFn =
+  'xmlserialize' '('
+    ('document' | 'content')
+    Expr
+    'as'
+    Type
+    ('no' 'ident' | 'ident')?
+  ')'
+
+XmlElementFn =
+  'xmlelement' '('
+    'name'
+    Name
+    ( 
+      ',' 'xmlattributes' '(' 
+           XmlAttributeList
+        ')'
+        (',' (Expr (',' Expr)*))?
+    | ',' (Expr (',' Expr)*)
+    )
+  ')'
+
+ExprAsName =
+  Expr AsName?
+
+XmlAttributeList =
+  (ExprAsName (',' ExprAsName)*)
+
+XmlForestFn =
+  'xmlforest' '(' XmlAttributeList ')'
+
+XmlExistsFn =
+  'xmlexists' '('
+    'passing'
+    XmlPassingMech?
+    Expr
+    XmlPassingMech?
+  ')'
+
+XmlParseFn =
+  'xmlparse' '('
+    ('document' | 'content')
+    Expr
+    (
+      'preserve' 'whitespace'
+    | 'strip' 'whitespace'
+    )
+  ')'
+
+XmlPiFn =
+  'xmlpi' '('
+    'name'
+    Name
+    (',' Expr)?
+  ')'
+
+ExistsFn =
+  'exists' '(' SelectVariant ')'
 
 CastExpr =
-  'cast' '(' Expr 'as' Type ')'
+  ('cast' | 'treat') '(' Expr 'as' Type ')'
 | Expr ColonColon Type
-| Expr Type
+| Type Literal
 
 ArrayExpr =
   'array' '[' (Expr (',' Expr)*) ']'
@@ -95,7 +355,7 @@ NamedArg =
   NameRef FatArrow Expr
 
 JsonFormatClause =
-  'format' 'json' ('encoding' Name)?
+  'format' 'json' JsonEncodingClause?
 
 JsonValueExpr =
   Expr JsonFormatClause?
@@ -122,7 +382,7 @@ NotIlike =
   'not' 'ilike'
 
 CustomOp =
-  ('+' | '-' | '*' | '/' | '<' | '>' | '=' | '~' | '!' | '@' | '#' | '%' | '^' | '&' | '|' | '`' | '?')
+  '+' | '-' | '*' | '/' | '<' | '>' | '=' | '~' | '!' | '@' | '#' | '%' | '^' | '&' | '|' | '`' | '?'
 
 NotIn =
  'not' 'in'
@@ -296,6 +556,9 @@ Type =
 | TimeType
 | IntervalType
 
+Arg =
+  Expr
+
 // For when we're parsing expressions and then later we realize they're types.
 // e.g., `select pg_catalog.varchar(10) 'foo'`
 ExprType =
@@ -451,22 +714,6 @@ NullConstraint =
 DefaultConstraint =
   ('constraint' NameRef)
   'default' Expr
-
-// SequenceOption =
-//   'as' Type
-// | 'increment' 'by'? Literal
-// | 'sequence' 'name' NameRef
-// | 'restart' ('with'? Literal)?
-// | 'logged'
-// | 'unlogged'
-// | 'start' 'with'? Literal
-// | 'owned' 'by' ('none' | Path)
-// | 'maxvalue' Literal
-// | 'minvalue' Literal
-// | 'no' 'minvalue'
-// | 'no' 'cycle'
-// | 'no' 'maxvalue'
-// | 'cycle'
 
 GeneratedConstraint =
   ('constraint' NameRef)
@@ -656,8 +903,20 @@ SequenceOptionList =
   '(' (SequenceOption (',' SequenceOption)*) ')'
 
 SequenceOption =
-  'cycle'
-| 'no' ('minvalue' | 'cycle' | 'maxvalue')
+  'as' Type
+| 'increment' 'by'? Literal
+| 'sequence' 'name' NameRef
+| 'restart' ('with'? Literal)?
+| 'logged'
+| 'unlogged'
+| 'start' 'with'? Literal
+| 'owned' 'by' ('none' | Path)
+| 'maxvalue' Literal
+| 'minvalue' Literal
+| 'no' 'maxvalue'
+| 'no' 'minvalue'
+| 'no' 'cycle'
+| 'cycle'
 
 ColumnList =
   '(' (Column (',' Column)*) ')'
@@ -666,7 +925,7 @@ ConstraintIncludeClause =
   'include'
 
 WithParams =
-  'with' '(' ')'
+  'with' AttributeList
 
 ConstraintIndexTablespace =
   'using' 'index' 'tablespace' NameRef
@@ -836,7 +1095,18 @@ PartitionBy =
   ) PartitionItemList
 
 CreateTable =
-  'create' 'table' IfNotExists? Path PartitionOf? OfType? TableArgList Inherits? PartitionBy? UsingMethod? (WithParams | WithoutOids)? OnCommit? Tablespace?
+  'create' 
+  (('global' | 'local')? ('temporary' | 'temp' | 'unlogged' ))?
+  'table' IfNotExists? Path 
+  PartitionOf?
+  OfType?
+  TableArgList
+  Inherits?
+  PartitionBy?
+  UsingMethod?
+  (WithParams | WithoutOids)?
+  OnCommit?
+  Tablespace?
 
 CreateIndex =
   'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName 
@@ -1140,7 +1410,18 @@ WithNoData =
   'with' 'no' 'data'
 
 CreateTableAs =
-  'create' 'table' IfNotExists? Path UsingMethod? WithParams? OnCommit? Tablespace? 'as' query:SelectVariant (WithData | WithNoData)?
+  'create'
+  (('global' | 'local')? ('temporary' | 'temp' | 'unlogged' ))?
+  'table'
+  IfNotExists?
+  Path
+  UsingMethod?
+  (WithParams | WithoutOids)?
+  OnCommit?
+  Tablespace?
+  'as'
+  query:SelectVariant
+  (WithData | WithNoData)?
 
 CreateMaterializedView =
   'create' 'materialized' 'view' IfNotExists? Path ColumnList? 
@@ -1187,7 +1468,19 @@ BetweenExpr =
 JsonTableColumn =
   Name 'for' 'ordinality'
 | Name Type
-| 'nested' 'path'? Expr
+    JsonFormatClause?
+    JsonPathClause?
+    JsonWrapperBehaviorClause?
+    JsonQuotesClause?
+    (JsonOnErrorClause | JsonOnEmptyClause)?
+| Name Type
+    'exists'
+    JsonPathClause?
+    JsonOnErrorClause?
+| 'nested' 'path'? Expr ('as' Name)? JsonTableColumnList
+
+JsonPathClause =
+  'path' Expr
 
 JsonTableColumnList =
   'columns' '(' (JsonTableColumn (',' JsonTableColumn)*) ')'
@@ -1239,7 +1532,9 @@ JsonBehavior =
 | JsonBehaviorEmptyObject
 
 JsonWrapperBehaviorClause =
-  'with' 'wrapper' | 'without' 'wrapper' | 'with' 'conditional' 'wrapper'
+  'without' 'array'? 'wrapper'
+| 'with' 'unconditional'? 'array'? 'wrapper'
+| 'with' 'conditional' 'array'? 'wrapper'
 
 JsonOnErrorClause =
   JsonBehavior 'on' 'error'
@@ -1247,8 +1542,11 @@ JsonOnErrorClause =
 JsonOnEmptyClause =
   JsonBehavior 'on' 'empty'
 
+JsonBehaviorClause =
+  JsonBehavior
+
 JsonPassingArg =
-  Expr JsonFormatClause? 'as' Name
+  Expr
 
 JsonPassingClause =
   'passing' (JsonPassingArg (',' JsonPassingArg)*)
@@ -1371,11 +1669,20 @@ OrderByClause =
 SortByList =
   SortBy (',' SortBy)*
 
+RepeatableClause =
+  'repeatable' '(' Expr ')'
+
+TablesampleClause =
+  'tablesample' CallExpr RepeatableClause?
+
 FromItem =
-  'only'? (NameRef | FieldExpr) Alias?
+  'only'? (NameRef | FieldExpr) Alias? TablesampleClause?
 | 'lateral'? ParenSelect Alias?
-| 'lateral'? CallExpr Alias?
-| 'lateral'? 'rows' 'from' '(' CallExpr ')' Alias?
+| 'lateral'? CallExpr ('with' 'ordinality')? Alias?
+| 'lateral'? JsonTable Alias?
+| 'lateral'? XmlTable Alias?
+| 'lateral'? CastExpr Alias?
+| 'lateral'? 'rows' 'from' '(' CallExpr ')' ('with' 'ordinality')? Alias?
 
 FromClause =
   'from'
@@ -1406,15 +1713,15 @@ ConstraintExclusionList =
   '(' (ConstraintExclusion (',' ConstraintExclusion)*) ')'
 
 ConstraintExclusion = 
- Expr 'with'
+ Expr 'with' Op
 
-ConstraintWhereClause =
+WhereConditionClause =
   'where' '(' Expr ')'
 
 ExcludeConstraint =
   ('constraint' Name)
   'exclude' ConstraintIndexMethod? ConstraintExclusionList
-  ConstraintWhereClause?
+  WhereConditionClause?
 
 FrameClause =
   'range' | 'rows' | 'groups'
@@ -1823,9 +2130,17 @@ EventTriggerWhen =
 
 CreateForeignDataWrapper =
   'create' 'foreign' 'data' 'wrapper' Name
+  FdwOptionList?
+  AlterOptionList?
 
 CreateForeignTable =
-  'create' 'foreign' 'table' IfNotExists? Path TableArgList? ('server' NameRef)?
+  'create' 'foreign' 'table' IfNotExists? Path
+  PartitionOf?
+  TableArgList?
+  Inherits?
+  PartitionType?
+  ('server' NameRef)
+  AlterOptionList?
 
 CreateGroup =
   'create' 'group' Name RoleOptionList
@@ -1837,7 +2152,8 @@ RoleOption =
   'inherit'
 
 CreateLanguage =
-  'create' 'language' Name
+  'create' OrReplace 'trusted'? 'procedural'? 'language' Name
+  ('handler' Path ('inline' Path)? ('validator' Path)?)?
 
 CreateOperator =
   'create' 'operator' 
@@ -1859,15 +2175,27 @@ CreateOperatorFamily =
 
 CreatePolicy =
   'create' 'policy' Name OnTable
+  ('as' '#ident')?
+  ('for' ('all' | 'select' | 'insert' | 'update' | 'delete'))?
+  ('to' RoleList)?
+  ('using' '(' Expr ')')
+  ('with' 'check' '(' Expr ')')
 
 CreateProcedure =
-  'create' 'procedure' Path ParamList option_list:FuncOptionList
+  'create' OrReplace? 'procedure' Path ParamList option_list:FuncOptionList
 
 CreatePublication =
   'create' 'publication' Name
+  ('for' 'all' 'tables' | 'for' (PublicationObject (',' PublicationObject)*))
+  WithParams?
+
+PublicationObject  =
+  'table' 'only'? (Path | '(' Path ')') '*'? ColumnList?  WhereConditionClause?
+| 'tables' 'in' 'schema' ('current_schema' | NameRef) WhereConditionClause?
+| 'current_schema'
 
 CreateRole =
-  'create' 'role' Name
+  'create' 'role' Name RoleOptionList
 
 CreateRule =
   'create' OrReplace? 'rule' Name 'as' 'on' ('#ident' | 'select' | 'insert' | 'update' | 'delete')
@@ -1879,13 +2207,21 @@ CreateSequence =
   SequenceOption*
 
 CreateServer =
-  'create' 'server' Name
+  'create' 'server' IfNotExists? Name
+  ('type' Literal)?
+  ('version' Literal)?
+  'foreign' 'data' 'wrapper' NameRef
+  AlterOptionList?
+
 
 CreateStatistics =
   'create' 'statistics' Path ('on' (NameRef (',' NameRef)*))? FromTable?
 
 CreateSubscription =
   'create' 'subscription' Name
+  'connection' Literal
+  'publication' (NameRef (',' NameRef)*)
+  WithParams?
 
 CreateTablespace =
   'create' 'tablespace' Name
@@ -1916,19 +2252,24 @@ TransformToFunc =
   'to' 'sql' 'with' 'function' FunctionSig
 
 CreateUserMapping =
-  'create' 'user' 'mapping' 'for' Role 'server' NameRef AlterOptionList?
+  'create' 'user' 'mapping' IfNotExists? 'for' Role
+  'server' NameRef
+  AlterOptionList?
 
 CreateUser =
   'create' 'user' Name
+  RoleOptionList?
 
 DropLanguage =
-  'drop' 'language' IfExists? NameRef
+  'drop' 'procedural'? 'language' IfExists? NameRef
+  ('cascade' | 'restrict')?
 
 DropGroup =
   'drop' 'group' IfExists? (NameRef (',' NameRef)*)
 
 DropFunction =
   'drop' 'function' IfExists? FunctionSigList
+  ('cascade' | 'restrict')?
 
 FunctionSigList =
   (FunctionSig (',' FunctionSig)*)
@@ -1937,10 +2278,12 @@ FunctionSig =
   Path ParamList?
 
 DropForeignDataWrapper =
-  'drop' 'foreign' 'data' 'wrapper' IfExists? NameRef
+  'drop' 'foreign' 'data' 'wrapper' IfExists? (NameRef (',' NameRef)*)
+  ('cascade' | 'restrict')
 
 DropForeignTable =
   'drop' 'foreign' 'table' IfExists? Path
+  ('cascade' | 'restrict')
 
 DropAccessMethod =
   'drop' 'access' 'method' IfExists? NameRef
@@ -1994,7 +2337,7 @@ DropOperatorClass =
   'drop' 'operator' 'class' IfExists? Path 'using' NameRef
 
 DropOwned =
-  'drop' 'owned' 'by'
+  'drop' 'owned' 'by' RoleList ('cascade' | 'restrict')?
 
 DropPolicy =
   'drop' 'policy' IfExists? NameRef OnTable
@@ -2179,7 +2522,7 @@ Reindex =
   'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? Path?
 
 CreateView =
-  'create' OrReplace? 'recursive'? 'view' Path ColumnList?
+  'create' OrReplace? ('temp' | 'temporary')? 'recursive'? 'view' Path ColumnList?
   WithParams?
   'as' query:SelectVariant
   ('with' ('cascaded' | 'local') 'check' 'option')

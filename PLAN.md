@@ -206,6 +206,23 @@ type checking should allow us to give type errors without the user having to run
 
 support more advanced lint rules
 
+#### type check `create type t as range`
+
+```sql
+create type timerange as range (
+  subtype = time,
+  subtype_diff = time_subtype_diff
+);
+```
+
+if set, `subtype_diff` must be of type `function time_subtype_diff(time without time zone, time without time zone)`
+
+```ts
+function createRangeType<T>(subtype: T, subtype_diff: (T, T) => float8)
+```
+
+https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-DEFINING
+
 ### PGO
 
 - https://github.com/rust-lang/rust-analyzer/pull/19582#issue-2992471459
@@ -590,6 +607,26 @@ select '{"foo": 1,}'::json;
 --               ^ invalid json, unexpected trailing comma
 ```
 
+```sql
+create type foo as (
+  a int8,
+  b int8
+);
+select foo '(1)';
+--            ^ malformed record literal, missing column b
+```
+
+```sql
+select '[1,,2)'::numrange;
+--         ^ malformed range literal, extra comma
+
+create table reservation (room int, during tsrange);
+insert into reservation values
+    (1108, '[2010-01-01 14:30,, 2010-01-01 15:30)');
+--                            ^ malformed range literal, extra comma
+
+```
+
 ### Rule: column label is the same as an existing column
 
 ```sql
@@ -770,6 +807,18 @@ select * from json_table(
   --      references json_table arg ^
   --          also references passing clause ^^
 );
+```
+
+#### `nextval`
+
+```sql
+-- via https://www.postgresql.org/docs/current/datatype-oid.html
+nextval('foo')              -- operates on sequence foo
+nextval('FOO')              -- same as above
+nextval('"Foo"')            -- operates on sequence Foo
+nextval('myschema.foo')     -- operates on myschema.foo
+nextval('"myschema".foo')   -- same as above
+nextval('foo')              -- searches search path for foo
 ```
 
 ### Autocomplete

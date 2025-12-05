@@ -54,6 +54,8 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::REVOKE_COMMAND_LIST,
     SyntaxKind::ROLE_LIST,
     SyntaxKind::ROW_LIST,
+    SyntaxKind::XML_ATTRIBUTE_LIST,
+    SyntaxKind::XML_NAMESPACE_LIST,
     SyntaxKind::SET_COLUMN_LIST,
     SyntaxKind::SET_EXPR_LIST,
     SyntaxKind::SET_OPTIONS_LIST,

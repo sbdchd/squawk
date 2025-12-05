@@ -75,6 +75,11 @@ select 1 > some(select 1);
 -- all
 select 1 = all(select 1);
 
+-- some/all/any with expr
+select 1 = all(array[1]);
+select 1 = some(array[1]);
+select 1 = any(array[1]);
+
 -- all with array
 select * from t
 where not (tag = all(array['a', 'b', 'c']));
