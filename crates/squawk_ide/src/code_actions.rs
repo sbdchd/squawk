@@ -6,15 +6,125 @@ use squawk_syntax::{
 };
 
 #[derive(Debug, Clone)]
+pub enum ActionKind {
+    QuickFix,
+    RefactorRewrite,
+}
+
+#[derive(Debug, Clone)]
 pub struct CodeAction {
     pub title: String,
     pub edits: Vec<Edit>,
+    pub kind: ActionKind,
 }
 
 pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeAction>> {
     let mut actions = vec![];
+    rewrite_as_regular_string(&mut actions, &file, offset);
+    rewrite_as_dollar_quoted_string(&mut actions, &file, offset);
     remove_else_clause(&mut actions, &file, offset);
     Some(actions)
+}
+
+fn rewrite_as_regular_string(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let dollar_string = file
+        .syntax()
+        .token_at_offset(offset)
+        .find(|token| token.kind() == SyntaxKind::DOLLAR_QUOTED_STRING)?;
+
+    let replacement = dollar_quoted_to_string(dollar_string.text())?;
+    actions.push(CodeAction {
+        title: "Rewrite as regular string".to_owned(),
+        edits: vec![Edit::replace(dollar_string.text_range(), replacement)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn rewrite_as_dollar_quoted_string(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let string = file
+        .syntax()
+        .token_at_offset(offset)
+        .find(|token| token.kind() == SyntaxKind::STRING)?;
+
+    let replacement = string_to_dollar_quoted(string.text())?;
+    actions.push(CodeAction {
+        title: "Rewrite as dollar-quoted string".to_owned(),
+        edits: vec![Edit::replace(string.text_range(), replacement)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn string_to_dollar_quoted(text: &str) -> Option<String> {
+    let normalized = normalize_single_quoted_string(text)?;
+    let delimiter = dollar_delimiter(&normalized)?;
+    let boundary = format!("${}$", delimiter);
+    Some(format!("{boundary}{normalized}{boundary}"))
+}
+
+fn dollar_quoted_to_string(text: &str) -> Option<String> {
+    debug_assert!(text.starts_with('$'));
+    let (delimiter, content) = split_dollar_quoted(text)?;
+    let boundary = format!("${}$", delimiter);
+
+    if !text.starts_with(&boundary) || !text.ends_with(&boundary) {
+        return None;
+    }
+
+    // quotes are escaped by using two of them in Postgres
+    let escaped = content.replace('\'', "''");
+    Some(format!("'{}'", escaped))
+}
+
+fn split_dollar_quoted(text: &str) -> Option<(String, &str)> {
+    debug_assert!(text.starts_with('$'));
+    let second_dollar = text[1..].find('$')?;
+    // the `foo` in `select $foo$bar$foo$`
+    let delimiter = &text[1..=second_dollar];
+    let boundary = format!("${}$", delimiter);
+
+    if !text.ends_with(&boundary) {
+        return None;
+    }
+
+    let start = boundary.len();
+    let end = text.len().checked_sub(boundary.len())?;
+    let content = text.get(start..end)?;
+    Some((delimiter.to_owned(), content))
+}
+
+fn normalize_single_quoted_string(text: &str) -> Option<String> {
+    let body = text.strip_prefix('\'')?.strip_suffix('\'')?;
+    return Some(body.replace("''", "'"));
+}
+
+fn dollar_delimiter(content: &str) -> Option<String> {
+    // We can't safely transform a trailing `$` i.e., `select 'foo $'` with an
+    // empty delim, because we'll  `select $$foo $$$` which isn't valid.
+    if !content.contains("$$") && !content.ends_with('$') {
+        return Some("".to_owned());
+    }
+
+    let mut delim = "q".to_owned();
+    // don't want to just loop forever
+    for idx in 0..10 {
+        if !content.contains(&format!("${}$", delim)) {
+            return Some(delim);
+        }
+        delim.push_str(&idx.to_string());
+    }
+    None
 }
 
 fn remove_else_clause(
@@ -40,6 +150,7 @@ fn remove_else_clause(
     actions.push(CodeAction {
         title: "Remove `else` clause".to_owned(),
         edits,
+        kind: ActionKind::RefactorRewrite,
     });
     Some(())
 }
@@ -149,6 +260,93 @@ mod test {
         assert!(code_action_not_applicable(
             remove_else_clause,
             "select case x when true then 1 else 2 end$0;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_string() {
+        assert_snapshot!(apply_code_action(
+            rewrite_as_dollar_quoted_string,
+            "select 'fo$0o';"),
+            @"select $$foo$$;"
+        );
+    }
+
+    #[test]
+    fn rewrite_string_with_single_quote() {
+        assert_snapshot!(apply_code_action(
+            rewrite_as_dollar_quoted_string,
+            "select 'it''s$0 nice';"),
+            @"select $$it's nice$$;"
+        );
+    }
+
+    #[test]
+    fn rewrite_string_with_dollar_signs() {
+        assert_snapshot!(apply_code_action(
+            rewrite_as_dollar_quoted_string,
+            "select 'foo $$ ba$0r';"),
+            @"select $q$foo $$ bar$q$;"
+        );
+    }
+
+    #[test]
+    fn rewrite_string_when_trailing_dollar() {
+        assert_snapshot!(apply_code_action(
+            rewrite_as_dollar_quoted_string,
+            "select 'foo $'$0;"),
+            @"select $q$foo $$q$;"
+        );
+    }
+
+    #[test]
+    fn rewrite_string_not_applicable() {
+        assert!(code_action_not_applicable(
+            rewrite_as_dollar_quoted_string,
+            "select 1 + $0 2;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_prefix_string_not_applicable() {
+        assert!(code_action_not_applicable(
+            rewrite_as_dollar_quoted_string,
+            "select b'foo$0';"
+        ));
+    }
+
+    #[test]
+    fn rewrite_dollar_string() {
+        assert_snapshot!(apply_code_action(
+            rewrite_as_regular_string,
+            "select $$fo$0o$$;"),
+            @"select 'foo';"
+        );
+    }
+
+    #[test]
+    fn rewrite_dollar_string_with_tag() {
+        assert_snapshot!(apply_code_action(
+            rewrite_as_regular_string,
+            "select $tag$fo$0o$tag$;"),
+            @"select 'foo';"
+        );
+    }
+
+    #[test]
+    fn rewrite_dollar_string_with_quote() {
+        assert_snapshot!(apply_code_action(
+            rewrite_as_regular_string,
+            "select $$it'$0s fine$$;"),
+            @"select 'it''s fine';"
+        );
+    }
+
+    #[test]
+    fn rewrite_dollar_string_not_applicable() {
+        assert!(code_action_not_applicable(
+            rewrite_as_regular_string,
+            "select 'foo$0';"
         ));
     }
 }

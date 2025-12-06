@@ -3,6 +3,7 @@ use std::{collections::HashMap, ops::Range};
 use line_index::{LineIndex, TextRange, TextSize};
 use log::warn;
 use lsp_types::{CodeAction, CodeActionKind, Url, WorkspaceEdit};
+use squawk_ide::code_actions::ActionKind;
 
 fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
     let start = offset(index, range.start)?;
@@ -42,9 +43,14 @@ pub(crate) fn code_action(
     uri: Url,
     action: squawk_ide::code_actions::CodeAction,
 ) -> lsp_types::CodeAction {
+    let kind = match action.kind {
+        ActionKind::QuickFix => CodeActionKind::QUICKFIX,
+        ActionKind::RefactorRewrite => CodeActionKind::REFACTOR_REWRITE,
+    };
+
     CodeAction {
         title: action.title,
-        kind: Some(CodeActionKind::QUICKFIX),
+        kind: Some(kind),
         diagnostics: None,
         edit: Some(WorkspaceEdit {
             changes: Some({
