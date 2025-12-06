@@ -1043,13 +1043,16 @@ IfExists =
  'if' 'exists'
 
 DropType =
-  'drop' 'type' IfExists? (Path (',' Path)*) ('cascade' | 'restrict')?
+  'drop' 'type' IfExists? (Path (',' Path)*)
+  ('cascade' | 'restrict')?
 
 DropIndex =
   'drop' 'index' 'concurrently'? IfExists? (Path (',' Path)*)
+  ('cascade' | 'restrict')?
 
 DropTable =
-  'drop' 'table' IfExists? (Path (',' Path)) ('cascade' | 'restrict')?
+  'drop' 'table' IfExists? (Path (',' Path))
+  ('cascade' | 'restrict')?
 
 DropDatabase =
   'drop' 'database' IfExists? NameRef
@@ -1677,7 +1680,7 @@ TablesampleClause =
   'tablesample' CallExpr RepeatableClause?
 
 FromItem =
-  'only'? (NameRef | FieldExpr) Alias? TablesampleClause?
+  'only'? (NameRef | FieldExpr) '*'? Alias? TablesampleClause?
 | 'lateral'? ParenSelect Alias?
 | 'lateral'? CallExpr ('with' 'ordinality')? Alias?
 | 'lateral'? JsonTable Alias?
@@ -2280,20 +2283,22 @@ FunctionSig =
 
 DropForeignDataWrapper =
   'drop' 'foreign' 'data' 'wrapper' IfExists? (NameRef (',' NameRef)*)
-  ('cascade' | 'restrict')
+  ('cascade' | 'restrict')?
 
 DropForeignTable =
   'drop' 'foreign' 'table' IfExists? Path
-  ('cascade' | 'restrict')
+  ('cascade' | 'restrict')?
 
 DropAccessMethod =
   'drop' 'access' 'method' IfExists? NameRef
+  ('cascade' | 'restrict')?
 
 Aggregate =
   Path ParamList
 
 DropAggregate =
   'drop' 'aggregate' IfExists? (Aggregate (',' Aggregate)*)
+  ('cascade' | 'restrict')?
 
 DropCast =
   'drop' 'cast' IfExists? CastSig
@@ -2304,9 +2309,11 @@ CastSig =
 
 DropCollation =
   'drop' 'collation' IfExists? (Path (',' Path)*)
+  ('cascade' | 'restrict')?
 
 DropConversion =
-  'drop' 'conversion' IfExists? Path ('cascade' | 'restrict')
+  'drop' 'conversion' IfExists? Path
+  ('cascade' | 'restrict')?
 
 DropDomain =
   'drop' 'domain' IfExists? (Path (',' Path)*)
@@ -2314,19 +2321,23 @@ DropDomain =
 
 DropEventTrigger =
   'drop' 'event' 'trigger' IfExists? NameRef
+  ('cascade' | 'restrict')?
 
 DropExtension =
   'drop' 'extension' IfExists? (NameRef (',' NameRef)*)
+  ('cascade' | 'restrict')?
 
 DropMaterializedView =
   'drop' 'materialized' 'view' IfExists? (Path (',' Path)*)
   ('cascade' | 'restrict')?
 
 DropOperatorFamily =
-  'drop' 'operator' 'family' IfExists? Path 'using' NameRef ('cascade' | 'restrict')
+  'drop' 'operator' 'family' IfExists? Path 'using' NameRef
+  ('cascade' | 'restrict')?
 
 DropOperator =
-  'drop' 'operator' IfExists? OpSigList ('cascade' | 'restrict')
+  'drop' 'operator' IfExists? OpSigList
+  ('cascade' | 'restrict')?
 
 OpSigList =
   (OpSig (',' OpSig)*)
@@ -2336,57 +2347,73 @@ OpSig =
 
 DropOperatorClass =
   'drop' 'operator' 'class' IfExists? Path 'using' NameRef
+  ('cascade' | 'restrict')?
 
 DropOwned =
-  'drop' 'owned' 'by' RoleList ('cascade' | 'restrict')?
+  'drop' 'owned' 'by' RoleList
+  ('cascade' | 'restrict')?
 
 DropPolicy =
   'drop' 'policy' IfExists? NameRef OnTable
+  ('cascade' | 'restrict')?
 
 DropProcedure =
   'drop' 'procedure' IfExists? FunctionSigList
+  ('cascade' | 'restrict')?
 
 DropPublication =
   'drop' 'publication' IfExists? (NameRef (',' NameRef)*)
+  ('cascade' | 'restrict')?
 
 DropRole =
   'drop' 'role' IfExists? (NameRef (',' NameRef)*)
 
 DropRoutine =
-  'drop' 'routine' IfExists? FunctionSigList ('cascade' | 'restrict')?
+  'drop' 'routine' IfExists? FunctionSigList
+  ('cascade' | 'restrict')?
 
 DropRule =
-  'drop' 'rule' IfExists? NameRef OnTable ('cascade' | 'restrict')?
+  'drop' 'rule' IfExists? NameRef OnTable
+  ('cascade' | 'restrict')?
 
 DropSequence =
   'drop' 'sequence' IfExists? (Path (',' Path)*)
+  ('cascade' | 'restrict')?
 
 DropServer =
   'drop' 'server' IfExists? NameRef
+  ('cascade' | 'restrict')?
 
 DropStatistics =
   'drop' 'statistics' IfExists? (Path (',' Path)*)
+  ('cascade' | 'restrict')?
 
 DropSubscription =
   'drop' 'subscription' IfExists? NameRef
+  ('cascade' | 'restrict')?
 
 DropTablespace =
   'drop' 'tablespace' IfExists? NameRef
 
 DropTextSearchParser =
-  'drop' 'text' 'search' 'parser' IfExists? Path ('cascade' | 'restrict')?
+  'drop' 'text' 'search' 'parser' IfExists? Path
+  ('cascade' | 'restrict')?
 
 DropTextSearchConfig =
-  'drop' 'text' 'search' 'configuration' IfExists? Path ('cascade' | 'restrict')?
+  'drop' 'text' 'search' 'configuration' IfExists? Path
+  ('cascade' | 'restrict')?
 
 DropTextSearchDict =
-  'drop' 'text' 'search' 'dictionary' IfExists? Path ('cascade' | 'restrict')?
+  'drop' 'text' 'search' 'dictionary' IfExists? Path
+  ('cascade' | 'restrict')?
 
 DropTextSearchTemplate =
-  'drop' 'text' 'search' 'template' IfExists? Path ('cascade' | 'restrict')?
+  'drop' 'text' 'search' 'template' IfExists? Path
+  ('cascade' | 'restrict')?
 
 DropTransform =
-  'drop' 'transform' IfExists? 'for' ty:Type 'language' language:NameRef ('cascade' | 'restrict')?
+  'drop' 'transform' IfExists? 'for' ty:Type 'language' language:NameRef
+  ('cascade' | 'restrict')?
 
 DropUser =
   'drop' 'user' IfExists? (NameRef (',' NameRef)*)
@@ -2396,6 +2423,7 @@ DropUserMapping =
 
 DropView =
   'drop' 'view' IfExists? Path
+  ('cascade' | 'restrict')?
 
 Explain =
   'explain'
@@ -2644,7 +2672,8 @@ TriggerEventList =
   (TriggerEvent ('or' TriggerEvent)*)
 
 DropSchema =
-  'drop' 'schema' IfExists? (NameRef (',' NameRef)*) ('cascade' | 'restrict')?
+  'drop' 'schema' IfExists? (NameRef (',' NameRef)*)
+  ('cascade' | 'restrict')?
 
 CreateSchema =
   'create' 'schema' IfNotExists? (SchemaAuthorization | Name) SchemaElement*
@@ -2661,7 +2690,8 @@ SchemaElement =
 | Grant
 
 DropTrigger =
-  'drop' 'trigger' IfExists? Path OnTable ('cascade' | 'restrict')?
+  'drop' 'trigger' IfExists? Path OnTable
+  ('cascade' | 'restrict')?
 
 OnTable =
   'on' Path
@@ -2807,7 +2837,8 @@ DetachPartition =
   'detach' 'partition'
 
 DropColumn =
- 'drop' 'column'? IfExists? NameRef ('restrict' | 'cascade')?
+ 'drop' 'column'? IfExists? NameRef
+ ('restrict' | 'cascade')?
 
 AddColumn =
   'add' 'column'? IfNotExists? Name Type Collate? (Constraint (',' Constraint)*)?

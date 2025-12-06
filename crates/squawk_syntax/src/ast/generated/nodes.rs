@@ -5414,12 +5414,20 @@ impl DropAccessMethod {
         support::token(&self.syntax, SyntaxKind::ACCESS_KW)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
     pub fn method_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::METHOD_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -5441,8 +5449,16 @@ impl DropAggregate {
         support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -5491,12 +5507,20 @@ impl DropCollation {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn collation_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLLATION_KW)
     }
     #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -5676,12 +5700,20 @@ impl DropEventTrigger {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
     pub fn event_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EVENT_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
     #[inline]
     pub fn trigger_token(&self) -> Option<SyntaxToken> {
@@ -5722,12 +5754,20 @@ impl DropExtension {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
     pub fn extension_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXTENSION_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -5892,6 +5932,10 @@ impl DropIndex {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn concurrently_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
     }
@@ -5902,6 +5946,10 @@ impl DropIndex {
     #[inline]
     pub fn index_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INDEX_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -6092,6 +6140,10 @@ impl DropOperatorClass {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn class_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CLASS_KW)
     }
@@ -6102,6 +6154,10 @@ impl DropOperatorClass {
     #[inline]
     pub fn operator_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
     #[inline]
     pub fn using_token(&self) -> Option<SyntaxToken> {
@@ -6201,12 +6257,20 @@ impl DropPolicy {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
     pub fn policy_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::POLICY_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -6224,12 +6288,20 @@ impl DropProcedure {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
     pub fn procedure_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -6247,12 +6319,20 @@ impl DropPublication {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
     pub fn publication_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -6390,8 +6470,16 @@ impl DropSequence {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
     #[inline]
     pub fn sequence_token(&self) -> Option<SyntaxToken> {
@@ -6413,8 +6501,16 @@ impl DropServer {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
     #[inline]
     pub fn server_token(&self) -> Option<SyntaxToken> {
@@ -6436,8 +6532,16 @@ impl DropStatistics {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
     #[inline]
     pub fn statistics_token(&self) -> Option<SyntaxToken> {
@@ -6459,8 +6563,16 @@ impl DropSubscription {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
     #[inline]
     pub fn subscription_token(&self) -> Option<SyntaxToken> {
@@ -6867,8 +6979,16 @@ impl DropView {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
     #[inline]
     pub fn view_token(&self) -> Option<SyntaxToken> {
@@ -7597,6 +7717,10 @@ impl FromItem {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn star_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STAR)
     }
     #[inline]
     pub fn from_token(&self) -> Option<SyntaxToken> {
@@ -15091,16 +15215,12 @@ pub struct UsingOnClause {
 }
 impl UsingOnClause {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn from_item(&self) -> Option<FromItem> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn on_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ON_KW)
+    pub fn on_clause(&self) -> Option<OnClause> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn using_token(&self) -> Option<SyntaxToken> {
