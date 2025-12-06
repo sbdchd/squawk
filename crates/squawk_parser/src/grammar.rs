@@ -11301,7 +11301,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
         }
     };
     p.eat(CONCURRENTLY_KW);
-    if opt_path_name(p).is_none() && name_required {
+    if opt_path_name_ref(p).is_none() && name_required {
         p.error("expected name");
     }
     m.complete(p, REINDEX)

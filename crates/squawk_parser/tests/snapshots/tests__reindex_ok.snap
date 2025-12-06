@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "my_index"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -23,7 +23,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "my_table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -36,7 +36,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "my_broken_table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -70,7 +70,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -81,7 +81,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -92,7 +92,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -103,7 +103,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -114,7 +114,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
