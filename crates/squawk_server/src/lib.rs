@@ -45,7 +45,10 @@ pub fn run() -> Result<()> {
             TextDocumentSyncKind::INCREMENTAL,
         )),
         code_action_provider: Some(CodeActionProviderCapability::Options(CodeActionOptions {
-            code_action_kinds: Some(vec![CodeActionKind::QUICKFIX]),
+            code_action_kinds: Some(vec![
+                CodeActionKind::QUICKFIX,
+                CodeActionKind::REFACTOR_REWRITE,
+            ]),
             work_done_progress_options: WorkDoneProgressOptions {
                 work_done_progress: None,
             },
