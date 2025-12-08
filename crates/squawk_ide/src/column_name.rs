@@ -61,8 +61,7 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 return name_from_name_ref(name_ref, true).map(|(column, node)| {
                     let column = match column {
                         ColumnName::Column(c) => ColumnName::new(c, unknown_column),
-                        ColumnName::UnknownColumn(uc) => ColumnName::UnknownColumn(uc),
-                        ColumnName::Star => ColumnName::Star,
+                        _ => column,
                     };
                     (column, node)
                 });
@@ -228,10 +227,10 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
         ast::Expr::CaseExpr(case) => {
             if let Some(else_clause) = case.else_clause()
                 && let Some(expr) = else_clause.expr()
-                && let Some(result) = name_from_expr(expr, in_type)
+                && let Some((column, node)) = name_from_expr(expr, in_type)
             {
-                if !matches!(result.0, ColumnName::UnknownColumn(_)) {
-                    return Some(result);
+                if !matches!(column, ColumnName::UnknownColumn(_)) {
+                    return Some((column, node));
                 }
             }
             return Some((ColumnName::Column("case".to_string()), node));
