@@ -20,51 +20,55 @@ SOURCE_FILE
     WHITESPACE " "
     VERBOSE_KW "verbose"
     WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-    COMMA ","
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
+    TABLE_AND_COLUMNS_LIST
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "b"
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "c"
+          R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "c"
-      R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full_parens"
@@ -92,31 +96,33 @@ SOURCE_FILE
           INT_NUMBER "10"
       R_PAREN ")"
     WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH
-          PATH_SEGMENT
+    TABLE_AND_COLUMNS_LIST
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "c"
-      R_PAREN ")"
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "c"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

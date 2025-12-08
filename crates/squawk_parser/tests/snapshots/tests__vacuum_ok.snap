@@ -24,11 +24,13 @@ SOURCE_FILE
         ANALYZE_KW "ANALYZE"
       R_PAREN ")"
     WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "onek"
+    TABLE_AND_COLUMNS_LIST
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "onek"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -223,11 +225,13 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t1"
+    TABLE_AND_COLUMNS_LIST
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_pg_9_syntax"
@@ -243,35 +247,39 @@ SOURCE_FILE
     WHITESPACE " "
     ANALYZE_KW "analyze"
     WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
-    COMMA ","
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
+    TABLE_AND_COLUMNS_LIST
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "b"
-      R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "c"
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n\n"

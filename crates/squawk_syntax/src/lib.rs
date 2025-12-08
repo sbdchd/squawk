@@ -42,7 +42,7 @@ pub use squawk_parser::SyntaxKind;
 use ast::AstNode;
 use rowan::GreenNode;
 use syntax_error::SyntaxError;
-pub use syntax_node::{SyntaxNode, SyntaxToken};
+pub use syntax_node::{SyntaxNode, SyntaxNodePtr, SyntaxToken};
 pub use token_text::TokenText;
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of

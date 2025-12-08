@@ -1696,8 +1696,12 @@ impl Analyze {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn relation_names(&self) -> AstChildren<RelationName> {
-        support::children(&self.syntax)
+    pub fn table_and_columns_list(&self) -> Option<TableAndColumnsList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn analyse_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ANALYSE_KW)
     }
     #[inline]
     pub fn analyze_token(&self) -> Option<SyntaxToken> {
@@ -2045,6 +2049,29 @@ pub struct BeginFuncOption {
     pub(crate) syntax: SyntaxNode,
 }
 impl BeginFuncOption {
+    #[inline]
+    pub fn return_func_option(&self) -> Option<ReturnFuncOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn stmt(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BeginFuncOptionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl BeginFuncOptionList {
+    #[inline]
+    pub fn begin_func_options(&self) -> AstChildren<BeginFuncOption> {
+        support::children(&self.syntax)
+    }
     #[inline]
     pub fn atomic_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ATOMIC_KW)
@@ -2996,6 +3023,10 @@ impl Copy {
     #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn with_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WITH_KW)
     }
 }
 
@@ -7291,8 +7322,20 @@ impl Explain {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn analyse_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ANALYSE_KW)
+    }
+    #[inline]
+    pub fn analyze_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ANALYZE_KW)
+    }
+    #[inline]
     pub fn explain_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXPLAIN_KW)
+    }
+    #[inline]
+    pub fn verbose_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERBOSE_KW)
     }
 }
 
@@ -14683,6 +14726,32 @@ impl Table {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TableAndColumns {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TableAndColumns {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn relation_name(&self) -> Option<RelationName> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TableAndColumnsList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TableAndColumnsList {
+    #[inline]
+    pub fn table_and_columnss(&self) -> AstChildren<TableAndColumns> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TableArgList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15234,7 +15303,7 @@ pub struct Vacuum {
 }
 impl Vacuum {
     #[inline]
-    pub fn relation_name(&self) -> Option<RelationName> {
+    pub fn table_and_columns_list(&self) -> Option<TableAndColumnsList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15242,8 +15311,28 @@ impl Vacuum {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn analyse_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ANALYSE_KW)
+    }
+    #[inline]
+    pub fn analyze_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ANALYZE_KW)
+    }
+    #[inline]
+    pub fn freeze_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FREEZE_KW)
+    }
+    #[inline]
+    pub fn full_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FULL_KW)
+    }
+    #[inline]
     pub fn vacuum_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VACUUM_KW)
+    }
+    #[inline]
+    pub fn verbose_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERBOSE_KW)
     }
 }
 
@@ -15253,8 +15342,8 @@ pub struct VacuumOption {
 }
 impl VacuumOption {
     #[inline]
-    pub fn full_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FULL_KW)
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
     }
 }
 
@@ -16412,7 +16501,7 @@ pub enum Expr {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FuncOption {
     AsFuncOption(AsFuncOption),
-    BeginFuncOption(BeginFuncOption),
+    BeginFuncOptionList(BeginFuncOptionList),
     CostFuncOption(CostFuncOption),
     LanguageFuncOption(LanguageFuncOption),
     LeakproofFuncOption(LeakproofFuncOption),
@@ -18022,6 +18111,24 @@ impl AstNode for BeginFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::BEGIN_FUNC_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for BeginFuncOptionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::BEGIN_FUNC_OPTION_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -26748,6 +26855,42 @@ impl AstNode for Table {
         &self.syntax
     }
 }
+impl AstNode for TableAndColumns {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TABLE_AND_COLUMNS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for TableAndColumnsList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TABLE_AND_COLUMNS_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TableArgList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -29479,7 +29622,7 @@ impl AstNode for FuncOption {
         matches!(
             kind,
             SyntaxKind::AS_FUNC_OPTION
-                | SyntaxKind::BEGIN_FUNC_OPTION
+                | SyntaxKind::BEGIN_FUNC_OPTION_LIST
                 | SyntaxKind::COST_FUNC_OPTION
                 | SyntaxKind::LANGUAGE_FUNC_OPTION
                 | SyntaxKind::LEAKPROOF_FUNC_OPTION
@@ -29500,8 +29643,8 @@ impl AstNode for FuncOption {
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::AS_FUNC_OPTION => FuncOption::AsFuncOption(AsFuncOption { syntax }),
-            SyntaxKind::BEGIN_FUNC_OPTION => {
-                FuncOption::BeginFuncOption(BeginFuncOption { syntax })
+            SyntaxKind::BEGIN_FUNC_OPTION_LIST => {
+                FuncOption::BeginFuncOptionList(BeginFuncOptionList { syntax })
             }
             SyntaxKind::COST_FUNC_OPTION => FuncOption::CostFuncOption(CostFuncOption { syntax }),
             SyntaxKind::LANGUAGE_FUNC_OPTION => {
@@ -29549,7 +29692,7 @@ impl AstNode for FuncOption {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             FuncOption::AsFuncOption(it) => &it.syntax,
-            FuncOption::BeginFuncOption(it) => &it.syntax,
+            FuncOption::BeginFuncOptionList(it) => &it.syntax,
             FuncOption::CostFuncOption(it) => &it.syntax,
             FuncOption::LanguageFuncOption(it) => &it.syntax,
             FuncOption::LeakproofFuncOption(it) => &it.syntax,
@@ -29573,10 +29716,10 @@ impl From<AsFuncOption> for FuncOption {
         FuncOption::AsFuncOption(node)
     }
 }
-impl From<BeginFuncOption> for FuncOption {
+impl From<BeginFuncOptionList> for FuncOption {
     #[inline]
-    fn from(node: BeginFuncOption) -> FuncOption {
-        FuncOption::BeginFuncOption(node)
+    fn from(node: BeginFuncOptionList) -> FuncOption {
+        FuncOption::BeginFuncOptionList(node)
     }
 }
 impl From<CostFuncOption> for FuncOption {
