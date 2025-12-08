@@ -1128,8 +1128,14 @@ OrReplace =
 RetType =
   'returns' Type
 
+BeginFuncOptionList =
+  'begin' 'atomic'
+  BeginFuncOption*
+  'end'
+
 BeginFuncOption =
-  'begin' 'atomic' 'end'
+  Stmt ';'
+| ReturnFuncOption ';'
 
 ReturnFuncOption =
   'return' Expr
@@ -1138,7 +1144,7 @@ FuncOptionList =
   options:(FuncOption*)
 
 FuncOption =
-  BeginFuncOption
+  BeginFuncOptionList
 | ReturnFuncOption
 | AsFuncOption
 | SetFuncOption
@@ -2068,7 +2074,9 @@ AlterView =
   'alter' 'view' Path
 
 Analyze =
-  'analyze' 'verbose'? OptionItemList? RelationName*
+  ('analyze' | 'analyse')
+  ('verbose' | OptionItemList)?
+  TableAndColumnsList?
 
 // suffix it with `On` to avoid conflicting with comment nodes
 CommentOn =
@@ -2427,6 +2435,7 @@ DropView =
 
 Explain =
   'explain'
+  ('analyze' | 'analyse' | 'verbose')?
   ExplainStmt
 
 ExplainStmt =
@@ -2608,11 +2617,21 @@ VacuumOptionList =
 
 Vacuum =
   'vacuum'
+  'full'?
+  'freeze'?
+  'verbose'?
+  ('analyze' | 'analyse')?
   VacuumOptionList?
-  RelationName
+  TableAndColumnsList?
+
+TableAndColumnsList =
+  TableAndColumns (',' TableAndColumns)*
+
+TableAndColumns =
+  RelationName ColumnList?
 
 VacuumOption =
-  'full'
+  Literal?
 
 Copy =
   'copy' 
@@ -2621,6 +2640,7 @@ Copy =
     ('from' ('stdin' | 'program'? Literal)) 
     | ('to' ('stdout' | 'program'? Literal))
   )
+  'with'?
   WhereClause?
 
 Call =

@@ -44,6 +44,7 @@ impl Language for Sql {
 
 pub type SyntaxNode = rowan::SyntaxNode<Sql>;
 pub type SyntaxToken = rowan::SyntaxToken<Sql>;
+pub type SyntaxNodePtr = rowan::ast::SyntaxNodePtr<Sql>;
 // pub type SyntaxElement = rowan::SyntaxElement<Sql>;
 pub type SyntaxNodeChildren = rowan::SyntaxNodeChildren<Sql>;
 // pub type SyntaxElementChildren = rowan::SyntaxElementChildren<Sql>;

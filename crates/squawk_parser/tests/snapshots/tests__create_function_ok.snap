@@ -1783,29 +1783,31 @@ SOURCE_FILE
         WHITESPACE " "
         SQL_KW "sql"
       WHITESPACE "\n"
-      BEGIN_FUNC_OPTION
+      BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"
         WHITESPACE " "
         ATOMIC_KW "atomic"
         WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "1"
+        BEGIN_FUNC_OPTION
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
         SEMICOLON ";"
         WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "2"
+        BEGIN_FUNC_OPTION
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "2"
         SEMICOLON ";"
         WHITESPACE "\n"
         END_KW "end"
@@ -1839,19 +1841,20 @@ SOURCE_FILE
         WHITESPACE " "
         SQL_KW "sql"
       WHITESPACE "\n"
-      BEGIN_FUNC_OPTION
+      BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"
         WHITESPACE " "
         ATOMIC_KW "atomic"
         WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "1"
+        BEGIN_FUNC_OPTION
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
         SEMICOLON ";"
         WHITESPACE "\n  "
         END_KW "end"
@@ -1891,7 +1894,7 @@ SOURCE_FILE
         WHITESPACE " "
         SQL_KW "sql"
       WHITESPACE "\n"
-      BEGIN_FUNC_OPTION
+      BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"
         WHITESPACE " "
         ATOMIC_KW "atomic"
@@ -1904,14 +1907,15 @@ SOURCE_FILE
         WHITESPACE "\n"
         SEMICOLON ";"
         WHITESPACE "\n  "
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                LITERAL
-                  INT_NUMBER "1"
+        BEGIN_FUNC_OPTION
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
         SEMICOLON ";"
         WHITESPACE "\n"
         SEMICOLON ";"

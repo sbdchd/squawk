@@ -8173,7 +8173,7 @@ fn analyze(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(VERBOSE_KW) {
         opt_option_list(p);
     }
-    opt_relation_list(p);
+    opt_table_and_columns_list(p);
     m.complete(p, ANALYZE)
 }
 
@@ -11691,7 +11691,7 @@ fn vacuum(p: &mut Parser<'_>) -> CompletedMarker {
     // [ ANALYZE ]
     let _ = p.eat(ANALYZE_KW) || p.eat(ANALYSE_KW);
     opt_vacuum_option_list(p);
-    opt_relation_list(p);
+    opt_table_and_columns_list(p);
     m.complete(p, VACUUM)
 }
 
@@ -11715,16 +11715,29 @@ fn opt_vacuum_option_list(p: &mut Parser<'_>) {
 // [ table_and_columns [, ...] ]
 // where table_and_coumns is:
 //  table_name [ ( column_name [, ...] ) ]
-fn opt_relation_list(p: &mut Parser<'_>) {
+fn opt_table_and_columns_list(p: &mut Parser<'_>) {
+    let m = p.start();
     while !p.at(EOF) {
-        if opt_relation_name(p).is_none() {
-            break;
+        if !opt_table_and_columns(p) {
+            m.abandon(p);
+            return;
         }
-        opt_column_list(p);
         if !p.eat(COMMA) {
             break;
         }
     }
+    m.complete(p, TABLE_AND_COLUMNS_LIST);
+}
+
+fn opt_table_and_columns(p: &mut Parser<'_>) -> bool {
+    let m = p.start();
+    if opt_relation_name(p).is_none() {
+        m.abandon(p);
+        return false;
+    }
+    opt_column_list(p);
+    m.complete(p, TABLE_AND_COLUMNS);
+    true
 }
 
 const VACUUM_OPTION_FIRST: TokenSet = NON_RESERVED_WORD
@@ -13194,20 +13207,13 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
                 if p.eat(SEMICOLON) {
                     continue;
                 }
-                // sql standard
-                if p.eat(RETURN_KW) {
-                    if expr(p).is_none() {
-                        p.error("expected expr")
-                    }
-                } else {
-                    stmt(p, &StmtRestrictions::default());
-                }
+                begin_func_option(p);
                 if p.at(END_KW) {
                     p.expect(SEMICOLON);
                 }
             }
             p.expect(END_KW);
-            BEGIN_FUNC_OPTION
+            BEGIN_FUNC_OPTION_LIST
         }
         _ => {
             m.abandon(p);
@@ -13216,6 +13222,21 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
     };
     m.complete(p, kind);
     true
+}
+
+fn begin_func_option(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.at(RETURN_KW) {
+        let m = p.start();
+        p.bump(RETURN_KW);
+        if expr(p).is_none() {
+            p.error("expected expr")
+        }
+        m.complete(p, RETURN_FUNC_OPTION);
+    } else {
+        stmt(p, &StmtRestrictions::default());
+    }
+    m.complete(p, BEGIN_FUNC_OPTION);
 }
 
 // SET configuration_parameter { TO | = } { value | DEFAULT }
