@@ -22,7 +22,7 @@ pub(crate) enum ColumnName {
 }
 
 impl ColumnName {
-    #[expect(unused)]
+    #[allow(dead_code)]
     pub(crate) fn from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(as_name) = target.as_name()
             && let Some(name_node) = as_name.name()
