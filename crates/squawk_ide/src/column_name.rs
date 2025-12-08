@@ -110,9 +110,9 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 "time".to_owned()
             };
             if let Some(ast::Timezone::WithTimezone(_)) = time_type.timezone() {
-                // time -> timez
-                // timestamp -> timestampz
-                name.push('z');
+                // time -> timetz
+                // timestamp -> timestamptz
+                name.push_str("tz");
             };
             return Some((
                 ColumnName::new(name.to_string(), unknown_column),
@@ -377,9 +377,9 @@ fn examples() {
 
     // time types
     assert_snapshot!(name("cast('12:00:00' as time(6) without time zone)"), @"time");
-    assert_snapshot!(name("cast('12:00:00' as time(6) with time zone)"), @"time");
-    assert_snapshot!(name("cast('12:00:00' as timestamp(6) with time zone)"), @"timestamptz");
-    assert_snapshot!(name("cast('12:00:00' as timestamp(6) without time zone)"), @"timestampt");
+    assert_snapshot!(name("cast('12:00:00' as time(6) with time zone)"), @"timetz");
+    assert_snapshot!(name("cast('2024-01-01 12:00:00' as timestamp(6) with time zone)"), @"timestamptz");
+    assert_snapshot!(name("cast('2024-01-01 12:00:00' as timestamp(6) without time zone)"), @"timestamp");
 
     #[track_caller]
     fn name(sql: &str) -> String {
