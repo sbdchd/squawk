@@ -3,6 +3,14 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
+fn normalize_identifier(text: &str) -> String {
+    if text.starts_with('"') && text.ends_with('"') {
+        text[1..text.len() - 1].to_string()
+    } else {
+        text.to_lowercase()
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum ColumnName {
     Column(String),
@@ -27,10 +35,9 @@ impl ColumnName {
         if let Some(as_name) = target.as_name()
             && let Some(name_node) = as_name.name()
         {
-            return Some((
-                ColumnName::Column(name_node.text().to_string()),
-                name_node.syntax().clone(),
-            ));
+            let text = name_node.text();
+            let normalized = normalize_identifier(&text);
+            return Some((ColumnName::Column(normalized), name_node.syntax().clone()));
         } else if let Some(expr) = target.expr()
             && let Some(name) = name_from_expr(expr, false)
         {
@@ -350,8 +357,20 @@ fn examples() {
     assert_snapshot!(name("'{1}'::pg_catalog.varchar(1)[]::integer[];"), @"int4");
     assert_snapshot!(name("'1'::bigint::smallint"), @"int2");
 
+    // alias
+    // with quoting
+    assert_snapshot!(name(r#"'foo' as "FOO""#), @"FOO");
+    assert_snapshot!(name(r#"'foo' as "foo""#), @"foo");
+    // without quoting
+    assert_snapshot!(name(r#"'foo' as FOO"#), @"foo");
+    assert_snapshot!(name(r#"'foo' as foo"#), @"foo");
+
     // tuple
     assert_snapshot!(name("(1, 2, 3)"), @"row");
+    assert_snapshot!(name("(1, 2, 3)::address"), @"row");
+
+    // composite type
+    assert_snapshot!(name("(x).city"), @"city");
 
     // array types
     assert_snapshot!(name("'{{1, 2}, {3, 4}}'::int[]"), @"int4");
