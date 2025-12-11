@@ -166,7 +166,7 @@ fn rewrite_table_as_select(
     file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(&file, offset)?;
+    let token = token_from_offset(file, offset)?;
     let table = token.parent_ancestors().find_map(ast::Table::cast)?;
 
     let relation_name = table.relation_name()?;
@@ -188,7 +188,7 @@ fn rewrite_select_as_table(
     file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(&file, offset)?;
+    let token = token_from_offset(file, offset)?;
     let select = token.parent_ancestors().find_map(ast::Select::cast)?;
 
     if !can_transform_select_to_table(&select) {
@@ -302,7 +302,7 @@ fn quote_identifier(
     file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(&file, offset)?;
+    let token = token_from_offset(file, offset)?;
     let parent = token.parent()?;
 
     let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
@@ -335,7 +335,7 @@ fn unquote_identifier(
     file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(&file, offset)?;
+    let token = token_from_offset(file, offset)?;
     let parent = token.parent()?;
 
     let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
@@ -393,10 +393,9 @@ fn unquote(node: &SyntaxNode) -> Option<String> {
 }
 
 fn is_reserved_word(text: &str) -> bool {
-    if let Ok(_) = RESERVED_KEYWORDS.binary_search(&text.to_lowercase().as_str()) {
-        return true;
-    }
-    false
+    RESERVED_KEYWORDS
+        .binary_search(&text.to_lowercase().as_str())
+        .is_ok()
 }
 
 #[cfg(test)]

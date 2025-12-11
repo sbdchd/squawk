@@ -217,7 +217,7 @@ fn generate_kind_src(
     }
 }
 
-fn generate_reserved_keywords_array(reserved_keywords: &Vec<String>) -> Result<String> {
+fn generate_reserved_keywords_array(reserved_keywords: &[String]) -> Result<String> {
     let mut reserved_keywords = reserved_keywords
         .iter()
         .map(|x| x.to_lowercase())
