@@ -142,6 +142,7 @@ config ideas:
 - lower / upper case keywords (default lowercase)
 - indent (default 2)
 - quoted idents (default avoid)
+- aliases (include `as` or not)
 
 links:
 
@@ -279,6 +280,19 @@ alter table t
   alter column c type int;
 ```
 
+### Rule: casing
+
+```sql
+select x as Foo from t;
+--          ^^^ casing: `Foo` will get parsed as `foo`.
+```
+
+Autofixes to
+
+```sql
+select x as "Foo" from t;
+```
+
 ### Rule: pointless cascade / restrict
 
 > These key words do not have any effect, since there are no dependencies on \$name.
@@ -409,6 +423,12 @@ suggests / autofixes to:
 select * from t join u using (id, name, ip, description, meta);
 ```
 
+also offer an autofix back to natural join:
+
+```sql
+select * from t natural join u;
+```
+
 ### Rule: using unsupported lambdas
 
 This actually parsers in Postgres, but could work off a heuristic
@@ -533,6 +553,19 @@ becomes:
 ```sql
 SELECT customer_id, merchant_id, request_id, count(*) from t
 group by 1, 2, 3;
+```
+
+### Rule: missing column in group by
+
+```sql
+select a, b from t
+--        ^ b must appear in group by, quick fix:
+group by a;
+
+-- becomes
+
+select a, b from t
+group by a, b;
 ```
 
 ### Rule: unused column
@@ -1005,7 +1038,7 @@ select * from (select case
 ```
 
 ```
-("case": boolean)
+case  boolean
 ```
 
 unnest
@@ -1016,7 +1049,8 @@ select * from unnest(ARRAY[1,2], ARRAY['foo','bar','baz']);
 ```
 
 ```
-("unnest": integer, "unnest": text)
+unnest integer,
+unnest text
 ```
 
 ### Semantic Syntax Highlighting
@@ -1070,11 +1104,72 @@ becomes after filling in alias name with `b`
 select b.name, b.email from bar
 ```
 
+```sql
+select * from (
+  select a, b from t where x > 10
+);
+-- ^introduce alias
+
+-- becomes
+
+select * from (
+  select a, b from t where x > 10
+) as foo;
+```
+
 should prompt for table name for each entry when there is an ambiguous column
 
 related:
 
 - https://blog.jetbrains.com/datagrip/2019/03/11/top-9-sql-features-of-datagrip-you-have-to-know/#introduce_alias
+
+### Quick Fix: introduce table alias
+
+```sql
+select t.a from t;
+-- becomes (with user input for value)
+select t2.a from t t2;
+```
+
+### Quick Fix: flip \$op
+
+```sql
+select 1 > 2;
+--     ^ flip >
+select 1 < 2;
+
+select 1 = 2;
+--     ^ flip =
+select 2 = 1;
+
+-- etc, etc.
+```
+
+### Quick Fix: flip join (may change semantics)
+
+```sql
+select * from t join u using (u_id);
+-- becomes
+select * from u join t using (u_id);
+```
+
+### Quick Fix: replace equality checks with `in` expression
+
+```sql
+select * from t where a = 1 or a = 2;
+-- becomes
+select * from t where a in (1, 2);
+```
+
+### Quick Fix: replace `using` with `on`
+
+```sql
+select * from t join u using (g_id);
+```
+
+```sql
+select * from t join u on t.g_id = u.g_id;
+```
 
 ### Quick Fix: table to select
 
@@ -1133,6 +1228,18 @@ select name, email, buzz, foo, "weird-column-name" from bar
 related:
 
 - [datagrips expand wildcard](https://blog.jetbrains.com/datagrip/2019/03/11/top-9-sql-features-of-datagrip-you-have-to-know/#expand_wildcard)
+
+### Quick Fix: create table definition
+
+```sql
+select a, b from t;
+--               ^ unknown table, quick fix: create table
+-- becomes
+create table t (a int not null, b int not null);
+select a, b from t;
+```
+
+We should have markers so you can quickly tab through and fill in the type and nullability for each field.
 
 ### Quick Fix: field rename
 
@@ -1249,4 +1356,111 @@ select 1 in (1,2,3);
 
 ### Quick Fix: subquery to CTE
 
-### Quick Fix: CTE to subquery
+```sql
+select * from (select 1);
+-- becomes (with user input for value)
+with t as (select 1)
+select * from t;
+```
+
+### Quick Fix: inline CTE
+
+```sql
+with t as (select 1)
+select * from t;
+-- becomes
+select * from (select 1) as t;
+
+with t(a) as (select 1)
+select * from t;
+-- becomes
+select * from (select 1) as t(a);
+```
+
+### Quick Fix: qualify identifier
+
+```sql
+create table foo.t(a int);
+select a from t;
+--     ^?
+-- becomes
+select t.a from t;
+```
+
+```sql
+create table t(a int);
+select a from t;
+--            ^?
+-- becomes
+select a from public.t;
+```
+
+### Quick Fix: convert to subquery
+
+```sql
+select a, b from t where x > 10;
+-- ^ quickfix:convert to subquery
+
+-- becomes
+
+select * from (
+  select a, b from t where x > 10
+);
+```
+
+### Inlay Hints
+
+[datagrip has good support](https://www.jetbrains.com/help/datagrip/inlay-hints.html) for these.
+
+Column Names
+
+```sql
+insert into t values (/* column_a: */ 1, /* column_c: */ 'foo');
+```
+
+```sql
+create view v(a, b) as select /* a: */ 1, /* b: */ 'foo';
+```
+
+```sql
+create view v(a, b) as select /* a,y: */ * from foo;
+```
+
+```sql
+with t(x, y) as (
+  select /* x: */ 1, /* y: */ 2
+)
+select x, y from t;
+```
+
+```sql
+create table t(id int, a text, b int);
+create table u(id int, a text, b int);
+
+select * from t
+union
+select /* id: */ 1, /* a: */ 'x', /* b: */ 'y' from u;
+```
+
+Function param names
+
+```sql
+create function foo(x int) returns text
+as $$select 'foo'$$ language sql;
+
+select foo(/* x: */ 'foo');
+```
+
+Join cardinality
+
+See datagrip docs
+
+```sql
+select * from t join u /* 1<->1..n: */ using (user_id);
+
+select * from t left join u /* 1<->0..n: */ using (user_id);
+
+select * from t inner join u /* 1<->0..n: */ using (user_id);
+
+select * from t full join u /* 0..n<->1: */ using (user_id);
+```
