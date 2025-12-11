@@ -1,3 +1,4 @@
+use crate::offsets::token_from_offset;
 use rowan::{TextRange, TextSize};
 use squawk_syntax::{
     SyntaxKind, SyntaxToken,
@@ -23,16 +24,6 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRa
     }
 
     return None;
-}
-
-fn token_from_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxToken> {
-    let mut token = file.syntax().token_at_offset(offset).right_biased()?;
-    // want to be lenient in case someone clicks the trailing `;` of a line
-    // instead of an identifier
-    if token.kind() == SyntaxKind::SEMICOLON {
-        token = token.prev_token()?;
-    }
-    return Some(token);
 }
 
 #[cfg(test)]
