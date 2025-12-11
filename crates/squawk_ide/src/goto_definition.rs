@@ -1,7 +1,7 @@
 use crate::offsets::token_from_offset;
 use rowan::{TextRange, TextSize};
 use squawk_syntax::{
-    SyntaxKind, SyntaxToken,
+    SyntaxKind,
     ast::{self, AstNode},
 };
 
