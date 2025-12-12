@@ -15,15 +15,64 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRa
         || (token.kind() == SyntaxKind::END_KW && parent.kind() == SyntaxKind::CASE_EXPR)
     {
         for parent in token.parent_ancestors() {
-            if let Some(case_expr) = ast::CaseExpr::cast(parent) {
-                if let Some(case_token) = case_expr.case_token() {
-                    return Some(case_token.text_range());
-                }
+            if let Some(case_expr) = ast::CaseExpr::cast(parent)
+                && let Some(case_token) = case_expr.case_token()
+            {
+                return Some(case_token.text_range());
             }
         }
     }
 
+    // goto def on COMMIT -> BEGIN/START TRANSACTION
+    if ast::Commit::can_cast(parent.kind()) {
+        if let Some(begin_range) = find_preceding_begin(&file, token.text_range().start()) {
+            return Some(begin_range);
+        }
+    }
+
+    // goto def on ROLLBACK -> BEGIN/START TRANSACTION
+    if ast::Rollback::can_cast(parent.kind()) {
+        if let Some(begin_range) = find_preceding_begin(&file, token.text_range().start()) {
+            return Some(begin_range);
+        }
+    }
+
+    // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
+    if ast::Begin::can_cast(parent.kind()) {
+        if let Some(end_range) = find_following_commit_or_rollback(&file, token.text_range().end())
+        {
+            return Some(end_range);
+        }
+    }
+
     return None;
+}
+
+fn find_preceding_begin(file: &ast::SourceFile, before: TextSize) -> Option<TextRange> {
+    let mut last_begin: Option<TextRange> = None;
+    for stmt in file.stmts() {
+        if let ast::Stmt::Begin(begin) = stmt {
+            let range = begin.syntax().text_range();
+            if range.end() <= before {
+                last_begin = Some(range);
+            }
+        }
+    }
+    last_begin
+}
+
+fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) -> Option<TextRange> {
+    for stmt in file.stmts() {
+        let range = match &stmt {
+            ast::Stmt::Commit(commit) => commit.syntax().text_range(),
+            ast::Stmt::Rollback(rollback) => rollback.syntax().text_range(),
+            _ => continue,
+        };
+        if range.start() >= after {
+            return Some(range);
+        }
+    }
+    None
 }
 
 #[cfg(test)]
@@ -135,5 +184,114 @@ select case when x > 1 then 1 else 2 end;$0
 select case when x > 1 then$0 1 else 2 end;
 ",
         )
+    }
+
+    #[test]
+    fn rollback_to_begin() {
+        assert_snapshot!(goto(
+            "
+begin;
+select 1;
+rollback$0;
+",
+        ), @r"
+          ╭▸ 
+        2 │ begin;
+          │ ───── 2. destination
+        3 │ select 1;
+        4 │ rollback;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn begin_to_rollback() {
+        assert_snapshot!(goto(
+            "
+begin$0;
+select 1;
+rollback;
+commit;
+",
+        ), @r"
+          ╭▸ 
+        2 │ begin;
+          │     ─ 1. source
+        3 │ select 1;
+        4 │ rollback;
+          ╰╴──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn commit_to_begin() {
+        assert_snapshot!(goto(
+            "
+begin;
+select 1;
+commit$0;
+",
+        ), @r"
+          ╭▸ 
+        2 │ begin;
+          │ ───── 2. destination
+        3 │ select 1;
+        4 │ commit;
+          ╰╴     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn begin_to_commit() {
+        assert_snapshot!(goto(
+            "
+begin$0;
+select 1;
+commit;
+",
+        ), @r"
+          ╭▸ 
+        2 │ begin;
+          │     ─ 1. source
+        3 │ select 1;
+        4 │ commit;
+          ╰╴────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn commit_to_start_transaction() {
+        assert_snapshot!(goto(
+            "
+start transaction;
+select 1;
+commit$0;
+",
+        ), @r"
+          ╭▸ 
+        2 │ start transaction;
+          │ ───────────────── 2. destination
+        3 │ select 1;
+        4 │ commit;
+          ╰╴     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn start_transaction_to_commit() {
+        assert_snapshot!(goto(
+            "
+start$0 transaction;
+select 1;
+commit;
+",
+        ), @r"
+          ╭▸ 
+        2 │ start transaction;
+          │     ─ 1. source
+        3 │ select 1;
+        4 │ commit;
+          ╰╴────── 2. destination
+        ");
     }
 }
