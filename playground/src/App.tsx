@@ -80,15 +80,22 @@ function initialMode(): Mode | null {
   return "Lint"
 }
 
+// pulling this into its own function due to gap in react compiler
+// https://github.com/facebook/react/issues/34761
+// this avoid a de-opt
+function saveMode(mode: Mode | null) {
+  try {
+    localStorage.setItem("play-mode-v1", mode ?? "none")
+  } catch {
+    // pass
+  }
+}
+
 function useMode() {
   const [mode, setActiveMode] = useState<Mode | null>(() => initialMode())
 
   useEffect(() => {
-    try {
-      localStorage.setItem("play-mode-v1", mode ?? "none")
-    } catch {
-      // pass
-    }
+    saveMode(mode)
   }, [mode])
 
   return [mode, setActiveMode] as const

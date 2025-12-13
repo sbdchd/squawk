@@ -3,7 +3,7 @@ import { sentryVitePlugin } from "@sentry/vite-plugin"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 
-const ReactCompilerConfig = {}
+const ReactCompilerConfig = { panicThreshold: "all_errors" }
 
 // https://vite.dev/config/
 export default defineConfig({
