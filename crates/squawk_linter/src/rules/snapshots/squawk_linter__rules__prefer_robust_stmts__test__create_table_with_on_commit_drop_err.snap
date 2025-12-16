@@ -1,0 +1,25 @@
+---
+source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferRobustStmts,
+        message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+        text_range: 40..87,
+        help: None,
+        fix: Some(
+            Fix {
+                title: "Insert `if not exists`",
+                edits: [
+                    Edit {
+                        text_range: 52..52,
+                        text: Some(
+                            " if not exists",
+                        ),
+                    },
+                ],
+            },
+        ),
+    },
+]
