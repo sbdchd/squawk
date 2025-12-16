@@ -34,16 +34,30 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
     None
 }
 
-fn resolve_table(binder: &Binder, table_name: &Name, schema: &Schema) -> Option<SyntaxNodePtr> {
-    let symbol_id = binder.scopes[binder.root_scope()]
-        .get(table_name)?
-        .iter()
-        .copied()
-        .find(|id| {
+fn resolve_table(
+    binder: &Binder,
+    table_name: &Name,
+    schema: &Option<Schema>,
+) -> Option<SyntaxNodePtr> {
+    let symbols = binder.scopes[binder.root_scope()].get(table_name)?;
+
+    if let Some(schema) = schema {
+        let symbol_id = symbols.iter().copied().find(|id| {
             let symbol = &binder.symbols[*id];
             symbol.kind == SymbolKind::Table && &symbol.schema == schema
         })?;
-    Some(binder.symbols[symbol_id].ptr)
+        return Some(binder.symbols[symbol_id].ptr);
+    } else {
+        for search_schema in [Schema::new("pg_temp"), Schema::new("public")] {
+            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
+                let symbol = &binder.symbols[*id];
+                symbol.kind == SymbolKind::Table && symbol.schema == search_schema
+            }) {
+                return Some(binder.symbols[symbol_id].ptr);
+            }
+        }
+    }
+    None
 }
 
 fn find_containing_path(name_ref: &ast::NameRef) -> Option<ast::Path> {
@@ -61,15 +75,9 @@ fn extract_table_name(path: &ast::Path) -> Option<Name> {
     Some(Name::new(name_ref.syntax().text().to_string()))
 }
 
-fn extract_schema_name(path: &ast::Path) -> Schema {
-    let Some(qualifier) = path.qualifier() else {
-        return Schema::Public;
-    };
-    let Some(segment) = qualifier.segment() else {
-        return Schema::Public;
-    };
-    let Some(name_ref) = segment.name_ref() else {
-        return Schema::Public;
-    };
-    Schema::from_name(Name::new(name_ref.syntax().text().to_string()))
+fn extract_schema_name(path: &ast::Path) -> Option<Schema> {
+    path.qualifier()
+        .and_then(|q| q.segment())
+        .and_then(|s| s.name_ref())
+        .map(|name_ref| Schema(Name::new(name_ref.syntax().text().to_string())))
 }

@@ -6,18 +6,11 @@ use squawk_syntax::SyntaxNodePtr;
 pub(crate) struct Name(pub(crate) SmolStr);
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) enum Schema {
-    Public,
-    Custom(Name),
-}
+pub(crate) struct Schema(pub(crate) Name);
 
 impl Schema {
-    pub(crate) fn from_name(name: Name) -> Self {
-        if name == Name::new("public") {
-            Schema::Public
-        } else {
-            Schema::Custom(name)
-        }
+    pub(crate) fn new(name: impl Into<SmolStr>) -> Self {
+        Schema(Name::new(name))
     }
 }
 

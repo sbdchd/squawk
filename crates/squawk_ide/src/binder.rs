@@ -58,7 +58,8 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
         return;
     };
     let name_ptr = path_to_ptr(&path);
-    let schema = schema_name(&path);
+    let is_temp = create_table.temp_token().is_some() || create_table.temporary_token().is_some();
+    let schema = schema_name(&path, is_temp);
 
     let table_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Table,
@@ -95,12 +96,11 @@ fn path_to_ptr(path: &ast::Path) -> SyntaxNodePtr {
     SyntaxNodePtr::new(path.syntax())
 }
 
-fn schema_name(path: &ast::Path) -> Schema {
-    let Some(qualifier) = path.qualifier() else {
-        return Schema::Public;
-    };
-    let Some(segment) = qualifier.segment() else {
-        return Schema::Public;
+fn schema_name(path: &ast::Path, is_temp: bool) -> Schema {
+    let default_schema = if is_temp { "pg_temp" } else { "public" };
+
+    let Some(segment) = path.qualifier().and_then(|q| q.segment()) else {
+        return Schema::new(default_schema);
     };
 
     let schema_name = if let Some(name) = segment.name() {
@@ -108,8 +108,8 @@ fn schema_name(path: &ast::Path) -> Schema {
     } else if let Some(name_ref) = segment.name_ref() {
         Name::new(name_ref.syntax().text().to_string())
     } else {
-        return Schema::Public;
+        return Schema::new(default_schema);
     };
 
-    Schema::from_name(schema_name)
+    Schema(schema_name)
 }
