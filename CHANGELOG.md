@@ -7,19 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.33.0 - 2025-12-16
+
+### Added
+
+- ide: goto def create temp table (#737)
+- ide: basic goto def for create table/drop table (#736)
+- ide: goto def on begin/commit/rollback (#734)
+- ide: quote & unquote identifiers (#733)
+- ide: add table <-> select rewrites (#728)
+- ide: string rewrites (#725)
+
+- parser: update grammar & ast (#727)
+
+- use npm trusted publishing (#724). Thanks @chdsbd!
+
+### Fixed
+
+- linter: fix false positive with `create temp table t() on commit drop;` (#739)
+- parser: fix reindex parsing (#726)
+
 ## v2.32.0 - 2025-12-04
 
-## Fixed
+### Fixed
 
 - parser: fixed issue parsing some `insert`'s with `select`s and `conflict` clauses (#720, #721, #722).
 
-## Added
+### Added
 
 - parser: special case functions like `extract` are now properly typed in the ast (#719).
 
 ## v2.31.0 - 2025-11-24
 
-## Added
+### Added
 
 - linter: adding_foreign_key_constraint: allow when create table in transaction (#713)
 - lsp: add code action for case else clause (#709). Thanks @cr4ftx!
@@ -30,14 +50,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - parser: improve option & role lists (#702)
 - parser: improve error recovery for update statements (#701)
 
-## Fixed
+### Fixed
 
 - parser: fix nodes for casts so ast access works correctly (#711)
 - linter: fix autofix for int & smallint with array types (#710)
 
 ## v2.30.0 - 2025-10-30
 
-## Added
+### Added
 
 - linter: new rule `ban-uncommitted-transaction`
 
@@ -64,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.29.0 - 2025-10-19
 
-## Added
+### Added
 
 - parser: improve error recovery for option lists in `reindex`, `prepare`,
   `vacuum`, `copy`, `drop database`, `create type`, `create function`,
@@ -97,7 +117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - vscode: improved commenting behavior (#690)
 
-## Fixed
+### Fixed
 
 - linter: fixed false positive with `constraint-missing-not-valid` (#694)
 
@@ -109,18 +129,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.28.1 - 2025-10-03
 
-## Added
+### Added
 
 - lsp server: expand selection support. (#674)
 
-## Fixed
+### Fixed
 
 - linter: fix require-timeout-settings false positives with `create table`
   statements that do not have foreign keys. (#675)
 
 ## v2.28.0 - 2025-10-02
 
-## Added
+### Added
 
 - New rule: require-timeout-settings (#671)
 
@@ -144,7 +164,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   If you've already configured timeouts for your migrations, you can safely
   ignore this rule.
 
-## Fixed
+### Fixed
 
 - parser: pg18 `like` clause in `create foreign table` now parses (#666)
 
@@ -152,7 +172,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.27.0 - 2025-09-23
 
-## Added
+### Added
 
 - cli: rendering of diffs for suggestions in output. (#662)
 
@@ -171,7 +191,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      ╰╴             ++++++++++++
   ```
 
-## Fixed
+### Fixed
 
 - parser: parsing some `set` related commands. (#657)
 
@@ -183,14 +203,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   set bar from current;
   ```
 
-## Changed
+### Changed
 
 - internal: bump rust to 1.90.0 (#659)
 - syntax: fill out more of the ast (#658)
 
 ## v2.26.0 - 2025-09-15
 
-## Added
+### Added
 
 - linter: `adding-field-with-default` now allows more cases (#652).
 
@@ -202,7 +222,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   alter table t add column c timestamptz default now() - interval '100 years';
   ```
 
-## Fixed
+### Fixed
 
 - parser: parse materialized views using a paren select (#651).
 
@@ -213,24 +233,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as (select * from t);
   ```
 
-## Changed
+### Changed
 
 - cli now uses unicode for snippet annotations (#654).
 
 ## v2.25.1 - 2025-09-03
 
-## Fixed
+### Fixed
 
 github: fix api calls failing with 403. (#643)
 
 ## v2.25.0 - 2025-09-02
 
-## Added
+### Added
 
 - linter: `--no-error-on-unmatched-pattern` argument to not exit with an error if no files are matched (default: false) (#639). Thanks @PascalFrenz!
 - linter: gitlab reporter (#624). Thanks @benedikt-bartscher!
 
-## Fixed
+### Fixed
 
 - linter: adding-field-with-default now checks that the postgres version is `<= 11` before reporting an error for non-volatile defaults (#637). Thanks @ermakov-oleg!
 
@@ -249,11 +269,11 @@ github: fix api calls failing with 403. (#643)
 
 ## v2.24.0 - 2025-08-24
 
-## Added
+### Added
 
 - linter: quick fixes for prefer-text-field (#621), ban-char-field (#620), prefer-bigint-over-int, prefer-bigint-over-small-int (#618), and prefer-timestamptz (#617).
 
-## Fixed
+### Fixed
 
 - Fixed typos in linter docs (#623). Thanks @benedikt-bartscher!
 
@@ -261,7 +281,7 @@ github: fix api calls failing with 403. (#643)
 
 ## v2.23.0 - 2025-08-20
 
-## Added
+### Added
 
 - github: support overriding api url for github enterprise usage (#611). Thanks @jvatic!
 
@@ -269,41 +289,41 @@ github: fix api calls failing with 403. (#643)
 
 - lsp server: quick fixes to ignore rules for a line or entire file (#613)
 
-## Fixed
+### Fixed
 
 - linter: violations no longer include leading whitespace & comments in their range. (#612)
 
 ## v2.22.0 - 2025-08-07
 
-## Added
+### Added
 
 - linter: add fixes for prefer-robust-stmts (currently LSP server only) (#602)
 
 - playground: add quick fix support (#606)
 
-## Fixed
+### Fixed
 
 - linter: fix comparison edge cases with identifiers (#600), (#601). Thanks @gilbsgilbs!
 
 ## v2.21.1 - 2025-07-23
 
-## Fixed
+### Fixed
 
 - parser: bugged warning for invalid casts that was warning about all casts inside function calls. (#598)
 
 ## v2.21.0 - 2025-07-23
 
-## Added
+### Added
 
 - parser: warn about `try_cast` and don't fail to parse casts that are invalid. (#593)
 
-## Fixed
+### Fixed
 
 - vscode: invalid binary path on windows causing extension not to load. (#595)
 
 ## v2.20.0 - 2025-07-12
 
-## Added
+### Added
 
 - GitHub annotations when run with `GITHUB_ACTIONS` set. (#589), (#590)
 
@@ -315,7 +335,7 @@ github: fix api calls failing with 403. (#643)
 
 ## v2.19.0 - 2025-07-09
 
-## Added
+### Added
 
 - linter: file level rule violation ignore comments. (#585)
 
@@ -347,7 +367,7 @@ github: fix api calls failing with 403. (#643)
 
 ## v2.18.0 - 2025-07-03
 
-## Added
+### Added
 
 - vscode: `Show tokens` command to get lexer output. (#579)
 - vscode: `Show server` & `Stop server` commands. (#576)
@@ -355,7 +375,7 @@ github: fix api calls failing with 403. (#643)
 
 ## v2.17.0 - 2025-06-30
 
-## Added
+### Added
 
 - Basic VSCode extension. (#567), (#569), (#571), (#572)
 
@@ -372,7 +392,7 @@ github: fix api calls failing with 403. (#643)
 - Improved CTE parsing. (#558)
 - Error recovery for type args & more forgiving create table args parsing. (#559)
 
-## Changed
+### Changed
 
 - Internal: bumped rust to 1.88.0
 
@@ -609,7 +629,7 @@ github: fix api calls failing with 403. (#643)
   explain (costs off) select;
   ```
 
-## Changed
+### Changed
 
 - Renamed `ast::Item` to `ast::Stmt`. (#483)
 - Split `select` into `select`, `tables`, and `values` statements. (#484)
@@ -913,58 +933,58 @@ github: fix api calls failing with 403. (#643)
 
 ## v0.18.0 - 2023-01-06
 
-## Fixed
+### Fixed
 
 - error parsing multiple transactions in one file (#259)
 
 ## v0.17.0 - 2022-07-27
 
-## Added
+### Added
 
 - added better error handling of invalid syntax. (#245)
 
 ## v0.16.0 - 2022-07-22
 
-## Added
+### Added
 
 - added `prefer-big-int` rule to prefer 64 bit types over 32 bit types. (#238)
 - added `prefer-identity` rule to prefer `identity` columns over `serial` columns. (#243)
 
 ## v0.15.0 - 2022-07-17
 
-## Added
+### Added
 
 - added `prefer-timestamptz` rule to warn about using `timestamp` instead of `timestamptz`. (#230)
 
-## Changed
+### Changed
 
 - only apply `prefer-robust-stmts` to files with more than one SQL statement. (#231)
 
-## Fixed
+### Fixed
 
 - catch another way to add foreign keys for `adding-foreign-key-constraint`. Thanks @adamrdavid! (#228)
 
 ## v0.14.0 - 2022-07-10
 
-## Added
+### Added
 
 - added `pg_version` configuration option to support ignoring rules by Postgres version. Thanks @adamrdavid! (#219)
 
 ## v0.13.2 - 2022-06-16
 
-## Changed
+### Changed
 
 - internal: use rule IDs based on serde annotations of `RuleViolationKind`. (#218)
 
 ## v0.13.1 - 2022-06-15
 
-## Fixed
+### Fixed
 
 - fix parsing enum values from configuration file. (#217)
 
 ## v0.13.0 - 2022-06-06
 
-## Added
+### Added
 
 - added validation for configured rules. (#216)
 
@@ -974,43 +994,43 @@ github: fix api calls failing with 403. (#643)
 
 ## v0.12.0 - 2022-05-27
 
-## Added
+### Added
 
 - added configuration file (`.squawk.toml`) to specify excluded rules. (#213)
 
 ## v0.11.3 - 2022-05-11
 
-## Fixed
+### Fixed
 
 - incorrectly silenced stdin
 
 ## v0.11.2 - 2022-05-11
 
-## Fixed
+### Fixed
 
 - silence stdin if it's empty (#210)
 
 ## v0.11.1 - 2022-05-11
 
-## Fixed
+### Fixed
 
 - duplicate messages being written when using GitHub Actions token authentication. (#209)
 
 ## v0.11.0 - 2022-05-11
 
-## Added
+### Added
 
 - Support GitHub API authentication via GitHub Actions tokens. (#207)
 
 ## v0.10.0 - 2022-04-25
 
-## Changed
+### Changed
 
 - differentiate between `VOLATILE` and non-`VOLATILE` defaults in `adding-field-with-default` documentation (#201)
 
 ## v0.9.0 - 2022-02-26
 
-## Added
+### Added
 
 - require-concurrent-index-deletion rule and removed deletion warnings from
   require-concurrency-index-creation. Thanks @K-Phoen! (#177)
