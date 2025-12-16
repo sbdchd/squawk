@@ -35,8 +35,33 @@ main() {
     
     echo "Updating CHANGELOG.md..."
     CURRENT_DATE=$(date +"%Y-%m-%d")
-    sed -i '' "s/^## \[Unreleased\]$/## [Unreleased]\n\n## v$NEW_VERSION - $CURRENT_DATE/" CHANGELOG.md
-    
+    LATEST_TAG=$(git tag --sort=-version:refname | head -1)
+
+    if [ -z "$LATEST_TAG" ]; then
+        echo "Error: No previous git tag found"
+        exit 1
+    fi
+
+    echo "Fetching commits since $LATEST_TAG..."
+    COMMITS_FILE=$(mktemp)
+    git log ${LATEST_TAG}..HEAD --pretty=format:"- %s" > "$COMMITS_FILE"
+
+    TEMP_CHANGELOG=$(mktemp)
+    awk -v date="$CURRENT_DATE" -v version="$NEW_VERSION" -v commits_file="$COMMITS_FILE" '
+        /^## \[Unreleased\]$/ {
+            print $0
+            print ""
+            print "## v" version " - " date
+            print ""
+            while ((getline line < commits_file) > 0) {
+                print line
+            }
+            close(commits_file)
+            next
+        }
+        { print }
+    ' CHANGELOG.md > "$TEMP_CHANGELOG" && mv "$TEMP_CHANGELOG" CHANGELOG.md
+
     echo "Opening CHANGELOG.md for editing..."
     ${EDITOR:-vi} CHANGELOG.md
 }
