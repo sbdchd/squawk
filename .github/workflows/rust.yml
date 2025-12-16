@@ -180,7 +180,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm publish
+      - run: npm publish --provenance --access public
 
   publish-docker:
     if: startsWith(github.ref, 'refs/tags/')
