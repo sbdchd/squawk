@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.33.2 - 2025-12-16
+
+### Fixed
+
+- ci: try to fix npm trusted publishing (#742)
+
 ## v2.33.1 - 2025-12-16
 
 ### Fixed
