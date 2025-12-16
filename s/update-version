@@ -16,14 +16,14 @@ main() {
         echo "Auto-incrementing to $NEW_VERSION"
     fi
 
-    echo "Checking out master branch..."
-    if ! git checkout master; then
-        echo "Error: Failed to checkout master branch"
+    echo "Switching to master branch..."
+    if ! git switch master; then
+        echo "Error: Failed to switch to master branch"
         exit 1
     fi
 
-    echo "Creating new release branch: release-$NEW_VERSION"
-    git checkout -b "release-$NEW_VERSION"
+    echo "Switching to release branch: release-$NEW_VERSION"
+    git switch "release-$NEW_VERSION" 2>/dev/null || git switch -c "release-$NEW_VERSION"
     echo "updating version to '$NEW_VERSION'..."
     fastmod --accept-all '^version = ".*"' 'version = "'$NEW_VERSION'"' Cargo.toml
     fastmod --accept-all '(squawk-[a-z_]+ = \{ path = "[^"]+", )version = "[^"]+"' '${1}version = "'$NEW_VERSION'"' Cargo.toml
@@ -44,7 +44,7 @@ main() {
 
     echo "Fetching commits since $LATEST_TAG..."
     COMMITS_FILE=$(mktemp)
-    git log ${LATEST_TAG}..HEAD --pretty=format:"- %s" > "$COMMITS_FILE"
+    git log ${LATEST_TAG}..master --pretty=format:"- %s" > "$COMMITS_FILE"
 
     TEMP_CHANGELOG=$(mktemp)
     awk -v date="$CURRENT_DATE" -v version="$NEW_VERSION" -v commits_file="$COMMITS_FILE" '
