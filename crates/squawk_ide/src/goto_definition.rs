@@ -1,4 +1,6 @@
+use crate::binder;
 use crate::offsets::token_from_offset;
+use crate::resolve;
 use rowan::{TextRange, TextSize};
 use squawk_syntax::{
     SyntaxKind,
@@ -42,6 +44,14 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRa
         if let Some(end_range) = find_following_commit_or_rollback(&file, token.text_range().end())
         {
             return Some(end_range);
+        }
+    }
+
+    if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
+        let binder_output = binder::bind(&file);
+        if let Some(ptr) = resolve::resolve_name_ref(&binder_output, &name_ref) {
+            let node = ptr.to_node(file.syntax());
+            return Some(node.text_range());
         }
     }
 
@@ -201,6 +211,69 @@ rollback$0;
         3 │ select 1;
         4 │ rollback;
           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_table() {
+        assert_snapshot!(goto("
+create table t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
+        3 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_table_with_schema() {
+        assert_snapshot!(goto("
+create table public.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table public.t();
+          │                     ─ 2. destination
+        3 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create table foo.t();
+drop table foo.t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table foo.t();
+          │                  ─ 2. destination
+        3 │ drop table foo.t;
+          ╰╴               ─ 1. source
+        ");
+
+        goto_not_found(
+            "
+-- defaults to public schema
+create table t();
+drop table foo.t$0;
+",
+        );
+
+        // todo: temp tables
+    }
+
+    #[test]
+    fn goto_drop_table_defined_after() {
+        assert_snapshot!(goto("
+drop table t$0;
+create table t();
+"), @r"
+          ╭▸ 
+        2 │ drop table t;
+          │            ─ 1. source
+        3 │ create table t();
+          ╰╴             ─ 2. destination
         ");
     }
 
