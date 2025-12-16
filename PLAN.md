@@ -581,6 +581,26 @@ FROM (
 WHERE total_amount > 1000;
 ```
 
+### Rule: aggregate free having condition
+
+```sql
+select a from t group by a having a > 10;
+--                                ^^^^^^
+
+-- quick fix to:
+select a from t where a > 10 group by a;
+```
+
+### Rule: order direction is redundent
+
+```sql
+select * from t order by a asc;
+--                         ^^^ order direction is redundent. asc is the default.
+
+-- quick fix to:
+select * from t order by a;
+```
+
 ### Rule: sum(boolean) to case stmt
 
 ```sql
@@ -1076,6 +1096,9 @@ also show lex command
 ### Snippets
 
 - [datagrip live templates](https://blog.jetbrains.com/datagrip/2019/03/11/top-9-sql-features-of-datagrip-you-have-to-know/#live_templates)
+  - insert
+  - select
+  - create table
 - [postgresql-snippets](https://github.com/Manuel7806/postgresql-snippets/blob/main/snippets/snippets.code-snippets)
 
 ### Quick Fix: alias query
@@ -1083,11 +1106,9 @@ also show lex command
 ```sql
 select * from bar
 --              ^$ action:rename-alias
-```
 
-becomes after filling in alias name with `b`
+-- becomes after filling in alias name with `b`
 
-```sql
 select b.* from bar b
 ```
 
@@ -1096,11 +1117,9 @@ another example:
 ```sql
 select name, email from bar
 --                       ^$ action:rename-alias
-```
 
-becomes after filling in alias name with `b`
+-- becomes after filling in alias name with `b`
 
-```sql
 select b.name, b.email from bar
 ```
 
