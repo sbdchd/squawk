@@ -11,10 +11,7 @@ enum NameRefContext {
     DropTable,
 }
 
-pub(crate) fn resolve_name_ref(
-    binder: &Binder,
-    name_ref: &ast::NameRef,
-) -> Option<SyntaxNodePtr> {
+pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
     let context = classify_name_ref_context(name_ref)?;
 
     match context {
