@@ -168,7 +168,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm:
-    if: startsWith(github.ref, 'refs/tags/')
+    # if: startsWith(github.ref, 'refs/tags/')
     needs: [build]
     runs-on: ubuntu-22.04
     permissions:
@@ -176,10 +176,11 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-      - run: npm publish --provenance --access public
+          node-version: 24
+      - run: npm --version
+      - run: npm publish
 
   publish-docker:
     if: startsWith(github.ref, 'refs/tags/')
