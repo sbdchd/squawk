@@ -259,8 +259,81 @@ create table t();
 drop table foo.t$0;
 ",
         );
+    }
 
-        // todo: temp tables
+    #[test]
+    fn goto_drop_temp_table() {
+        assert_snapshot!(goto("
+create temp table t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create temp table t();
+          │                   ─ 2. destination
+        3 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_temporary_table() {
+        assert_snapshot!(goto("
+create temporary table t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create temporary table t();
+          │                        ─ 2. destination
+        3 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_temp_table_with_pg_temp_schema() {
+        assert_snapshot!(goto("
+create temp table t();
+drop table pg_temp.t$0;
+"), @r"
+          ╭▸ 
+        2 │ create temp table t();
+          │                   ─ 2. destination
+        3 │ drop table pg_temp.t;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_temp_table_shadows_public() {
+        // temp tables shadow public tables when no schema is specified
+        assert_snapshot!(goto("
+create table t();
+create temp table t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        3 │ create temp table t();
+          │                   ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_public_table_when_temp_exists() {
+        // can still access public table explicitly
+        assert_snapshot!(goto("
+create table t();
+create temp table t();
+drop table public.t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
+        3 │ create temp table t();
+        4 │ drop table public.t;
+          ╰╴                  ─ 1. source
+        ");
     }
 
     #[test]
