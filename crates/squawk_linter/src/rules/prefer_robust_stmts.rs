@@ -157,6 +157,17 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::CreateTable(create_table)
                 if create_table.if_not_exists().is_none() && !inside_transaction =>
             {
+                let is_temp =
+                    create_table.temp_token().is_some() || create_table.temporary_token().is_some();
+                let on_commit_drop = create_table
+                    .on_commit()
+                    .and_then(|oc| oc.on_commit_action())
+                    .is_some_and(|action| matches!(action, ast::OnCommitAction::Drop(_)));
+
+                if is_temp && on_commit_drop {
+                    continue;
+                }
+
                 let fix = create_table.table_token().map(|table_token| {
                     let at = table_token.text_range().end();
                     let edit = Edit::insert(" if not exists", at);
@@ -664,6 +675,48 @@ alter table t alter column c set not null;
         let sql = r#"
 select 1; -- so we don't skip checking
 DROP INDEX CONCURRENTLY "email_idx";
+        "#;
+        let errors = lint(sql, Rule::PreferRobustStmts);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn create_temp_table_on_commit_drop_ok() {
+        let sql = r#"
+select 1; -- so we don't skip checking
+CREATE TEMP TABLE test_table (id int) ON COMMIT DROP;
+        "#;
+        let errors = lint(sql, Rule::PreferRobustStmts);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn create_temporary_table_on_commit_drop_ok() {
+        let sql = r#"
+select 1; -- so we don't skip checking
+CREATE TEMPORARY TABLE test_table (id int) ON COMMIT DROP;
+        "#;
+        let errors = lint(sql, Rule::PreferRobustStmts);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn create_temp_table_without_on_commit_drop_err() {
+        let sql = r#"
+select 1; -- so we don't skip checking
+CREATE TEMP TABLE test_table (id int);
+        "#;
+        let errors = lint(sql, Rule::PreferRobustStmts);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn create_table_with_on_commit_drop_err() {
+        let sql = r#"
+select 1; -- so we don't skip checking
+CREATE TABLE test_table (id int) ON COMMIT DROP;
         "#;
         let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
