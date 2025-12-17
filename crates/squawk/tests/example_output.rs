@@ -3,7 +3,7 @@ use snapbox::{cmd::Command, file};
 #[test]
 fn example_sql_svg() {
     let expected = file!["../src/snapshots/example.svg": TermSvg];
-    let bin_path = snapbox::cmd::cargo_bin("squawk");
+    let bin_path = snapbox::cmd::cargo_bin!("squawk");
     Command::new(bin_path)
         .env("CLICOLOR_FORCE", "1")
         .env("SQUAWK_DISABLE_GITHUB_ANNOTATIONS", "1")
