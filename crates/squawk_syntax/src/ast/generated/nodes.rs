@@ -13768,7 +13768,15 @@ pub struct Set {
 }
 impl Set {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn config_value(&self) -> Option<ConfigValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn config_values(&self) -> AstChildren<ConfigValue> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13780,12 +13788,40 @@ impl Set {
         support::token(&self.syntax, SyntaxKind::EQ)
     }
     #[inline]
+    pub fn catalog_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CATALOG_KW)
+    }
+    #[inline]
+    pub fn content_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONTENT_KW)
+    }
+    #[inline]
+    pub fn current_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_KW)
+    }
+    #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
     }
     #[inline]
+    pub fn document_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOCUMENT_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
     pub fn local_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LOCAL_KW)
+    }
+    #[inline]
+    pub fn option_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPTION_KW)
+    }
+    #[inline]
+    pub fn schema_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
     }
     #[inline]
     pub fn session_token(&self) -> Option<SyntaxToken> {
@@ -13802,6 +13838,10 @@ impl Set {
     #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn xml_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::XML_KW)
     }
     #[inline]
     pub fn zone_token(&self) -> Option<SyntaxToken> {
@@ -16434,6 +16474,12 @@ pub enum ColumnConstraint {
     PrimaryKeyConstraint(PrimaryKeyConstraint),
     ReferencesConstraint(ReferencesConstraint),
     UniqueConstraint(UniqueConstraint),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConfigValue {
+    Literal(Literal),
+    NameRef(NameRef),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -29104,6 +29150,42 @@ impl From<UniqueConstraint> for ColumnConstraint {
     #[inline]
     fn from(node: UniqueConstraint) -> ColumnConstraint {
         ColumnConstraint::UniqueConstraint(node)
+    }
+}
+impl AstNode for ConfigValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::LITERAL | SyntaxKind::NAME_REF)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::LITERAL => ConfigValue::Literal(Literal { syntax }),
+            SyntaxKind::NAME_REF => ConfigValue::NameRef(NameRef { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ConfigValue::Literal(it) => &it.syntax,
+            ConfigValue::NameRef(it) => &it.syntax,
+        }
+    }
+}
+impl From<Literal> for ConfigValue {
+    #[inline]
+    fn from(node: Literal) -> ConfigValue {
+        ConfigValue::Literal(node)
+    }
+}
+impl From<NameRef> for ConfigValue {
+    #[inline]
+    fn from(node: NameRef) -> ConfigValue {
+        ConfigValue::NameRef(node)
     }
 }
 impl AstNode for ConflictAction {

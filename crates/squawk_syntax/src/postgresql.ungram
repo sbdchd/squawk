@@ -2742,10 +2742,20 @@ CreateExtension =
   'create' 'extension' IfNotExists? Name
 
 Set =
-  'set' 
-  ('session' | 'local')? 
-  ('time' 'zone' | (Path ('to' | '='))) 
-  (Expr | 'local' | 'default')
+  'set'
+  ('session' | 'local')?
+  ( 'xml' 'option' ('document' | 'content')
+  | 'time' 'zone' (ConfigValue | 'default' | 'local')?
+  | ('catalog' | 'schema') Literal
+  | Path (
+      'from' 'current'
+    | (('to' | '=') (ConfigValue* | 'default') )
+    )
+  )
+
+ConfigValue =
+  Literal
+| NameRef
 
 Show =
   'show'

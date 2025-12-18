@@ -13535,14 +13535,10 @@ fn config_value(p: &mut Parser<'_>) -> bool {
     while !p.at(EOF) {
         if opt_string_literal(p).is_none()
             && opt_numeric_literal(p).is_none()
-            && !opt_ident(p)
+            && opt_name_ref(p).is_none()
             && !opt_bool_literal(p)
         {
-            if p.at_ts(BARE_LABEL_KEYWORDS) {
-                p.bump_any();
-            } else {
-                break;
-            }
+            break;
         }
         found_value = true;
         if !p.eat(COMMA) {

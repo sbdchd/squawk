@@ -1,3 +1,4 @@
+use rowan::TextSize;
 use squawk_syntax::{
     SyntaxNodePtr,
     ast::{self, AstNode},
@@ -19,7 +20,8 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
-            resolve_table(binder, &table_name, &schema)
+            let position = name_ref.syntax().text_range().start();
+            resolve_table(binder, &table_name, &schema, position)
         }
     }
 }
@@ -38,6 +40,7 @@ fn resolve_table(
     binder: &Binder,
     table_name: &Name,
     schema: &Option<Schema>,
+    position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     let symbols = binder.scopes[binder.root_scope()].get(table_name)?;
 
@@ -48,10 +51,11 @@ fn resolve_table(
         })?;
         return Some(binder.symbols[symbol_id].ptr);
     } else {
-        for search_schema in [Schema::new("pg_temp"), Schema::new("public")] {
+        let search_path = binder.search_path_at(position);
+        for search_schema in search_path {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &binder.symbols[*id];
-                symbol.kind == SymbolKind::Table && symbol.schema == search_schema
+                symbol.kind == SymbolKind::Table && &symbol.schema == search_schema
             }) {
                 return Some(binder.symbols[symbol_id].ptr);
             }

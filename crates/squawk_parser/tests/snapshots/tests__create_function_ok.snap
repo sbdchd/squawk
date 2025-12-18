@@ -142,10 +142,12 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          ADMIN_KW "admin"
+          NAME_REF
+            ADMIN_KW "admin"
           COMMA ","
           WHITESPACE " "
-          IDENT "pg_temp"
+          NAME_REF
+            IDENT "pg_temp"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_function_with_percent_type"

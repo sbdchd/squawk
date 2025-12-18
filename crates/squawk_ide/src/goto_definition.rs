@@ -440,4 +440,167 @@ commit;
           ╰╴────── 2. destination
         ");
     }
+
+    #[test]
+    fn goto_with_search_path() {
+        assert_snapshot!(goto(r#"
+set search_path to "foo", public;
+create table foo.t();
+drop table t$0;
+"#), @r"
+          ╭▸ 
+        3 │ create table foo.t();
+          │                  ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_search_path_like_variable() {
+        // not actually search path
+        goto_not_found(
+            "
+set bar.search_path to foo, public;
+create table foo.t();
+drop table t$0;
+",
+        )
+    }
+
+    #[test]
+    fn goto_with_search_path_second_schema() {
+        assert_snapshot!(goto("
+set search_path to foo, bar, public;
+create table bar.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        3 │ create table bar.t();
+          │                  ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_search_path_skips_first() {
+        assert_snapshot!(goto("
+set search_path to foo, bar, public;
+create table foo.t();
+create table bar.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t();
+          │                  ─ 2. destination
+        4 │ create table bar.t();
+        5 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_without_search_path_uses_default() {
+        assert_snapshot!(goto("
+create table foo.t();
+create table public.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        3 │ create table public.t();
+          │                     ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_set_schema() {
+        assert_snapshot!(goto("
+set schema 'myschema';
+create table myschema.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        3 │ create table myschema.t();
+          │                       ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_set_schema_ignores_other_schemas() {
+        assert_snapshot!(goto("
+set schema 'myschema';
+create table public.t();
+create table myschema.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        4 │ create table myschema.t();
+          │                       ─ 2. destination
+        5 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_search_path_changed_twice() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.t();
+set search_path to bar;
+create table bar.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        5 │ create table bar.t();
+          │                  ─ 2. destination
+        6 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.t();
+drop table t$0;
+set search_path to bar;
+create table bar.t();
+drop table t;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t();
+          │                  ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_empty_search_path() {
+        goto_not_found(
+            "
+set search_path to '';
+create table public.t();
+drop table t$0;
+",
+        )
+    }
+
+    #[test]
+    fn goto_with_search_path_uppercase() {
+        assert_snapshot!(goto("
+SET SEARCH_PATH TO foo;
+create table foo.t();
+drop table t$0;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t();
+          │                  ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
 }
