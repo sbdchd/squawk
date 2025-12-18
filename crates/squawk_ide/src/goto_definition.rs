@@ -603,4 +603,47 @@ drop table t$0;
           ╰╴           ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_table_stmt() {
+        assert_snapshot!(goto("
+create table t();
+table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
+        3 │ table t;
+          ╰╴      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_stmt_with_schema() {
+        assert_snapshot!(goto("
+create table public.t();
+table public.t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table public.t();
+          │                     ─ 2. destination
+        3 │ table public.t;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_stmt_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.t();
+table t$0;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t();
+          │                  ─ 2. destination
+        4 │ table t;
+          ╰╴      ─ 1. source
+        ");
+    }
 }

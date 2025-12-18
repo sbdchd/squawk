@@ -10,13 +10,14 @@ use crate::symbols::{Name, Schema, SymbolKind};
 #[derive(Debug)]
 enum NameRefContext {
     DropTable,
+    Table,
 }
 
 pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
     let context = classify_name_ref_context(name_ref)?;
 
     match context {
-        NameRefContext::DropTable => {
+        NameRefContext::DropTable | NameRefContext::Table => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -30,6 +31,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropTable);
+        }
+        if ast::Table::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::Table);
         }
     }
 
