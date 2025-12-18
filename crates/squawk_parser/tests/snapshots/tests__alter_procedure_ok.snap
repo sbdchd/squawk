@@ -260,7 +260,8 @@ SOURCE_FILE
           WHITESPACE " "
           TO_KW "to"
           WHITESPACE " "
-          IDENT "v"
+          NAME_REF
+            IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -286,7 +287,8 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          IDENT "v"
+          NAME_REF
+            IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE

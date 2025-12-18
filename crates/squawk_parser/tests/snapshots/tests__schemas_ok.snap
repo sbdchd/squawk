@@ -409,9 +409,11 @@ SOURCE_FILE
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
-    IDENT "myschema"
+    NAME_REF
+      IDENT "myschema"
     COMMA ","
-    IDENT "public"
+    NAME_REF
+      IDENT "public"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -424,7 +426,8 @@ SOURCE_FILE
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
-    IDENT "myschema"
+    NAME_REF
+      IDENT "myschema"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -437,7 +440,8 @@ SOURCE_FILE
     WHITESPACE " "
     EQ "="
     WHITESPACE " "
-    IDENT "bar"
+    NAME_REF
+      IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -564,7 +568,8 @@ SOURCE_FILE
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
-    IDENT "a"
+    NAME_REF
+      IDENT "a"
     COMMA ","
     WHITESPACE " "
     LITERAL
