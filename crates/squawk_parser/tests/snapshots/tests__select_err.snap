@@ -610,6 +610,81 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- case missing then expr"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CASE_EXPR
+            CASE_KW "case"
+            WHITESPACE " "
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+                WHITESPACE " "
+                THEN_KW "then"
+            WHITESPACE " "
+            END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- case missing when expr"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CASE_EXPR
+            CASE_KW "case"
+            WHITESPACE " "
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "x"
+            WHITESPACE " "
+            END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- case missing else expr"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CASE_EXPR
+            CASE_KW "case"
+            WHITESPACE " "
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
+            WHITESPACE " "
+            ELSE_CLAUSE
+              ELSE_KW "else"
+            WHITESPACE " "
+            END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
   SELECT
@@ -649,4 +724,7 @@ ERROR@1047: unexpected comma
 ERROR@1079: unexpected trailing comma
 ERROR@1203: expected SEMICOLON
 ERROR@1236: unexpected trailing comma
-ERROR@1280: unexpected trailing comma
+ERROR@1296: expected an expression, found END_KW
+ERROR@1345: expected an expression, found THEN_KW
+ERROR@1415: expected an expression, found END_KW
+ERROR@1455: unexpected trailing comma

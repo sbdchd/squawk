@@ -20,6 +20,14 @@ const EXPR_RECOVERY_SET: TokenSet = TokenSet::new(&[
     // which should be written as:
     //   select 1; select 2;
     SELECT_KW,
+    // select case when x then y else end;
+    //                               ^ missing expr
+    END_KW,
+    // select case when x then else z end;
+    //                        ^ missing expr
+    ELSE_KW, // select case when then y end;
+    //                          ^ missing expr
+    THEN_KW,
 ]);
 
 fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -208,8 +216,8 @@ fn opt_else_clause(p: &mut Parser<'_>) {
         return;
     }
     let m = p.start();
-    if p.eat(ELSE_KW) && expr(p).is_none() {
-        p.error("expected an expression");
+    if p.eat(ELSE_KW) {
+        expr(p);
     }
     m.complete(p, ELSE_CLAUSE);
 }
@@ -219,13 +227,9 @@ fn opt_else_clause(p: &mut Parser<'_>) {
 fn when_clause(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(WHEN_KW);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     p.expect(THEN_KW);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     m.complete(p, WHEN_CLAUSE)
 }
 
@@ -2334,7 +2338,6 @@ fn postfix_dot_expr(
     })
 }
 
-#[must_use]
 fn expr(p: &mut Parser) -> Option<CompletedMarker> {
     expr_bp(p, 1, &Restrictions::default())
 }
