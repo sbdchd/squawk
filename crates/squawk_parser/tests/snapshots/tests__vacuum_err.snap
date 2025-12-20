@@ -28,5 +28,11 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@35: expected COMMA
-ERROR@49: expected COMMA
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ vacuum (full analyze false skip_locked true);
+  ╰╴            ━
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ vacuum (full analyze false skip_locked true);
+  ╰╴                          ━

@@ -673,16 +673,57 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@39: expected path name
-ERROR@143: unexpected trailing comma
-ERROR@197: unexpected comma
-ERROR@198: unexpected comma
-ERROR@199: unexpected comma
-ERROR@200: unexpected comma
-ERROR@201: unexpected comma
-ERROR@1011: expected COMMA
-ERROR@1032: expected COMMA
-ERROR@1116: expected COMMA
-ERROR@1119: expected COMMA
-ERROR@1226: expected COMMA
-ERROR@1268: expected SEMICOLON
+error[syntax-error]: expected path name
+  ╭▸ 
+2 │ create table (
+  ╰╴            ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+10 │ create table t (a text,);
+   ╰╴                      ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+13 │ create table t (,,,,,);
+   ╰╴                ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+13 │ create table t (,,,,,);
+   ╰╴                 ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+13 │ create table t (,,,,,);
+   ╰╴                  ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+13 │ create table t (,,,,,);
+   ╰╴                   ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+13 │ create table t (,,,,,);
+   ╰╴                    ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+51 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
+   ╰╴                                 ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+51 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
+   ╰╴                                                      ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+55 │     for values in (1  2  3);
+   ╰╴                    ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+55 │     for values in (1  2  3);
+   ╰╴                       ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+61 │   exclude using btree ( a with buzz.> b with <) 
+   ╰╴                                     ━
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+66 │   )
+   │ ┏━━┛
+67 │ ┃ -- ^ missing semi
+   ╰╴┗━┛

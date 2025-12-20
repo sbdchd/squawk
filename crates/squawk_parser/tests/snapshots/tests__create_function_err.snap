@@ -129,7 +129,23 @@ SOURCE_FILE
     FUNCTION_KW "function"
   WHITESPACE "\n\n"
 ---
-ERROR@58: expected COMMA
-ERROR@121: expected COMMA
-ERROR@249: expected path name
-ERROR@249: expected param list
+error[syntax-error]: expected COMMA
+  ╭▸ 
+3 │ returns table (a text  b int)
+  ╰╴                     ━
+error[syntax-error]: expected COMMA
+  ╭▸ 
+6 │ create function foo(arg float = 1 int4 = 4)
+  ╰╴                                 ━
+error[syntax-error]: expected path name
+   ╭▸ 
+13 │   create function
+   │ ┏━━━━━━━━━━━━━━━━┛
+14 │ ┃
+   ╰╴┗━┛
+error[syntax-error]: expected param list
+   ╭▸ 
+13 │   create function
+   │ ┏━━━━━━━━━━━━━━━━┛
+14 │ ┃
+   ╰╴┗━┛

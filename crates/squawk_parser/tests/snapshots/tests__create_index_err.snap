@@ -44,4 +44,7 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@51: expected COMMA
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ create index i on t (a nulls first b nulls first);
+  ╰╴                                  ━

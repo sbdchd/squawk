@@ -25,4 +25,7 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@45: expected COMMA
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ drop database d with ( force  force );
+  ╰╴                            ━

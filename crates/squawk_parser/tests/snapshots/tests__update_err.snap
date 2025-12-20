@@ -84,5 +84,11 @@ SOURCE_FILE
   COMMENT "--                ^ missing comma"
   WHITESPACE "\n"
 ---
-ERROR@15: expected COMMA
-ERROR@79: expected COMMA
+error[syntax-error]: expected COMMA
+  ╭▸ 
+1 │ update t set (j k) = (1, 2);
+  ╰╴               ━
+error[syntax-error]: expected COMMA
+  ╭▸ 
+4 │ update t set a = 1 b = 2;
+  ╰╴                  ━

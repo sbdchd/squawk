@@ -176,8 +176,23 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@51: expected COMMA
-ERROR@168: missing column
-ERROR@170: unexpected trailing comma
-ERROR@301: expected COMMA
-ERROR@304: unexpected trailing comma
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ insert into t (a, b c)
+  ╰╴                   ━
+error[syntax-error]: missing column
+  ╭▸ 
+7 │ insert into t (a,,c,)
+  ╰╴                 ━
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+7 │ insert into t (a,,c,)
+  ╰╴                   ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+13 │   values (4, 5  6,)
+   ╰╴              ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+13 │   values (4, 5  6,)
+   ╰╴                 ━

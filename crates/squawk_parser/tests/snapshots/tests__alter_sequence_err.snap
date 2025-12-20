@@ -17,4 +17,7 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@34: expected ALTER SEQUENCE option
+error[syntax-error]: expected ALTER SEQUENCE option
+  ╭▸ 
+2 │ alter sequence s;
+  ╰╴                ━

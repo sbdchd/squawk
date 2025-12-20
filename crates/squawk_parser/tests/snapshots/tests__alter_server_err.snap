@@ -15,4 +15,7 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@32: expected ALTER SERVER option
+error[syntax-error]: expected ALTER SERVER option
+  ╭▸ 
+2 │ alter server s;
+  ╰╴              ━

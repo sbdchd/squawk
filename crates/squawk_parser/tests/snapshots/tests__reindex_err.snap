@@ -28,5 +28,11 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@39: expected COMMA
-ERROR@47: expected COMMA
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ reindex (concurrently verbose tablespace t) index i;
+  ╰╴                     ━
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ reindex (concurrently verbose tablespace t) index i;
+  ╰╴                             ━

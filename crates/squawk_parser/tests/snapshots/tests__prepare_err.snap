@@ -78,5 +78,11 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@38: expected COMMA
-ERROR@44: expected COMMA
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ PREPARE fooplan (int  text  bool, numeric) AS
+  ╰╴                    ━
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ PREPARE fooplan (int  text  bool, numeric) AS
+  ╰╴                          ━
