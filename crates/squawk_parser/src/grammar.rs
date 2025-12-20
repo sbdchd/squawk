@@ -300,16 +300,6 @@ fn overlay_fn(p: &mut Parser<'_>) -> CompletedMarker {
 //  cause trouble in the places where b_expr is used.
 fn position_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(POSITION_KW));
-    fn b_expr(r: &mut Parser<'_>) -> Option<CompletedMarker> {
-        expr_bp(
-            r,
-            1,
-            &Restrictions {
-                in_disabled: true,
-                ..Restrictions::default()
-            },
-        )
-    }
     let m = p.start();
     p.expect(POSITION_KW);
     p.expect(L_PAREN);
@@ -1419,7 +1409,7 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<CompletedMarker> {
         }
     };
     // parse the interior of the unary expression
-    let _ = expr_bp(p, prefix_bp, &Restrictions::default());
+    expr_bp(p, prefix_bp, &Restrictions::default());
     let cm = m.complete(p, kind);
     Some(cm)
 }
@@ -2127,9 +2117,9 @@ fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(NOT_KW);
     p.expect(BETWEEN_KW);
     p.eat(SYMMETRIC_KW);
-    bexpr(p);
+    b_expr(p);
     p.expect(AND_KW);
-    bexpr(p);
+    b_expr(p);
     m.complete(p, BETWEEN_EXPR)
 }
 
@@ -2315,8 +2305,7 @@ fn opt_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 // Based on the Postgres grammar b_expr, it's expr without `AND`, `NOT`, `IS`,
 // and `IN`
-#[must_use]
-fn bexpr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn b_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     expr_bp(
         p,
         1,
@@ -2477,7 +2466,6 @@ struct Restrictions {
     and_disabled: bool,
 }
 
-#[must_use]
 fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMarker> {
     let m = p.start();
     if !p.at_ts(EXPR_FIRST) {
