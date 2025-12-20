@@ -699,32 +699,119 @@ SOURCE_FILE
           COMMA ","
   WHITESPACE "\n"
 ---
-ERROR@124: unexpected trailing comma
-ERROR@153: unexpected trailing comma
-ERROR@213: unexpected trailing comma
-ERROR@248: missing comma
-ERROR@378: expected COMMA
-ERROR@494: expected COMMA
-ERROR@496: expected COMMA
-ERROR@533: expected COMMA
-ERROR@535: expected COMMA
-ERROR@583: expected COMMA
-ERROR@586: expected COMMA
-ERROR@663: unexpected trailing comma
-ERROR@695: expected expression
-ERROR@696: expected expression
-ERROR@697: expected expression
-ERROR@698: expected expression
-ERROR@821: missing comma
-ERROR@860: expected COMMA
-ERROR@898: unexpected comma
-ERROR@939: unexpected trailing comma
-ERROR@1009: expected COMMA
-ERROR@1047: unexpected comma
-ERROR@1079: unexpected trailing comma
-ERROR@1203: expected SEMICOLON
-ERROR@1236: unexpected trailing comma
-ERROR@1296: expected an expression, found END_KW
-ERROR@1345: expected an expression, found THEN_KW
-ERROR@1415: expected an expression, found END_KW
-ERROR@1455: unexpected trailing comma
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+4 │   array['a', 'b', 'c',] as y,
+  ╰╴                     ━
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+5 │   'hello world' as z,
+  ╰╴                    ━
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+9 │ select * from t as u(a,);
+  ╰╴                      ━
+error[syntax-error]: missing comma
+   ╭▸ 
+12 │ select a, b c  d, e from t;
+   ╰╴             ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+17 │ SELECT DISTINCT ON (a b) a, b, c
+   ╰╴                     ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+22 │ select * from t group by rollup (1 2 3);
+   ╰╴                                  ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+22 │ select * from t group by rollup (1 2 3);
+   ╰╴                                    ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+23 │ select * from t group by cube (1 2 3);
+   ╰╴                                ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+23 │ select * from t group by cube (1 2 3);
+   ╰╴                                  ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+25 │   group by grouping sets((1 2) grouping sets((), grouping sets(())));
+   ╰╴                           ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+25 │   group by grouping sets((1 2) grouping sets((), grouping sets(())));
+   ╰╴                              ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+28 │ select f(1,);
+   ╰╴          ━
+error[syntax-error]: expected expression
+   ╭▸ 
+31 │ select f(a,,,,,);
+   ╰╴           ━
+error[syntax-error]: expected expression
+   ╭▸ 
+31 │ select f(a,,,,,);
+   ╰╴            ━
+error[syntax-error]: expected expression
+   ╭▸ 
+31 │ select f(a,,,,,);
+   ╰╴             ━
+error[syntax-error]: expected expression
+   ╭▸ 
+31 │ select f(a,,,,,);
+   ╰╴              ━
+error[syntax-error]: missing comma
+   ╭▸ 
+37 │ select numeric 1234;
+   ╰╴              ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+40 │ select array[1 2,3];
+   ╰╴              ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+42 │ select array[1, ,3];
+   ╰╴                ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+44 │ select array[1,2,3,];
+   ╰╴                  ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+47 │ select cast(x as varchar(100 200));
+   ╰╴                            ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+48 │ select cast(x as varchar(100, , 200));
+   ╰╴                              ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+49 │ select cast(x as t(a, b,));
+   ╰╴                       ━
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+53 │ select select;
+   ╰╴      ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+56 │ select a, from t;
+   ╰╴        ━
+error[syntax-error]: expected an expression, found END_KW
+   ╭▸ 
+59 │ select case when 1 then end;
+   ╰╴                       ━
+error[syntax-error]: expected an expression, found THEN_KW
+   ╭▸ 
+62 │ select case when then x end;
+   ╰╴                ━
+error[syntax-error]: expected an expression, found END_KW
+   ╭▸ 
+65 │ select case when 1 then 2 else end;
+   ╰╴                              ━
+error[syntax-error]: unexpected trailing comma
+   ╭▸ 
+68 │ select 1,
+   ╰╴        ━

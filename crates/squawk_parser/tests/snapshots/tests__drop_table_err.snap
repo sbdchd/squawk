@@ -54,5 +54,11 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@36: expected COMMA
-ERROR@86: unexpected comma, expected a name
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ drop table foo, bar buzz cascade;
+  ╰╴                   ━
+error[syntax-error]: unexpected comma, expected a name
+  ╭▸ 
+5 │ drop table foo,   , buzz cascade;
+  ╰╴                  ━

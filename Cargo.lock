@@ -1915,6 +1915,7 @@ dependencies = [
 name = "squawk-parser"
 version = "2.33.2"
 dependencies = [
+ "annotate-snippets",
  "camino",
  "dir-test",
  "drop_bomb",

@@ -333,9 +333,27 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@24: unexpected comma
-ERROR@140: unexpected comma, expected a column name
-ERROR@270: expected COMMA
-ERROR@357: missing comma
-ERROR@492: missing comma
-ERROR@645: unexpected comma
+error[syntax-error]: unexpected comma
+  ╭▸ 
+3 │ ), -- <--- extra comma!
+  ╰╴ ━
+error[syntax-error]: unexpected comma, expected a column name
+  ╭▸ 
+8 │ search depth first by a, , c set ordercol
+  ╰╴                         ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+13 │ search depth first by a, b c set ordercol
+   ╰╴                          ━
+error[syntax-error]: missing comma
+   ╭▸ 
+19 │    ) -- <-- missing a comma
+   ╰╴    ━
+error[syntax-error]: missing comma
+   ╭▸ 
+29 │    ) -- <-- missing a comma
+   ╰╴    ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+38 │    ), -- <-- extra comma
+   ╰╴    ━

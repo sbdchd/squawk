@@ -1,4 +1,5 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/tests.rs
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
@@ -137,8 +138,7 @@ fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
         }
         squawk_parser::StrStep::Error { msg, pos } => {
             assert!(depth > 0);
-            let err = "ERROR";
-            errors.push(format!("{err}@{pos}: {msg}\n"));
+            errors.push((pos, msg.to_string()));
         }
     });
     assert_eq!(
@@ -151,15 +151,32 @@ fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
 
     for (token, msg) in lexed.errors() {
         let pos = lexed.text_start(token);
-        let err = "ERROR";
-        errors.push(format!("{err}@{pos}: {msg}\n"));
+        errors.push((pos, msg.to_string()));
     }
 
     if !errors.is_empty() {
+        errors.sort_by_key(|(pos, _)| *pos);
+
         buf.push_str("---\n");
-        for e in &errors {
-            buf.push_str(e);
+
+        let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
+
+        for (pos, msg) in &errors {
+            let group = Level::ERROR.primary_title(msg).id("syntax-error").element(
+                Snippet::source(text)
+                    .fold(true)
+                    .annotation(AnnotationKind::Primary.span(*pos..*pos + 1)),
+            );
+            let rendered = renderer.render(&[group]).to_string();
+
+            buf.push_str(&rendered);
+            buf.push('\n');
         }
     }
-    (buf, errors)
+
+    let error_vec = errors
+        .iter()
+        .map(|(pos, msg)| format!("ERROR@{pos}: {msg}\n"))
+        .collect();
+    (buf, error_vec)
 }

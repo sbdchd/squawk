@@ -19,4 +19,7 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@46: Missing alter foreign data wrapper option or action.
+error[syntax-error]: Missing alter foreign data wrapper option or action.
+  ╭▸ 
+2 │ alter foreign data wrapper w;
+  ╰╴                            ━

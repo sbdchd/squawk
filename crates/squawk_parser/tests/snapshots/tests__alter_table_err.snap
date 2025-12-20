@@ -210,10 +210,31 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@23: expected command, found ADD_KW
-ERROR@27: expected command, found COLUMN_KW
-ERROR@34: expected command, found IDENT
-ERROR@38: expected command, found BOOLEAN_KW
-ERROR@175: missing comma
-ERROR@505: expected COMMA
-ERROR@570: unexpected comma
+error[syntax-error]: expected command, found ADD_KW
+  ╭▸ 
+2 │ add column foo boolean;
+  ╰╴━
+error[syntax-error]: expected command, found COLUMN_KW
+  ╭▸ 
+2 │ add column foo boolean;
+  ╰╴    ━
+error[syntax-error]: expected command, found IDENT
+  ╭▸ 
+2 │ add column foo boolean;
+  ╰╴           ━
+error[syntax-error]: expected command, found BOOLEAN_KW
+  ╭▸ 
+2 │ add column foo boolean;
+  ╰╴               ━
+error[syntax-error]: missing comma
+  ╭▸ 
+8 │ validate constraint foo validate constraint b ;
+  ╰╴                       ━
+error[syntax-error]: expected COMMA
+   ╭▸ 
+16 │   alter c set (a b = 1);
+   ╰╴                ━
+error[syntax-error]: unexpected comma
+   ╭▸ 
+20 │   alter c set (a, , b = 1);
+   ╰╴                  ━

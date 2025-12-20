@@ -48,6 +48,15 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@66: unexpected trailing comma
-ERROR@68: expected COMMA
-ERROR@120: expected L_PAREN
+error[syntax-error]: unexpected trailing comma
+  ╭▸ 
+3 │ values (1,) (1);
+  ╰╴         ━
+error[syntax-error]: expected COMMA
+  ╭▸ 
+3 │ values (1,) (1);
+  ╰╴           ━
+error[syntax-error]: expected L_PAREN
+  ╭▸ 
+6 │ values (1),, (2);
+  ╰╴           ━

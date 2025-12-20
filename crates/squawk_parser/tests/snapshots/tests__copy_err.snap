@@ -43,5 +43,11 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
-ERROR@36: expected COMMA
-ERROR@79: expected COMMA
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ copy x (i y) from '/tmp/input.file' (on_error ignore  log_verbosity verbose);
+  ╰╴         ━
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │ copy x (i y) from '/tmp/input.file' (on_error ignore  log_verbosity verbose);
+  ╰╴                                                    ━
