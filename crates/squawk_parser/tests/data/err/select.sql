@@ -55,5 +55,14 @@ select select;
 -- extra comma
 select a, from t;
 
+-- case missing then expr
+select case when 1 then end;
+
+-- case missing when expr
+select case when then x end;
+
+-- case missing else expr
+select case when 1 then 2 else end;
+
 -- trailing comma at EOF
 select 1,
