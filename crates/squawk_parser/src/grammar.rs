@@ -188,8 +188,8 @@ fn tuple_expr(p: &mut Parser<'_>) -> CompletedMarker {
 fn case_expr(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(CASE_KW);
-    if !p.at(WHEN_KW) && expr(p).is_none() {
-        p.error("expected an expression");
+    if !p.at(WHEN_KW) {
+        expr(p);
     }
     when_clause_list(p);
     opt_else_clause(p);
@@ -256,9 +256,7 @@ fn extract_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(L_PAREN);
     extract_arg(p);
     p.expect(FROM_KW);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     p.expect(R_PAREN);
     let m = m.complete(p, EXTRACT_FN).precede(p);
     opt_agg_clauses(p);
@@ -276,19 +274,13 @@ fn overlay_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(OVERLAY_KW);
     p.expect(L_PAREN);
     if !p.at(R_PAREN) {
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+        expr(p);
         if p.eat(PLACING_KW) {
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
             p.expect(FROM_KW);
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
-            if p.eat(FOR_KW) && expr(p).is_none() {
-                p.error("expected an expression");
+            expr(p);
+            if p.eat(FOR_KW) {
+                expr(p);
             }
         } else if p.eat(COMMA) {
             opt_expr_list(p);
@@ -321,13 +313,9 @@ fn position_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(POSITION_KW);
     p.expect(L_PAREN);
-    if b_expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    b_expr(p);
     p.expect(IN_KW);
-    if b_expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    b_expr(p);
     p.expect(R_PAREN);
     let m = m.complete(p, POSITION_FN).precede(p);
     opt_agg_clauses(p);
@@ -379,40 +367,32 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(SUBSTRING_KW);
     p.expect(L_PAREN);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     match p.current() {
         // FOR a_expr FROM a_expr
         // FOR a_expr
         FOR_KW => {
             p.bump(FOR_KW);
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
             // [ from expr ]
-            if p.eat(FROM_KW) && expr(p).is_none() {
-                p.error("expected an expression");
+            if p.eat(FROM_KW) {
+                expr(p);
             }
         }
         // FROM a_expr
         // FROM a_expr FOR a_expr
         FROM_KW => {
             p.bump(FROM_KW);
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
             // [ for expr ]
-            if p.eat(FOR_KW) && expr(p).is_none() {
-                p.error("expected an expression");
+            if p.eat(FOR_KW) {
+                expr(p);
             }
         }
         // SIMILAR a_expr ESCAPE a_expr
         SIMILAR_KW => {
             p.bump(SIMILAR_KW);
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
         }
         _ if p.eat(COMMA) => {
             opt_expr_list(p);
@@ -807,9 +787,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             let m = p.start();
             p.bump_any();
             p.bump(L_PAREN);
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
             p.expect(AS_KW);
             type_name(p);
             opt_collate(p);
@@ -1894,9 +1872,7 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
         TIMESTAMP_KW | TIME_KW => {
             p.bump_any();
             if p.eat(L_PAREN) {
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
+                expr(p);
                 p.expect(R_PAREN);
             }
             opt_with_timezone(p);
@@ -2151,13 +2127,9 @@ fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(NOT_KW);
     p.expect(BETWEEN_KW);
     p.eat(SYMMETRIC_KW);
-    if bexpr(p).is_none() {
-        p.error("expected an expression");
-    }
+    bexpr(p);
     p.expect(AND_KW);
-    if bexpr(p).is_none() {
-        p.error("expected an expression");
-    }
+    bexpr(p);
     m.complete(p, BETWEEN_EXPR)
 }
 
@@ -2193,9 +2165,7 @@ fn opt_filter_clause(p: &mut Parser<'_>) {
         p.expect(FILTER_KW);
         p.expect(L_PAREN);
         p.expect(WHERE_KW);
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+        expr(p);
         p.expect(R_PAREN);
         m.complete(p, FILTER_CLAUSE);
     }
@@ -2248,9 +2218,7 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
                 return m.complete(p, SLICE_EXPR);
             } else {
                 // foo[:b]
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
+                expr(p);
                 p.expect(R_BRACK);
                 return m.complete(p, SLICE_EXPR);
             }
@@ -2258,18 +2226,14 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
         // foo[a]
         // foo[a:]
         // foo[a:b]
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+        expr(p);
         if p.eat(COLON) {
             // foo[a:]
             if p.eat(R_BRACK) {
                 return m.complete(p, SLICE_EXPR);
             }
             // foo[a:b]
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
             p.expect(R_BRACK);
             return m.complete(p, SLICE_EXPR);
         }
@@ -2655,13 +2619,9 @@ fn opt_cycle_clause(p: &mut Parser<'_>) {
     p.expect(SET_KW);
     name_ref(p);
     if p.eat(TO_KW) {
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+        expr(p);
         p.expect(DEFAULT_KW);
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+        expr(p);
     }
     p.expect(USING_KW);
     name_ref(p);
@@ -2874,8 +2834,8 @@ fn opt_fetch_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.error("expected first or next");
     }
     // [ count ]
-    if !p.at(ROWS_KW) && !p.at(ROW_KW) && expr(p).is_none() {
-        p.error("expected an expression");
+    if !p.at(ROWS_KW) && !p.at(ROW_KW) {
+        expr(p);
     }
     // { ROW | ROWS }
     if !p.eat(ROW_KW) {
@@ -2915,9 +2875,7 @@ fn sort_by_list(p: &mut Parser<'_>) {
 
 fn sort_by(p: &mut Parser<'_>) {
     let m = p.start();
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     opt_sort_order(p);
     opt_nulls_order(p);
     m.complete(p, SORT_BY);
@@ -3473,9 +3431,7 @@ fn on_clause(p: &mut Parser<'_>) {
     assert!(p.at(ON_KW));
     let m = p.start();
     p.bump(ON_KW);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     m.complete(p, ON_CLAUSE);
 }
 
@@ -3885,9 +3841,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 p.expect(ALWAYS_KW);
                 p.expect(AS_KW);
                 p.expect(L_PAREN);
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
+                expr(p);
                 p.expect(R_PAREN);
                 opt_virtual_or_stored(p);
                 GENERATED_CONSTRAINT
@@ -3900,9 +3854,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 }
                 p.expect(AS_KW);
                 if p.eat(L_PAREN) {
-                    if expr(p).is_none() {
-                        p.error("expected an expression");
-                    }
+                    expr(p);
                     p.expect(R_PAREN);
                     opt_virtual_or_stored(p);
                 } else {
@@ -4066,9 +4018,7 @@ fn opt_index_elem(p: &mut Parser<'_>) -> bool {
         return false;
     }
     if p.eat(L_PAREN) {
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+        expr(p);
         p.expect(R_PAREN);
     } else {
         if expr(p).is_none() {
@@ -4546,9 +4496,7 @@ fn opt_where_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump(WHERE_KW);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     Some(m.complete(p, WHERE_CLAUSE))
 }
 
@@ -4622,9 +4570,7 @@ fn opt_group_by_item(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             GROUPING_SETS
         }
         _ => {
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
             GROUPING_EXPR
         }
     };
@@ -4638,9 +4584,7 @@ fn opt_having_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump(HAVING_KW);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     Some(m.complete(p, HAVING_CLAUSE))
 }
 
@@ -4657,9 +4601,7 @@ fn frame_start_end(p: &mut Parser<'_>) {
             p.bump_any();
         }
         _ => {
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+            expr(p);
             if p.at(PRECEDING_KW) || p.at(FOLLOWING_KW) {
                 p.bump_any();
             } else {
@@ -4768,8 +4710,8 @@ fn opt_limit_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         m.abandon(p);
         return None;
     }
-    if !p.eat(ALL_KW) && expr(p).is_none() {
-        p.error("expected an expression");
+    if !p.eat(ALL_KW) {
+        expr(p);
     }
     Some(m.complete(p, LIMIT_CLAUSE))
 }
@@ -4781,9 +4723,7 @@ fn opt_offset_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump(OFFSET_KW);
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
+    expr(p);
     if p.at(ROW_KW) || p.at(ROWS_KW) {
         p.bump_any();
     }
