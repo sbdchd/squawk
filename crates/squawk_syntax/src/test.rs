@@ -1,10 +1,10 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/tests.rs
-use annotate_snippets::{renderer::DecorStyle, AnnotationKind, Level, Renderer, Snippet};
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use camino::Utf8Path;
-use dir_test::{dir_test, Fixture};
+use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
 
-use crate::{syntax_error::SyntaxError, SourceFile};
+use crate::{SourceFile, syntax_error::SyntaxError};
 
 fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
     let mut rendered = String::new();
