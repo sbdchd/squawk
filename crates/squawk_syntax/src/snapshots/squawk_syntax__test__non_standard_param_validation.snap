@@ -31,5 +31,11 @@ SOURCE_FILE@0..47
   SEMICOLON@45..46 ";"
   WHITESPACE@46..47 "\n"
 
-ERROR@29:31 "Invalid parameter type. Use positional params like $1 instead."
-ERROR@40:45 "Invalid parameter type. Use positional params like $1 instead."
+error[syntax-error]: Invalid parameter type. Use positional params like $1 instead.
+  ╭▸ 
+2 │ select :x;
+  ╰╴       ━━
+error[syntax-error]: Invalid parameter type. Use positional params like $1 instead.
+  ╭▸ 
+3 │ select : foo;
+  ╰╴       ━━━━━

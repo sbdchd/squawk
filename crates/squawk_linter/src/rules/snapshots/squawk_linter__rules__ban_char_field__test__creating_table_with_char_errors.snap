@@ -2,14 +2,14 @@
 source: crates/squawk_linter/src/rules/ban_char_field.rs
 expression: "lint_errors(sql, Rule::BanCharField)"
 ---
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 4 │     "alpha" char(100) NOT NULL,
   │             ━━━━━━━━━
   ╭╴
 4 │     "alpha" varchar(100) NOT NULL,
   ╰╴            +++
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 5 │     "beta" character(100) NOT NULL,
   │            ━━━━━━━━━━━━━━
@@ -17,7 +17,7 @@ error[BanCharField]: Using `character` is likely a mistake and should almost alw
 5 -     "beta" character(100) NOT NULL,
 5 +     "beta" varchar(100) NOT NULL,
   ╰╴
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 6 │     "charlie" char NOT NULL,
   │               ━━━━
@@ -25,7 +25,7 @@ error[BanCharField]: Using `character` is likely a mistake and should almost alw
 6 -     "charlie" char NOT NULL,
 6 +     "charlie" text NOT NULL,
   ╰╴
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 7 │     "delta" character NOT NULL
   │             ━━━━━━━━━

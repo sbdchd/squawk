@@ -399,9 +399,27 @@ SOURCE_FILE@0..523
   SEMICOLON@521..522 ";"
   WHITESPACE@522..523 "\n"
 
-ERROR@30 "Join missing condition."
-ERROR@60 "Join missing condition."
-ERROR@91 "Join missing condition."
-ERROR@121 "Join missing condition."
-ERROR@203:213 "Join `using` clause is not allowed for natural joins."
-ERROR@291:301 "Join `using` clause is not allowed for cross joins."
+error[syntax-error]: Join missing condition.
+  ╭▸ 
+2 │ select * from t join u;
+  ╰╴                      ━
+error[syntax-error]: Join missing condition.
+  ╭▸ 
+4 │ select * from t left join u;
+  ╰╴                           ━
+error[syntax-error]: Join missing condition.
+  ╭▸ 
+6 │ select * from t right join u;
+  ╰╴                            ━
+error[syntax-error]: Join missing condition.
+  ╭▸ 
+8 │ select * from t full join u;
+  ╰╴                           ━
+error[syntax-error]: Join `using` clause is not allowed for natural joins.
+   ╭▸ 
+12 │ select * from t natural join u using (id);
+   ╰╴                               ━━━━━━━━━━
+error[syntax-error]: Join `using` clause is not allowed for cross joins.
+   ╭▸ 
+15 │ select * from t cross join u using (id);
+   ╰╴                             ━━━━━━━━━━

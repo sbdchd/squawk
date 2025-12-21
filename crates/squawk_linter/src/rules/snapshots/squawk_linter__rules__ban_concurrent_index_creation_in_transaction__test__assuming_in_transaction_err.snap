@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/ban_concurrent_index_creation_in_transaction.rs
 expression: "lint_errors_with(sql, LinterSettings\n{ assume_in_transaction: true, ..Default::default() },)"
 ---
-error[BanConcurrentIndexCreationInTransaction]: While regular index creation can happen inside a transaction, this is not allowed when the `CONCURRENTLY` option is used.
+warning[ban-concurrent-index-creation-in-transaction]: While regular index creation can happen inside a transaction, this is not allowed when the `CONCURRENTLY` option is used.
   ╭▸ 
 3 │   CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   │                       ━━━━━━━━━━━━

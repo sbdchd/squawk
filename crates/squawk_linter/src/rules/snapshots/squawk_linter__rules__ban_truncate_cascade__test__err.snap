@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/ban_truncate_cascade.rs
 expression: "lint_errors(sql, Rule::BanTruncateCascade)"
 ---
-error[BanTruncateCascade]: Using `CASCADE` will recursively truncate any tables that foreign key to the referenced tables! So if you had foreign keys setup as `a <- b <- c` and truncated `a`, then `b` & `c` would also be truncated!
+warning[ban-truncate-cascade]: Using `CASCADE` will recursively truncate any tables that foreign key to the referenced tables! So if you had foreign keys setup as `a <- b <- c` and truncated `a`, then `b` & `c` would also be truncated!
   ╭▸ 
 2 │         truncate a, b, c cascade;
   │                          ━━━━━━━

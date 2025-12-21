@@ -31,7 +31,7 @@ fn parser_ok(fixture: Fixture<&str>) {
     // We check that all of our tests in `ok` also pass the Postgres parser,
     // if they don't, they should be moved to the `err` directory.
     assert!(
-        errors.is_empty(),
+        errors.is_none(),
         "tests defined in the `ok` can't have parser errors."
     );
     // skipping pg17/pg18 specific stuff since our parser isn't using the latest parser
@@ -69,7 +69,7 @@ fn parser_err(fixture: Fixture<&str>) {
     });
 
     assert!(
-        !errors.is_empty(),
+        errors.is_some(),
         "tests defined in the `err` directory must have parser errors."
     );
 }
@@ -95,20 +95,22 @@ fn regression_suite(fixture: Fixture<&str>) {
 
     let snapshot_name = format!("regression_{test_name}");
 
+    let has_errors = errors.is_none();
+
     with_settings!({
       omit_expression => true,
       input_file => input_file
     }, {
-      assert_snapshot!(snapshot_name, errors.join(""));
+      assert_snapshot!(snapshot_name, errors.unwrap_or_default());
     });
 
     assert!(
-        errors.is_empty(),
+        has_errors,
         "tests defined in the regression suite can't have parser errors."
     );
 }
 
-fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
+fn parse_text(text: &str) -> (String, Option<String>) {
     let lexed = LexedStr::new(text);
     let input = lexed.to_input();
     let output = parse(&input);
@@ -154,12 +156,12 @@ fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
         errors.push((pos, msg.to_string()));
     }
 
-    if !errors.is_empty() {
+    let error_message = if !errors.is_empty() {
         errors.sort_by_key(|(pos, _)| *pos);
 
-        buf.push_str("---\n");
-
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
+
+        let mut out = "---\n".to_owned();
 
         for (pos, msg) in &errors {
             let group = Level::ERROR.primary_title(msg).id("syntax-error").element(
@@ -169,14 +171,17 @@ fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
             );
             let rendered = renderer.render(&[group]).to_string();
 
-            buf.push_str(&rendered);
-            buf.push('\n');
+            out.push_str(&rendered);
+            out.push('\n');
         }
+        Some(out)
+    } else {
+        None
+    };
+
+    if let Some(error_message) = error_message.clone() {
+        buf.push_str(&error_message);
     }
 
-    let error_vec = errors
-        .iter()
-        .map(|(pos, msg)| format!("ERROR@{pos}: {msg}\n"))
-        .collect();
-    (buf, error_vec)
+    (buf, error_message)
 }

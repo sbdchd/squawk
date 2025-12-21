@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/prefer_bigint_over_int.rs
 expression: "lint_errors(sql, Rule::PreferBigintOverInt)"
 ---
-error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
   ╭▸ 
 3 │     id int
   │        ━━━
@@ -11,7 +11,7 @@ error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting th
   ╭╴
 3 │     id bigint
   ╰╴       +++
-error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
   ╭▸ 
 6 │     id integer
   │        ━━━━━━━
@@ -21,7 +21,7 @@ error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting th
 6 -     id integer
 6 +     id bigint
   ╰╴
-error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
   ╭▸ 
 9 │     id int4
   │        ━━━━
@@ -31,7 +31,7 @@ error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting th
 9 -     id int4
 9 +     id int8
   ╰╴
-error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
    ╭▸ 
 12 │     id serial
    │        ━━━━━━
@@ -40,7 +40,7 @@ error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting th
    ╭╴
 12 │     id bigserial
    ╰╴       +++
-error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
    ╭▸ 
 15 │     id serial4
    │        ━━━━━━━

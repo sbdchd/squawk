@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/transaction_nesting.rs
 expression: "lint_errors(sql, Rule::TransactionNesting)"
 ---
-error[TransactionNesting]: There is no transaction to `COMMIT` or `ROLLBACK`.
+warning[transaction-nesting]: There is no transaction to `COMMIT` or `ROLLBACK`.
   ╭▸ 
 5 │ COMMIT;
   │ ━━━━━━

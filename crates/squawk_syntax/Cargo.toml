@@ -16,6 +16,7 @@ rowan.workspace = true
 smol_str.workspace = true
 
 [dev-dependencies]
+annotate-snippets.workspace = true
 insta.workspace = true
 dir-test.workspace = true
 camino.workspace = true

@@ -2,11 +2,11 @@
 source: crates/squawk_linter/src/rules/changing_column_type.rs
 expression: "lint_errors(sql, Rule::ChangingColumnType)"
 ---
-error[ChangingColumnType]: Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.
+warning[changing-column-type]: Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.
   ╭▸ 
 6 │ ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE varchar(255) USING "foo"::varchar(255);
   ╰╴                                             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-error[ChangingColumnType]: Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.
+warning[changing-column-type]: Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.
   ╭▸ 
 7 │ ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE text USING "foo"::text;
   ╰╴                                             ━━━━━━━━━━━━━━━━━━━━━━━━━━━

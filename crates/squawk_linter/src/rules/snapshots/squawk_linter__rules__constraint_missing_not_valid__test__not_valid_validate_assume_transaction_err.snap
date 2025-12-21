@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/constraint_missing_not_valid.rs
 expression: "lint_errors_with(sql, LinterSettings\n{ assume_in_transaction: true, ..Default::default() },)"
 ---
-error[ConstraintMissingNotValid]: Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.
+warning[constraint-missing-not-valid]: Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.
   ╭▸ 
 3 │ ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
   │                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

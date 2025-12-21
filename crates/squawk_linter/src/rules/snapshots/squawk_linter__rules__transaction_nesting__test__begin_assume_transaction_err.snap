@@ -2,19 +2,19 @@
 source: crates/squawk_linter/src/rules/transaction_nesting.rs
 expression: "lint_errors_with(sql, settings)"
 ---
-error[TransactionNesting]: There is an existing transaction already in progress, managed by your migration tool.
+warning[transaction-nesting]: There is an existing transaction already in progress, managed by your migration tool.
   ╭▸ 
 2 │ BEGIN;
   │ ━━━━━
   │
   ╰ help: Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.
-error[TransactionNesting]: There is an existing transaction already in progress, managed by your migration tool.
+warning[transaction-nesting]: There is an existing transaction already in progress, managed by your migration tool.
   ╭▸ 
 3 │ BEGIN;
   │ ━━━━━
   │
   ╰ help: Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.
-error[TransactionNesting]: Attempting to end the transaction that is managed by your migration tool
+warning[transaction-nesting]: Attempting to end the transaction that is managed by your migration tool
   ╭▸ 
 5 │ COMMIT;
   │ ━━━━━━

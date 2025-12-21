@@ -102,8 +102,8 @@ fn format_violations(sql: &str, violations: &[Violation]) -> String {
             .fold(true)
             .annotation(AnnotationKind::Primary.span(start..end));
 
-        let code = format!("{:?}", violation.code);
-        let mut group = Level::ERROR
+        let code = format!("{}", violation.code);
+        let mut group = Level::WARNING
             .primary_title(&violation.message)
             .id(&code)
             .element(snippet);

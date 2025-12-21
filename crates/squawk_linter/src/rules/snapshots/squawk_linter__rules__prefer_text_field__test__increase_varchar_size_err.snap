@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/prefer_text_field.rs
 expression: "lint_errors(sql, Rule::PreferTextField)"
 ---
-error[PreferTextField]: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
+warning[prefer-text-field]: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
   ╭▸ 
 6 │ ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
   │                                                 ━━━━━━━━━━━━━

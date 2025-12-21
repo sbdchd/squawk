@@ -50,4 +50,7 @@ SOURCE_FILE@0..91
   SEMICOLON@88..89 ";"
   WHITESPACE@89..91 "\n\n"
 
-ERROR@64:67 "Out params are not allowed with aggregates."
+error[syntax-error]: Out params are not allowed with aggregates.
+  ╭▸ 
+2 │ alter aggregate a (in t, out u) 
+  ╰╴                         ━━━

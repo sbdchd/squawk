@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/adding_field_with_default.rs
 expression: "lint_errors(sql, Rule::AddingFieldWithDefault)"
 ---
-error[AddingFieldWithDefault]: Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.
+warning[adding-field-with-default]: Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.
   ╭▸ 
 3 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
   │                                                            ━━━━━━━━

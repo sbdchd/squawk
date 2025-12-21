@@ -96,10 +96,31 @@ SOURCE_FILE@0..108
   SEMICOLON@106..107 ";"
   WHITESPACE@107..108 "\n"
 
-ERROR@39 "missing comma"
-ERROR@49:50 "Invalid operator."
-ERROR@60:61 "Invalid operator."
-ERROR@71:72 "Invalid operator."
-ERROR@82:83 "Invalid operator."
-ERROR@93:94 "Invalid operator."
-ERROR@104:105 "Invalid operator."
+error[syntax-error]: missing comma
+  ╭▸ 
+2 │ select *c;
+  ╰╴        ━
+error[syntax-error]: Invalid operator.
+  ╭▸ 
+3 │ select /d;
+  ╰╴       ━
+error[syntax-error]: Invalid operator.
+  ╭▸ 
+4 │ select <e;
+  ╰╴       ━
+error[syntax-error]: Invalid operator.
+  ╭▸ 
+5 │ select >f;
+  ╰╴       ━
+error[syntax-error]: Invalid operator.
+  ╭▸ 
+6 │ select =g;
+  ╰╴       ━
+error[syntax-error]: Invalid operator.
+  ╭▸ 
+7 │ select %l;
+  ╰╴       ━
+error[syntax-error]: Invalid operator.
+  ╭▸ 
+8 │ select ^m;
+  ╰╴       ━

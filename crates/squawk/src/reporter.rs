@@ -91,10 +91,6 @@ fn render_lint_error<W: std::io::Write>(
     sql: &str,
 ) -> Result<()> {
     let renderer = Renderer::styled().decor_style(DecorStyle::Unicode);
-    let error_name = &err.rule_name;
-
-    let title = &err.message;
-
     let level = match err.level {
         ViolationLevel::Warning => Level::WARNING,
         ViolationLevel::Error => Level::ERROR,
@@ -105,7 +101,10 @@ fn render_lint_error<W: std::io::Write>(
         .fold(true)
         .annotation(AnnotationKind::Primary.span(err.range.into()));
 
-    let mut group = level.primary_title(title).id(error_name).element(snippet);
+    let mut group = level
+        .primary_title(&err.message)
+        .id(&err.rule_name)
+        .element(snippet);
 
     if let Some(help) = &err.help {
         group = group.element(Level::HELP.message(help));
