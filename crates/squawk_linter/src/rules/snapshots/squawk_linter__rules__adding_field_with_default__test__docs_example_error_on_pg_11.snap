@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/adding_field_with_default.rs
-expression: errors
+expression: "lint_errors_with(sql, LinterSettings\n{\n    pg_version: \"11\".parse().expect(\"Invalid PostgreSQL version\"),\n    ..Default::default()\n},)"
 ---
-[
-    Violation {
-        code: AddingFieldWithDefault,
-        message: "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.",
-        text_range: 74..76,
-        help: Some(
-            "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.",
-        ),
-        fix: None,
-    },
-]
+error[AddingFieldWithDefault]: Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.
+  ╭▸ 
+3 │ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+  │                                                            ━━
+  │
+  ╰ help: Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.
