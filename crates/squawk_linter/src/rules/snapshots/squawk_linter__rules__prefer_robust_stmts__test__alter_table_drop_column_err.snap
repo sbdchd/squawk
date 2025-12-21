@@ -1,8 +1,8 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: "lint_formatted(r#\"\nselect 1; -- so we don't skip checking\nalter table t drop column c cascade;\n        \"#)"
+expression: "lint_errors(r#\"\nselect 1; -- so we don't skip checking\nalter table t drop column c cascade;\n        \"#)"
 ---
-error[PreferRobustStmts]: Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.
+warning[prefer-robust-stmts]: Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ alter table t drop column c cascade;
   │               ━━━━━━━━━━━━━━━━━━━━━

@@ -1,8 +1,8 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: "lint_formatted(r#\"\nselect 1; -- so we don't skip checking\nCREATE INDEX CONCURRENTLY \"core_foo_idx\" ON \"core_foo\" (\"answer_id\");\n        \"#)"
+expression: "lint_errors(r#\"\nselect 1; -- so we don't skip checking\nCREATE INDEX CONCURRENTLY \"core_foo_idx\" ON \"core_foo\" (\"answer_id\");\n        \"#)"
 ---
-error[PreferRobustStmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
   │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/prefer_bigint_over_smallint.rs
 expression: "lint_errors(sql, Rule::PreferBigintOverSmallint)"
 ---
-error[PreferBigintOverSmallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-smallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
   ╭▸ 
 3 │     id smallint
   │        ━━━━━━━━
@@ -12,7 +12,7 @@ error[PreferBigintOverSmallint]: Using 16-bit integer fields can result in hitti
 3 -     id smallint
 3 +     id bigint
   ╰╴
-error[PreferBigintOverSmallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-smallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
   ╭▸ 
 6 │     id int2
   │        ━━━━
@@ -22,7 +22,7 @@ error[PreferBigintOverSmallint]: Using 16-bit integer fields can result in hitti
 6 -     id int2
 6 +     id int8
   ╰╴
-error[PreferBigintOverSmallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-smallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
   ╭▸ 
 9 │     id smallserial
   │        ━━━━━━━━━━━
@@ -32,7 +32,7 @@ error[PreferBigintOverSmallint]: Using 16-bit integer fields can result in hitti
 9 -     id smallserial
 9 +     id bigserial
   ╰╴
-error[PreferBigintOverSmallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
+warning[prefer-bigint-over-smallint]: Using 16-bit integer fields can result in hitting the max `int` limit.
    ╭▸ 
 12 │     id serial2
    │        ━━━━━━━

@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/constraint_missing_not_valid.rs
 expression: "lint_errors(sql, Rule::ConstraintMissingNotValid)"
 ---
-error[ConstraintMissingNotValid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
   ╭▸ 
 3 │ ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
   │                          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

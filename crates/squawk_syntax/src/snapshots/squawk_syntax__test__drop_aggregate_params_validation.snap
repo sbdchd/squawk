@@ -244,6 +244,15 @@ SOURCE_FILE@0..389
   SEMICOLON@386..387 ";"
   WHITESPACE@387..389 "\n\n"
 
-ERROR@111:114 "Out params are not allowed with aggregates."
-ERROR@265:268 "Out params are not allowed with aggregates."
-ERROR@361:364 "Out params are not allowed with aggregates."
+error[syntax-error]: Out params are not allowed with aggregates.
+  ╭▸ 
+9 │         out bar integer,
+  ╰╴        ━━━
+error[syntax-error]: Out params are not allowed with aggregates.
+   ╭▸ 
+22 │     out b numeric,
+   ╰╴    ━━━
+error[syntax-error]: Out params are not allowed with aggregates.
+   ╭▸ 
+29 │     out b numeric,
+   ╰╴    ━━━

@@ -1,8 +1,8 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: "lint_formatted(r#\"\nCREATE TABLE IF NOT EXISTS test();\nALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;\n        \"#)"
+expression: "lint_errors(r#\"\nCREATE TABLE IF NOT EXISTS test();\nALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;\n        \"#)"
 ---
-error[PreferRobustStmts]: Missing transaction, the migration can't be rerun if it fails part way through.
+warning[prefer-robust-stmts]: Missing transaction, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ ALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;
   ╰╴                           ━━━━━━━━━━━━━━━━━━━━━━━━━

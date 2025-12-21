@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/ban_alter_domain_with_add_constraint.rs
 expression: "lint_errors(sql, Rule::BanAlterDomainWithAddConstraint)"
 ---
-error[BanAlterDomainWithAddConstraint]: Domains with constraints have poor support for online migrations. Use table and column constraints instead.
+warning[ban-alter-domain-with-add-constraint]: Domains with constraints have poor support for online migrations. Use table and column constraints instead.
   ╭▸ 
 2 │      ALTER DOMAIN domain_name ADD CONSTRAINT constraint_name CHECK (value > 0);
   ╰╴                              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

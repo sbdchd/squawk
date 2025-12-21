@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/renaming_column.rs
 expression: "lint_errors(sql, Rule::RenamingColumn)"
 ---
-error[RenamingColumn]: Renaming a column may break existing clients.
+warning[renaming-column]: Renaming a column may break existing clients.
   ╭▸ 
 2 │ ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
   ╰╴                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

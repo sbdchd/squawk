@@ -1950,6 +1950,7 @@ dependencies = [
 name = "squawk-syntax"
 version = "2.33.2"
 dependencies = [
+ "annotate-snippets",
  "camino",
  "dir-test",
  "insta",

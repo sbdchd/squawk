@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/transaction_nesting.rs
 expression: "lint_errors(sql, Rule::TransactionNesting)"
 ---
-error[TransactionNesting]: There is an existing transaction already in progress.
+warning[transaction-nesting]: There is an existing transaction already in progress.
   ╭▸ 
 3 │ BEGIN;
   │ ━━━━━

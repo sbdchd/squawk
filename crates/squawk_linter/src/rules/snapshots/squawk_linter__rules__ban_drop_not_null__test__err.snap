@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/ban_drop_not_null.rs
 expression: "lint_errors(sql, Rule::BanDropNotNull)"
 ---
-error[BanDropNotNull]: Dropping a `NOT NULL` constraint may break existing clients.
+warning[ban-drop-not-null]: Dropping a `NOT NULL` constraint may break existing clients.
   ╭▸ 
 2 │ ALTER TABLE "bar_tbl" ALTER COLUMN "foo_col" DROP NOT NULL;
   ╰╴                                             ━━━━━━━━━━━━━

@@ -53,7 +53,7 @@ BEGIN;
 CREATE TABLE users (id bigint);
         "#;
         assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
-        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+        warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         2 │ BEGIN;
           │ ━━━━━
@@ -105,7 +105,7 @@ BEGIN;
 CREATE TABLE posts (id bigint);
         "#;
         assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
-        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+        warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         6 │ BEGIN;
           │ ━━━━━
@@ -125,7 +125,7 @@ START TRANSACTION;
 CREATE TABLE users (id bigint);
         "#;
         assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
-        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+        warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         2 │ START TRANSACTION;
           │ ━━━━━━━━━━━━━━━━━
@@ -155,7 +155,7 @@ BEGIN WORK;
 CREATE TABLE users (id bigint);
         "#;
         assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
-        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+        warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         2 │ BEGIN WORK;
           │ ━━━━━━━━━━

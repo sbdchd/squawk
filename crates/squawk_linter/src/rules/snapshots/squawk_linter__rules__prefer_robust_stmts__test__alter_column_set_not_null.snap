@@ -1,8 +1,8 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: "lint_formatted(r#\"\nselect 1; -- so we don't skip checking\nalter table t alter column c set not null;\n        \"#)"
+expression: "lint_errors(r#\"\nselect 1; -- so we don't skip checking\nalter table t alter column c set not null;\n        \"#)"
 ---
-error[PreferRobustStmts]: Missing transaction, the migration can't be rerun if it fails part way through.
+warning[prefer-robust-stmts]: Missing transaction, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ alter table t alter column c set not null;
   ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━

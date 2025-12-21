@@ -2,14 +2,14 @@
 source: crates/squawk_linter/src/rules/ban_char_field.rs
 expression: "lint_errors(sql, Rule::BanCharField)"
 ---
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 4 │     b char(100),
   │       ━━━━━━━━━
   ╭╴
 4 │     b varchar(100),
   ╰╴      +++
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 5 │     c character(100),
   │       ━━━━━━━━━━━━━━
@@ -17,7 +17,7 @@ error[BanCharField]: Using `character` is likely a mistake and should almost alw
 5 -     c character(100),
 5 +     c varchar(100),
   ╰╴
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 6 │     d char,
   │       ━━━━
@@ -25,7 +25,7 @@ error[BanCharField]: Using `character` is likely a mistake and should almost alw
 6 -     d char,
 6 +     d text,
   ╰╴
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
   ╭▸ 
 7 │     e character,
   │       ━━━━━━━━━
@@ -33,7 +33,7 @@ error[BanCharField]: Using `character` is likely a mistake and should almost alw
 7 -     e character,
 7 +     e text,
   ╰╴
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
    ╭▸ 
 15 │     o pg_catalog.char,
    │       ━━━━━━━━━━━━━━━
@@ -41,7 +41,7 @@ error[BanCharField]: Using `character` is likely a mistake and should almost alw
 15 -     o pg_catalog.char,
 15 +     o pg_catalog.text,
    ╰╴
-error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+warning[ban-char-field]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
    ╭▸ 
 16 │     p char[]
    │       ━━━━

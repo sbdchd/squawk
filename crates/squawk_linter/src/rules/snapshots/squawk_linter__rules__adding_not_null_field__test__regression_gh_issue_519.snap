@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/adding_not_null_field.rs
 expression: "lint_errors(sql, Rule::AddingNotNullableField)"
 ---
-error[AddingNotNullableField]: Setting a column `NOT NULL` blocks reads while the table is scanned.
+warning[adding-not-nullable-field]: Setting a column `NOT NULL` blocks reads while the table is scanned.
   ╭▸ 
 4 │ ALTER TABLE my_table ALTER COLUMN my_column SET NOT NULL;
   │                                             ━━━━━━━━━━━━

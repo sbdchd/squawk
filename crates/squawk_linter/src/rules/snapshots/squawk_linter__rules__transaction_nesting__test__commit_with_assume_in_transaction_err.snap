@@ -2,7 +2,7 @@
 source: crates/squawk_linter/src/rules/transaction_nesting.rs
 expression: "lint_errors_with(sql, settings)"
 ---
-error[TransactionNesting]: Attempting to end the transaction that is managed by your migration tool
+warning[transaction-nesting]: Attempting to end the transaction that is managed by your migration tool
   ╭▸ 
 3 │ COMMIT;
   │ ━━━━━━

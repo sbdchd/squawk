@@ -90,10 +90,31 @@ SOURCE_FILE@0..233
   SEMICOLON@231..232 ";"
   WHITESPACE@232..233 "\n"
 
-ERROR@12:13 "Expected new line or comma between string literals"
-ERROR@33:46 "Comments between string literals are not allowed."
-ERROR@69:82 "Comments between string literals are not allowed."
-ERROR@89:110 "Comments between string literals are not allowed."
-ERROR@137:147 "Comments between string literals are not allowed."
-ERROR@218:219 "Expected new line or comma between string literals"
-ERROR@224:225 "Expected new line or comma between string literals"
+error[syntax-error]: Expected new line or comma between string literals
+  ╭▸ 
+1 │ select 'foo' 'bar';
+  ╰╴            ━
+error[syntax-error]: Comments between string literals are not allowed.
+  ╭▸ 
+2 │ select 'foo' /* comment */ 'bar';
+  ╰╴             ━━━━━━━━━━━━━
+error[syntax-error]: Comments between string literals are not allowed.
+  ╭▸ 
+3 │ select 'hello' /* comment */ 'bar' /* another comment */ ' world';
+  ╰╴               ━━━━━━━━━━━━━
+error[syntax-error]: Comments between string literals are not allowed.
+  ╭▸ 
+3 │ select 'hello' /* comment */ 'bar' /* another comment */ ' world';
+  ╰╴                                   ━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: Comments between string literals are not allowed.
+  ╭▸ 
+5 │ select 'hello' -- comment
+  ╰╴               ━━━━━━━━━━
+error[syntax-error]: Expected new line or comma between string literals
+   ╭▸ 
+12 │ select 'foo' 'bar' 'buzz';
+   ╰╴            ━
+error[syntax-error]: Expected new line or comma between string literals
+   ╭▸ 
+12 │ select 'foo' 'bar' 'buzz';
+   ╰╴                  ━
