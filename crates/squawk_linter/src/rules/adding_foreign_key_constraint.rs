@@ -80,15 +80,11 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
 mod test {
     use insta::assert_snapshot;
 
+    use crate::test_utils::{lint_errors, lint_ok};
     use crate::{LinterSettings, Rule};
-    use crate::test_utils::{lint_ok, lint_errors};
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {
         crate::test_utils::lint_ok_with(sql, settings, Rule::AddingForeignKeyConstraint);
-    }
-
-    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
-        crate::test_utils::lint_errors_with(sql, settings, Rule::AddingForeignKeyConstraint)
     }
 
     #[test]

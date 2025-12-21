@@ -148,15 +148,15 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
 mod test {
     use insta::assert_snapshot;
 
+    use crate::test_utils::{lint_errors, lint_ok};
     use crate::{LinterSettings, Rule};
-    use crate::test_utils::{lint_ok, lint_errors};
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {
         crate::test_utils::lint_ok_with(sql, settings, Rule::ConstraintMissingNotValid);
     }
 
-    fn lint_errors_with(sql: &str, settings: LinterSettings) {
-        crate::test_utils::lint_errors_with(sql, settings, Rule::ConstraintMissingNotValid);
+    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
+        crate::test_utils::lint_errors_with(sql, settings, Rule::ConstraintMissingNotValid)
     }
 
     #[test]
@@ -176,13 +176,13 @@ COMMIT;
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCES "app_user" (id) NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
         "#;
-        lint_errors_with(
+        assert_snapshot!(lint_errors_with(
             sql,
             LinterSettings {
                 assume_in_transaction: true,
                 ..Default::default()
             },
-        );
+        ));
     }
 
     #[test]
@@ -192,13 +192,13 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCE
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
-        lint_errors_with(
+        assert_snapshot!(lint_errors_with(
             sql,
             LinterSettings {
                 assume_in_transaction: true,
                 ..Default::default()
             },
-        );
+        ));
     }
 
     #[test]
@@ -234,13 +234,13 @@ ALTER TABLE account ADD CONSTRAINT account_pk PRIMARY KEY USING INDEX account_pk
 -- instead of
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
         "#;
-        lint_errors_with(
+        assert_snapshot!(lint_errors_with(
             sql,
             LinterSettings {
                 assume_in_transaction: true,
                 ..Default::default()
             },
-        );
+        ));
     }
 
     #[test]

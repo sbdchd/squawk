@@ -50,15 +50,11 @@ mod test {
 
     use crate::{
         LinterSettings, Rule,
-        test_utils::{fix_sql, lint_ok, lint_errors},
+        test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {
         crate::test_utils::lint_ok_with(sql, settings, Rule::RequireConcurrentIndexCreation);
-    }
-
-    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
-        crate::test_utils::lint_errors_with(sql, settings, Rule::RequireConcurrentIndexCreation)
     }
 
     fn fix(sql: &str) -> String {

@@ -44,8 +44,8 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
 mod test {
     use insta::assert_snapshot;
 
+    use crate::test_utils::{lint_errors, lint_ok};
     use crate::{LinterSettings, Rule};
-    use crate::test_utils::{lint_ok, lint_errors};
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {
         crate::test_utils::lint_ok_with(
@@ -55,12 +55,12 @@ mod test {
         );
     }
 
-    fn lint_errors_with(sql: &str, settings: LinterSettings) {
+    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
         crate::test_utils::lint_errors_with(
             sql,
             settings,
             Rule::BanConcurrentIndexCreationInTransaction,
-        );
+        )
     }
 
     #[test]
@@ -71,7 +71,10 @@ mod test {
         CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
         COMMIT;
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::BanConcurrentIndexCreationInTransaction));
+        assert_snapshot!(lint_errors(
+            sql,
+            Rule::BanConcurrentIndexCreationInTransaction
+        ));
     }
 
     #[test]
@@ -90,13 +93,13 @@ mod test {
   CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
     "#;
-        lint_errors_with(
+        assert_snapshot!(lint_errors_with(
             sql,
             LinterSettings {
                 assume_in_transaction: true,
                 ..Default::default()
             },
-        );
+        ));
     }
 
     #[test]

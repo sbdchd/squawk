@@ -57,8 +57,8 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_snapshot;
 
-    use crate::{LinterSettings, Rule};
     use crate::test_utils::{lint_errors, lint_ok};
+    use crate::{LinterSettings, Rule};
 
     fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
         crate::test_utils::lint_errors_with(sql, settings, Rule::TransactionNesting)

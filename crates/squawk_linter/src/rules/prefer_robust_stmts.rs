@@ -251,10 +251,6 @@ mod test {
         crate::test_utils::lint_ok_with(sql, settings, Rule::PreferRobustStmts);
     }
 
-    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
-        crate::test_utils::lint_errors_with(sql, settings, Rule::PreferRobustStmts)
-    }
-
     #[test]
     fn fix_drop_type_if_exists() {
         assert_snapshot!(fix("
