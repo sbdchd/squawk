@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/transaction_nesting.rs
-expression: errors
+expression: "lint_errors(sql, Rule::TransactionNesting)"
 ---
-[
-    Violation {
-        code: TransactionNesting,
-        message: "There is an existing transaction already in progress.",
-        text_range: 8..13,
-        help: Some(
-            "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
-        ),
-        fix: None,
-    },
-]
+error[TransactionNesting]: There is an existing transaction already in progress.
+  ╭▸ 
+3 │ BEGIN;
+  │ ━━━━━
+  │
+  ╰ help: Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.

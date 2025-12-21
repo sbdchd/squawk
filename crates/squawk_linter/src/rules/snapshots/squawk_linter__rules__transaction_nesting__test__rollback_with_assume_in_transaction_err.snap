@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/transaction_nesting.rs
-expression: errors
+expression: "lint_errors_with(sql, settings)"
 ---
-[
-    Violation {
-        code: TransactionNesting,
-        message: "Attempting to end the transaction that is managed by your migration tool",
-        text_range: 92..100,
-        help: Some(
-            "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
-        ),
-        fix: None,
-    },
-]
+error[TransactionNesting]: Attempting to end the transaction that is managed by your migration tool
+  ╭▸ 
+4 │ ROLLBACK;
+  │ ━━━━━━━━
+  │
+  ╰ help: Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.

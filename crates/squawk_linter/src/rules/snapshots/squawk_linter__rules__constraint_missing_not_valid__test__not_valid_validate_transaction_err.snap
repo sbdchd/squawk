@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/constraint_missing_not_valid.rs
-expression: errors
+expression: "lint_errors(sql, Rule::ConstraintMissingNotValid)"
 ---
-[
-    Violation {
-        code: ConstraintMissingNotValid,
-        message: "Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.",
-        text_range: 141..170,
-        help: Some(
-            "Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction.",
-        ),
-        fix: None,
-    },
-]
+error[ConstraintMissingNotValid]: Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.
+  ╭▸ 
+4 │ ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
+  │                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction.

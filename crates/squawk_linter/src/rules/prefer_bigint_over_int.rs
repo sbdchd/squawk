@@ -66,11 +66,11 @@ pub(crate) fn prefer_bigint_over_int(ctx: &mut Linter, parse: &Parse<SourceFile>
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
     use crate::{
         Rule,
-        test_utils::{fix_sql, lint},
+        test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
     fn fix(sql: &str) -> String {
@@ -133,17 +133,7 @@ create table users (
     id serial4
 );
         "#;
-        let errors = lint(sql, Rule::PreferBigintOverInt);
-        assert_ne!(errors.len(), 0);
-        assert_eq!(errors.len(), 5);
-        assert_eq!(
-            errors
-                .iter()
-                .filter(|x| x.code == Rule::PreferBigintOverInt)
-                .count(),
-            5
-        );
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::PreferBigintOverInt));
     }
 
     #[test]
@@ -174,7 +164,6 @@ create table users (
     id serial2
 );
         "#;
-        let errors = lint(sql, Rule::PreferBigintOverInt);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::PreferBigintOverInt);
     }
 }

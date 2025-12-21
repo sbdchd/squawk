@@ -28,18 +28,16 @@ pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::lint_errors;
 
     #[test]
     fn err() {
         let sql = r#"
 ALTER TABLE "bar_tbl" ALTER COLUMN "foo_col" DROP NOT NULL;
         "#;
-        let errors = lint(sql, Rule::BanDropNotNull);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanDropNotNull));
     }
 }

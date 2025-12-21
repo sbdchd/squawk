@@ -1,13 +1,8 @@
 ---
 source: crates/squawk_linter/src/rules/ban_drop_column.rs
-expression: errors
+expression: "lint_errors(sql, Rule::BanDropColumn)"
 ---
-[
-    Violation {
-        code: BanDropColumn,
-        message: "Dropping a column may break existing clients.",
-        text_range: 23..52,
-        help: None,
-        fix: None,
-    },
-]
+error[BanDropColumn]: Dropping a column may break existing clients.
+  ╭▸ 
+2 │ ALTER TABLE "bar_tbl" DROP COLUMN "foo_col" CASCADE;
+  ╰╴                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

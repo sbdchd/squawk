@@ -35,19 +35,17 @@ pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::{lint_errors, lint_ok};
 
     #[test]
     fn err() {
         let sql = r#"
 CREATE DOMAIN domain_name_3 AS NUMERIC(15,5) CHECK (value > 0);
         "#;
-        let errors = lint(sql, Rule::BanCreateDomainWithConstraint);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanCreateDomainWithConstraint));
     }
 
     #[test]
@@ -56,9 +54,7 @@ CREATE DOMAIN domain_name_3 AS NUMERIC(15,5) CHECK (value > 0);
         let sql = r#"
 create domain d as t check (value > 0) not null;
         "#;
-        let errors = lint(sql, Rule::BanCreateDomainWithConstraint);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanCreateDomainWithConstraint));
     }
 
     #[test]
@@ -68,7 +64,6 @@ create domain d as t check (value > 0) not null;
 CREATE DOMAIN domain_name_1 AS TEXT;
 CREATE DOMAIN domain_name_2 AS CHARACTER VARYING;
         "#;
-        let errors = lint(sql, Rule::BanCreateDomainWithConstraint);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::BanCreateDomainWithConstraint);
     }
 }

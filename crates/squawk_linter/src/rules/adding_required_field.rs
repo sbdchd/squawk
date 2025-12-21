@@ -55,18 +55,17 @@ fn has_not_null_and_no_default_constraint(constraints: ast::AstChildren<ast::Con
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::{lint_errors, lint_ok};
 
     #[test]
     fn nullable_ok() {
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean;
   "#;
-        let errors = lint(sql, Rule::AddingRequiredField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingRequiredField);
     }
 
     #[test]
@@ -74,8 +73,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean;
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
   "#;
-        let errors = lint(sql, Rule::AddingRequiredField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingRequiredField);
     }
 
     #[test]
@@ -83,9 +81,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
   "#;
-        let errors = lint(sql, Rule::AddingRequiredField);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingRequiredField));
     }
 
     #[test]
@@ -94,8 +90,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
 ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED NOT NULL;
   "#;
-        let errors = lint(sql, Rule::AddingRequiredField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingRequiredField);
     }
 
     #[test]
@@ -104,7 +99,6 @@ ALTER TABLE foo
  ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED ;
   "#;
-        let errors = lint(sql, Rule::AddingRequiredField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingRequiredField);
     }
 }

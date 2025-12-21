@@ -46,12 +46,20 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
     use crate::{
-        Rule,
-        test_utils::{fix_sql, lint, lint_with_assume_in_transaction},
+        LinterSettings, Rule,
+        test_utils::{fix_sql, lint_ok, lint_errors},
     };
+
+    fn lint_ok_with(sql: &str, settings: LinterSettings) {
+        crate::test_utils::lint_ok_with(sql, settings, Rule::RequireConcurrentIndexCreation);
+    }
+
+    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
+        crate::test_utils::lint_errors_with(sql, settings, Rule::RequireConcurrentIndexCreation)
+    }
 
     fn fix(sql: &str) -> String {
         fix_sql(sql, Rule::RequireConcurrentIndexCreation)
@@ -81,9 +89,7 @@ CREATE INDEX ON t (a);
 -- instead of
 CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexCreation);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexCreation));
     }
 
     #[test]
@@ -92,8 +98,7 @@ CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
 -- use CONCURRENTLY
 CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexCreation);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireConcurrentIndexCreation);
     }
 
     #[test]
@@ -107,8 +112,7 @@ CREATE TABLE "core_foo" (
 CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexCreation);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireConcurrentIndexCreation);
     }
 
     #[test]
@@ -120,7 +124,12 @@ CREATE TABLE "core_foo" (
 );
 CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::RequireConcurrentIndexCreation);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 }

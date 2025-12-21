@@ -1,48 +1,23 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_timestamptz.rs
-expression: errors
+expression: "lint_errors(sql, Rule::PreferTimestampTz)"
 ---
-[
-    Violation {
-        code: PreferTimestampTz,
-        message: "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.",
-        text_range: 56..65,
-        help: Some(
-            "Use `timestamptz` instead of `timestamp` for your column type.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with `timestamptz`",
-                edits: [
-                    Edit {
-                        text_range: 56..65,
-                        text: Some(
-                            "timestamptz",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: PreferTimestampTz,
-        message: "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.",
-        text_range: 125..152,
-        help: Some(
-            "Use `timestamptz` instead of `timestamp` for your column type.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with `timestamptz`",
-                edits: [
-                    Edit {
-                        text_range: 125..152,
-                        text: Some(
-                            "timestamptz",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[PreferTimestampTz]: When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.
+  ╭▸ 
+3 │     alter column created_ts type timestamp;
+  │                                  ━━━━━━━━━
+  │
+  ├ help: Use `timestamptz` instead of `timestamp` for your column type.
+  ╭╴
+3 │     alter column created_ts type timestamptz;
+  ╰╴                                          ++
+error[PreferTimestampTz]: When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.
+  ╭▸ 
+5 │     alter column created_ts type timestamp without time zone;
+  │                                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Use `timestamptz` instead of `timestamp` for your column type.
+  ╭╴
+5 -     alter column created_ts type timestamp without time zone;
+5 +     alter column created_ts type timestamptz;
+  ╰╴

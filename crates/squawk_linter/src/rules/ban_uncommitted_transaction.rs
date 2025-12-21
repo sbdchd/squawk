@@ -39,10 +39,12 @@ pub(crate) fn ban_uncommitted_transaction(ctx: &mut Linter, parse: &Parse<Source
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
-    use crate::{Linter, Rule, test_utils::fix_sql};
-    use squawk_syntax::SourceFile;
+    use crate::{
+        Rule,
+        test_utils::{fix_sql, lint_errors, lint_ok},
+    };
 
     #[test]
     fn uncommitted_transaction_err() {
@@ -50,35 +52,18 @@ mod test {
 BEGIN;
 CREATE TABLE users (id bigint);
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: BanUncommittedTransaction,
-                message: "Transaction never committed or rolled back.",
-                text_range: 1..6,
-                help: Some(
-                    "Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add COMMIT",
-                        edits: [
-                            Edit {
-                                text_range: 48..48,
-                                text: Some(
-                                    "\nCOMMIT;\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+          ╭▸ 
+        2 │ BEGIN;
+          │ ━━━━━
+          │
+          ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
+          ╭╴
+        4 ± 
+        5 + COMMIT;
+          ╰╴
+        ");
     }
 
     #[test]
@@ -88,10 +73,7 @@ BEGIN;
 CREATE TABLE users (id bigint);
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::BanUncommittedTransaction);
     }
 
     #[test]
@@ -101,10 +83,7 @@ BEGIN;
 CREATE TABLE users (id bigint);
 ROLLBACK;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::BanUncommittedTransaction);
     }
 
     #[test]
@@ -112,10 +91,7 @@ ROLLBACK;
         let sql = r#"
 CREATE TABLE users (id bigint);
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::BanUncommittedTransaction);
     }
 
     #[test]
@@ -128,35 +104,18 @@ COMMIT;
 BEGIN;
 CREATE TABLE posts (id bigint);
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: BanUncommittedTransaction,
-                message: "Transaction never committed or rolled back.",
-                text_range: 49..54,
-                help: Some(
-                    "Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add COMMIT",
-                        edits: [
-                            Edit {
-                                text_range: 96..96,
-                                text: Some(
-                                    "\nCOMMIT;\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+          ╭▸ 
+        6 │ BEGIN;
+          │ ━━━━━
+          │
+          ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
+          ╭╴
+        8 ± 
+        9 + COMMIT;
+          ╰╴
+        ");
     }
 
     #[test]
@@ -165,35 +124,18 @@ CREATE TABLE posts (id bigint);
 START TRANSACTION;
 CREATE TABLE users (id bigint);
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: BanUncommittedTransaction,
-                message: "Transaction never committed or rolled back.",
-                text_range: 1..18,
-                help: Some(
-                    "Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add COMMIT",
-                        edits: [
-                            Edit {
-                                text_range: 60..60,
-                                text: Some(
-                                    "\nCOMMIT;\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+          ╭▸ 
+        2 │ START TRANSACTION;
+          │ ━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
+          ╭╴
+        4 ± 
+        5 + COMMIT;
+          ╰╴
+        ");
     }
 
     #[test]
@@ -203,10 +145,7 @@ BEGIN;
 BEGIN;
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::BanUncommittedTransaction);
     }
 
     #[test]
@@ -215,45 +154,29 @@ COMMIT;
 BEGIN WORK;
 CREATE TABLE users (id bigint);
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanUncommittedTransaction]);
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: BanUncommittedTransaction,
-                message: "Transaction never committed or rolled back.",
-                text_range: 1..11,
-                help: Some(
-                    "Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add COMMIT",
-                        edits: [
-                            Edit {
-                                text_range: 53..53,
-                                text: Some(
-                                    "\nCOMMIT;\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        error[BanUncommittedTransaction]: Transaction never committed or rolled back.
+          ╭▸ 
+        2 │ BEGIN WORK;
+          │ ━━━━━━━━━━
+          │
+          ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
+          ╭╴
+        4 ± 
+        5 + COMMIT;
+          ╰╴
+        ");
     }
 
     #[test]
     fn fix_adds_commit() {
-        let sql = r#"
+        assert_snapshot!(fix_sql(
+            "
 BEGIN;
 CREATE TABLE users (id bigint);
-        "#;
-        let fixed = fix_sql(sql, Rule::BanUncommittedTransaction);
-        assert_snapshot!(fixed, @r"
+        ",
+            Rule::BanUncommittedTransaction,
+        ), @r"
         BEGIN;
         CREATE TABLE users (id bigint);
                 
@@ -263,10 +186,11 @@ CREATE TABLE users (id bigint);
 
     #[test]
     fn fix_adds_commit_to_start_transaction() {
-        let sql = r#"START TRANSACTION;
-CREATE TABLE posts (id bigint);"#;
-        let fixed = fix_sql(sql, Rule::BanUncommittedTransaction);
-        assert_snapshot!(fixed, @r"START TRANSACTION;
+        assert_snapshot!(fix_sql(
+            "START TRANSACTION;
+CREATE TABLE posts (id bigint);",
+            Rule::BanUncommittedTransaction,
+        ), @r"START TRANSACTION;
 CREATE TABLE posts (id bigint);
 COMMIT;
 ");

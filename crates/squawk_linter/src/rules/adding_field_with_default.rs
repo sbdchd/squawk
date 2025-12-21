@@ -123,10 +123,14 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
-    use crate::Rule;
-    use crate::test_utils::{lint, lint_with_postgres_version};
+    use crate::test_utils::{lint_errors, lint_ok};
+    use crate::{LinterSettings, Rule};
+
+    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
+        crate::test_utils::lint_errors_with(sql, settings, Rule::AddingFieldWithDefault)
+    }
 
     #[test]
     fn docs_example_ok_post_pg_11() {
@@ -135,9 +139,7 @@ mod test {
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -150,9 +152,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
             "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -161,9 +161,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 alter table t set logged, add column c integer default uuid();
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
@@ -172,9 +170,7 @@ alter table t set logged, add column c integer default uuid();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
@@ -184,9 +180,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
             "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
@@ -196,9 +190,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
             "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -211,9 +203,7 @@ alter table t add column b bigint[] default cast(array[] as bigint[]);
 alter table t add column c text[] default array['foo', 'bar']::text[];
             "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -223,9 +213,7 @@ ALTER TABLE assessments
 ADD COLUMN statistics_last_updated_at timestamptz NOT NULL DEFAULT now() - interval '100 years';
             "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -235,9 +223,7 @@ ADD COLUMN statistics_last_updated_at timestamptz NOT NULL DEFAULT now() - inter
 ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
             "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -247,9 +233,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
 ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-variant';
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -259,9 +243,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-varia
 ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -271,9 +253,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
@@ -283,9 +263,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
@@ -295,9 +273,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
 ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -306,9 +282,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
 alter table t add column c timestamptz default current_timestamp;
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -317,9 +291,7 @@ alter table t add column c timestamptz default current_timestamp;
 alter table account_metadata add column blah integer default 2 + 2;
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(errors.is_empty());
-        assert_debug_snapshot!(errors);
+        lint_ok(sql, Rule::AddingFieldWithDefault);
     }
 
     #[test]
@@ -329,9 +301,7 @@ ALTER TABLE foo
 ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
         "#;
 
-        let errors = lint(sql, Rule::AddingFieldWithDefault);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
@@ -341,8 +311,12 @@ ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         "#;
 
-        let errors = lint_with_postgres_version(sql, Rule::AddingFieldWithDefault, "11");
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                pg_version: "11".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+        ));
     }
 }

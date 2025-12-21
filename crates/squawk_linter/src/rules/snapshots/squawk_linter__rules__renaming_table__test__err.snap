@@ -1,13 +1,8 @@
 ---
 source: crates/squawk_linter/src/rules/renaming_table.rs
-expression: errors
+expression: "lint_errors(sql, Rule::RenamingTable)"
 ---
-[
-    Violation {
-        code: RenamingTable,
-        message: "Renaming a table may break existing clients.",
-        text_range: 26..52,
-        help: None,
-        fix: None,
-    },
-]
+error[RenamingTable]: Renaming a table may break existing clients.
+  ╭▸ 
+2 │ ALTER TABLE "table_name" RENAME TO "new_table_name";
+  ╰╴                         ━━━━━━━━━━━━━━━━━━━━━━━━━━

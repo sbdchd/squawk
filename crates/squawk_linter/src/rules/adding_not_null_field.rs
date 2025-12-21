@@ -31,19 +31,17 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::{lint_errors, lint_ok};
 
     #[test]
     fn set_not_null() {
         let sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
-        let errors = lint(sql, Rule::AddingNotNullableField);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingNotNullableField));
     }
 
     #[test]
@@ -56,8 +54,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::AddingNotNullableField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingNotNullableField);
     }
 
     #[test]
@@ -66,8 +63,7 @@ COMMIT;
 -- This won't work if the table is populated, but that error is caught by adding-required-field.
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
-        let errors = lint(sql, Rule::AddingNotNullableField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingNotNullableField);
     }
 
     #[test]
@@ -80,8 +76,7 @@ BEGIN;
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL DEFAULT 10;
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::AddingNotNullableField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingNotNullableField);
     }
 
     #[test]
@@ -93,8 +88,6 @@ ALTER TABLE my_table ALTER COLUMN my_column SET NOT NULL;
 UPDATE alembic_version SET version_num='b' WHERE alembic_version.version_num = 'a';
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::AddingNotNullableField);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingNotNullableField));
     }
 }

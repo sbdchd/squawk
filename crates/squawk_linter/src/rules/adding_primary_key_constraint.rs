@@ -56,19 +56,17 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::{lint_errors, lint_ok};
 
     #[test]
     fn serial_primary_key() {
         let sql = r#"
         ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
     "#;
-        let errors = lint(sql, Rule::AddingSerialPrimaryKeyField);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingSerialPrimaryKeyField));
     }
 
     #[test]
@@ -76,9 +74,7 @@ mod test {
         let sql = r#"
 ALTER TABLE items ADD PRIMARY KEY (id);
     "#;
-        let errors = lint(sql, Rule::AddingSerialPrimaryKeyField);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::AddingSerialPrimaryKeyField));
     }
 
     #[test]
@@ -87,7 +83,6 @@ ALTER TABLE items ADD PRIMARY KEY (id);
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
         "#;
 
-        let errors = lint(sql, Rule::AddingSerialPrimaryKeyField);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingSerialPrimaryKeyField);
     }
 }

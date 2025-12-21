@@ -24,19 +24,17 @@ pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Par
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::{lint_errors, lint_ok};
 
     #[test]
     fn err() {
         let sql = r#"
      ALTER DOMAIN domain_name ADD CONSTRAINT constraint_name CHECK (value > 0);
         "#;
-        let errors = lint(sql, Rule::BanAlterDomainWithAddConstraint);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanAlterDomainWithAddConstraint));
     }
 
     #[test]
@@ -50,7 +48,6 @@ mod test {
      ALTER DOMAIN domain_name_7 OWNER TO you;
      ALTER DOMAIN domain_name_8 SET SCHEMA foo;
         "#;
-        let errors = lint(sql, Rule::BanAlterDomainWithAddConstraint);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::BanAlterDomainWithAddConstraint);
     }
 }

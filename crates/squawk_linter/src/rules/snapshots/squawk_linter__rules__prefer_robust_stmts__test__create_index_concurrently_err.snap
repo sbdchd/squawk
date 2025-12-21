@@ -1,27 +1,13 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: errors
+expression: "lint_formatted(r#\"\nselect 1; -- so we don't skip checking\nCREATE INDEX CONCURRENTLY \"core_foo_idx\" ON \"core_foo\" (\"answer_id\");\n        \"#)"
 ---
-[
-    Violation {
-        code: PreferRobustStmts,
-        message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
-        text_range: 40..108,
-        help: Some(
-            "Use an explicit name for a concurrently created index",
-        ),
-        fix: Some(
-            Fix {
-                title: "Insert `if not exists`",
-                edits: [
-                    Edit {
-                        text_range: 66..66,
-                        text: Some(
-                            "if not exists ",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[PreferRobustStmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ 
+3 │ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Use an explicit name for a concurrently created index
+  ╭╴
+3 │ CREATE INDEX CONCURRENTLY if not exists "core_foo_idx" ON "core_foo" ("answer_id");
+  ╰╴                          +++++++++++++

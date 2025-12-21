@@ -1,111 +1,52 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_bigint_over_int.rs
-expression: errors
+expression: "lint_errors(sql, Rule::PreferBigintOverInt)"
 ---
-[
-    Violation {
-        code: PreferBigintOverInt,
-        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
-        text_range: 29..32,
-        help: Some(
-            "Use 64-bit integer values instead to prevent hitting this limit.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with a 64-bit integer type: `bigint`",
-                edits: [
-                    Edit {
-                        text_range: 29..32,
-                        text: Some(
-                            "bigint",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: PreferBigintOverInt,
-        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
-        text_range: 64..71,
-        help: Some(
-            "Use 64-bit integer values instead to prevent hitting this limit.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with a 64-bit integer type: `bigint`",
-                edits: [
-                    Edit {
-                        text_range: 64..71,
-                        text: Some(
-                            "bigint",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: PreferBigintOverInt,
-        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
-        text_range: 103..107,
-        help: Some(
-            "Use 64-bit integer values instead to prevent hitting this limit.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with a 64-bit integer type: `int8`",
-                edits: [
-                    Edit {
-                        text_range: 103..107,
-                        text: Some(
-                            "int8",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: PreferBigintOverInt,
-        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
-        text_range: 139..145,
-        help: Some(
-            "Use 64-bit integer values instead to prevent hitting this limit.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with a 64-bit integer type: `bigserial`",
-                edits: [
-                    Edit {
-                        text_range: 139..145,
-                        text: Some(
-                            "bigserial",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: PreferBigintOverInt,
-        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
-        text_range: 177..184,
-        help: Some(
-            "Use 64-bit integer values instead to prevent hitting this limit.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with a 64-bit integer type: `serial8`",
-                edits: [
-                    Edit {
-                        text_range: 177..184,
-                        text: Some(
-                            "serial8",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+  ╭▸ 
+3 │     id int
+  │        ━━━
+  │
+  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭╴
+3 │     id bigint
+  ╰╴       +++
+error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+  ╭▸ 
+6 │     id integer
+  │        ━━━━━━━
+  │
+  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭╴
+6 -     id integer
+6 +     id bigint
+  ╰╴
+error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+  ╭▸ 
+9 │     id int4
+  │        ━━━━
+  │
+  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭╴
+9 -     id int4
+9 +     id int8
+  ╰╴
+error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+   ╭▸ 
+12 │     id serial
+   │        ━━━━━━
+   │
+   ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+   ╭╴
+12 │     id bigserial
+   ╰╴       +++
+error[PreferBigintOverInt]: Using 32-bit integer fields can result in hitting the max `int` limit.
+   ╭▸ 
+15 │     id serial4
+   │        ━━━━━━━
+   │
+   ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+   ╭╴
+15 -     id serial4
+15 +     id serial8
+   ╰╴

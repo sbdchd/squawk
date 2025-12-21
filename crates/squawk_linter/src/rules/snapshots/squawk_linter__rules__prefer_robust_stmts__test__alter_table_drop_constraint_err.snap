@@ -1,25 +1,11 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: errors
+expression: "lint_formatted(r#\"\nselect 1; -- so we don't skip checking\nALTER TABLE \"core_foo\" DROP CONSTRAINT \"core_foo_idx\";\n        \"#)"
 ---
-[
-    Violation {
-        code: PreferRobustStmts,
-        message: "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
-        text_range: 63..93,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Insert `if exists`",
-                edits: [
-                    Edit {
-                        text_range: 78..78,
-                        text: Some(
-                            " if exists",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[PreferRobustStmts]: Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ 
+3 │ ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
+  │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+3 │ ALTER TABLE "core_foo" DROP CONSTRAINT if exists "core_foo_idx";
+  ╰╴                                       +++++++++

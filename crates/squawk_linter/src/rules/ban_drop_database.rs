@@ -21,10 +21,10 @@ pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::lint_errors;
 
     #[test]
     fn ban_drop_database() {
@@ -33,8 +33,6 @@ mod test {
         DROP DATABASE IF EXISTS "table_name";
         DROP DATABASE IF EXISTS "table_name"
                 "#;
-        let errors = lint(sql, Rule::BanDropDatabase);
-        assert!(!errors.is_empty());
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanDropDatabase));
     }
 }

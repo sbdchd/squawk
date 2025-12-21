@@ -1,25 +1,12 @@
 ---
 source: crates/squawk_linter/src/rules/ban_char_field.rs
-expression: errors
+expression: "lint_errors(sql, Rule::BanCharField)"
 ---
-[
-    Violation {
-        code: BanCharField,
-        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
-        text_range: 22..26,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Replace with `text`",
-                edits: [
-                    Edit {
-                        text_range: 22..26,
-                        text: Some(
-                            "text",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+  ╭▸ 
+3 │   a Char
+  │     ━━━━
+  ╭╴
+3 -   a Char
+3 +   a text
+  ╰╴

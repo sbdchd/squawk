@@ -78,8 +78,18 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
 
 #[cfg(test)]
 mod test {
-    use crate::Rule;
-    use crate::test_utils::{lint, lint_with_assume_in_transaction};
+    use insta::assert_snapshot;
+
+    use crate::{LinterSettings, Rule};
+    use crate::test_utils::{lint_ok, lint_errors};
+
+    fn lint_ok_with(sql: &str, settings: LinterSettings) {
+        crate::test_utils::lint_ok_with(sql, settings, Rule::AddingForeignKeyConstraint);
+    }
+
+    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
+        crate::test_utils::lint_errors_with(sql, settings, Rule::AddingForeignKeyConstraint)
+    }
 
     #[test]
     fn create_table_with_foreign_key_constraint() {
@@ -91,14 +101,13 @@ mod test {
             email TEXT,
             PRIMARY KEY(id),
             CONSTRAINT fk_user
-                FOREIGN KEY ("user_id") 
+                FOREIGN KEY ("user_id")
                 REFERENCES "user" ("id")
         );
         COMMIT;
         "#;
 
-        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingForeignKeyConstraint);
     }
 
     #[test]
@@ -108,8 +117,13 @@ CREATE TABLE "emails" ("id" UUID NOT NULL, "user_id" UUID NOT NULL);
 ALTER TABLE "emails" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "users" ("id");
         "#;
 
-        let errors = lint_with_assume_in_transaction(sql, Rule::AddingForeignKeyConstraint);
-        assert!(errors.is_empty());
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
@@ -121,8 +135,7 @@ ALTER TABLE "emails" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES
 COMMIT;
         "#;
 
-        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingForeignKeyConstraint);
     }
 
     #[test]
@@ -135,8 +148,7 @@ ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
 
-        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
-        assert!(errors.is_empty());
+        lint_ok(sql, Rule::AddingForeignKeyConstraint);
     }
 
     #[test]
@@ -148,9 +160,7 @@ ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES 
 COMMIT;
         "#;
 
-        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
-        assert_eq!(errors.len(), 1);
-        assert_eq!(errors[0].code, Rule::AddingForeignKeyConstraint);
+        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint));
     }
 
     #[test]
@@ -161,8 +171,6 @@ ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");
 COMMIT;
         "#;
 
-        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
-        assert_eq!(errors.len(), 1);
-        assert_eq!(errors[0].code, Rule::AddingForeignKeyConstraint);
+        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint));
     }
 }

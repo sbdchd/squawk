@@ -1,27 +1,13 @@
 ---
 source: crates/squawk_linter/src/rules/require_concurrent_index_creation.rs
-expression: errors
+expression: "lint_errors(sql, Rule::RequireConcurrentIndexCreation)"
 ---
-[
-    Violation {
-        code: RequireConcurrentIndexCreation,
-        message: "During normal index creation, table updates are blocked, but reads are still allowed.",
-        text_range: 15..75,
-        help: Some(
-            "Use `concurrently` to avoid blocking writes.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Add `concurrently`",
-                edits: [
-                    Edit {
-                        text_range: 27..27,
-                        text: Some(
-                            " concurrently",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[RequireConcurrentIndexCreation]: During normal index creation, table updates are blocked, but reads are still allowed.
+  ╭▸ 
+3 │ CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Use `concurrently` to avoid blocking writes.
+  ╭╴
+3 │ CREATE INDEX concurrently "field_name_idx" ON "table_name" ("field_name");
+  ╰╴             ++++++++++++

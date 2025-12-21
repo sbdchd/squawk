@@ -55,10 +55,18 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
-    use crate::{Linter, Rule};
-    use squawk_syntax::SourceFile;
+    use crate::{LinterSettings, Rule};
+    use crate::test_utils::{lint_errors, lint_ok};
+
+    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
+        crate::test_utils::lint_errors_with(sql, settings, Rule::TransactionNesting)
+    }
+
+    fn lint_ok_with(sql: &str, settings: LinterSettings) {
+        crate::test_utils::lint_ok_with(sql, settings, Rule::TransactionNesting);
+    }
 
     #[test]
     fn begin_repeated_err() {
@@ -68,11 +76,7 @@ BEGIN;
 SELECT 1;
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::TransactionNesting));
     }
 
     #[test]
@@ -83,11 +87,7 @@ SELECT 1;
 COMMIT;
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::TransactionNesting));
     }
 
     #[test]
@@ -96,12 +96,11 @@ COMMIT;
 SELECT 1;
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        let settings = LinterSettings {
+            assume_in_transaction: true,
+            ..Default::default()
+        };
+        assert_snapshot!(lint_errors_with(sql, settings));
     }
 
     #[test]
@@ -111,12 +110,11 @@ SELECT 1;
 -- Not sure why rollback would be used in a migration, but test for completeness
 ROLLBACK;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        let settings = LinterSettings {
+            assume_in_transaction: true,
+            ..Default::default()
+        };
+        assert_snapshot!(lint_errors_with(sql, settings));
     }
 
     #[test]
@@ -127,12 +125,11 @@ BEGIN;
 SELECT 1;
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(&file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        let settings = LinterSettings {
+            assume_in_transaction: true,
+            ..Default::default()
+        };
+        assert_snapshot!(lint_errors_with(sql, settings));
     }
 
     #[test]
@@ -142,10 +139,7 @@ BEGIN;
 SELECT 1;
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(&file, sql);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::TransactionNesting);
     }
 
     #[test]
@@ -160,10 +154,7 @@ BEGIN;
 SELECT 2;
 COMMIT;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(&file, sql);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::TransactionNesting);
     }
 
     #[test]
@@ -171,10 +162,10 @@ COMMIT;
         let sql = r#"
 SELECT 1;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::TransactionNesting]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(&file, sql);
-        assert_eq!(errors.len(), 0);
+        let settings = LinterSettings {
+            assume_in_transaction: true,
+            ..Default::default()
+        };
+        lint_ok_with(sql, settings);
     }
 }

@@ -64,11 +64,11 @@ pub(crate) fn prefer_bigint_over_smallint(ctx: &mut Linter, parse: &Parse<Source
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
     use crate::{
         Rule,
-        test_utils::{fix_sql, lint},
+        test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
     fn fix(sql: &str) -> String {
@@ -125,17 +125,7 @@ create table users (
     id serial2
 );
         "#;
-        let errors = lint(sql, Rule::PreferBigintOverSmallint);
-        assert_ne!(errors.len(), 0);
-        assert_eq!(errors.len(), 4);
-        assert_eq!(
-            errors
-                .iter()
-                .filter(|x| x.code == Rule::PreferBigintOverSmallint)
-                .count(),
-            4
-        );
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::PreferBigintOverSmallint));
     }
 
     #[test]
@@ -166,7 +156,6 @@ create table users (
     id serial4
 );
         "#;
-        let errors = lint(sql, Rule::PreferBigintOverSmallint);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::PreferBigintOverSmallint);
     }
 }

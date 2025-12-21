@@ -1,25 +1,11 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: errors
+expression: "lint_formatted(r#\"\nselect 1; -- so we don't skip checking\nALTER TABLE \"core_foo\" ADD COLUMN \"answer_id\" integer NULL;\n        \"#)"
 ---
-[
-    Violation {
-        code: PreferRobustStmts,
-        message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
-        text_range: 63..98,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Insert `if not exists`",
-                edits: [
-                    Edit {
-                        text_range: 73..73,
-                        text: Some(
-                            " if not exists",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[PreferRobustStmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ 
+3 │ ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
+  │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+3 │ ALTER TABLE "core_foo" ADD COLUMN if not exists "answer_id" integer NULL;
+  ╰╴                                  +++++++++++++

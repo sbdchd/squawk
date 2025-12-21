@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/adding_primary_key_constraint.rs
-expression: errors
+expression: "lint_errors(sql, Rule::AddingSerialPrimaryKeyField)"
 ---
-[
-    Violation {
-        code: AddingSerialPrimaryKeyField,
-        message: "Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.",
-        text_range: 43..54,
-        help: Some(
-            "Add the `PRIMARY KEY` constraint `USING` an index.",
-        ),
-        fix: None,
-    },
-]
+error[AddingSerialPrimaryKeyField]: Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+  ╭▸ 
+2 │         ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
+  │                                           ━━━━━━━━━━━
+  │
+  ╰ help: Add the `PRIMARY KEY` constraint `USING` an index.

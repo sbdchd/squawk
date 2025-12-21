@@ -1,27 +1,16 @@
 ---
 source: crates/squawk_linter/src/rules/ban_drop_table.rs
-expression: errors
+expression: "lint_errors(sql, Rule::BanDropTable)"
 ---
-[
-    Violation {
-        code: BanDropTable,
-        message: "Dropping a table may break existing clients.",
-        text_range: 1..24,
-        help: None,
-        fix: None,
-    },
-    Violation {
-        code: BanDropTable,
-        message: "Dropping a table may break existing clients.",
-        text_range: 26..59,
-        help: None,
-        fix: None,
-    },
-    Violation {
-        code: BanDropTable,
-        message: "Dropping a table may break existing clients.",
-        text_range: 61..94,
-        help: None,
-        fix: None,
-    },
-]
+error[BanDropTable]: Dropping a table may break existing clients.
+  ╭▸ 
+2 │ DROP TABLE "table_name";
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━
+error[BanDropTable]: Dropping a table may break existing clients.
+  ╭▸ 
+3 │ DROP TABLE IF EXISTS "table_name";
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[BanDropTable]: Dropping a table may break existing clients.
+  ╭▸ 
+4 │ DROP TABLE IF EXISTS "table_name"
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -68,21 +68,25 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
-    use crate::{
-        Rule,
-        test_utils::{lint, lint_with_assume_in_transaction},
-    };
+    use crate::{LinterSettings, Rule};
+    use crate::test_utils::{lint_ok, lint_errors};
+
+    fn lint_ok_with(sql: &str, settings: LinterSettings) {
+        crate::test_utils::lint_ok_with(sql, settings, Rule::DisallowedUniqueConstraint);
+    }
+
+    fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
+        crate::test_utils::lint_errors_with(sql, settings, Rule::DisallowedUniqueConstraint)
+    }
 
     #[test]
     fn adding_unique_constraint_err() {
         let sql = r#"
 ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
         "#;
-        let errors = lint(sql, Rule::DisallowedUniqueConstraint);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint));
     }
 
     #[test]
@@ -90,8 +94,7 @@ ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
         let sql = r#"
 ALTER TABLE table_name DROP CONSTRAINT field_name_constraint;
         "#;
-        let errors = lint(sql, Rule::DisallowedUniqueConstraint);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::DisallowedUniqueConstraint);
     }
 
     #[test]
@@ -101,8 +104,7 @@ CREATE UNIQUE INDEX CONCURRENTLY dist_id_temp_idx ON distributors (dist_id);
 ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
         "#;
-        let errors = lint(sql, Rule::DisallowedUniqueConstraint);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::DisallowedUniqueConstraint);
     }
 
     #[test]
@@ -112,8 +114,7 @@ CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_
     ON "legacy_questiongrouppg" ("mongo_id");
 ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
         "#;
-        let errors = lint(sql, Rule::DisallowedUniqueConstraint);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::DisallowedUniqueConstraint);
     }
 
     #[test]
@@ -127,8 +128,7 @@ CREATE TABLE products (
 ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::DisallowedUniqueConstraint);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::DisallowedUniqueConstraint);
     }
 
     #[test]
@@ -140,8 +140,13 @@ CREATE TABLE products (
 );
 ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::DisallowedUniqueConstraint);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
@@ -149,9 +154,7 @@ ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
         let sql = r#"
 ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
         "#;
-        let errors = lint(sql, Rule::DisallowedUniqueConstraint);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint));
     }
 
     #[test]
@@ -159,8 +162,6 @@ ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
         let sql = r#"
 ALTER TABLE foo ADD COLUMN bar text UNIQUE;
         "#;
-        let errors = lint(sql, Rule::DisallowedUniqueConstraint);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint));
     }
 }
