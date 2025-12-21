@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/disallow_unique_constraint.rs
-expression: errors
+expression: "lint_errors(sql, Rule::DisallowedUniqueConstraint)"
 ---
-[
-    Violation {
-        code: DisallowedUniqueConstraint,
-        message: "Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.",
-        text_range: 37..69,
-        help: Some(
-            "Create an index `CONCURRENTLY` and create the constraint using the index.",
-        ),
-        fix: None,
-    },
-]
+error[DisallowedUniqueConstraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
+  ╭▸ 
+2 │ ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
+  │                                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: Create an index `CONCURRENTLY` and create the constraint using the index.

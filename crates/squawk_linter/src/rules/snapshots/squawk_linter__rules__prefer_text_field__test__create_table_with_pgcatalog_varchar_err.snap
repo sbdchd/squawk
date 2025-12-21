@@ -1,27 +1,14 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_text_field.rs
-expression: errors
+expression: "lint_errors(sql, Rule::PreferTextField)"
 ---
-[
-    Violation {
-        code: PreferTextField,
-        message: "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.",
-        text_range: 69..92,
-        help: Some(
-            "Use a `TEXT` field with a `CHECK` constraint.",
-        ),
-        fix: Some(
-            Fix {
-                title: "Replace with `text`",
-                edits: [
-                    Edit {
-                        text_range: 69..92,
-                        text: Some(
-                            "text",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[PreferTextField]: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
+  ╭▸ 
+4 │     "alpha" pg_catalog.varchar(100) NOT NULL
+  │             ━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Use a `TEXT` field with a `CHECK` constraint.
+  ╭╴
+4 -     "alpha" pg_catalog.varchar(100) NOT NULL
+4 +     "alpha" text NOT NULL
+  ╰╴

@@ -20,10 +20,10 @@ pub(crate) fn ban_drop_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::lint_errors;
 
     #[test]
     fn err() {
@@ -32,8 +32,6 @@ DROP TABLE "table_name";
 DROP TABLE IF EXISTS "table_name";
 DROP TABLE IF EXISTS "table_name"
         "#;
-        let errors = lint(sql, Rule::BanDropTable);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanDropTable));
     }
 }

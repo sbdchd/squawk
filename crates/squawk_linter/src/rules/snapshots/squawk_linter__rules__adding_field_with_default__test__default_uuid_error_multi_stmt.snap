@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/adding_field_with_default.rs
-expression: errors
+expression: "lint_errors(sql, Rule::AddingFieldWithDefault)"
 ---
-[
-    Violation {
-        code: AddingFieldWithDefault,
-        message: "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.",
-        text_range: 56..62,
-        help: Some(
-            "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.",
-        ),
-        fix: None,
-    },
-]
+error[AddingFieldWithDefault]: Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.
+  ╭▸ 
+2 │ alter table t set logged, add column c integer default uuid();
+  │                                                        ━━━━━━
+  │
+  ╰ help: Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.

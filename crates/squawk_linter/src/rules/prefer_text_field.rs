@@ -93,11 +93,11 @@ pub(crate) fn prefer_text_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
     use crate::{
         Rule,
-        test_utils::{fix_sql, lint},
+        test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
     fn fix(sql: &str) -> String {
@@ -116,9 +116,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::PreferTextField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::PreferTextField));
     }
 
     #[test]
@@ -129,27 +127,23 @@ BEGIN;
 -- Create model Bar
 --
 CREATE TABLE "core_bar" (
-    "id" serial NOT NULL PRIMARY KEY, 
+    "id" serial NOT NULL PRIMARY KEY,
     "alpha" varchar(100) NOT NULL
 );
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::PreferTextField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::PreferTextField));
     }
 
     #[test]
     fn create_table_with_pgcatalog_varchar_err() {
         let sql = r#"
 create table t (
-    "id" serial NOT NULL PRIMARY KEY, 
+    "id" serial NOT NULL PRIMARY KEY,
     "alpha" pg_catalog.varchar(100) NOT NULL
 );
         "#;
-        let errors = lint(sql, Rule::PreferTextField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::PreferTextField));
     }
 
     #[test]
@@ -159,9 +153,7 @@ BEGIN;
 ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::PreferTextField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::PreferTextField));
     }
 
     #[test]
@@ -169,8 +161,7 @@ COMMIT;
         let sql = r#"
 CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
         "#;
-        let errors = lint(sql, Rule::PreferTextField);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::PreferTextField);
     }
 
     #[test]
@@ -181,7 +172,7 @@ BEGIN;
 -- Create model Bar
 --
 CREATE TABLE "core_bar" (
-    "id" serial NOT NULL PRIMARY KEY, 
+    "id" serial NOT NULL PRIMARY KEY,
     "bravo" text NOT NULL
 );
 --
@@ -190,8 +181,7 @@ CREATE TABLE "core_bar" (
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::PreferTextField);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::PreferTextField);
     }
 
     #[test]

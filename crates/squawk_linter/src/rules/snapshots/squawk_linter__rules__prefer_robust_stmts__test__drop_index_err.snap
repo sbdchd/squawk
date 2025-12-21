@@ -1,25 +1,11 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
-expression: errors
+expression: "lint_formatted(r#\"\nselect 1; -- so we don't skip checking\nDROP INDEX CONCURRENTLY \"email_idx\";\n        \"#)"
 ---
-[
-    Violation {
-        code: PreferRobustStmts,
-        message: "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
-        text_range: 40..75,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Insert `if exists`",
-                edits: [
-                    Edit {
-                        text_range: 64..64,
-                        text: Some(
-                            "if exists ",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[PreferRobustStmts]: Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.
+  ╭▸ 
+3 │ DROP INDEX CONCURRENTLY "email_idx";
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+3 │ DROP INDEX CONCURRENTLY if exists "email_idx";
+  ╰╴                        +++++++++

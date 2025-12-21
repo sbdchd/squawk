@@ -231,15 +231,24 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
-    use crate::{
-        Rule,
-        test_utils::{fix_sql, lint, lint_with_assume_in_transaction},
-    };
+    use crate::{LinterSettings, Rule};
 
     fn fix(sql: &str) -> String {
-        fix_sql(sql, Rule::PreferRobustStmts)
+        crate::test_utils::fix_sql(sql, Rule::PreferRobustStmts)
+    }
+
+    fn lint_errors(sql: &str) -> String {
+        crate::test_utils::lint_errors(sql, Rule::PreferRobustStmts)
+    }
+
+    fn lint_ok(sql: &str) {
+        crate::test_utils::lint_ok(sql, Rule::PreferRobustStmts)
+    }
+
+    fn lint_ok_with(sql: &str, settings: LinterSettings) {
+        crate::test_utils::lint_ok_with(sql, settings, Rule::PreferRobustStmts);
     }
 
     #[test]
@@ -336,8 +345,7 @@ ALTER TABLE users DROP CONSTRAINT pk_users;
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -346,8 +354,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_id
 select 1; -- so we don't skip checking
 DROP INDEX CONCURRENTLY IF EXISTS "email_idx";
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -357,8 +364,7 @@ ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "fk_user";
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "app_user" ("id") DEFERRABLE INITIALLY DEFERRED NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -368,8 +374,7 @@ BEGIN;
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -378,8 +383,7 @@ COMMIT;
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -388,8 +392,7 @@ ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
 select 1; -- so we don't skip checking
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "core_foo_idx" ON "core_foo" ("answer_id");
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -402,8 +405,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -414,8 +416,7 @@ CREATE TABLE IF NOT EXISTS "core_bar" (
     "bravo" text NOT NULL
 );
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -428,8 +429,7 @@ DROP TABLE "core_bar";
 DROP TYPE foo;
 COMMIT;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -439,8 +439,7 @@ COMMIT;
 select 1; -- so we don't skip checking
 SELECT 1;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -450,8 +449,7 @@ SELECT 1;
 select 1; -- so we don't skip checking
 INSERT INTO tbl VALUES (a);
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -461,8 +459,7 @@ INSERT INTO tbl VALUES (a);
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -471,8 +468,13 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
@@ -482,8 +484,13 @@ DROP INDEX "core_bar_foo_id_idx";
 DROP TABLE "core_bar";
 DROP TYPE foo;
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
@@ -494,8 +501,13 @@ CREATE TABLE "core_bar" (
     "bravo" text NOT NULL
 );
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
@@ -505,8 +517,13 @@ CREATE TABLE "core_bar" (
         let sql = r#"
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
@@ -515,8 +532,13 @@ CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
@@ -534,41 +556,43 @@ ALTER TABLE "D" DROP CONSTRAINT "UQ_468cad3743146a81c94b0b114ac";
 
 COMMIT;
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
     }
 
     #[test]
     fn alter_table_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn create_index_concurrently_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn alter_table_drop_column_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 alter table t drop column c cascade;
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
@@ -577,30 +601,27 @@ alter table t drop column c cascade;
 select 1; -- so we don't skip checking
 alter table t drop column if exists c cascade;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
     fn create_table_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn alter_table_drop_constraint_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
@@ -609,76 +630,69 @@ ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
 select 1; -- so we don't skip checking
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
     fn enable_row_level_security_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn enable_row_level_security_without_exists_check_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE test ENABLE ROW LEVEL SECURITY;
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn disable_row_level_security_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn double_add_after_drop_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
 -- this second add constraint should error because it's not robust
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn alter_column_set_not_null() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 alter table t alter column c set not null;
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn drop_index_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 DROP INDEX CONCURRENTLY "email_idx";
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
@@ -687,8 +701,7 @@ DROP INDEX CONCURRENTLY "email_idx";
 select 1; -- so we don't skip checking
 CREATE TEMP TABLE test_table (id int) ON COMMIT DROP;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
@@ -697,29 +710,26 @@ CREATE TEMP TABLE test_table (id int) ON COMMIT DROP;
 select 1; -- so we don't skip checking
 CREATE TEMPORARY TABLE test_table (id int) ON COMMIT DROP;
         "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql);
     }
 
     #[test]
     fn create_temp_table_without_on_commit_drop_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 CREATE TEMP TABLE test_table (id int);
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 
     #[test]
     fn create_table_with_on_commit_drop_err() {
-        let sql = r#"
+        assert_snapshot!(lint_errors(
+            r#"
 select 1; -- so we don't skip checking
 CREATE TABLE test_table (id int) ON COMMIT DROP;
-        "#;
-        let errors = lint(sql, Rule::PreferRobustStmts);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        "#
+        ));
     }
 }

@@ -1,27 +1,16 @@
 ---
 source: crates/squawk_linter/src/rules/ban_drop_database.rs
-expression: errors
+expression: "lint_errors(sql, Rule::BanDropDatabase)"
 ---
-[
-    Violation {
-        code: BanDropDatabase,
-        message: "Dropping a database may break existing clients.",
-        text_range: 9..35,
-        help: None,
-        fix: None,
-    },
-    Violation {
-        code: BanDropDatabase,
-        message: "Dropping a database may break existing clients.",
-        text_range: 45..81,
-        help: None,
-        fix: None,
-    },
-    Violation {
-        code: BanDropDatabase,
-        message: "Dropping a database may break existing clients.",
-        text_range: 91..127,
-        help: None,
-        fix: None,
-    },
-]
+error[BanDropDatabase]: Dropping a database may break existing clients.
+  ╭▸ 
+2 │         DROP DATABASE "table_name";
+  ╰╴        ━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[BanDropDatabase]: Dropping a database may break existing clients.
+  ╭▸ 
+3 │         DROP DATABASE IF EXISTS "table_name";
+  ╰╴        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[BanDropDatabase]: Dropping a database may break existing clients.
+  ╭▸ 
+4 │         DROP DATABASE IF EXISTS "table_name"
+  ╰╴        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

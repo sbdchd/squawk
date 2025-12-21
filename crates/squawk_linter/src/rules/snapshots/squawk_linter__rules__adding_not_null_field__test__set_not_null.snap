@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/adding_not_null_field.rs
-expression: errors
+expression: "lint_errors(sql, Rule::AddingNotNullableField)"
 ---
-[
-    Violation {
-        code: AddingNotNullableField,
-        message: "Setting a column `NOT NULL` blocks reads while the table is scanned.",
-        text_range: 46..58,
-        help: Some(
-            "Make the field nullable and use a `CHECK` constraint instead.",
-        ),
-        fix: None,
-    },
-]
+error[AddingNotNullableField]: Setting a column `NOT NULL` blocks reads while the table is scanned.
+  ╭▸ 
+2 │ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
+  │                                              ━━━━━━━━━━━━
+  │
+  ╰ help: Make the field nullable and use a `CHECK` constraint instead.

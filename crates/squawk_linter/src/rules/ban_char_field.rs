@@ -90,11 +90,11 @@ pub(crate) fn ban_char_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
     use crate::{
         Rule,
-        test_utils::{fix_sql, lint},
+        test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
     fn fix(sql: &str) -> String {
@@ -154,9 +154,7 @@ CREATE TABLE "core_bar" (
     "delta" character NOT NULL
 );
         "#;
-        let errors = lint(sql, Rule::BanCharField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanCharField));
     }
 
     #[test]
@@ -168,8 +166,7 @@ CREATE TABLE "core_bar" (
     "beta" text NOT NULL
 );
         "#;
-        let errors = lint(sql, Rule::BanCharField);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::BanCharField);
     }
 
     #[test]
@@ -192,9 +189,7 @@ create table t (
     p char[]
 );
         "#;
-        let errors = lint(sql, Rule::BanCharField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanCharField));
     }
 
     #[test]
@@ -204,9 +199,7 @@ create table t (
   a Char
 );
         "#;
-        let errors = lint(sql, Rule::BanCharField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanCharField));
     }
 
     #[test]
@@ -216,9 +209,7 @@ create table t (
   a char[]
 );
         "#;
-        let errors = lint(sql, Rule::BanCharField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanCharField));
     }
 
     #[test]
@@ -226,8 +217,6 @@ create table t (
         let sql = r#"
 alter table t add column c char;
         "#;
-        let errors = lint(sql, Rule::BanCharField);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::BanCharField));
     }
 }

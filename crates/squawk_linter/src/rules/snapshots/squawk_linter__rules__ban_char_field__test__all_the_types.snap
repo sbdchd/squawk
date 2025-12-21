@@ -1,120 +1,51 @@
 ---
 source: crates/squawk_linter/src/rules/ban_char_field.rs
-expression: errors
+expression: "lint_errors(sql, Rule::BanCharField)"
 ---
-[
-    Violation {
-        code: BanCharField,
-        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
-        text_range: 59..68,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Replace with `varchar`",
-                edits: [
-                    Edit {
-                        text_range: 59..63,
-                        text: Some(
-                            "varchar",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: BanCharField,
-        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
-        text_range: 76..90,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Replace with `varchar`",
-                edits: [
-                    Edit {
-                        text_range: 76..85,
-                        text: Some(
-                            "varchar",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: BanCharField,
-        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
-        text_range: 98..102,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Replace with `text`",
-                edits: [
-                    Edit {
-                        text_range: 98..102,
-                        text: Some(
-                            "text",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: BanCharField,
-        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
-        text_range: 110..119,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Replace with `text`",
-                edits: [
-                    Edit {
-                        text_range: 110..119,
-                        text: Some(
-                            "text",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: BanCharField,
-        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
-        text_range: 265..280,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Replace with `text`",
-                edits: [
-                    Edit {
-                        text_range: 276..280,
-                        text: Some(
-                            "text",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-    Violation {
-        code: BanCharField,
-        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
-        text_range: 288..292,
-        help: None,
-        fix: Some(
-            Fix {
-                title: "Replace with `text`",
-                edits: [
-                    Edit {
-                        text_range: 288..292,
-                        text: Some(
-                            "text",
-                        ),
-                    },
-                ],
-            },
-        ),
-    },
-]
+error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+  ╭▸ 
+4 │     b char(100),
+  │       ━━━━━━━━━
+  ╭╴
+4 │     b varchar(100),
+  ╰╴      +++
+error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+  ╭▸ 
+5 │     c character(100),
+  │       ━━━━━━━━━━━━━━
+  ╭╴
+5 -     c character(100),
+5 +     c varchar(100),
+  ╰╴
+error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+  ╭▸ 
+6 │     d char,
+  │       ━━━━
+  ╭╴
+6 -     d char,
+6 +     d text,
+  ╰╴
+error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+  ╭▸ 
+7 │     e character,
+  │       ━━━━━━━━━
+  ╭╴
+7 -     e character,
+7 +     e text,
+  ╰╴
+error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+   ╭▸ 
+15 │     o pg_catalog.char,
+   │       ━━━━━━━━━━━━━━━
+   ╭╴
+15 -     o pg_catalog.char,
+15 +     o pg_catalog.text,
+   ╰╴
+error[BanCharField]: Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+   ╭▸ 
+16 │     p char[]
+   │       ━━━━
+   ╭╴
+16 -     p char[]
+16 +     p text[]
+   ╰╴

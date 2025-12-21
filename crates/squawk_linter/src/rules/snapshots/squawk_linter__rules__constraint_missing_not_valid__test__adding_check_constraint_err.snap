@@ -1,15 +1,10 @@
 ---
 source: crates/squawk_linter/src/rules/constraint_missing_not_valid.rs
-expression: errors
+expression: "lint_errors_with(sql, LinterSettings\n{ assume_in_transaction: true, ..Default::default() },)"
 ---
-[
-    Violation {
-        code: ConstraintMissingNotValid,
-        message: "By default new constraints require a table scan and block writes to the table while that scan occurs.",
-        text_range: 38..94,
-        help: Some(
-            "Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.",
-        ),
-        fix: None,
-    },
-]
+error[ConstraintMissingNotValid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+  ╭▸ 
+3 │ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
+  │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.

@@ -31,11 +31,11 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
     use crate::{
         Rule,
-        test_utils::{fix_sql, lint},
+        test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
     fn fix(sql: &str) -> String {
@@ -69,10 +69,7 @@ mod test {
   -- instead of
   DROP INDEX IF EXISTS "field_name_idx";
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
-        assert_eq!(errors.len(), 1);
-        assert_eq!(errors[0].code, Rule::RequireConcurrentIndexDeletion);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexDeletion));
     }
 
     #[test]
@@ -80,8 +77,7 @@ mod test {
         let sql = r#"
 DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireConcurrentIndexDeletion);
     }
 
     #[test]
@@ -89,8 +85,7 @@ DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         let sql = r#"
 DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireConcurrentIndexDeletion);
     }
 
     #[test]
@@ -98,8 +93,7 @@ DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         let sql = r#"
 DROP TABLE IF EXISTS some_table;
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireConcurrentIndexDeletion);
     }
 
     #[test]
@@ -107,7 +101,6 @@ DROP TABLE IF EXISTS some_table;
         let sql = r#"
 DROP TRIGGER IF EXISTS trigger on foo_table;
         "#;
-        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireConcurrentIndexDeletion);
     }
 }

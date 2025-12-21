@@ -24,18 +24,16 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::lint_errors;
 
     #[test]
     fn err() {
         let sql = r#"
 ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
         "#;
-        let errors = lint(sql, Rule::RenamingColumn);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::RenamingColumn));
     }
 }

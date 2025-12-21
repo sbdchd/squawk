@@ -469,7 +469,7 @@ impl Linter {
             errors: vec![],
             ignores: vec![],
             rules: rules.into(),
-            settings: LinterSettings::default(),
+            settings: Default::default(),
         }
     }
 }

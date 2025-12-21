@@ -106,11 +106,11 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
 
 #[cfg(test)]
 mod test {
-    use insta::{assert_debug_snapshot, assert_snapshot};
+    use insta::assert_snapshot;
 
     use crate::{
         Rule,
-        test_utils::{fix_sql, lint},
+        test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
     fn fix(sql: &str) -> String {
@@ -122,54 +122,26 @@ mod test {
         let sql = r#"
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before potentially slow operations",
-                text_range: 1..35,
-                help: Some(
-                    "Configure a `lock_timeout` before this statement.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add lock timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set lock_timeout = '1s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before potentially slow operations",
-                text_range: 1..35,
-                help: Some(
-                    "Configure a `statement_timeout` before this statement",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add statement timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set statement_timeout = '5s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        error[RequireTimeoutSettings]: Missing `set lock_timeout` before potentially slow operations
+          ╭▸ 
+        2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `lock_timeout` before this statement.
+          ╭╴
+        2 + set lock_timeout = '1s';
+          ╰╴
+        error[RequireTimeoutSettings]: Missing `set statement_timeout` before potentially slow operations
+          ╭▸ 
+        2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `statement_timeout` before this statement
+          ╭╴
+        2 + set statement_timeout = '5s';
+          ╰╴
+        ");
     }
 
     #[test]
@@ -178,33 +150,17 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 SET statement_timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before potentially slow operations",
-                text_range: 31..65,
-                help: Some(
-                    "Configure a `lock_timeout` before this statement.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add lock timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set lock_timeout = '1s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        error[RequireTimeoutSettings]: Missing `set lock_timeout` before potentially slow operations
+          ╭▸ 
+        3 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `lock_timeout` before this statement.
+          ╭╴
+        2 + set lock_timeout = '1s';
+          ╰╴
+        ");
     }
 
     #[test]
@@ -213,33 +169,17 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 SET lock_timeout = '1s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before potentially slow operations",
-                text_range: 26..60,
-                help: Some(
-                    "Configure a `statement_timeout` before this statement",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add statement timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set statement_timeout = '5s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        error[RequireTimeoutSettings]: Missing `set statement_timeout` before potentially slow operations
+          ╭▸ 
+        3 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `statement_timeout` before this statement
+          ╭╴
+        2 + set statement_timeout = '5s';
+          ╰╴
+        ");
     }
 
     #[test]
@@ -249,8 +189,7 @@ SET lock_timeout = '1s';
 SET statement_timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireTimeoutSettings);
     }
 
     #[test]
@@ -260,8 +199,7 @@ SET Lock_Timeout = '1s';
 SET Statement_Timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireTimeoutSettings);
     }
 
     #[test]
@@ -269,8 +207,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         let sql = r#"
 SELECT * FROM t;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireTimeoutSettings);
     }
 
     #[test]
@@ -280,54 +217,26 @@ SET foo.lock_timeout = '1s';
 SET foo.statement_timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before potentially slow operations",
-                text_range: 64..98,
-                help: Some(
-                    "Configure a `lock_timeout` before this statement.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add lock timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set lock_timeout = '1s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before potentially slow operations",
-                text_range: 64..98,
-                help: Some(
-                    "Configure a `statement_timeout` before this statement",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add statement timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set statement_timeout = '5s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        error[RequireTimeoutSettings]: Missing `set lock_timeout` before potentially slow operations
+          ╭▸ 
+        4 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `lock_timeout` before this statement.
+          ╭╴
+        2 + set lock_timeout = '1s';
+          ╰╴
+        error[RequireTimeoutSettings]: Missing `set statement_timeout` before potentially slow operations
+          ╭▸ 
+        4 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `statement_timeout` before this statement
+          ╭╴
+        2 + set statement_timeout = '5s';
+          ╰╴
+        ");
     }
     #[test]
     fn err_timeouts_after_ddl() {
@@ -336,54 +245,26 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 SET lock_timeout = '1s';
 SET statement_timeout = '5s';
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before potentially slow operations",
-                text_range: 1..35,
-                help: Some(
-                    "Configure a `lock_timeout` before this statement.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add lock timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set lock_timeout = '1s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before potentially slow operations",
-                text_range: 1..35,
-                help: Some(
-                    "Configure a `statement_timeout` before this statement",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add statement timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set statement_timeout = '5s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        error[RequireTimeoutSettings]: Missing `set lock_timeout` before potentially slow operations
+          ╭▸ 
+        2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `lock_timeout` before this statement.
+          ╭╴
+        2 + set lock_timeout = '1s';
+          ╰╴
+        error[RequireTimeoutSettings]: Missing `set statement_timeout` before potentially slow operations
+          ╭▸ 
+        2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `statement_timeout` before this statement
+          ╭╴
+        2 + set statement_timeout = '5s';
+          ╰╴
+        ");
     }
 
     #[test]
@@ -391,54 +272,26 @@ SET statement_timeout = '5s';
         let sql = r#"
 CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors, @r#"
-        [
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before potentially slow operations",
-                text_range: 1..48,
-                help: Some(
-                    "Configure a `lock_timeout` before this statement.",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add lock timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set lock_timeout = '1s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-            Violation {
-                code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before potentially slow operations",
-                text_range: 1..48,
-                help: Some(
-                    "Configure a `statement_timeout` before this statement",
-                ),
-                fix: Some(
-                    Fix {
-                        title: "Add statement timeout",
-                        edits: [
-                            Edit {
-                                text_range: 1..1,
-                                text: Some(
-                                    "set statement_timeout = '5s';\n",
-                                ),
-                            },
-                        ],
-                    },
-                ),
-            },
-        ]
-        "#);
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        error[RequireTimeoutSettings]: Missing `set lock_timeout` before potentially slow operations
+          ╭▸ 
+        2 │ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `lock_timeout` before this statement.
+          ╭╴
+        2 + set lock_timeout = '1s';
+          ╰╴
+        error[RequireTimeoutSettings]: Missing `set statement_timeout` before potentially slow operations
+          ╭▸ 
+        2 │ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `statement_timeout` before this statement
+          ╭╴
+        2 + set statement_timeout = '5s';
+          ╰╴
+        ");
     }
 
     #[test]
@@ -450,8 +303,7 @@ CREATE FUNCTION add(integer, integer) RETURNS integer
     AS 'select $1 + $2;'
     LANGUAGE SQL;
         "#;
-        let errors = lint(sql, Rule::RequireTimeoutSettings);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::RequireTimeoutSettings);
     }
 
     #[test]
