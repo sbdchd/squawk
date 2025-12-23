@@ -4,24 +4,25 @@ use clap::{Args, Parser, Subcommand, arg};
 use codegen::codegen;
 use new_rule::new_lint;
 use sync_kwlist::sync_kwlist;
+use sync_regression_suite::sync_regression_suite;
 
 mod codegen;
-mod download_regression_tests;
 mod keywords;
 mod new_rule;
 mod path;
 mod sync_kwlist;
+mod sync_regression_suite;
 
 #[derive(Subcommand, Debug)]
 enum TaskName {
-    #[command(long_about = "Generate code for AST, SyntaxKind, and TokenSets.")]
+    #[command(long_about = "Generate code for AST, SyntaxKind, and TokenSets")]
     Codegen,
     #[command(long_about = "Fetch the latest version of kwlist.h from Postgres")]
     SyncKwlist,
     #[command(long_about = "Create a new linter rule")]
     NewRule(NewRuleArgs),
-    #[command(long_about = "Download and process regression tests from Postgres")]
-    DownloadRegressionTests,
+    #[command(long_about = "Fetch the latest regression suite from Postgres")]
+    SyncRegressionSuite,
 }
 
 #[derive(Args, Debug)]
@@ -42,8 +43,8 @@ fn main() -> Result<()> {
     let args = Arguments::parse();
     match args.task {
         TaskName::SyncKwlist => sync_kwlist(),
+        TaskName::SyncRegressionSuite => sync_regression_suite(),
         TaskName::NewRule(args) => new_lint(args),
         TaskName::Codegen => codegen(),
-        TaskName::DownloadRegressionTests => download_regression_tests::download_regression_tests(),
     }
 }
