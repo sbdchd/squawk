@@ -103,7 +103,7 @@ const GSET_REPLACEMENTS: &[(&str, &str)] = &[
     ),
 ];
 
-pub(crate) fn download_regression_tests() -> Result<()> {
+pub(crate) fn sync_regression_suite() -> Result<()> {
     let temp_dir = download_regression_suite()?;
     transform_regression_suite(&temp_dir)?;
     Ok(())
