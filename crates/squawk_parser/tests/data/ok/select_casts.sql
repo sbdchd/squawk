@@ -17,6 +17,10 @@ select '{}' :: int[] :: int8[] :: numeric[1];
 
 select '{}'::int[]::int8[]::numeric[1];
 
+-- setof
+select cast('1' as setof int);
+select '1'::setof int;
+
 -- based on postgres' gram.y
 
 -- Bit

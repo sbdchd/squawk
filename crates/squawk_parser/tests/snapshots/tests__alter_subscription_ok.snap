@@ -315,7 +315,7 @@ SOURCE_FILE
       L_PAREN "("
       ATTRIBUTE_OPTION
         NAME
-          IDENT "lsn"
+          LSN_KW "lsn"
         WHITESPACE " "
         EQ "="
         WHITESPACE " "

@@ -7,7 +7,10 @@
 SELECT getdatabaseencoding() <> 'UTF8' OR
        (SELECT count(*) FROM pg_collation WHERE collname IN ('de_DE', 'en_US', 'sv_SE', 'tr_TR') AND collencoding = pg_char_to_encoding('UTF8')) <> 4 OR
        version() !~ 'linux-gnu'
-       AS skip_test ;
+       AS skip_test /* \gset */;
+-- \if :skip_test
+-- \quit
+-- \endif
 
 SET client_encoding TO UTF8;
 
@@ -20,6 +23,7 @@ CREATE TABLE collate_test1 (
     b text COLLATE "en_US" NOT NULL
 );
 
+-- \d collate_test1
 
 CREATE TABLE collate_test_fail (
     a int,
@@ -40,6 +44,7 @@ CREATE TABLE collate_test_like (
     LIKE collate_test1
 );
 
+-- \d collate_test_like
 
 CREATE TABLE collate_test2 (
     a int,
@@ -51,7 +56,7 @@ CREATE TABLE collate_test3 (
     b text COLLATE "C"
 );
 
-INSERT INTO collate_test1 VALUES (1, 'abc'), (2, 'Ã¤bc'), (3, 'bbc'), (4, 'ABC');
+INSERT INTO collate_test1 VALUES (1, 'abc'), (2, 'äbc'), (3, 'bbc'), (4, 'ABC');
 INSERT INTO collate_test2 SELECT * FROM collate_test1;
 INSERT INTO collate_test3 SELECT * FROM collate_test1;
 
@@ -95,8 +100,8 @@ SELECT * FROM collate_test2 ORDER BY b;
 SELECT * FROM collate_test3 ORDER BY b;
 
 -- constant expression folding
-SELECT 'bbc' COLLATE "en_US" > 'Ã¤bc' COLLATE "en_US" AS "true";
-SELECT 'bbc' COLLATE "sv_SE" > 'Ã¤bc' COLLATE "sv_SE" AS "false";
+SELECT 'bbc' COLLATE "en_US" > 'äbc' COLLATE "en_US" AS "true";
+SELECT 'bbc' COLLATE "sv_SE" > 'äbc' COLLATE "sv_SE" AS "false";
 
 -- upper/lower
 
@@ -122,11 +127,11 @@ SELECT * FROM collate_test1 WHERE b ILIKE 'abc';
 SELECT * FROM collate_test1 WHERE b ILIKE 'abc%';
 SELECT * FROM collate_test1 WHERE b ILIKE '%bc%';
 
-SELECT 'TÃ¼rkiye' COLLATE "en_US" ILIKE '%KI%' AS "true";
-SELECT 'TÃ¼rkiye' COLLATE "tr_TR" ILIKE '%KI%' AS "false";
+SELECT 'Türkiye' COLLATE "en_US" ILIKE '%KI%' AS "true";
+SELECT 'Türkiye' COLLATE "tr_TR" ILIKE '%KI%' AS "false";
 
-SELECT 'bÄ±t' ILIKE 'BIT' COLLATE "en_US" AS "false";
-SELECT 'bÄ±t' ILIKE 'BIT' COLLATE "tr_TR" AS "true";
+SELECT 'bıt' ILIKE 'BIT' COLLATE "en_US" AS "false";
+SELECT 'bıt' ILIKE 'BIT' COLLATE "tr_TR" AS "true";
 
 -- The following actually exercises the selectivity estimation for ILIKE.
 SELECT relname FROM pg_class WHERE relname ILIKE 'abc%';
@@ -146,7 +151,7 @@ CREATE TABLE collate_test6 (
 );
 INSERT INTO collate_test6 VALUES (1, 'abc'), (2, 'ABC'), (3, '123'), (4, 'ab1'),
                                  (5, 'a1!'), (6, 'a c'), (7, '!.;'), (8, '   '),
-                                 (9, 'Ã¤bÃ§'), (10, 'ÃBÃ');
+                                 (9, 'äbç'), (10, 'ÄBÇ');
 SELECT b,
        b ~ '^[[:alpha:]]+$' AS is_alpha,
        b ~ '^[[:upper:]]+$' AS is_upper,
@@ -159,11 +164,11 @@ SELECT b,
        b ~ '^[[:space:]]+$' AS is_space
 FROM collate_test6;
 
-SELECT 'TÃ¼rkiye' COLLATE "en_US" ~* 'KI' AS "true";
-SELECT 'TÃ¼rkiye' COLLATE "tr_TR" ~* 'KI' AS "false";
+SELECT 'Türkiye' COLLATE "en_US" ~* 'KI' AS "true";
+SELECT 'Türkiye' COLLATE "tr_TR" ~* 'KI' AS "false";
 
-SELECT 'bÄ±t' ~* 'BIT' COLLATE "en_US" AS "false";
-SELECT 'bÄ±t' ~* 'BIT' COLLATE "tr_TR" AS "true";
+SELECT 'bıt' ~* 'BIT' COLLATE "en_US" AS "false";
+SELECT 'bıt' ~* 'BIT' COLLATE "tr_TR" AS "true";
 
 -- The following actually exercises the selectivity estimation for ~*.
 SELECT relname FROM pg_class WHERE relname ~* '^abc';
@@ -179,8 +184,8 @@ SELECT to_char(date '2010-04-01', 'DD TMMON YYYY' COLLATE "tr_TR");
 
 -- to_date
 
-SELECT to_date('01 ÅUB 2010', 'DD TMMON YYYY');
-SELECT to_date('01 Åub 2010', 'DD TMMON YYYY');
+SELECT to_date('01 ŞUB 2010', 'DD TMMON YYYY');
+SELECT to_date('01 Şub 2010', 'DD TMMON YYYY');
 SELECT to_date('1234567890ab 2010', 'TMMONTH YYYY'); -- fail
 
 
@@ -406,7 +411,7 @@ DROP ROLE regress_test_role;
 ALTER COLLATION "en_US" REFRESH VERSION;
 
 -- also test for database while we are here
-SELECT current_database() AS datname ;
+SELECT current_database() AS datname /* \gset */;
 ALTER DATABASE "datname" REFRESH COLLATION VERSION;
 
 
@@ -424,6 +429,8 @@ CREATE INDEX collate_dep_test4i ON collate_dep_test4t (b COLLATE test0);
 DROP COLLATION test0 RESTRICT; -- fail
 DROP COLLATION test0 CASCADE;
 
+-- \d collate_dep_test1
+-- \d collate_dep_test2
 
 DROP TABLE collate_dep_test1, collate_dep_test4t;
 DROP TYPE collate_dep_test2;

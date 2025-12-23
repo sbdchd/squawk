@@ -47,6 +47,7 @@ DROP TABLE temptest;
 
 CREATE TEMP TABLE temptest(col int);
 
+-- \c
 
 SELECT * FROM temptest;
 
@@ -305,6 +306,7 @@ prepare transaction 'twophase_tab';
 -- Corner case: current_schema may create a temporary schema if namespace
 -- creation is pending, so check after that.  First reset the connection
 -- to remove the temporary namespace.
+-- \c -
 SET search_path TO 'pg_temp';
 BEGIN;
 SELECT current_schema() ~ 'pg_temp' AS is_temp_schema;
@@ -315,6 +317,7 @@ PREPARE TRANSACTION 'twophase_search';
 -- related matters.
 
 -- use lower possible buffer limit to make the test cheaper
+-- \c
 SET temp_buffers = 100;
 
 CREATE TEMPORARY TABLE test_temp(a int not null unique, b TEXT not null, cnt int not null);
@@ -323,6 +326,7 @@ INSERT INTO test_temp SELECT generate_series(1, 10000) as id, repeat('a', 200), 
 SELECT pg_relation_size('test_temp') / current_setting('block_size')::int8 > 200;
 
 -- Don't want cursor names and plpgsql function lines in the error messages
+-- \set VERBOSITY terse
 
 /* helper function to create cursors for each page in [p_start, p_end] */
 CREATE FUNCTION test_temp_pin(p_start int, p_end int)

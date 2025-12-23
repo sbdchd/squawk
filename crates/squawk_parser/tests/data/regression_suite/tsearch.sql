@@ -1,4 +1,5 @@
 -- directory paths are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
 
 --
 -- Sanity checks for text search catalogs
@@ -47,6 +48,7 @@ CREATE TABLE test_tsvector(
 	a tsvector
 );
 
+-- \set filename :abs_srcdir '/data/tsearch.data'
 COPY test_tsvector FROM 'filename';
 
 ANALYZE test_tsvector;
@@ -150,6 +152,7 @@ CREATE INDEX wowidx1 ON test_tsvector USING gist (a tsvector_ops(siglen=100, sig
 
 CREATE INDEX wowidx2 ON test_tsvector USING gist (a tsvector_ops(siglen=1));
 
+-- \d test_tsvector
 
 DROP INDEX wowidx;
 
@@ -184,6 +187,7 @@ DROP INDEX wowidx2;
 
 CREATE INDEX wowidx ON test_tsvector USING gist (a tsvector_ops(siglen=484));
 
+-- \d test_tsvector
 
 EXPLAIN (costs off) SELECT count(*) FROM test_tsvector WHERE a @@ 'wr|qh';
 
@@ -645,12 +649,16 @@ SELECT ts_headline('english',
 --Rewrite sub system
 
 CREATE TABLE test_tsquery (txtkeyword TEXT, txtsample TEXT);
+-- \set ECHO none
+-- \copy test_tsquery from stdin
 -- 'New York'	new <-> york | big <-> apple | nyc
 -- Moscow	moskva | moscow
 -- 'Sanct Peter'	Peterburg | peter | 'Sanct Peterburg'
 -- foo & bar & qq	foo & (bar | qq) & city
 -- 1 & (2 <-> 3)	2 <-> 4
 -- 5 <-> 6	5 <-> 7
+-- \.
+-- \set ECHO all
 
 ALTER TABLE test_tsquery ADD COLUMN keyword tsquery;
 UPDATE test_tsquery SET keyword = to_tsquery('english', txtkeyword);
@@ -861,7 +869,7 @@ select websearch_to_tsquery('english', 'abc """"" def');
 select websearch_to_tsquery('english', 'cat -"fat rat"');
 select websearch_to_tsquery('english', 'cat -"fat rat" cheese');
 select websearch_to_tsquery('english', 'abc "def -"');
-select websearch_to_tsquery('english', 'abc "def :"');
+select websearch_to_tsquery('english', 'abc "def "');
 
 select websearch_to_tsquery('english', '"A fat cat" has just eaten a -rat.');
 select websearch_to_tsquery('english', '"A fat cat" has just eaten OR !rat.');

@@ -76,6 +76,7 @@ INSERT INTO tbl_gist SELECT x, 2*x, 3*x, box(point(x,x+1),point(2*x,2*x+1)) FROM
 CREATE INDEX tbl_gist_idx ON tbl_gist using gist (c4) INCLUDE (c1,c3);
 ALTER TABLE tbl_gist ALTER c1 TYPE bigint;
 ALTER TABLE tbl_gist ALTER c3 TYPE bigint;
+-- \d tbl_gist
 DROP TABLE tbl_gist;
 
 /*
@@ -85,4 +86,5 @@ CREATE TABLE tbl_gist (c1 int, c2 int, c3 int, c4 box, EXCLUDE USING gist (c4 WI
 INSERT INTO tbl_gist SELECT x, 2*x, 3*x, box(point(x,x+1),point(2*x,2*x+1)) FROM generate_series(1,10) AS x;
 INSERT INTO tbl_gist SELECT x, 2*x, 3*x, box(point(3*x,2*x),point(3*x+1,2*x+1)) FROM generate_series(1,10) AS x;
 EXPLAIN  (costs off) SELECT * FROM tbl_gist where c4 <@ box(point(1,1),point(10,10));
+-- \d tbl_gist
 DROP TABLE tbl_gist;

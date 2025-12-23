@@ -128,21 +128,21 @@ SELECT pg_snapshot '1:9223372036854775808:3';
 -- test pg_current_xact_id_if_assigned
 BEGIN;
 SELECT pg_current_xact_id_if_assigned() IS NULL;
-SELECT pg_current_xact_id() ;
+SELECT pg_current_xact_id() /* \gset */;
 SELECT pg_current_xact_id_if_assigned() IS NOT DISTINCT FROM xid8 'pg_current_xact_id';
 COMMIT;
 
 -- test xid status functions
 BEGIN;
-SELECT pg_current_xact_id() AS committed ;
+SELECT pg_current_xact_id() AS committed /* \gset */;
 COMMIT;
 
 BEGIN;
-SELECT pg_current_xact_id() AS rolledback ;
+SELECT pg_current_xact_id() AS rolledback /* \gset */;
 ROLLBACK;
 
 BEGIN;
-SELECT pg_current_xact_id() AS inprogress ;
+SELECT pg_current_xact_id() AS inprogress /* \gset */;
 
 SELECT pg_xact_status('committed'::text::xid8) AS committed;
 SELECT pg_xact_status('rolledback'::text::xid8) AS rolledback;

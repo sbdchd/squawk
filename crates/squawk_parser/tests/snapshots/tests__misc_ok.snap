@@ -2014,21 +2014,24 @@ SOURCE_FILE
     WHITESPACE "\n    "
     WITH_KW "WITH"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n        "
-    NAME
-      FORMAT_KW "FORMAT"
-    WHITESPACE " "
-    CSV_KW "csv"
-    COMMA ","
-    WHITESPACE "\n        "
-    NAME
-      DELIMITER_KW "DELIMITER"
-    WHITESPACE " "
-    LITERAL
-      ESC_STRING "E'\\t'"
-    WHITESPACE "\n        "
-    R_PAREN ")"
+    COPY_OPTION_LIST
+      L_PAREN "("
+      WHITESPACE "\n        "
+      COPY_OPTION
+        NAME
+          FORMAT_KW "FORMAT"
+        WHITESPACE " "
+        CSV_KW "csv"
+      COMMA ","
+      WHITESPACE "\n        "
+      COPY_OPTION
+        NAME
+          DELIMITER_KW "DELIMITER"
+        WHITESPACE " "
+        LITERAL
+          ESC_STRING "E'\\t'"
+      WHITESPACE "\n        "
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Enable pgvector"

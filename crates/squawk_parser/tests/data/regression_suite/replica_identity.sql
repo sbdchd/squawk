@@ -53,6 +53,7 @@ SELECT relreplident FROM pg_class WHERE oid = 'test_replica_identity'::regclass;
 -- succeed, primary key
 ALTER TABLE test_replica_identity REPLICA IDENTITY USING INDEX test_replica_identity_pkey;
 SELECT relreplident FROM pg_class WHERE oid = 'test_replica_identity'::regclass;
+-- \d test_replica_identity
 
 -- succeed, nondeferrable unique constraint over nonnullable cols
 ALTER TABLE test_replica_identity REPLICA IDENTITY USING INDEX test_replica_identity_unique_nondefer;
@@ -61,6 +62,7 @@ ALTER TABLE test_replica_identity REPLICA IDENTITY USING INDEX test_replica_iden
 ALTER TABLE test_replica_identity REPLICA IDENTITY USING INDEX test_replica_identity_keyab_key;
 ALTER TABLE test_replica_identity REPLICA IDENTITY USING INDEX test_replica_identity_keyab_key;
 SELECT relreplident FROM pg_class WHERE oid = 'test_replica_identity'::regclass;
+-- \d test_replica_identity
 SELECT count(*) FROM pg_index WHERE indrelid = 'test_replica_identity'::regclass AND indisreplident;
 
 ----
@@ -72,6 +74,7 @@ SELECT count(*) FROM pg_index WHERE indrelid = 'test_replica_identity'::regclass
 
 ALTER TABLE test_replica_identity REPLICA IDENTITY FULL;
 SELECT relreplident FROM pg_class WHERE oid = 'test_replica_identity'::regclass;
+-- \d+ test_replica_identity
 ALTER TABLE test_replica_identity REPLICA IDENTITY NOTHING;
 SELECT relreplident FROM pg_class WHERE oid = 'test_replica_identity'::regclass;
 
@@ -82,13 +85,17 @@ SELECT relreplident FROM pg_class WHERE oid = 'test_replica_identity'::regclass;
 -- constraint variant
 CREATE TABLE test_replica_identity2 (id int UNIQUE NOT NULL);
 ALTER TABLE test_replica_identity2 REPLICA IDENTITY USING INDEX test_replica_identity2_id_key;
+-- \d test_replica_identity2
 ALTER TABLE test_replica_identity2 ALTER COLUMN id TYPE bigint;
+-- \d test_replica_identity2
 
 -- straight index variant
 CREATE TABLE test_replica_identity3 (id int NOT NULL);
 CREATE UNIQUE INDEX test_replica_identity3_id_key ON test_replica_identity3 (id);
 ALTER TABLE test_replica_identity3 REPLICA IDENTITY USING INDEX test_replica_identity3_id_key;
+-- \d test_replica_identity3
 ALTER TABLE test_replica_identity3 ALTER COLUMN id TYPE bigint;
+-- \d test_replica_identity3
 
 -- ALTER TABLE DROP NOT NULL is not allowed for columns part of an index
 -- used as replica identity.
@@ -111,8 +118,10 @@ ALTER TABLE ONLY test_replica_identity4
   REPLICA IDENTITY USING INDEX test_replica_identity4_pkey;
 ALTER TABLE ONLY test_replica_identity4_1
   ADD CONSTRAINT test_replica_identity4_1_pkey PRIMARY KEY (id);
+-- \d+ test_replica_identity4
 ALTER INDEX test_replica_identity4_pkey
   ATTACH PARTITION test_replica_identity4_1_pkey;
+-- \d+ test_replica_identity4
 
 -- Dropping the primary key is not allowed if that would leave the replica
 -- identity as nullable

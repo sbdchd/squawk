@@ -42,15 +42,18 @@ CREATE TABLE temporal_rng (
   valid_at daterange,
   CONSTRAINT temporal_rng_pk PRIMARY KEY (id, valid_at WITHOUT OVERLAPS)
 );
+-- \d temporal_rng
 SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'temporal_rng_pk';
 SELECT pg_get_indexdef(conindid, 0, true) FROM pg_constraint WHERE conname = 'temporal_rng_pk';
 
 -- PK from LIKE:
 CREATE TABLE temporal_rng2 (LIKE temporal_rng INCLUDING ALL);
+-- \d temporal_rng2
 DROP TABLE temporal_rng2;
 
 -- no PK from INHERITS:
 CREATE TABLE temporal_rng2 () INHERITS (temporal_rng);
+-- \d temporal_rng2
 DROP TABLE temporal_rng2;
 DROP TABLE temporal_rng;
 
@@ -62,6 +65,7 @@ CREATE TABLE temporal_rng (
 CREATE TABLE temporal_rng2 (
   CONSTRAINT temporal_rng_pk PRIMARY KEY (id, valid_at WITHOUT OVERLAPS)
 ) INHERITS (temporal_rng);
+-- \d temporal_rng2
 DROP TABLE temporal_rng CASCADE;
 
 -- Add PK to already inheriting table:
@@ -72,6 +76,7 @@ CREATE TABLE temporal_rng (
 CREATE TABLE temporal_rng2 () INHERITS (temporal_rng);
 ALTER TABLE temporal_rng2
   ADD CONSTRAINT temporal_rng_pk PRIMARY KEY (id, valid_at WITHOUT OVERLAPS);
+-- \d temporal_rng2
 DROP TABLE temporal_rng2;
 DROP TABLE temporal_rng;
 
@@ -82,6 +87,7 @@ CREATE TABLE temporal_rng2 (
   valid_at daterange,
   CONSTRAINT temporal_rng2_pk PRIMARY KEY (id1, id2, valid_at WITHOUT OVERLAPS)
 );
+-- \d temporal_rng2
 SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'temporal_rng2_pk';
 SELECT pg_get_indexdef(conindid, 0, true) FROM pg_constraint WHERE conname = 'temporal_rng2_pk';
 
@@ -102,6 +108,7 @@ CREATE TABLE temporal_mltrng (
   valid_at datemultirange,
   CONSTRAINT temporal_mltrng_pk PRIMARY KEY (id, valid_at WITHOUT OVERLAPS)
 );
+-- \d temporal_mltrng
 SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'temporal_mltrng_pk';
 SELECT pg_get_indexdef(conindid, 0, true) FROM pg_constraint WHERE conname = 'temporal_mltrng_pk';
 
@@ -112,6 +119,7 @@ CREATE TABLE temporal_mltrng2 (
   valid_at datemultirange,
   CONSTRAINT temporal_mltrng2_pk PRIMARY KEY (id1, id2, valid_at WITHOUT OVERLAPS)
 );
+-- \d temporal_mltrng2
 SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'temporal_mltrng2_pk';
 SELECT pg_get_indexdef(conindid, 0, true) FROM pg_constraint WHERE conname = 'temporal_mltrng2_pk';
 
@@ -144,6 +152,7 @@ CREATE TABLE temporal_rng3 (
   valid_at daterange,
   CONSTRAINT temporal_rng3_uq UNIQUE (id, valid_at WITHOUT OVERLAPS)
 );
+-- \d temporal_rng3
 SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'temporal_rng3_uq';
 SELECT pg_get_indexdef(conindid, 0, true) FROM pg_constraint WHERE conname = 'temporal_rng3_uq';
 DROP TABLE temporal_rng3;
@@ -155,6 +164,7 @@ CREATE TABLE temporal_rng3 (
   valid_at daterange,
   CONSTRAINT temporal_rng3_uq UNIQUE (id1, id2, valid_at WITHOUT OVERLAPS)
 );
+-- \d temporal_rng3
 SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'temporal_rng3_uq';
 SELECT pg_get_indexdef(conindid, 0, true) FROM pg_constraint WHERE conname = 'temporal_rng3_uq';
 DROP TABLE temporal_rng3;
@@ -681,7 +691,9 @@ SELECT * FROM tp2 ORDER BY id, valid_at;
 DROP TABLE temporal_partitioned;
 
 -- ALTER TABLE REPLICA IDENTITY
+-- \d temporal_rng
 ALTER TABLE temporal_rng REPLICA IDENTITY USING INDEX temporal_rng_pk;
+-- \d temporal_rng
 
 --
 -- ON CONFLICT: ranges
@@ -1073,6 +1085,7 @@ CREATE TABLE temporal_fk2_rng2rng (
   CONSTRAINT temporal_fk2_rng2rng_fk FOREIGN KEY (parent_id1, parent_id2, PERIOD valid_at)
     REFERENCES temporal_rng2 (id1, id2, PERIOD valid_at)
 );
+-- \d temporal_fk2_rng2rng
 DROP TABLE temporal_fk2_rng2rng;
 
 --
@@ -1101,6 +1114,7 @@ ALTER TABLE temporal_fk2_rng2rng
   ADD CONSTRAINT temporal_fk2_rng2rng_fk
   FOREIGN KEY (parent_id1, parent_id2, PERIOD valid_at)
   REFERENCES temporal_rng2 (id1, id2, PERIOD valid_at);
+-- \d temporal_fk2_rng2rng
 
 -- with inferred PK on the referenced table, and wrong column type:
 ALTER TABLE temporal_fk_rng2rng
@@ -1514,6 +1528,7 @@ CREATE TABLE temporal_fk2_mltrng2mltrng (
   CONSTRAINT temporal_fk2_mltrng2mltrng_fk FOREIGN KEY (parent_id1, parent_id2, PERIOD valid_at)
     REFERENCES temporal_mltrng2 (id1, id2, PERIOD valid_at)
 );
+-- \d temporal_fk2_mltrng2mltrng
 DROP TABLE temporal_fk2_mltrng2mltrng;
 
 --
@@ -1544,6 +1559,7 @@ ALTER TABLE temporal_fk2_mltrng2mltrng
   ADD CONSTRAINT temporal_fk2_mltrng2mltrng_fk
   FOREIGN KEY (parent_id1, parent_id2, PERIOD valid_at)
   REFERENCES temporal_mltrng2 (id1, id2, PERIOD valid_at);
+-- \d temporal_fk2_mltrng2mltrng
 
 -- should fail because of duplicate referenced columns:
 ALTER TABLE temporal_fk_mltrng2mltrng

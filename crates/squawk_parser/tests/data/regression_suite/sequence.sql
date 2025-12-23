@@ -245,6 +245,8 @@ WHERE sequencename ~ ANY(ARRAY['sequence_test', 'serialtest'])
 SELECT * FROM pg_sequence_parameters('sequence_test4'::regclass);
 
 
+-- \d sequence_test4
+-- \d serialtest2_f2_seq
 
 
 -- Test comments
@@ -273,7 +275,9 @@ SELECT lastval();
 -- (more tests in src/test/recovery/)
 CREATE UNLOGGED SEQUENCE sequence_test_unlogged;
 ALTER SEQUENCE sequence_test_unlogged SET LOGGED;
+-- \d sequence_test_unlogged
 ALTER SEQUENCE sequence_test_unlogged SET UNLOGGED;
+-- \d sequence_test_unlogged
 DROP SEQUENCE sequence_test_unlogged;
 
 -- Test sequences in read-only transactions
@@ -410,6 +414,6 @@ SELECT nextval('test_seq1');
 SELECT nextval('test_seq1');
 
 -- pg_get_sequence_data
-SELECT * FROM pg_get_sequence_data('test_seq1');
+SELECT last_value, is_called, page_lsn <= pg_current_wal_lsn() as lsn FROM pg_get_sequence_data('test_seq1');
 
 DROP SEQUENCE test_seq1;

@@ -42,7 +42,7 @@ copy (select t into temp test3 from test1 where id=3) to stdout;
 -- This should fail
 --
 copy (select * from test1) from stdin;
---
+-- --
 -- This should fail
 --
 -- copy (select * from test1) (t,id) to stdout;
@@ -65,12 +65,15 @@ copy (select t from test1 where id = 1) to stdout csv header force quote t;
 --
 -- Test psql builtins, plain table
 --
+-- \copy test1 to stdout
 --
 -- This should fail
 --
+-- \copy v_test1 to stdout
 --
 -- Test \copy (select ...)
 --
+-- \copy (select "id",'id','id""'||t,(id + 1)*id,t,"test1"."t" from test1 where id=3) to stdout
 --
 -- Drop everything
 --
@@ -86,6 +89,8 @@ drop table test1;
 create table test3 (c int);
 -- select 0\; copy test3 from stdin\; copy test3 from stdin\; select 1; -- 0 1
 -- 1
+-- \.
 -- 2
+-- \.
 select * from test3;
 drop table test3;

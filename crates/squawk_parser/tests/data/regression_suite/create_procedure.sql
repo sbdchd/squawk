@@ -11,11 +11,14 @@ AS $$
 INSERT INTO cp_test VALUES (1, x);
 $$;
 
+-- \df ptest1
 SELECT pg_get_functiondef('ptest1'::regproc);
 
 -- show only normal functions
+-- \dfn public.*test*1
 
 -- show only procedures
+-- \dfp public.*test*1
 
 SELECT ptest1('x');  -- error
 CALL ptest1('a');  -- ok
@@ -32,6 +35,7 @@ BEGIN ATOMIC
   INSERT INTO cp_test VALUES (1, x);
 END;
 
+-- \df ptest1s
 SELECT pg_get_functiondef('ptest1s'::regproc);
 
 CALL ptest1s('b');
@@ -171,6 +175,7 @@ CREATE PROCEDURE ptest8(x text)
 BEGIN ATOMIC
 END;
 
+-- \df ptest8
 SELECT pg_get_functiondef('ptest8'::regproc);
 CALL ptest8('');
 
@@ -211,15 +216,18 @@ CALL ptest11(null, 11, 12, 13);
 CREATE PROCEDURE ptest10(IN a int, IN b int, IN c int)
 LANGUAGE SQL AS $$ SELECT a + b - c $$;
 
+-- \df ptest10
 
 drop procedure ptest10;  -- fail
 drop procedure ptest10(int, int, int);  -- fail
 begin;
 drop procedure ptest10(out int, int, int);
+-- \df ptest10
 drop procedure ptest10(int, int, int);  -- now this would work
 rollback;
 begin;
 drop procedure ptest10(in int, int, int);
+-- \df ptest10
 drop procedure ptest10(int, int, int);  -- now this would work
 rollback;
 

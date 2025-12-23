@@ -14,6 +14,7 @@ CREATE INDEX ON tbl_include_reg (c1, c2) INCLUDE (c1, c3);
 SELECT pg_get_indexdef(i.indexrelid)
 FROM pg_index i JOIN pg_class c ON i.indexrelid = c.oid
 WHERE i.indrelid = 'tbl_include_reg'::regclass ORDER BY c.relname;
+-- \d tbl_include_reg_idx
 
 -- Unique index and unique constraint
 CREATE TABLE tbl_include_unique1 (c1 int, c2 int, c3 int, c4 box);
@@ -214,6 +215,7 @@ CREATE TABLE tbl (c1 int,c2 int, c3 int, c4 box, UNIQUE(c1, c2) INCLUDE(c3,c4));
 INSERT INTO tbl SELECT x, 2*x, 3*x, box('4,4,4,4') FROM generate_series(1,10) AS x;
 ALTER TABLE tbl ALTER c1 TYPE bigint;
 ALTER TABLE tbl ALTER c3 TYPE bigint;
+-- \d tbl
 DROP TABLE tbl;
 
 /*

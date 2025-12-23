@@ -71,14 +71,14 @@ SELECT c.relname FROM pg_class c, pg_tablespace s
 -- relfilenode.
 -- Save first the existing relfilenode for the toast and main relations.
 SELECT relfilenode as main_filenode FROM pg_class
-  WHERE relname = 'regress_tblspace_test_tbl_idx' ;
+  WHERE relname = 'regress_tblspace_test_tbl_idx' /* \gset */;
 SELECT relfilenode as toast_filenode FROM pg_class
   WHERE oid =
     (SELECT i.indexrelid
        FROM pg_class c,
             pg_index i
        WHERE i.indrelid = c.reltoastrelid AND
-             c.relname = 'regress_tblspace_test_tbl') ;
+             c.relname = 'regress_tblspace_test_tbl') /* \gset */;
 REINDEX (TABLESPACE regress_tblspace) TABLE regress_tblspace_test_tbl;
 SELECT c.relname FROM pg_class c, pg_tablespace s
   WHERE c.reltablespace = s.oid AND s.spcname = 'regress_tblspace'
@@ -180,6 +180,8 @@ SELECT relname, spcname FROM pg_catalog.pg_tablespace t, pg_catalog.pg_class c
     where c.reltablespace = t.oid AND c.relname = 'foo_idx';
 
 -- check \d output
+-- \d testschema.foo
+-- \d testschema.foo_idx
 
 --
 -- partitioned table
@@ -222,6 +224,12 @@ CREATE INDEX part_a_idx ON testschema.part (a) TABLESPACE regress_tblspace;
 CREATE TABLE testschema.part2 PARTITION OF testschema.part FOR VALUES IN (2);
 SELECT relname, spcname FROM pg_catalog.pg_tablespace t, pg_catalog.pg_class c
     where c.reltablespace = t.oid AND c.relname LIKE 'part%_idx' ORDER BY relname;
+-- \d testschema.part
+-- \d+ testschema.part
+-- \d testschema.part1
+-- \d+ testschema.part1
+-- \d testschema.part_a_idx
+-- \d+ testschema.part_a_idx
 
 -- partitioned rels cannot specify the default tablespace.  These fail:
 CREATE TABLE testschema.dflt (a int PRIMARY KEY) PARTITION BY LIST (a) TABLESPACE pg_default;
@@ -243,20 +251,40 @@ CREATE INDEX test_index2 on testschema.test_default_tab (id) TABLESPACE regress_
 ALTER TABLE testschema.test_default_tab ADD CONSTRAINT test_index3 PRIMARY KEY (id);
 ALTER TABLE testschema.test_default_tab ADD CONSTRAINT test_index4 UNIQUE (id) USING INDEX TABLESPACE regress_tblspace;
 
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 -- use a custom tablespace for default_tablespace
 SET default_tablespace TO regress_tblspace;
 -- tablespace should not change if no rewrite
 ALTER TABLE testschema.test_default_tab ALTER id TYPE bigint;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 SELECT * FROM testschema.test_default_tab;
 -- tablespace should not change even if there is an index rewrite
 ALTER TABLE testschema.test_default_tab ALTER id TYPE int;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 SELECT * FROM testschema.test_default_tab;
 -- now use the default tablespace for default_tablespace
 SET default_tablespace TO '';
 -- tablespace should not change if no rewrite
 ALTER TABLE testschema.test_default_tab ALTER id TYPE int;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 -- tablespace should not change even if there is an index rewrite
 ALTER TABLE testschema.test_default_tab ALTER id TYPE bigint;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 DROP TABLE testschema.test_default_tab;
 
 -- check that default_tablespace doesn't affect ALTER TABLE index rebuilds
@@ -271,20 +299,40 @@ CREATE INDEX test_index2 on testschema.test_default_tab_p (val) TABLESPACE regre
 ALTER TABLE testschema.test_default_tab_p ADD CONSTRAINT test_index3 PRIMARY KEY (id);
 ALTER TABLE testschema.test_default_tab_p ADD CONSTRAINT test_index4 UNIQUE (id) USING INDEX TABLESPACE regress_tblspace;
 
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 -- use a custom tablespace for default_tablespace
 SET default_tablespace TO regress_tblspace;
 -- tablespace should not change if no rewrite
 ALTER TABLE testschema.test_default_tab_p ALTER val TYPE bigint;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 SELECT * FROM testschema.test_default_tab_p;
 -- tablespace should not change even if there is an index rewrite
 ALTER TABLE testschema.test_default_tab_p ALTER val TYPE int;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 SELECT * FROM testschema.test_default_tab_p;
 -- now use the default tablespace for default_tablespace
 SET default_tablespace TO '';
 -- tablespace should not change if no rewrite
 ALTER TABLE testschema.test_default_tab_p ALTER val TYPE int;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 -- tablespace should not change even if there is an index rewrite
 ALTER TABLE testschema.test_default_tab_p ALTER val TYPE bigint;
+-- \d testschema.test_index1
+-- \d testschema.test_index2
+-- \d testschema.test_index3
+-- \d testschema.test_index4
 DROP TABLE testschema.test_default_tab_p;
 
 -- check that default_tablespace affects index additions in ALTER TABLE
@@ -294,6 +342,8 @@ SET default_tablespace TO regress_tblspace;
 ALTER TABLE testschema.test_tab ADD CONSTRAINT test_tab_unique UNIQUE (id);
 SET default_tablespace TO '';
 ALTER TABLE testschema.test_tab ADD CONSTRAINT test_tab_pkey PRIMARY KEY (id);
+-- \d testschema.test_tab_unique
+-- \d testschema.test_tab_pkey
 SELECT * FROM testschema.test_tab;
 DROP TABLE testschema.test_tab;
 
@@ -305,7 +355,13 @@ ALTER TABLE testschema.test_tab ADD CONSTRAINT test_tab_unique UNIQUE (a);
 CREATE INDEX test_tab_a_idx ON testschema.test_tab (a);
 SET default_tablespace TO '';
 CREATE INDEX test_tab_b_idx ON testschema.test_tab (b);
+-- \d testschema.test_tab_unique
+-- \d testschema.test_tab_a_idx
+-- \d testschema.test_tab_b_idx
 ALTER TABLE testschema.test_tab ALTER b TYPE bigint, ADD UNIQUE (c);
+-- \d testschema.test_tab_unique
+-- \d testschema.test_tab_a_idx
+-- \d testschema.test_tab_b_idx
 DROP TABLE testschema.test_tab;
 
 -- let's try moving a table from one place to another
@@ -341,6 +397,7 @@ ALTER INDEX testschema.part_a_idx SET TABLESPACE pg_default;
 DROP TABLESPACE regress_tblspace;
 
 -- Adequate cache initialization before GRANT
+-- \c -
 BEGIN;
 GRANT ALL ON TABLESPACE regress_tblspace TO PUBLIC;
 ROLLBACK;

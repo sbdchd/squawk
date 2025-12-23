@@ -4,10 +4,15 @@
 
 -- skip test if not UTF8 server encoding
 SELECT getdatabaseencoding() <> 'UTF8'
-       AS skip_test ;
+       AS skip_test /* \gset */;
+-- \if :skip_test
+-- \quit
+-- \endif
 
 -- directory paths are passed to us in environment variables
+-- \getenv abs_builddir PG_ABS_BUILDDIR
 
+-- \set utf8_csv :abs_builddir '/results/copyencoding_utf8.csv'
 
 CREATE TABLE copy_encoding_tab (t text);
 

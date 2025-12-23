@@ -293,15 +293,15 @@ SELECT $$
     HAVING count(*) > 1
     ORDER BY 2 DESC, 1 DESC, 3 DESC, 4 DESC, 5 DESC, 6 DESC
     LIMIT 10
-$$ AS qry ;
+$$ AS qry /* \gset */;
 
 -- test mark/restore with in-memory sorts
--- EXPLAIN (COSTS OFF) 'qry';
--- 'qry';
+-- EXPLAIN (COSTS OFF) :qry;
+-- :qry;
 
 -- test mark/restore with on-disk sorts
 SET LOCAL work_mem = '100kB';
--- EXPLAIN (COSTS OFF) 'qry';
--- 'qry';
+-- EXPLAIN (COSTS OFF) :qry;
+-- :qry;
 
 COMMIT;

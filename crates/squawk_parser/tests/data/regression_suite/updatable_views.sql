@@ -1262,6 +1262,7 @@ INSERT INTO base_tbl VALUES (1,2), (2,3), (1,-1);
 
 CREATE VIEW rw_view1 AS SELECT * FROM base_tbl WHERE a < b
   WITH LOCAL CHECK OPTION;
+-- \d+ rw_view1
 SELECT * FROM information_schema.views WHERE table_name = 'rw_view1';
 
 INSERT INTO rw_view1 VALUES(3,4); -- ok
@@ -1292,6 +1293,7 @@ CREATE TABLE base_tbl (a int);
 CREATE VIEW rw_view1 AS SELECT * FROM base_tbl WHERE a > 0;
 CREATE VIEW rw_view2 AS SELECT * FROM rw_view1 WHERE a < 10
   WITH CHECK OPTION; -- implicitly cascaded
+-- \d+ rw_view2
 SELECT * FROM information_schema.views WHERE table_name = 'rw_view2';
 
 INSERT INTO rw_view2 VALUES (-5); -- should fail
@@ -1304,6 +1306,7 @@ UPDATE rw_view2 SET a = a + 10; -- should fail
 
 CREATE OR REPLACE VIEW rw_view2 AS SELECT * FROM rw_view1 WHERE a < 10
   WITH LOCAL CHECK OPTION;
+-- \d+ rw_view2
 SELECT * FROM information_schema.views WHERE table_name = 'rw_view2';
 
 INSERT INTO rw_view2 VALUES (-10); -- ok, but not in view
@@ -1317,6 +1320,7 @@ INSERT INTO rw_view2 VALUES (-20); -- should fail
 INSERT INTO rw_view2 VALUES (30); -- should fail
 
 ALTER VIEW rw_view2 RESET (check_option);
+-- \d+ rw_view2
 SELECT * FROM information_schema.views WHERE table_name = 'rw_view2';
 INSERT INTO rw_view2 VALUES (30); -- ok, but not in view
 SELECT * FROM base_tbl;

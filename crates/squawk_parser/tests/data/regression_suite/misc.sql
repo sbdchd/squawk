@@ -3,7 +3,12 @@
 --
 
 -- directory paths and dlsuffix are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
+-- \getenv abs_builddir PG_ABS_BUILDDIR
+-- \getenv libdir PG_LIBDIR
+-- \getenv dlsuffix PG_DLSUFFIX
 
+-- \set regresslib :libdir '/regress' :dlsuffix
 
 CREATE FUNCTION overpaid(emp)
    RETURNS bool
@@ -68,6 +73,7 @@ DROP TABLE tmp;
 --
 -- copy
 --
+-- \set filename :abs_builddir '/results/onek.data'
 COPY onek TO 'filename';
 
 CREATE TEMP TABLE onek_copy (LIKE onek);
@@ -78,6 +84,7 @@ SELECT * FROM onek EXCEPT ALL SELECT * FROM onek_copy;
 
 SELECT * FROM onek_copy EXCEPT ALL SELECT * FROM onek;
 
+-- \set filename :abs_builddir '/results/stud_emp.data'
 COPY BINARY stud_emp TO 'filename';
 
 CREATE TEMP TABLE stud_emp_copy (LIKE stud_emp);

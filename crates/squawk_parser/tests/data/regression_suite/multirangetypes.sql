@@ -414,6 +414,28 @@ SELECT nummultirange(numrange(1,3), numrange(4,5)) - nummultirange(numrange(2,9)
 SELECT nummultirange(numrange(1,2), numrange(4,5)) - nummultirange(numrange(8,9));
 SELECT nummultirange(numrange(1,2), numrange(4,5)) - nummultirange(numrange(-2,0), numrange(8,9));
 
+-- multirange_minus_multi
+SELECT multirange_minus_multi(nummultirange(), nummultirange());
+SELECT multirange_minus_multi(nummultirange(), nummultirange(numrange(1,2)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2)), nummultirange());
+SELECT multirange_minus_multi(nummultirange(numrange(1,2), numrange(3,4)), nummultirange());
+SELECT multirange_minus_multi(nummultirange(numrange(1,2)), nummultirange(numrange(1,2)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2)), nummultirange(numrange(2,4)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2)), nummultirange(numrange(3,4)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,4)), nummultirange(numrange(1,2)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,4)), nummultirange(numrange(2,3)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,4)), nummultirange(numrange(0,8)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,4)), nummultirange(numrange(0,2)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,8)), nummultirange(numrange(0,2), numrange(3,4)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,8)), nummultirange(numrange(2,3), numrange(5,null)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2), numrange(4,5)), nummultirange(numrange(-2,0)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2), numrange(4,5)), nummultirange(numrange(2,4)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2), numrange(4,5)), nummultirange(numrange(3,5)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2), numrange(4,5)), nummultirange(numrange(0,9)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,3), numrange(4,5)), nummultirange(numrange(2,9)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2), numrange(4,5)), nummultirange(numrange(8,9)));
+SELECT multirange_minus_multi(nummultirange(numrange(1,2), numrange(4,5)), nummultirange(numrange(-2,0), numrange(8,9)));
+
 -- intersection
 SELECT nummultirange() * nummultirange();
 SELECT nummultirange() * nummultirange(numrange(1,2));
@@ -711,6 +733,7 @@ alter type textrange1 owner to regress_multirange_owner;
 set role regress_multirange_owner;
 revoke usage on type multitextrange1 from public;  -- fail
 revoke usage on type textrange1 from public;
+-- \dT+ *textrange1*
 create temp table test1(f1 multitextrange1[]);
 revoke usage on type textrange1 from regress_multirange_owner;
 create temp table test2(f1 multitextrange1[]);  -- fail

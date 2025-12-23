@@ -324,8 +324,8 @@ DROP TABLE only_inh_parent CASCADE;
 
 -- parenthesized syntax for ANALYZE
 ANALYZE (VERBOSE) does_not_exist;
--- ANALYZE (nonexistent-arg) does_not_exist;
--- ANALYZE (nonexistentarg) does_not_exit;
+ANALYZE (nonexistent-arg) does_not_exist;
+ANALYZE (nonexistentarg) does_not_exit;
 
 -- ensure argument order independence, and that SKIP_LOCKED on non-existing
 -- relation still errors out.  Suppress WARNING messages caused by concurrent
@@ -379,9 +379,9 @@ VACUUM (PROCESS_MAIN FALSE, PROCESS_TOAST FALSE) vac_option_tab;
 SELECT * FROM vac_option_tab_counts;
 -- Check if the filenodes nodes have been updated as wanted after FULL.
 SELECT relfilenode AS main_filenode FROM pg_class
-  WHERE relname = 'vac_option_tab' ;
+  WHERE relname = 'vac_option_tab' /* \gset */;
 SELECT t.relfilenode AS toast_filenode FROM pg_class c, pg_class t
-  WHERE c.reltoastrelid = t.oid AND c.relname = 'vac_option_tab' ;
+  WHERE c.reltoastrelid = t.oid AND c.relname = 'vac_option_tab' /* \gset */;
 -- Only the toast relation is processed.
 VACUUM (PROCESS_MAIN FALSE, FULL) vac_option_tab;
 SELECT relfilenode = 'main_filenode' AS is_same_main_filenode
@@ -495,3 +495,33 @@ RESET ROLE;
 DROP TABLE vacowned;
 DROP TABLE vacowned_parted;
 DROP ROLE regress_vacuum;
+
+-- Test checking how new toast values are allocated on rewrite.
+-- Create table with plain storage (forces inline storage initially).
+CREATE TABLE vac_rewrite_toast (id int, f1 TEXT STORAGE plain);
+-- Insert tuple large enough to trigger toast storage on rewrite, still
+-- small enough to fit on a page.
+INSERT INTO vac_rewrite_toast values (1, repeat('a', 7000));
+-- Switch to external storage to force toast table usage.
+ALTER TABLE vac_rewrite_toast ALTER COLUMN f1 SET STORAGE EXTERNAL;
+-- This second tuple is toasted, its value should still be the
+-- same after rewrite.
+INSERT INTO vac_rewrite_toast values (2, repeat('a', 7000));
+SELECT pg_column_toast_chunk_id(f1) AS id_2_chunk FROM vac_rewrite_toast
+  WHERE id = 2 /* \gset */;
+-- Check initial state of the data.
+SELECT id, pg_column_toast_chunk_id(f1) IS NULL AS f1_chunk_null,
+  substr(f1, 5, 10) AS f1_data,
+  pg_column_compression(f1) AS f1_comp
+  FROM vac_rewrite_toast ORDER BY id;
+-- VACUUM FULL forces toast data rewrite.
+VACUUM FULL vac_rewrite_toast;
+-- Check after rewrite.
+SELECT id, pg_column_toast_chunk_id(f1) IS NULL AS f1_chunk_null,
+  substr(f1, 5, 10) AS f1_data,
+  pg_column_compression(f1) AS f1_comp
+  FROM vac_rewrite_toast ORDER BY id;
+-- The same value is reused for the tuple toasted before the rewrite.
+SELECT pg_column_toast_chunk_id(f1) = 'id_2_chunk' AS same_chunk
+  FROM vac_rewrite_toast WHERE id = 2;
+DROP TABLE vac_rewrite_toast;

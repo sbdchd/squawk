@@ -869,6 +869,8 @@ SELECT width_bucket(5.0::float8, 3.0::float8, 4.0::float8, 0);
 SELECT width_bucket(5.0::float8, 3.0::float8, 4.0::float8, -5);
 SELECT width_bucket(3.5::float8, 3.0::float8, 3.0::float8, 888);
 SELECT width_bucket('NaN', 3.0, 4.0, 888);
+SELECT width_bucket('NaN'::float8, 3.0::float8, 4.0::float8, 888);
+SELECT width_bucket(0, 'NaN', 4.0, 888);
 SELECT width_bucket(0::float8, 'NaN', 4.0::float8, 888);
 SELECT width_bucket(2.0, 3.0, '-inf', 888);
 SELECT width_bucket(0::float8, '-inf', 4.0::float8, 888);
@@ -876,6 +878,27 @@ SELECT width_bucket(0::float8, '-inf', 4.0::float8, 888);
 -- normal operation
 CREATE TABLE width_bucket_test (operand_num numeric, operand_f8 float8);
 
+COPY width_bucket_test (operand_num) FROM stdin;
+-- -5.2
+-- -0.0000000001
+-- 0.000000000001
+-- 1
+-- 1.99999999999999
+-- 2
+-- 2.00000000000001
+-- 3
+-- 4
+-- 4.5
+-- 5
+-- 5.5
+-- 6
+-- 7
+-- 8
+-- 9
+-- 9.99999999999999
+-- 10
+-- 10.0000000000001
+-- \.
 
 UPDATE width_bucket_test SET operand_f8 = operand_num::float8;
 
@@ -1183,6 +1206,7 @@ CREATE TABLE num_typemod_test (
   thousandths numeric(3, 3),
   millionths numeric(3, 6)
 );
+-- \d num_typemod_test
 
 -- rounding of valid inputs
 INSERT INTO num_typemod_test VALUES (123456, 123, 0.123, 0.000123, 0.000000123);

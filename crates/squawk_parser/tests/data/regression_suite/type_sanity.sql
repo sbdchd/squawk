@@ -13,7 +13,10 @@
 -- field can't be 0, we have to check it here.
 
 -- directory paths and dlsuffix are passed to us in environment variables
+-- \getenv libdir PG_LIBDIR
+-- \getenv dlsuffix PG_DLSUFFIX
 
+-- \set regresslib :libdir '/regress' :dlsuffix
 
 -- **************** pg_type ****************
 
@@ -536,6 +539,7 @@ CREATE TABLE tab_core_types AS SELECT
   'regtype'::regtype type,
   'pg_monitor'::regrole,
   'pg_class'::regclass::oid,
+  'template1'::regdatabase,
   '(1,1)'::tid, '2'::xid, '3'::cid,
   '10:20:10,14,15'::txid_snapshot,
   '10:20:10,14,15'::pg_snapshot,

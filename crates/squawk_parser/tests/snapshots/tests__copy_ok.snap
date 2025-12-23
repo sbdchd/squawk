@@ -33,13 +33,15 @@ SOURCE_FILE
     WHITESPACE " "
     STDOUT_KW "STDOUT"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      DELIMITER_KW "DELIMITER"
-    WHITESPACE " "
-    LITERAL
-      STRING "'|'"
-    R_PAREN ")"
+    COPY_OPTION_LIST
+      L_PAREN "("
+      COPY_OPTION
+        NAME
+          DELIMITER_KW "DELIMITER"
+        WHITESPACE " "
+        LITERAL
+          STRING "'|'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- copy_from"
@@ -143,20 +145,23 @@ SOURCE_FILE
     LITERAL
       STRING "'/tmp/input.file'"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE " "
-    NAME
-      IDENT "on_error"
-    WHITESPACE " "
-    IDENT "ignore"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "log_verbosity"
-    WHITESPACE " "
-    VERBOSE_KW "verbose"
-    WHITESPACE " "
-    R_PAREN ")"
+    COPY_OPTION_LIST
+      L_PAREN "("
+      WHITESPACE " "
+      COPY_OPTION
+        NAME
+          IDENT "on_error"
+        WHITESPACE " "
+        IGNORE_KW "ignore"
+      COMMA ","
+      WHITESPACE " "
+      COPY_OPTION
+        NAME
+          IDENT "log_verbosity"
+        WHITESPACE " "
+        VERBOSE_KW "verbose"
+      WHITESPACE " "
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_error"
@@ -174,14 +179,16 @@ SOURCE_FILE
     LITERAL
       STRING "'/tmp/copy.data'"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE " "
-    NAME
-      IDENT "on_error"
-    WHITESPACE " "
-    IDENT "ignore"
-    WHITESPACE " "
-    R_PAREN ")"
+    COPY_OPTION_LIST
+      L_PAREN "("
+      WHITESPACE " "
+      COPY_OPTION
+        NAME
+          IDENT "on_error"
+        WHITESPACE " "
+        IGNORE_KW "ignore"
+      WHITESPACE " "
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_the_options"
@@ -199,176 +206,210 @@ SOURCE_FILE
     LITERAL
       STRING "'foo'"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      FORMAT_KW "format"
-    WHITESPACE " "
-    CSV_KW "csv"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      FREEZE_KW "freeze"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      FREEZE_KW "freeze"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      FREEZE_KW "freeze"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      DELIMITER_KW "delimiter"
-    WHITESPACE " "
-    LITERAL
-      STRING "','"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      NULL_KW "null"
-    WHITESPACE " "
-    LITERAL
-      STRING "'\\n'"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      DEFAULT_KW "default"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      HEADER_KW "header"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      HEADER_KW "header"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      HEADER_KW "header"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      HEADER_KW "header"
-    WHITESPACE " "
-    MATCH_KW "match"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      QUOTE_KW "quote"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      ESCAPE_KW "escape"
-    WHITESPACE " "
-    LITERAL
-      STRING "'bar'"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "force_quote"
-    WHITESPACE " "
-    STAR "*"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "force_quote"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "c"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "d"
-    R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "force_not_null"
-    WHITESPACE " "
-    STAR "*"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "force_not_null"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "force_null"
-    WHITESPACE " "
-    STAR "*"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "force_null"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "on_error"
-    WHITESPACE " "
-    IDENT "stop"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "on_error"
-    WHITESPACE " "
-    IDENT "ignore"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      ENCODING_KW "encoding"
-    WHITESPACE " "
-    LITERAL
-      STRING "'utf8'"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "log_verbosity"
-    WHITESPACE " "
-    VERBOSE_KW "verbose"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    COPY_OPTION_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          FORMAT_KW "format"
+        WHITESPACE " "
+        CSV_KW "csv"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          FREEZE_KW "freeze"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          FREEZE_KW "freeze"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          FREEZE_KW "freeze"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          DELIMITER_KW "delimiter"
+        WHITESPACE " "
+        LITERAL
+          STRING "','"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          NULL_KW "null"
+        WHITESPACE " "
+        LITERAL
+          STRING "'\\n'"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          DEFAULT_KW "default"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          HEADER_KW "header"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          HEADER_KW "header"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          HEADER_KW "header"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          HEADER_KW "header"
+        WHITESPACE " "
+        MATCH_KW "match"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          QUOTE_KW "quote"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          ESCAPE_KW "escape"
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "force_quote"
+        WHITESPACE " "
+        STAR "*"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "force_quote"
+        WHITESPACE " "
+        COPY_OPTION_LIST
+          L_PAREN "("
+          COPY_OPTION
+            NAME
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COPY_OPTION
+            NAME
+              IDENT "b"
+          COMMA ","
+          WHITESPACE " "
+          COPY_OPTION
+            NAME
+              IDENT "c"
+          COMMA ","
+          WHITESPACE " "
+          COPY_OPTION
+            NAME
+              IDENT "d"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "force_not_null"
+        WHITESPACE " "
+        STAR "*"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "force_not_null"
+        WHITESPACE " "
+        COPY_OPTION_LIST
+          L_PAREN "("
+          COPY_OPTION
+            NAME
+              IDENT "a"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "force_null"
+        WHITESPACE " "
+        STAR "*"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "force_null"
+        WHITESPACE " "
+        COPY_OPTION_LIST
+          L_PAREN "("
+          COPY_OPTION
+            NAME
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COPY_OPTION
+            NAME
+              IDENT "b"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "on_error"
+        WHITESPACE " "
+        IDENT "stop"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "on_error"
+        WHITESPACE " "
+        IGNORE_KW "ignore"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          ENCODING_KW "encoding"
+        WHITESPACE " "
+        LITERAL
+          STRING "'utf8'"
+      COMMA ","
+      WHITESPACE "\n  "
+      COPY_OPTION
+        NAME
+          IDENT "log_verbosity"
+        WHITESPACE " "
+        VERBOSE_KW "verbose"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -211,6 +211,7 @@ pub enum SyntaxKind {
     HOUR_KW,
     IDENTITY_KW,
     IF_KW,
+    IGNORE_KW,
     ILIKE_KW,
     IMMEDIATE_KW,
     IMMUTABLE_KW,
@@ -278,6 +279,7 @@ pub enum SyntaxKind {
     LOCK_KW,
     LOCKED_KW,
     LOGGED_KW,
+    LSN_KW,
     MAPPING_KW,
     MATCH_KW,
     MATCHED_KW,
@@ -346,6 +348,7 @@ pub enum SyntaxKind {
     PARSER_KW,
     PARTIAL_KW,
     PARTITION_KW,
+    PARTITIONS_KW,
     PASSING_KW,
     PASSWORD_KW,
     PATH_KW,
@@ -387,6 +390,7 @@ pub enum SyntaxKind {
     REPLACE_KW,
     REPLICA_KW,
     RESET_KW,
+    RESPECT_KW,
     RESTART_KW,
     RESTRICT_KW,
     RETURN_KW,
@@ -429,6 +433,7 @@ pub enum SyntaxKind {
     SNAPSHOT_KW,
     SOME_KW,
     SOURCE_KW,
+    SPLIT_KW,
     SQL_KW,
     STABLE_KW,
     STANDALONE_KW,
@@ -503,6 +508,7 @@ pub enum SyntaxKind {
     VIEWS_KW,
     VIRTUAL_KW,
     VOLATILE_KW,
+    WAIT_KW,
     WHEN_KW,
     WHERE_KW,
     WHITESPACE_KW,
@@ -647,6 +653,8 @@ pub enum SyntaxKind {
     CONSTRAINT_INDEX_METHOD,
     CONSTRAINT_INDEX_TABLESPACE,
     COPY,
+    COPY_OPTION,
+    COPY_OPTION_LIST,
     COST_FUNC_OPTION,
     CREATE_ACCESS_METHOD,
     CREATE_AGGREGATE,
@@ -905,6 +913,7 @@ pub enum SyntaxKind {
     MERGE_DELETE,
     MERGE_DO_NOTHING,
     MERGE_INSERT,
+    MERGE_PARTITIONS,
     MERGE_UPDATE,
     MERGE_WHEN_MATCHED,
     MERGE_WHEN_NOT_MATCHED_SOURCE,
@@ -969,6 +978,7 @@ pub enum SyntaxKind {
     PARAM_VARIADIC,
     PAREN_EXPR,
     PAREN_SELECT,
+    PARTITION,
     PARTITION_BY,
     PARTITION_DEFAULT,
     PARTITION_FOR_VALUES_FROM,
@@ -976,6 +986,7 @@ pub enum SyntaxKind {
     PARTITION_FOR_VALUES_WITH,
     PARTITION_ITEM,
     PARTITION_ITEM_LIST,
+    PARTITION_LIST,
     PARTITION_OF,
     PATH,
     PATH_SEGMENT,
@@ -1090,6 +1101,7 @@ pub enum SyntaxKind {
     SORT_DESC,
     SORT_USING,
     SOURCE_FILE,
+    SPLIT_PARTITION,
     STORAGE,
     STRICT_FUNC_OPTION,
     SUBSTRING_FN,
@@ -1529,6 +1541,8 @@ impl SyntaxKind {
             SyntaxKind::IDENTITY_KW
         } else if ident.eq_ignore_ascii_case("if") {
             SyntaxKind::IF_KW
+        } else if ident.eq_ignore_ascii_case("ignore") {
+            SyntaxKind::IGNORE_KW
         } else if ident.eq_ignore_ascii_case("ilike") {
             SyntaxKind::ILIKE_KW
         } else if ident.eq_ignore_ascii_case("immediate") {
@@ -1663,6 +1677,8 @@ impl SyntaxKind {
             SyntaxKind::LOCKED_KW
         } else if ident.eq_ignore_ascii_case("logged") {
             SyntaxKind::LOGGED_KW
+        } else if ident.eq_ignore_ascii_case("lsn") {
+            SyntaxKind::LSN_KW
         } else if ident.eq_ignore_ascii_case("mapping") {
             SyntaxKind::MAPPING_KW
         } else if ident.eq_ignore_ascii_case("match") {
@@ -1799,6 +1815,8 @@ impl SyntaxKind {
             SyntaxKind::PARTIAL_KW
         } else if ident.eq_ignore_ascii_case("partition") {
             SyntaxKind::PARTITION_KW
+        } else if ident.eq_ignore_ascii_case("partitions") {
+            SyntaxKind::PARTITIONS_KW
         } else if ident.eq_ignore_ascii_case("passing") {
             SyntaxKind::PASSING_KW
         } else if ident.eq_ignore_ascii_case("password") {
@@ -1881,6 +1899,8 @@ impl SyntaxKind {
             SyntaxKind::REPLICA_KW
         } else if ident.eq_ignore_ascii_case("reset") {
             SyntaxKind::RESET_KW
+        } else if ident.eq_ignore_ascii_case("respect") {
+            SyntaxKind::RESPECT_KW
         } else if ident.eq_ignore_ascii_case("restart") {
             SyntaxKind::RESTART_KW
         } else if ident.eq_ignore_ascii_case("restrict") {
@@ -1965,6 +1985,8 @@ impl SyntaxKind {
             SyntaxKind::SOME_KW
         } else if ident.eq_ignore_ascii_case("source") {
             SyntaxKind::SOURCE_KW
+        } else if ident.eq_ignore_ascii_case("split") {
+            SyntaxKind::SPLIT_KW
         } else if ident.eq_ignore_ascii_case("sql") {
             SyntaxKind::SQL_KW
         } else if ident.eq_ignore_ascii_case("stable") {
@@ -2113,6 +2135,8 @@ impl SyntaxKind {
             SyntaxKind::VIRTUAL_KW
         } else if ident.eq_ignore_ascii_case("volatile") {
             SyntaxKind::VOLATILE_KW
+        } else if ident.eq_ignore_ascii_case("wait") {
+            SyntaxKind::WAIT_KW
         } else if ident.eq_ignore_ascii_case("when") {
             SyntaxKind::WHEN_KW
         } else if ident.eq_ignore_ascii_case("where") {

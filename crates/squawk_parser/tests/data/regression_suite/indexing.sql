@@ -58,7 +58,11 @@ create table idxpart (a int, b int, c text) partition by range (a);
 create index idxparti on idxpart (a);
 create index idxparti2 on idxpart (b, c);
 create table idxpart1 (like idxpart);
+-- \d idxpart1
 alter table idxpart attach partition idxpart1 for values from (0) to (10);
+-- \d idxpart1
+-- \d+ idxpart1_a_idx
+-- \d+ idxpart1_b_c_idx
 
 -- Forbid ALTER TABLE when attaching or detaching an index to a partition.
 create index idxpart_c on only idxpart (c);
@@ -76,6 +80,7 @@ create table idxpart (a int, b int) partition by range (a, b);
 create table idxpart1 partition of idxpart for values from (0, 0) to (10, 10);
 create index on idxpart1 (a, b);
 create index on idxpart (a, b);
+-- \d idxpart1
 select relname, relkind, relhassubclass, inhparent::regclass
     from pg_class left join pg_index ix on (indexrelid = oid)
 	left join pg_inherits on (ix.indexrelid = inhrelid)
@@ -146,6 +151,7 @@ create index on idxpart1 ((a + 0));
 create index on idxpart1 (a, a);
 create index on idxpart (a);
 alter table idxpart attach partition idxpart1 for values from (0) to (1000);
+-- \d idxpart1
 drop table idxpart;
 
 -- If CREATE INDEX ONLY, don't create indexes on partitions; and existing
@@ -162,6 +168,9 @@ create index on only idxpart2 (a);
 create index on idxpart (a);
 -- Here we expect that idxpart1 and idxpart2 have a new index, but idxpart21
 -- does not; also, idxpart22 is not attached.
+-- \d idxpart1
+-- \d idxpart2
+-- \d idxpart21
 select indexrelid::regclass, indrelid::regclass, inhparent::regclass
   from pg_index idx left join pg_inherits inh on (idx.indexrelid = inh.inhrelid)
 where indexrelid::regclass::text like 'idxpart%'
@@ -173,9 +182,11 @@ where indexrelid::regclass::text like 'idxpart%'
   order by indexrelid::regclass::text collate "C";
 -- attaching idxpart22 is not enough to set idxpart22_a_idx valid ...
 alter index idxpart2_a_idx attach partition idxpart22_a_idx;
+-- \d idxpart2
 -- ... but this one is.
 create index on idxpart21 (a);
 alter index idxpart2_a_idx attach partition idxpart21_a_idx;
+-- \d idxpart2
 drop table idxpart;
 
 -- When a table is attached a partition and it already has an index, a
@@ -185,22 +196,26 @@ create table idxpart (a int, b int, c text, d bool) partition by range (a);
 create index idxparti on idxpart (a);
 create index idxparti2 on idxpart (b, c);
 create table idxpart1 (like idxpart including indexes);
+-- \d idxpart1
 select relname, relkind, inhparent::regclass
     from pg_class left join pg_index ix on (indexrelid = oid)
 	left join pg_inherits on (ix.indexrelid = inhrelid)
 	where relname like 'idxpart%' order by relname;
 alter table idxpart attach partition idxpart1 for values from (0) to (10);
+-- \d idxpart1
 select relname, relkind, inhparent::regclass
     from pg_class left join pg_index ix on (indexrelid = oid)
 	left join pg_inherits on (ix.indexrelid = inhrelid)
 	where relname like 'idxpart%' order by relname;
 -- While here, also check matching when creating an index after the fact.
 create index on idxpart1 ((a+b)) where d = true;
+-- \d idxpart1
 select relname, relkind, inhparent::regclass
     from pg_class left join pg_index ix on (indexrelid = oid)
 	left join pg_inherits on (ix.indexrelid = inhrelid)
 	where relname like 'idxpart%' order by relname;
 create index idxparti3 on idxpart ((a+b)) where d = true;
+-- \d idxpart1
 select relname, relkind, inhparent::regclass
     from pg_class left join pg_index ix on (indexrelid = oid)
 	left join pg_inherits on (ix.indexrelid = inhrelid)
@@ -275,7 +290,9 @@ create index on idxpart(c);
 create table idxpart1 partition of idxpart for values from (0) to (250);
 create table idxpart2 partition of idxpart for values from (250) to (500);
 alter table idxpart detach partition idxpart2;
+-- \d idxpart2
 alter table idxpart2 drop column c;
+-- \d idxpart2
 drop table idxpart, idxpart2;
 
 -- Verify that expression indexes inherit correctly
@@ -417,6 +434,8 @@ create index on idxpart1 (col_keep);
 create table idxpart (col_keep int) partition by range (col_keep);
 create index on idxpart (col_keep);
 alter table idxpart attach partition idxpart1 for values from (0) to (1000);
+-- \d idxpart
+-- \d idxpart1
 select attrelid::regclass, attname, attnum from pg_attribute
   where attrelid::regclass::text like 'idxpart%' and attnum > 0
   order by attrelid::regclass, attnum;
@@ -431,6 +450,8 @@ create table idxpart1 (col_keep int);
 create index on idxpart1 (col_keep);
 create index on idxpart (col_keep);
 alter table idxpart attach partition idxpart1 for values from (0) to (1000);
+-- \d idxpart
+-- \d idxpart1
 select attrelid::regclass, attname, attnum from pg_attribute
   where attrelid::regclass::text like 'idxpart%' and attnum > 0
   order by attrelid::regclass, attnum;
@@ -442,12 +463,14 @@ drop table idxpart;
 
 -- Verify that it works to add primary key / unique to partitioned tables
 create table idxpart (a int primary key, b int) partition by range (a);
+-- \d idxpart
 -- multiple primary key on child should fail
 create table failpart partition of idxpart (b primary key) for values from (0) to (100);
 drop table idxpart;
 -- primary key on child is okay if there's no PK in the parent, though
 create table idxpart (a int) partition by range (a);
 create table idxpart1pk partition of idxpart (a primary key) for values from (0) to (100);
+-- \d idxpart1pk
 drop table idxpart;
 
 -- Failing to use the full partition key is not allowed
@@ -490,13 +513,16 @@ create table idxpart (a int unique, b int) partition by range ((b + a));
 create table idxpart (a int, b int, c text) partition by range (a, b);
 alter table idxpart add primary key (a);	-- not an incomplete one though
 alter table idxpart add primary key (a, b);	-- this works
+-- \d idxpart
 create table idxpart1 partition of idxpart for values from (0, 0) to (1000, 1000);
+-- \d idxpart1
 drop table idxpart;
 
 -- use ALTER TABLE to add a unique constraint
 create table idxpart (a int, b int) partition by range (a, b);
 alter table idxpart add unique (a);			-- not an incomplete one though
 alter table idxpart add unique (b, a);		-- this works
+-- \d idxpart
 drop table idxpart;
 
 -- Exclusion constraints can be added if partitioning by their equal column
@@ -796,6 +822,10 @@ create index on parted_index_col_drop (b);
 create index on parted_index_col_drop (c);
 create index on parted_index_col_drop (b, c);
 alter table parted_index_col_drop drop column c;
+-- \d parted_index_col_drop
+-- \d parted_index_col_drop1
+-- \d parted_index_col_drop2
+-- \d parted_index_col_drop11
 drop table parted_index_col_drop;
 
 -- Check that invalid indexes are not selected when attaching a partition.
@@ -893,7 +923,7 @@ drop table parted_replica_tab;
 create table test_pg_index_toast_table (a int);
 create or replace function test_pg_index_toast_func (a int, b int[])
   returns bool as $$ select true $$ language sql immutable;
-select array_agg(n) b from generate_series(1, 10000) n ;
+select array_agg(n) b from generate_series(1, 10000) n /* \gset */;
 create index concurrently test_pg_index_toast_index
   on test_pg_index_toast_table (test_pg_index_toast_func(a, 'b'));
 reindex index concurrently test_pg_index_toast_index;

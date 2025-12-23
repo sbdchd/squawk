@@ -391,6 +391,7 @@ WHERE d.classoid IS NULL AND p1.oid <= 9999;
 -- leakproof function is. If unsure, don't mark it as such.
 
 -- temporarily disable fancy output, so catalog changes create less diff noise
+-- \a\t
 
 SELECT p1.oid::regprocedure
 FROM pg_proc p1 JOIN pg_namespace pn
@@ -406,6 +407,7 @@ WHERE nspname = 'pg_catalog' AND proleakproof AND pronargs = 0
 ORDER BY 1;
 
 -- restore normal output mode
+-- \a\t
 
 -- List of functions used by libpq's fe-lobj.c
 --
@@ -845,7 +847,7 @@ WHERE aggfnoid = 0 OR aggtransfn = 0 OR
     (aggkind = 'n' AND aggnumdirectargs > 0) OR
     aggfinalmodify NOT IN ('r', 's', 'w') OR
     aggmfinalmodify NOT IN ('r', 's', 'w') OR
-    aggtranstype = 0 OR aggtransspace < 0 OR aggmtransspace < 0;
+    aggtranstype = 0 OR aggmtransspace < 0;
 
 -- Make sure the matching pg_proc entry is sensible, too.
 
