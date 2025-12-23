@@ -6,7 +6,7 @@ use std::fs::{File, create_dir_all, remove_dir_all};
 use std::io::{BufRead, Write};
 use std::process::Command;
 
-const PROCESSED_OUTPUT_DIR: &str = "crates/squawk_parser/tests/data/regression_suite";
+const PROCESSED_OUTPUT_DIR: &str = "postgres/regression_suite";
 
 const START_END_MARKERS: &[(&str, &str)] = &[
     (
