@@ -8,6 +8,101 @@ use std::process::Command;
 
 const PROCESSED_OUTPUT_DIR: &str = "crates/squawk_parser/tests/data/regression_suite";
 
+const START_END_MARKERS: &[(&str, &str)] = &[
+    (
+        "MERGE INTO target t RANDOMWORD",
+        "\tUPDATE SET balance = 0;",
+    ),
+    (
+        "-- incorrectly specifying INTO target",
+        "\tINSERT INTO target DEFAULT VALUES;",
+    ),
+    ("-- Multiple VALUES clause", "\tINSERT VALUES (1,1), (2,2);"),
+    ("-- SELECT query for INSERT", "\tINSERT SELECT (1, 1);"),
+    ("-- UPDATE tablename", "\tUPDATE target SET balance = 0;"),
+];
+
+const IGNORED_LINES: &[&str] = &[
+    r#"SELECT rank() OVER (PARTITION BY four, ORDER BY ten) FROM tenk1;"#,
+    r#"SELECT q.* FROM (SELECT * FROM test_tablesample) as q TABLESAMPLE BERNOULLI (5);"#,
+    r#"CREATE SEQUENCE tableam_seq_heap2 USING heap2;"#,
+    "CREATE VIEW tableam_view_heap2 USING heap2 AS SELECT * FROM tableam_tbl_heap2;",
+    "SELECT INTO tableam_tblselectinto_heap2 USING heap2 FROM tableam_tbl_heap2;",
+    "INSERT INTO foo DEFAULT VALUES RETURNING WITH (nonsuch AS something) *;",
+    "SELECT 0.0e;",
+    "SELECT 0.0e+a;",
+    "SELECT 0b;",
+    "SELECT 0o;",
+    "SELECT 0x;",
+    "SELECT _1_000.5;",
+    "EXPLAIN (COSTS OFF) :qry;",
+    ":qry;",
+    "create table foo (with baz);",
+    "create table foo (with ordinality);",
+    ":show_data;",
+    "alter trigger a on only grandparent rename to b;	-- ONLY not supported",
+    "CREATE SUBSCRIPTION regress_testsub CONNECTION 'foo';",
+    "CREATE SUBSCRIPTION regress_testsub PUBLICATION foo;",
+    "SELECT U&'wrong: +0061' UESCAPE +;",
+    "CREATE STATISTICS tst;",
+    "CREATE STATISTICS tst ON a, b;",
+    "CREATE STATISTICS tst ON a FROM (VALUES (x)) AS foo;",
+    "CREATE STATISTICS tst ON a FROM foo NATURAL JOIN bar;",
+    "CREATE STATISTICS tst ON a FROM (SELECT * FROM ext_stats_test) AS foo;",
+    "CREATE STATISTICS tst ON a FROM ext_stats_test s TABLESAMPLE system (x);",
+    "CREATE STATISTICS tst ON a FROM XMLTABLE('foo' PASSING 'bar' COLUMNS a text);",
+    "CREATE STATISTICS tst ON a FROM JSON_TABLE(jsonb '123', '$' COLUMNS (item int));",
+    "CREATE STATISTICS alt_stat2 ON a FROM tftest(1);",
+    "ALTER STATISTICS IF EXISTS ab1_a_b_stats SET STATISTICS 0;",
+    "CHECKPOINT (WRONG);",
+    "CHECKPOINT (MODE WRONG);",
+    "CHECKPOINT (MODE FAST, FLUSH_UNLOGGED FALSE);",
+    "CHECKPOINT (FLUSH_UNLOGGED);",
+    "ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo (a, b);",
+    "CREATE SCHEMA IF NOT EXISTS test_ns_schema_renamed -- fail, disallowed",
+    "insert into insertconflicttest values (1) on conflict (key int4_ops (fillfactor=10)) do nothing;",
+    "insert into insertconflicttest values (1) on conflict (key asc) do nothing;",
+    "insert into insertconflicttest values (1) on conflict (key nulls last) do nothing;",
+    "ALTER USER MAPPING FOR user SERVER ss4 OPTIONS (gotcha 'true'); -- ERROR",
+    "ALTER FOREIGN DATA WRAPPER foo;                             -- ERROR",
+    "ALTER SERVER s0;                                            -- ERROR",
+    "ALTER USER MAPPING FOR user SERVER ss4 OPTIONS (gotcha 'true'); -- ERROR",
+    "alter table atacc1 SET WITH OIDS;",
+    "alter table atacc1 drop xmin;",
+    "create view myview as select * from atacc1;",
+    "CREATE INDEX IF NOT EXISTS ON onek USING btree(unique1 int4_ops);",
+    "SELECT 10 !=-;",
+    "CREATE TABLE withoid() WITH OIDS;",
+    "update dposintatable set (f1[2])[1] = array[98];",
+    "CREATE FOREIGN TABLE ft1 ();                                    -- ERROR",
+    r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
+    r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
+    "copy (select * from test1) (t,id) to stdout;",
+];
+
+const VARIABLE_REPLACEMENTS: &[(&str, &str)] = &[
+    (":reltoastname", "reltoastname"),
+    (":temp_schema_name", "temp_schema_name"),
+    (":toastrel", "toastrel"),
+    (":newloid", "10101"),
+    (r#" :""#, r#" ""#),
+];
+
+const GSET_REPLACEMENTS: &[(&str, &str)] = &[
+    (
+        "\\gset my_io_sum_shared_before_",
+        "/* \\gset my_io_sum_shared_before_ */;",
+    ),
+    (
+        "\\gset io_sum_shared_before_",
+        "/* \\gset io_sum_shared_before_ */;",
+    ),
+    (
+        "\\gset io_sum_wal_normal_before_",
+        "/* \\gset io_sum_wal_normal_before_ */;",
+    ),
+];
+
 pub(crate) fn download_regression_tests() -> Result<()> {
     let temp_dir = download_regression_suite()?;
     transform_regression_suite(&temp_dir)?;
@@ -15,8 +110,8 @@ pub(crate) fn download_regression_tests() -> Result<()> {
 }
 
 fn download_regression_suite() -> Result<Utf8PathBuf> {
-    let target_dir = Utf8PathBuf::from_path_buf(std::env::temp_dir())
-        .unwrap()
+    let target_dir = Utf8PathBuf::try_from(std::env::temp_dir())
+        .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
         .join("squawk_raw_regression_suite");
 
     if target_dir.exists() {
@@ -32,7 +127,6 @@ fn download_regression_suite() -> Result<Utf8PathBuf> {
     for (index, url) in urls.iter().enumerate() {
         let filename = url.split('/').next_back().unwrap();
         if filename.contains("psql") {
-            // skipping this for now, we don't support psql
             continue;
         }
         let filepath = target_dir.join(filename);
@@ -50,8 +144,8 @@ fn download_regression_suite() -> Result<Utf8PathBuf> {
             let error_msg = String::from_utf8_lossy(&output.stderr);
             bail!("Failed to download '{}': {}", url, error_msg);
         }
-        let mut dest = File::create(&filepath)?;
-        dest.write_all(&output.stdout)?
+
+        File::create(&filepath)?.write_all(&output.stdout)?;
     }
 
     Ok(target_dir)
@@ -122,14 +216,12 @@ fn fetch_download_urls() -> Result<Vec<String>> {
     let json_str = String::from_utf8(output.stdout)?;
     let files: Vec<serde_json::Value> = serde_json::from_str(&json_str)?;
 
-    // Extract download URLs for SQL files
     let urls: Vec<String> = files
         .into_iter()
         .filter(|file| {
             file["name"]
                 .as_str()
-                .map(|name| name.ends_with(".sql"))
-                .unwrap_or(false)
+                .is_some_and(|name| name.ends_with(".sql"))
         })
         .filter_map(|file| file["download_url"].as_str().map(String::from))
         .collect();
@@ -141,24 +233,19 @@ fn fetch_download_urls() -> Result<Vec<String>> {
     Ok(urls)
 }
 
-fn comment(line: &str) -> String {
-    "-- ".to_owned() + line
-}
-
 // The regression suite from postgres has a mix of valid and invalid sql. We
 // don't have a good way to determine what is what, so we munge the data to
 // comment out any problematic code.
 pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Result<()> {
-    let mut in_cp_stdin = false;
+    let template_vars_regex = Regex::new(r"^:'([^']+)'|^:([a-zA-Z_][a-zA-Z0-9_]*)").unwrap();
+    let mut in_copy_stdin = false;
     let mut in_bogus_cases = false;
-    let mut std_strings_off = false;
     let mut in_copy_select_input = false;
     let mut looking_for_end: Option<&str> = None;
 
-    let template_vars_regex = Regex::new(r"^:'([^']+)'|^:([a-zA-Z_][a-zA-Z0-9_]*)").unwrap();
-
     for line in source.lines() {
         let mut line = line?;
+        let mut should_comment = false;
 
         if line.contains("bogus cases") {
             in_bogus_cases = true;
@@ -172,171 +259,73 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
             in_copy_select_input = false;
         }
 
-        if line.contains("set standard_conforming_strings = off;") {
-            // std_strings_off = true;
-        } else if line.contains("set standard_conforming_strings = on;")
-            || line.contains("reset standard_conforming_strings;")
-        {
-            std_strings_off = false;
-        }
-
-        let start_end = [
-            (
-                "MERGE INTO target t RANDOMWORD",
-                "\tUPDATE SET balance = 0;",
-            ),
-            (
-                "-- incorrectly specifying INTO target",
-                "	INSERT INTO target DEFAULT VALUES;",
-            ),
-            ("-- Multiple VALUES clause", "	INSERT VALUES (1,1), (2,2);"),
-            ("-- SELECT query for INSERT", "	INSERT SELECT (1, 1);"),
-            ("-- UPDATE tablename", "	UPDATE target SET balance = 0;"),
-        ];
-        for (start, end) in start_end {
+        for &(start, end) in START_END_MARKERS {
             if line.contains(start) {
                 looking_for_end = Some(end);
             }
         }
 
         if let Some(end) = looking_for_end {
+            should_comment = true;
             if line.contains(end) {
                 looking_for_end = None;
             }
-            line = comment(&line);
         }
 
-        if (line.to_lowercase().starts_with("copy ") || line.to_lowercase().starts_with("\\copy"))
-            && (line.to_lowercase().contains("from stdin")
-                || line.to_lowercase().contains("from stdout"))
+        let line_lower = line.to_lowercase();
+        if (line_lower.starts_with("copy ") || line_lower.starts_with("\\copy"))
+            && (line_lower.contains("from stdin") || line_lower.contains("from stdout"))
         {
-            in_cp_stdin = true;
+            in_copy_stdin = true;
             if line.starts_with("\\copy") {
-                line = comment(&line);
+                should_comment = true;
             }
-        } else if in_cp_stdin
-            && (line == "\\."
+        } else if in_copy_stdin {
+            if line == "\\."
                 || line.starts_with("--")
                 || ["copy", "begin", "rollback", "select"]
                     .iter()
-                    .any(|prefix| line.to_lowercase().starts_with(prefix)))
+                    .any(|prefix| line_lower.starts_with(prefix))
+            {
+                in_copy_stdin = false;
+            }
+            should_comment = true;
+        } else if (line.trim_start().starts_with('\\') && !line.contains("\\gset"))
+            || line.starts_with("'show_data'")
+            || line.starts_with(':')
         {
-            in_cp_stdin = false;
-            line = comment(&line);
-        } else if in_cp_stdin || (line.trim_start().starts_with("\\") && !line.contains("\\gset")) {
-            line = comment(&line);
-        } else if line.starts_with("'show_data'") || line.starts_with(':') {
-            // we're at one of these commands like:
-            // 'show_data';
-            line = comment(&line);
+            should_comment = true;
         }
 
-        if in_bogus_cases || std_strings_off || in_copy_select_input {
-            line = comment(&line);
+        if in_bogus_cases || in_copy_select_input {
+            should_comment = true;
         }
 
-        // TODO: We should burn these down or figure out a better way to deal with the
-        // intentional syntax errors in the regression suite.
-        // We might be able to parse the .out files that accompany the .sql
-        // files and figure out what are and aren't expected errors.
-        let ignored = [
-            r#"SELECT rank() OVER (PARTITION BY four, ORDER BY ten) FROM tenk1;"#,
-            r#"SELECT q.* FROM (SELECT * FROM test_tablesample) as q TABLESAMPLE BERNOULLI (5);"#,
-            r#"CREATE SEQUENCE tableam_seq_heap2 USING heap2;"#,
-            "CREATE VIEW tableam_view_heap2 USING heap2 AS SELECT * FROM tableam_tbl_heap2;",
-            "SELECT INTO tableam_tblselectinto_heap2 USING heap2 FROM tableam_tbl_heap2;",
-            "INSERT INTO foo DEFAULT VALUES RETURNING WITH (nonsuch AS something) *;",
-            "SELECT 0.0e;",
-            "SELECT 0.0e+a;",
-            "SELECT 0b;",
-            "SELECT 0o;",
-            "SELECT 0x;",
-            "SELECT _1_000.5;",
-            "EXPLAIN (COSTS OFF) :qry;",
-            ":qry;",
-            "create table foo (with baz);",
-            "create table foo (with ordinality);",
-            ":show_data;",
-            "alter trigger a on only grandparent rename to b;	-- ONLY not supported",
-            "CREATE SUBSCRIPTION regress_testsub CONNECTION 'foo';",
-            "CREATE SUBSCRIPTION regress_testsub PUBLICATION foo;",
-            "SELECT U&'wrong: +0061' UESCAPE +;",
-            "CREATE STATISTICS tst;",
-            "CREATE STATISTICS tst ON a, b;",
-            "CREATE STATISTICS tst ON a FROM (VALUES (x)) AS foo;",
-            "CREATE STATISTICS tst ON a FROM foo NATURAL JOIN bar;",
-            "CREATE STATISTICS tst ON a FROM (SELECT * FROM ext_stats_test) AS foo;",
-            "CREATE STATISTICS tst ON a FROM ext_stats_test s TABLESAMPLE system (x);",
-            "CREATE STATISTICS tst ON a FROM XMLTABLE('foo' PASSING 'bar' COLUMNS a text);",
-            "CREATE STATISTICS tst ON a FROM JSON_TABLE(jsonb '123', '$' COLUMNS (item int));",
-            "CREATE STATISTICS alt_stat2 ON a FROM tftest(1);",
-            "ALTER STATISTICS IF EXISTS ab1_a_b_stats SET STATISTICS 0;",
-            "CHECKPOINT (WRONG);",
-            "CHECKPOINT (MODE WRONG);",
-            "CHECKPOINT (MODE FAST, FLUSH_UNLOGGED FALSE);",
-            "CHECKPOINT (FLUSH_UNLOGGED);",
-            "ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo (a, b);",
-            "CREATE SCHEMA IF NOT EXISTS test_ns_schema_renamed -- fail, disallowed",
-            "insert into insertconflicttest values (1) on conflict (key int4_ops (fillfactor=10)) do nothing;",
-            "insert into insertconflicttest values (1) on conflict (key asc) do nothing;",
-            "insert into insertconflicttest values (1) on conflict (key nulls last) do nothing;",
-            "ALTER USER MAPPING FOR user SERVER ss4 OPTIONS (gotcha 'true'); -- ERROR",
-            "ALTER FOREIGN DATA WRAPPER foo;                             -- ERROR",
-            "ALTER SERVER s0;                                            -- ERROR",
-            "ALTER USER MAPPING FOR user SERVER ss4 OPTIONS (gotcha 'true'); -- ERROR",
-            "alter table atacc1 SET WITH OIDS;",
-            "alter table atacc1 drop xmin;",
-            "create view myview as select * from atacc1;",
-            "CREATE INDEX IF NOT EXISTS ON onek USING btree(unique1 int4_ops);",
-            "SELECT 10 !=-;",
-            "CREATE TABLE withoid() WITH OIDS;",
-            "update dposintatable set (f1[2])[1] = array[98];",
-            "CREATE FOREIGN TABLE ft1 ();                                    -- ERROR",
-            r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
-            r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
-            "copy (select * from test1) (t,id) to stdout;",
-        ];
-
-        if ignored.iter().any(|prefix| line.starts_with(prefix)) {
-            line = comment(&line);
+        if IGNORED_LINES.iter().any(|&prefix| line.starts_with(prefix)) {
+            should_comment = true;
         }
 
-        if line.contains("\\;") {
-            line = comment(&line);
+        if line.contains("\\;") || line.starts_with("**") {
+            should_comment = true;
         }
 
-        if line.starts_with("**") {
-            line = comment(&line);
+        if should_comment {
+            line = format!("-- {line}");
         }
 
-        line = line.replace(
-            "\\gset my_io_sum_shared_before_",
-            "/* \\gset my_io_sum_shared_before_ */;",
-        );
-        line = line.replace(
-            "\\gset io_sum_shared_before_",
-            "/* \\gset io_sum_shared_before_ */;",
-        );
-        line = line.replace(
-            "\\gset io_sum_wal_normal_before_",
-            "/* \\gset io_sum_wal_normal_before_ */;",
-        );
+        for &(from, to) in GSET_REPLACEMENTS {
+            line = line.replace(from, to);
+        }
 
         line = line.replace(
             "FROM generate_series(1, 1100) g(i)",
             "FROM generate_series(1, 1100) g(i);",
         );
 
-        for l in ["reltoastname", "temp_schema_name", "toastrel"] {
-            let before = ":".to_owned() + l;
-            line = line.replace(&before, l);
+        for &(from, to) in VARIABLE_REPLACEMENTS {
+            line = line.replace(from, to);
         }
 
-        // replace "\gset" with ";"
-        // for example:
-        // \gset io_sum_vac_strategy_before_
-        // becomes:
-        // /* \gset io_sum_vac_strategy_before_ */
         if line.contains("\\gset") {
             if let Some(start) = line.find("\\gset") {
                 let end = line[start..]
@@ -347,94 +336,86 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
                 line = format!("{}/* {} */;{}", &line[..start], gset_cmd, &line[end..]);
             }
         }
-        line = line.replace(":newloid", "10101");
-        line = line.replace(r#" :""#, r#" ""#);
 
-        // Skip template variable replacement for commented lines
         if line.trim_start().starts_with("--") {
             writeln!(dest, "{line}")?;
             continue;
         }
 
-        // Replace template variables
-        let mut result = String::new();
-        let mut char_indices = line.char_indices().peekable();
-        let mut in_single_quote = false;
-        let mut in_double_quote = false;
-        let mut in_array = false;
-
-        while let Some((byte_pos, c)) = char_indices.next() {
-            // Handle quote state transitions
-            match c {
-                '\'' => {
-                    result.push(c);
-                    in_single_quote = !in_single_quote;
-                    continue;
-                }
-                '"' => {
-                    result.push(c);
-                    in_double_quote = !in_double_quote;
-                    continue;
-                }
-                '[' => {
-                    result.push(c);
-                    in_array = true;
-                    continue;
-                }
-                ']' => {
-                    result.push(c);
-                    in_array = false;
-                    continue;
-                }
-                ':' if !in_single_quote && !in_double_quote && !in_array => {
-                    // Skip type casts (e.g., ::text)
-                    if let Some(&(_, next_c)) = char_indices.peek() {
-                        if next_c == ':' {
-                            result.push_str("::");
-                            char_indices.next();
-                            continue;
-                        }
-                        if next_c == '=' {
-                            result.push_str(":=");
-                            char_indices.next();
-                            continue;
-                        }
-                    }
-
-                    let remaining = &line[byte_pos..];
-                    if let Some(caps) = template_vars_regex.captures(remaining) {
-                        let full = caps.get(0).unwrap();
-                        let m = caps.get(1).or_else(|| caps.get(2)).unwrap();
-                        let matched_var = &remaining[m.start()..m.end()];
-
-                        result.push('\'');
-                        result.push_str(matched_var);
-                        result.push('\'');
-
-                        // Skip the matched characters
-                        let skip_bytes = full.end() - c.len_utf8();
-                        let mut skipped = 0;
-                        while skipped < skip_bytes {
-                            if let Some((_, ch)) = char_indices.next() {
-                                skipped += ch.len_utf8();
-                            } else {
-                                break;
-                            }
-                        }
-                        continue;
-                    }
-                }
-                _ => {}
-            }
-
-            result.push(c);
-        }
-
-        // Write the cleaned line
-        writeln!(dest, "{result}")?;
+        let processed = replace_template_vars(&line, &template_vars_regex)?;
+        writeln!(dest, "{processed}")?;
     }
 
     Ok(())
+}
+
+fn replace_template_vars(line: &str, template_vars_regex: &Regex) -> Result<String> {
+    let mut result = String::new();
+    let mut char_indices = line.char_indices().peekable();
+    let mut in_single_quote = false;
+    let mut in_double_quote = false;
+    let mut in_array = false;
+
+    while let Some((byte_pos, c)) = char_indices.next() {
+        match c {
+            '\'' => {
+                result.push(c);
+                in_single_quote = !in_single_quote;
+            }
+            '"' => {
+                result.push(c);
+                in_double_quote = !in_double_quote;
+            }
+            '[' => {
+                result.push(c);
+                in_array = true;
+            }
+            ']' => {
+                result.push(c);
+                in_array = false;
+            }
+            ':' if !in_single_quote && !in_double_quote && !in_array => {
+                if let Some(&(_, next_c)) = char_indices.peek() {
+                    if next_c == ':' {
+                        result.push_str("::");
+                        char_indices.next();
+                        continue;
+                    }
+                    if next_c == '=' {
+                        result.push_str(":=");
+                        char_indices.next();
+                        continue;
+                    }
+                }
+
+                let remaining = &line[byte_pos..];
+                if let Some(caps) = template_vars_regex.captures(remaining) {
+                    let full = caps.get(0).unwrap();
+                    let m = caps.get(1).or_else(|| caps.get(2)).unwrap();
+                    let matched_var = &remaining[m.start()..m.end()];
+
+                    result.push('\'');
+                    result.push_str(matched_var);
+                    result.push('\'');
+
+                    let skip_bytes = full.end() - c.len_utf8();
+                    let mut skipped = 0;
+                    while skipped < skip_bytes {
+                        if let Some((_, ch)) = char_indices.next() {
+                            skipped += ch.len_utf8();
+                        } else {
+                            break;
+                        }
+                    }
+                    continue;
+                }
+                result.push(c);
+            }
+            _ => result.push(c),
+        }
+    }
+
+    Ok(result)
 }
 
 #[cfg(test)]

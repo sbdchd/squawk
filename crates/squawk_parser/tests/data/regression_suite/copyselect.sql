@@ -87,10 +87,10 @@ drop table test1;
 -- copy (select 1) to stdout\; copy (select 2) to stdout\; select 3\; select 4; -- 1 2 3 4
 
 create table test3 (c int);
--- -- select 0\; copy test3 from stdin\; copy test3 from stdin\; select 1; -- 0 1
+-- select 0\; copy test3 from stdin\; copy test3 from stdin\; select 1; -- 0 1
 -- 1
--- -- \.
+-- \.
 -- 2
--- -- \.
+-- \.
 select * from test3;
 drop table test3;
