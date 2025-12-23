@@ -121,32 +121,62 @@ fn download_regression_suite() -> Result<Utf8PathBuf> {
 
     create_dir_all(&target_dir)?;
 
-    let urls = fetch_download_urls()?;
-    let total_files = urls.len();
+    let clone_dir = Utf8PathBuf::try_from(std::env::temp_dir())
+        .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
+        .join("postgres_sparse_clone");
 
-    for (index, url) in urls.iter().enumerate() {
-        let filename = url.split('/').next_back().unwrap();
-        if filename.contains("psql") {
-            continue;
-        }
-        let filepath = target_dir.join(filename);
-
-        println!(
-            "[{}/{}] Downloading {}... ",
-            index + 1,
-            total_files,
-            filename
-        );
-
-        let output = Command::new("curl").args(["-s", url]).output()?;
-
-        if !output.status.success() {
-            let error_msg = String::from_utf8_lossy(&output.stderr);
-            bail!("Failed to download '{}': {}", url, error_msg);
-        }
-
-        File::create(&filepath)?.write_all(&output.stdout)?;
+    if clone_dir.exists() {
+        remove_dir_all(&clone_dir)?;
     }
+
+    println!("Cloning postgres repository with sparse checkout...");
+
+    let status = Command::new("git")
+        .args([
+            "clone",
+            "--filter=blob:none",
+            "--depth=1",
+            "--sparse",
+            "https://github.com/postgres/postgres.git",
+        ])
+        .arg(clone_dir.as_str())
+        .status()?;
+
+    if !status.success() {
+        bail!("Failed to clone postgres repository");
+    }
+
+    println!("Setting up sparse checkout for src/test/regress/sql...");
+
+    let status = Command::new("git")
+        .args(["sparse-checkout", "set", "src/test/regress/sql"])
+        .current_dir(&clone_dir)
+        .status()?;
+
+    if !status.success() {
+        bail!("Failed to set sparse checkout");
+    }
+
+    println!("Copying SQL files...");
+    let source_dir = clone_dir.join("src/test/regress/sql");
+
+    let mut file_count = 0;
+    for entry in std::fs::read_dir(&source_dir)? {
+        let entry = entry?;
+        let path = Utf8PathBuf::try_from(entry.path())?;
+        if path.extension() == Some("sql") {
+            let filename = path.file_name().unwrap();
+            if !filename.contains("psql") {
+                std::fs::copy(&path, target_dir.join(filename))?;
+                file_count += 1;
+            }
+        }
+    }
+
+    println!("Copied {file_count} SQL files");
+
+    println!("Cleaning up clone directory...");
+    remove_dir_all(&clone_dir)?;
 
     Ok(target_dir)
 }
@@ -193,44 +223,6 @@ fn transform_regression_suite(input_dir: &Utf8PathBuf) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn fetch_download_urls() -> Result<Vec<String>> {
-    println!("Fetching SQL file URLs...");
-    let output = Command::new("gh")
-        .args([
-            "api",
-            "-H",
-            "Accept: application/vnd.github+json",
-            "/repos/postgres/postgres/contents/src/test/regress/sql",
-        ])
-        .output()?;
-
-    if !output.status.success() {
-        bail!(
-            "Failed to fetch SQL files: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
-
-    let json_str = String::from_utf8(output.stdout)?;
-    let files: Vec<serde_json::Value> = serde_json::from_str(&json_str)?;
-
-    let urls: Vec<String> = files
-        .into_iter()
-        .filter(|file| {
-            file["name"]
-                .as_str()
-                .is_some_and(|name| name.ends_with(".sql"))
-        })
-        .filter_map(|file| file["download_url"].as_str().map(String::from))
-        .collect();
-
-    if urls.is_empty() {
-        bail!("No SQL files found");
-    }
-
-    Ok(urls)
 }
 
 // The regression suite from postgres has a mix of valid and invalid sql. We
