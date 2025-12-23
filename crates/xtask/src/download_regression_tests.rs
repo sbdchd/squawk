@@ -132,7 +132,13 @@ fn download_regression_suite() -> Result<Utf8PathBuf> {
     println!("Cloning postgres repository with sparse checkout...");
 
     let status = Command::new("git")
-        .args(["clone", "--filter=blob:none", "--depth=1", "--sparse", "https://github.com/postgres/postgres.git"])
+        .args([
+            "clone",
+            "--filter=blob:none",
+            "--depth=1",
+            "--sparse",
+            "https://github.com/postgres/postgres.git",
+        ])
         .arg(clone_dir.as_str())
         .status()?;
 
@@ -218,7 +224,6 @@ fn transform_regression_suite(input_dir: &Utf8PathBuf) -> Result<()> {
 
     Ok(())
 }
-
 
 // The regression suite from postgres has a mix of valid and invalid sql. We
 // don't have a good way to determine what is what, so we munge the data to
