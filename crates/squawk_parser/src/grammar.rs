@@ -1848,6 +1848,8 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
         return None;
     }
     let m = p.start();
+    // TODO: add to ungram
+    p.eat(SETOF_KW);
     let wrapper_type = match p.current() {
         BIT_KW => {
             p.bump(BIT_KW);
@@ -2162,10 +2164,13 @@ fn opt_filter_clause(p: &mut Parser<'_>) {
 }
 
 fn opt_over_clause(p: &mut Parser<'_>) {
-    if p.at(OVER_KW) {
+    if p.at(OVER_KW) || p.at(RESPECT_KW) || p.at(IGNORE_KW) {
         // OVER window_name
         // OVER ( window_definition )
         let m = p.start();
+        if p.eat(RESPECT_KW) || p.eat(IGNORE_KW) {
+            p.expect(NULLS_KW);
+        }
         p.expect(OVER_KW);
         if p.eat(L_PAREN) {
             window_spec(p);
@@ -7820,7 +7825,11 @@ fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(RENAME_KW) {
         rename_to(p);
     } else {
-        depends_on_extension(p);
+        if p.at(NO_KW) || p.at(DEPENDS_KW) {
+            depends_on_extension(p);
+        } else {
+            p.error(format!("expected NO or DEPENDS, found {:?}", p.current()));
+        }
     }
     m.complete(p, ALTER_TRIGGER)
 }
@@ -9111,8 +9120,11 @@ fn create_publication(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(PUBLICATION_KW);
     name(p);
     if p.eat(FOR_KW) {
-        if p.eat(ALL_KW) {
-            p.expect(TABLES_KW);
+        if p.at(ALL_KW) {
+            publication_all_object(p);
+            while !p.at(EOF) && p.eat(COMMA) {
+                publication_all_object(p);
+            }
         } else {
             publication_object(p);
             while !p.at(EOF) && p.eat(COMMA) {
@@ -9122,6 +9134,16 @@ fn create_publication(p: &mut Parser<'_>) -> CompletedMarker {
     }
     opt_with_params(p);
     m.complete(p, CREATE_PUBLICATION)
+}
+
+fn publication_all_object(p: &mut Parser<'_>) {
+    p.expect(ALL_KW);
+    if !p.eat(TABLES_KW) && !p.eat(SEQUENCES_KW) {
+        p.error(format!(
+            "expected TABLES or SEQUENCES, got {:?}",
+            p.current()
+        ));
+    }
 }
 
 // CREATE ROLE name [ [ WITH ] option [ ... ] ]
@@ -11729,20 +11751,24 @@ fn opt_vacuum_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 //       | '(' copy_generic_opt_arg_list ')'
 //       | /* EMPTY */
 fn opt_copy_option(p: &mut Parser) -> bool {
-    col_label(p);
+    let m = p.start();
+    if !opt_col_label(p) {
+        m.abandon(p);
+        return false;
+    }
     copy_option_arg(p);
+    m.complete(p, COPY_OPTION);
     true
 }
 
 fn copy_option_arg(p: &mut Parser<'_>) {
     match p.current() {
-        STAR | DEFAULT_KW => {
+        STAR | DEFAULT_KW | ON_KW | OFF_KW => {
             p.bump_any();
         }
         L_PAREN => {
             copy_option_list(p);
         }
-        ON_KW => {}
         _ => {
             if p.at_ts(NON_RESERVED_WORD) {
                 p.bump_any();
@@ -11762,6 +11788,7 @@ fn copy_option_arg(p: &mut Parser<'_>) {
 }
 
 fn copy_option_list(p: &mut Parser<'_>) {
+    let m = p.start();
     delimited(
         p,
         L_PAREN,
@@ -11771,6 +11798,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
         COL_LABEL_FIRST,
         opt_copy_option,
     );
+    m.complete(p, COPY_OPTION_LIST);
 }
 
 fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
@@ -11888,7 +11916,7 @@ fn copy(p: &mut Parser<'_>) -> CompletedMarker {
     }
     if p.eat(FROM_KW) {
         // STDIN
-        if p.eat(STDIN_KW) {
+        if p.eat(STDIN_KW) || p.eat(STDOUT_KW) {
             // PROGRAM 'command'
         } else if p.eat(PROGRAM_KW) {
             string_literal(p);
@@ -12435,6 +12463,9 @@ fn set_expr_list_or_paren_select(p: &mut Parser<'_>) {
         } else {
             set_expr_list(p, m);
         }
+    } else {
+        p.error("expected row expression or sub-select");
+        m.abandon(p);
     }
 }
 
@@ -13468,6 +13499,7 @@ fn config_value(p: &mut Parser<'_>) -> bool {
             && opt_numeric_literal(p).is_none()
             && opt_name_ref(p).is_none()
             && !opt_bool_literal(p)
+            && !p.eat(NULL_KW)
         {
             break;
         }
@@ -13600,6 +13632,12 @@ fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 //     ATTACH PARTITION partition_name { FOR VALUES partition_bound_spec | DEFAULT }
 // ALTER TABLE [ IF EXISTS ] name
 //     DETACH PARTITION partition_name [ CONCURRENTLY | FINALIZE ]
+// ALTER TABLE [ IF EXISTS ] name
+//     MERGE PARTITIONS (partition_name1, partition_name2 [, ...]) INTO partition_name
+// ALTER TABLE [ IF EXISTS ] name
+//     SPLIT PARTITION partition_name INTO
+//         (PARTITION partition_name1 { FOR VALUES partition_bound_spec | DEFAULT },
+//          PARTITION partition_name2 { FOR VALUES partition_bound_spec | DEFAULT } [, ...])
 //
 // ALTER TABLE [ IF EXISTS ] [ ONLY ] name [ * ]
 //     action [, ... ]
@@ -13692,6 +13730,8 @@ const ALTER_TABLE_ACTION_FIRST: TokenSet = TokenSet::new(&[
     CLUSTER_KW,
     OWNER_KW,
     DETACH_KW,
+    MERGE_KW,
+    SPLIT_KW,
     DROP_KW,
     ADD_KW,
     ATTACH_KW,
@@ -13889,6 +13929,26 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             }
             m.complete(p, DETACH_PARTITION)
         }
+        MERGE_KW => {
+            let m = p.start();
+            p.bump(MERGE_KW);
+            p.expect(PARTITIONS_KW);
+            p.expect(L_PAREN);
+            path_name_ref_list(p);
+            p.expect(R_PAREN);
+            p.eat(INTO_KW);
+            path_name(p);
+            m.complete(p, MERGE_PARTITIONS)
+        }
+        SPLIT_KW => {
+            let m = p.start();
+            p.bump(SPLIT_KW);
+            p.expect(PARTITION_KW);
+            path_name_ref(p);
+            p.expect(INTO_KW);
+            partition_list(p);
+            m.complete(p, SPLIT_PARTITION)
+        }
         // DROP [ COLUMN ] [ IF EXISTS ] column_name [ RESTRICT | CASCADE ]
         // DROP CONSTRAINT [ IF EXISTS ] constraint_name [ RESTRICT | CASCADE ]
         DROP_KW => {
@@ -14077,6 +14137,31 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         _ => return None,
     };
     Some(cm)
+}
+
+fn partition_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    fn opt_partition(p: &mut Parser<'_>) -> bool {
+        let m = p.start();
+        if !p.eat(PARTITION_KW) {
+            m.abandon(p);
+            return false;
+        }
+        path_name_ref(p);
+        partition_option(p);
+        m.complete(p, PARTITION);
+        true
+    }
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        TokenSet::new(&[PARTITION_KW]),
+        opt_partition,
+    );
+    m.complete(p, PARTITION_LIST);
 }
 
 // /* Column label --- allowed labels in "AS" clauses.

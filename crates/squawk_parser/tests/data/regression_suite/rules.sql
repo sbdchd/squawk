@@ -185,6 +185,8 @@ select * from rtest_v1;
 -- ** Remember the delete rule on rtest_v1: It says
 -- ** DO INSTEAD DELETE FROM rtest_t1 WHERE a = old.a
 -- ** So this time both rows with a = 2 must get deleted
+-- \p
+-- \r
 delete from rtest_v1 where b = 12;
 select * from rtest_v1;
 delete from rtest_v1;
@@ -771,6 +773,7 @@ drop table cchild;
 --
 
 -- temporarily disable fancy output, so view changes create less diff noise
+-- \a\t
 
 SELECT viewname, definition FROM pg_views
 WHERE schemaname = 'pg_catalog'
@@ -781,6 +784,7 @@ WHERE schemaname = 'pg_catalog'
 ORDER BY tablename, rulename;
 
 -- restore normal output mode
+-- \a\t
 
 --
 -- CREATE OR REPLACE RULE
@@ -1029,6 +1033,7 @@ create rule r7 as on delete to rules_src do instead
   returning trgt.f1, trgt.f2;
 
 -- check display of all rules added above
+-- \d+ rules_src
 
 --
 -- Also check multiassignment deparsing.
@@ -1038,6 +1043,7 @@ create table rule_dest(f1 int, f2 int[], tag text);
 create rule rr as on update to rule_t1 do instead UPDATE rule_dest trgt
   SET (f2[1], f1, tag) = (SELECT new.f2, new.f1, 'updated'::varchar)
   WHERE trgt.f1 = new.f1 RETURNING new.*;
+-- \d+ rule_t1
 drop table rule_t1, rule_dest;
 
 --
@@ -1073,6 +1079,7 @@ ALTER RULE InsertRule ON rule_v1 RENAME to NewInsertRule;
 INSERT INTO rule_v1 VALUES(1);
 SELECT * FROM rule_v1;
 
+-- \d+ rule_v1
 
 --
 -- error conditions for alter rename rule
@@ -1088,13 +1095,18 @@ DROP TABLE rule_t1;
 -- check display of VALUES in view definitions
 --
 create view rule_v1 as values(1,2);
+-- \d+ rule_v1
 alter table rule_v1 rename column column2 to q2;
+-- \d+ rule_v1
 drop view rule_v1;
 create view rule_v1(x) as values(1,2);
+-- \d+ rule_v1
 drop view rule_v1;
 create view rule_v1(x) as select * from (values(1,2)) v;
+-- \d+ rule_v1
 drop view rule_v1;
 create view rule_v1(x) as select * from (values(1,2)) v(q,w);
+-- \d+ rule_v1
 drop view rule_v1;
 
 --
@@ -1205,6 +1217,7 @@ CREATE FUNCTION func_with_set_params() RETURNS integer
     SET extra_float_digits TO 2
     SET work_mem TO '4MB'
     SET datestyle to iso, mdy
+    SET temp_tablespaces to NULL
     SET local_preload_libraries TO "Mixed/Case", 'c:/''a"/path', '', '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
     IMMUTABLE STRICT;
 SELECT pg_get_functiondef('func_with_set_params()'::regprocedure);
@@ -1328,6 +1341,7 @@ RETURNING
    merge_action() AS action, *, o.*, n.*;
 END;
 
+-- \sf merge_sf_test
 
 CREATE FUNCTION merge_sf_test2()
  RETURNS void
@@ -1345,6 +1359,7 @@ WHEN NOT MATCHED BY SOURCE
    THEN DELETE;
 END;
 
+-- \sf merge_sf_test2
 
 DROP FUNCTION merge_sf_test;
 DROP FUNCTION merge_sf_test2;

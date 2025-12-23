@@ -56,10 +56,10 @@ SELECT COUNT(*) FROM pg_class WHERE relnamespace =
 CREATE SCHEMA test_ns_schema_renamed; -- fail, already exists
 CREATE SCHEMA IF NOT EXISTS test_ns_schema_renamed; -- ok with notice
 -- CREATE SCHEMA IF NOT EXISTS test_ns_schema_renamed -- fail, disallowed
---        CREATE TABLE abc (
---               a serial,
---               b int UNIQUE
---        );
+       CREATE TABLE abc (
+              a serial,
+              b int UNIQUE
+       );
 
 DROP SCHEMA test_ns_schema_renamed CASCADE;
 

@@ -340,6 +340,55 @@ SOURCE_FILE
                 R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- setof"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_KW "cast"
+            L_PAREN "("
+            LITERAL
+              STRING "'1'"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            PATH_TYPE
+              SETOF_KW "setof"
+              WHITESPACE " "
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    SETOF_KW "setof"
+          WHITESPACE " "
+          AS_NAME
+            NAME
+              INT_KW "int"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- based on postgres' gram.y"
   WHITESPACE "\n\n"
   COMMENT "-- Bit"

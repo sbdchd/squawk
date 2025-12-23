@@ -1287,6 +1287,7 @@ create table hp_prefix_test (a int, b int, c int, d int)
 -- create 8 partitions
 select 'create table hp_prefix_test_p' || x::text || ' partition of hp_prefix_test for values with (modulus 8, remainder ' || x::text || ');'
 from generate_Series(0,7) x;
+-- \gexec
 
 -- insert 16 rows, one row for each test to perform.
 insert into hp_prefix_test
@@ -1305,12 +1306,14 @@ from
 -- and equality quals.  This may seem a little excessive, but there have been
 -- a number of bugs in this area over the years.  We make use of row only
 -- output to reduce the size of the expected results.
+-- \t on
 select
   'explain (costs off) select tableoid::regclass,* from hp_prefix_test where ' ||
   string_agg(c.colname || case when g.s & (1 << c.colpos) = 0 then ' is null' else ' = ' || (colpos+1)::text end, ' and ' order by c.colpos)
 from (values('a',0),('b',1),('c',2),('d',3)) c(colname, colpos), generate_Series(0,15) g(s)
 group by g.s
 order by g.s;
+-- \gexec
 
 -- And ensure we get exactly 1 row from each. Again, all 16 possible combinations.
 select
@@ -1319,6 +1322,8 @@ select
 from (values('a',0),('b',1),('c',2),('d',3)) c(colname, colpos), generate_Series(0,15) g(s)
 group by g.s
 order by g.s;
+-- \gexec
+-- \t off
 
 drop table hp_prefix_test;
 
@@ -1366,12 +1371,12 @@ create view part_abc_view as select * from part_abc where b <> 'a' with check op
 prepare update_part_abc_view as update part_abc_view set b = $2 where a = $1 returning *;
 -- Only the unpruned partition should be shown in the list of relations to be
 -- updated
-explain (costs off) execute update_part_abc_view (1, 'd');
+explain (verbose, costs off) execute update_part_abc_view (1, 'd');
 execute update_part_abc_view (1, 'd');
-explain (costs off) execute update_part_abc_view (2, 'a');
+explain (verbose, costs off) execute update_part_abc_view (2, 'a');
 execute update_part_abc_view (2, 'a');
 -- All pruned.
-explain (costs off) execute update_part_abc_view (3, 'a');
+explain (verbose, costs off) execute update_part_abc_view (3, 'a');
 execute update_part_abc_view (3, 'a');
 deallocate update_part_abc_view;
 

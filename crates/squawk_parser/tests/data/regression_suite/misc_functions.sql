@@ -1,5 +1,8 @@
 -- directory paths and dlsuffix are passed to us in environment variables
+-- \getenv libdir PG_LIBDIR
+-- \getenv dlsuffix PG_DLSUFFIX
 
+-- \set regresslib :libdir '/regress' :dlsuffix
 
 -- Function to assist with verifying EXPLAIN which includes costs.  A series
 -- of bool flags allows control over which portions are masked out
@@ -75,6 +78,17 @@ SELECT num_nonnulls();
 SELECT num_nulls();
 
 --
+-- error_on_null()
+--
+
+SELECT error_on_null(1);
+SELECT error_on_null(NULL::int);
+SELECT error_on_null(NULL::int[]);
+SELECT error_on_null('{1,2,NULL,3}'::int[]);
+SELECT error_on_null(ROW(1,NULL::int));
+SELECT error_on_null(ROW(NULL,NULL));
+
+--
 -- canonicalize_path()
 --
 
@@ -147,7 +161,8 @@ DROP ROLE regress_log_memory;
 -- directly, but we can at least verify that the code doesn't fail.
 --
 select setting as segsize
-from pg_settings where name = 'wal_segment_size';
+from pg_settings where name = 'wal_segment_size'
+/* \gset */;
 
 select count(*) > 0 as ok from pg_ls_waldir();
 -- Test ProjectSet as well as FunctionScan
@@ -345,6 +360,40 @@ SELECT explain_mask_costs($$
 SELECT * FROM generate_series(25.0, 2.0, 0.0) g(s);$$,
 false, true, false, true);
 
+--
+-- Test SupportRequestInlineInFrom request
+--
+
+CREATE FUNCTION test_inline_in_from_support_func(internal)
+    RETURNS internal
+    AS 'regresslib', 'test_inline_in_from_support_func'
+    LANGUAGE C STRICT;
+
+CREATE FUNCTION foo_from_bar(colname TEXT, tablename TEXT, filter TEXT)
+RETURNS SETOF TEXT
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+  sql TEXT;
+BEGIN
+  sql := format('SELECT %I::text FROM %I', colname, tablename);
+  IF filter IS NOT NULL THEN
+    sql := CONCAT(sql, format(' WHERE %I::text = $1', colname));
+  END IF;
+  RETURN QUERY EXECUTE sql USING filter;
+END;
+$function$ STABLE;
+
+ALTER FUNCTION foo_from_bar(TEXT, TEXT, TEXT)
+  SUPPORT test_inline_in_from_support_func;
+
+SELECT * FROM foo_from_bar('f1', 'text_tbl', NULL);
+SELECT * FROM foo_from_bar('f1', 'text_tbl', 'doh!');
+EXPLAIN (COSTS OFF) SELECT * FROM foo_from_bar('f1', 'text_tbl', NULL);
+EXPLAIN (COSTS OFF) SELECT * FROM foo_from_bar('f1', 'text_tbl', 'doh!');
+
+DROP FUNCTION foo_from_bar;
+
 -- Test functions for control data
 SELECT count(*) > 0 AS ok FROM pg_control_checkpoint();
 SELECT count(*) > 0 AS ok FROM pg_control_init();
@@ -360,7 +409,8 @@ SELECT segment_number > 0 AS ok_segment_number, timeline_id
   FROM pg_split_walfile_name('ffffffFF00000001000000af');
 SELECT setting::int8 AS segment_size
 FROM pg_settings
-WHERE name = 'wal_segment_size';
+WHERE name = 'wal_segment_size'
+/* \gset */;
 SELECT segment_number, file_offset
 FROM pg_walfile_name_offset('0/0'::pg_lsn + 'segment_size'),
      pg_split_walfile_name(file_name);
@@ -387,16 +437,17 @@ CREATE TABLE test_chunk_id (a TEXT, b TEXT STORAGE EXTERNAL);
 INSERT INTO test_chunk_id VALUES ('x', repeat('x', 8192));
 SELECT t.relname AS toastrel FROM pg_class c
   LEFT JOIN pg_class t ON c.reltoastrelid = t.oid
-  WHERE c.relname = 'test_chunk_id';
+  WHERE c.relname = 'test_chunk_id'
+/* \gset */;
 SELECT pg_column_toast_chunk_id(a) IS NULL,
-  pg_column_toast_chunk_id(b) IN (SELECT chunk_id FROM pg_toast."toastrel")
+  pg_column_toast_chunk_id(b) IN (SELECT chunk_id FROM pg_toast.toastrel)
   FROM test_chunk_id;
 DROP TABLE test_chunk_id;
 DROP FUNCTION explain_mask_costs(text, bool, bool, bool, bool);
 
--- test stratnum support functions
-SELECT gist_stratnum_common(7);
-SELECT gist_stratnum_common(3);
+-- test stratnum translation support functions
+SELECT gist_translate_cmptype_common(7);
+SELECT gist_translate_cmptype_common(3);
 
 
 -- relpath tests

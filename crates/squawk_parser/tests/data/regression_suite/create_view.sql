@@ -5,7 +5,11 @@
 --
 
 -- directory paths and dlsuffix are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
+-- \getenv libdir PG_LIBDIR
+-- \getenv dlsuffix PG_DLSUFFIX
 
+-- \set regresslib :libdir '/regress' :dlsuffix
 
 CREATE FUNCTION interpt_pp(path, path)
     RETURNS point
@@ -18,6 +22,7 @@ CREATE TABLE real_city (
 	outline 	path
 );
 
+-- \set filename :abs_srcdir '/data/real_city.data'
 COPY real_city FROM 'filename';
 ANALYZE real_city;
 
@@ -64,6 +69,12 @@ CREATE VIEW key_dependent_view_no_cols AS
 
 CREATE TABLE viewtest_tbl (a int, b int, c numeric(10,1), d text COLLATE "C");
 
+COPY viewtest_tbl FROM stdin;
+-- 5	10	1.1	xy
+-- 10	15	2.2	xyz
+-- 15	20	3.3	xyzz
+-- 20	25	4.4	xyzzy
+-- \.
 
 CREATE OR REPLACE VIEW viewtest AS
 	SELECT * FROM viewtest_tbl;
@@ -168,8 +179,8 @@ CREATE VIEW v12_temp AS SELECT true FROM v11_temp;
 -- a view should also be temporary if it references a temporary sequence
 CREATE SEQUENCE seq1;
 CREATE TEMPORARY SEQUENCE seq1_temp;
-CREATE VIEW v9 AS SELECT seq1.is_called FROM seq1;
-CREATE VIEW v13_temp AS SELECT seq1_temp.is_called FROM seq1_temp;
+CREATE VIEW v9 AS SELECT nextval('seq1');
+CREATE VIEW v13_temp AS SELECT nextval('seq1_temp');
 
 SELECT relname FROM pg_class
     WHERE relname LIKE 'v_'
@@ -284,6 +295,7 @@ SELECT relname, relkind, reloptions FROM pg_class
 
 CREATE VIEW unspecified_types AS
   SELECT 42 as i, 42.5 as num, 'foo' as u, 'foo'::unknown as u2, null as n;
+-- \d+ unspecified_types
 SELECT * FROM unspecified_types;
 
 -- This test checks that proper typmods are assigned in a multi-row VALUES
@@ -294,6 +306,7 @@ CREATE VIEW tt1 AS
        ('abc'::varchar(3), '0123456789', 42, 'abcd'::varchar(4)),
        ('0123456789', 'abc'::varchar(3), 42.12, 'abc'::varchar(4))
   ) vv(a,b,c,d);
+-- \d+ tt1
 SELECT * FROM tt1;
 SELECT a::varchar(3) FROM tt1;
 DROP VIEW tt1;
@@ -317,24 +330,48 @@ CREATE VIEW aliased_view_4 AS
   select * from temp_view_test.tt1
     where exists (select 1 from tt1 where temp_view_test.tt1.y1 = tt1.f1);
 
+-- \d+ aliased_view_1
+-- \d+ aliased_view_2
+-- \d+ aliased_view_3
+-- \d+ aliased_view_4
 
 ALTER TABLE tx1 RENAME TO a1;
 
+-- \d+ aliased_view_1
+-- \d+ aliased_view_2
+-- \d+ aliased_view_3
+-- \d+ aliased_view_4
 
 ALTER TABLE tt1 RENAME TO a2;
 
+-- \d+ aliased_view_1
+-- \d+ aliased_view_2
+-- \d+ aliased_view_3
+-- \d+ aliased_view_4
 
 ALTER TABLE a1 RENAME TO tt1;
 
+-- \d+ aliased_view_1
+-- \d+ aliased_view_2
+-- \d+ aliased_view_3
+-- \d+ aliased_view_4
 
 ALTER TABLE a2 RENAME TO tx1;
 ALTER TABLE tx1 SET SCHEMA temp_view_test;
 
+-- \d+ aliased_view_1
+-- \d+ aliased_view_2
+-- \d+ aliased_view_3
+-- \d+ aliased_view_4
 
 ALTER TABLE temp_view_test.tt1 RENAME TO tmp1;
 ALTER TABLE temp_view_test.tmp1 SET SCHEMA testviewschm2;
 ALTER TABLE tmp1 RENAME TO tx1;
 
+-- \d+ aliased_view_1
+-- \d+ aliased_view_2
+-- \d+ aliased_view_3
+-- \d+ aliased_view_4
 
 -- Test correct deparsing of ORDER BY when there is an output name conflict
 
@@ -342,12 +379,15 @@ create view aliased_order_by as
 select x1 as x2, x2 as x1, x3 from tt1
   order by x2;  -- this is interpreted per SQL92, so really ordering by x1
 
+-- \d+ aliased_order_by
 
 alter view aliased_order_by rename column x1 to x0;
 
+-- \d+ aliased_order_by
 
 alter view aliased_order_by rename column x3 to x1;
 
+-- \d+ aliased_order_by
 
 -- Test aliasing of joins
 
@@ -356,6 +396,7 @@ select * from
   (select * from (tbl1 cross join tbl2) same) ss,
   (tbl3 cross join tbl4) same;
 
+-- \d+ view_of_joins
 
 create table tbl1a (a int, c int);
 create view view_of_joins_2a as select * from tbl1 join tbl1a using (a);
@@ -640,6 +681,7 @@ select * from int8_tbl i where i.* in (values(i.*::int8_tbl));
 create table tt15v_log(o tt15v, n tt15v, incr bool);
 create rule updlog as on update to tt15v do also
   insert into tt15v_log values(old, new, row(old,old) < row(new,new));
+-- \d+ tt15v
 
 -- check unique-ification of overlength names
 

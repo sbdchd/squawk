@@ -248,6 +248,8 @@ select pc.relname, pgc.conname, pgc.contype, pgc.conislocal, pgc.coninhcount, pg
 
 -- Test that child does not inherit NO INHERIT constraints
 create table c1 () inherits (p1);
+-- \d p1
+-- \d c1
 
 -- Test that child does not override inheritable constraints of the parent
 create table c2 (constraint p2chk check (ff1 > 10) no inherit) inherits (p1);	--fails
@@ -344,15 +346,20 @@ insert into c1 values(1,1,2);
 alter table p2 add check (f2>0);
 insert into c1 values(1,-1,2);  -- fail
 create table c2(f3 int) inherits(p1,p2);
+-- \d c2
 create table c3 (f4 int) inherits(c1,c2);
+-- \d c3
 drop table p1 cascade;
 drop table p2 cascade;
 
 create table pp1 (f1 int);
 create table cc1 (f2 text, f3 int) inherits (pp1);
 alter table pp1 add column a1 int check (a1 > 0);
+-- \d cc1
 create table cc2(f4 float) inherits(pp1,cc1);
+-- \d cc2
 alter table pp1 add column a2 int check (a2 > 0);
+-- \d cc2
 drop table pp1 cascade;
 
 -- Test for renaming in simple multiple inheritance
@@ -364,6 +371,7 @@ ALTER TABLE inht1 RENAME a TO aa;
 ALTER TABLE inht1 RENAME b TO bb;                -- to be failed
 ALTER TABLE inhts RENAME aa TO aaa;      -- to be failed
 ALTER TABLE inhts RENAME d TO dd;
+-- \d+ inhts
 
 DROP TABLE inhts;
 
@@ -373,6 +381,8 @@ CREATE TABLE inhtb () INHERITS (inhta);
 CREATE TABLE inhtc () INHERITS (inhtb);
 CREATE TABLE inhtd () INHERITS (inhta, inhtb, inhtc);
 ALTER TABLE inhta ADD COLUMN i int, ADD COLUMN j bigint DEFAULT 1;
+-- \d+ inhta
+-- \d+ inhtd
 DROP TABLE inhta, inhtb, inhtc, inhtd;
 
 -- Test for renaming in diamond inheritance
@@ -381,10 +391,12 @@ CREATE TABLE inht3 (y int) INHERITS (inht1);
 CREATE TABLE inht4 (z int) INHERITS (inht2, inht3);
 
 ALTER TABLE inht1 RENAME aa TO aaa;
+-- \d+ inht4
 
 CREATE TABLE inhts (d int) INHERITS (inht2, inhs1);
 ALTER TABLE inht1 RENAME aaa TO aaaa;
 ALTER TABLE inht1 RENAME b TO bb;                -- to be failed
+-- \d+ inhts
 
 WITH RECURSIVE r AS (
   SELECT 'inht1'::regclass AS inhrelid
@@ -403,7 +415,10 @@ DROP TABLE inht1, inhs1 CASCADE;
 -- Test non-inheritable indices [UNIQUE, EXCLUDE] constraints
 CREATE TABLE test_constraints (id int, val1 varchar, val2 int, UNIQUE(val1, val2));
 CREATE TABLE test_constraints_inh () INHERITS (test_constraints);
+-- \d+ test_constraints
 ALTER TABLE ONLY test_constraints DROP CONSTRAINT test_constraints_val1_val2_key;
+-- \d+ test_constraints
+-- \d+ test_constraints_inh
 DROP TABLE test_constraints_inh;
 DROP TABLE test_constraints;
 
@@ -412,7 +427,10 @@ CREATE TABLE test_ex_constraints (
     EXCLUDE USING gist (c WITH &&)
 );
 CREATE TABLE test_ex_constraints_inh () INHERITS (test_ex_constraints);
+-- \d+ test_ex_constraints
 ALTER TABLE test_ex_constraints DROP CONSTRAINT test_ex_constraints_c_excl;
+-- \d+ test_ex_constraints
+-- \d+ test_ex_constraints_inh
 DROP TABLE test_ex_constraints_inh;
 DROP TABLE test_ex_constraints;
 
@@ -420,7 +438,11 @@ DROP TABLE test_ex_constraints;
 CREATE TABLE test_primary_constraints(id int PRIMARY KEY);
 CREATE TABLE test_foreign_constraints(id1 int REFERENCES test_primary_constraints(id));
 CREATE TABLE test_foreign_constraints_inh () INHERITS (test_foreign_constraints);
+-- \d+ test_primary_constraints
+-- \d+ test_foreign_constraints
 ALTER TABLE test_foreign_constraints DROP CONSTRAINT test_foreign_constraints_id1_fkey;
+-- \d+ test_foreign_constraints
+-- \d+ test_foreign_constraints_inh
 DROP TABLE test_foreign_constraints_inh;
 DROP TABLE test_foreign_constraints;
 DROP TABLE test_primary_constraints;
@@ -512,6 +534,7 @@ create table p1(f1 int constraint f1_pos CHECK (f1 > 0));
 create table p1_c1 (f1 int constraint f1_pos CHECK (f1 > 0)) inherits (p1);
 alter table p1_c1 drop constraint f1_pos;
 alter table p1 drop constraint f1_pos;
+-- \d p1_c1
 drop table p1 cascade;
 
 create table p1(f1 int constraint f1_pos CHECK (f1 > 0));
@@ -520,13 +543,16 @@ create table p1p2_c1 (f1 int) inherits (p1, p2);
 create table p1p2_c2 (f1 int constraint f1_pos CHECK (f1 > 0)) inherits (p1, p2);
 alter table p2 drop constraint f1_pos;
 alter table p1 drop constraint f1_pos;
+-- \d p1p2_c*
 drop table p1, p2 cascade;
 
 create table p1(f1 int constraint f1_pos CHECK (f1 > 0));
 create table p1_c1() inherits (p1);
 create table p1_c2() inherits (p1);
 create table p1_c1c2() inherits (p1_c1, p1_c2);
+-- \d p1_c1c2
 alter table p1 drop constraint f1_pos;
+-- \d p1_c1c2
 drop table p1 cascade;
 
 create table p1(f1 int constraint f1_pos CHECK (f1 > 0));
@@ -537,6 +563,7 @@ alter table p1_c2 drop constraint f1_pos;
 alter table p1 drop constraint f1_pos;
 alter table p1_c1c2 drop constraint f1_pos;
 alter table p1_c2 drop constraint f1_pos;
+-- \d p1_c1c2
 drop table p1 cascade;
 
 -- Test that a valid child can have not-valid parent, but not vice versa
@@ -804,14 +831,21 @@ create table cc1 (f2 text, f3 int) inherits (pp1);
 create table cc2 (f4 float) inherits (pp1,cc1);
 create table cc3 () inherits (pp1,cc1,cc2);
 alter table pp1 alter f1 set not null;
+-- \d+ cc3
 alter table cc3 no inherit pp1;
 alter table cc3 no inherit cc1;
 alter table cc3 no inherit cc2;
+-- \d+ cc3
 drop table cc3;
 
 -- named NOT NULL constraint
 alter table cc1 add column a2 int constraint nn not null;
+-- \d+ cc1
+-- \d+ cc2
 alter table pp1 alter column f1 set not null;
+-- \d+ pp1
+-- \d+ cc1
+-- \d+ cc2
 
 -- cannot create table with inconsistent NO INHERIT constraint
 create table cc3 (a2 int not null no inherit) inherits (cc1);
@@ -824,15 +858,18 @@ alter table cc2 alter column a2 drop not null;
 
 -- remove constraint from cc1, should succeed
 alter table cc1 alter column a2 drop not null;
+-- \d+ cc1
 
 -- same for cc2
 alter table cc2 alter column f1 drop not null;
+-- \d+ cc2
 
 -- remove from cc1, should fail again
 alter table cc1 alter column f1 drop not null;
 
 -- remove from pp1, should succeed
 alter table pp1 alter column f1 drop not null;
+-- \d+ pp1
 
 alter table pp1 add primary key (f1);
 -- Leave these tables around, for pg_upgrade testing
@@ -842,6 +879,7 @@ create table inh_parent (f1 int not null no inherit, f2 int not null no inherit)
 create table inh_child (f1 int not null no inherit, f2 int);
 alter table inh_child inherit inh_parent;
 alter table inh_child no inherit inh_parent;
+-- \d+ inh_child
 drop table inh_parent, inh_child;
 
 -- test that inhcount is updated correctly through multiple inheritance
@@ -851,12 +889,14 @@ create table inh_cc2(f4 float) inherits(inh_pp1,inh_cc1);
 alter table inh_pp1 alter column f1 set not null;
 alter table inh_cc2 no inherit inh_pp1;
 alter table inh_cc2 no inherit inh_cc1;
+-- \d+ inh_cc2
 drop table inh_pp1, inh_cc1, inh_cc2;
 
 create table inh_pp1 (f1 int not null);
 create table inh_cc1 (f2 text, f3 int) inherits (inh_pp1);
 create table inh_cc2(f4 float) inherits(inh_pp1,inh_cc1);
 alter table inh_pp1 alter column f1 drop not null;
+-- \d+ inh_cc2
 drop table inh_pp1, inh_cc1, inh_cc2;
 
 
@@ -871,9 +911,11 @@ drop table inh_parent, inh_child, inh_grandchild;
 create table inh_parent1(a int constraint nn not null);
 create table inh_parent2(b int constraint nn not null);
 create table inh_child1 () inherits (inh_parent1, inh_parent2);
+-- \d+ inh_child1
 
 create table inh_child2 (constraint foo not null a) inherits (inh_parent1, inh_parent2);
 alter table inh_child2 no inherit inh_parent2;
+-- \d+ inh_child2
 
 drop table inh_parent1, inh_parent2, inh_child1, inh_child2;
 
@@ -886,6 +928,7 @@ select conrelid::regclass, conname, contype, conkey,
  from pg_constraint where contype in ('n','p') and
  conrelid::regclass::text in ('inh_child', 'inh_parent1', 'inh_parent2')
  order by 1, 2;
+-- \d+ inh_child
 drop table inh_parent1, inh_parent2, inh_child;
 
 -- NOT NULL NO INHERIT
@@ -899,6 +942,7 @@ select conrelid::regclass, conname, contype, conkey,
  from pg_constraint where contype = 'n' and
  conrelid::regclass::text like 'inh\_nn\_%'
  order by 2, 1;
+-- \d+ inh_nn*
 drop table inh_nn_parent, inh_nn_child, inh_nn_child2;
 
 CREATE TABLE inh_nn_parent (a int, NOT NULL a NO INHERIT);
@@ -942,6 +986,9 @@ alter table inh_child2 inherit inh_child1;
 -- add NOT NULL constraint recursively
 alter table inh_parent alter column f1 set not null;
 
+-- \d+ inh_parent
+-- \d+ inh_child1
+-- \d+ inh_child2
 
 select conrelid::regclass, conname, contype, coninhcount, conislocal
  from pg_constraint where contype = 'n' and
@@ -955,6 +1002,9 @@ select conrelid::regclass, conname, contype, coninhcount, conislocal
 -- deinherit inh_child1
 create table inh_child3 () inherits (inh_child1);
 alter table inh_child1 no inherit inh_parent;
+-- \d+ inh_parent
+-- \d+ inh_child1
+-- \d+ inh_child2
 select conrelid::regclass, conname, contype, coninhcount, conislocal
  from pg_constraint where contype = 'n' and
  conrelid::regclass::text in ('inh_parent', 'inh_child1', 'inh_child2', 'inh_child3')

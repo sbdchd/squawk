@@ -1,9 +1,11 @@
 -- directory paths are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
 
 CREATE TABLE testjsonb (
        j jsonb
 );
 
+-- \set filename :abs_srcdir '/data/jsonb.data'
 COPY testjsonb FROM 'filename';
 
 -- Strings.
@@ -399,6 +401,12 @@ SELECT jsonb_build_object('{1,2,3}'::int[], 3);
 -- handling of NULL values
 SELECT jsonb_object_agg(1, NULL::jsonb);
 SELECT jsonb_object_agg(NULL, '{"a":1}');
+
+SELECT jsonb_object_agg_unique(i, null) OVER (ORDER BY i)
+  FROM generate_series(1, 10) g(i);
+
+SELECT jsonb_object_agg_unique_strict(i, null) OVER (ORDER BY i)
+  FROM generate_series(1, 10) g(i);
 
 CREATE TEMP TABLE foo (serial_num int, name text, type text);
 INSERT INTO foo VALUES (847001,'t15','GE1043');
@@ -1252,6 +1260,7 @@ select jsonb_set('{"a": {"b": [1, 2, 3]}}', '{a, b, NULL}', '"new_value"');
 
 -- jsonb_set_lax
 
+-- \pset null NULL
 
 -- pass though non nulls to jsonb_set
 select jsonb_set_lax('{"a":1,"b":2}','{b}','5') ;
@@ -1268,6 +1277,7 @@ select jsonb_set_lax('{"a":1,"b":2}', '{b}', null, null_value_treatment => 'retu
 select jsonb_set_lax('{"a":1,"b":2}', '{b}', null, null_value_treatment => 'delete_key') as delete_key;
 select jsonb_set_lax('{"a":1,"b":2}', '{b}', null, null_value_treatment => 'use_json_null') as use_json_null;
 
+-- \pset null ''
 
 -- jsonb_insert
 select jsonb_insert('{"a": [0,1,2]}', '{a, 1}', '"new_value"');
@@ -1492,7 +1502,9 @@ insert into test_jsonb_subscript
 select length(id), test_json[id] from test_jsonb_subscript;
 update test_jsonb_subscript set test_json[id] = '"baz"';
 select length(id), test_json[id] from test_jsonb_subscript;
+-- \x
 table test_jsonb_subscript;
+-- \x
 
 -- jsonb to tsvector
 select to_tsvector('{"a": "aaa bbb ddd ccc", "b": ["eee fff ggg"], "c": {"d": "hhh iii"}}'::jsonb);

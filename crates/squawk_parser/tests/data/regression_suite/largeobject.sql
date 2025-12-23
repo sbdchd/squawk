@@ -3,6 +3,8 @@
 --
 
 -- directory paths are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
+-- \getenv abs_builddir PG_ABS_BUILDDIR
 
 -- ensure consistent test output regardless of the default bytea format
 SET bytea_output TO escape;
@@ -21,6 +23,10 @@ COMMENT ON LARGE OBJECT 42 IS 'the ultimate answer';
 RESET SESSION AUTHORIZATION;
 
 -- Test psql's \lo_list et al (we assume no other LOs exist yet)
+-- \lo_list
+-- \lo_list+
+-- \lo_unlink 42
+-- \dl
 
 -- Load a file
 CREATE TABLE lotest_stash_values (loid oid, fd integer);
@@ -85,10 +91,11 @@ END;
 -- Note: we intentionally don't remove the object created here;
 -- it's left behind to help test pg_dump.
 
-SELECT lo_from_bytea(0, lo_get(loid)) AS newloid FROM lotest_stash_values;
+SELECT lo_from_bytea(0, lo_get(loid)) AS newloid FROM lotest_stash_values
+/* \gset */;
 
 -- Add a comment to it, as well, for pg_dump/pg_upgrade testing.
-COMMENT ON LARGE OBJECT 1235 IS 'I Wandered Lonely as a Cloud';
+COMMENT ON LARGE OBJECT 10101 IS 'I Wandered Lonely as a Cloud';
 
 -- Read out a portion
 BEGIN;
@@ -125,6 +132,12 @@ BEGIN;
 SELECT lo_open(loid, x'40000'::int) from lotest_stash_values;
 ABORT;
 
+-- \set filename :abs_builddir '/results/invalid/path'
+-- \set dobody 'DECLARE loid oid; BEGIN '
+-- \set dobody :dobody 'SELECT tbl.loid INTO loid FROM lotest_stash_values tbl; '
+-- \set dobody :dobody 'PERFORM lo_export(loid, ' :'filename' '); '
+-- \set dobody :dobody 'EXCEPTION WHEN UNDEFINED_FILE THEN '
+-- \set dobody :dobody 'RAISE NOTICE ''could not open file, as expected''; END'
 DO 'dobody';
 
 -- Test truncation.
@@ -175,6 +188,7 @@ SELECT lo_unlink(loid) from lotest_stash_values;
 
 TRUNCATE lotest_stash_values;
 
+-- \set filename :abs_srcdir '/data/tenk.data'
 INSERT INTO lotest_stash_values (loid) SELECT lo_import('filename');
 
 BEGIN;
@@ -204,45 +218,58 @@ SELECT loread(fd, 36) FROM lotest_stash_values;
 SELECT lo_close(fd) FROM lotest_stash_values;
 END;
 
+-- \set filename :abs_builddir '/results/lotest.txt'
 SELECT lo_export(loid, 'filename') FROM lotest_stash_values;
 
+-- \lo_import :filename
 
+-- \set newloid :LASTOID
 
 -- just make sure \lo_export does not barf
+-- \set filename :abs_builddir '/results/lotest2.txt'
+-- \lo_export 10101 :filename
 
 -- This is a hack to test that export/import are reversible
 -- This uses knowledge about the inner workings of large object mechanism
 -- which should not be used outside it.  This makes it a HACK
 SELECT pageno, data FROM pg_largeobject WHERE loid = (SELECT loid from lotest_stash_values)
 EXCEPT
-SELECT pageno, data FROM pg_largeobject WHERE loid = 'newloid';
+SELECT pageno, data FROM pg_largeobject WHERE loid = 10101;
 
 SELECT lo_unlink(loid) FROM lotest_stash_values;
 
 TRUNCATE lotest_stash_values;
 
+-- \lo_unlink 10101
 
+-- \set filename :abs_builddir '/results/lotest.txt'
+-- \lo_import :filename
 
+-- \set newloid_1 :LASTOID
 
-SELECT lo_from_bytea(0, lo_get('newloid_1')) AS newloid_2;
+SELECT lo_from_bytea(0, lo_get(10101_1)) AS newloid_2
+/* \gset */;
 
-SELECT fipshash(lo_get('newloid_1')) = fipshash(lo_get('newloid_2'));
+SELECT fipshash(lo_get(10101_1)) = fipshash(lo_get(10101_2));
 
-SELECT lo_get('newloid_1', 0, 20);
-SELECT lo_get('newloid_1', 10, 20);
-SELECT lo_put('newloid_1', 5, decode('afafafaf', 'hex'));
-SELECT lo_get('newloid_1', 0, 20);
+SELECT lo_get(10101_1, 0, 20);
+SELECT lo_get(10101_1, 10, 20);
+SELECT lo_put(10101_1, 5, decode('afafafaf', 'hex'));
+SELECT lo_get(10101_1, 0, 20);
 
-SELECT lo_put('newloid_1', 4294967310, 'foo');
-SELECT lo_get('newloid_1');
-SELECT lo_get('newloid_1', 4294967294, 100);
+SELECT lo_put(10101_1, 4294967310, 'foo');
+SELECT lo_get(10101_1);
+SELECT lo_get(10101_1, 4294967294, 100);
 
+-- \lo_unlink 10101_1
+-- \lo_unlink 10101_2
 
 -- This object is left in the database for pg_dump test purposes
-SELECT lo_from_bytea(0, E'\\xdeadbeef') AS newloid;
+SELECT lo_from_bytea(0, E'\\xdeadbeef') AS newloid
+/* \gset */;
 
 SET bytea_output TO hex;
-SELECT lo_get(1235);
+SELECT lo_get(10101);
 
 -- Create one more object that we leave behind for testing pg_dump/pg_upgrade;
 -- this one intentionally has an OID in the system range

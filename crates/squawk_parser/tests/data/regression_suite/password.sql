@@ -21,7 +21,7 @@ CREATE ROLE regress_passwd4 PASSWORD NULL;
 -- check list of created entries
 --
 -- The scram secret will look something like:
--- SCRAM-SHA-256$4096'E4HxLGtnRzsYwg'==$6YtlR4t69SguDiwFvbVgVZtuz6gpJQQqUMZ7IQJK5yI='ps75jrHeYU4lXCcXI4O8oIdJ3eO8o2jirjruw9phBTo'=
+-- SCRAM-SHA-256$4096:E4HxLGtnRzsYwg==$6YtlR4t69SguDiwFvbVgVZtuz6gpJQQqUMZ7IQJK5yI=:ps75jrHeYU4lXCcXI4O8oIdJ3eO8o2jirjruw9phBTo=
 --
 -- Since the salt is random, the exact value stored will be different on every test
 -- run. Use a regular expression to mask the changing parts.

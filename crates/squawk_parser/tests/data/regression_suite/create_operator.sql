@@ -22,6 +22,13 @@ CREATE OPERATOR #%# (
 -- Test operator created above
 SELECT @#@ 24;
 
+-- Test error cases
+select @@##@@ 24;  -- no such operator
+set search_path = pg_catalog;
+select @#@ 24;  -- wrong schema
+reset search_path;
+select @#@ 24.0;  -- wrong data type
+
 -- Test comments
 COMMENT ON OPERATOR ###### (NONE, int4) IS 'bad prefix';
 COMMENT ON OPERATOR ###### (int4, NONE) IS 'bad postfix';
@@ -86,21 +93,21 @@ ROLLBACK;
 
 
 -- Should fail. SETOF type functions not allowed as argument (testing leftarg)
--- BEGIN TRANSACTION;
--- CREATE OPERATOR #*# (
---    leftarg = SETOF int8,
---    procedure = factorial
--- );
--- ROLLBACK;
+BEGIN TRANSACTION;
+CREATE OPERATOR #*# (
+   leftarg = SETOF int8,
+   procedure = factorial
+);
+ROLLBACK;
 
 
 -- Should fail. SETOF type functions not allowed as argument (testing rightarg)
--- BEGIN TRANSACTION;
--- CREATE OPERATOR #*# (
---    rightarg = SETOF int8,
---    procedure = factorial
--- );
--- ROLLBACK;
+BEGIN TRANSACTION;
+CREATE OPERATOR #*# (
+   rightarg = SETOF int8,
+   procedure = factorial
+);
+ROLLBACK;
 
 
 -- Should work. Sample text-book case

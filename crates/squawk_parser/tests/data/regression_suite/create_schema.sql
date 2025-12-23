@@ -51,15 +51,18 @@ RESET ROLE;
 -- The schema created matches the role name.
 CREATE SCHEMA AUTHORIZATION regress_create_schema_role
   CREATE TABLE regress_create_schema_role.tab (id int);
+-- \d regress_create_schema_role.tab
 DROP SCHEMA regress_create_schema_role CASCADE;
 -- Again, with a different role specification and no schema names.
 SET ROLE regress_create_schema_role;
 CREATE SCHEMA AUTHORIZATION CURRENT_ROLE
   CREATE TABLE regress_create_schema_role.tab (id int);
+-- \d regress_create_schema_role.tab
 DROP SCHEMA regress_create_schema_role CASCADE;
 -- Again, with a schema name and a role specification.
 CREATE SCHEMA regress_schema_1 AUTHORIZATION CURRENT_ROLE
   CREATE TABLE regress_schema_1.tab (id int);
+-- \d regress_schema_1.tab
 DROP SCHEMA regress_schema_1 CASCADE;
 RESET ROLE;
 

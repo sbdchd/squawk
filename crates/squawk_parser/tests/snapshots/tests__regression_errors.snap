@@ -2,4 +2,460 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/errors.sql
 ---
-
+---
+error[syntax-error]: expected relation name
+   ╭▸ 
+49 │ delete from;
+   ╰╴           ━
+error[syntax-error]: expected path name
+    ╭▸ 
+131 │ drop index;
+    ╰╴          ━
+error[syntax-error]: expected path name
+    ╭▸ 
+134 │ drop index 314159;
+    ╰╴          ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+134 │ drop index 314159;
+    ╰╴          ━
+error[syntax-error]: expected command, found INT_NUMBER
+    ╭▸ 
+134 │ drop index 314159;
+    ╰╴           ━
+error[syntax-error]: expected path name
+    ╭▸ 
+144 │ drop aggregate;
+    ╰╴              ━
+error[syntax-error]: expected L_PAREN
+    ╭▸ 
+144 │ drop aggregate;
+    ╰╴              ━
+error[syntax-error]: expected type name
+    ╭▸ 
+144 │ drop aggregate;
+    ╰╴              ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+144 │ drop aggregate;
+    ╰╴              ━
+error[syntax-error]: expected L_PAREN
+    ╭▸ 
+147 │ drop aggregate newcnt1;
+    ╰╴                      ━
+error[syntax-error]: expected type name
+    ╭▸ 
+147 │ drop aggregate newcnt1;
+    ╰╴                      ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+147 │ drop aggregate newcnt1;
+    ╰╴                      ━
+error[syntax-error]: expected path name
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴               ━
+error[syntax-error]: expected L_PAREN
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴               ━
+error[syntax-error]: expected type name
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴               ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴               ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴               ━
+error[syntax-error]: expected command, found INT_NUMBER
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴               ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴                       ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴                       ━
+error[syntax-error]: expected command, found INT_KW
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴                       ━
+error[syntax-error]: expected command, found R_PAREN
+    ╭▸ 
+150 │ drop aggregate 314159 (int);
+    ╰╴                          ━
+error[syntax-error]: expected path name
+    ╭▸ 
+166 │ drop function ();
+    ╰╴              ━
+error[syntax-error]: expected path name
+    ╭▸ 
+169 │ drop function 314159();
+    ╰╴              ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+169 │ drop function 314159();
+    ╰╴              ━
+error[syntax-error]: expected command, found INT_NUMBER
+    ╭▸ 
+169 │ drop function 314159();
+    ╰╴              ━
+error[syntax-error]: expected path name
+    ╭▸ 
+179 │ drop type;
+    ╰╴         ━
+error[syntax-error]: expected path name
+    ╭▸ 
+182 │ drop type 314159;
+    ╰╴         ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+182 │ drop type 314159;
+    ╰╴         ━
+error[syntax-error]: expected command, found INT_NUMBER
+    ╭▸ 
+182 │ drop type 314159;
+    ╰╴          ━
+error[syntax-error]: expected operator, got SEMICOLON
+    ╭▸ 
+192 │ drop operator;
+    ╰╴             ━
+error[syntax-error]: expected L_PAREN
+    ╭▸ 
+192 │ drop operator;
+    ╰╴             ━
+error[syntax-error]: expected type name
+    ╭▸ 
+192 │ drop operator;
+    ╰╴             ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+192 │ drop operator;
+    ╰╴             ━
+error[syntax-error]: expected type name
+    ╭▸ 
+192 │ drop operator;
+    ╰╴             ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+192 │ drop operator;
+    ╰╴             ━
+error[syntax-error]: expected operator, got SEMICOLON
+    ╭▸ 
+195 │ drop operator equals;
+    ╰╴                    ━
+error[syntax-error]: expected L_PAREN
+    ╭▸ 
+195 │ drop operator equals;
+    ╰╴                    ━
+error[syntax-error]: expected type name
+    ╭▸ 
+195 │ drop operator equals;
+    ╰╴                    ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+195 │ drop operator equals;
+    ╰╴                    ━
+error[syntax-error]: expected type name
+    ╭▸ 
+195 │ drop operator equals;
+    ╰╴                    ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+195 │ drop operator equals;
+    ╰╴                    ━
+error[syntax-error]: expected L_PAREN
+    ╭▸ 
+198 │ drop operator ===;
+    ╰╴                 ━
+error[syntax-error]: expected type name
+    ╭▸ 
+198 │ drop operator ===;
+    ╰╴                 ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+198 │ drop operator ===;
+    ╰╴                 ━
+error[syntax-error]: expected type name
+    ╭▸ 
+198 │ drop operator ===;
+    ╰╴                 ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+198 │ drop operator ===;
+    ╰╴                 ━
+error[syntax-error]: expected operator, got COMMA
+    ╭▸ 
+201 │ drop operator int4, int4;
+    ╰╴                  ━
+error[syntax-error]: expected L_PAREN
+    ╭▸ 
+201 │ drop operator int4, int4;
+    ╰╴                  ━
+error[syntax-error]: expected type name
+    ╭▸ 
+201 │ drop operator int4, int4;
+    ╰╴                  ━
+error[syntax-error]: expected R_PAREN
+    ╭▸ 
+201 │ drop operator int4, int4;
+    ╰╴                        ━
+error[syntax-error]: expected operator, got L_PAREN
+    ╭▸ 
+204 │ drop operator (int4, int4);
+    ╰╴              ━
+error[syntax-error]: expected type name
+    ╭▸ 
+207 │ drop operator === ();
+    ╰╴                   ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+207 │ drop operator === ();
+    ╰╴                   ━
+error[syntax-error]: expected type name
+    ╭▸ 
+207 │ drop operator === ();
+    ╰╴                   ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+210 │ drop operator === (int4);
+    ╰╴                       ━
+error[syntax-error]: expected type name
+    ╭▸ 
+210 │ drop operator === (int4);
+    ╰╴                       ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+216 │ drop operator = (nonesuch);
+    ╰╴                         ━
+error[syntax-error]: expected type name
+    ╭▸ 
+216 │ drop operator = (nonesuch);
+    ╰╴                         ━
+error[syntax-error]: expected type name
+    ╭▸ 
+219 │ drop operator = ( , int4);
+    ╰╴                 ━
+error[syntax-error]: expected type name
+    ╭▸ 
+228 │ drop operator = (int4, );
+    ╰╴                      ━
+error[syntax-error]: expected name
+    ╭▸ 
+235 │ drop rule;
+    ╰╴         ━
+error[syntax-error]: expected ON_KW
+    ╭▸ 
+235 │ drop rule;
+    ╰╴         ━
+error[syntax-error]: expected path name
+    ╭▸ 
+235 │ drop rule;
+    ╰╴         ━
+error[syntax-error]: expected name
+    ╭▸ 
+238 │ drop rule 314159;
+    ╰╴         ━
+error[syntax-error]: expected ON_KW
+    ╭▸ 
+238 │ drop rule 314159;
+    ╰╴          ━
+error[syntax-error]: expected path name
+    ╭▸ 
+238 │ drop rule 314159;
+    ╰╴          ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+238 │ drop rule 314159;
+    ╰╴          ━
+error[syntax-error]: expected command, found INT_NUMBER
+    ╭▸ 
+238 │ drop rule 314159;
+    ╰╴          ━
+error[syntax-error]: expected command, found DROP_KW
+    ╭▸ 
+244 │ drop tuple rule nonesuch;
+    ╰╴━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+244 │ drop tuple rule nonesuch;
+    ╰╴     ━
+error[syntax-error]: expected command, found RULE_KW
+    ╭▸ 
+244 │ drop tuple rule nonesuch;
+    ╰╴           ━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+244 │ drop tuple rule nonesuch;
+    ╰╴                ━
+error[syntax-error]: expected command, found DROP_KW
+    ╭▸ 
+245 │ drop instance rule nonesuch on noplace;
+    ╰╴━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+245 │ drop instance rule nonesuch on noplace;
+    ╰╴     ━
+error[syntax-error]: expected command, found RULE_KW
+    ╭▸ 
+245 │ drop instance rule nonesuch on noplace;
+    ╰╴              ━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+245 │ drop instance rule nonesuch on noplace;
+    ╰╴                   ━
+error[syntax-error]: expected command, found ON_KW
+    ╭▸ 
+245 │ drop instance rule nonesuch on noplace;
+    ╰╴                            ━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+245 │ drop instance rule nonesuch on noplace;
+    ╰╴                               ━
+error[syntax-error]: expected command, found DROP_KW
+    ╭▸ 
+246 │ drop rewrite rule nonesuch;
+    ╰╴━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+246 │ drop rewrite rule nonesuch;
+    ╰╴     ━
+error[syntax-error]: expected command, found RULE_KW
+    ╭▸ 
+246 │ drop rewrite rule nonesuch;
+    ╰╴             ━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+246 │ drop rewrite rule nonesuch;
+    ╰╴                  ━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+279 │ xxx;
+    ╰╴━
+error[syntax-error]: expected command, found CREATE_KW
+    ╭▸ 
+281 │ CREATE foo;
+    ╰╴━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+281 │ CREATE foo;
+    ╰╴       ━
+error[syntax-error]: expected path name
+    ╭▸ 
+283 │ CREATE TABLE ;
+    ╰╴            ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+288 │ INSERT INTO foo VALUES(123) foo;
+    ╰╴      ━
+error[syntax-error]: expected command, found INTO_KW
+    ╭▸ 
+288 │ INSERT INTO foo VALUES(123) foo;
+    ╰╴       ━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+288 │ INSERT INTO foo VALUES(123) foo;
+    ╰╴            ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+288 │ INSERT INTO foo VALUES(123) foo;
+    ╰╴                           ━
+error[syntax-error]: expected command, found IDENT
+    ╭▸ 
+288 │ INSERT INTO foo VALUES(123) foo;
+    ╰╴                            ━
+error[syntax-error]: expected path name
+    ╭▸ 
+290 │ INSERT INTO 123
+    ╰╴           ━
+error[syntax-error]: expected select stmt
+    ╭▸ 
+290 │ INSERT INTO 123
+    ╰╴           ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+290 │ INSERT INTO 123
+    ╰╴           ━
+error[syntax-error]: expected command, found INT_NUMBER
+    ╭▸ 
+290 │ INSERT INTO 123
+    ╰╴            ━
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+294 │ VALUES(123) 123
+    ╰╴           ━
+error[syntax-error]: expected command, found INT_NUMBER
+    ╭▸ 
+294 │ VALUES(123) 123
+    ╰╴            ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+300 │     id3 INTEGER NOT NUL,
+    ╰╴                   ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+300 │     id3 INTEGER NOT NUL,
+    ╰╴                   ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+304 │ CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
+    ╰╴                                                                                        ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+304 │ CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
+    ╰╴                                                                                        ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+309 │ id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY);
+    ╰╴               ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+309 │ id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY);
+    ╰╴               ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+312 │ CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQ…
+    ╰╴                                                                                        ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+312 │ CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQ…
+    ╰╴                                                                                        ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+318 │ foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
+    ╰╴                                                                           ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+318 │ foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
+    ╰╴                                                                           ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+334 │ id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY)
+    ╰╴               ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+334 │ id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY)
+    ╰╴               ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+344 │ UNIQUE NOT NULL, idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNI…
+    ╰╴                                                                                                                   ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+344 │ UNIQUE NOT NULL, idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNI…
+    ╰╴                                                                                                                   ━
+error[syntax-error]: expected NULL_KW
+    ╭▸ 
+364 │ idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5…
+    ╰╴                                                                                                  ━
+error[syntax-error]: expected COMMA
+    ╭▸ 
+364 │ idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5…
+    ╰╴                                                                                                  ━

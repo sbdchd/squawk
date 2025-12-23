@@ -739,6 +739,7 @@ $$ language sql;
 select dfunc();
 
 -- verify it lists properly
+-- \df dfunc
 
 drop function dfunc(int, int);
 
@@ -818,6 +819,7 @@ select dfunc(10,20);
 create or replace function dfunc(a variadic int[]) returns int as
 $$ select array_upper($1, 1) $$ language sql;
 
+-- \df dfunc
 
 drop function dfunc(a variadic int[]);
 
@@ -870,6 +872,26 @@ select * from dfunc(10, 10, a := 20);  -- fail, a overlaps positional parameter
 select * from dfunc(1,c := 2,d := 3); -- fail, no value for b
 
 drop function dfunc(int, int, int, int);
+
+create function xleast(x numeric, variadic arr numeric[])
+  returns numeric as $$
+  select least(x, min(arr[i])) from generate_subscripts(arr, 1) g(i);
+$$ language sql;
+
+select xleast(x => 1, variadic arr => array[2,3]);
+select xleast(1, variadic arr => array[2,3]);
+
+set search_path = pg_catalog;
+select xleast(1, variadic arr => array[2,3]);  -- wrong schema
+reset search_path;
+select xleast(foo => 1, variadic arr => array[2,3]);  -- wrong argument name
+select xleast(x => 1, variadic array[2,3]);  -- misuse of mixed notation
+select xleast(1, variadic x => array[2,3]);  -- misuse of mixed notation
+select xleast(arr => array[1], variadic x => 3);  -- wrong arg is VARIADIC
+select xleast(arr => array[1], x => 3);  -- failed to use VARIADIC
+select xleast(arr => 1, variadic x => array[2,3]);  -- mixed-up args
+
+drop function xleast(x numeric, variadic arr numeric[]);
 
 -- test with different parameter types
 create function dfunc(a varchar, b numeric, c date = current_date)
@@ -991,6 +1013,7 @@ CREATE VIEW dfview AS
 
 select * from dfview;
 
+-- \d+ dfview
 
 drop view dfview;
 drop function dfunc(anyelement, anyelement, bool);

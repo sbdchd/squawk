@@ -1,4 +1,7 @@
-SELECT getdatabaseencoding() <> 'UTF8' AS skip_test ;
+SELECT getdatabaseencoding() <> 'UTF8' AS skip_test /* \gset */;
+-- \if :skip_test
+-- \quit
+-- \endif
 
 SELECT U&'\0061\0308bc' <> U&'\00E4bc' COLLATE "C" AS sanity_check;
 

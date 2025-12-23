@@ -35,8 +35,10 @@ DROP USER regress_dep_user2;
 -- can't drop the owner of an object
 -- the error message detail here would include a pg_toast_nnn name that
 -- is not constant, so suppress it
+-- \set VERBOSITY terse
 ALTER TABLE deptest OWNER TO regress_dep_user3;
 DROP USER regress_dep_user3;
+-- \set VERBOSITY default
 
 -- if we drop the object, we can drop the user too
 DROP TABLE deptest;
@@ -62,10 +64,13 @@ SET SESSION AUTHORIZATION regress_dep_user1;
 CREATE TABLE deptest (a serial primary key, b text);
 GRANT ALL ON deptest1 TO regress_dep_user2;
 RESET SESSION AUTHORIZATION;
+-- \z deptest1
 
 DROP OWNED BY regress_dep_user1;
 -- all grants revoked
+-- \z deptest1
 -- table was dropped
+-- \d deptest
 
 -- Test REASSIGN OWNED
 GRANT ALL ON deptest1 TO regress_dep_user1;
@@ -95,6 +100,7 @@ FROM pg_type JOIN pg_class c ON typrelid = c.oid WHERE typname = 'deptest_t';
 
 RESET SESSION AUTHORIZATION;
 REASSIGN OWNED BY regress_dep_user1 TO regress_dep_user2;
+-- \dt deptest
 
 SELECT typowner = relowner
 FROM pg_type JOIN pg_class c ON typrelid = c.oid WHERE typname = 'deptest_t';

@@ -749,6 +749,8 @@ AlterTableAction =
 | ClusterOn
 | OwnerTo
 | DetachPartition
+| MergePartitions
+| SplitPartition
 | DropConstraint
 | DropColumn
 | AddConstraint
@@ -2643,6 +2645,12 @@ Copy =
   'with'?
   WhereClause?
 
+CopyOptionList =
+  '(' (CopyOption (',' CopyOption)*) ')'
+
+CopyOption =
+  Name
+
 Call =
   'call' Path ArgList
 
@@ -2865,6 +2873,24 @@ ClusterOn =
 
 DetachPartition =
   'detach' 'partition'
+
+MergePartitions =
+  'merge' 'partitions'
+  '(' ')'
+  'into'
+  Path
+
+SplitPartition =
+  'split' 'partition' 'into'
+  PartitionList
+
+PartitionList =
+  '(' (Partition (',' Partition)*) ')'
+
+Partition =
+  'partition'
+  Path
+  PartitionType
 
 DropColumn =
  'drop' 'column'? IfExists? NameRef

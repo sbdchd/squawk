@@ -7,7 +7,7 @@ select pg_stat_force_next_flush();
 select parallel_workers_to_launch as parallel_workers_to_launch_before,
        parallel_workers_launched as parallel_workers_launched_before
   from pg_stat_database
-  where datname = current_database() ;
+  where datname = current_database() /* \gset */;
 
 create function sp_parallel_restricted(int) returns int as
   $$begin return $1; end$$ language plpgsql parallel restricted;

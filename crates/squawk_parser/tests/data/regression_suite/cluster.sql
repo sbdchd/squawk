@@ -225,6 +225,7 @@ CLUSTER clstrpart USING clstrpart_idx;
 CREATE TEMP TABLE new_cluster_info AS SELECT relname, level, relfilenode, relkind FROM pg_partition_tree('clstrpart'::regclass) AS tree JOIN pg_class c ON c.oid=tree.relid ;
 SELECT relname, old.level, old.relkind, old.relfilenode = new.relfilenode FROM old_cluster_info AS old JOIN new_cluster_info AS new USING (relname) ORDER BY relname COLLATE "C";
 -- Partitioned indexes aren't and can't be marked un/clustered:
+-- \d clstrpart
 CLUSTER clstrpart;
 ALTER TABLE clstrpart SET WITHOUT CLUSTER;
 ALTER TABLE clstrpart CLUSTER ON clstrpart_idx;

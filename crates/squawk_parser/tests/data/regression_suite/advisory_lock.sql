@@ -2,7 +2,7 @@
 -- ADVISORY LOCKS
 --
 
-SELECT oid AS datoid FROM pg_database WHERE datname = current_database() ;
+SELECT oid AS datoid FROM pg_database WHERE datname = current_database() /* \gset */;
 
 BEGIN;
 

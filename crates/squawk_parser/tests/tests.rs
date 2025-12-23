@@ -93,9 +93,12 @@ fn regression_suite(fixture: Fixture<&str>) {
 
     let (_parsed, errors) = parse_text(content);
 
+    let expect_errors = test_name == "errors";
+
     let snapshot_name = format!("regression_{test_name}");
 
-    let has_errors = errors.is_none();
+    let no_errors = errors.is_none();
+    let has_errors = !no_errors;
 
     with_settings!({
       omit_expression => true,
@@ -104,10 +107,17 @@ fn regression_suite(fixture: Fixture<&str>) {
       assert_snapshot!(snapshot_name, errors.unwrap_or_default());
     });
 
-    assert!(
-        has_errors,
-        "tests defined in the regression suite can't have parser errors."
-    );
+    if expect_errors {
+        assert!(
+            has_errors,
+            "the errors.sql regression test must have errors"
+        );
+    } else {
+        assert!(
+            no_errors,
+            "tests defined in the regression suite can't have parser errors."
+        );
+    }
 }
 
 fn parse_text(text: &str) -> (String, Option<String>) {

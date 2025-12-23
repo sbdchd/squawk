@@ -3,7 +3,11 @@
 --
 
 -- directory paths and dlsuffix are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
+-- \getenv libdir PG_LIBDIR
+-- \getenv dlsuffix PG_DLSUFFIX
 
+-- \set regresslib :libdir '/regress' :dlsuffix
 
 --
 -- synchronous_commit=off delays when hint bits may be set. Some plans change
@@ -130,6 +134,7 @@ CREATE TABLE onek (
 	string4		name
 );
 
+-- \set filename :abs_srcdir '/data/onek.data'
 COPY onek FROM 'filename';
 VACUUM ANALYZE onek;
 
@@ -155,6 +160,7 @@ CREATE TABLE tenk1 (
 	string4		name
 );
 
+-- \set filename :abs_srcdir '/data/tenk.data'
 COPY tenk1 FROM 'filename';
 VACUUM ANALYZE tenk1;
 
@@ -167,6 +173,7 @@ CREATE TABLE person (
 	location 	point
 );
 
+-- \set filename :abs_srcdir '/data/person.data'
 COPY person FROM 'filename';
 VACUUM ANALYZE person;
 
@@ -175,6 +182,7 @@ CREATE TABLE emp (
 	manager 	name
 ) INHERITS (person);
 
+-- \set filename :abs_srcdir '/data/emp.data'
 COPY emp FROM 'filename';
 VACUUM ANALYZE emp;
 
@@ -182,6 +190,7 @@ CREATE TABLE student (
 	gpa 		float8
 ) INHERITS (person);
 
+-- \set filename :abs_srcdir '/data/student.data'
 COPY student FROM 'filename';
 VACUUM ANALYZE student;
 
@@ -189,6 +198,7 @@ CREATE TABLE stud_emp (
 	percent 	int4
 ) INHERITS (emp, student);
 
+-- \set filename :abs_srcdir '/data/stud_emp.data'
 COPY stud_emp FROM 'filename';
 VACUUM ANALYZE stud_emp;
 
@@ -197,6 +207,7 @@ CREATE TABLE road (
 	thepath 	path
 );
 
+-- \set filename :abs_srcdir '/data/streets.data'
 COPY road FROM 'filename';
 VACUUM ANALYZE road;
 

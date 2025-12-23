@@ -13,9 +13,9 @@ SELECT * FROM JSON_TABLE('[]', 'strict $.a' COLUMNS (js2 int PATH '$') ERROR ON 
 SELECT * FROM JSON_TABLE(jsonb'"1.23"', '$.a' as js2 COLUMNS (js2 int path '$'));
 
 -- Should fail (no columns)
--- SELECT * FROM JSON_TABLE(NULL, '$' COLUMNS ());
+SELECT * FROM JSON_TABLE(NULL, '$' COLUMNS ());
 
--- SELECT * FROM JSON_TABLE (NULL::jsonb, '$' COLUMNS (v1 timestamp)) AS f (v1, v2);
+SELECT * FROM JSON_TABLE (NULL::jsonb, '$' COLUMNS (v1 timestamp)) AS f (v1, v2);
 
 --duplicated column name
 SELECT * FROM JSON_TABLE(jsonb'"1.23"', '$.a' COLUMNS (js2 int path '$', js2 int path '$'));
@@ -188,6 +188,11 @@ SELECT * FROM
 			ta text[] PATH '$',
 			jba jsonb[] PATH '$'));
 
+-- \sv jsonb_table_view2
+-- \sv jsonb_table_view3
+-- \sv jsonb_table_view4
+-- \sv jsonb_table_view5
+-- \sv jsonb_table_view6
 
 EXPLAIN (COSTS OFF, VERBOSE) SELECT * FROM jsonb_table_view2;
 EXPLAIN (COSTS OFF, VERBOSE) SELECT * FROM jsonb_table_view3;
@@ -445,6 +450,7 @@ SELECT * FROM
 		)
 	);
 
+-- \sv jsonb_table_view_nested
 DROP VIEW jsonb_table_view_nested;
 
 CREATE TABLE s (js jsonb);
@@ -523,6 +529,7 @@ SELECT sub.* FROM s,
 		NESTED PATH '$.a.za[1]' COLUMNS
 			(NESTED PATH '$.z21[*] ? (@ >= ($"y" +121))' as z21 COLUMNS (b int PATH '$ ? (@ > ($"x" +111))' DEFAULT 0 ON EMPTY))
 	)) sub;
+-- \sv jsonb_table_view7
 DROP VIEW jsonb_table_view7;
 DROP TABLE s;
 
@@ -539,14 +546,18 @@ SELECT * FROM JSON_TABLE(jsonb '1', '$' COLUMNS (a int exists empty object on er
 -- Test JSON_TABLE() column deparsing -- don't emit default ON ERROR / EMPTY
 -- behavior
 CREATE VIEW json_table_view8 AS SELECT * from JSON_TABLE('"a"', '$' COLUMNS (a text PATH '$'));
+-- \sv json_table_view8;
 
 CREATE VIEW json_table_view9 AS SELECT * from JSON_TABLE('"a"', '$' COLUMNS (a text PATH '$') ERROR ON ERROR);
+-- \sv json_table_view9;
 
 DROP VIEW json_table_view8, json_table_view9;
 
 -- Test JSON_TABLE() deparsing -- don't emit default ON ERROR behavior
 CREATE VIEW json_table_view8 AS SELECT * from JSON_TABLE('"a"', '$' COLUMNS (a text PATH '$') EMPTY ON ERROR);
+-- \sv json_table_view8;
 
 CREATE VIEW json_table_view9 AS SELECT * from JSON_TABLE('"a"', '$' COLUMNS (a text PATH '$') EMPTY ARRAY ON ERROR);
+-- \sv json_table_view9;
 
 DROP VIEW json_table_view8, json_table_view9;

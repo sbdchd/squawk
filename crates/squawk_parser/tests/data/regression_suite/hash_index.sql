@@ -3,6 +3,7 @@
 --
 
 -- directory paths are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
 
 CREATE TABLE hash_i4_heap (
 	seqno 		int4,
@@ -24,6 +25,7 @@ CREATE TABLE hash_f8_heap (
 	random 		float8
 );
 
+-- \set filename :abs_srcdir '/data/hash.data'
 COPY hash_i4_heap FROM 'filename';
 COPY hash_name_heap FROM 'filename';
 COPY hash_txt_heap FROM 'filename';
@@ -34,8 +36,8 @@ COPY hash_f8_heap FROM 'filename';
 -- this is therefore a stress test of the bucket overflow code (unlike
 -- the data in hash.data, which has unique index keys).
 --
--- \set filename 'abs_srcdir' '/data/hashovfl.data'
--- COPY hash_ovfl_heap FROM 'filename';
+-- \set filename :abs_srcdir '/data/hashovfl.data'
+-- COPY hash_ovfl_heap FROM :'filename';
 
 ANALYZE hash_i4_heap;
 ANALYZE hash_name_heap;
@@ -50,6 +52,9 @@ CREATE INDEX hash_txt_index ON hash_txt_heap USING hash (random text_ops);
 
 CREATE INDEX hash_f8_index ON hash_f8_heap USING hash (random float8_ops)
   WITH (fillfactor=60);
+
+CREATE INDEX hash_i4_partial_index ON hash_i4_heap USING hash (seqno)
+  WHERE seqno = 9999;
 
 --
 -- Also try building functional, expressional, and partial indexes on
@@ -114,6 +119,16 @@ SELECT * FROM hash_f8_heap
 --
 SELECT * FROM hash_f8_heap
    WHERE hash_f8_heap.random = '88888888'::float8;
+
+--
+-- partial hash index
+--
+EXPLAIN (COSTS OFF)
+SELECT * FROM hash_i4_heap
+   WHERE seqno = 9999;
+
+SELECT * FROM hash_i4_heap
+   WHERE seqno = 9999;
 
 --
 -- hash index

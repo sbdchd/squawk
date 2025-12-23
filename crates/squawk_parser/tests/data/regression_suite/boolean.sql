@@ -230,6 +230,7 @@ FROM booltbl3 ORDER BY o;
 -- from interfering.
 CREATE TABLE booltbl4(isfalse bool, istrue bool, isnul bool);
 INSERT INTO booltbl4 VALUES (false, true, null);
+-- \pset null '(null)'
 
 -- AND expression need to return null if there's any nulls and not all
 -- of the value are true

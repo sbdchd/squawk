@@ -3,6 +3,7 @@
 --
 
 -- directory paths are passed to us in environment variables
+-- \getenv abs_srcdir PG_ABS_SRCDIR
 
 CREATE TABLE arrtest (
 	a 			int2[],
@@ -20,6 +21,7 @@ CREATE TABLE array_op_test (
 	t			text[]
 );
 
+-- \set filename :abs_srcdir '/data/array.data'
 COPY array_op_test FROM 'filename';
 ANALYZE array_op_test;
 
@@ -440,6 +442,7 @@ reset enable_bitmapscan;
 
 -- The normal error message includes a platform-dependent limit,
 -- so suppress it to avoid needing multiple expected-files.
+-- \set VERBOSITY sqlstate
 
 insert into arr_pk_tbl values(10, '[-2147483648:-2147483647]={1,2}');
 update arr_pk_tbl set f1[2147483647] = 42 where pk = 10;
@@ -454,6 +457,7 @@ begin
   a[2147483647] := 42;
 end $$;
 
+-- \set VERBOSITY default
 
 -- test [not] (like|ilike) (any|all) (...)
 select 'foo' like any (array['%a', '%o']); -- t

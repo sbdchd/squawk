@@ -3,7 +3,10 @@
 --
 
 -- directory paths and dlsuffix are passed to us in environment variables
+-- \getenv libdir PG_LIBDIR
+-- \getenv dlsuffix PG_DLSUFFIX
 
+-- \set regresslib :libdir '/regress' :dlsuffix
 
 CREATE FUNCTION test_enc_setup() RETURNS void
     AS 'regresslib', 'test_enc_setup'
@@ -295,6 +298,7 @@ insert into gb18030_inputs  values
   ('\x666f6fcff3',	'valid'),
   ('\x666f6f8431a530',	'valid, no translation to UTF-8'),
   ('\x666f6f84309c38',	'valid, translates to UTF-8 by mapping function'),
+  ('\xa6d9',  'valid, changed from version 2000 to 2022'),
   ('\x666f6f84309c',	'incomplete char '),
   ('\x666f6f84309c0a',	'incomplete char, followed by newline '),
   ('\x666f6f84',		'incomplete char at end'),

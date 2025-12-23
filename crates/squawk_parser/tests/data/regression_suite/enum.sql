@@ -19,7 +19,12 @@ SELECT 'mauve'::rainbow;
 SELECT pg_input_is_valid('red', 'rainbow');
 SELECT pg_input_is_valid('mauve', 'rainbow');
 SELECT * FROM pg_input_error_info('mauve', 'rainbow');
+-- \x
 SELECT * FROM pg_input_error_info(repeat('too_long', 32), 'rainbow');
+-- \x
+
+-- check for duplicate enum entries
+CREATE TYPE dup_enum AS ENUM ('foo','bar','foo');
 
 --
 -- adding new values
@@ -128,6 +133,10 @@ ORDER BY enumsortorder;
 --
 CREATE TABLE enumtest (col rainbow);
 INSERT INTO enumtest values ('red'), ('orange'), ('yellow'), ('green');
+COPY enumtest FROM stdin;
+-- blue
+-- purple
+-- \.
 SELECT * FROM enumtest;
 
 --

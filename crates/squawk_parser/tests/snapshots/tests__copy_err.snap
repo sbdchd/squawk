@@ -29,17 +29,20 @@ SOURCE_FILE
     LITERAL
       STRING "'/tmp/input.file'"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "on_error"
-    WHITESPACE " "
-    IDENT "ignore"
-    WHITESPACE "  "
-    NAME
-      IDENT "log_verbosity"
-    WHITESPACE " "
-    VERBOSE_KW "verbose"
-    R_PAREN ")"
+    COPY_OPTION_LIST
+      L_PAREN "("
+      COPY_OPTION
+        NAME
+          IDENT "on_error"
+        WHITESPACE " "
+        IGNORE_KW "ignore"
+      WHITESPACE "  "
+      COPY_OPTION
+        NAME
+          IDENT "log_verbosity"
+        WHITESPACE " "
+        VERBOSE_KW "verbose"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
 ---

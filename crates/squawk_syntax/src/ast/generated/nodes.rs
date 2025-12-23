@@ -3031,6 +3031,36 @@ impl Copy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CopyOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CopyOption {
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CopyOptionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CopyOptionList {
+    #[inline]
+    pub fn copy_options(&self) -> AstChildren<CopyOption> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CostFuncOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -10276,6 +10306,21 @@ impl MergeInsert {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergePartitions {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergePartitions {
+    #[inline]
+    pub fn merge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MERGE_KW)
+    }
+    #[inline]
+    pub fn partitions_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARTITIONS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MergeUpdate {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11708,6 +11753,25 @@ impl ParenSelect {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Partition {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Partition {
+    #[inline]
+    pub fn partition_type(&self) -> Option<PartitionType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn partition_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARTITION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PartitionBy {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11872,6 +11936,25 @@ pub struct PartitionItemList {
 impl PartitionItemList {
     #[inline]
     pub fn partition_items(&self) -> AstChildren<PartitionItem> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionList {
+    #[inline]
+    pub fn partitions(&self) -> AstChildren<Partition> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -14647,6 +14730,25 @@ impl SourceFile {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SplitPartition {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SplitPartition {
+    #[inline]
+    pub fn partition_list(&self) -> Option<PartitionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn partition_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARTITION_KW)
+    }
+    #[inline]
+    pub fn split_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SPLIT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Storage {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16443,6 +16545,7 @@ pub enum AlterTableAction {
     EnableTrigger(EnableTrigger),
     ForceRls(ForceRls),
     InheritTable(InheritTable),
+    MergePartitions(MergePartitions),
     NoForceRls(NoForceRls),
     NoInheritTable(NoInheritTable),
     NotOf(NotOf),
@@ -16462,6 +16565,7 @@ pub enum AlterTableAction {
     SetUnlogged(SetUnlogged),
     SetWithoutCluster(SetWithoutCluster),
     SetWithoutOids(SetWithoutOids),
+    SplitPartition(SplitPartition),
     ValidateConstraint(ValidateConstraint),
 }
 
@@ -18823,6 +18927,42 @@ impl AstNode for Copy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::COPY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CopyOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COPY_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CopyOptionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COPY_OPTION_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -23481,6 +23621,24 @@ impl AstNode for MergeInsert {
         &self.syntax
     }
 }
+impl AstNode for MergePartitions {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_PARTITIONS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for MergeUpdate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -24633,6 +24791,24 @@ impl AstNode for ParenSelect {
         &self.syntax
     }
 }
+impl AstNode for Partition {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PartitionBy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -24745,6 +24921,24 @@ impl AstNode for PartitionItemList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PARTITION_ITEM_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PartitionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -26811,6 +27005,24 @@ impl AstNode for SourceFile {
         &self.syntax
     }
 }
+impl AstNode for SplitPartition {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SPLIT_PARTITION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Storage {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -28654,6 +28866,7 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::ENABLE_TRIGGER
                 | SyntaxKind::FORCE_RLS
                 | SyntaxKind::INHERIT_TABLE
+                | SyntaxKind::MERGE_PARTITIONS
                 | SyntaxKind::NO_FORCE_RLS
                 | SyntaxKind::NO_INHERIT_TABLE
                 | SyntaxKind::NOT_OF
@@ -28673,6 +28886,7 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::SET_UNLOGGED
                 | SyntaxKind::SET_WITHOUT_CLUSTER
                 | SyntaxKind::SET_WITHOUT_OIDS
+                | SyntaxKind::SPLIT_PARTITION
                 | SyntaxKind::VALIDATE_CONSTRAINT
         )
     }
@@ -28718,6 +28932,9 @@ impl AstNode for AlterTableAction {
             SyntaxKind::ENABLE_TRIGGER => AlterTableAction::EnableTrigger(EnableTrigger { syntax }),
             SyntaxKind::FORCE_RLS => AlterTableAction::ForceRls(ForceRls { syntax }),
             SyntaxKind::INHERIT_TABLE => AlterTableAction::InheritTable(InheritTable { syntax }),
+            SyntaxKind::MERGE_PARTITIONS => {
+                AlterTableAction::MergePartitions(MergePartitions { syntax })
+            }
             SyntaxKind::NO_FORCE_RLS => AlterTableAction::NoForceRls(NoForceRls { syntax }),
             SyntaxKind::NO_INHERIT_TABLE => {
                 AlterTableAction::NoInheritTable(NoInheritTable { syntax })
@@ -28750,6 +28967,9 @@ impl AstNode for AlterTableAction {
             }
             SyntaxKind::SET_WITHOUT_OIDS => {
                 AlterTableAction::SetWithoutOids(SetWithoutOids { syntax })
+            }
+            SyntaxKind::SPLIT_PARTITION => {
+                AlterTableAction::SplitPartition(SplitPartition { syntax })
             }
             SyntaxKind::VALIDATE_CONSTRAINT => {
                 AlterTableAction::ValidateConstraint(ValidateConstraint { syntax })
@@ -28784,6 +29004,7 @@ impl AstNode for AlterTableAction {
             AlterTableAction::EnableTrigger(it) => &it.syntax,
             AlterTableAction::ForceRls(it) => &it.syntax,
             AlterTableAction::InheritTable(it) => &it.syntax,
+            AlterTableAction::MergePartitions(it) => &it.syntax,
             AlterTableAction::NoForceRls(it) => &it.syntax,
             AlterTableAction::NoInheritTable(it) => &it.syntax,
             AlterTableAction::NotOf(it) => &it.syntax,
@@ -28803,6 +29024,7 @@ impl AstNode for AlterTableAction {
             AlterTableAction::SetUnlogged(it) => &it.syntax,
             AlterTableAction::SetWithoutCluster(it) => &it.syntax,
             AlterTableAction::SetWithoutOids(it) => &it.syntax,
+            AlterTableAction::SplitPartition(it) => &it.syntax,
             AlterTableAction::ValidateConstraint(it) => &it.syntax,
         }
     }
@@ -28933,6 +29155,12 @@ impl From<InheritTable> for AlterTableAction {
         AlterTableAction::InheritTable(node)
     }
 }
+impl From<MergePartitions> for AlterTableAction {
+    #[inline]
+    fn from(node: MergePartitions) -> AlterTableAction {
+        AlterTableAction::MergePartitions(node)
+    }
+}
 impl From<NoForceRls> for AlterTableAction {
     #[inline]
     fn from(node: NoForceRls) -> AlterTableAction {
@@ -29045,6 +29273,12 @@ impl From<SetWithoutOids> for AlterTableAction {
     #[inline]
     fn from(node: SetWithoutOids) -> AlterTableAction {
         AlterTableAction::SetWithoutOids(node)
+    }
+}
+impl From<SplitPartition> for AlterTableAction {
+    #[inline]
+    fn from(node: SplitPartition) -> AlterTableAction {
+        AlterTableAction::SplitPartition(node)
     }
 }
 impl From<ValidateConstraint> for AlterTableAction {

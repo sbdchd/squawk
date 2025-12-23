@@ -19,7 +19,7 @@ CREATE INDEX clean_aborted_self_key ON clean_aborted_self(key);
 INSERT INTO clean_aborted_self (key, data) VALUES (-1, 'just to allocate metapage');
 
 -- save index size from before the changes, for comparison
-SELECT pg_relation_size('clean_aborted_self_key') AS clean_aborted_self_key_before ;
+SELECT pg_relation_size('clean_aborted_self_key') AS clean_aborted_self_key_before /* \gset */;
 
 DO $$
 BEGIN
