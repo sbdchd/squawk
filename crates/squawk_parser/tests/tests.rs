@@ -74,9 +74,8 @@ fn parser_err(fixture: Fixture<&str>) {
     );
 }
 
-// 102 failing
 #[dir_test(
-    dir: "$CARGO_MANIFEST_DIR/tests/data/regression_suite",
+    dir: "$CARGO_MANIFEST_DIR/../../postgres/regression_suite",
     glob: "*.sql",
 )]
 fn regression_suite(fixture: Fixture<&str>) {
