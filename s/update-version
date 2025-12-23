@@ -23,7 +23,7 @@ main() {
     fi
 
     echo "Switching to release branch: release-$NEW_VERSION"
-    git switch "release-$NEW_VERSION" 2>/dev/null || git switch -c "release-$NEW_VERSION"
+    git switch "release-$NEW_VERSION-v2" 2>/dev/null || git switch -c "release-$NEW_VERSION-v2"
     echo "updating version to '$NEW_VERSION'..."
     fastmod --accept-all '^version = ".*"' 'version = "'$NEW_VERSION'"' Cargo.toml
     fastmod --accept-all '(squawk-[a-z_]+ = \{ path = "[^"]+", )version = "[^"]+"' '${1}version = "'$NEW_VERSION'"' Cargo.toml

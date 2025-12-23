@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.34.0 - 2025-12-22
+
+### Added
+
+- parser: add support for postgres 19's partition merge, partition split, and more. (#754)
+- parser: handle missing exprs in case expr (#749)
+- ide: goto def with `table` stmt (#748)
+- ide: support `set search_path` (#747)
+
+### Internal
+
+- fix: Removed deprecated cargo_bin() function in snapbox (#746). Thanks @ranger-ross!
+
 ## v2.33.2 - 2025-12-16
 
 ### Fixed
