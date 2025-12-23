@@ -6,20 +6,21 @@ use std::fs::{File, create_dir_all, remove_dir_all};
 use std::io::{BufRead, Write};
 use std::process::Command;
 
-pub(crate) const RAW_OUTPUT_DIR: &str = "crates/squawk_parser/tests/data/raw_regression_suite";
 const PROCESSED_OUTPUT_DIR: &str = "crates/squawk_parser/tests/data/regression_suite";
 
 pub(crate) fn download_regression_tests() -> Result<()> {
-    // download_raw_regression_suite()?;
-    transform_regression_suite()?;
+    let temp_dir = download_regression_suite()?;
+    transform_regression_suite(&temp_dir)?;
     Ok(())
 }
 
-fn download_raw_regression_suite() -> Result<()> {
-    let target_dir = project_root().join(RAW_OUTPUT_DIR);
+fn download_regression_suite() -> Result<Utf8PathBuf> {
+    let target_dir = Utf8PathBuf::from_path_buf(std::env::temp_dir())
+        .unwrap()
+        .join("squawk_raw_regression_suite");
 
     if target_dir.exists() {
-        println!("Cleaning target directory: {target_dir:?}");
+        println!("Cleaning temp directory: {target_dir:?}");
         remove_dir_all(&target_dir)?;
     }
 
@@ -49,26 +50,14 @@ fn download_raw_regression_suite() -> Result<()> {
             let error_msg = String::from_utf8_lossy(&output.stderr);
             bail!("Failed to download '{}': {}", url, error_msg);
         }
-
-        // let mut processed_content = Vec::new();
-
-        // let cursor = Cursor::new(&output.stdout);
-
-        // if let Err(e) = preprocess_sql(cursor, &mut processed_content) {
-        //     eprintln!("Error: Failed to process file: {e}");
-        //     continue;
-        // }
-        let processed_content = output.stdout;
-
         let mut dest = File::create(&filepath)?;
-        dest.write_all(&processed_content)?
+        dest.write_all(&output.stdout)?
     }
 
-    Ok(())
+    Ok(target_dir)
 }
 
-fn transform_regression_suite() -> Result<()> {
-    let input_dir = project_root().join(RAW_OUTPUT_DIR);
+fn transform_regression_suite(input_dir: &Utf8PathBuf) -> Result<()> {
     let output_dir = project_root().join(PROCESSED_OUTPUT_DIR);
 
     if output_dir.exists() {
@@ -79,7 +68,7 @@ fn transform_regression_suite() -> Result<()> {
     create_dir_all(&output_dir)?;
 
     let mut files: Vec<Utf8PathBuf> = vec![];
-    for entry in std::fs::read_dir(&input_dir)? {
+    for entry in std::fs::read_dir(input_dir)? {
         let entry = entry?;
         let path = Utf8PathBuf::try_from(entry.path())?;
         if path.extension() == Some("sql") {
@@ -113,7 +102,6 @@ fn transform_regression_suite() -> Result<()> {
 }
 
 fn fetch_download_urls() -> Result<Vec<String>> {
-    // Fetch list of SQL file URLs
     println!("Fetching SQL file URLs...");
     let output = Command::new("gh")
         .args([
@@ -169,7 +157,7 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
 
     let template_vars_regex = Regex::new(r"^:'([^']+)'|^:([a-zA-Z_][a-zA-Z0-9_]*)").unwrap();
 
-    for (idx, line) in source.lines().enumerate() {
+    for line in source.lines() {
         let mut line = line?;
 
         if line.contains("bogus cases") {
@@ -418,8 +406,6 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
                         let full = caps.get(0).unwrap();
                         let m = caps.get(1).or_else(|| caps.get(2)).unwrap();
                         let matched_var = &remaining[m.start()..m.end()];
-
-                        println!("#{idx} Replacing template variable {matched_var}");
 
                         result.push('\'');
                         result.push_str(matched_var);
