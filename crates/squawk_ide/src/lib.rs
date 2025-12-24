@@ -2,6 +2,7 @@ mod binder;
 pub mod code_actions;
 pub mod column_name;
 pub mod expand_selection;
+pub mod find_references;
 mod generated;
 pub mod goto_definition;
 mod offsets;

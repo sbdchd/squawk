@@ -7,17 +7,18 @@ use lsp_types::{
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, OneOf,
-    PublishDiagnosticsParams, SelectionRangeParams, SelectionRangeProviderCapability,
-    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
-    WorkDoneProgressOptions, WorkspaceEdit,
+    PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
+    SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
+    TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
     },
-    request::{CodeActionRequest, GotoDefinition, Request, SelectionRangeRequest},
+    request::{CodeActionRequest, GotoDefinition, References, Request, SelectionRangeRequest},
 };
 use rowan::TextRange;
 use squawk_ide::code_actions::code_actions;
+use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_syntax::{Parse, SourceFile};
 use std::collections::HashMap;
@@ -55,6 +56,7 @@ pub fn run() -> Result<()> {
             resolve_provider: None,
         })),
         selection_range_provider: Some(SelectionRangeProviderCapability::Simple(true)),
+        references_provider: Some(OneOf::Left(true)),
         definition_provider: Some(OneOf::Left(true)),
         ..Default::default()
     })
@@ -107,6 +109,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     }
                     "squawk/tokens" => {
                         handle_tokens(&connection, req, &documents)?;
+                    }
+                    References::METHOD => {
+                        handle_references(&connection, req, &documents)?;
                     }
                     _ => {
                         info!("Ignoring unhandled request: {}", req.method);
@@ -229,6 +234,43 @@ fn handle_selection_range(
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&selection_ranges).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
+fn handle_references(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
+    let params: ReferenceParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document_position.text_document.uri;
+    let position = params.text_document_position.position;
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let file = parse.tree();
+    let line_index = LineIndex::new(content);
+    let offset = lsp_utils::offset(&line_index, position).unwrap();
+
+    let ranges = find_references(&file, offset);
+    let include_declaration = params.context.include_declaration;
+
+    let locations: Vec<Location> = ranges
+        .into_iter()
+        .filter(|range| include_declaration || !range.contains(offset))
+        .map(|range| Location {
+            uri: uri.clone(),
+            range: lsp_utils::range(&line_index, range),
+        })
+        .collect();
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&locations).unwrap()),
         error: None,
     };
 
