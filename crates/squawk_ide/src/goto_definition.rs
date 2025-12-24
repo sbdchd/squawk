@@ -47,6 +47,10 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRa
         }
     }
 
+    if let Some(name) = ast::Name::cast(parent.clone()) {
+        return Some(name.syntax().text_range());
+    }
+
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         let binder_output = binder::bind(&file);
         if let Some(ptr) = resolve::resolve_name_ref(&binder_output, &name_ref) {
@@ -300,6 +304,20 @@ drop table pg_temp.t$0;
           │                   ─ 2. destination
         3 │ drop table pg_temp.t;
           ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_definition_returns_self() {
+        assert_snapshot!(goto("
+create table t$0(x bigint, y bigint);
+"), @r"
+          ╭▸ 
+        2 │ create table t(x bigint, y bigint);
+          │              ┬
+          │              │
+          │              2. destination
+          ╰╴             1. source
         ");
     }
 
