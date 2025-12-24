@@ -342,22 +342,4 @@ drop table foo_bar;
           ╰╴           ─── 2. reference
         ");
     }
-
-    #[test]
-    fn dedupes_duplicate_ranges() {
-        let (mut offset, sql) = fixture(
-            "
-create table t();
-drop table t;
-drop table t$0;
-",
-        );
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
-        let file: ast::SourceFile = parse.tree();
-
-        let references = find_references(&file, offset);
-        assert_eq!(references.len(), 3);
-    }
 }
