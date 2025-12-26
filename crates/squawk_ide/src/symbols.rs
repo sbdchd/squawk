@@ -1,6 +1,7 @@
 use la_arena::Idx;
 use smol_str::SmolStr;
 use squawk_syntax::SyntaxNodePtr;
+use std::fmt;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) struct Name(pub(crate) SmolStr);
@@ -11,6 +12,12 @@ pub(crate) struct Schema(pub(crate) Name);
 impl Schema {
     pub(crate) fn new(name: impl Into<SmolStr>) -> Self {
         Schema(Name::new(name))
+    }
+}
+
+impl fmt::Display for Schema {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0.0)
     }
 }
 
