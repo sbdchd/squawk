@@ -35,9 +35,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_index(binder, &index_name, &schema, position)
         }
-        NameRefContext::CreateIndexColumn => {
-            resolve_create_index_column(binder, name_ref)
-        }
+        NameRefContext::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
     }
 }
 
@@ -127,7 +125,10 @@ fn resolve_index(
 fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
     let column_name = Name::new(name_ref.syntax().text().to_string());
 
-    let create_index = name_ref.syntax().ancestors().find_map(ast::CreateIndex::cast)?;
+    let create_index = name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::CreateIndex::cast)?;
     let relation_name = create_index.relation_name()?;
     let path = relation_name.path()?;
 
@@ -147,12 +148,11 @@ fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     let table_arg_list = create_table.table_arg_list()?;
 
     for arg in table_arg_list.args() {
-        if let ast::TableArg::Column(column) = arg {
-            if let Some(col_name) = column.name() {
-                if Name::new(col_name.syntax().text().to_string()) == column_name {
-                    return Some(SyntaxNodePtr::new(col_name.syntax()));
-                }
-            }
+        if let ast::TableArg::Column(column) = arg
+            && let Some(col_name) = column.name()
+            && Name::new(col_name.syntax().text().to_string()) == column_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
         }
     }
 
