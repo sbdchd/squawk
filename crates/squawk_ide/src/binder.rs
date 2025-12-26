@@ -78,6 +78,7 @@ fn bind_file(b: &mut Binder, file: &ast::SourceFile) {
 fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
     match stmt {
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
+        ast::Stmt::CreateIndex(create_index) => bind_create_index(b, create_index),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -104,6 +105,28 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
 
     let root = b.root_scope();
     b.scopes[root].insert(table_name, table_id);
+}
+
+fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
+    let Some(name) = create_index.name() else {
+        return;
+    };
+
+    let index_name = Name::new(name.syntax().text().to_string());
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let Some(schema) = b.current_search_path().first().cloned() else {
+        return;
+    };
+
+    let index_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Index,
+        ptr: name_ptr,
+        schema,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(index_name, index_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

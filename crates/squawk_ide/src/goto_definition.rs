@@ -691,4 +691,221 @@ table t$0;
           ╰╴      ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_drop_index() {
+        assert_snapshot!(goto("
+create index idx_name on t(x);
+drop index idx_name$0;
+"), @r"
+          ╭▸ 
+        2 │ create index idx_name on t(x);
+          │              ──────── 2. destination
+        3 │ drop index idx_name;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_index_with_schema() {
+        assert_snapshot!(goto(r#"
+set search_path to public;
+create index idx_name on t(x);
+drop index public.idx_name$0;
+"#), @r"
+          ╭▸ 
+        3 │ create index idx_name on t(x);
+          │              ──────── 2. destination
+        4 │ drop index public.idx_name;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_index_defined_after() {
+        assert_snapshot!(goto("
+drop index idx_name$0;
+create index idx_name on t(x);
+"), @r"
+          ╭▸ 
+        2 │ drop index idx_name;
+          │                   ─ 1. source
+        3 │ create index idx_name on t(x);
+          ╰╴             ──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_index_definition_returns_self() {
+        assert_snapshot!(goto("
+create index idx_name$0 on t(x);
+"), @r"
+          ╭▸ 
+        2 │ create index idx_name on t(x);
+          │              ┬──────┬
+          │              │      │
+          │              │      1. source
+          ╰╴             2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_drop_index_with_search_path() {
+        assert_snapshot!(goto(r#"
+create index idx_name on t(x);
+set search_path to bar;
+create index idx_name on f(x);
+set search_path to default;
+drop index idx_name$0;
+"#), @r"
+          ╭▸ 
+        2 │ create index idx_name on t(x);
+          │              ──────── 2. destination
+          ‡
+        6 │ drop index idx_name;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_index_multiple() {
+        assert_snapshot!(goto("
+create index idx1 on t(x);
+create index idx2 on t(y);
+drop index idx1, idx2$0;
+"), @r"
+          ╭▸ 
+        3 │ create index idx2 on t(y);
+          │              ──── 2. destination
+        4 │ drop index idx1, idx2;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_table() {
+        assert_snapshot!(goto("
+create table users(id int);
+create index idx_users on users$0(id);
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │              ───── 2. destination
+        3 │ create index idx_users on users(id);
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_table_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int);
+create index idx_users on public.users$0(id);
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int);
+          │                     ───── 2. destination
+        3 │ create index idx_users on public.users(id);
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_table_with_search_path() {
+        assert_snapshot!(goto(r#"
+set search_path to foo;
+create table foo.users(id int);
+create index idx_users on users$0(id);
+"#), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int);
+          │                  ───── 2. destination
+        4 │ create index idx_users on users(id);
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_temp_table() {
+        assert_snapshot!(goto("
+create temp table users(id int);
+create index idx_users on users$0(id);
+"), @r"
+          ╭▸ 
+        2 │ create temp table users(id int);
+          │                   ───── 2. destination
+        3 │ create index idx_users on users(id);
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create index idx_email on users(email$0);
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ create index idx_email on users(email);
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_first_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create index idx_id on users(id$0);
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ create index idx_id on users(id);
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_multiple_columns() {
+        assert_snapshot!(goto("
+create table users(id int, email text, name text);
+create index idx_users on users(id, email$0, name);
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text, name text);
+          │                            ───── 2. destination
+        3 │ create index idx_users on users(id, email, name);
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_column_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+create index idx_email on public.users(email$0);
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                                   ───── 2. destination
+        3 │ create index idx_email on public.users(email);
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_column_temp_table() {
+        assert_snapshot!(goto("
+create temp table users(id int, email text);
+create index idx_email on users(email$0);
+"), @r"
+          ╭▸ 
+        2 │ create temp table users(id int, email text);
+          │                                 ───── 2. destination
+        3 │ create index idx_email on users(email);
+          ╰╴                                    ─ 1. source
+        ");
+    }
 }
