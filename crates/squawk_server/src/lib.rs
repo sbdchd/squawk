@@ -6,7 +6,8 @@ use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, OneOf,
+    GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverContents, HoverParams,
+    HoverProviderCapability, InitializeParams, LanguageString, Location, MarkedString, OneOf,
     PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
     SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
     TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
@@ -14,12 +15,15 @@ use lsp_types::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
     },
-    request::{CodeActionRequest, GotoDefinition, References, Request, SelectionRangeRequest},
+    request::{
+        CodeActionRequest, GotoDefinition, HoverRequest, References, Request, SelectionRangeRequest,
+    },
 };
 use rowan::TextRange;
 use squawk_ide::code_actions::code_actions;
 use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
+use squawk_ide::hover::hover;
 use squawk_syntax::{Parse, SourceFile};
 use std::collections::HashMap;
 
@@ -58,6 +62,7 @@ pub fn run() -> Result<()> {
         selection_range_provider: Some(SelectionRangeProviderCapability::Simple(true)),
         references_provider: Some(OneOf::Left(true)),
         definition_provider: Some(OneOf::Left(true)),
+        hover_provider: Some(HoverProviderCapability::Simple(true)),
         ..Default::default()
     })
     .unwrap();
@@ -97,6 +102,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                 match req.method.as_ref() {
                     GotoDefinition::METHOD => {
                         handle_goto_definition(&connection, req, &documents)?;
+                    }
+                    HoverRequest::METHOD => {
+                        handle_hover(&connection, req, &documents)?;
                     }
                     CodeActionRequest::METHOD => {
                         handle_code_action(&connection, req, &documents)?;
@@ -173,6 +181,41 @@ fn handle_goto_definition(
         }
         None => GotoDefinitionResponse::Array(vec![]),
     };
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&result).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
+fn handle_hover(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
+    let params: HoverParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document_position_params.text_document.uri;
+    let position = params.text_document_position_params.position;
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let file = parse.tree();
+    let line_index = LineIndex::new(content);
+    let offset = lsp_utils::offset(&line_index, position).unwrap();
+
+    let type_info = hover(&file, offset);
+
+    let result = type_info.map(|type_str| Hover {
+        contents: HoverContents::Scalar(MarkedString::LanguageString(LanguageString {
+            language: "sql".to_string(),
+            value: type_str,
+        })),
+        range: None,
+    });
 
     let resp = Response {
         id: req.id,
