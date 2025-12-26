@@ -27,7 +27,7 @@ impl Binder {
             symbols: Arena::new(),
             search_path_changes: vec![SearchPathChange {
                 position: TextSize::from(0),
-                search_path: vec![Schema::new("pg_temp"), Schema::new("public")],
+                search_path: vec![Schema::new("public"), Schema::new("pg_temp")],
             }],
         }
     }
@@ -38,6 +38,14 @@ impl Binder {
             .next()
             .map(|(id, _)| id)
             .expect("root scope must exist")
+    }
+
+    fn current_search_path(&self) -> &[Schema] {
+        &self
+            .search_path_changes
+            .last()
+            .expect("search_path_changes should never be empty")
+            .search_path
     }
 
     pub(crate) fn search_path_at(&self, position: TextSize) -> &[Schema] {
@@ -84,7 +92,9 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
     };
     let name_ptr = path_to_ptr(&path);
     let is_temp = create_table.temp_token().is_some() || create_table.temporary_token().is_some();
-    let schema = schema_name(&path, is_temp);
+    let Some(schema) = schema_name(b, &path, is_temp) else {
+        return;
+    };
 
     let table_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Table,
@@ -121,22 +131,20 @@ fn path_to_ptr(path: &ast::Path) -> SyntaxNodePtr {
     SyntaxNodePtr::new(path.syntax())
 }
 
-fn schema_name(path: &ast::Path, is_temp: bool) -> Schema {
-    let default_schema = if is_temp { "pg_temp" } else { "public" };
+fn schema_name(b: &Binder, path: &ast::Path, is_temp: bool) -> Option<Schema> {
+    if let Some(name_ref) = path
+        .qualifier()
+        .and_then(|q| q.segment())
+        .and_then(|s| s.name_ref())
+    {
+        return Some(Schema(Name::new(name_ref.syntax().text().to_string())));
+    }
 
-    let Some(segment) = path.qualifier().and_then(|q| q.segment()) else {
-        return Schema::new(default_schema);
-    };
+    if is_temp {
+        return Some(Schema::new("pg_temp"));
+    }
 
-    let schema_name = if let Some(name) = segment.name() {
-        Name::new(name.syntax().text().to_string())
-    } else if let Some(name_ref) = segment.name_ref() {
-        Name::new(name_ref.syntax().text().to_string())
-    } else {
-        return Schema::new(default_schema);
-    };
-
-    Schema(schema_name)
+    b.current_search_path().first().cloned()
 }
 
 fn bind_set(b: &mut Binder, set: ast::Set) {
@@ -144,13 +152,13 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
 
     // `set schema` is an alternative to `set search_path`
     if set.schema_token().is_some() {
-        if let Some(literal) = set.literal() {
-            if let Some(string_value) = extract_string_literal(&literal) {
-                b.search_path_changes.push(SearchPathChange {
-                    position,
-                    search_path: vec![Schema::new(string_value)],
-                });
-            }
+        if let Some(literal) = set.literal()
+            && let Some(string_value) = extract_string_literal(&literal)
+        {
+            b.search_path_changes.push(SearchPathChange {
+                position,
+                search_path: vec![Schema::new(string_value)],
+            });
         }
         return;
     }
@@ -179,7 +187,7 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
     if set.default_token().is_some() {
         b.search_path_changes.push(SearchPathChange {
             position,
-            search_path: vec![Schema::new("pg_temp"), Schema::new("public")],
+            search_path: vec![Schema::new("public"), Schema::new("pg_temp")],
         });
     } else {
         let mut search_path = vec![];
@@ -187,6 +195,9 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
             match config_value {
                 ast::ConfigValue::Literal(literal) => {
                     if let Some(string_value) = extract_string_literal(&literal) {
+                        // You can unset the search path via `set search_path = ''`
+                        // so we want to skip over these, otherwise we'll
+                        // have a schema of value `''` which isn't valid.
                         if !string_value.is_empty() {
                             search_path.push(Schema::new(string_value));
                         }

@@ -330,8 +330,9 @@ create temp table t();
 drop table t$0;
 "), @r"
           ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
         3 │ create temp table t();
-          │                   ─ 2. destination
         4 │ drop table t;
           ╰╴           ─ 1. source
         ");
@@ -472,6 +473,32 @@ drop table t$0;
         4 │ drop table t;
           ╰╴           ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_with_search_path_and_unspecified_table() {
+        assert_snapshot!(goto(r#"
+set search_path to foo,bar;
+create table t();
+drop table foo.t$0;
+"#), @r"
+          ╭▸ 
+        3 │ create table t();
+          │              ─ 2. destination
+        4 │ drop table foo.t;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_search_path_empty() {
+        goto_not_found(
+            r#"
+set search_path = '';
+create table t();
+drop table t$0;
+"#,
+        );
     }
 
     #[test]
