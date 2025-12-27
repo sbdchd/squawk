@@ -43,7 +43,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             return format_create_index(&create_index, &binder);
         }
 
-        if let Some(create_function) = name.syntax().ancestors().find_map(ast::CreateFunction::cast)
+        if let Some(create_function) = name
+            .syntax()
+            .ancestors()
+            .find_map(ast::CreateFunction::cast)
         {
             return format_create_function(&create_function, &binder);
         }
@@ -340,7 +343,10 @@ fn format_create_function(
     ))
 }
 
-fn function_schema(create_function: &ast::CreateFunction, binder: &binder::Binder) -> Option<String> {
+fn function_schema(
+    create_function: &ast::CreateFunction,
+    binder: &binder::Binder,
+) -> Option<String> {
     let position = create_function.syntax().text_range().start();
     let search_path = binder.search_path_at(position);
     search_path.first().map(|s| s.to_string())
