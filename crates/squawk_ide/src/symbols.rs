@@ -41,6 +41,7 @@ fn normalize_identifier(text: &str) -> SmolStr {
 pub(crate) enum SymbolKind {
     Table,
     Index,
+    Function,
 }
 
 #[derive(Clone, Debug)]

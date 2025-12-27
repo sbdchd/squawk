@@ -79,6 +79,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
     match stmt {
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
         ast::Stmt::CreateIndex(create_index) => bind_create_index(b, create_index),
+        ast::Stmt::CreateFunction(create_function) => bind_create_function(b, create_function),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -127,6 +128,31 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
 
     let root = b.root_scope();
     b.scopes[root].insert(index_name, index_id);
+}
+
+fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
+    let Some(path) = create_function.path() else {
+        return;
+    };
+
+    let Some(function_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+
+    let Some(schema) = b.current_search_path().first().cloned() else {
+        return;
+    };
+
+    let function_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Function,
+        ptr: name_ptr,
+        schema,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(function_name, function_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
