@@ -141,7 +141,7 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
 
     let name_ptr = path_to_ptr(&path);
 
-    let Some(schema) = b.current_search_path().first().cloned() else {
+    let Some(schema) = schema_name(b, &path, false) else {
         return;
     };
 
