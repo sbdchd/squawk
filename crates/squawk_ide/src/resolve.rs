@@ -318,23 +318,24 @@ fn extract_schema_name(path: &ast::Path) -> Option<Schema> {
         .map(|name_ref| Schema(Name::new(name_ref.syntax().text().to_string())))
 }
 
-pub(crate) fn extract_column_name(col: &ast::Column) -> Option<String> {
-    if let Some(name_ref) = col.name_ref() {
-        Some(name_ref.syntax().text().to_string())
+pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
+    let text = if let Some(name_ref) = col.name_ref() {
+        name_ref.syntax().text().to_string()
     } else {
-        col.name().map(|name| name.syntax().text().to_string())
-    }
+        let name = col.name()?;
+        name.syntax().text().to_string()
+    };
+    Some(Name::new(text))
 }
 
 pub(crate) fn find_column_in_table(
     table_arg_list: &ast::TableArgList,
-    col_name: &str,
+    col_name: &Name,
 ) -> Option<TextRange> {
-    let col_name_normalized = Name::new(col_name.to_string());
     table_arg_list.args().find_map(|arg| {
         if let ast::TableArg::Column(column) = arg
             && let Some(name) = column.name()
-            && Name::new(name.syntax().text().to_string()) == col_name_normalized
+            && Name::new(name.syntax().text().to_string()) == *col_name
         {
             Some(name.syntax().text_range())
         } else {

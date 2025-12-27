@@ -1,6 +1,7 @@
 use crate::binder;
 use crate::binder::Binder;
 use crate::resolve;
+use crate::symbols::Name;
 use rowan::{TextRange, TextSize};
 use squawk_syntax::ast::{self, AstNode};
 
@@ -85,8 +86,7 @@ fn inlay_hint_insert(
     let values = insert.values()?;
     let row_list = values.row_list()?;
 
-    let columns: Vec<(String, Option<TextRange>)> = if let Some(column_list) = insert.column_list()
-    {
+    let columns: Vec<(Name, Option<TextRange>)> = if let Some(column_list) = insert.column_list() {
         let table_arg_list = resolve::resolve_insert_table_columns(file, binder, &insert);
 
         column_list
@@ -108,7 +108,7 @@ fn inlay_hint_insert(
                 if let ast::TableArg::Column(column) = arg
                     && let Some(name) = column.name()
                 {
-                    let col_name = name.syntax().text().to_string();
+                    let col_name = Name::new(name.syntax().text().to_string());
                     let target = Some(name.syntax().text_range());
                     Some((col_name, target))
                 } else {
