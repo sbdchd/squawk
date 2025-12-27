@@ -7,7 +7,6 @@ use squawk_syntax::{
 use crate::binder::Binder;
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
-use squawk_syntax::SyntaxNode;
 
 #[derive(Debug)]
 enum NameRefContext {
@@ -18,13 +17,21 @@ enum NameRefContext {
     CreateIndex,
     CreateIndexColumn,
     SelectFunctionCall,
+    InsertTable,
+    InsertColumn,
+    DeleteTable,
+    DeleteWhereColumn,
 }
 
 pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
     let context = classify_name_ref_context(name_ref)?;
 
     match context {
-        NameRefContext::DropTable | NameRefContext::Table | NameRefContext::CreateIndex => {
+        NameRefContext::DropTable
+        | NameRefContext::Table
+        | NameRefContext::CreateIndex
+        | NameRefContext::InsertTable
+        | NameRefContext::DeleteTable => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -61,12 +68,16 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             resolve_function(binder, &function_name, &schema, position)
         }
         NameRefContext::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
+        NameRefContext::InsertColumn => resolve_insert_column(binder, name_ref),
+        NameRefContext::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
     }
 }
 
 fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> {
     let mut in_partition_item = false;
     let mut in_call_expr = false;
+    let mut in_column_list = false;
+    let mut in_where_clause = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
@@ -95,6 +106,24 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         }
         if ast::Select::can_cast(ancestor.kind()) && in_call_expr {
             return Some(NameRefContext::SelectFunctionCall);
+        }
+        if ast::ColumnList::can_cast(ancestor.kind()) {
+            in_column_list = true;
+        }
+        if ast::Insert::can_cast(ancestor.kind()) {
+            if in_column_list {
+                return Some(NameRefContext::InsertColumn);
+            }
+            return Some(NameRefContext::InsertTable);
+        }
+        if ast::WhereClause::can_cast(ancestor.kind()) {
+            in_where_clause = true;
+        }
+        if ast::Delete::can_cast(ancestor.kind()) {
+            if in_where_clause {
+                return Some(NameRefContext::DeleteWhereColumn);
+            }
+            return Some(NameRefContext::DeleteTable);
         }
     }
 
@@ -179,7 +208,74 @@ fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 
     let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
 
-    let root: &SyntaxNode = &name_ref.syntax().ancestors().last()?;
+    let root = &name_ref.syntax().ancestors().last()?;
+    let table_name_node = table_ptr.to_node(root);
+
+    let create_table = table_name_node
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
+
+    let table_arg_list = create_table.table_arg_list()?;
+
+    for arg in table_arg_list.args() {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(col_name) = column.name()
+            && Name::new(col_name.syntax().text().to_string()) == column_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
+        }
+    }
+
+    None
+}
+
+fn resolve_insert_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+    let column_name = Name::new(name_ref.syntax().text().to_string());
+
+    let insert = name_ref.syntax().ancestors().find_map(ast::Insert::cast)?;
+    let path = insert.path()?;
+
+    let table_name = extract_table_name(&path)?;
+    let schema = extract_schema_name(&path);
+    let position = name_ref.syntax().text_range().start();
+
+    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
+
+    let root = &name_ref.syntax().ancestors().last()?;
+    let table_name_node = table_ptr.to_node(root);
+
+    let create_table = table_name_node
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
+
+    let table_arg_list = create_table.table_arg_list()?;
+
+    for arg in table_arg_list.args() {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(col_name) = column.name()
+            && Name::new(col_name.syntax().text().to_string()) == column_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
+        }
+    }
+
+    None
+}
+
+fn resolve_delete_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+    let column_name = Name::new(name_ref.syntax().text().to_string());
+
+    let delete = name_ref.syntax().ancestors().find_map(ast::Delete::cast)?;
+    let relation_name = delete.relation_name()?;
+    let path = relation_name.path()?;
+
+    let table_name = extract_table_name(&path)?;
+    let schema = extract_schema_name(&path);
+    let position = name_ref.syntax().text_range().start();
+
+    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
+
+    let root = &name_ref.syntax().ancestors().last()?;
     let table_name_node = table_ptr.to_node(root);
 
     let create_table = table_name_node
