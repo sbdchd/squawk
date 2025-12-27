@@ -1,7 +1,7 @@
 use crate::binder;
 use crate::binder::Binder;
 use crate::resolve;
-use rowan::TextSize;
+use rowan::{TextRange, TextSize};
 use squawk_syntax::ast::{self, AstNode};
 
 /// `VSCode` has some theming options based on these types.
@@ -16,6 +16,7 @@ pub struct InlayHint {
     pub position: TextSize,
     pub label: String,
     pub kind: InlayHintKind,
+    pub target: Option<TextRange>,
 }
 
 pub fn inlay_hints(file: &ast::SourceFile) -> Vec<InlayHint> {
@@ -23,8 +24,10 @@ pub fn inlay_hints(file: &ast::SourceFile) -> Vec<InlayHint> {
     let binder = binder::bind(file);
 
     for node in file.syntax().descendants() {
-        if let Some(call_expr) = ast::CallExpr::cast(node) {
+        if let Some(call_expr) = ast::CallExpr::cast(node.clone()) {
             inlay_hint_call_expr(&mut hints, file, &binder, call_expr);
+        } else if let Some(insert) = ast::Insert::cast(node) {
+            inlay_hint_insert(&mut hints, file, &binder, insert);
         }
     }
 
@@ -59,14 +62,72 @@ fn inlay_hint_call_expr(
         for (param, arg) in param_list.params().zip(arg_list.args()) {
             if let Some(param_name) = param.name() {
                 let arg_start = arg.syntax().text_range().start();
+                let target = Some(param_name.syntax().text_range());
                 hints.push(InlayHint {
                     position: arg_start,
                     label: format!("{}: ", param_name.syntax().text()),
                     kind: InlayHintKind::Parameter,
+                    target,
                 });
             }
         }
     };
+
+    Some(())
+}
+
+fn inlay_hint_insert(
+    hints: &mut Vec<InlayHint>,
+    file: &ast::SourceFile,
+    binder: &Binder,
+    insert: ast::Insert,
+) -> Option<()> {
+    let values = insert.values()?;
+    let row_list = values.row_list()?;
+
+    let columns: Vec<(String, Option<TextRange>)> = if let Some(column_list) = insert.column_list() {
+        let table_arg_list = resolve::resolve_insert_table_columns(file, binder, &insert);
+
+        column_list
+            .columns()
+            .filter_map(|col| {
+                let col_name = resolve::extract_column_name(&col)?;
+                let target = table_arg_list
+                    .as_ref()
+                    .and_then(|list| resolve::find_column_in_table(list, &col_name));
+                Some((col_name, target))
+            })
+            .collect()
+    } else {
+        let table_arg_list = resolve::resolve_insert_table_columns(file, binder, &insert)?;
+
+        table_arg_list
+            .args()
+            .filter_map(|arg| {
+                if let ast::TableArg::Column(column) = arg
+                    && let Some(name) = column.name()
+                {
+                    let col_name = name.syntax().text().to_string();
+                    let target = Some(name.syntax().text_range());
+                    Some((col_name, target))
+                } else {
+                    None
+                }
+            })
+            .collect()
+    };
+
+    for row in row_list.rows() {
+        for ((column_name, target), expr) in columns.iter().zip(row.exprs()) {
+            let expr_start = expr.syntax().text_range().start();
+            hints.push(InlayHint {
+                position: expr_start,
+                label: format!("{}: ", column_name),
+                kind: InlayHintKind::Parameter,
+                target: *target,
+            });
+        }
+    }
 
     Some(())
 }
@@ -214,6 +275,70 @@ select foo(1, 2);
           ╭▸ 
         3 │ select foo(a: 1, 2);
           ╰╴           ───
+        ");
+    }
+
+    #[test]
+    fn insert_with_column_list() {
+        assert_snapshot!(check_inlay_hints("
+create table t (column_a int, column_b int, column_c text);
+insert into t (column_a, column_c) values (1, 'foo');
+"), @r"
+        inlay hints:
+          ╭▸ 
+        3 │ insert into t (column_a, column_c) values (column_a: 1, column_c: 'foo');
+          ╰╴                                           ──────────   ──────────
+        ");
+    }
+
+    #[test]
+    fn insert_without_column_list() {
+        assert_snapshot!(check_inlay_hints("
+create table t (column_a int, column_b int, column_c text);
+insert into t values (1, 2, 'foo');
+"), @r"
+        inlay hints:
+          ╭▸ 
+        3 │ insert into t values (column_a: 1, column_b: 2, column_c: 'foo');
+          ╰╴                      ──────────   ──────────   ──────────
+        ");
+    }
+
+    #[test]
+    fn insert_multiple_rows() {
+        assert_snapshot!(check_inlay_hints("
+create table t (x int, y int);
+insert into t values (1, 2), (3, 4);
+"), @r"
+        inlay hints:
+          ╭▸ 
+        3 │ insert into t values (x: 1, y: 2), (x: 3, y: 4);
+          ╰╴                      ───   ───     ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_no_create_table() {
+        assert_snapshot!(check_inlay_hints("
+insert into t (a, b) values (1, 2);
+"), @r"
+        inlay hints:
+          ╭▸ 
+        2 │ insert into t (a, b) values (a: 1, b: 2);
+          ╰╴                             ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_more_values_than_columns() {
+        assert_snapshot!(check_inlay_hints("
+create table t (a int, b int);
+insert into t values (1, 2, 3);
+"), @r"
+        inlay hints:
+          ╭▸ 
+        3 │ insert into t values (a: 1, b: 2, 3);
+          ╰╴                      ───   ───
         ");
     }
 }
