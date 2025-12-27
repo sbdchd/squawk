@@ -26,6 +26,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         if is_function_ref(&name_ref) {
             return hover_function(file, &name_ref, &binder);
         }
+
+        if is_select_function_call(&name_ref) {
+            return hover_function(file, &name_ref, &binder);
+        }
     }
 
     if let Some(name) = ast::Name::cast(parent) {
@@ -293,6 +297,20 @@ fn is_index_ref(name_ref: &ast::NameRef) -> bool {
 fn is_function_ref(name_ref: &ast::NameRef) -> bool {
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropFunction::can_cast(ancestor.kind()) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_select_function_call(name_ref: &ast::NameRef) -> bool {
+    let mut in_call_expr = false;
+
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::CallExpr::can_cast(ancestor.kind()) {
+            in_call_expr = true;
+        }
+        if ast::Select::can_cast(ancestor.kind()) && in_call_expr {
             return true;
         }
     }
@@ -854,6 +872,59 @@ drop function foo$0();
           ╭▸ 
         4 │ drop function foo();
           ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_function_call() {
+        assert_snapshot!(check_hover("
+create function foo() returns int as $$ select 1 $$ language sql;
+select foo$0();
+"), @r"
+        hover: function public.foo() returns int
+          ╭▸ 
+        3 │ select foo();
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_function_call_with_schema() {
+        assert_snapshot!(check_hover("
+create function public.foo() returns int as $$ select 1 $$ language sql;
+select public.foo$0();
+"), @r"
+        hover: function public.foo() returns int
+          ╭▸ 
+        3 │ select public.foo();
+          ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_function_call_with_search_path() {
+        assert_snapshot!(check_hover(r#"
+set search_path to myschema;
+create function foo() returns int as $$ select 1 $$ language sql;
+select foo$0();
+"#), @r"
+        hover: function myschema.foo() returns int
+          ╭▸ 
+        4 │ select foo();
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_function_call_with_params() {
+        assert_snapshot!(check_hover("
+create function add(a int, b int) returns int as $$ select a + b $$ language sql;
+select add$0(1, 2);
+"), @r"
+        hover: function public.add(a int, b int) returns int
+          ╭▸ 
+        3 │ select add(1, 2);
+          ╰╴         ─ hover
         ");
     }
 }
