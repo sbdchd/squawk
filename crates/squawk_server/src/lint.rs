@@ -20,7 +20,7 @@ fn to_text_edit(edit: Edit, line_index: &LineIndex) -> Option<TextEdit> {
 }
 
 pub(crate) fn lint(content: &str) -> Vec<Diagnostic> {
-    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let parse = SourceFile::parse(content);
     let parse_errors = parse.errors();
     let mut linter = Linter::with_all_rules();
     let violations = linter.lint(&parse, content);
