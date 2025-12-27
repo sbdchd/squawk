@@ -908,4 +908,94 @@ create index idx_email on users(email$0);
           ╰╴                                    ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_drop_function() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+drop function foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        3 │ drop function foo();
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_function_with_schema() {
+        assert_snapshot!(goto("
+set search_path to public;
+create function foo() returns int as $$ select 1 $$ language sql;
+drop function public.foo$0();
+"), @r"
+          ╭▸ 
+        3 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        4 │ drop function public.foo();
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_function_defined_after() {
+        assert_snapshot!(goto("
+drop function foo$0();
+create function foo() returns int as $$ select 1 $$ language sql;
+"), @r"
+          ╭▸ 
+        2 │ drop function foo();
+          │                 ─ 1. source
+        3 │ create function foo() returns int as $$ select 1 $$ language sql;
+          ╰╴                ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_function_definition_returns_self() {
+        assert_snapshot!(goto("
+create function foo$0() returns int as $$ select 1 $$ language sql;
+"), @r"
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ┬─┬
+          │                 │ │
+          │                 │ 1. source
+          ╰╴                2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_drop_function_with_search_path() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+set search_path to bar;
+create function foo() returns int as $$ select 1 $$ language sql;
+set search_path to default;
+drop function foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+          ‡
+        6 │ drop function foo();
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_function_multiple() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+create function bar() returns int as $$ select 1 $$ language sql;
+drop function foo(), bar$0();
+"), @r"
+          ╭▸ 
+        3 │ create function bar() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        4 │ drop function foo(), bar();
+          ╰╴                       ─ 1. source
+        ");
+    }
 }

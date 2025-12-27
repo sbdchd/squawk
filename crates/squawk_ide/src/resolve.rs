@@ -14,6 +14,7 @@ enum NameRefContext {
     DropTable,
     Table,
     DropIndex,
+    DropFunction,
     CreateIndex,
     CreateIndexColumn,
 }
@@ -36,6 +37,13 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_index(binder, &index_name, &schema, position)
         }
+        NameRefContext::DropFunction => {
+            let path = find_containing_path(name_ref)?;
+            let function_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_function(binder, &function_name, &schema, position)
+        }
         NameRefContext::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
     }
 }
@@ -52,6 +60,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         }
         if ast::DropIndex::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropIndex);
+        }
+        if ast::DropFunction::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::DropFunction);
         }
         if ast::PartitionItem::can_cast(ancestor.kind()) {
             in_partition_item = true;
@@ -115,6 +126,34 @@ fn resolve_index(
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &binder.symbols[*id];
                 symbol.kind == SymbolKind::Index && &symbol.schema == search_schema
+            }) {
+                return Some(binder.symbols[symbol_id].ptr);
+            }
+        }
+    }
+    None
+}
+
+fn resolve_function(
+    binder: &Binder,
+    function_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    let symbols = binder.scopes[binder.root_scope()].get(function_name)?;
+
+    if let Some(schema) = schema {
+        let symbol_id = symbols.iter().copied().find(|id| {
+            let symbol = &binder.symbols[*id];
+            symbol.kind == SymbolKind::Function && &symbol.schema == schema
+        })?;
+        return Some(binder.symbols[symbol_id].ptr);
+    } else {
+        let search_path = binder.search_path_at(position);
+        for search_schema in search_path {
+            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
+                let symbol = &binder.symbols[*id];
+                symbol.kind == SymbolKind::Function && &symbol.schema == search_schema
             }) {
                 return Some(binder.symbols[symbol_id].ptr);
             }
