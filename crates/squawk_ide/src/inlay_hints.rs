@@ -85,7 +85,8 @@ fn inlay_hint_insert(
     let values = insert.values()?;
     let row_list = values.row_list()?;
 
-    let columns: Vec<(String, Option<TextRange>)> = if let Some(column_list) = insert.column_list() {
+    let columns: Vec<(String, Option<TextRange>)> = if let Some(column_list) = insert.column_list()
+    {
         let table_arg_list = resolve::resolve_insert_table_columns(file, binder, &insert);
 
         column_list
