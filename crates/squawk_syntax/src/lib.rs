@@ -259,7 +259,7 @@ fn api_walkthrough() {
 
     // Besides the "typed" AST API, there's an untyped CST one as well.
     // To switch from AST to CST, call `.syntax()` method:
-    let func_option_syntax: &SyntaxNode = func_option.syntax();
+    let func_option_syntax = func_option.syntax();
 
     // Note how `expr` and `bin_expr` are in fact the same node underneath:
     assert!(func_option_syntax == option.syntax());

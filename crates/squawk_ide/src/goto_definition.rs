@@ -1041,4 +1041,232 @@ select myschema.foo$0();
           ╰╴                  ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_insert_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+insert into users$0(id, email) values (1, 'test@example.com');
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ insert into users(id, email) values (1, 'test@example.com');
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_table_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+insert into public.users$0(id, email) values (1, 'test@example.com');
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                     ───── 2. destination
+        3 │ insert into public.users(id, email) values (1, 'test@example.com');
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+insert into users(id$0, email) values (1, 'test@example.com');
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ insert into users(id, email) values (1, 'test@example.com');
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_column_second() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+insert into users(id, email$0) values (1, 'test@example.com');
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ insert into users(id, email) values (1, 'test@example.com');
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_column_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+insert into public.users(email$0) values ('test@example.com');
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                                   ───── 2. destination
+        3 │ insert into public.users(email) values ('test@example.com');
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_table_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+insert into users$0(id, email) values (1, 'test@example.com');
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                  ───── 2. destination
+        4 │ insert into users(id, email) values (1, 'test@example.com');
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_column_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to myschema;
+create table myschema.users(id int, email text, name text);
+insert into users(email$0, name) values ('test@example.com', 'Test');
+"), @r"
+          ╭▸ 
+        3 │ create table myschema.users(id int, email text, name text);
+          │                                     ───── 2. destination
+        4 │ insert into users(email, name) values ('test@example.com', 'Test');
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+delete from users$0 where id = 1;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ delete from users where id = 1;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_table_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+delete from public.users$0 where id = 1;
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                     ───── 2. destination
+        3 │ delete from public.users where id = 1;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_table_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+delete from users$0 where id = 1;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                  ───── 2. destination
+        4 │ delete from users where id = 1;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_temp_table() {
+        assert_snapshot!(goto("
+create temp table users(id int, email text);
+delete from users$0 where id = 1;
+"), @r"
+          ╭▸ 
+        2 │ create temp table users(id int, email text);
+          │                   ───── 2. destination
+        3 │ delete from users where id = 1;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+delete from users where id$0 = 1;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ delete from users where id = 1;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_column_second() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+delete from users where email$0 = 'test@example.com';
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ delete from users where email = 'test@example.com';
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_column_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text, name text);
+delete from public.users where name$0 = 'Test';
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text, name text);
+          │                                               ──── 2. destination
+        3 │ delete from public.users where name = 'Test';
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_column_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to myschema;
+create table myschema.users(id int, email text, active boolean);
+delete from users where active$0 = true;
+"), @r"
+          ╭▸ 
+        3 │ create table myschema.users(id int, email text, active boolean);
+          │                                                 ────── 2. destination
+        4 │ delete from users where active = true;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_multiple_columns() {
+        assert_snapshot!(goto("
+create table users(id int, email text, active boolean);
+delete from users where id$0 = 1 and active = true;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text, active boolean);
+          │                    ── 2. destination
+        3 │ delete from users where id = 1 and active = true;
+          ╰╴                         ─ 1. source
+        ");
+    }
 }
