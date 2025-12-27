@@ -18,6 +18,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         if is_table_ref(&name_ref) {
             return hover_table(file, &name_ref, &binder);
         }
+
+        if is_index_ref(&name_ref) {
+            return hover_index(file, &name_ref, &binder);
+        }
     }
 
     if let Some(name) = ast::Name::cast(parent) {
@@ -29,6 +33,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
         if let Some(create_table) = name.syntax().ancestors().find_map(ast::CreateTable::cast) {
             return format_create_table(&create_table, &binder);
+        }
+
+        if let Some(create_index) = name.syntax().ancestors().find_map(ast::CreateIndex::cast) {
+            return format_create_index(&create_index, &binder);
         }
     }
 
@@ -116,6 +124,23 @@ fn hover_table(
     format_create_table(&create_table, binder)
 }
 
+fn hover_index(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let index_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+
+    let root = file.syntax();
+    let index_name_node = index_ptr.to_node(root);
+
+    let create_index = index_name_node
+        .ancestors()
+        .find_map(ast::CreateIndex::cast)?;
+
+    format_create_index(&create_index, binder)
+}
+
 // Insert inferred schema into the create table hover info
 fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder) -> Option<String> {
     let path = create_table.path()?;
@@ -156,6 +181,57 @@ fn table_name_offset(create_table: &ast::CreateTable, path: &ast::Path) -> Optio
     Some((name_start - create_table_start).into())
 }
 
+// Insert inferred schema for index name and table name
+fn format_create_index(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
+    let mut text = create_index.syntax().text().to_string();
+    let create_index_start = create_index.syntax().text_range().start();
+
+    let Some(index_schema_str) = index_schema(create_index, binder) else {
+        return Some(text);
+    };
+
+    let mut insertions = vec![];
+
+    if let Some(name) = create_index.name() {
+        let has_schema = name
+            .syntax()
+            .parent()
+            .map(|p| ast::Path::can_cast(p.kind()))
+            .unwrap_or(false);
+
+        if !has_schema {
+            let name_start = name.syntax().text_range().start();
+            let offset: usize = (name_start - create_index_start).into();
+            insertions.push((offset, format!("{}.", index_schema_str)));
+        }
+    }
+
+    if let Some(relation_name) = create_index.relation_name()
+        && let Some(path) = relation_name.path()
+        && path.qualifier().is_none()
+    {
+        let (table_schema, _) = resolve::resolve_table_info(binder, &path)?;
+        let segment = path.segment()?;
+        let name_ref = segment.name_ref()?;
+        let table_name_start = name_ref.syntax().text_range().start();
+        let offset: usize = (table_name_start - create_index_start).into();
+        insertions.push((offset, format!("{}.", table_schema)));
+    }
+
+    insertions.sort_by(|a, b| b.0.cmp(&a.0));
+    for (offset, schema_str) in insertions {
+        text.insert_str(offset, &schema_str);
+    }
+
+    Some(text)
+}
+
+fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
+    let position = create_index.syntax().text_range().start();
+    let search_path = binder.search_path_at(position);
+    search_path.first().map(|s| s.to_string())
+}
+
 fn is_column_ref(name_ref: &ast::NameRef) -> bool {
     let mut in_partition_item = false;
 
@@ -188,6 +264,15 @@ fn is_table_ref(name_ref: &ast::NameRef) -> bool {
         }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
             return !in_partition_item;
+        }
+    }
+    false
+}
+
+fn is_index_ref(name_ref: &ast::NameRef) -> bool {
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::DropIndex::can_cast(ancestor.kind()) {
+            return true;
         }
     }
     false
@@ -234,13 +319,6 @@ mod test {
             );
         }
         None
-    }
-
-    fn hover_not_found(sql: &str) {
-        assert!(
-            check_hover_(sql).is_none(),
-            "Should not find hover information"
-        );
     }
 
     #[test]
@@ -390,13 +468,16 @@ create index idx on t$0(id);
     }
 
     #[test]
-    fn hover_not_on_index_name() {
-        hover_not_found(
-            "
+    fn hover_on_index_name_in_create() {
+        assert_snapshot!(check_hover("
 create table users(id int);
 create index idx$0 on users(id);
-",
-        );
+"), @r"
+        hover: create index public.idx on public.users(id)
+          ╭▸ 
+        3 │ create index idx on users(id);
+          ╰╴               ─ hover
+        ");
     }
 
     #[test]
@@ -569,6 +650,72 @@ create table t(id int, email$0 text, name varchar(100));
           ╭▸ 
         2 │ create table t(id int, email text, name varchar(100));
           ╰╴                           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+drop table users$0;
+"), @r"
+        hover: create table public.users(id int, email text)
+          ╭▸ 
+        3 │ drop table users;
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_table_with_schema() {
+        assert_snapshot!(check_hover("
+create table myschema.users(id int);
+drop table myschema.users$0;
+"), @r"
+        hover: create table myschema.users(id int)
+          ╭▸ 
+        3 │ drop table myschema.users;
+          ╰╴                        ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_temp_table() {
+        assert_snapshot!(check_hover("
+create temp table t(x bigint);
+drop table t$0;
+"), @r"
+        hover: create temp table pg_temp.t(x bigint)
+          ╭▸ 
+        3 │ drop table t;
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_index_definition() {
+        assert_snapshot!(check_hover("
+create table t(x bigint);
+create index idx$0 on t(x);
+"), @r"
+        hover: create index public.idx on public.t(x)
+          ╭▸ 
+        3 │ create index idx on t(x);
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_index() {
+        assert_snapshot!(check_hover("
+create table t(x bigint);
+create index idx_x on t(x);
+drop index idx_x$0;
+"), @r"
+        hover: create index public.idx_x on public.t(x)
+          ╭▸ 
+        4 │ drop index idx_x;
+          ╰╴               ─ hover
         ");
     }
 }
