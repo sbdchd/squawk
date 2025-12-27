@@ -29,6 +29,12 @@ impl Name {
     }
 }
 
+impl fmt::Display for Name {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 fn normalize_identifier(text: &str) -> SmolStr {
     if text.starts_with('"') && text.ends_with('"') && text.len() >= 2 {
         text[1..text.len() - 1].into()

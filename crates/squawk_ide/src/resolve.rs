@@ -1,4 +1,4 @@
-use rowan::TextSize;
+use rowan::{TextRange, TextSize};
 use squawk_syntax::{
     SyntaxNodePtr,
     ast::{self, AstNode},
@@ -316,6 +316,53 @@ fn extract_schema_name(path: &ast::Path) -> Option<Schema> {
         .and_then(|q| q.segment())
         .and_then(|s| s.name_ref())
         .map(|name_ref| Schema(Name::new(name_ref.syntax().text().to_string())))
+}
+
+pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
+    let text = if let Some(name_ref) = col.name_ref() {
+        name_ref.syntax().text().to_string()
+    } else {
+        let name = col.name()?;
+        name.syntax().text().to_string()
+    };
+    Some(Name::new(text))
+}
+
+pub(crate) fn find_column_in_table(
+    table_arg_list: &ast::TableArgList,
+    col_name: &Name,
+) -> Option<TextRange> {
+    table_arg_list.args().find_map(|arg| {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(name) = column.name()
+            && Name::new(name.syntax().text().to_string()) == *col_name
+        {
+            Some(name.syntax().text_range())
+        } else {
+            None
+        }
+    })
+}
+
+pub(crate) fn resolve_insert_table_columns(
+    file: &ast::SourceFile,
+    binder: &Binder,
+    insert: &ast::Insert,
+) -> Option<ast::TableArgList> {
+    let path = insert.path()?;
+    let table_name = extract_table_name(&path)?;
+    let schema = extract_schema_name(&path);
+    let position = insert.syntax().text_range().start();
+
+    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
+    let root = file.syntax();
+    let table_name_node = table_ptr.to_node(root);
+
+    let create_table = table_name_node
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
+
+    create_table.table_arg_list()
 }
 
 pub(crate) fn resolve_table_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {

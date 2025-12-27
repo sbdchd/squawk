@@ -8,9 +8,10 @@ use lsp_types::{
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverContents, HoverParams,
     HoverProviderCapability, InitializeParams, InlayHint, InlayHintKind, InlayHintLabel,
-    InlayHintParams, LanguageString, Location, MarkedString, OneOf, PublishDiagnosticsParams,
-    ReferenceParams, SelectionRangeParams, SelectionRangeProviderCapability, ServerCapabilities,
-    TextDocumentSyncCapability, TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
+    InlayHintLabelPart, InlayHintParams, LanguageString, Location, MarkedString, OneOf,
+    PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
+    SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
+    TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
@@ -257,9 +258,24 @@ fn handle_inlay_hints(
                 squawk_ide::inlay_hints::InlayHintKind::Type => InlayHintKind::TYPE,
                 squawk_ide::inlay_hints::InlayHintKind::Parameter => InlayHintKind::PARAMETER,
             };
+
+            let label = if let Some(target_range) = hint.target {
+                InlayHintLabel::LabelParts(vec![InlayHintLabelPart {
+                    value: hint.label,
+                    location: Some(Location {
+                        uri: uri.clone(),
+                        range: lsp_utils::range(&line_index, target_range),
+                    }),
+                    tooltip: None,
+                    command: None,
+                }])
+            } else {
+                InlayHintLabel::String(hint.label)
+            };
+
             InlayHint {
                 position,
-                label: InlayHintLabel::String(hint.label),
+                label,
                 kind: Some(kind),
                 text_edits: None,
                 tooltip: None,
