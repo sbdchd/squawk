@@ -22,6 +22,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         if is_index_ref(&name_ref) {
             return hover_index(file, &name_ref, &binder);
         }
+
+        if is_function_ref(&name_ref) {
+            return hover_function(file, &name_ref, &binder);
+        }
     }
 
     if let Some(name) = ast::Name::cast(parent) {
@@ -37,6 +41,11 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
         if let Some(create_index) = name.syntax().ancestors().find_map(ast::CreateIndex::cast) {
             return format_create_index(&create_index, &binder);
+        }
+
+        if let Some(create_function) = name.syntax().ancestors().find_map(ast::CreateFunction::cast)
+        {
+            return format_create_function(&create_function, &binder);
         }
     }
 
@@ -276,6 +285,65 @@ fn is_index_ref(name_ref: &ast::NameRef) -> bool {
         }
     }
     false
+}
+
+fn is_function_ref(name_ref: &ast::NameRef) -> bool {
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::DropFunction::can_cast(ancestor.kind()) {
+            return true;
+        }
+    }
+    false
+}
+
+fn hover_function(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let function_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+
+    let root = file.syntax();
+    let function_name_node = function_ptr.to_node(root);
+
+    let create_function = function_name_node
+        .ancestors()
+        .find_map(ast::CreateFunction::cast)?;
+
+    format_create_function(&create_function, binder)
+}
+
+fn format_create_function(
+    create_function: &ast::CreateFunction,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let path = create_function.path()?;
+    let segment = path.segment()?;
+    let name = segment.name()?;
+    let function_name = name.syntax().text().to_string();
+
+    let schema = if let Some(qualifier) = path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        function_schema(create_function, binder)?
+    };
+
+    let param_list = create_function.param_list()?;
+    let params = param_list.syntax().text().to_string();
+
+    let ret_type = create_function.ret_type()?;
+    let return_type = ret_type.syntax().text().to_string();
+
+    Some(format!(
+        "function {}.{}{} {}",
+        schema, function_name, params, return_type
+    ))
+}
+
+fn function_schema(create_function: &ast::CreateFunction, binder: &binder::Binder) -> Option<String> {
+    let position = create_function.syntax().text_range().start();
+    let search_path = binder.search_path_at(position);
+    search_path.first().map(|s| s.to_string())
 }
 
 #[cfg(test)]
@@ -716,6 +784,70 @@ drop index idx_x$0;
           ╭▸ 
         4 │ drop index idx_x;
           ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_function() {
+        assert_snapshot!(check_hover("
+create function foo() returns int as $$ select 1 $$ language sql;
+drop function foo$0();
+"), @r"
+        hover: function public.foo() returns int
+          ╭▸ 
+        3 │ drop function foo();
+          ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_function_with_schema() {
+        assert_snapshot!(check_hover("
+create function myschema.foo() returns int as $$ select 1 $$ language sql;
+drop function myschema.foo$0();
+"), @r"
+        hover: function myschema.foo() returns int
+          ╭▸ 
+        3 │ drop function myschema.foo();
+          ╰╴                         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_function_definition() {
+        assert_snapshot!(check_hover("
+create function foo$0() returns int as $$ select 1 $$ language sql;
+"), @r"
+        hover: function public.foo() returns int
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_function_with_explicit_schema() {
+        assert_snapshot!(check_hover("
+create function myschema.foo$0() returns int as $$ select 1 $$ language sql;
+"), @r"
+        hover: function myschema.foo() returns int
+          ╭▸ 
+        2 │ create function myschema.foo() returns int as $$ select 1 $$ language sql;
+          ╰╴                           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_function_with_search_path() {
+        assert_snapshot!(check_hover(r#"
+set search_path to myschema;
+create function foo() returns int as $$ select 1 $$ language sql;
+drop function foo$0();
+"#), @r"
+        hover: function myschema.foo() returns int
+          ╭▸ 
+        4 │ drop function foo();
+          ╰╴                ─ hover
         ");
     }
 }

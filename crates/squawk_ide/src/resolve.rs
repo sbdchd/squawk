@@ -84,26 +84,7 @@ fn resolve_table(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(table_name)?;
-
-    if let Some(schema) = schema {
-        let symbol_id = symbols.iter().copied().find(|id| {
-            let symbol = &binder.symbols[*id];
-            symbol.kind == SymbolKind::Table && &symbol.schema == schema
-        })?;
-        return Some(binder.symbols[symbol_id].ptr);
-    } else {
-        let search_path = binder.search_path_at(position);
-        for search_schema in search_path {
-            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
-                let symbol = &binder.symbols[*id];
-                symbol.kind == SymbolKind::Table && &symbol.schema == search_schema
-            }) {
-                return Some(binder.symbols[symbol_id].ptr);
-            }
-        }
-    }
-    None
+    resolve_for_kind(binder, table_name, schema, position, SymbolKind::Table)
 }
 
 fn resolve_index(
@@ -112,12 +93,22 @@ fn resolve_index(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(index_name)?;
+    resolve_for_kind(binder, index_name, schema, position, SymbolKind::Index)
+}
+
+fn resolve_for_kind(
+    binder: &Binder,
+    name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+    kind: SymbolKind,
+) -> Option<SyntaxNodePtr> {
+    let symbols = binder.scopes[binder.root_scope()].get(name)?;
 
     if let Some(schema) = schema {
         let symbol_id = symbols.iter().copied().find(|id| {
             let symbol = &binder.symbols[*id];
-            symbol.kind == SymbolKind::Index && &symbol.schema == schema
+            symbol.kind == kind && &symbol.schema == schema
         })?;
         return Some(binder.symbols[symbol_id].ptr);
     } else {
@@ -125,7 +116,7 @@ fn resolve_index(
         for search_schema in search_path {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &binder.symbols[*id];
-                symbol.kind == SymbolKind::Index && &symbol.schema == search_schema
+                symbol.kind == kind && &symbol.schema == search_schema
             }) {
                 return Some(binder.symbols[symbol_id].ptr);
             }
@@ -140,26 +131,13 @@ fn resolve_function(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(function_name)?;
-
-    if let Some(schema) = schema {
-        let symbol_id = symbols.iter().copied().find(|id| {
-            let symbol = &binder.symbols[*id];
-            symbol.kind == SymbolKind::Function && &symbol.schema == schema
-        })?;
-        return Some(binder.symbols[symbol_id].ptr);
-    } else {
-        let search_path = binder.search_path_at(position);
-        for search_schema in search_path {
-            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
-                let symbol = &binder.symbols[*id];
-                symbol.kind == SymbolKind::Function && &symbol.schema == search_schema
-            }) {
-                return Some(binder.symbols[symbol_id].ptr);
-            }
-        }
-    }
-    None
+    resolve_for_kind(
+        binder,
+        function_name,
+        schema,
+        position,
+        SymbolKind::Function,
+    )
 }
 
 fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
