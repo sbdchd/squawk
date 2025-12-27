@@ -7,16 +7,17 @@ use lsp_types::{
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverContents, HoverParams,
-    HoverProviderCapability, InitializeParams, LanguageString, Location, MarkedString, OneOf,
-    PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
-    SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
-    TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
+    HoverProviderCapability, InitializeParams, InlayHint, InlayHintKind, InlayHintLabel,
+    InlayHintParams, LanguageString, Location, MarkedString, OneOf, PublishDiagnosticsParams,
+    ReferenceParams, SelectionRangeParams, SelectionRangeProviderCapability, ServerCapabilities,
+    TextDocumentSyncCapability, TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
     },
     request::{
-        CodeActionRequest, GotoDefinition, HoverRequest, References, Request, SelectionRangeRequest,
+        CodeActionRequest, GotoDefinition, HoverRequest, InlayHintRequest, References, Request,
+        SelectionRangeRequest,
     },
 };
 use rowan::TextRange;
@@ -24,7 +25,8 @@ use squawk_ide::code_actions::code_actions;
 use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_ide::hover::hover;
-use squawk_syntax::{Parse, SourceFile};
+use squawk_ide::inlay_hints::inlay_hints;
+use squawk_syntax::SourceFile;
 use std::collections::HashMap;
 
 use diagnostic::DIAGNOSTIC_NAME;
@@ -63,6 +65,7 @@ pub fn run() -> Result<()> {
         references_provider: Some(OneOf::Left(true)),
         definition_provider: Some(OneOf::Left(true)),
         hover_provider: Some(HoverProviderCapability::Simple(true)),
+        inlay_hint_provider: Some(OneOf::Left(true)),
         ..Default::default()
     })
     .unwrap();
@@ -111,6 +114,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     }
                     SelectionRangeRequest::METHOD => {
                         handle_selection_range(&connection, req, &documents)?;
+                    }
+                    InlayHintRequest::METHOD => {
+                        handle_inlay_hints(&connection, req, &documents)?;
                     }
                     "squawk/syntaxTree" => {
                         handle_syntax_tree(&connection, req, &documents)?;
@@ -161,7 +167,7 @@ fn handle_goto_definition(
     let position = params.text_document_position_params.position;
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
-    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let parse = SourceFile::parse(content);
     let file = parse.tree();
     let line_index = LineIndex::new(content);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
@@ -202,7 +208,7 @@ fn handle_hover(
     let position = params.text_document_position_params.position;
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
-    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let parse = SourceFile::parse(content);
     let file = parse.tree();
     let line_index = LineIndex::new(content);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
@@ -227,6 +233,53 @@ fn handle_hover(
     Ok(())
 }
 
+fn handle_inlay_hints(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
+    let params: InlayHintParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document.uri;
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse = SourceFile::parse(content);
+    let file = parse.tree();
+    let line_index = LineIndex::new(content);
+
+    let hints = inlay_hints(&file);
+
+    let lsp_hints: Vec<InlayHint> = hints
+        .into_iter()
+        .map(|hint| {
+            let line_col = line_index.line_col(hint.position);
+            let position = lsp_types::Position::new(line_col.line, line_col.col);
+            let kind = match hint.kind {
+                squawk_ide::inlay_hints::InlayHintKind::Type => InlayHintKind::TYPE,
+                squawk_ide::inlay_hints::InlayHintKind::Parameter => InlayHintKind::PARAMETER,
+            };
+            InlayHint {
+                position,
+                label: InlayHintLabel::String(hint.label),
+                kind: Some(kind),
+                text_edits: None,
+                tooltip: None,
+                padding_left: None,
+                padding_right: None,
+                data: None,
+            }
+        })
+        .collect();
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&lsp_hints).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
 fn handle_selection_range(
     connection: &Connection,
     req: lsp_server::Request,
@@ -236,7 +289,7 @@ fn handle_selection_range(
     let uri = params.text_document.uri;
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
-    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let parse = SourceFile::parse(content);
     let root = parse.syntax_node();
     let line_index = LineIndex::new(content);
 
@@ -294,7 +347,7 @@ fn handle_references(
     let position = params.text_document_position.position;
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
-    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let parse = SourceFile::parse(content);
     let file = parse.tree();
     let line_index = LineIndex::new(content);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
@@ -332,7 +385,7 @@ fn handle_code_action(
     let mut actions: CodeActionResponse = Vec::new();
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
-    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let parse = SourceFile::parse(content);
     let file = parse.tree();
     let line_index = LineIndex::new(content);
     let offset = lsp_utils::offset(&line_index, params.range.start).unwrap();
@@ -569,7 +622,7 @@ fn handle_syntax_tree(
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
 
-    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let parse = SourceFile::parse(content);
     let syntax_tree = format!("{:#?}", parse.syntax_node());
 
     let resp = Response {

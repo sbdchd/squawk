@@ -568,6 +568,15 @@ select a, b from t
 group by a, b;
 ```
 
+### Rule: unresolved column
+
+```sql
+create function foo(a int, b int) returns int
+as 'select $0'
+--         ^^ unresolved column, did you mean `a` or `b`?
+language sql;
+```
+
 ### Rule: unused column
 
 ```sql
