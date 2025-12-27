@@ -998,4 +998,47 @@ drop function foo(), bar$0();
           ╰╴                       ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_select_function_call() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+select foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        3 │ select foo();
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_function_call_with_schema() {
+        assert_snapshot!(goto("
+create function public.foo() returns int as $$ select 1 $$ language sql;
+select public.foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create function public.foo() returns int as $$ select 1 $$ language sql;
+          │                        ─── 2. destination
+        3 │ select public.foo();
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_function_call_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to myschema;
+create function foo() returns int as $$ select 1 $$ language sql;
+select myschema.foo$0();
+"), @r"
+          ╭▸ 
+        3 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        4 │ select myschema.foo();
+          ╰╴                  ─ 1. source
+        ");
+    }
 }

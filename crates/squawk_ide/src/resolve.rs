@@ -17,6 +17,7 @@ enum NameRefContext {
     DropFunction,
     CreateIndex,
     CreateIndexColumn,
+    SelectFunctionCall,
 }
 
 pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
@@ -44,12 +45,28 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_function(binder, &function_name, &schema, position)
         }
+        NameRefContext::SelectFunctionCall => {
+            let schema = if let Some(parent_node) = name_ref.syntax().parent()
+                && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
+            {
+                let base = field_expr.base()?;
+                let schema_name_ref = ast::NameRef::cast(base.syntax().clone())?;
+                let schema_text = schema_name_ref.syntax().text().to_string();
+                Some(Schema(Name::new(schema_text)))
+            } else {
+                None
+            };
+            let function_name = Name::new(name_ref.syntax().text().to_string());
+            let position = name_ref.syntax().text_range().start();
+            resolve_function(binder, &function_name, &schema, position)
+        }
         NameRefContext::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
     }
 }
 
 fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> {
     let mut in_partition_item = false;
+    let mut in_call_expr = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
@@ -72,6 +89,12 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
                 return Some(NameRefContext::CreateIndexColumn);
             }
             return Some(NameRefContext::CreateIndex);
+        }
+        if ast::CallExpr::can_cast(ancestor.kind()) {
+            in_call_expr = true;
+        }
+        if ast::Select::can_cast(ancestor.kind()) && in_call_expr {
+            return Some(NameRefContext::SelectFunctionCall);
         }
     }
 
