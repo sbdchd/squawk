@@ -1,7 +1,7 @@
 use line_index::LineIndex;
 use lsp_types::{CodeDescription, Diagnostic, DiagnosticSeverity, Position, Range, TextEdit, Url};
 use squawk_linter::{Edit, Linter};
-use squawk_syntax::{Parse, SourceFile};
+use squawk_syntax::SourceFile;
 
 use crate::{
     DIAGNOSTIC_NAME,

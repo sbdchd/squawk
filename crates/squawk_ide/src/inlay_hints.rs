@@ -4,10 +4,18 @@ use crate::resolve;
 use rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode};
 
+/// `VSCode` has some theming options based on these types.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InlayHintKind {
+    Type,
+    Parameter,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InlayHint {
     pub position: TextSize,
     pub label: String,
+    pub kind: InlayHintKind,
 }
 
 pub fn inlay_hints(file: &ast::SourceFile) -> Vec<InlayHint> {
@@ -38,7 +46,7 @@ fn inlay_hint_call_expr(
         ast::FieldExpr::cast(expr.syntax().clone())?.field()?
     };
 
-    let function_ptr = resolve::resolve_name_ref(&binder, &name_ref)?;
+    let function_ptr = resolve::resolve_name_ref(binder, &name_ref)?;
 
     let root = file.syntax();
     let function_name_node = function_ptr.to_node(root);
@@ -54,6 +62,7 @@ fn inlay_hint_call_expr(
                 hints.push(InlayHint {
                     position: arg_start,
                     label: format!("{}: ", param_name.syntax().text()),
+                    kind: InlayHintKind::Parameter,
                 });
             }
         }

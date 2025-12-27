@@ -7,9 +7,9 @@ use lsp_types::{
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverContents, HoverParams,
-    HoverProviderCapability, InitializeParams, InlayHint, InlayHintLabel, InlayHintParams,
-    LanguageString, Location, MarkedString, OneOf, PublishDiagnosticsParams, ReferenceParams,
-    SelectionRangeParams, SelectionRangeProviderCapability, ServerCapabilities,
+    HoverProviderCapability, InitializeParams, InlayHint, InlayHintKind, InlayHintLabel,
+    InlayHintParams, LanguageString, Location, MarkedString, OneOf, PublishDiagnosticsParams,
+    ReferenceParams, SelectionRangeParams, SelectionRangeProviderCapability, ServerCapabilities,
     TextDocumentSyncCapability, TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
@@ -26,7 +26,7 @@ use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_ide::hover::hover;
 use squawk_ide::inlay_hints::inlay_hints;
-use squawk_syntax::{Parse, SourceFile};
+use squawk_syntax::SourceFile;
 use std::collections::HashMap;
 
 use diagnostic::DIAGNOSTIC_NAME;
@@ -253,10 +253,14 @@ fn handle_inlay_hints(
         .map(|hint| {
             let line_col = line_index.line_col(hint.position);
             let position = lsp_types::Position::new(line_col.line, line_col.col);
+            let kind = match hint.kind {
+                squawk_ide::inlay_hints::InlayHintKind::Type => InlayHintKind::TYPE,
+                squawk_ide::inlay_hints::InlayHintKind::Parameter => InlayHintKind::PARAMETER,
+            };
             InlayHint {
                 position,
                 label: InlayHintLabel::String(hint.label),
-                kind: None,
+                kind: Some(kind),
                 text_edits: None,
                 tooltip: None,
                 padding_left: None,
