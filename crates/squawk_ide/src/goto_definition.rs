@@ -1043,6 +1043,241 @@ select myschema.foo$0();
     }
 
     #[test]
+    fn goto_function_call_style_column_access() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+select a$0(t) from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ select a(t) from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_style_column_access_with_function_precedence() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' LANGUAGE sql;
+select b$0(t) from t;
+"), @r"
+          ╭▸ 
+        3 │ create function b(t) returns int as 'select 1' LANGUAGE sql;
+          │                 ─ 2. destination
+        4 │ select b(t) from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_style_column_access_table_arg() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+select a(t$0) from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ select a(t) from t;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_style_column_access_table_arg_with_function() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' LANGUAGE sql;
+select b(t$0) from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create function b(t) returns int as 'select 1' LANGUAGE sql;
+        4 │ select b(t) from t;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_multiple_args_not_column_access() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+select a$0(t, 1) from t;
+",
+        );
+    }
+
+    #[test]
+    fn goto_field_style_function_call() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select t.b$0 from t;
+"), @r"
+          ╭▸ 
+        3 │ create function b(t) returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        4 │ select t.b from t;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_field_style_function_call_column_precedence() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' language sql;
+select t.b$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create function b(t) returns int as 'select 1' language sql;
+        4 │ select t.b from t;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_field_style_function_call_table_ref() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select t$0.b from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ create function b(t) returns int as 'select 1' language sql;
+        4 │ select t.b from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_style_in_where() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+select * from t where a$0(t) > 0;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ select * from t where a(t) > 0;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_style_in_where_function_precedence() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t where b$0(t) > 0;
+"), @r"
+          ╭▸ 
+        3 │ create function b(t) returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        4 │ select * from t where b(t) > 0;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_field_style_function_call_in_where() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t where t.b$0 > 0;
+"), @r"
+          ╭▸ 
+        3 │ create function b(t) returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        4 │ select * from t where t.b > 0;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_field_style_in_where_column_precedence() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t where t.b$0 > 0;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create function b(t) returns int as 'select 1' language sql;
+        4 │ select * from t where t.b > 0;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_style_in_order_by() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t order by b$0(t);
+"), @r"
+          ╭▸ 
+        3 │ create function b(t) returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        4 │ select * from t order by b(t);
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_field_style_in_order_by() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t order by t.b$0;
+"), @r"
+          ╭▸ 
+        3 │ create function b(t) returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        4 │ select * from t order by t.b;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_call_style_in_group_by() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+select * from t group by a$0(t);
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ select * from t group by a(t);
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_field_style_in_group_by() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t group by t.b$0;
+"), @r"
+          ╭▸ 
+        3 │ create function b(t) returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        4 │ select * from t group by t.b;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_insert_table() {
         assert_snapshot!(goto("
 create table users(id int, email text);

@@ -90,7 +90,24 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             };
             let function_name = Name::new(name_ref.syntax().text().to_string());
             let position = name_ref.syntax().text_range().start();
-            resolve_function(binder, &function_name, &schema, position)
+
+            // functions take precedence
+            if let Some(ptr) = resolve_function(binder, &function_name, &schema, position) {
+                return Some(ptr);
+            }
+
+            // if no function found, check if this is function-call-style column access
+            // ```sql
+            // create table t(a int, b int);
+            // select a(t) from t;
+            // ```
+            if schema.is_none()
+                && let Some(ptr) = resolve_function_call_style_column(binder, name_ref)
+            {
+                return Some(ptr);
+            }
+
+            None
         }
         NameRefContext::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
         NameRefContext::SelectColumn => resolve_select_column(binder, name_ref),
@@ -106,6 +123,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> {
     let mut in_partition_item = false;
     let mut in_call_expr = false;
+    let mut in_arg_list = false;
     let mut in_column_list = false;
     let mut in_where_clause = false;
     let mut in_from_clause = false;
@@ -163,8 +181,12 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
             .and_then(ast::FieldExpr::cast)
             .is_some();
 
+        let mut in_from_clause = false;
         for ancestor in parent.ancestors() {
-            if ast::TargetList::can_cast(ancestor.kind()) {
+            if ast::FromClause::can_cast(ancestor.kind()) {
+                in_from_clause = true;
+            }
+            if ast::Select::can_cast(ancestor.kind()) && !in_from_clause {
                 if is_base_of_outer_field_expr {
                     return Some(NameRefContext::SelectQualifiedColumnTable);
                 } else if let Some(base) = field_expr.base()
@@ -215,6 +237,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
             }
             return Some(NameRefContext::CreateIndex);
         }
+        if ast::ArgList::can_cast(ancestor.kind()) {
+            in_arg_list = true;
+        }
         if ast::CallExpr::can_cast(ancestor.kind()) {
             in_call_expr = true;
         }
@@ -225,7 +250,7 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
             in_target_list = true;
         }
         if ast::Select::can_cast(ancestor.kind()) {
-            if in_call_expr {
+            if in_call_expr && !in_arg_list {
                 return Some(NameRefContext::SelectFunctionCall);
             }
             if in_from_clause {
@@ -352,9 +377,7 @@ fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
 
-    let table_arg_list = create_table.table_arg_list()?;
-
-    for arg in table_arg_list.args() {
+    for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
             && Name::new(col_name.syntax().text().to_string()) == column_name
@@ -385,9 +408,7 @@ fn resolve_insert_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
 
-    let table_arg_list = create_table.table_arg_list()?;
-
-    for arg in table_arg_list.args() {
+    for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
             && Name::new(col_name.syntax().text().to_string()) == column_name
@@ -537,6 +558,8 @@ fn resolve_select_qualified_column(
     let create_table = table_name_node
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
+
+    // 1. Try to find a matching column (columns take precedence)
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
@@ -546,7 +569,9 @@ fn resolve_select_qualified_column(
         }
     }
 
-    None
+    // 2. No column found, check for field-style function call
+    // e.g., select t.b from t where b is a function that takes t as an argument
+    resolve_function(binder, &column_name, &schema, position)
 }
 
 fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
@@ -576,10 +601,8 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     let create_table = table_name_node
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
-    let table_arg_list = create_table.table_arg_list()?;
-
     // 1. try to find a matching column
-    for arg in table_arg_list.args() {
+    for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
             && Name::new(col_name.syntax().text().to_string()) == column_name
@@ -621,9 +644,60 @@ fn resolve_delete_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
 
-    let table_arg_list = create_table.table_arg_list()?;
+    for arg in create_table.table_arg_list()?.args() {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(col_name) = column.name()
+            && Name::new(col_name.syntax().text().to_string()) == column_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
+        }
+    }
 
-    for arg in table_arg_list.args() {
+    None
+}
+
+fn resolve_function_call_style_column(
+    binder: &Binder,
+    name_ref: &ast::NameRef,
+) -> Option<SyntaxNodePtr> {
+    let column_name = Name::new(name_ref.syntax().text().to_string());
+
+    // function call syntax for columns is only valid if there is one argument
+    let call_expr = name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::CallExpr::cast)?;
+    let arg_count = call_expr.arg_list()?.args().count();
+    if arg_count != 1 {
+        return None;
+    }
+
+    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
+    let from_clause = select.from_clause()?;
+    let from_item = from_clause.from_items().next()?;
+
+    // get the table name and schema from the FROM clause
+    let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
+        (Name::new(name_ref_node.syntax().text().to_string()), None)
+    } else {
+        let field_expr = from_item.field_expr()?;
+        let table_name = Name::new(field_expr.field()?.syntax().text().to_string());
+        let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? else {
+            return None;
+        };
+        let schema = Schema(Name::new(schema_name_ref.syntax().text().to_string()));
+        (table_name, Some(schema))
+    };
+
+    let position = name_ref.syntax().text_range().start();
+    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
+
+    let root = &name_ref.syntax().ancestors().last()?;
+    let table_name_node = table_ptr.to_node(root);
+    let create_table = table_name_node
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
+    for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
             && Name::new(col_name.syntax().text().to_string()) == column_name
