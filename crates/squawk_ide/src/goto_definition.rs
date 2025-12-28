@@ -1340,4 +1340,61 @@ create table users(id int, email text);
           ╰╴             ───── 2. destination
         ");
     }
+
+    #[test]
+    fn goto_select_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+select id$0 from users;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ select id from users;
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_second() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+select id, email$0 from users;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ select id, email from users;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+select email$0 from public.users;
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                                   ───── 2. destination
+        3 │ select email from public.users;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+select id$0 from users;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                        ── 2. destination
+        4 │ select id from users;
+          ╰╴        ─ 1. source
+        ");
+    }
 }
