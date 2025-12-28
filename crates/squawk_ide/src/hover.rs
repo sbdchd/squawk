@@ -19,6 +19,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             return hover_table(file, &name_ref, &binder);
         }
 
+        if is_select_from_table(&name_ref) {
+            return hover_table(file, &name_ref, &binder);
+        }
+
         if is_index_ref(&name_ref) {
             return hover_index(file, &name_ref, &binder);
         }
@@ -160,22 +164,19 @@ fn hover_index(
 // Insert inferred schema into the create table hover info
 fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder) -> Option<String> {
     let path = create_table.path()?;
-    let mut text = create_table.syntax().text().to_string();
+    let segment = path.segment()?;
+    let table_name = segment.name()?.syntax().text().to_string();
 
-    if path.qualifier().is_some() {
-        return Some(text);
-    }
-
-    let Some(schema) = table_schema(create_table, binder) else {
-        return Some(text);
+    let schema = if let Some(qualifier) = path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        table_schema(create_table, binder)?
     };
 
-    let Some(offset) = table_name_offset(create_table, &path) else {
-        return Some(text);
-    };
+    let table_arg_list = create_table.table_arg_list()?;
+    let args = table_arg_list.syntax().text().to_string();
 
-    text.insert_str(offset, &format!("{}.", schema));
-    Some(text)
+    Some(format!("table {}.{}{}", schema, table_name, args))
 }
 
 fn table_schema(create_table: &ast::CreateTable, binder: &binder::Binder) -> Option<String> {
@@ -189,57 +190,22 @@ fn table_schema(create_table: &ast::CreateTable, binder: &binder::Binder) -> Opt
     search_path.first().map(|s| s.to_string())
 }
 
-fn table_name_offset(create_table: &ast::CreateTable, path: &ast::Path) -> Option<usize> {
-    let segment = path.segment()?;
-    let name = segment.name()?;
-    let name_start = name.syntax().text_range().start();
-    let create_table_start = create_table.syntax().text_range().start();
-    Some((name_start - create_table_start).into())
-}
-
-// Insert inferred schema for index name and table name
 fn format_create_index(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
-    let mut text = create_index.syntax().text().to_string();
-    let create_index_start = create_index.syntax().text_range().start();
+    let index_name = create_index.name()?.syntax().text().to_string();
 
-    let Some(index_schema_str) = index_schema(create_index, binder) else {
-        return Some(text);
-    };
+    let index_schema = index_schema(create_index, binder)?;
 
-    let mut insertions = vec![];
+    let relation_name = create_index.relation_name()?;
+    let path = relation_name.path()?;
+    let (table_schema, table_name) = resolve::resolve_table_info(binder, &path)?;
 
-    if let Some(name) = create_index.name() {
-        let has_schema = name
-            .syntax()
-            .parent()
-            .map(|p| ast::Path::can_cast(p.kind()))
-            .unwrap_or(false);
+    let partition_item_list = create_index.partition_item_list()?;
+    let columns = partition_item_list.syntax().text().to_string();
 
-        if !has_schema {
-            let name_start = name.syntax().text_range().start();
-            let offset: usize = (name_start - create_index_start).into();
-            insertions.push((offset, format!("{}.", index_schema_str)));
-        }
-    }
-
-    if let Some(relation_name) = create_index.relation_name()
-        && let Some(path) = relation_name.path()
-        && path.qualifier().is_none()
-    {
-        let (table_schema, _) = resolve::resolve_table_info(binder, &path)?;
-        let segment = path.segment()?;
-        let name_ref = segment.name_ref()?;
-        let table_name_start = name_ref.syntax().text_range().start();
-        let offset: usize = (table_name_start - create_index_start).into();
-        insertions.push((offset, format!("{}.", table_schema)));
-    }
-
-    insertions.sort_by(|a, b| b.0.cmp(&a.0));
-    for (offset, schema_str) in insertions {
-        text.insert_str(offset, &schema_str);
-    }
-
-    Some(text)
+    Some(format!(
+        "index {}.{} on {}.{}{}",
+        index_schema, index_name, table_schema, table_name, columns
+    ))
 }
 
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
@@ -311,6 +277,20 @@ fn is_select_function_call(name_ref: &ast::NameRef) -> bool {
             in_call_expr = true;
         }
         if ast::Select::can_cast(ancestor.kind()) && in_call_expr {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_select_from_table(name_ref: &ast::NameRef) -> bool {
+    let mut in_from_clause = false;
+
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::FromClause::can_cast(ancestor.kind()) {
+            in_from_clause = true;
+        }
+        if ast::Select::can_cast(ancestor.kind()) && in_from_clause {
             return true;
         }
     }
@@ -552,7 +532,7 @@ create index idx_email on public.users(email$0);
 create table t(id int);
 create index idx on t$0(id);
 "), @r"
-        hover: create table public.t(id int)
+        hover: table public.t(id int)
           ╭▸ 
         3 │ create index idx on t(id);
           ╰╴                    ─ hover
@@ -565,7 +545,7 @@ create index idx on t$0(id);
 create table users(id int);
 create index idx$0 on users(id);
 "), @r"
-        hover: create index public.idx on public.users(id)
+        hover: index public.idx on public.users(id)
           ╭▸ 
         3 │ create index idx on users(id);
           ╰╴               ─ hover
@@ -578,7 +558,7 @@ create index idx$0 on users(id);
 create table users(id int, email text);
 create index idx_email on users$0(email);
 "), @r"
-        hover: create table public.users(id int, email text)
+        hover: table public.users(id int, email text)
           ╭▸ 
         3 │ create index idx_email on users(email);
           ╰╴                              ─ hover
@@ -591,7 +571,7 @@ create index idx_email on users$0(email);
 create table public.users(id int, email text);
 create index idx on public.users$0(id);
 "), @r"
-        hover: create table public.users(id int, email text)
+        hover: table public.users(id int, email text)
           ╭▸ 
         3 │ create index idx on public.users(id);
           ╰╴                               ─ hover
@@ -604,7 +584,7 @@ create index idx on public.users$0(id);
 create temp table users(id int, email text);
 create index idx on users$0(id);
 "), @r"
-        hover: create temp table pg_temp.users(id int, email text)
+        hover: table pg_temp.users(id int, email text)
           ╭▸ 
         3 │ create index idx on users(id);
           ╰╴                        ─ hover
@@ -621,7 +601,7 @@ create table users(
 );
 create index idx on users$0(id);
 "), @r"
-        hover: create table public.users(
+        hover: table public.users(
                   id int,
                   email text,
                   name varchar(100)
@@ -639,7 +619,7 @@ set search_path to myschema;
 create table users(id int, email text);
 create index idx on users$0(id);
 "#), @r"
-        hover: create table myschema.users(id int, email text)
+        hover: table myschema.users(id int, email text)
           ╭▸ 
         4 │ create index idx on users(id);
           ╰╴                        ─ hover
@@ -654,7 +634,7 @@ create table users(id int, email text);
 set search_path to myschema, otherschema;
 create index idx on users$0(id);
 "#), @r"
-        hover: create table myschema.users(id int, email text)
+        hover: table myschema.users(id int, email text)
           ╭▸ 
         5 │ create index idx on users(id);
           ╰╴                        ─ hover
@@ -666,7 +646,7 @@ create index idx on users$0(id);
         assert_snapshot!(check_hover("
 create table t$0(x bigint);
 "), @r"
-        hover: create table public.t(x bigint)
+        hover: table public.t(x bigint)
           ╭▸ 
         2 │ create table t(x bigint);
           ╰╴             ─ hover
@@ -678,7 +658,7 @@ create table t$0(x bigint);
         assert_snapshot!(check_hover("
 create table myschema.users$0(id int);
 "), @r"
-        hover: create table myschema.users(id int)
+        hover: table myschema.users(id int)
           ╭▸ 
         2 │ create table myschema.users(id int);
           ╰╴                          ─ hover
@@ -690,7 +670,7 @@ create table myschema.users$0(id int);
         assert_snapshot!(check_hover("
 create temp table t$0(x bigint);
 "), @r"
-        hover: create temp table pg_temp.t(x bigint)
+        hover: table pg_temp.t(x bigint)
           ╭▸ 
         2 │ create temp table t(x bigint);
           ╰╴                  ─ hover
@@ -751,7 +731,7 @@ create table t(id int, email$0 text, name varchar(100));
 create table users(id int, email text);
 drop table users$0;
 "), @r"
-        hover: create table public.users(id int, email text)
+        hover: table public.users(id int, email text)
           ╭▸ 
         3 │ drop table users;
           ╰╴               ─ hover
@@ -764,7 +744,7 @@ drop table users$0;
 create table myschema.users(id int);
 drop table myschema.users$0;
 "), @r"
-        hover: create table myschema.users(id int)
+        hover: table myschema.users(id int)
           ╭▸ 
         3 │ drop table myschema.users;
           ╰╴                        ─ hover
@@ -777,7 +757,7 @@ drop table myschema.users$0;
 create temp table t(x bigint);
 drop table t$0;
 "), @r"
-        hover: create temp table pg_temp.t(x bigint)
+        hover: table pg_temp.t(x bigint)
           ╭▸ 
         3 │ drop table t;
           ╰╴           ─ hover
@@ -790,7 +770,7 @@ drop table t$0;
 create table t(x bigint);
 create index idx$0 on t(x);
 "), @r"
-        hover: create index public.idx on public.t(x)
+        hover: index public.idx on public.t(x)
           ╭▸ 
         3 │ create index idx on t(x);
           ╰╴               ─ hover
@@ -804,7 +784,7 @@ create table t(x bigint);
 create index idx_x on t(x);
 drop index idx_x$0;
 "), @r"
-        hover: create index public.idx_x on public.t(x)
+        hover: index public.idx_x on public.t(x)
           ╭▸ 
         4 │ drop index idx_x;
           ╰╴               ─ hover
@@ -925,6 +905,80 @@ select add$0(1, 2);
           ╭▸ 
         3 │ select add(1, 2);
           ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_from_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+select * from users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ select * from users;
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_from_table_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+select * from public.users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ select * from public.users;
+          ╰╴                         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_from_table_with_search_path() {
+        assert_snapshot!(check_hover("
+set search_path to foo;
+create table foo.users(id int, email text);
+select * from users$0;
+"), @r"
+        hover: table foo.users(id int, email text)
+          ╭▸ 
+        4 │ select * from users;
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_from_temp_table() {
+        assert_snapshot!(check_hover("
+create temp table users(id int, email text);
+select * from users$0;
+"), @r"
+        hover: table pg_temp.users(id int, email text)
+          ╭▸ 
+        3 │ select * from users;
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_from_multiline_table() {
+        assert_snapshot!(check_hover("
+create table users(
+    id int,
+    email text,
+    name varchar(100)
+);
+select * from users$0;
+"), @r"
+        hover: table public.users(
+                  id int,
+                  email text,
+                  name varchar(100)
+              )
+          ╭▸ 
+        7 │ select * from users;
+          ╰╴                  ─ hover
         ");
     }
 }
