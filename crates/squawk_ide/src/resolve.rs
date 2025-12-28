@@ -308,9 +308,8 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     } else {
         let field_expr = from_item.field_expr()?;
         let table_name = Name::new(field_expr.field()?.syntax().text().to_string());
-        let schema_name_ref = match field_expr.base()? {
-            ast::Expr::NameRef(name_ref) => name_ref,
-            _ => return None,
+        let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? else {
+            return None;
         };
         let schema = Schema(Name::new(schema_name_ref.syntax().text().to_string()));
         (table_name, Some(schema))
