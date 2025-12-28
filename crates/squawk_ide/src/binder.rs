@@ -80,6 +80,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
         ast::Stmt::CreateIndex(create_index) => bind_create_index(b, create_index),
         ast::Stmt::CreateFunction(create_function) => bind_create_function(b, create_function),
+        ast::Stmt::CreateSchema(create_schema) => bind_create_schema(b, create_schema),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -153,6 +154,24 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
 
     let root = b.root_scope();
     b.scopes[root].insert(function_name, function_id);
+}
+
+fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
+    let Some(schema_name_node) = create_schema.name() else {
+        return;
+    };
+
+    let schema_name = Name::new(schema_name_node.syntax().text().to_string());
+    let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
+
+    let schema_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Schema,
+        ptr: name_ptr,
+        schema: Schema(schema_name.clone()),
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(schema_name, schema_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

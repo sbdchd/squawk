@@ -48,6 +48,7 @@ pub(crate) enum SymbolKind {
     Table,
     Index,
     Function,
+    Schema,
 }
 
 #[derive(Clone, Debug)]
