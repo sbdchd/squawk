@@ -127,7 +127,6 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
     let mut in_column_list = false;
     let mut in_where_clause = false;
     let mut in_from_clause = false;
-    let mut in_target_list = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -149,8 +148,12 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
             .and_then(ast::FieldExpr::cast)
             .is_some();
 
+        let mut in_from_clause = false;
         for ancestor in parent.ancestors() {
-            if ast::TargetList::can_cast(ancestor.kind()) {
+            if ast::FromClause::can_cast(ancestor.kind()) {
+                in_from_clause = true;
+            }
+            if ast::Select::can_cast(ancestor.kind()) && !in_from_clause {
                 if is_function_call || is_schema_table_col {
                     return Some(NameRefContext::SchemaQualifier);
                 } else {
@@ -246,9 +249,6 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         if ast::FromClause::can_cast(ancestor.kind()) {
             in_from_clause = true;
         }
-        if ast::TargetList::can_cast(ancestor.kind()) {
-            in_target_list = true;
-        }
         if ast::Select::can_cast(ancestor.kind()) {
             if in_call_expr && !in_arg_list {
                 return Some(NameRefContext::SelectFunctionCall);
@@ -256,9 +256,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
             if in_from_clause {
                 return Some(NameRefContext::SelectFromTable);
             }
-            if in_target_list {
-                return Some(NameRefContext::SelectColumn);
-            }
+            // Classify as SelectColumn for target list, WHERE, ORDER BY, GROUP BY, etc.
+            // (anything in SELECT except FROM clause)
+            return Some(NameRefContext::SelectColumn);
         }
         if ast::ColumnList::can_cast(ancestor.kind()) {
             in_column_list = true;
