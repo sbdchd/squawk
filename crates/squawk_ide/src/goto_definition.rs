@@ -1269,4 +1269,75 @@ delete from users where id$0 = 1 and active = true;
           ╰╴                         ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_select_from_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+select * from users$0;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ select * from users;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_table_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+select * from public.users$0;
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                     ───── 2. destination
+        3 │ select * from public.users;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_table_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+select * from users$0;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                  ───── 2. destination
+        4 │ select * from users;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_temp_table() {
+        assert_snapshot!(goto("
+create temp table users(id int, email text);
+select * from users$0;
+"), @r"
+          ╭▸ 
+        2 │ create temp table users(id int, email text);
+          │                   ───── 2. destination
+        3 │ select * from users;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_table_defined_after() {
+        assert_snapshot!(goto("
+select * from users$0;
+create table users(id int, email text);
+"), @r"
+          ╭▸ 
+        2 │ select * from users;
+          │                   ─ 1. source
+        3 │ create table users(id int, email text);
+          ╰╴             ───── 2. destination
+        ");
+    }
 }

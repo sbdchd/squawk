@@ -17,6 +17,7 @@ enum NameRefContext {
     CreateIndex,
     CreateIndexColumn,
     SelectFunctionCall,
+    SelectFromTable,
     InsertTable,
     InsertColumn,
     DeleteTable,
@@ -35,6 +36,21 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_table(binder, &table_name, &schema, position)
+        }
+        NameRefContext::SelectFromTable => {
+            let table_name = Name::new(name_ref.syntax().text().to_string());
+            let schema = if let Some(parent) = name_ref.syntax().parent()
+                && let Some(field_expr) = ast::FieldExpr::cast(parent)
+                && let Some(base) = field_expr.base()
+                && let Some(schema_name_ref) = ast::NameRef::cast(base.syntax().clone())
+            {
+                let schema_text = schema_name_ref.syntax().text().to_string();
+                Some(Schema(Name::new(schema_text)))
+            } else {
+                None
+            };
             let position = name_ref.syntax().text_range().start();
             resolve_table(binder, &table_name, &schema, position)
         }
@@ -78,6 +94,7 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
     let mut in_call_expr = false;
     let mut in_column_list = false;
     let mut in_where_clause = false;
+    let mut in_from_clause = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
@@ -104,8 +121,16 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         if ast::CallExpr::can_cast(ancestor.kind()) {
             in_call_expr = true;
         }
-        if ast::Select::can_cast(ancestor.kind()) && in_call_expr {
-            return Some(NameRefContext::SelectFunctionCall);
+        if ast::FromClause::can_cast(ancestor.kind()) {
+            in_from_clause = true;
+        }
+        if ast::Select::can_cast(ancestor.kind()) {
+            if in_call_expr {
+                return Some(NameRefContext::SelectFunctionCall);
+            }
+            if in_from_clause {
+                return Some(NameRefContext::SelectFromTable);
+            }
         }
         if ast::ColumnList::can_cast(ancestor.kind()) {
             in_column_list = true;
