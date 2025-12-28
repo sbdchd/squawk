@@ -16,11 +16,15 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         }
 
         if is_select_column(&name_ref) {
-            // Try hover as column first, if that fails try as table
-            // (handles case like `select t from t;` where t is the table)
+            // Try hover as column first
             if let Some(result) = hover_column(file, &name_ref, &binder) {
                 return Some(result);
             }
+            // If no column, try as function (handles field-style function calls like `t.b`)
+            if let Some(result) = hover_function(file, &name_ref, &binder) {
+                return Some(result);
+            }
+            // Finally try as table (handles case like `select t from t;` where t is the table)
             return hover_table(file, &name_ref, &binder);
         }
 
@@ -41,7 +45,12 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         }
 
         if is_select_function_call(&name_ref) {
-            return hover_function(file, &name_ref, &binder);
+            // Try function first, but fall back to column if no function found
+            // (handles function-call-style column access like `select a(t)`)
+            if let Some(result) = hover_function(file, &name_ref, &binder) {
+                return Some(result);
+            }
+            return hover_column(file, &name_ref, &binder);
         }
 
         if is_schema_ref(&name_ref) {
@@ -80,6 +89,15 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
     None
 }
 
+fn format_column(
+    schema: &str,
+    table_name: &str,
+    column_name: &str,
+    ty: &impl std::fmt::Display,
+) -> String {
+    format!("column {schema}.{table_name}.{column_name} {ty}")
+}
+
 fn hover_column(
     file: &ast::SourceFile,
     name_ref: &ast::NameRef,
@@ -107,9 +125,11 @@ fn hover_column(
         table_schema(&create_table, binder)?
     };
 
-    Some(format!(
-        "{schema}.{table_name}.{column_name} {}",
-        ty.syntax().text()
+    Some(format_column(
+        &schema,
+        &table_name,
+        &column_name,
+        &ty.syntax().text(),
     ))
 }
 
@@ -125,23 +145,15 @@ fn hover_column_definition(
 
     let schema = if let Some(qualifier) = path.qualifier() {
         qualifier.syntax().text().to_string()
-    } else if let Some(schema) = table_schema(create_table, binder) {
-        schema
     } else {
-        return Some(format!(
-            "{}.{} {}",
-            table_name,
-            column_name,
-            ty.syntax().text()
-        ));
+        table_schema(create_table, binder)?
     };
 
-    Some(format!(
-        "{}.{}.{} {}",
-        schema,
-        table_name,
-        column_name,
-        ty.syntax().text()
+    Some(format_column(
+        &schema,
+        &table_name,
+        &column_name,
+        &ty.syntax().text(),
     ))
 }
 
@@ -191,8 +203,7 @@ fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder)
         table_schema(create_table, binder)?
     };
 
-    let table_arg_list = create_table.table_arg_list()?;
-    let args = table_arg_list.syntax().text().to_string();
+    let args = create_table.table_arg_list()?.syntax().text().to_string();
 
     Some(format!("table {}.{}{}", schema, table_name, args))
 }
@@ -317,12 +328,16 @@ fn is_function_ref(name_ref: &ast::NameRef) -> bool {
 
 fn is_select_function_call(name_ref: &ast::NameRef) -> bool {
     let mut in_call_expr = false;
+    let mut in_arg_list = false;
 
     for ancestor in name_ref.syntax().ancestors() {
+        if ast::ArgList::can_cast(ancestor.kind()) {
+            in_arg_list = true;
+        }
         if ast::CallExpr::can_cast(ancestor.kind()) {
             in_call_expr = true;
         }
-        if ast::Select::can_cast(ancestor.kind()) && in_call_expr {
+        if ast::Select::can_cast(ancestor.kind()) && in_call_expr && !in_arg_list {
             return true;
         }
     }
@@ -345,15 +360,24 @@ fn is_select_from_table(name_ref: &ast::NameRef) -> bool {
 
 fn is_select_column(name_ref: &ast::NameRef) -> bool {
     let mut in_target_list = false;
+    let mut in_call_expr = false;
+    let mut in_arg_list = false;
 
     for ancestor in name_ref.syntax().ancestors() {
+        if ast::ArgList::can_cast(ancestor.kind()) {
+            in_arg_list = true;
+        }
         if ast::CallExpr::can_cast(ancestor.kind()) {
-            return false;
+            in_call_expr = true;
         }
         if ast::TargetList::can_cast(ancestor.kind()) {
             in_target_list = true;
         }
         if ast::Select::can_cast(ancestor.kind()) && in_target_list {
+            // if we're inside a call expr but not inside an arg list, this is a function call
+            if in_call_expr && !in_arg_list {
+                return false;
+            }
             return true;
         }
     }
@@ -491,7 +515,7 @@ mod test {
 create table users(id int, email text);
 create index idx_email on users(email$0);
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ create index idx_email on users(email);
           ╰╴                                    ─ hover
@@ -504,7 +528,7 @@ create index idx_email on users(email$0);
 create table users(id int, email text);
 create index idx_id on users(id$0);
 "), @r"
-        hover: public.users.id int
+        hover: column public.users.id int
           ╭▸ 
         3 │ create index idx_id on users(id);
           ╰╴                              ─ hover
@@ -517,7 +541,7 @@ create index idx_id on users(id$0);
 create table public.users(id int, email text);
 create index idx_email on public.users(email$0);
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ create index idx_email on public.users(email);
           ╰╴                                           ─ hover
@@ -530,7 +554,7 @@ create index idx_email on public.users(email$0);
 create temp table users(id int, email text);
 create index idx_email on users(email$0);
 "), @r"
-        hover: pg_temp.users.email text
+        hover: column pg_temp.users.email text
           ╭▸ 
         3 │ create index idx_email on users(email);
           ╰╴                                    ─ hover
@@ -543,7 +567,7 @@ create index idx_email on users(email$0);
 create table users(id int, email text, name varchar(100));
 create index idx_users on users(id, email$0, name);
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ create index idx_users on users(id, email, name);
           ╰╴                                        ─ hover
@@ -556,7 +580,7 @@ create index idx_users on users(id, email$0, name);
 create table users(id int, name varchar(100));
 create index idx_name on users(name$0);
 "), @r"
-        hover: public.users.name varchar(100)
+        hover: column public.users.name varchar(100)
           ╭▸ 
         3 │ create index idx_name on users(name);
           ╰╴                                  ─ hover
@@ -569,7 +593,7 @@ create index idx_name on users(name$0);
 create table metrics(value bigint);
 create index idx_value on metrics(value$0);
 "), @r"
-        hover: public.metrics.value bigint
+        hover: column public.metrics.value bigint
           ╭▸ 
         3 │ create index idx_value on metrics(value);
           ╰╴                                      ─ hover
@@ -582,7 +606,7 @@ create index idx_value on metrics(value$0);
 create table events(created_at timestamp with time zone);
 create index idx_created on events(created_at$0);
 "), @r"
-        hover: public.events.created_at timestamp with time zone
+        hover: column public.events.created_at timestamp with time zone
           ╭▸ 
         3 │ create index idx_created on events(created_at);
           ╰╴                                            ─ hover
@@ -596,7 +620,7 @@ set search_path to myschema;
 create table myschema.users(id int, email text);
 create index idx_email on users(email$0);
 "#), @r"
-        hover: myschema.users.email text
+        hover: column myschema.users.email text
           ╭▸ 
         4 │ create index idx_email on users(email);
           ╰╴                                    ─ hover
@@ -611,7 +635,7 @@ create table public.users(id int, email text);
 create table myschema.users(value bigint);
 create index idx_email on public.users(email$0);
 "#), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         5 │ create index idx_email on public.users(email);
           ╰╴                                           ─ hover
@@ -774,7 +798,7 @@ create temp table t$0(x bigint);
         assert_snapshot!(check_hover("
 create table t(id$0 int);
 "), @r"
-        hover: public.t.id int
+        hover: column public.t.id int
           ╭▸ 
         2 │ create table t(id int);
           ╰╴                ─ hover
@@ -786,7 +810,7 @@ create table t(id$0 int);
         assert_snapshot!(check_hover("
 create table myschema.users(id$0 int, name text);
 "), @r"
-        hover: myschema.users.id int
+        hover: column myschema.users.id int
           ╭▸ 
         2 │ create table myschema.users(id int, name text);
           ╰╴                             ─ hover
@@ -798,7 +822,7 @@ create table myschema.users(id$0 int, name text);
         assert_snapshot!(check_hover("
 create temp table t(x$0 bigint);
 "), @r"
-        hover: pg_temp.t.x bigint
+        hover: column pg_temp.t.x bigint
           ╭▸ 
         2 │ create temp table t(x bigint);
           ╰╴                    ─ hover
@@ -810,7 +834,7 @@ create temp table t(x$0 bigint);
         assert_snapshot!(check_hover("
 create table t(id int, email$0 text, name varchar(100));
 "), @r"
-        hover: public.t.email text
+        hover: column public.t.email text
           ╭▸ 
         2 │ create table t(id int, email text, name varchar(100));
           ╰╴                           ─ hover
@@ -1001,6 +1025,102 @@ select add$0(1, 2);
     }
 
     #[test]
+    fn hover_on_function_call_style_column_access() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+select a$0(t) from t;
+"), @r"
+        hover: column public.t.a int
+          ╭▸ 
+        3 │ select a(t) from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_function_call_style_column_access_with_function_precedence() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' LANGUAGE sql;
+select b$0(t) from t;
+"), @r"
+        hover: function public.b(t) returns int
+          ╭▸ 
+        4 │ select b(t) from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_function_call_style_table_arg() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+select a(t$0) from t;
+"), @r"
+        hover: table public.t(a int, b int)
+          ╭▸ 
+        3 │ select a(t) from t;
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_function_call_style_table_arg_with_function() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' LANGUAGE sql;
+select b(t$0) from t;
+"), @r"
+        hover: table public.t(a int, b int)
+          ╭▸ 
+        4 │ select b(t) from t;
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_field_style_function_call() {
+        assert_snapshot!(check_hover("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select t.b$0 from t;
+"), @r"
+        hover: function public.b(t) returns int
+          ╭▸ 
+        4 │ select t.b from t;
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_field_style_function_call_column_precedence() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+create function b(t) returns int as 'select 1' language sql;
+select t.b$0 from t;
+"), @r"
+        hover: column public.t.b int
+          ╭▸ 
+        4 │ select t.b from t;
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_field_style_function_call_table_ref() {
+        assert_snapshot!(check_hover("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select t$0.b from t;
+"), @r"
+        hover: table public.t(a int)
+          ╭▸ 
+        4 │ select t.b from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
     fn hover_on_select_from_table() {
         assert_snapshot!(check_hover("
 create table users(id int, email text);
@@ -1080,7 +1200,7 @@ select * from users$0;
 create table users(id int, email text);
 select id$0 from users;
 "), @r"
-        hover: public.users.id int
+        hover: column public.users.id int
           ╭▸ 
         3 │ select id from users;
           ╰╴        ─ hover
@@ -1093,7 +1213,7 @@ select id$0 from users;
 create table users(id int, email text);
 select id, email$0 from users;
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ select id, email from users;
           ╰╴               ─ hover
@@ -1106,7 +1226,7 @@ select id, email$0 from users;
 create table public.users(id int, email text);
 select email$0 from public.users;
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ select email from public.users;
           ╰╴           ─ hover
@@ -1120,7 +1240,7 @@ set search_path to foo;
 create table foo.users(id int, email text);
 select id$0 from users;
 "), @r"
-        hover: foo.users.id int
+        hover: column foo.users.id int
           ╭▸ 
         4 │ select id from users;
           ╰╴        ─ hover
@@ -1159,7 +1279,7 @@ insert into public.users$0(id, email) values (1, 'test');
 create table users(id int, email text);
 insert into users(id$0, email) values (1, 'test');
 "), @r"
-        hover: public.users.id int
+        hover: column public.users.id int
           ╭▸ 
         3 │ insert into users(id, email) values (1, 'test');
           ╰╴                   ─ hover
@@ -1172,7 +1292,7 @@ insert into users(id$0, email) values (1, 'test');
 create table users(id int, email text);
 insert into users(id, email$0) values (1, 'test');
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ insert into users(id, email) values (1, 'test');
           ╰╴                          ─ hover
@@ -1185,7 +1305,7 @@ insert into users(id, email$0) values (1, 'test');
 create table public.users(id int, email text);
 insert into public.users(email$0) values ('test');
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ insert into public.users(email) values ('test');
           ╰╴                             ─ hover
@@ -1224,7 +1344,7 @@ delete from public.users$0 where id = 1;
 create table users(id int, email text);
 delete from users where id$0 = 1;
 "), @r"
-        hover: public.users.id int
+        hover: column public.users.id int
           ╭▸ 
         3 │ delete from users where id = 1;
           ╰╴                         ─ hover
@@ -1237,7 +1357,7 @@ delete from users where id$0 = 1;
 create table users(id int, email text, active boolean);
 delete from users where id = 1 and email$0 = 'test';
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ delete from users where id = 1 and email = 'test';
           ╰╴                                       ─ hover
@@ -1250,7 +1370,7 @@ delete from users where id = 1 and email$0 = 'test';
 create table public.users(id int, email text);
 delete from public.users where email$0 = 'test';
 "), @r"
-        hover: public.users.email text
+        hover: column public.users.email text
           ╭▸ 
         3 │ delete from public.users where email = 'test';
           ╰╴                                   ─ hover
@@ -1303,7 +1423,7 @@ select users$0 from users;
 create table t(t int);
 select t$0 from t;
 "), @r"
-        hover: public.t.t int
+        hover: column public.t.t int
           ╭▸ 
         3 │ select t from t;
           ╰╴       ─ hover
