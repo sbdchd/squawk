@@ -1397,4 +1397,284 @@ select id$0 from users;
           ╰╴        ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_select_table_as_column() {
+        assert_snapshot!(goto("
+create table t(x bigint, y bigint);
+select t$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(x bigint, y bigint);
+          │              ─ 2. destination
+        3 │ select t from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_table_as_column_with_schema() {
+        assert_snapshot!(goto("
+create table public.t(x bigint, y bigint);
+select t$0 from public.t;
+"), @r"
+          ╭▸ 
+        2 │ create table public.t(x bigint, y bigint);
+          │                     ─ 2. destination
+        3 │ select t from public.t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_table_as_column_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+select users$0 from users;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                  ───── 2. destination
+        4 │ select users from users;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_with_same_name_as_table() {
+        assert_snapshot!(goto("
+create table t(t int);
+select t$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(t int);
+          │                ─ 2. destination
+        3 │ select t from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_schema() {
+        assert_snapshot!(goto("
+create schema foo;
+drop schema foo$0;
+"), @r"
+          ╭▸ 
+        2 │ create schema foo;
+          │               ─── 2. destination
+        3 │ drop schema foo;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_schema_defined_after() {
+        assert_snapshot!(goto("
+drop schema foo$0;
+create schema foo;
+"), @r"
+          ╭▸ 
+        2 │ drop schema foo;
+          │               ─ 1. source
+        3 │ create schema foo;
+          ╰╴              ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_schema_qualifier_in_table() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo$0.t(a int);
+"), @r"
+          ╭▸ 
+        2 │ create schema foo;
+          │               ─── 2. destination
+        3 │ create table foo.t(a int);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_schema_qualifier_in_drop_table() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.t(a int);
+drop table foo$0.t;
+"), @r"
+          ╭▸ 
+        2 │ create schema foo;
+          │               ─── 2. destination
+        3 │ create table foo.t(a int);
+        4 │ drop table foo.t;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_schema_qualifier_multiple_schemas() {
+        assert_snapshot!(goto("
+create schema foo;
+create schema bar;
+create table bar$0.t(a int);
+"), @r"
+          ╭▸ 
+        3 │ create schema bar;
+          │               ─── 2. destination
+        4 │ create table bar.t(a int);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_schema_qualifier_in_function_call() {
+        assert_snapshot!(goto(r#"
+create schema foo;
+create function foo.bar() returns int as $$ begin return 1; end; $$ language plpgsql;
+select foo$0.bar();
+"#), @r"
+          ╭▸ 
+        2 │ create schema foo;
+          │               ─── 2. destination
+        3 │ create function foo.bar() returns int as $$ begin return 1; end; $$ language plpgsql;
+        4 │ select foo.bar();
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_schema_qualifier_in_function_call_from_clause() {
+        assert_snapshot!(goto(r#"
+create schema myschema;
+create function myschema.get_data() returns table(id int) as $$ begin return query select 1; end; $$ language plpgsql;
+select * from myschema$0.get_data();
+"#), @r"
+          ╭▸ 
+        2 │ create schema myschema;
+          │               ──────── 2. destination
+        3 │ create function myschema.get_data() returns table(id int) as $$ begin return query select 1; end; $$ language plpgsql;
+        4 │ select * from myschema.get_data();
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_schema_qualifier_in_select_from() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.t(x int);
+select x from foo$0.t;
+"), @r"
+          ╭▸ 
+        2 │ create schema foo;
+          │               ─── 2. destination
+        3 │ create table foo.t(x int);
+        4 │ select x from foo.t;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_qualified_column_table() {
+        assert_snapshot!(goto("
+create table t(a int);
+select t$0.a from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ select t.a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_qualified_column_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+select t.a$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ select t.a from t;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_three_part_qualified_column_schema() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.t(a int);
+select foo$0.t.a from t;
+"), @r"
+          ╭▸ 
+        2 │ create schema foo;
+          │               ─── 2. destination
+        3 │ create table foo.t(a int);
+        4 │ select foo.t.a from t;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_three_part_qualified_column_table() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.t(a int);
+select foo.t$0.a from t;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t(a int);
+          │                  ─ 2. destination
+        4 │ select foo.t.a from t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_three_part_qualified_column_column() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.t(a int);
+select foo.t.a$0 from t;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t(a int);
+          │                    ─ 2. destination
+        4 │ select foo.t.a from t;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_qualified_column_with_schema_in_from_table() {
+        assert_snapshot!(goto("
+create table foo.t(a int, b int);
+select t$0.a from foo.t;
+"), @r"
+          ╭▸ 
+        2 │ create table foo.t(a int, b int);
+          │                  ─ 2. destination
+        3 │ select t.a from foo.t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_qualified_column_with_schema_in_from_column() {
+        assert_snapshot!(goto("
+create table foo.t(a int, b int);
+select t.a$0 from foo.t;
+"), @r"
+          ╭▸ 
+        2 │ create table foo.t(a int, b int);
+          │                    ─ 2. destination
+        3 │ select t.a from foo.t;
+          ╰╴         ─ 1. source
+        ");
+    }
 }

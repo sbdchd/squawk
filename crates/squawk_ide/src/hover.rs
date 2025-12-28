@@ -16,7 +16,12 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         }
 
         if is_select_column(&name_ref) {
-            return hover_column(file, &name_ref, &binder);
+            // Try hover as column first, if that fails try as table
+            // (handles case like `select t from t;` where t is the table)
+            if let Some(result) = hover_column(file, &name_ref, &binder) {
+                return Some(result);
+            }
+            return hover_table(file, &name_ref, &binder);
         }
 
         if is_table_ref(&name_ref) {
@@ -37,6 +42,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
         if is_select_function_call(&name_ref) {
             return hover_function(file, &name_ref, &binder);
+        }
+
+        if is_schema_ref(&name_ref) {
+            return hover_schema(file, &name_ref, &binder);
         }
     }
 
@@ -61,6 +70,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             .find_map(ast::CreateFunction::cast)
         {
             return format_create_function(&create_function, &binder);
+        }
+
+        if let Some(create_schema) = name.syntax().ancestors().find_map(ast::CreateSchema::cast) {
+            return format_create_schema(&create_schema);
         }
     }
 
@@ -345,6 +358,35 @@ fn is_select_column(name_ref: &ast::NameRef) -> bool {
         }
     }
     false
+}
+
+fn is_schema_ref(name_ref: &ast::NameRef) -> bool {
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::DropSchema::can_cast(ancestor.kind()) {
+            return true;
+        }
+    }
+    false
+}
+
+fn hover_schema(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let schema_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+
+    let root = file.syntax();
+    let schema_name_node = schema_ptr.to_node(root);
+
+    let create_schema = ast::CreateSchema::cast(schema_name_node.parent()?)?;
+
+    format_create_schema(&create_schema)
+}
+
+fn format_create_schema(create_schema: &ast::CreateSchema) -> Option<String> {
+    let schema_name = create_schema.name()?.syntax().text().to_string();
+    Some(format!("schema {}", schema_name))
 }
 
 fn hover_function(
@@ -1212,6 +1254,97 @@ delete from public.users where email$0 = 'test';
           ╭▸ 
         3 │ delete from public.users where email = 'test';
           ╰╴                                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_table_as_column() {
+        assert_snapshot!(check_hover("
+create table t(x bigint, y bigint);
+select t$0 from t;
+"), @r"
+        hover: table public.t(x bigint, y bigint)
+          ╭▸ 
+        3 │ select t from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_table_as_column_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.t(x bigint, y bigint);
+select t$0 from public.t;
+"), @r"
+        hover: table public.t(x bigint, y bigint)
+          ╭▸ 
+        3 │ select t from public.t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_table_as_column_with_search_path() {
+        assert_snapshot!(check_hover("
+set search_path to foo;
+create table foo.users(id int, email text);
+select users$0 from users;
+"), @r"
+        hover: table foo.users(id int, email text)
+          ╭▸ 
+        4 │ select users from users;
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_with_same_name_as_table() {
+        assert_snapshot!(check_hover("
+create table t(t int);
+select t$0 from t;
+"), @r"
+        hover: public.t.t int
+          ╭▸ 
+        3 │ select t from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_schema() {
+        assert_snapshot!(check_hover("
+create schema foo$0;
+"), @r"
+        hover: schema foo
+          ╭▸ 
+        2 │ create schema foo;
+          ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_schema() {
+        assert_snapshot!(check_hover("
+create schema foo;
+drop schema foo$0;
+"), @r"
+        hover: schema foo
+          ╭▸ 
+        3 │ drop schema foo;
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_schema_after_definition() {
+        assert_snapshot!(check_hover("
+drop schema foo$0;
+create schema foo;
+"), @r"
+        hover: schema foo
+          ╭▸ 
+        2 │ drop schema foo;
+          ╰╴              ─ hover
         ");
     }
 }
