@@ -15,6 +15,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             return hover_column(file, &name_ref, &binder);
         }
 
+        if is_select_column(&name_ref) {
+            return hover_column(file, &name_ref, &binder);
+        }
+
         if is_table_ref(&name_ref) {
             return hover_table(file, &name_ref, &binder);
         }
@@ -68,26 +72,27 @@ fn hover_column(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let column_name = name_ref.syntax().text().to_string();
-
-    let create_index = name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::CreateIndex::cast)?;
-
-    let relation_name = create_index.relation_name()?;
-    let path = relation_name.path()?;
-
-    let (schema, table_name) = resolve::resolve_table_info(binder, &path)?;
-
     let column_ptr = resolve::resolve_name_ref(binder, name_ref)?;
 
     let root = file.syntax();
     let column_name_node = column_ptr.to_node(root);
 
     let column = column_name_node.ancestors().find_map(ast::Column::cast)?;
-
+    let column_name = column.name()?.syntax().text().to_string();
     let ty = column.ty()?;
+
+    let create_table = column
+        .syntax()
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
+    let path = create_table.path()?;
+    let table_name = path.segment()?.name()?.syntax().text().to_string();
+
+    let schema = if let Some(qualifier) = path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        table_schema(&create_table, binder)?
+    };
 
     Some(format!(
         "{schema}.{table_name}.{column_name} {}",
@@ -216,6 +221,8 @@ fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Opt
 
 fn is_column_ref(name_ref: &ast::NameRef) -> bool {
     let mut in_partition_item = false;
+    let mut in_column_list = false;
+    let mut in_where_clause = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::PartitionItem::can_cast(ancestor.kind()) {
@@ -224,12 +231,26 @@ fn is_column_ref(name_ref: &ast::NameRef) -> bool {
         if ast::CreateIndex::can_cast(ancestor.kind()) {
             return in_partition_item;
         }
+        if ast::ColumnList::can_cast(ancestor.kind()) {
+            in_column_list = true;
+        }
+        if ast::Insert::can_cast(ancestor.kind()) {
+            return in_column_list;
+        }
+        if ast::WhereClause::can_cast(ancestor.kind()) {
+            in_where_clause = true;
+        }
+        if ast::Delete::can_cast(ancestor.kind()) {
+            return in_where_clause;
+        }
     }
     false
 }
 
 fn is_table_ref(name_ref: &ast::NameRef) -> bool {
     let mut in_partition_item = false;
+    let mut in_column_list = false;
+    let mut in_where_clause = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
@@ -237,6 +258,18 @@ fn is_table_ref(name_ref: &ast::NameRef) -> bool {
         }
         if ast::Table::can_cast(ancestor.kind()) {
             return true;
+        }
+        if ast::ColumnList::can_cast(ancestor.kind()) {
+            in_column_list = true;
+        }
+        if ast::Insert::can_cast(ancestor.kind()) {
+            return !in_column_list;
+        }
+        if ast::WhereClause::can_cast(ancestor.kind()) {
+            in_where_clause = true;
+        }
+        if ast::Delete::can_cast(ancestor.kind()) {
+            return !in_where_clause;
         }
         if ast::DropIndex::can_cast(ancestor.kind()) {
             return false;
@@ -291,6 +324,23 @@ fn is_select_from_table(name_ref: &ast::NameRef) -> bool {
             in_from_clause = true;
         }
         if ast::Select::can_cast(ancestor.kind()) && in_from_clause {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_select_column(name_ref: &ast::NameRef) -> bool {
+    let mut in_target_list = false;
+
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::CallExpr::can_cast(ancestor.kind()) {
+            return false;
+        }
+        if ast::TargetList::can_cast(ancestor.kind()) {
+            in_target_list = true;
+        }
+        if ast::Select::can_cast(ancestor.kind()) && in_target_list {
             return true;
         }
     }
@@ -979,6 +1029,189 @@ select * from users$0;
           ╭▸ 
         7 │ select * from users;
           ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+select id$0 from users;
+"), @r"
+        hover: public.users.id int
+          ╭▸ 
+        3 │ select id from users;
+          ╰╴        ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_second() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+select id, email$0 from users;
+"), @r"
+        hover: public.users.email text
+          ╭▸ 
+        3 │ select id, email from users;
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+select email$0 from public.users;
+"), @r"
+        hover: public.users.email text
+          ╭▸ 
+        3 │ select email from public.users;
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_with_search_path() {
+        assert_snapshot!(check_hover("
+set search_path to foo;
+create table foo.users(id int, email text);
+select id$0 from users;
+"), @r"
+        hover: foo.users.id int
+          ╭▸ 
+        4 │ select id from users;
+          ╰╴        ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_insert_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+insert into users$0(id, email) values (1, 'test');
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ insert into users(id, email) values (1, 'test');
+          ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_insert_table_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+insert into public.users$0(id, email) values (1, 'test');
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ insert into public.users(id, email) values (1, 'test');
+          ╰╴                       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_insert_column() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+insert into users(id$0, email) values (1, 'test');
+"), @r"
+        hover: public.users.id int
+          ╭▸ 
+        3 │ insert into users(id, email) values (1, 'test');
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_insert_column_second() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+insert into users(id, email$0) values (1, 'test');
+"), @r"
+        hover: public.users.email text
+          ╭▸ 
+        3 │ insert into users(id, email) values (1, 'test');
+          ╰╴                          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_insert_column_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+insert into public.users(email$0) values ('test');
+"), @r"
+        hover: public.users.email text
+          ╭▸ 
+        3 │ insert into public.users(email) values ('test');
+          ╰╴                             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_delete_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+delete from users$0 where id = 1;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ delete from users where id = 1;
+          ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_delete_table_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+delete from public.users$0 where id = 1;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ delete from public.users where id = 1;
+          ╰╴                       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_delete_where_column() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+delete from users where id$0 = 1;
+"), @r"
+        hover: public.users.id int
+          ╭▸ 
+        3 │ delete from users where id = 1;
+          ╰╴                         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_delete_where_column_second() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text, active boolean);
+delete from users where id = 1 and email$0 = 'test';
+"), @r"
+        hover: public.users.email text
+          ╭▸ 
+        3 │ delete from users where id = 1 and email = 'test';
+          ╰╴                                       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_delete_where_column_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+delete from public.users where email$0 = 'test';
+"), @r"
+        hover: public.users.email text
+          ╭▸ 
+        3 │ delete from public.users where email = 'test';
+          ╰╴                                   ─ hover
         ");
     }
 }

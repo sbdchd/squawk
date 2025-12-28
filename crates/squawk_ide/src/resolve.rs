@@ -18,6 +18,7 @@ enum NameRefContext {
     CreateIndexColumn,
     SelectFunctionCall,
     SelectFromTable,
+    SelectColumn,
     InsertTable,
     InsertColumn,
     DeleteTable,
@@ -84,6 +85,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             resolve_function(binder, &function_name, &schema, position)
         }
         NameRefContext::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
+        NameRefContext::SelectColumn => resolve_select_column(binder, name_ref),
         NameRefContext::InsertColumn => resolve_insert_column(binder, name_ref),
         NameRefContext::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
     }
@@ -95,6 +97,7 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
     let mut in_column_list = false;
     let mut in_where_clause = false;
     let mut in_from_clause = false;
+    let mut in_target_list = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
@@ -124,12 +127,18 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         if ast::FromClause::can_cast(ancestor.kind()) {
             in_from_clause = true;
         }
+        if ast::TargetList::can_cast(ancestor.kind()) {
+            in_target_list = true;
+        }
         if ast::Select::can_cast(ancestor.kind()) {
             if in_call_expr {
                 return Some(NameRefContext::SelectFunctionCall);
             }
             if in_from_clause {
                 return Some(NameRefContext::SelectFromTable);
+            }
+            if in_target_list {
+                return Some(NameRefContext::SelectColumn);
             }
         }
         if ast::ColumnList::can_cast(ancestor.kind()) {
@@ -273,6 +282,48 @@ fn resolve_insert_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
 
+    let table_arg_list = create_table.table_arg_list()?;
+
+    for arg in table_arg_list.args() {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(col_name) = column.name()
+            && Name::new(col_name.syntax().text().to_string()) == column_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
+        }
+    }
+
+    None
+}
+
+fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+    let column_name = Name::new(name_ref.syntax().text().to_string());
+
+    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
+    let from_clause = select.from_clause()?;
+    let from_item = from_clause.from_items().next()?;
+
+    let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
+        (Name::new(name_ref_node.syntax().text().to_string()), None)
+    } else {
+        let field_expr = from_item.field_expr()?;
+        let table_name = Name::new(field_expr.field()?.syntax().text().to_string());
+        let schema_name_ref = match field_expr.base()? {
+            ast::Expr::NameRef(name_ref) => name_ref,
+            _ => return None,
+        };
+        let schema = Schema(Name::new(schema_name_ref.syntax().text().to_string()));
+        (table_name, Some(schema))
+    };
+
+    let position = name_ref.syntax().text_range().start();
+    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
+
+    let root = &name_ref.syntax().ancestors().last()?;
+    let table_name_node = table_ptr.to_node(root);
+    let create_table = table_name_node
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
     let table_arg_list = create_table.table_arg_list()?;
 
     for arg in table_arg_list.args() {
