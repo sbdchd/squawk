@@ -1219,6 +1219,36 @@ select * from t where t.b$0 > 0;
     }
 
     #[test]
+    fn goto_function_call_style_table_arg_in_where() {
+        assert_snapshot!(goto("
+create table t(a int);
+select * from t where a(t$0) > 2;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ select * from t where a(t) > 2;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_qualified_table_ref_in_where() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t where t$0.b > 2;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ create function b(t) returns int as 'select 1' language sql;
+        4 │ select * from t where t.b > 2;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_function_call_style_in_order_by() {
         assert_snapshot!(goto("
 create table t(a int, b int);

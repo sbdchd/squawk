@@ -359,9 +359,9 @@ fn is_select_from_table(name_ref: &ast::NameRef) -> bool {
 }
 
 fn is_select_column(name_ref: &ast::NameRef) -> bool {
-    let mut in_target_list = false;
     let mut in_call_expr = false;
     let mut in_arg_list = false;
+    let mut in_from_clause = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::ArgList::can_cast(ancestor.kind()) {
@@ -370,14 +370,19 @@ fn is_select_column(name_ref: &ast::NameRef) -> bool {
         if ast::CallExpr::can_cast(ancestor.kind()) {
             in_call_expr = true;
         }
-        if ast::TargetList::can_cast(ancestor.kind()) {
-            in_target_list = true;
+        if ast::FromClause::can_cast(ancestor.kind()) {
+            in_from_clause = true;
         }
-        if ast::Select::can_cast(ancestor.kind()) && in_target_list {
+        if ast::Select::can_cast(ancestor.kind()) {
             // if we're inside a call expr but not inside an arg list, this is a function call
             if in_call_expr && !in_arg_list {
                 return false;
             }
+            // if we're in FROM clause, this is a table reference, not a column
+            if in_from_clause {
+                return false;
+            }
+            // anything else in SELECT (target list, WHERE, ORDER BY, etc.) is a column
             return true;
         }
     }
@@ -1075,6 +1080,33 @@ select b(t$0) from t;
           ╭▸ 
         4 │ select b(t) from t;
           ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_function_call_style_table_arg_in_where() {
+        assert_snapshot!(check_hover("
+create table t(a int);
+select * from t where a(t$0) > 2;
+"), @r"
+        hover: table public.t(a int)
+          ╭▸ 
+        3 │ select * from t where a(t) > 2;
+          ╰╴                        ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_qualified_table_ref_in_where() {
+        assert_snapshot!(check_hover("
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select * from t where t$0.b > 2;
+"), @r"
+        hover: table public.t(a int)
+          ╭▸ 
+        4 │ select * from t where t.b > 2;
+          ╰╴                      ─ hover
         ");
     }
 
