@@ -4519,7 +4519,7 @@ fn opt_group_by_list(p: &mut Parser<'_>) {
 
     let m = p.start();
     let mut found_item = false;
-    while !p.at(EOF) && !p.at(SEMICOLON) {
+    while !p.at(EOF) {
         if opt_group_by_item(p).is_none() {
             break;
         }
