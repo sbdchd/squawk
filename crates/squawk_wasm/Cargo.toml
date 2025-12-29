@@ -21,6 +21,8 @@ default = ["console_error_panic_hook"]
 squawk-syntax.workspace = true
 squawk-linter.workspace = true
 squawk-lexer.workspace = true
+squawk-ide.workspace = true
+rowan.workspace = true
 
 wasm-bindgen.workspace = true
 serde-wasm-bindgen.workspace = true
