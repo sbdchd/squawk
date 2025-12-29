@@ -1,6 +1,7 @@
 mod binder;
 pub mod code_actions;
 pub mod column_name;
+pub mod document_symbols;
 pub mod expand_selection;
 pub mod find_references;
 mod generated;

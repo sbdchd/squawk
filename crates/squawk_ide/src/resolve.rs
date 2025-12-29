@@ -779,30 +779,42 @@ pub(crate) fn resolve_insert_table_columns(
 }
 
 pub(crate) fn resolve_table_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
-    let table_name_str = extract_table_name_from_path(path)?;
+    resolve_symbol_info(binder, path, SymbolKind::Table)
+}
+
+pub(crate) fn resolve_function_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
+    resolve_symbol_info(binder, path, SymbolKind::Function)
+}
+
+fn resolve_symbol_info(
+    binder: &Binder,
+    path: &ast::Path,
+    kind: SymbolKind,
+) -> Option<(Schema, String)> {
+    let name_str = extract_table_name_from_path(path)?;
     let schema = extract_schema_from_path(path);
 
-    let table_name_normalized = Name::new(table_name_str.clone());
-    let symbols = binder.scopes[binder.root_scope()].get(&table_name_normalized)?;
+    let name_normalized = Name::new(name_str.clone());
+    let symbols = binder.scopes[binder.root_scope()].get(&name_normalized)?;
 
     if let Some(schema_name) = schema {
         let schema_normalized = Schema::new(schema_name);
         let symbol_id = symbols.iter().copied().find(|id| {
             let symbol = &binder.symbols[*id];
-            symbol.kind == SymbolKind::Table && symbol.schema == schema_normalized
+            symbol.kind == kind && symbol.schema == schema_normalized
         })?;
         let symbol = &binder.symbols[symbol_id];
-        return Some((symbol.schema.clone(), table_name_str));
+        return Some((symbol.schema.clone(), name_str));
     } else {
         let position = path.syntax().text_range().start();
         let search_path = binder.search_path_at(position);
         for search_schema in search_path {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &binder.symbols[*id];
-                symbol.kind == SymbolKind::Table && &symbol.schema == search_schema
+                symbol.kind == kind && &symbol.schema == search_schema
             }) {
                 let symbol = &binder.symbols[symbol_id];
-                return Some((symbol.schema.clone(), table_name_str));
+                return Some((symbol.schema.clone(), name_str));
             }
         }
     }
