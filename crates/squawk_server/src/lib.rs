@@ -316,27 +316,41 @@ fn handle_document_symbol(
 
     let symbols = document_symbols(&file);
 
+    fn convert_symbol(
+        sym: squawk_ide::document_symbols::DocumentSymbol,
+        line_index: &LineIndex,
+    ) -> DocumentSymbol {
+        let range = lsp_utils::range(line_index, sym.full_range);
+        let selection_range = lsp_utils::range(line_index, sym.focus_range);
+
+        let children = sym
+            .children
+            .into_iter()
+            .map(|child| convert_symbol(child, line_index))
+            .collect::<Vec<_>>();
+
+        let children = (!children.is_empty()).then_some(children);
+
+        DocumentSymbol {
+            name: sym.name,
+            detail: sym.detail,
+            kind: match sym.kind {
+                DocumentSymbolKind::Table => SymbolKind::STRUCT,
+                DocumentSymbolKind::Function => SymbolKind::FUNCTION,
+                DocumentSymbolKind::Column => SymbolKind::FIELD,
+            },
+            tags: None,
+            range,
+            selection_range,
+            children,
+            #[allow(deprecated)]
+            deprecated: None,
+        }
+    }
+
     let lsp_symbols: Vec<DocumentSymbol> = symbols
         .into_iter()
-        .map(|sym| {
-            let range = lsp_utils::range(&line_index, sym.range);
-            let selection_range = lsp_utils::range(&line_index, sym.selection_range);
-
-            DocumentSymbol {
-                name: sym.name,
-                detail: sym.detail,
-                kind: match sym.kind {
-                    DocumentSymbolKind::Table => SymbolKind::STRUCT,
-                    DocumentSymbolKind::Function => SymbolKind::FUNCTION,
-                },
-                tags: None,
-                range,
-                selection_range,
-                children: None,
-                #[allow(deprecated)]
-                deprecated: None,
-            }
-        })
+        .map(|sym| convert_symbol(sym, &line_index))
         .collect();
 
     let resp = Response {
