@@ -13,6 +13,13 @@ import {
   decompress,
   decompressFromEncodedURIComponent,
 } from "lz-string"
+import {
+  provideInlayHints,
+  provideHover,
+  provideDefinition,
+  provideReferences,
+  provideDocumentSymbols,
+} from "./providers"
 
 const modes = ["Lint", "Syntax Tree", "Tokens"] as const
 const STORAGE_KEY = "playground-history-v1"
@@ -424,6 +431,36 @@ function Editor({
       },
     )
 
+    const hoverProvider = monaco.languages.registerHoverProvider("pgsql", {
+      provideHover,
+    })
+
+    const definitionProvider = monaco.languages.registerDefinitionProvider(
+      "pgsql",
+      {
+        provideDefinition,
+      },
+    )
+
+    const referencesProvider = monaco.languages.registerReferenceProvider(
+      "pgsql",
+      {
+        provideReferences,
+      },
+    )
+
+    const documentSymbolProvider =
+      monaco.languages.registerDocumentSymbolProvider("pgsql", {
+        provideDocumentSymbols,
+      })
+
+    const inlayHintsProvider = monaco.languages.registerInlayHintsProvider(
+      "pgsql",
+      {
+        provideInlayHints,
+      },
+    )
+
     editor.onDidChangeModelContent(() => {
       onChangeText(editor.getValue())
     })
@@ -434,6 +471,11 @@ function Editor({
     return () => {
       editorRef.current = null
       codeActionProvider.dispose()
+      hoverProvider.dispose()
+      definitionProvider.dispose()
+      referencesProvider.dispose()
+      documentSymbolProvider.dispose()
+      inlayHintsProvider.dispose()
       editor?.dispose()
       tokenProvider.dispose()
     }

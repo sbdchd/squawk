@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "wasm-pack build --target web ../crates/squawk_wasm --out-dir ../../playground/src/pkg && vite build",
+    "dev": "npm run build:wasm && vite",
+    "build": "npm run build:wasm && vite build",
+    "build:wasm": "wasm-pack build --target web ../crates/squawk_wasm --out-dir ../../playground/src/pkg",
     "deploy": "netlify deploy --prod --dir dist",
     "lint": "eslint .",
     "preview": "vite preview"

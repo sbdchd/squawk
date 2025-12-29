@@ -3,6 +3,12 @@ import initWasm, {
   dump_cst,
   dump_tokens,
   lint as lint_,
+  goto_definition as goto_definition_,
+  hover as hover_,
+  find_references as find_references_,
+  document_symbols as document_symbols_,
+  code_actions as code_actions_,
+  inlay_hints as inlay_hints_,
 } from "./pkg/squawk_wasm"
 
 export type TextEdit = {
@@ -32,13 +38,53 @@ export type LintError = {
   fix?: Fix
 }
 
-function lintWithTypes(text: string): Array<LintError> {
+function lint(text: string): Array<LintError> {
   return lint_(text)
+}
+
+export function inlay_hints(content: string): InlayHint[] {
+  return inlay_hints_(content)
+}
+
+export function code_actions(
+  content: string,
+  line: number,
+  column: number,
+): CodeAction[] | null {
+  return code_actions_(content, line, column)
+}
+
+export function document_symbols(content: string): DocumentSymbol[] {
+  return document_symbols_(content)
+}
+
+export function hover(
+  content: string,
+  line: number,
+  column: number,
+): string | null {
+  return hover_(content, line, column)
+}
+
+export function goto_definition(
+  content: string,
+  line: number,
+  column: number,
+): LocationRange | null {
+  return goto_definition_(content, line, column)
+}
+
+export function find_references(
+  content: string,
+  line: number,
+  column: number,
+): LocationRange[] {
+  return find_references_(content, line, column)
 }
 
 export function useErrors(text: string) {
   const isReady = useWasmStatus()
-  return isReady ? lintWithTypes(text) : []
+  return isReady ? lint(text) : []
 }
 
 export function useDumpCst(text: string): string {
@@ -82,4 +128,39 @@ function useWasmStatus() {
     isStartingAlready = { promise, start: start }
   }, [])
   return isReady
+}
+
+interface LocationRange {
+  start_line: number
+  start_column: number
+  end_line: number
+  end_column: number
+}
+
+interface CodeAction {
+  title: string
+  edits: TextEdit[]
+  kind: string
+}
+
+export interface DocumentSymbol {
+  name: string
+  detail: string | null
+  kind: string
+  start_line: number
+  start_column: number
+  end_line: number
+  end_column: number
+  selection_start_line: number
+  selection_start_column: number
+  selection_end_line: number
+  selection_end_column: number
+  children: DocumentSymbol[]
+}
+
+interface InlayHint {
+  line: number
+  column: number
+  label: string
+  kind: string
 }
