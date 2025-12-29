@@ -34,8 +34,9 @@ fn parser_ok(fixture: Fixture<&str>) {
         errors.is_none(),
         "tests defined in the `ok` can't have parser errors."
     );
-    // skipping pg17/pg18 specific stuff since our parser isn't using the latest parser
-    if !test_name.ends_with("pg17") && !test_name.ends_with("pg18") {
+    // skipping pg17/pg18/pg19 specific stuff since our parser isn't using the latest parser
+    if !test_name.ends_with("pg17") && !test_name.ends_with("pg18") && !test_name.ends_with("pg19")
+    {
         let pg_result = pg_query::parse(content);
         if let Err(e) = &pg_result {
             assert!(

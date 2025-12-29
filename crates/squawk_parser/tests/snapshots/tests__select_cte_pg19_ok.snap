@@ -1,0 +1,58 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/select_cte_pg19.sql
+---
+SOURCE_FILE
+  COMMENT "-- group by all"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "x"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                STAR "*"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            FROM_ITEM
+              NAME_REF
+                IDENT "t"
+          WHITESPACE " "
+          GROUP_BY_CLAUSE
+            GROUP_KW "group"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            ALL_KW "all"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "x"
+  SEMICOLON ";"
+  WHITESPACE "\n"

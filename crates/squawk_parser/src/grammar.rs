@@ -4504,12 +4504,12 @@ fn opt_group_by_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(ALL_KW) || p.at(DISTINCT_KW) {
         p.bump_any();
     }
-    group_by_list(p);
+    opt_group_by_list(p);
 
     Some(m.complete(p, GROUP_BY_CLAUSE))
 }
 
-fn group_by_list(p: &mut Parser<'_>) {
+fn opt_group_by_list(p: &mut Parser<'_>) {
     // From pg docs:
     // An expression used inside a grouping_element can be an input column name,
     // or the name or ordinal number of an output column (SELECT list item), or
@@ -4518,15 +4518,21 @@ fn group_by_list(p: &mut Parser<'_>) {
     // rather than an output column name.
 
     let m = p.start();
-    while !p.at(EOF) && !p.at(SEMICOLON) {
+    let mut found_item = false;
+    while !p.at(EOF) {
         if opt_group_by_item(p).is_none() {
-            p.error("expected group by item");
+            break;
         }
+        found_item = true;
         if !p.eat(COMMA) {
             break;
         }
     }
-    m.complete(p, GROUP_BY_LIST);
+    if found_item {
+        m.complete(p, GROUP_BY_LIST);
+    } else {
+        m.abandon(p);
+    }
 }
 
 const GROUP_BY_ITEM_FIRST: TokenSet =
