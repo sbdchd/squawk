@@ -6,23 +6,24 @@ use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverContents, HoverParams,
-    HoverProviderCapability, InitializeParams, InlayHint, InlayHintKind, InlayHintLabel,
-    InlayHintLabelPart, InlayHintParams, LanguageString, Location, MarkedString, OneOf,
-    PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
-    SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
+    DocumentSymbol, DocumentSymbolParams, GotoDefinitionParams, GotoDefinitionResponse, Hover,
+    HoverContents, HoverParams, HoverProviderCapability, InitializeParams, InlayHint,
+    InlayHintKind, InlayHintLabel, InlayHintLabelPart, InlayHintParams, LanguageString, Location,
+    MarkedString, OneOf, PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
+    SelectionRangeProviderCapability, ServerCapabilities, SymbolKind, TextDocumentSyncCapability,
     TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
     },
     request::{
-        CodeActionRequest, GotoDefinition, HoverRequest, InlayHintRequest, References, Request,
-        SelectionRangeRequest,
+        CodeActionRequest, DocumentSymbolRequest, GotoDefinition, HoverRequest, InlayHintRequest,
+        References, Request, SelectionRangeRequest,
     },
 };
 use rowan::TextRange;
 use squawk_ide::code_actions::code_actions;
+use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_ide::hover::hover;
@@ -67,6 +68,7 @@ pub fn run() -> Result<()> {
         definition_provider: Some(OneOf::Left(true)),
         hover_provider: Some(HoverProviderCapability::Simple(true)),
         inlay_hint_provider: Some(OneOf::Left(true)),
+        document_symbol_provider: Some(OneOf::Left(true)),
         ..Default::default()
     })
     .unwrap();
@@ -118,6 +120,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     }
                     InlayHintRequest::METHOD => {
                         handle_inlay_hints(&connection, req, &documents)?;
+                    }
+                    DocumentSymbolRequest::METHOD => {
+                        handle_document_symbol(&connection, req, &documents)?;
                     }
                     "squawk/syntaxTree" => {
                         handle_syntax_tree(&connection, req, &documents)?;
@@ -289,6 +294,54 @@ fn handle_inlay_hints(
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&lsp_hints).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
+fn handle_document_symbol(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
+    let params: DocumentSymbolParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document.uri;
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse = SourceFile::parse(content);
+    let file = parse.tree();
+    let line_index = LineIndex::new(content);
+
+    let symbols = document_symbols(&file);
+
+    let lsp_symbols: Vec<DocumentSymbol> = symbols
+        .into_iter()
+        .map(|sym| {
+            let range = lsp_utils::range(&line_index, sym.range);
+            let selection_range = lsp_utils::range(&line_index, sym.selection_range);
+
+            DocumentSymbol {
+                name: sym.name,
+                detail: sym.detail,
+                kind: match sym.kind {
+                    DocumentSymbolKind::Table => SymbolKind::STRUCT,
+                    DocumentSymbolKind::Function => SymbolKind::FUNCTION,
+                },
+                tags: None,
+                range,
+                selection_range,
+                children: None,
+                #[allow(deprecated)]
+                deprecated: None,
+            }
+        })
+        .collect();
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&lsp_symbols).unwrap()),
         error: None,
     };
 
