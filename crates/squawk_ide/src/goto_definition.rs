@@ -1379,6 +1379,66 @@ select "?column?"$0 from x;
     }
 
     #[test]
+    fn goto_cte_star_expansion() {
+        assert_snapshot!(goto("
+with t as (select 1 a),
+     y as (select * from t)
+select a$0 from y;
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a),
+          │                     ─ 2. destination
+        3 │      y as (select * from t)
+        4 │ select a from y;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_reference_inside_cte() {
+        assert_snapshot!(goto("
+with t as (select 1 a),
+     y as (select a$0 from t)
+select a from y;
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a),
+          │                     ─ 2. destination
+        3 │      y as (select a from t)
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_with_column_list() {
+        assert_snapshot!(goto("
+with t(a) as (select 1)
+select a$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ with t(a) as (select 1)
+          │        ─ 2. destination
+        3 │ select a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_shadows_table() {
+        assert_snapshot!(goto("
+create table t(a int);
+with t as (select a$0 from t)
+select a from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ with t as (select a from t)
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_insert_table() {
         assert_snapshot!(goto("
 create table users(id int, email text);

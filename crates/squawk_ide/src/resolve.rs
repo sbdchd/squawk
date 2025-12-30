@@ -602,7 +602,7 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     };
 
     if schema.is_none()
-        && let Some(cte_column_ptr) = resolve_cte_column(&select, &table_name, &column_name)
+        && let Some(cte_column_ptr) = resolve_cte_column(name_ref, &table_name, &column_name)
     {
         return Some(cte_column_ptr);
     }
@@ -787,16 +787,41 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
 }
 
 fn resolve_cte_column(
-    select: &ast::Select,
+    name_ref: &ast::NameRef,
     cte_name: &Name,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
+    let select = name_ref
+        .syntax()
+        .ancestors()
+        .filter_map(ast::Select::cast)
+        .find(|s| s.with_clause().is_some())?;
     let with_clause = select.with_clause()?;
 
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
             && Name::new(name.syntax().text().to_string()) == *cte_name
         {
+            // Skip if we're inside this CTE's definition (CTE doesn't shadow itself)
+            if with_table
+                .syntax()
+                .text_range()
+                .contains_range(name_ref.syntax().text_range())
+            {
+                continue;
+            }
+
+            if let Some(column_list) = with_table.column_list() {
+                for column in column_list.columns() {
+                    if let Some(col_name) = column.name()
+                        && Name::new(col_name.syntax().text().to_string()) == *column_name
+                    {
+                        return Some(SyntaxNodePtr::new(col_name.syntax()));
+                    }
+                }
+                return None;
+            }
+
             let query = with_table.query()?;
 
             let cte_select = match query {
@@ -812,11 +837,23 @@ fn resolve_cte_column(
             let target_list = select_clause.target_list()?;
 
             for target in target_list.targets() {
-                if let Some((col_name, node)) = ColumnName::from_target(target)
-                    && let Some(col_name_str) = col_name.to_string()
-                    && Name::new(col_name_str) == *column_name
-                {
-                    return Some(SyntaxNodePtr::new(&node));
+                if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
+                    if let Some(col_name_str) = col_name.to_string()
+                        && Name::new(col_name_str) == *column_name
+                    {
+                        return Some(SyntaxNodePtr::new(&node));
+                    }
+
+                    if matches!(col_name, ColumnName::Star) {
+                        if let Some(from_clause) = cte_select.from_clause()
+                            && let Some(from_item) = from_clause.from_items().next()
+                            && let Some(from_name_ref) = from_item.name_ref()
+                        {
+                            let from_table_name =
+                                Name::new(from_name_ref.syntax().text().to_string());
+                            return resolve_cte_column(name_ref, &from_table_name, column_name);
+                        }
+                    }
                 }
             }
         }
