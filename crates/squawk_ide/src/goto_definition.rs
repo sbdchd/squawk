@@ -1308,6 +1308,77 @@ select * from t group by t.b$0;
     }
 
     #[test]
+    fn goto_cte_table() {
+        assert_snapshot!(goto("
+with x as (select 1 as a)
+select a from x$0;
+"), @r"
+          ╭▸ 
+        2 │ with x as (select 1 as a)
+          │      ─ 2. destination
+        3 │ select a from x;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_column() {
+        assert_snapshot!(goto("
+with x as (select 1 as a)
+select a$0 from x;
+"), @r"
+          ╭▸ 
+        2 │ with x as (select 1 as a)
+          │                        ─ 2. destination
+        3 │ select a from x;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_multiple_columns() {
+        assert_snapshot!(goto("
+with x as (select 1 as a, 2 as b)
+select b$0 from x;
+"), @r"
+          ╭▸ 
+        2 │ with x as (select 1 as a, 2 as b)
+          │                                ─ 2. destination
+        3 │ select b from x;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_nested() {
+        assert_snapshot!(goto("
+with x as (select 1 as a),
+     y as (select a from x)
+select a$0 from y;
+"), @r"
+          ╭▸ 
+        3 │      y as (select a from x)
+          │                   ─ 2. destination
+        4 │ select a from y;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_unnamed_column() {
+        assert_snapshot!(goto(r#"
+with x as (select 1)
+select "?column?"$0 from x;
+"#), @r#"
+          ╭▸ 
+        2 │ with x as (select 1)
+          │                   ─ 2. destination
+        3 │ select "?column?" from x;
+          ╰╴                ─ 1. source
+        "#);
+    }
+
+    #[test]
     fn goto_insert_table() {
         assert_snapshot!(goto("
 create table users(id int, email text);
