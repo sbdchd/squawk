@@ -108,6 +108,12 @@ fn hover_column(
     let root = file.syntax();
     let column_name_node = column_ptr.to_node(root);
 
+    if let Some(with_table) = column_name_node.ancestors().find_map(ast::WithTable::cast) {
+        let cte_name = with_table.name()?.syntax().text().to_string();
+        let column_name = column_name_node.text().to_string();
+        return Some(format!("column {}.{}", cte_name, column_name));
+    }
+
     let column = column_name_node.ancestors().find_map(ast::Column::cast)?;
     let column_name = column.name()?.syntax().text().to_string();
     let ty = column.ty()?;
@@ -167,6 +173,10 @@ fn hover_table(
     let root = file.syntax();
     let table_name_node = table_ptr.to_node(root);
 
+    if let Some(with_table) = table_name_node.ancestors().find_map(ast::WithTable::cast) {
+        return format_with_table(&with_table);
+    }
+
     let create_table = table_name_node
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
@@ -206,6 +216,12 @@ fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder)
     let args = create_table.table_arg_list()?.syntax().text().to_string();
 
     Some(format!("table {}.{}{}", schema, table_name, args))
+}
+
+fn format_with_table(with_table: &ast::WithTable) -> Option<String> {
+    let name = with_table.name()?.syntax().text().to_string();
+    let query = with_table.query()?.syntax().text().to_string();
+    Some(format!("with {} as ({})", name, query))
 }
 
 fn table_schema(create_table: &ast::CreateTable, binder: &binder::Binder) -> Option<String> {
@@ -1497,6 +1513,72 @@ create schema foo;
           ╭▸ 
         2 │ drop schema foo;
           ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_table() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a)
+select a from t$0;
+"), @r"
+        hover: with t as (select 1 a)
+          ╭▸ 
+        3 │ select a from t;
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_column() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a)
+select a$0 from t;
+"), @r"
+        hover: column t.a
+          ╭▸ 
+        3 │ select a from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_with_multiple_columns() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b)
+select b$0 from t;
+"), @r"
+        hover: column t.b
+          ╭▸ 
+        3 │ select b from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_with_column_list() {
+        assert_snapshot!(check_hover("
+with t(a) as (select 1)
+select a$0 from t;
+"), @r"
+        hover: column t.a
+          ╭▸ 
+        3 │ select a from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_nested_cte() {
+        assert_snapshot!(check_hover("
+with x as (select 1 a),
+     y as (select a from x)
+select a$0 from y;
+"), @r"
+        hover: column y.a
+          ╭▸ 
+        4 │ select a from y;
+          ╰╴       ─ hover
         ");
     }
 }
