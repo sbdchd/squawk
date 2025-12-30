@@ -5,6 +5,7 @@ use squawk_syntax::{
 };
 
 use crate::binder::Binder;
+use crate::column_name::ColumnName;
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
 
@@ -56,6 +57,13 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             } else {
                 None
             };
+
+            if schema.is_none()
+                && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
+            {
+                return Some(cte_ptr);
+            }
+
             let position = name_ref.syntax().text_range().start();
             resolve_table(binder, &table_name, &schema, position)
         }
@@ -593,6 +601,12 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
         (table_name, Some(schema))
     };
 
+    if schema.is_none()
+        && let Some(cte_column_ptr) = resolve_cte_column(&select, &table_name, &column_name)
+    {
+        return Some(cte_column_ptr);
+    }
+
     let position = name_ref.syntax().text_range().start();
     let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
 
@@ -755,6 +769,60 @@ pub(crate) fn find_column_in_table(
             None
         }
     })
+}
+
+fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
+    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
+    let with_clause = select.with_clause()?;
+
+    for with_table in with_clause.with_tables() {
+        if let Some(name) = with_table.name()
+            && Name::new(name.syntax().text().to_string()) == *cte_name
+        {
+            return Some(SyntaxNodePtr::new(name.syntax()));
+        }
+    }
+
+    None
+}
+
+fn resolve_cte_column(
+    select: &ast::Select,
+    cte_name: &Name,
+    column_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    let with_clause = select.with_clause()?;
+
+    for with_table in with_clause.with_tables() {
+        if let Some(name) = with_table.name()
+            && Name::new(name.syntax().text().to_string()) == *cte_name
+        {
+            let query = with_table.query()?;
+
+            let cte_select = match query {
+                ast::WithQuery::Select(s) => s,
+                ast::WithQuery::ParenSelect(ps) => match ps.select()? {
+                    ast::SelectVariant::Select(s) => s,
+                    _ => continue,
+                },
+                _ => continue,
+            };
+
+            let select_clause = cte_select.select_clause()?;
+            let target_list = select_clause.target_list()?;
+
+            for target in target_list.targets() {
+                if let Some((col_name, node)) = ColumnName::from_target(target)
+                    && let Some(col_name_str) = col_name.to_string()
+                    && Name::new(col_name_str) == *column_name
+                {
+                    return Some(SyntaxNodePtr::new(&node));
+                }
+            }
+        }
+    }
+
+    None
 }
 
 pub(crate) fn resolve_insert_table_columns(
