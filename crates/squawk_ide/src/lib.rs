@@ -9,6 +9,7 @@ pub mod goto_definition;
 pub mod hover;
 pub mod inlay_hints;
 mod offsets;
+mod quote;
 mod resolve;
 mod scope;
 mod symbols;

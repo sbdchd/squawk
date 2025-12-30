@@ -30,7 +30,6 @@ pub(crate) enum ColumnName {
 }
 
 impl ColumnName {
-    #[allow(dead_code)]
     pub(crate) fn from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(as_name) = target.as_name()
             && let Some(name_node) = as_name.name()
@@ -53,6 +52,16 @@ impl ColumnName {
             ColumnName::UnknownColumn(Some(name))
         } else {
             ColumnName::Column(name)
+        }
+    }
+
+    pub(crate) fn to_string(&self) -> Option<String> {
+        match self {
+            ColumnName::Column(string) => Some(string.to_string()),
+            ColumnName::Star => None,
+            ColumnName::UnknownColumn(c) => {
+                Some(c.clone().unwrap_or_else(|| "?column?".to_string()))
+            }
         }
     }
 }
@@ -174,10 +183,9 @@ fn name_from_name_ref(name_ref: ast::NameRef, in_type: bool) -> Option<(ColumnNa
             }
         }
     }
-    return Some((
-        ColumnName::Column(name_ref.text().to_string()),
-        name_ref.syntax().clone(),
-    ));
+    let text = name_ref.text();
+    let normalized = normalize_identifier(&text);
+    return Some((ColumnName::Column(normalized), name_ref.syntax().clone()));
 }
 
 /*
@@ -418,11 +426,7 @@ fn examples() {
             .unwrap();
 
         ColumnName::from_target(target)
-            .map(|x| match x.0 {
-                ColumnName::Column(string) => string,
-                ColumnName::Star => unreachable!(),
-                ColumnName::UnknownColumn(c) => c.unwrap_or_else(|| "?column?".to_string()),
-            })
+            .and_then(|x| x.0.to_string())
             .unwrap()
     }
 }

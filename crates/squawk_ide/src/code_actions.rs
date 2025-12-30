@@ -1,11 +1,15 @@
 use rowan::TextSize;
 use squawk_linter::Edit;
 use squawk_syntax::{
-    SyntaxKind, SyntaxNode,
+    SyntaxKind,
     ast::{self, AstNode},
 };
 
-use crate::{generated::keywords::RESERVED_KEYWORDS, offsets::token_from_offset};
+use crate::{
+    column_name::ColumnName,
+    offsets::token_from_offset,
+    quote::{quote_column_alias, unquote_ident},
+};
 
 #[derive(Debug, Clone)]
 pub enum ActionKind {
@@ -29,6 +33,7 @@ pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeA
     rewrite_select_as_table(&mut actions, &file, offset);
     quote_identifier(&mut actions, &file, offset);
     unquote_identifier(&mut actions, &file, offset);
+    add_explicit_alias(&mut actions, &file, offset);
     Some(actions)
 }
 
@@ -346,7 +351,7 @@ fn unquote_identifier(
         return None;
     };
 
-    let unquoted = unquote(&name_node)?;
+    let unquoted = unquote_ident(&name_node)?;
 
     actions.push(CodeAction {
         title: "Unquote identifier".to_owned(),
@@ -357,45 +362,37 @@ fn unquote_identifier(
     Some(())
 }
 
-fn unquote(node: &SyntaxNode) -> Option<String> {
-    let text = node.text().to_string();
+// Postgres docs call these output names.
+// Postgres' parser calls this a column label.
+// Third-party docs call these aliases, so going with that.
+fn add_explicit_alias(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let target = token.parent_ancestors().find_map(ast::Target::cast)?;
 
-    if !text.starts_with('"') || !text.ends_with('"') {
+    if target.as_name().is_some() {
         return None;
     }
 
-    let text = &text[1..text.len() - 1];
+    let alias = ColumnName::from_target(target.clone()).and_then(|c| c.0.to_string())?;
 
-    if is_reserved_word(text) {
-        return None;
-    }
+    let expr_end = target.expr().map(|e| e.syntax().text_range().end())?;
 
-    if text.is_empty() {
-        return None;
-    }
+    let quoted_alias = quote_column_alias(&alias);
+    // Postgres docs recommend either using `as` or quoting the name. I think
+    // `as` looks a bit nicer.
+    let replacement = format!(" as {}", quoted_alias);
 
-    let mut chars = text.chars();
+    actions.push(CodeAction {
+        title: "Add explicit alias".to_owned(),
+        edits: vec![Edit::insert(replacement, expr_end)],
+        kind: ActionKind::RefactorRewrite,
+    });
 
-    // see: https://www.postgresql.org/docs/18/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-    match chars.next() {
-        Some(c) if c.is_lowercase() || c == '_' => {}
-        _ => return None,
-    }
-
-    for c in chars {
-        if c.is_lowercase() || c.is_ascii_digit() || c == '_' || c == '$' {
-            continue;
-        }
-        return None;
-    }
-
-    Some(text.to_string())
-}
-
-fn is_reserved_word(text: &str) -> bool {
-    RESERVED_KEYWORDS
-        .binary_search(&text.to_lowercase().as_str())
-        .is_ok()
+    Some(())
 }
 
 #[cfg(test)]
@@ -931,6 +928,121 @@ mod test {
             unquote_identifier,
             r#"create table T("x"$0 int);"#),
             @"create table T(x int);"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_simple_column() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select col_na$0me from t;"),
+            @"select col_name as col_name from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_quoted_identifier() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            r#"select "b"$0 from t;"#),
+            @r#"select "b" as b from t;"#
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_field_expr() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select t.col$0umn from t;"),
+            @"select t.column as column from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_function_call() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select cou$0nt(*) from t;"),
+            @"select count(*) as count from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_cast_to_type() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select '1'::bigi$0nt from t;"),
+            @"select '1'::bigint as int8 from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_cast_column() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select col_na$0me::text from t;"),
+            @"select col_name::text as col_name from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_case_expr() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select ca$0se when true then 'a' end from t;"),
+            @"select case when true then 'a' end as case from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_case_with_else() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select ca$0se when true then 'a' else now()::text end from t;"),
+            @"select case when true then 'a' else now()::text end as now from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_array() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select arr$0ay[1, 2, 3] from t;"),
+            @"select array[1, 2, 3] as array from t;"
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_not_applicable_already_has_alias() {
+        assert!(code_action_not_applicable(
+            add_explicit_alias,
+            "select col_name$0 as foo from t;"
+        ));
+    }
+
+    #[test]
+    fn add_explicit_alias_unknown_column() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select 1 $0+ 2 from t;"),
+            @r#"select 1 + 2 as "?column?" from t;"#
+        );
+    }
+
+    #[test]
+    fn add_explicit_alias_not_applicable_star() {
+        assert!(code_action_not_applicable(
+            add_explicit_alias,
+            "select $0* from t;"
+        ));
+    }
+
+    #[test]
+    fn add_explicit_alias_literal() {
+        assert_snapshot!(apply_code_action(
+            add_explicit_alias,
+            "select 'foo$0' from t;"),
+            @r#"select 'foo' as "?column?" from t;"#
         );
     }
 }
