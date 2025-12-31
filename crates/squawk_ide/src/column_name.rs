@@ -3,13 +3,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-fn normalize_identifier(text: &str) -> String {
-    if text.starts_with('"') && text.ends_with('"') {
-        text[1..text.len() - 1].to_string()
-    } else {
-        text.to_lowercase()
-    }
-}
+use crate::quote::normalize_identifier;
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum ColumnName {
@@ -30,6 +24,7 @@ pub(crate) enum ColumnName {
 }
 
 impl ColumnName {
+    // Get the alias, otherwise infer the column name.
     pub(crate) fn from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(as_name) = target.as_name()
             && let Some(name_node) = as_name.name()
@@ -37,7 +32,13 @@ impl ColumnName {
             let text = name_node.text();
             let normalized = normalize_identifier(&text);
             return Some((ColumnName::Column(normalized), name_node.syntax().clone()));
-        } else if let Some(expr) = target.expr()
+        }
+        Self::inferred_from_target(target)
+    }
+
+    // Ignore any aliases, just infer the what the column name.
+    pub(crate) fn inferred_from_target(target: ast::Target) -> Option<(ColumnName, SyntaxNode)> {
+        if let Some(expr) = target.expr()
             && let Some(name) = name_from_expr(expr, false)
         {
             return Some(name);

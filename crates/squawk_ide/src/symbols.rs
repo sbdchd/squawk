@@ -3,6 +3,8 @@ use smol_str::SmolStr;
 use squawk_syntax::SyntaxNodePtr;
 use std::fmt;
 
+use crate::quote::normalize_identifier;
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) struct Name(pub(crate) SmolStr);
 
@@ -25,21 +27,13 @@ impl Name {
     pub(crate) fn new(text: impl Into<SmolStr>) -> Self {
         let text = text.into();
         let normalized = normalize_identifier(&text);
-        Name(normalized)
+        Name(normalized.into())
     }
 }
 
 impl fmt::Display for Name {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
-    }
-}
-
-fn normalize_identifier(text: &str) -> SmolStr {
-    if text.starts_with('"') && text.ends_with('"') && text.len() >= 2 {
-        text[1..text.len() - 1].into()
-    } else {
-        text.to_lowercase().into()
     }
 }
 
@@ -59,3 +53,17 @@ pub(crate) struct Symbol {
 }
 
 pub(crate) type SymbolId = Idx<Symbol>;
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn name_case_insensitive_compare() {
+        assert_eq!(Name::new("foo"), Name::new("FOO"));
+    }
+
+    #[test]
+    fn name_quote_comparing() {
+        assert_eq!(Name::new(r#""foo""#), Name::new("foo"));
+    }
+}

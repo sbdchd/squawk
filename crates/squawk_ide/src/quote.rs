@@ -77,6 +77,14 @@ pub(crate) fn is_reserved_word(text: &str) -> bool {
         .is_ok()
 }
 
+pub(crate) fn normalize_identifier(text: &str) -> String {
+    if text.starts_with('"') && text.ends_with('"') && text.len() >= 2 {
+        text[1..text.len() - 1].to_string()
+    } else {
+        text.to_lowercase()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
