@@ -1,4 +1,4 @@
-use rowan::TextSize;
+use rowan::{TextRange, TextSize};
 use squawk_linter::Edit;
 use squawk_syntax::{
     SyntaxKind,
@@ -9,6 +9,7 @@ use crate::{
     column_name::ColumnName,
     offsets::token_from_offset,
     quote::{quote_column_alias, unquote_ident},
+    symbols::Name,
 };
 
 #[derive(Debug, Clone)]
@@ -34,6 +35,7 @@ pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeA
     quote_identifier(&mut actions, &file, offset);
     unquote_identifier(&mut actions, &file, offset);
     add_explicit_alias(&mut actions, &file, offset);
+    remove_redundant_alias(&mut actions, &file, offset);
     Some(actions)
 }
 
@@ -390,6 +392,45 @@ fn add_explicit_alias(
         title: "Add explicit alias".to_owned(),
         edits: vec![Edit::insert(replacement, expr_end)],
         kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn remove_redundant_alias(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let target = token.parent_ancestors().find_map(ast::Target::cast)?;
+
+    let as_name = target.as_name()?;
+    let alias_name = as_name.name()?;
+
+    let (inferred_column, _) = ColumnName::inferred_from_target(target.clone())?;
+    let inferred_column_alias = inferred_column.to_string()?;
+
+    let alias = alias_name.syntax().text().to_string();
+
+    if Name::new(alias) != Name::new(inferred_column_alias) {
+        return None;
+    }
+
+    // TODO:
+    // This lets use remove any whitespace so we don't end up with:
+    //   select x as x, b from t;
+    // becoming
+    //   select x , b from t;
+    // but we probably want a better way to express this.
+    // Maybe a "Remove preceding whitespace" style option for edits.
+    let expr_end = target.expr()?.syntax().text_range().end();
+    let alias_end = as_name.syntax().text_range().end();
+
+    actions.push(CodeAction {
+        title: "Remove redundant alias".to_owned(),
+        edits: vec![Edit::delete(TextRange::new(expr_end, alias_end))],
+        kind: ActionKind::QuickFix,
     });
 
     Some(())
@@ -1044,5 +1085,66 @@ mod test {
             "select 'foo$0' from t;"),
             @r#"select 'foo' as "?column?" from t;"#
         );
+    }
+
+    #[test]
+    fn remove_redundant_alias_simple() {
+        assert_snapshot!(apply_code_action(
+            remove_redundant_alias,
+            "select col_name as col_na$0me from t;"),
+            @"select col_name from t;"
+        );
+    }
+
+    #[test]
+    fn remove_redundant_alias_quoted() {
+        assert_snapshot!(apply_code_action(
+            remove_redundant_alias,
+            r#"select "x"$0 as x from t;"#),
+            @r#"select "x" from t;"#
+        );
+    }
+
+    #[test]
+    fn remove_redundant_alias_case_insensitive() {
+        assert_snapshot!(apply_code_action(
+            remove_redundant_alias,
+            "select col_name$0 as COL_NAME from t;"),
+            @"select col_name from t;"
+        );
+    }
+
+    #[test]
+    fn remove_redundant_alias_function() {
+        assert_snapshot!(apply_code_action(
+            remove_redundant_alias,
+            "select count(*)$0 as count from t;"),
+            @"select count(*) from t;"
+        );
+    }
+
+    #[test]
+    fn remove_redundant_alias_field_expr() {
+        assert_snapshot!(apply_code_action(
+            remove_redundant_alias,
+            "select t.col$0umn as column from t;"),
+            @"select t.column from t;"
+        );
+    }
+
+    #[test]
+    fn remove_redundant_alias_not_applicable_different_name() {
+        assert!(code_action_not_applicable(
+            remove_redundant_alias,
+            "select col_name$0 as foo from t;"
+        ));
+    }
+
+    #[test]
+    fn remove_redundant_alias_not_applicable_no_alias() {
+        assert!(code_action_not_applicable(
+            remove_redundant_alias,
+            "select col_name$0 from t;"
+        ));
     }
 }
