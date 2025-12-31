@@ -1,6 +1,6 @@
-use crate::binder;
 use crate::offsets::token_from_offset;
 use crate::resolve;
+use crate::{binder, symbols::Name};
 use rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode};
 
@@ -69,6 +69,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             return format_create_table(&create_table, &binder);
         }
 
+        if let Some(with_table) = name.syntax().parent().and_then(ast::WithTable::cast) {
+            return format_with_table(&with_table);
+        }
+
         if let Some(create_index) = name.syntax().ancestors().find_map(ast::CreateIndex::cast) {
             return format_create_index(&create_index, &binder);
         }
@@ -110,7 +114,14 @@ fn hover_column(
 
     if let Some(with_table) = column_name_node.ancestors().find_map(ast::WithTable::cast) {
         let cte_name = with_table.name()?.syntax().text().to_string();
-        let column_name = column_name_node.text().to_string();
+        let column_name = if column_name_node
+            .ancestors()
+            .any(|a| ast::Values::can_cast(a.kind()))
+        {
+            Name::new(name_ref.syntax().text().to_string())
+        } else {
+            Name::new(column_name_node.text().to_string())
+        };
         return Some(format!("column {}.{}", cte_name, column_name));
     }
 
@@ -1593,6 +1604,79 @@ select a$0 from t;
           ╭▸ 
         4 │ select a from t;
           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_definition() {
+        assert_snapshot!(check_hover("
+with t$0 as (select 1 a)
+select a from t;
+"), @r"
+        hover: with t as (select 1 a)
+          ╭▸ 
+        2 │ with t as (select 1 a)
+          ╰╴     ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_values_column1() {
+        assert_snapshot!(check_hover("
+with t as (
+    values (1, 2), (3, 4)
+)
+select column1$0, column2 from t;
+"), @r"
+        hover: column t.column1
+          ╭▸ 
+        5 │ select column1, column2 from t;
+          ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_values_column2() {
+        assert_snapshot!(check_hover("
+with t as (
+    values (1, 2), (3, 4)
+)
+select column1, column2$0 from t;
+"), @r"
+        hover: column t.column2
+          ╭▸ 
+        5 │ select column1, column2 from t;
+          ╰╴                      ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_values_single_column() {
+        assert_snapshot!(check_hover("
+with t as (
+    values (1), (2), (3)
+)
+select column1$0 from t;
+"), @r"
+        hover: column t.column1
+          ╭▸ 
+        5 │ select column1 from t;
+          ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_values_uppercase_column_names() {
+        assert_snapshot!(check_hover("
+with t as (
+    values (1, 2), (3, 4)
+)
+select COLUMN1$0, COLUMN2 from t;
+"), @r"
+        hover: column t.column1
+          ╭▸ 
+        5 │ select COLUMN1, COLUMN2 from t;
+          ╰╴             ─ hover
         ");
     }
 }

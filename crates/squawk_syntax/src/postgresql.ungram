@@ -1454,7 +1454,7 @@ ReleaseSavepoint =
   'release' 'savepoint' NameRef
 
 ParenExpr =
-  '(' Expr | Select ')'
+  '(' Expr | Select | FromItem ')'
 
 TupleExpr =
   '(' (Expr (',' Expr)*) ')'
@@ -1689,7 +1689,7 @@ TablesampleClause =
 
 FromItem =
   'only'? (NameRef | FieldExpr) '*'? Alias? TablesampleClause?
-| 'lateral'? ParenSelect Alias?
+| 'lateral'? (ParenSelect | ParenExpr) Alias?
 | 'lateral'? CallExpr ('with' 'ordinality')? Alias?
 | 'lateral'? JsonTable Alias?
 | 'lateral'? XmlTable Alias?
