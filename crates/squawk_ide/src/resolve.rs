@@ -851,7 +851,11 @@ fn resolve_cte_column(
                         {
                             let from_table_name =
                                 Name::new(from_name_ref.syntax().text().to_string());
-                            return resolve_cte_column(name_ref, &from_table_name, column_name);
+                            // Skip recursive CTE lookup if the FROM table has the same name as the current CTE
+                            // (CTEs don't shadow themselves in their own definition)
+                            if from_table_name != *cte_name {
+                                return resolve_cte_column(name_ref, &from_table_name, column_name);
+                            }
                         }
                     }
                 }

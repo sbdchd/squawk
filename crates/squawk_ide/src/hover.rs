@@ -1581,4 +1581,18 @@ select a$0 from y;
           ╰╴       ─ hover
         ");
     }
+
+    #[test]
+    fn hover_on_cte_shadowing_table_with_star() {
+        assert_snapshot!(check_hover("
+create table t(a bigint);
+with t as (select * from t)
+select a$0 from t;
+"), @r"
+        hover: column public.t.a bigint
+          ╭▸ 
+        4 │ select a from t;
+          ╰╴       ─ hover
+        ");
+    }
 }
