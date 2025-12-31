@@ -589,6 +589,14 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     let from_clause = select.from_clause()?;
     let from_item = from_clause.from_items().next()?;
 
+    if let Some(paren_select) = from_item.paren_select() {
+        return resolve_subquery_column(&paren_select, &column_name);
+    }
+
+    if let Some(paren_expr) = from_item.paren_expr() {
+        return resolve_column_from_paren_expr(&paren_expr, &column_name);
+    }
+
     let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
         (Name::new(name_ref_node.syntax().text().to_string()), None)
     } else {
@@ -811,7 +819,7 @@ fn resolve_cte_column(
                 continue;
             }
 
-            if let Some(column_list) = with_table.column_list() {
+            let column_list_len = if let Some(column_list) = with_table.column_list() {
                 for column in column_list.columns() {
                     if let Some(col_name) = column.name()
                         && Name::new(col_name.syntax().text().to_string()) == *column_name
@@ -819,14 +827,36 @@ fn resolve_cte_column(
                         return Some(SyntaxNodePtr::new(col_name.syntax()));
                     }
                 }
-                return None;
-            }
+                column_list.columns().count()
+            } else {
+                0
+            };
 
             let query = with_table.query()?;
 
-            let cte_select = match query {
-                ast::WithQuery::Select(s) => s,
-                ast::WithQuery::ParenSelect(ps) => match ps.select()? {
+            if let ast::WithQuery::Values(values) = query {
+                if let Some(num_str) = column_name.0.strip_prefix("column")
+                    && let Ok(col_num) = num_str.parse::<usize>()
+                    && col_num > 0
+                    && let Some(row_list) = values.row_list()
+                    && let Some(first_row) = row_list.rows().next()
+                    && let Some(expr) = first_row.exprs().nth(col_num - 1)
+                {
+                    return Some(SyntaxNodePtr::new(expr.syntax()));
+                }
+                continue;
+            }
+
+            let select_variant = match query {
+                ast::WithQuery::Select(s) => ast::SelectVariant::Select(s),
+                ast::WithQuery::ParenSelect(ps) => ps.select()?,
+                ast::WithQuery::CompoundSelect(compound) => compound.lhs()?,
+                _ => continue,
+            };
+
+            let cte_select = match select_variant {
+                ast::SelectVariant::Select(s) => s,
+                ast::SelectVariant::CompoundSelect(compound) => match compound.lhs()? {
                     ast::SelectVariant::Select(s) => s,
                     _ => continue,
                 },
@@ -836,7 +866,12 @@ fn resolve_cte_column(
             let select_clause = cte_select.select_clause()?;
             let target_list = select_clause.target_list()?;
 
-            for target in target_list.targets() {
+            for (idx, target) in target_list.targets().enumerate() {
+                // Skip targets that are covered by the column list
+                if idx < column_list_len {
+                    continue;
+                }
+
                 if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
                     if let Some(col_name_str) = col_name.to_string()
                         && Name::new(col_name_str) == *column_name
@@ -861,6 +896,64 @@ fn resolve_cte_column(
                 }
             }
         }
+    }
+
+    None
+}
+
+fn resolve_subquery_column(
+    paren_select: &ast::ParenSelect,
+    column_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    let select_variant = paren_select.select()?;
+    let ast::SelectVariant::Select(subquery_select) = select_variant else {
+        return None;
+    };
+
+    let select_clause = subquery_select.select_clause()?;
+    let target_list = select_clause.target_list()?;
+
+    for target in target_list.targets() {
+        if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
+            if let Some(col_name_str) = col_name.to_string()
+                && Name::new(col_name_str) == *column_name
+            {
+                return Some(SyntaxNodePtr::new(&node));
+            }
+        }
+    }
+
+    None
+}
+
+fn resolve_column_from_paren_expr(
+    paren_expr: &ast::ParenExpr,
+    column_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    if let Some(select) = paren_expr.select() {
+        if let Some(select_clause) = select.select_clause()
+            && let Some(target_list) = select_clause.target_list()
+        {
+            for target in target_list.targets() {
+                if let Some((col_name, node)) = ColumnName::from_target(target.clone())
+                    && let Some(col_name_str) = col_name.to_string()
+                    && Name::new(col_name_str) == *column_name
+                {
+                    return Some(SyntaxNodePtr::new(&node));
+                }
+            }
+        }
+        return None;
+    }
+
+    if let Some(ast::Expr::ParenExpr(paren_expr)) = paren_expr.expr() {
+        return resolve_column_from_paren_expr(&paren_expr, column_name);
+    }
+
+    if let Some(from_item) = paren_expr.from_item()
+        && let Some(paren_select) = from_item.paren_select()
+    {
+        return resolve_subquery_column(&paren_select, column_name);
     }
 
     None

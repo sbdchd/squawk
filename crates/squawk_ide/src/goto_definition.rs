@@ -1424,6 +1424,44 @@ select a$0 from t;
     }
 
     #[test]
+    fn goto_cte_with_partial_column_list() {
+        assert_snapshot!(goto("
+with t(x) as (select 1 as a, 2 as b)
+select b$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ with t(x) as (select 1 as a, 2 as b)
+          │                                   ─ 2. destination
+        3 │ select b from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_with_partial_column_list_renamed() {
+        assert_snapshot!(goto("
+with t(x) as (select 1 as a, 2 as b)
+select x$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ with t(x) as (select 1 as a, 2 as b)
+          │        ─ 2. destination
+        3 │ select x from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_column_list_overwrites_column() {
+        goto_not_found(
+            "
+with t(x) as (select 1 as a)
+select a$0 from t;
+",
+        );
+    }
+
+    #[test]
     fn goto_cte_shadows_table() {
         assert_snapshot!(goto("
 create table t(a int);
@@ -1435,6 +1473,50 @@ select a from t;
           │                ─ 2. destination
         3 │ with t as (select a from t)
           ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column() {
+        assert_snapshot!(goto("
+select a$0 from (select 1 a);
+"), @r"
+          ╭▸ 
+        2 │ select a from (select 1 a);
+          ╰╴       ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column_with_as() {
+        assert_snapshot!(goto("
+select a$0 from (select 1 as a);
+"), @r"
+          ╭▸ 
+        2 │ select a from (select 1 as a);
+          ╰╴       ─ 1. source         ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column_multiple_columns() {
+        assert_snapshot!(goto("
+select b$0 from (select 1 a, 2 b);
+"), @r"
+          ╭▸ 
+        2 │ select b from (select 1 a, 2 b);
+          ╰╴       ─ 1. source           ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column_nested_parens() {
+        assert_snapshot!(goto("
+select a$0 from ((select 1 a));
+"), @r"
+          ╭▸ 
+        2 │ select a from ((select 1 a));
+          ╰╴       ─ 1. source       ─ 2. destination
         ");
     }
 
@@ -2047,6 +2129,94 @@ select foo.t.a$0 from t;
     }
 
     #[test]
+    fn goto_cte_values_column1() {
+        assert_snapshot!(goto("
+with t as (
+    values (1, 2), (3, 4)
+)
+select column1$0, column2 from t;
+"), @r"
+          ╭▸ 
+        3 │     values (1, 2), (3, 4)
+          │             ─ 2. destination
+        4 │ )
+        5 │ select column1, column2 from t;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_values_column2() {
+        assert_snapshot!(goto("
+with t as (
+    values (1, 2), (3, 4)
+)
+select column1, column2$0 from t;
+"), @r"
+          ╭▸ 
+        3 │     values (1, 2), (3, 4)
+          │                ─ 2. destination
+        4 │ )
+        5 │ select column1, column2 from t;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_values_single_column() {
+        assert_snapshot!(goto("
+with t as (
+    values (1), (2), (3)
+)
+select column1$0 from t;
+"), @r"
+          ╭▸ 
+        3 │     values (1), (2), (3)
+          │             ─ 2. destination
+        4 │ )
+        5 │ select column1 from t;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_values_multiple_rows() {
+        assert_snapshot!(goto("
+with t as (
+    values
+        (1, 2, 3),
+        (4, 5, 6),
+        (7, 8, 9)
+)
+select column3$0 from t;
+"), @r"
+          ╭▸ 
+        4 │         (1, 2, 3),
+          │                ─ 2. destination
+          ‡
+        8 │ select column3 from t;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_values_uppercase_column_names() {
+        assert_snapshot!(goto("
+with t as (
+    values (1, 2), (3, 4)
+)
+select COLUMN1$0, COLUMN2 from t;
+"), @r"
+          ╭▸ 
+        3 │     values (1, 2), (3, 4)
+          │             ─ 2. destination
+        4 │ )
+        5 │ select COLUMN1, COLUMN2 from t;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_qualified_column_with_schema_in_from_table() {
         assert_snapshot!(goto("
 create table foo.t(a int, b int);
@@ -2071,6 +2241,63 @@ select t.a$0 from foo.t;
           │                    ─ 2. destination
         3 │ select t.a from foo.t;
           ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_union_all_column() {
+        assert_snapshot!(goto("
+with t as (
+    select 1 as a, 2 as b
+    union all
+    select 3, 4
+)
+select a$0, b from t;
+"), @r"
+          ╭▸ 
+        3 │     select 1 as a, 2 as b
+          │                 ─ 2. destination
+          ‡
+        7 │ select a, b from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_union_all_column_second() {
+        assert_snapshot!(goto("
+with t as (
+    select 1 as a, 2 as b
+    union all
+    select 3, 4
+)
+select a, b$0 from t;
+"), @r"
+          ╭▸ 
+        3 │     select 1 as a, 2 as b
+          │                         ─ 2. destination
+          ‡
+        7 │ select a, b from t;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_union_column() {
+        assert_snapshot!(goto("
+with t as (
+    select 1 as a, 2 as b
+    union
+    select 3, 4
+)
+select a$0 from t;
+"), @r"
+          ╭▸ 
+        3 │     select 1 as a, 2 as b
+          │                 ─ 2. destination
+          ‡
+        7 │ select a from t;
+          ╰╴       ─ 1. source
         ");
     }
 }

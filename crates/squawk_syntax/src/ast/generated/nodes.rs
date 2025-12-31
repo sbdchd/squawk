@@ -7772,6 +7772,10 @@ impl FromItem {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn paren_expr(&self) -> Option<ParenExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn paren_select(&self) -> Option<ParenSelect> {
         support::child(&self.syntax)
     }
@@ -10311,6 +10315,22 @@ pub struct MergePartitions {
 }
 impl MergePartitions {
     #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn into_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INTO_KW)
+    }
+    #[inline]
     pub fn merge_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MERGE_KW)
     }
@@ -11717,6 +11737,10 @@ pub struct ParenExpr {
 impl ParenExpr {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn from_item(&self) -> Option<FromItem> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14737,6 +14761,10 @@ impl SplitPartition {
     #[inline]
     pub fn partition_list(&self) -> Option<PartitionList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn into_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INTO_KW)
     }
     #[inline]
     pub fn partition_token(&self) -> Option<SyntaxToken> {
