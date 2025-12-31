@@ -80,6 +80,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
         ast::Stmt::CreateIndex(create_index) => bind_create_index(b, create_index),
         ast::Stmt::CreateFunction(create_function) => bind_create_function(b, create_function),
+        ast::Stmt::CreateAggregate(create_aggregate) => bind_create_aggregate(b, create_aggregate),
         ast::Stmt::CreateSchema(create_schema) => bind_create_schema(b, create_schema),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
@@ -103,6 +104,7 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
         kind: SymbolKind::Table,
         ptr: name_ptr,
         schema,
+        params: None,
     });
 
     let root = b.root_scope();
@@ -125,6 +127,7 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
         kind: SymbolKind::Index,
         ptr: name_ptr,
         schema,
+        params: None,
     });
 
     let root = b.root_scope();
@@ -146,14 +149,45 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
         return;
     };
 
+    let params = extract_param_signature(create_function.param_list());
+
     let function_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Function,
         ptr: name_ptr,
         schema,
+        params,
     });
 
     let root = b.root_scope();
     b.scopes[root].insert(function_name, function_id);
+}
+
+fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate) {
+    let Some(path) = create_aggregate.path() else {
+        return;
+    };
+
+    let Some(aggregate_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let params = extract_param_signature(create_aggregate.param_list());
+
+    let aggregate_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Aggregate,
+        ptr: name_ptr,
+        schema,
+        params,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(aggregate_name, aggregate_id);
 }
 
 fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
@@ -168,6 +202,7 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
         kind: SymbolKind::Schema,
         ptr: name_ptr,
         schema: Schema(schema_name.clone()),
+        params: None,
     });
 
     let root = b.root_scope();
@@ -292,4 +327,20 @@ fn extract_string_literal(literal: &ast::Literal) -> Option<String> {
     } else {
         None
     }
+}
+
+fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Name>> {
+    let param_list = param_list?;
+    let mut params = vec![];
+    for param in param_list.params() {
+        if let Some(ty) = param.ty()
+            && let ast::Type::PathType(path_type) = ty
+            && let Some(path) = path_type.path()
+            && let Some(segment) = path.segment()
+            && let Some(name_ref) = segment.name_ref()
+        {
+            params.push(Name::new(name_ref.syntax().text().to_string()));
+        }
+    }
+    (!params.is_empty()).then_some(params)
 }

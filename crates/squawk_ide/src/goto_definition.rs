@@ -1000,6 +1000,37 @@ drop function foo(), bar$0();
     }
 
     #[test]
+    fn goto_drop_function_overloaded() {
+        assert_snapshot!(goto("
+create function add(complex) returns complex as $$ select null $$ language sql;
+create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+drop function add$0(complex);
+"), @r"
+          ╭▸ 
+        2 │ create function add(complex) returns complex as $$ select null $$ language sql;
+          │                 ─── 2. destination
+        3 │ create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+        4 │ drop function add(complex);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_function_second_overload() {
+        assert_snapshot!(goto("
+create function add(complex) returns complex as $$ select null $$ language sql;
+create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+drop function add$0(bigint);
+"), @r"
+          ╭▸ 
+        3 │ create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        4 │ drop function add(bigint);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_select_function_call() {
         assert_snapshot!(goto("
 create function foo() returns int as $$ select 1 $$ language sql;
@@ -2298,6 +2329,127 @@ select a$0 from t;
           ‡
         7 │ select a from t;
           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_aggregate() {
+        assert_snapshot!(goto("
+create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+drop aggregate myavg$0(int);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+          │                  ───── 2. destination
+        3 │ drop aggregate myavg(int);
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_aggregate_with_schema() {
+        assert_snapshot!(goto("
+set search_path to public;
+create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+drop aggregate public.myavg$0(int);
+"), @r"
+          ╭▸ 
+        3 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+          │                  ───── 2. destination
+        4 │ drop aggregate public.myavg(int);
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_aggregate_defined_after() {
+        assert_snapshot!(goto("
+drop aggregate myavg$0(int);
+create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+"), @r"
+          ╭▸ 
+        2 │ drop aggregate myavg(int);
+          │                    ─ 1. source
+        3 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+          ╰╴                 ───── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_aggregate_definition_returns_self() {
+        assert_snapshot!(goto("
+create aggregate myavg$0(int) (sfunc = int4_avg_accum, stype = _int8);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+          │                  ┬───┬
+          │                  │   │
+          │                  │   1. source
+          ╰╴                 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_drop_aggregate_with_search_path() {
+        assert_snapshot!(goto("
+create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+set search_path to bar;
+create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+set search_path to default;
+drop aggregate myavg$0(int);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+          │                  ───── 2. destination
+          ‡
+        6 │ drop aggregate myavg(int);
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_aggregate_multiple() {
+        assert_snapshot!(goto("
+create aggregate avg1(int) (sfunc = int4_avg_accum, stype = _int8);
+create aggregate avg2(int) (sfunc = int4_avg_accum, stype = _int8);
+drop aggregate avg1(int), avg2$0(int);
+"), @r"
+          ╭▸ 
+        3 │ create aggregate avg2(int) (sfunc = int4_avg_accum, stype = _int8);
+          │                  ──── 2. destination
+        4 │ drop aggregate avg1(int), avg2(int);
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_aggregate_overloaded() {
+        assert_snapshot!(goto("
+create aggregate sum(complex) (sfunc = complex_add, stype = complex, initcond = '(0,0)');
+create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
+drop aggregate sum$0(complex);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate sum(complex) (sfunc = complex_add, stype = complex, initcond = '(0,0)');
+          │                  ─── 2. destination
+        3 │ create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
+        4 │ drop aggregate sum(complex);
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_aggregate_second_overload() {
+        assert_snapshot!(goto("
+create aggregate sum(complex) (sfunc = complex_add, stype = complex, initcond = '(0,0)');
+create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
+drop aggregate sum$0(bigint);
+"), @r"
+          ╭▸ 
+        3 │ create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
+          │                  ─── 2. destination
+        4 │ drop aggregate sum(bigint);
+          ╰╴                 ─ 1. source
         ");
     }
 }

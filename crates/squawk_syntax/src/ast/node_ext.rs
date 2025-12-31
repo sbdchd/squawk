@@ -229,6 +229,9 @@ pub(crate) fn text_of_first_token(node: &SyntaxNode) -> TokenText<'_> {
     }
 }
 
+impl ast::HasParamList for ast::FunctionSig {}
+impl ast::HasParamList for ast::Aggregate {}
+
 #[test]
 fn index_expr() {
     let source_code = "

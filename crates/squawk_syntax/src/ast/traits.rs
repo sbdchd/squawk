@@ -15,6 +15,12 @@ pub trait HasArgList: AstNode {
     }
 }
 
+pub trait HasParamList: AstNode {
+    fn param_list(&self) -> Option<ast::ParamList> {
+        support::child(self.syntax())
+    }
+}
+
 pub trait HasIfExists: AstNode {
     fn if_exists(&self) -> Option<ast::IfExists> {
         support::child(self.syntax())
