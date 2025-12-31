@@ -15,6 +15,7 @@ enum NameRefContext {
     Table,
     DropIndex,
     DropFunction,
+    DropAggregate,
     DropSchema,
     CreateIndex,
     CreateIndexColumn,
@@ -75,11 +76,34 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             resolve_index(binder, &index_name, &schema, position)
         }
         NameRefContext::DropFunction => {
-            let path = find_containing_path(name_ref)?;
+            let function_sig = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::FunctionSig::cast)?;
+            let path = function_sig.path()?;
             let function_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
+            let params = extract_param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
-            resolve_function(binder, &function_name, &schema, position)
+            resolve_function(binder, &function_name, &schema, params.as_deref(), position)
+        }
+        NameRefContext::DropAggregate => {
+            let aggregate = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::Aggregate::cast)?;
+            let path = aggregate.path()?;
+            let aggregate_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let params = extract_param_signature(&aggregate);
+            let position = name_ref.syntax().text_range().start();
+            resolve_aggregate(
+                binder,
+                &aggregate_name,
+                &schema,
+                params.as_deref(),
+                position,
+            )
         }
         NameRefContext::DropSchema | NameRefContext::SchemaQualifier => {
             let schema_name = Name::new(name_ref.syntax().text().to_string());
@@ -100,7 +124,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
 
             // functions take precedence
-            if let Some(ptr) = resolve_function(binder, &function_name, &schema, position) {
+            if let Some(ptr) = resolve_function(binder, &function_name, &schema, None, position) {
                 return Some(ptr);
             }
 
@@ -236,6 +260,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         if ast::DropFunction::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropFunction);
         }
+        if ast::DropAggregate::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::DropAggregate);
+        }
         if ast::DropSchema::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropSchema);
         }
@@ -338,18 +365,79 @@ fn resolve_for_kind(
     None
 }
 
+fn resolve_for_kind_with_params(
+    binder: &Binder,
+    name: &Name,
+    schema: &Option<Schema>,
+    params: Option<&[Name]>,
+    position: TextSize,
+    kind: SymbolKind,
+) -> Option<SyntaxNodePtr> {
+    let symbols = binder.scopes[binder.root_scope()].get(name)?;
+
+    if let Some(schema) = schema {
+        let symbol_id = symbols.iter().copied().find(|id| {
+            let symbol = &binder.symbols[*id];
+            let params_match = match (&symbol.params, params) {
+                (Some(sym_params), Some(req_params)) => sym_params.as_slice() == req_params,
+                (None, None) => true,
+                (_, None) => true,
+                _ => false,
+            };
+            symbol.kind == kind && &symbol.schema == schema && params_match
+        })?;
+        return Some(binder.symbols[symbol_id].ptr);
+    } else {
+        let search_path = binder.search_path_at(position);
+        for search_schema in search_path {
+            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
+                let symbol = &binder.symbols[*id];
+                let params_match = match (&symbol.params, params) {
+                    (Some(sym_params), Some(req_params)) => sym_params.as_slice() == req_params,
+                    (None, None) => true,
+                    (_, None) => true,
+                    _ => false,
+                };
+                symbol.kind == kind && &symbol.schema == search_schema && params_match
+            }) {
+                return Some(binder.symbols[symbol_id].ptr);
+            }
+        }
+    }
+    None
+}
+
 fn resolve_function(
     binder: &Binder,
     function_name: &Name,
     schema: &Option<Schema>,
+    params: Option<&[Name]>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    resolve_for_kind(
+    resolve_for_kind_with_params(
         binder,
         function_name,
         schema,
+        params,
         position,
         SymbolKind::Function,
+    )
+}
+
+fn resolve_aggregate(
+    binder: &Binder,
+    aggregate_name: &Name,
+    schema: &Option<Schema>,
+    params: Option<&[Name]>,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    resolve_for_kind_with_params(
+        binder,
+        aggregate_name,
+        schema,
+        params,
+        position,
+        SymbolKind::Aggregate,
     )
 }
 
@@ -579,7 +667,7 @@ fn resolve_select_qualified_column(
 
     // 2. No column found, check for field-style function call
     // e.g., select t.b from t where b is a function that takes t as an argument
-    resolve_function(binder, &column_name, &schema, position)
+    resolve_function(binder, &column_name, &schema, None, position)
 }
 
 fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
@@ -1039,4 +1127,20 @@ fn extract_schema_from_path(path: &ast::Path) -> Option<String> {
         .and_then(|q| q.segment())
         .and_then(|s| s.name_ref())
         .map(|name_ref| name_ref.syntax().text().to_string())
+}
+
+fn extract_param_signature(node: &impl ast::HasParamList) -> Option<Vec<Name>> {
+    let param_list = node.param_list()?;
+    let mut params = vec![];
+    for param in param_list.params() {
+        if let Some(ty) = param.ty()
+            && let ast::Type::PathType(path_type) = ty
+            && let Some(path) = path_type.path()
+            && let Some(segment) = path.segment()
+            && let Some(name_ref) = segment.name_ref()
+        {
+            params.push(Name::new(name_ref.syntax().text().to_string()));
+        }
+    }
+    (!params.is_empty()).then_some(params)
 }

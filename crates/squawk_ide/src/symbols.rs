@@ -42,6 +42,7 @@ pub(crate) enum SymbolKind {
     Table,
     Index,
     Function,
+    Aggregate,
     Schema,
 }
 
@@ -50,6 +51,7 @@ pub(crate) struct Symbol {
     pub(crate) kind: SymbolKind,
     pub(crate) ptr: SyntaxNodePtr,
     pub(crate) schema: Schema,
+    pub(crate) params: Option<Vec<Name>>,
 }
 
 pub(crate) type SymbolId = Idx<Symbol>;

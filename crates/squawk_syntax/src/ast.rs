@@ -54,6 +54,7 @@ pub use self::{
         // HasVisibility,
         // HasGenericParams, HasLoopBody,
         HasName,
+        HasParamList,
     },
 };
 
