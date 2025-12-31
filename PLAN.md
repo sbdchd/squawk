@@ -590,7 +590,7 @@ FROM (
 WHERE total_amount > 1000;
 ```
 
-### Rule: aggregate free having condition
+### Rule: aggregate free `having` condition
 
 ```sql
 select a from t group by a having a > 10;
@@ -598,6 +598,21 @@ select a from t group by a having a > 10;
 
 -- quick fix to:
 select a from t where a > 10 group by a;
+```
+
+### Rule: conflicting function and aggregate definitions
+
+```sql
+create function foo(int) returns int as $$
+  select $1 * 2;
+$$ language sql;
+
+create aggregate foo(int) (
+  sfunc = int4pl,
+  stype = int,
+  initcond = '0'
+);
+-- Query 1 ERROR at Line 1: : ERROR:  function "foo" already exists with same argument types
 ```
 
 ### Rule: order direction is redundent
