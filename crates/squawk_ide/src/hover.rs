@@ -2380,4 +2380,52 @@ update users set email = messages.email from public.messages$0 where users.id = 
           ╰╴                                                           ─ hover
         ");
     }
+
+    #[test]
+    fn hover_on_update_with_cte_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'new@example.com' as email
+)
+update users set email = new_data.email from new_data$0 where users.id = new_data.id;
+"), @r"
+        hover: with new_data as (select 1 as id, 'new@example.com' as email)
+          ╭▸ 
+        6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
+          ╰╴                                                    ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_with_cte_column_in_set() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'new@example.com' as email
+)
+update users set email = new_data.email$0 from new_data where users.id = new_data.id;
+"), @r"
+        hover: column new_data.email
+          ╭▸ 
+        6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
+          ╰╴                                      ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_with_cte_column_in_where() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'new@example.com' as email
+)
+update users set email = new_data.email from new_data where new_data.id$0 = users.id;
+"), @r"
+        hover: column new_data.id
+          ╭▸ 
+        6 │ update users set email = new_data.email from new_data where new_data.id = users.id;
+          ╰╴                                                                      ─ hover
+        ");
+    }
 }

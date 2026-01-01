@@ -3252,4 +3252,76 @@ update users set email = messages.email from messages$0 where users.id = message
           ╰╴                                                    ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_update_with_cte_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'new@example.com' as email
+)
+update users set email = new_data.email from new_data$0 where users.id = new_data.id;
+"), @r"
+          ╭▸ 
+        3 │ with new_data as (
+          │      ──────── 2. destination
+          ‡
+        6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
+          ╰╴                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_with_cte_column_in_set() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'new@example.com' as email
+)
+update users set email = new_data.email$0 from new_data where users.id = new_data.id;
+"), @r"
+          ╭▸ 
+        4 │     select 1 as id, 'new@example.com' as email
+          │                                          ───── 2. destination
+        5 │ )
+        6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_with_cte_column_in_where() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'new@example.com' as email
+)
+update users set email = new_data.email from new_data where new_data.id$0 = users.id;
+"), @r"
+          ╭▸ 
+        4 │     select 1 as id, 'new@example.com' as email
+          │                 ── 2. destination
+        5 │ )
+        6 │ update users set email = new_data.email from new_data where new_data.id = users.id;
+          ╰╴                                                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_with_cte_values() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with new_data as (
+    values (1, 'new@example.com')
+)
+update users set email = new_data.column2$0 from new_data where users.id = new_data.column1;
+"), @r"
+          ╭▸ 
+        4 │     values (1, 'new@example.com')
+          │                ───────────────── 2. destination
+        5 │ )
+        6 │ update users set email = new_data.column2 from new_data where users.id = new_data.column1;
+          ╰╴                                        ─ 1. source
+        ");
+    }
 }

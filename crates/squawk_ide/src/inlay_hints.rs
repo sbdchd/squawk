@@ -85,9 +85,10 @@ fn inlay_hint_insert(
 ) -> Option<()> {
     let values = insert.values()?;
     let row_list = values.row_list()?;
+    let create_table = resolve::resolve_insert_create_table(file, binder, &insert);
 
     let columns: Vec<(Name, Option<TextRange>)> = if let Some(column_list) = insert.column_list() {
-        let create_table = resolve::resolve_insert_create_table(file, binder, &insert);
+        // `insert into t(a, b, c) values (1, 2, 3)`
         column_list
             .columns()
             .filter_map(|col| {
@@ -100,8 +101,8 @@ fn inlay_hint_insert(
             })
             .collect()
     } else {
-        let create_table = resolve::resolve_insert_create_table(file, binder, &insert)?;
-        create_table
+        // `insert into t values (1, 2, 3)`
+        create_table?
             .table_arg_list()?
             .args()
             .filter_map(|arg| {
