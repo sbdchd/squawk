@@ -2454,6 +2454,353 @@ drop aggregate sum$0(bigint);
     }
 
     #[test]
+    fn goto_drop_routine_function() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+drop routine foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        3 │ drop routine foo();
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_aggregate() {
+        assert_snapshot!(goto("
+create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+drop routine myavg$0(int);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+          │                  ───── 2. destination
+        3 │ drop routine myavg(int);
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_with_schema() {
+        assert_snapshot!(goto("
+set search_path to public;
+create function foo() returns int as $$ select 1 $$ language sql;
+drop routine public.foo$0();
+"), @r"
+          ╭▸ 
+        3 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        4 │ drop routine public.foo();
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_defined_after() {
+        assert_snapshot!(goto("
+drop routine foo$0();
+create function foo() returns int as $$ select 1 $$ language sql;
+"), @r"
+          ╭▸ 
+        2 │ drop routine foo();
+          │                ─ 1. source
+        3 │ create function foo() returns int as $$ select 1 $$ language sql;
+          ╰╴                ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_with_search_path() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+set search_path to bar;
+create function foo() returns int as $$ select 1 $$ language sql;
+set search_path to default;
+drop routine foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+          ‡
+        6 │ drop routine foo();
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_overloaded() {
+        assert_snapshot!(goto("
+create function add(complex) returns complex as $$ select null $$ language sql;
+create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+drop routine add$0(complex);
+"), @r"
+          ╭▸ 
+        2 │ create function add(complex) returns complex as $$ select null $$ language sql;
+          │                 ─── 2. destination
+        3 │ create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+        4 │ drop routine add(complex);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_second_overload() {
+        assert_snapshot!(goto("
+create function add(complex) returns complex as $$ select null $$ language sql;
+create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+drop routine add$0(bigint);
+"), @r"
+          ╭▸ 
+        3 │ create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        4 │ drop routine add(bigint);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_aggregate_overloaded() {
+        assert_snapshot!(goto("
+create aggregate sum(complex) (sfunc = complex_add, stype = complex, initcond = '(0,0)');
+create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
+drop routine sum$0(complex);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate sum(complex) (sfunc = complex_add, stype = complex, initcond = '(0,0)');
+          │                  ─── 2. destination
+        3 │ create aggregate sum(bigint) (sfunc = bigint_add, stype = bigint, initcond = '0');
+        4 │ drop routine sum(complex);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_multiple() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+create function bar() returns int as $$ select 1 $$ language sql;
+drop routine foo(), bar$0();
+"), @r"
+          ╭▸ 
+        3 │ create function bar() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        4 │ drop routine foo(), bar();
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_procedure() {
+        assert_snapshot!(goto("
+create procedure foo() language sql as $$ select 1 $$;
+drop procedure foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create procedure foo() language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+        3 │ drop procedure foo();
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_procedure_with_schema() {
+        assert_snapshot!(goto("
+set search_path to public;
+create procedure foo() language sql as $$ select 1 $$;
+drop procedure public.foo$0();
+"), @r"
+          ╭▸ 
+        3 │ create procedure foo() language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+        4 │ drop procedure public.foo();
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_procedure_defined_after() {
+        assert_snapshot!(goto("
+drop procedure foo$0();
+create procedure foo() language sql as $$ select 1 $$;
+"), @r"
+          ╭▸ 
+        2 │ drop procedure foo();
+          │                  ─ 1. source
+        3 │ create procedure foo() language sql as $$ select 1 $$;
+          ╰╴                 ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_drop_procedure_with_search_path() {
+        assert_snapshot!(goto("
+create procedure foo() language sql as $$ select 1 $$;
+set search_path to bar;
+create procedure foo() language sql as $$ select 1 $$;
+set search_path to default;
+drop procedure foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create procedure foo() language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+          ‡
+        6 │ drop procedure foo();
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_procedure_overloaded() {
+        assert_snapshot!(goto("
+create procedure add(complex) language sql as $$ select null $$;
+create procedure add(bigint) language sql as $$ select 1 $$;
+drop procedure add$0(complex);
+"), @r"
+          ╭▸ 
+        2 │ create procedure add(complex) language sql as $$ select null $$;
+          │                  ─── 2. destination
+        3 │ create procedure add(bigint) language sql as $$ select 1 $$;
+        4 │ drop procedure add(complex);
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_procedure_second_overload() {
+        assert_snapshot!(goto("
+create procedure add(complex) language sql as $$ select null $$;
+create procedure add(bigint) language sql as $$ select 1 $$;
+drop procedure add$0(bigint);
+"), @r"
+          ╭▸ 
+        3 │ create procedure add(bigint) language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+        4 │ drop procedure add(bigint);
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_procedure_multiple() {
+        assert_snapshot!(goto("
+create procedure foo() language sql as $$ select 1 $$;
+create procedure bar() language sql as $$ select 1 $$;
+drop procedure foo(), bar$0();
+"), @r"
+          ╭▸ 
+        3 │ create procedure bar() language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+        4 │ drop procedure foo(), bar();
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_procedure_definition_returns_self() {
+        assert_snapshot!(goto("
+create procedure foo$0() language sql as $$ select 1 $$;
+"), @r"
+          ╭▸ 
+        2 │ create procedure foo() language sql as $$ select 1 $$;
+          │                  ┬─┬
+          │                  │ │
+          │                  │ 1. source
+          ╰╴                 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_call_procedure() {
+        assert_snapshot!(goto("
+create procedure foo() language sql as $$ select 1 $$;
+call foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create procedure foo() language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+        3 │ call foo();
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_call_procedure_with_schema() {
+        assert_snapshot!(goto("
+create procedure public.foo() language sql as $$ select 1 $$;
+call public.foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create procedure public.foo() language sql as $$ select 1 $$;
+          │                         ─── 2. destination
+        3 │ call public.foo();
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_call_procedure_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to myschema;
+create procedure foo() language sql as $$ select 1 $$;
+call myschema.foo$0();
+"), @r"
+          ╭▸ 
+        3 │ create procedure foo() language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+        4 │ call myschema.foo();
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_procedure() {
+        assert_snapshot!(goto("
+create procedure foo() language sql as $$ select 1 $$;
+drop routine foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create procedure foo() language sql as $$ select 1 $$;
+          │                  ─── 2. destination
+        3 │ drop routine foo();
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_prefers_function_over_procedure() {
+        assert_snapshot!(goto("
+create function foo() returns int as $$ select 1 $$ language sql;
+create procedure foo() language sql as $$ select 1 $$;
+drop routine foo$0();
+"), @r"
+          ╭▸ 
+        2 │ create function foo() returns int as $$ select 1 $$ language sql;
+          │                 ─── 2. destination
+        3 │ create procedure foo() language sql as $$ select 1 $$;
+        4 │ drop routine foo();
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_routine_prefers_aggregate_over_procedure() {
+        assert_snapshot!(goto("
+create aggregate foo(int) (sfunc = int4_avg_accum, stype = _int8);
+create procedure foo(int) language sql as $$ select 1 $$;
+drop routine foo$0(int);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate foo(int) (sfunc = int4_avg_accum, stype = _int8);
+          │                  ─── 2. destination
+        3 │ create procedure foo(int) language sql as $$ select 1 $$;
+        4 │ drop routine foo(int);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_table_alias_in_qualified_column() {
         assert_snapshot!(goto("
 create table t(a int8, b text);

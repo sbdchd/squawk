@@ -48,6 +48,7 @@ pub(crate) enum SymbolKind {
     Index,
     Function,
     Aggregate,
+    Procedure,
     Schema,
 }
 
