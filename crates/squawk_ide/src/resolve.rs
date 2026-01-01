@@ -31,6 +31,10 @@ enum NameRefContext {
     InsertColumn,
     DeleteTable,
     DeleteWhereColumn,
+    UpdateTable,
+    UpdateWhereColumn,
+    UpdateSetColumn,
+    UpdateFromTable,
     SchemaQualifier,
 }
 
@@ -42,7 +46,8 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
         | NameRefContext::Table
         | NameRefContext::CreateIndex
         | NameRefContext::InsertTable
-        | NameRefContext::DeleteTable => {
+        | NameRefContext::DeleteTable
+        | NameRefContext::UpdateTable => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -201,6 +206,29 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
         NameRefContext::SelectQualifiedColumn => resolve_select_qualified_column(binder, name_ref),
         NameRefContext::InsertColumn => resolve_insert_column(binder, name_ref),
         NameRefContext::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
+        NameRefContext::UpdateWhereColumn => resolve_update_where_column(binder, name_ref),
+        NameRefContext::UpdateSetColumn => resolve_update_set_column(binder, name_ref),
+        NameRefContext::UpdateFromTable => {
+            let table_name = Name::from_node(name_ref);
+            let schema = if let Some(parent) = name_ref.syntax().parent()
+                && let Some(field_expr) = ast::FieldExpr::cast(parent)
+                && let Some(base) = field_expr.base()
+                && let Some(schema_name_ref) = ast::NameRef::cast(base.syntax().clone())
+            {
+                Some(Schema(Name::from_node(&schema_name_ref)))
+            } else {
+                None
+            };
+
+            if schema.is_none()
+                && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
+            {
+                return Some(cte_ptr);
+            }
+
+            let position = name_ref.syntax().text_range().start();
+            resolve_table(binder, &table_name, &schema, position)
+        }
     }
 }
 
@@ -211,6 +239,7 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
     let mut in_column_list = false;
     let mut in_where_clause = false;
     let mut in_from_clause = false;
+    let mut in_set_clause = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -368,11 +397,26 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         if ast::WhereClause::can_cast(ancestor.kind()) {
             in_where_clause = true;
         }
+        if ast::SetClause::can_cast(ancestor.kind()) {
+            in_set_clause = true;
+        }
         if ast::Delete::can_cast(ancestor.kind()) {
             if in_where_clause {
                 return Some(NameRefContext::DeleteWhereColumn);
             }
             return Some(NameRefContext::DeleteTable);
+        }
+        if ast::Update::can_cast(ancestor.kind()) {
+            if in_where_clause {
+                return Some(NameRefContext::UpdateWhereColumn);
+            }
+            if in_set_clause {
+                return Some(NameRefContext::UpdateSetColumn);
+            }
+            if in_from_clause {
+                return Some(NameRefContext::UpdateFromTable);
+            }
+            return Some(NameRefContext::UpdateTable);
         }
     }
 
@@ -903,6 +947,70 @@ fn resolve_delete_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 
     let delete = name_ref.syntax().ancestors().find_map(ast::Delete::cast)?;
     let relation_name = delete.relation_name()?;
+    let path = relation_name.path()?;
+
+    let table_name = extract_table_name(&path)?;
+    let schema = extract_schema_name(&path);
+    let position = name_ref.syntax().text_range().start();
+
+    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
+
+    let root = &name_ref.syntax().ancestors().last()?;
+    let table_name_node = table_ptr.to_node(root);
+
+    let create_table = table_name_node
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
+
+    for arg in create_table.table_arg_list()?.args() {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(col_name) = column.name()
+            && Name::from_node(&col_name) == column_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
+        }
+    }
+
+    None
+}
+
+fn resolve_update_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+    let column_name = Name::from_node(name_ref);
+
+    let update = name_ref.syntax().ancestors().find_map(ast::Update::cast)?;
+    let relation_name = update.relation_name()?;
+    let path = relation_name.path()?;
+
+    let table_name = extract_table_name(&path)?;
+    let schema = extract_schema_name(&path);
+    let position = name_ref.syntax().text_range().start();
+
+    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
+
+    let root = &name_ref.syntax().ancestors().last()?;
+    let table_name_node = table_ptr.to_node(root);
+
+    let create_table = table_name_node
+        .ancestors()
+        .find_map(ast::CreateTable::cast)?;
+
+    for arg in create_table.table_arg_list()?.args() {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(col_name) = column.name()
+            && Name::from_node(&col_name) == column_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
+        }
+    }
+
+    None
+}
+
+fn resolve_update_set_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+    let column_name = Name::from_node(name_ref);
+
+    let update = name_ref.syntax().ancestors().find_map(ast::Update::cast)?;
+    let relation_name = update.relation_name()?;
     let path = relation_name.path()?;
 
     let table_name = extract_table_name(&path)?;
