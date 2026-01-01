@@ -2452,4 +2452,56 @@ drop aggregate sum$0(bigint);
           ╰╴                 ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_table_alias_in_qualified_column() {
+        assert_snapshot!(goto("
+create table t(a int8, b text);
+select f$0.a from t as f;
+"), @r"
+          ╭▸ 
+        3 │ select f.a from t as f;
+          ╰╴       ─ 1. source   ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_column_through_table_alias() {
+        assert_snapshot!(goto("
+create table t(a int8, b text);
+select f.a$0 from t as f;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int8, b text);
+          │                ─ 2. destination
+        3 │ select f.a from t as f;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_alias_renamed_column() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select f.x$0 from t as f(x);
+"), @r"
+          ╭▸ 
+        3 │ select f.x from t as f(x);
+          ╰╴         ─ 1. source   ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_cte_alias_unrenamed_column() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select f.b$0 from t as f(x);
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b)
+          │                          ─ 2. destination
+        3 │ select f.b from t as f(x);
+          ╰╴         ─ 1. source
+        ");
+    }
 }

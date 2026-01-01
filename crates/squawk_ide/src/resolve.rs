@@ -552,6 +552,12 @@ fn resolve_select_qualified_column_table(
     let from_clause = select.from_clause()?;
     let from_item = from_clause.from_items().next()?;
 
+    if let Some(alias_name) = from_item.alias().and_then(|a| a.name())
+        && Name::from_node(&alias_name) == table_name
+    {
+        return Some(SyntaxNodePtr::new(alias_name.syntax()));
+    }
+
     let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
         // `from foo`
         let from_table_name = Name::from_node(&name_ref_node);
@@ -618,7 +624,48 @@ fn resolve_select_qualified_column(
         let from_clause = select.from_clause()?;
         let from_item = from_clause.from_items().next()?;
 
-        if let Some(name_ref_node) = from_item.name_ref() {
+        // `from t as u`
+        // `from t as u(a, b, c)`
+        if let Some(alias) = from_item.alias()
+            && let Some(alias_name) = alias.name()
+            && Name::from_node(&alias_name) == column_table_name
+        {
+            // `from t as u(a, b, c)`
+            if let Some(column_list) = alias.column_list() {
+                for column in column_list.columns() {
+                    if let Some(col_name) = column.name()
+                        && Name::from_node(&col_name) == column_name
+                    {
+                        return Some(SyntaxNodePtr::new(col_name.syntax()));
+                    }
+                }
+
+                // ```sql
+                // create table t(a int, b int);
+                // select b from t as u(x);
+                //        ^
+                // ```
+                if let Some(name_ref_node) = from_item.name_ref() {
+                    let cte_name = Name::from_node(&name_ref_node);
+                    return resolve_cte_column(name_ref, &cte_name, &column_name);
+                }
+            }
+
+            // `from t as u`
+            if let Some(name_ref_node) = from_item.name_ref() {
+                (Name::from_node(&name_ref_node), None)
+            // `from foo.t as u`
+            } else if let Some(from_field_expr) = from_item.field_expr() {
+                let table_name = Name::from_node(&from_field_expr.field()?);
+                let ast::Expr::NameRef(schema_name_ref) = from_field_expr.base()? else {
+                    return None;
+                };
+                let schema = Schema(Name::from_node(&schema_name_ref));
+                (table_name, Some(schema))
+            } else {
+                return None;
+            }
+        } else if let Some(name_ref_node) = from_item.name_ref() {
             // `from bar`
             let from_table_name = Name::from_node(&name_ref_node);
             if from_table_name == column_table_name {
