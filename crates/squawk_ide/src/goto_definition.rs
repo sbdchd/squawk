@@ -2806,7 +2806,7 @@ drop routine foo$0(int);
 create table t(a int8, b text);
 select f$0.a from t as f;
 "), @r"
-          ╭▸
+          ╭▸ 
         3 │ select f.a from t as f;
           ╰╴       ─ 1. source   ─ 2. destination
         ");

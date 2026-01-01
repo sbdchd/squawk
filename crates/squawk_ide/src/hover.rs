@@ -1978,7 +1978,7 @@ with t as (
 select COLUMN1$0, COLUMN2 from t;
 "), @r"
         hover: column t.column1
-          ╭▸
+          ╭▸ 
         5 │ select COLUMN1, COLUMN2 from t;
           ╰╴             ─ hover
         ");
