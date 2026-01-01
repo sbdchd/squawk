@@ -1,6 +1,6 @@
 use rowan::{TextRange, TextSize};
 use squawk_syntax::{
-    SyntaxNodePtr,
+    SyntaxNode, SyntaxNodePtr,
     ast::{self, AstNode},
 };
 
@@ -1120,9 +1120,7 @@ pub(crate) fn find_column_in_table(
 }
 
 fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
-    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
-    let with_clause = select.with_clause()?;
-
+    let with_clause = find_parent_with_clause(name_ref.syntax())?;
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
             && Name::from_node(&name) == *cte_name
@@ -1134,17 +1132,26 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
     None
 }
 
+fn find_parent_with_clause(node: &SyntaxNode) -> Option<ast::WithClause> {
+    node.ancestors().find_map(|x| {
+        if let Some(select) = ast::Select::cast(x.clone()) {
+            select.with_clause()
+        } else if let Some(delete) = ast::Delete::cast(x.clone()) {
+            delete.with_clause()
+        } else if let Some(insert) = ast::Insert::cast(x) {
+            insert.with_clause()
+        } else {
+            None
+        }
+    })
+}
+
 fn resolve_cte_column(
     name_ref: &ast::NameRef,
     cte_name: &Name,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
-    let select = name_ref
-        .syntax()
-        .ancestors()
-        .filter_map(ast::Select::cast)
-        .find(|s| s.with_clause().is_some())?;
-    let with_clause = select.with_clause()?;
+    let with_clause = find_parent_with_clause(name_ref.syntax())?;
 
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
