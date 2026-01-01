@@ -10,6 +10,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
     let binder = binder::bind(file);
 
+    // TODO: can we use the classify_name_ref_context function from goto def here?
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         if is_column_ref(&name_ref) {
             return hover_column(file, &name_ref, &binder);
@@ -33,6 +34,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         }
 
         if is_select_from_table(&name_ref) {
+            return hover_table(file, &name_ref, &binder);
+        }
+
+        if is_update_from_table(&name_ref) {
             return hover_table(file, &name_ref, &binder);
         }
 
@@ -306,6 +311,7 @@ fn is_column_ref(name_ref: &ast::NameRef) -> bool {
     let mut in_partition_item = false;
     let mut in_column_list = false;
     let mut in_where_clause = false;
+    let mut in_set_clause = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::PartitionItem::can_cast(ancestor.kind()) {
@@ -323,8 +329,14 @@ fn is_column_ref(name_ref: &ast::NameRef) -> bool {
         if ast::WhereClause::can_cast(ancestor.kind()) {
             in_where_clause = true;
         }
+        if ast::SetClause::can_cast(ancestor.kind()) {
+            in_set_clause = true;
+        }
         if ast::Delete::can_cast(ancestor.kind()) {
             return in_where_clause;
+        }
+        if ast::Update::can_cast(ancestor.kind()) {
+            return in_where_clause || in_set_clause;
         }
     }
     false
@@ -334,6 +346,8 @@ fn is_table_ref(name_ref: &ast::NameRef) -> bool {
     let mut in_partition_item = false;
     let mut in_column_list = false;
     let mut in_where_clause = false;
+    let mut in_set_clause = false;
+    let mut in_from_clause = false;
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
@@ -351,8 +365,17 @@ fn is_table_ref(name_ref: &ast::NameRef) -> bool {
         if ast::WhereClause::can_cast(ancestor.kind()) {
             in_where_clause = true;
         }
+        if ast::SetClause::can_cast(ancestor.kind()) {
+            in_set_clause = true;
+        }
+        if ast::FromClause::can_cast(ancestor.kind()) {
+            in_from_clause = true;
+        }
         if ast::Delete::can_cast(ancestor.kind()) {
             return !in_where_clause;
+        }
+        if ast::Update::can_cast(ancestor.kind()) {
+            return !in_where_clause && !in_set_clause && !in_from_clause;
         }
         if ast::DropIndex::can_cast(ancestor.kind()) {
             return false;
@@ -447,6 +470,20 @@ fn is_select_from_table(name_ref: &ast::NameRef) -> bool {
             in_from_clause = true;
         }
         if ast::Select::can_cast(ancestor.kind()) && in_from_clause {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_update_from_table(name_ref: &ast::NameRef) -> bool {
+    let mut in_from_clause = false;
+
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::FromClause::can_cast(ancestor.kind()) {
+            in_from_clause = true;
+        }
+        if ast::Update::can_cast(ancestor.kind()) && in_from_clause {
             return true;
         }
     }
@@ -2235,6 +2272,112 @@ drop routine foo$0(int);
           ╭▸ 
         4 │ drop routine foo(int);
           ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+update users$0 set email = 'new@example.com';
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ update users set email = 'new@example.com';
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_table_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+update public.users$0 set email = 'new@example.com';
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ update public.users set email = 'new@example.com';
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_set_column() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+update users set email$0 = 'new@example.com' where id = 1;
+"), @r"
+        hover: column public.users.email text
+          ╭▸ 
+        3 │ update users set email = 'new@example.com' where id = 1;
+          ╰╴                     ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_set_column_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+update public.users set email$0 = 'new@example.com' where id = 1;
+"), @r"
+        hover: column public.users.email text
+          ╭▸ 
+        3 │ update public.users set email = 'new@example.com' where id = 1;
+          ╰╴                            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_where_column() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+update users set email = 'new@example.com' where id$0 = 1;
+"), @r"
+        hover: column public.users.id int
+          ╭▸ 
+        3 │ update users set email = 'new@example.com' where id = 1;
+          ╰╴                                                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_where_column_with_schema() {
+        assert_snapshot!(check_hover("
+create table public.users(id int, email text);
+update public.users set email = 'new@example.com' where id$0 = 1;
+"), @r"
+        hover: column public.users.id int
+          ╭▸ 
+        3 │ update public.users set email = 'new@example.com' where id = 1;
+          ╰╴                                                         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_from_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+create table messages(id int, user_id int, email text);
+update users set email = messages.email from messages$0 where users.id = messages.user_id;
+"), @r"
+        hover: table public.messages(id int, user_id int, email text)
+          ╭▸ 
+        4 │ update users set email = messages.email from messages where users.id = messages.user_id;
+          ╰╴                                                    ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_update_from_table_with_schema() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+create table public.messages(id int, user_id int, email text);
+update users set email = messages.email from public.messages$0 where users.id = messages.user_id;
+"), @r"
+        hover: table public.messages(id int, user_id int, email text)
+          ╭▸ 
+        4 │ update users set email = messages.email from public.messages where users.id = messages.user_id;
+          ╰╴                                                           ─ hover
         ");
     }
 }

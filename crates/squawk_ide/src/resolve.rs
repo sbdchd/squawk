@@ -1,4 +1,4 @@
-use rowan::{TextRange, TextSize};
+use rowan::TextSize;
 use squawk_syntax::{
     SyntaxNode, SyntaxNodePtr,
     ast::{self, AstNode},
@@ -206,8 +206,9 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
         NameRefContext::SelectQualifiedColumn => resolve_select_qualified_column(binder, name_ref),
         NameRefContext::InsertColumn => resolve_insert_column(binder, name_ref),
         NameRefContext::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
-        NameRefContext::UpdateWhereColumn => resolve_update_where_column(binder, name_ref),
-        NameRefContext::UpdateSetColumn => resolve_update_set_column(binder, name_ref),
+        NameRefContext::UpdateWhereColumn | NameRefContext::UpdateSetColumn => {
+            resolve_update_where_column(binder, name_ref)
+        }
         NameRefContext::UpdateFromTable => {
             let table_name = Name::from_node(name_ref);
             let schema = if let Some(parent) = name_ref.syntax().parent()
@@ -582,29 +583,28 @@ fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     let relation_name = create_index.relation_name()?;
     let path = relation_name.path()?;
 
-    let table_name = extract_table_name(&path)?;
-    let schema = extract_schema_name(&path);
-    let position = name_ref.syntax().text_range().start();
+    resolve_column_for_path(binder, &path, column_name)
+}
+
+fn resolve_column_for_path(
+    binder: &Binder,
+    path: &ast::Path,
+    column_name: Name,
+) -> Option<SyntaxNodePtr> {
+    let table_name = extract_table_name(path)?;
+    let schema = extract_schema_name(path);
+    let position = path.syntax().text_range().start();
 
     let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
 
-    let root = &name_ref.syntax().ancestors().last()?;
+    let root = &path.syntax().ancestors().last()?;
     let table_name_node = table_ptr.to_node(root);
 
     let create_table = table_name_node
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
 
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
-    }
-
-    None
+    find_column_in_create_table(&create_table, &column_name)
 }
 
 fn resolve_insert_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
@@ -613,29 +613,7 @@ fn resolve_insert_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     let insert = name_ref.syntax().ancestors().find_map(ast::Insert::cast)?;
     let path = insert.path()?;
 
-    let table_name = extract_table_name(&path)?;
-    let schema = extract_schema_name(&path);
-    let position = name_ref.syntax().text_range().start();
-
-    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
-
-    let root = &name_ref.syntax().ancestors().last()?;
-    let table_name_node = table_ptr.to_node(root);
-
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTable::cast)?;
-
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
-    }
-
-    None
+    resolve_column_for_path(binder, &path, column_name)
 }
 
 fn resolve_select_qualified_column_table(
@@ -821,13 +799,9 @@ fn resolve_select_qualified_column(
         .find_map(ast::CreateTable::cast)?;
 
     // 1. Try to find a matching column (columns take precedence)
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
+
+    if let Some(ptr) = find_column_in_create_table(&create_table, &column_name) {
+        return Some(ptr);
     }
 
     // 2. No column found, check for field-style function call
@@ -876,13 +850,8 @@ fn resolve_from_item_for_column(
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
     // 1. try to find a matching column
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
+    if let Some(ptr) = find_column_in_create_table(&create_table, &column_name) {
+        return Some(ptr);
     }
 
     // 2. No column found, check if the name matches the table name.
@@ -949,29 +918,7 @@ fn resolve_delete_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     let relation_name = delete.relation_name()?;
     let path = relation_name.path()?;
 
-    let table_name = extract_table_name(&path)?;
-    let schema = extract_schema_name(&path);
-    let position = name_ref.syntax().text_range().start();
-
-    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
-
-    let root = &name_ref.syntax().ancestors().last()?;
-    let table_name_node = table_ptr.to_node(root);
-
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTable::cast)?;
-
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
-    }
-
-    None
+    resolve_column_for_path(binder, &path, column_name)
 }
 
 fn resolve_update_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
@@ -981,61 +928,7 @@ fn resolve_update_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     let relation_name = update.relation_name()?;
     let path = relation_name.path()?;
 
-    let table_name = extract_table_name(&path)?;
-    let schema = extract_schema_name(&path);
-    let position = name_ref.syntax().text_range().start();
-
-    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
-
-    let root = &name_ref.syntax().ancestors().last()?;
-    let table_name_node = table_ptr.to_node(root);
-
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTable::cast)?;
-
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
-    }
-
-    None
-}
-
-fn resolve_update_set_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
-    let column_name = Name::from_node(name_ref);
-
-    let update = name_ref.syntax().ancestors().find_map(ast::Update::cast)?;
-    let relation_name = update.relation_name()?;
-    let path = relation_name.path()?;
-
-    let table_name = extract_table_name(&path)?;
-    let schema = extract_schema_name(&path);
-    let position = name_ref.syntax().text_range().start();
-
-    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
-
-    let root = &name_ref.syntax().ancestors().last()?;
-    let table_name_node = table_ptr.to_node(root);
-
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTable::cast)?;
-
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
-    }
-
-    None
+    resolve_column_for_path(binder, &path, column_name)
 }
 
 fn resolve_fn_call_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
@@ -1099,16 +992,8 @@ fn resolve_from_item_for_fn_call_column(
     let create_table = table_name_node
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
-    for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = arg
-            && let Some(col_name) = column.name()
-            && Name::from_node(&col_name) == *column_name
-        {
-            return Some(SyntaxNodePtr::new(col_name.syntax()));
-        }
-    }
 
-    None
+    find_column_in_create_table(&create_table, column_name)
 }
 
 fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
@@ -1211,16 +1096,16 @@ pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
     Some(name)
 }
 
-pub(crate) fn find_column_in_table(
-    table_arg_list: &ast::TableArgList,
-    col_name: &Name,
-) -> Option<TextRange> {
-    table_arg_list.args().find_map(|arg| {
+pub(crate) fn find_column_in_create_table(
+    create_table: &ast::CreateTable,
+    column_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    create_table.table_arg_list()?.args().find_map(|arg| {
         if let ast::TableArg::Column(column) = arg
             && let Some(name) = column.name()
-            && Name::from_node(&name) == *col_name
+            && Name::from_node(&name) == *column_name
         {
-            Some(name.syntax().text_range())
+            return Some(SyntaxNodePtr::new(name.syntax()));
         } else {
             None
         }
@@ -1413,11 +1298,11 @@ fn resolve_column_from_paren_expr(
     None
 }
 
-pub(crate) fn resolve_insert_table_columns(
+pub(crate) fn resolve_insert_create_table(
     file: &ast::SourceFile,
     binder: &Binder,
     insert: &ast::Insert,
-) -> Option<ast::TableArgList> {
+) -> Option<ast::CreateTable> {
     let path = insert.path()?;
     let table_name = extract_table_name(&path)?;
     let schema = extract_schema_name(&path);
@@ -1427,11 +1312,7 @@ pub(crate) fn resolve_insert_table_columns(
     let root = file.syntax();
     let table_name_node = table_ptr.to_node(root);
 
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTable::cast)?;
-
-    create_table.table_arg_list()
+    table_name_node.ancestors().find_map(ast::CreateTable::cast)
 }
 
 pub(crate) fn resolve_table_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
