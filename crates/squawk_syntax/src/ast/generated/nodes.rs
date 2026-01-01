@@ -5247,6 +5247,10 @@ impl Delete {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn delete_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DELETE_KW)
     }
@@ -8430,6 +8434,10 @@ impl Insert {
     }
     #[inline]
     pub fn values(&self) -> Option<Values> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15391,6 +15399,10 @@ impl Update {
     }
     #[inline]
     pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
     }
     #[inline]

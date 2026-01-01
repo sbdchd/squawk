@@ -1263,6 +1263,7 @@ Table =
   'table' RelationName
 
 Insert =
+  WithClause?
   'insert' 'into' Path Alias? ColumnList?
   ('overriding' ('system' | 'user') 'value')?
   ('default' 'values' | Values | Stmt)
@@ -1326,6 +1327,7 @@ SetExpr =
 | 'default'
 
 Update =
+  WithClause?
   'update'
   RelationName
   Alias?
@@ -1348,6 +1350,7 @@ ReturningOption =
   Name
 
 Delete =
+  WithClause?
   'delete' 'from' RelationName Alias?
   UsingClause?
   (WhereClause | WhereCurrentOf)?

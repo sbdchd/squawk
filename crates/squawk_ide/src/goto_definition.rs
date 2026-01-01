@@ -3002,4 +3002,79 @@ select messages.message$0 from users left join messages on users.id = messages.u
           ╰╴                      ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_insert_select_cte_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'test@example.com' as email
+)
+insert into users (id, email)
+select id$0, email from new_data;
+"), @r"
+          ╭▸ 
+        4 │     select 1 as id, 'test@example.com' as email
+          │                 ── 2. destination
+          ‡
+        7 │ select id, email from new_data;
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_select_cte_column_second() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'test@example.com' as email
+)
+insert into users (id, email)
+select id, email$0 from new_data;
+"), @r"
+          ╭▸ 
+        4 │     select 1 as id, 'test@example.com' as email
+          │                                           ───── 2. destination
+          ‡
+        7 │ select id, email from new_data;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_select_cte_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with new_data as (
+    select 1 as id, 'test@example.com' as email
+)
+insert into users (id, email)
+select id, email from new_data$0;
+"), @r"
+          ╭▸ 
+        3 │ with new_data as (
+          │      ──────── 2. destination
+          ‡
+        7 │ select id, email from new_data;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_cte_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+with old_data as (
+    select 1 as id
+)
+delete from users where id in (select id$0 from old_data);
+"), @r"
+          ╭▸ 
+        4 │     select 1 as id
+          │                 ── 2. destination
+        5 │ )
+        6 │ delete from users where id in (select id from old_data);
+          ╰╴                                       ─ 1. source
+        ");
+    }
 }
