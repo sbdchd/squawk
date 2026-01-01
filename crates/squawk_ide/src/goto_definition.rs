@@ -3077,4 +3077,179 @@ delete from users where id in (select id$0 from old_data);
           ╰╴                                       ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_update_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+update users$0 set email = 'new@example.com';
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ update users set email = 'new@example.com';
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_table_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+update public.users$0 set email = 'new@example.com';
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                     ───── 2. destination
+        3 │ update public.users set email = 'new@example.com';
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_table_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+update users$0 set email = 'new@example.com';
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                  ───── 2. destination
+        4 │ update users set email = 'new@example.com';
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+update users set email = 'new@example.com' where id$0 = 1;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ update users set email = 'new@example.com' where id = 1;
+          ╰╴                                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_column_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+update public.users set email = 'new@example.com' where id$0 = 1;
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                           ── 2. destination
+        3 │ update public.users set email = 'new@example.com' where id = 1;
+          ╰╴                                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_column_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+update users set email = 'new@example.com' where id$0 = 1;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                        ── 2. destination
+        4 │ update users set email = 'new@example.com' where id = 1;
+          ╰╴                                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+update users set email$0 = 'new@example.com' where id = 1;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ update users set email = 'new@example.com' where id = 1;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_column_with_schema() {
+        assert_snapshot!(goto("
+create table public.users(id int, email text);
+update public.users set email$0 = 'new@example.com' where id = 1;
+"), @r"
+          ╭▸ 
+        2 │ create table public.users(id int, email text);
+          │                                   ───── 2. destination
+        3 │ update public.users set email = 'new@example.com' where id = 1;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_column_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table foo.users(id int, email text);
+update users set email$0 = 'new@example.com' where id = 1;
+"), @r"
+          ╭▸ 
+        3 │ create table foo.users(id int, email text);
+          │                                ───── 2. destination
+        4 │ update users set email = 'new@example.com' where id = 1;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table messages(id int, user_id int, email text);
+update users set email = messages.email from messages$0 where users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        3 │ create table messages(id int, user_id int, email text);
+          │              ──────── 2. destination
+        4 │ update users set email = messages.email from messages where users.id = messages.user_id;
+          ╰╴                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_table_with_schema() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table public.messages(id int, user_id int, email text);
+update users set email = messages.email from public.messages$0 where users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        3 │ create table public.messages(id int, user_id int, email text);
+          │                     ──────── 2. destination
+        4 │ update users set email = messages.email from public.messages where users.id = messages.user_id;
+          ╰╴                                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_from_table_with_search_path() {
+        assert_snapshot!(goto("
+set search_path to foo;
+create table users(id int, email text);
+create table foo.messages(id int, user_id int, email text);
+update users set email = messages.email from messages$0 where users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        4 │ create table foo.messages(id int, user_id int, email text);
+          │                  ──────── 2. destination
+        5 │ update users set email = messages.email from messages where users.id = messages.user_id;
+          ╰╴                                                    ─ 1. source
+        ");
+    }
 }
