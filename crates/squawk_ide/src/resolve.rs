@@ -47,14 +47,13 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             resolve_table(binder, &table_name, &schema, position)
         }
         NameRefContext::SelectFromTable => {
-            let table_name = Name::new(name_ref.syntax().text().to_string());
+            let table_name = Name::from_node(name_ref);
             let schema = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
                 && let Some(base) = field_expr.base()
                 && let Some(schema_name_ref) = ast::NameRef::cast(base.syntax().clone())
             {
-                let schema_text = schema_name_ref.syntax().text().to_string();
-                Some(Schema(Name::new(schema_text)))
+                Some(Schema(Name::from_node(&schema_name_ref)))
             } else {
                 None
             };
@@ -106,7 +105,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             )
         }
         NameRefContext::DropSchema | NameRefContext::SchemaQualifier => {
-            let schema_name = Name::new(name_ref.syntax().text().to_string());
+            let schema_name = Name::from_node(name_ref);
             resolve_schema(binder, &schema_name)
         }
         NameRefContext::SelectFunctionCall => {
@@ -115,12 +114,11 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             {
                 let base = field_expr.base()?;
                 let schema_name_ref = ast::NameRef::cast(base.syntax().clone())?;
-                let schema_text = schema_name_ref.syntax().text().to_string();
-                Some(Schema(Name::new(schema_text)))
+                Some(Schema(Name::from_node(&schema_name_ref)))
             } else {
                 None
             };
-            let function_name = Name::new(name_ref.syntax().text().to_string());
+            let function_name = Name::from_node(name_ref);
             let position = name_ref.syntax().text_range().start();
 
             // functions take precedence
@@ -451,7 +449,7 @@ fn resolve_schema(binder: &Binder, schema_name: &Name) -> Option<SyntaxNodePtr> 
 }
 
 fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
-    let column_name = Name::new(name_ref.syntax().text().to_string());
+    let column_name = Name::from_node(name_ref);
 
     let create_index = name_ref
         .syntax()
@@ -476,7 +474,7 @@ fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
-            && Name::new(col_name.syntax().text().to_string()) == column_name
+            && Name::from_node(&col_name) == column_name
         {
             return Some(SyntaxNodePtr::new(col_name.syntax()));
         }
@@ -486,7 +484,7 @@ fn resolve_create_index_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 }
 
 fn resolve_insert_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
-    let column_name = Name::new(name_ref.syntax().text().to_string());
+    let column_name = Name::from_node(name_ref);
 
     let insert = name_ref.syntax().ancestors().find_map(ast::Insert::cast)?;
     let path = insert.path()?;
@@ -507,7 +505,7 @@ fn resolve_insert_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
-            && Name::new(col_name.syntax().text().to_string()) == column_name
+            && Name::from_node(&col_name) == column_name
         {
             return Some(SyntaxNodePtr::new(col_name.syntax()));
         }
@@ -520,7 +518,7 @@ fn resolve_select_qualified_column_table(
     binder: &Binder,
     name_ref: &ast::NameRef,
 ) -> Option<SyntaxNodePtr> {
-    let table_name = Name::new(name_ref.syntax().text().to_string());
+    let table_name = Name::from_node(name_ref);
 
     let field_expr = name_ref.syntax().parent().and_then(ast::FieldExpr::cast)?;
 
@@ -530,9 +528,7 @@ fn resolve_select_qualified_column_table(
     {
         // if we're at the field `bar` in `foo.bar`
         if let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? {
-            Some(Schema(Name::new(
-                schema_name_ref.syntax().text().to_string(),
-            )))
+            Some(Schema(Name::from_node(&schema_name_ref)))
         } else {
             None
         }
@@ -542,9 +538,7 @@ fn resolve_select_qualified_column_table(
         && let ast::Expr::NameRef(schema_name_ref) = inner_base
     {
         // if we're at the field `foo` in `foo.buzz.bar`
-        Some(Schema(Name::new(
-            schema_name_ref.syntax().text().to_string(),
-        )))
+        Some(Schema(Name::from_node(&schema_name_ref)))
     } else {
         None
     };
@@ -560,7 +554,7 @@ fn resolve_select_qualified_column_table(
 
     let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
         // `from foo`
-        let from_table_name = Name::new(name_ref_node.syntax().text().to_string());
+        let from_table_name = Name::from_node(&name_ref_node);
         if from_table_name == table_name {
             (from_table_name, None)
         } else {
@@ -569,14 +563,14 @@ fn resolve_select_qualified_column_table(
     } else {
         // `from bar.foo`
         let from_field_expr = from_item.field_expr()?;
-        let from_table_name = Name::new(from_field_expr.field()?.syntax().text().to_string());
+        let from_table_name = Name::from_node(&from_field_expr.field()?);
         if from_table_name != table_name {
             return None;
         }
         let ast::Expr::NameRef(schema_name_ref) = from_field_expr.base()? else {
             return None;
         };
-        let schema = Schema(Name::new(schema_name_ref.syntax().text().to_string()));
+        let schema = Schema(Name::from_node(&schema_name_ref));
         (from_table_name, Some(schema))
     };
 
@@ -588,7 +582,7 @@ fn resolve_select_qualified_column(
     binder: &Binder,
     name_ref: &ast::NameRef,
 ) -> Option<SyntaxNodePtr> {
-    let column_name = Name::new(name_ref.syntax().text().to_string());
+    let column_name = Name::from_node(name_ref);
 
     let field_expr = name_ref.syntax().parent().and_then(ast::FieldExpr::cast)?;
 
@@ -597,7 +591,7 @@ fn resolve_select_qualified_column(
     if let Some(base) = field_expr.base()
         && let ast::Expr::NameRef(table_name_ref) = base
     {
-        (Name::new(table_name_ref.syntax().text().to_string()), None)
+        (Name::from_node(&table_name_ref), None)
     // we have `foo.bar.buzz`
     } else if let Some(base) = field_expr.base()
         && let ast::Expr::FieldExpr(inner_field_expr) = base
@@ -606,9 +600,9 @@ fn resolve_select_qualified_column(
         && let ast::Expr::NameRef(schema_name_ref) = inner_base
     {
         (
-            Name::new(table_field.syntax().text().to_string()),
-            Some(Schema(Name::new(
-                schema_name_ref.syntax().text().to_string(),
+            Name::from_node(&table_field),
+            Some(Schema(Name::from_node(
+                &schema_name_ref
             ))),
         )
     } else {
@@ -626,7 +620,7 @@ fn resolve_select_qualified_column(
 
         if let Some(name_ref_node) = from_item.name_ref() {
             // `from bar`
-            let from_table_name = Name::new(name_ref_node.syntax().text().to_string());
+            let from_table_name = Name::from_node(&name_ref_node);
             if from_table_name == column_table_name {
                 (from_table_name, None)
             } else {
@@ -635,14 +629,14 @@ fn resolve_select_qualified_column(
         } else {
             // `from foo.bar`
             let from_field_expr = from_item.field_expr()?;
-            let from_table_name = Name::new(from_field_expr.field()?.syntax().text().to_string());
+            let from_table_name = Name::from_node(&from_field_expr.field()?);
             if from_table_name != column_table_name {
                 return None;
             }
             let ast::Expr::NameRef(schema_name_ref) = from_field_expr.base()? else {
                 return None;
             };
-            let schema = Schema(Name::new(schema_name_ref.syntax().text().to_string()));
+            let schema = Schema(Name::from_node(&schema_name_ref));
             (from_table_name, Some(schema))
         }
     };
@@ -659,7 +653,7 @@ fn resolve_select_qualified_column(
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
-            && Name::new(col_name.syntax().text().to_string()) == column_name
+            && Name::from_node(&col_name) == column_name
         {
             return Some(SyntaxNodePtr::new(col_name.syntax()));
         }
@@ -671,7 +665,7 @@ fn resolve_select_qualified_column(
 }
 
 fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
-    let column_name = Name::new(name_ref.syntax().text().to_string());
+    let column_name = Name::from_node(name_ref);
 
     let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
     let from_clause = select.from_clause()?;
@@ -686,14 +680,14 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     }
 
     let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
-        (Name::new(name_ref_node.syntax().text().to_string()), None)
+        (Name::from_node(&name_ref_node), None)
     } else {
         let field_expr = from_item.field_expr()?;
-        let table_name = Name::new(field_expr.field()?.syntax().text().to_string());
+        let table_name = Name::from_node(&field_expr.field()?);
         let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? else {
             return None;
         };
-        let schema = Schema(Name::new(schema_name_ref.syntax().text().to_string()));
+        let schema = Schema(Name::from_node(&schema_name_ref));
         (table_name, Some(schema))
     };
 
@@ -715,7 +709,7 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
-            && Name::new(col_name.syntax().text().to_string()) == column_name
+            && Name::from_node(&col_name) == column_name
         {
             return Some(SyntaxNodePtr::new(col_name.syntax()));
         }
@@ -735,7 +729,7 @@ fn resolve_select_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<Syn
 }
 
 fn resolve_delete_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
-    let column_name = Name::new(name_ref.syntax().text().to_string());
+    let column_name = Name::from_node(name_ref);
 
     let delete = name_ref.syntax().ancestors().find_map(ast::Delete::cast)?;
     let relation_name = delete.relation_name()?;
@@ -757,7 +751,7 @@ fn resolve_delete_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
-            && Name::new(col_name.syntax().text().to_string()) == column_name
+            && Name::from_node(&col_name) == column_name
         {
             return Some(SyntaxNodePtr::new(col_name.syntax()));
         }
@@ -770,7 +764,7 @@ fn resolve_function_call_style_column(
     binder: &Binder,
     name_ref: &ast::NameRef,
 ) -> Option<SyntaxNodePtr> {
-    let column_name = Name::new(name_ref.syntax().text().to_string());
+    let column_name = Name::from_node(name_ref);
 
     // function call syntax for columns is only valid if there is one argument
     let call_expr = name_ref
@@ -788,14 +782,14 @@ fn resolve_function_call_style_column(
 
     // get the table name and schema from the FROM clause
     let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
-        (Name::new(name_ref_node.syntax().text().to_string()), None)
+        (Name::from_node(&name_ref_node), None)
     } else {
         let field_expr = from_item.field_expr()?;
-        let table_name = Name::new(field_expr.field()?.syntax().text().to_string());
+        let table_name = Name::from_node(&field_expr.field()?);
         let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? else {
             return None;
         };
-        let schema = Schema(Name::new(schema_name_ref.syntax().text().to_string()));
+        let schema = Schema(Name::from_node(&schema_name_ref));
         (table_name, Some(schema))
     };
 
@@ -810,7 +804,7 @@ fn resolve_function_call_style_column(
     for arg in create_table.table_arg_list()?.args() {
         if let ast::TableArg::Column(column) = arg
             && let Some(col_name) = column.name()
-            && Name::new(col_name.syntax().text().to_string()) == column_name
+            && Name::from_node(&col_name) == column_name
         {
             return Some(SyntaxNodePtr::new(col_name.syntax()));
         }
@@ -831,24 +825,24 @@ fn find_containing_path(name_ref: &ast::NameRef) -> Option<ast::Path> {
 fn extract_table_name(path: &ast::Path) -> Option<Name> {
     let segment = path.segment()?;
     let name_ref = segment.name_ref()?;
-    Some(Name::new(name_ref.syntax().text().to_string()))
+    Some(Name::from_node(&name_ref))
 }
 
 fn extract_schema_name(path: &ast::Path) -> Option<Schema> {
     path.qualifier()
         .and_then(|q| q.segment())
         .and_then(|s| s.name_ref())
-        .map(|name_ref| Schema(Name::new(name_ref.syntax().text().to_string())))
+        .map(|name_ref| Schema(Name::from_node(&name_ref)))
 }
 
 pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
-    let text = if let Some(name_ref) = col.name_ref() {
-        name_ref.syntax().text().to_string()
+    let name = if let Some(name_ref) = col.name_ref() {
+        Name::from_node(&name_ref)
     } else {
         let name = col.name()?;
-        name.syntax().text().to_string()
+        Name::from_node(&name)
     };
-    Some(Name::new(text))
+    Some(name)
 }
 
 pub(crate) fn find_column_in_table(
@@ -858,7 +852,7 @@ pub(crate) fn find_column_in_table(
     table_arg_list.args().find_map(|arg| {
         if let ast::TableArg::Column(column) = arg
             && let Some(name) = column.name()
-            && Name::new(name.syntax().text().to_string()) == *col_name
+            && Name::from_node(&name) == *col_name
         {
             Some(name.syntax().text_range())
         } else {
@@ -873,7 +867,7 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
 
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
-            && Name::new(name.syntax().text().to_string()) == *cte_name
+            && Name::from_node(&name) == *cte_name
         {
             return Some(SyntaxNodePtr::new(name.syntax()));
         }
@@ -896,7 +890,7 @@ fn resolve_cte_column(
 
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
-            && Name::new(name.syntax().text().to_string()) == *cte_name
+            && Name::from_node(&name) == *cte_name
         {
             // Skip if we're inside this CTE's definition (CTE doesn't shadow itself)
             if with_table
@@ -910,7 +904,7 @@ fn resolve_cte_column(
             let column_list_len = if let Some(column_list) = with_table.column_list() {
                 for column in column_list.columns() {
                     if let Some(col_name) = column.name()
-                        && Name::new(col_name.syntax().text().to_string()) == *column_name
+                        && Name::from_node(&col_name) == *column_name
                     {
                         return Some(SyntaxNodePtr::new(col_name.syntax()));
                     }
@@ -962,7 +956,7 @@ fn resolve_cte_column(
 
                 if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
                     if let Some(col_name_str) = col_name.to_string()
-                        && Name::new(col_name_str) == *column_name
+                        && Name::from_string(col_name_str) == *column_name
                     {
                         return Some(SyntaxNodePtr::new(&node));
                     }
@@ -972,8 +966,7 @@ fn resolve_cte_column(
                             && let Some(from_item) = from_clause.from_items().next()
                             && let Some(from_name_ref) = from_item.name_ref()
                         {
-                            let from_table_name =
-                                Name::new(from_name_ref.syntax().text().to_string());
+                            let from_table_name = Name::from_node(&from_name_ref);
                             // Skip recursive CTE lookup if the FROM table has the same name as the current CTE
                             // (CTEs don't shadow themselves in their own definition)
                             if from_table_name != *cte_name {
@@ -1004,7 +997,7 @@ fn resolve_subquery_column(
     for target in target_list.targets() {
         if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
             if let Some(col_name_str) = col_name.to_string()
-                && Name::new(col_name_str) == *column_name
+                && Name::from_string(col_name_str) == *column_name
             {
                 return Some(SyntaxNodePtr::new(&node));
             }
@@ -1025,7 +1018,7 @@ fn resolve_column_from_paren_expr(
             for target in target_list.targets() {
                 if let Some((col_name, node)) = ColumnName::from_target(target.clone())
                     && let Some(col_name_str) = col_name.to_string()
-                    && Name::new(col_name_str) == *column_name
+                    && Name::from_string(col_name_str) == *column_name
                 {
                     return Some(SyntaxNodePtr::new(&node));
                 }
@@ -1084,7 +1077,7 @@ fn resolve_symbol_info(
     let name_str = extract_table_name_from_path(path)?;
     let schema = extract_schema_from_path(path);
 
-    let name_normalized = Name::new(name_str.clone());
+    let name_normalized = Name::from_string(name_str.clone());
     let symbols = binder.scopes[binder.root_scope()].get(&name_normalized)?;
 
     if let Some(schema_name) = schema {
@@ -1139,7 +1132,7 @@ fn extract_param_signature(node: &impl ast::HasParamList) -> Option<Vec<Name>> {
             && let Some(segment) = path.segment()
             && let Some(name_ref) = segment.name_ref()
         {
-            params.push(Name::new(name_ref.syntax().text().to_string()));
+            params.push(Name::from_node(&name_ref));
         }
     }
     (!params.is_empty()).then_some(params)

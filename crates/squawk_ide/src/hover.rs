@@ -130,9 +130,9 @@ fn hover_column(
             .ancestors()
             .any(|a| ast::Values::can_cast(a.kind()))
         {
-            Name::new(name_ref.syntax().text().to_string())
+            Name::from_node(name_ref)
         } else {
-            Name::new(column_name_node.text().to_string())
+            Name::from_string(column_name_node.text().to_string())
         };
         return Some(format!("column {}.{}", cte_name, column_name));
     }

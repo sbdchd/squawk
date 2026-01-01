@@ -406,14 +406,12 @@ fn remove_redundant_alias(
     let target = token.parent_ancestors().find_map(ast::Target::cast)?;
 
     let as_name = target.as_name()?;
-    let alias_name = as_name.name()?;
-
     let (inferred_column, _) = ColumnName::inferred_from_target(target.clone())?;
     let inferred_column_alias = inferred_column.to_string()?;
 
-    let alias = alias_name.syntax().text().to_string();
+    let alias = as_name.name()?;
 
-    if Name::new(alias) != Name::new(inferred_column_alias) {
+    if Name::from_node(&alias) != Name::from_string(inferred_column_alias) {
         return None;
     }
 

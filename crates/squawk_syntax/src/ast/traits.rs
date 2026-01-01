@@ -9,6 +9,8 @@ pub trait HasName: AstNode {
     }
 }
 
+pub trait NameLike: AstNode {}
+
 pub trait HasArgList: AstNode {
     fn arg_list(&self) -> Option<ast::ArgList> {
         support::child(self.syntax())
