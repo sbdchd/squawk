@@ -48,6 +48,18 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             return hover_aggregate(file, &name_ref, &binder);
         }
 
+        if is_procedure_ref(&name_ref) {
+            return hover_procedure(file, &name_ref, &binder);
+        }
+
+        if is_routine_ref(&name_ref) {
+            return hover_routine(file, &name_ref, &binder);
+        }
+
+        if is_call_procedure(&name_ref) {
+            return hover_procedure(file, &name_ref, &binder);
+        }
+
         if is_select_function_call(&name_ref) {
             // Try function first, but fall back to column if no function found
             // (handles function-call-style column access like `select a(t)`)
@@ -95,6 +107,14 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             .find_map(ast::CreateAggregate::cast)
         {
             return format_create_aggregate(&create_aggregate, &binder);
+        }
+
+        if let Some(create_procedure) = name
+            .syntax()
+            .ancestors()
+            .find_map(ast::CreateProcedure::cast)
+        {
+            return format_create_procedure(&create_procedure, &binder);
         }
 
         if let Some(create_schema) = name.syntax().ancestors().find_map(ast::CreateSchema::cast) {
@@ -374,6 +394,33 @@ fn is_aggregate_ref(name_ref: &ast::NameRef) -> bool {
     false
 }
 
+fn is_procedure_ref(name_ref: &ast::NameRef) -> bool {
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::DropProcedure::can_cast(ancestor.kind()) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_routine_ref(name_ref: &ast::NameRef) -> bool {
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::DropRoutine::can_cast(ancestor.kind()) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_call_procedure(name_ref: &ast::NameRef) -> bool {
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::Call::can_cast(ancestor.kind()) {
+            return true;
+        }
+    }
+    false
+}
+
 fn is_select_function_call(name_ref: &ast::NameRef) -> bool {
     let mut in_call_expr = false;
     let mut in_arg_list = false;
@@ -564,6 +611,87 @@ fn aggregate_schema(
     let position = create_aggregate.syntax().text_range().start();
     let search_path = binder.search_path_at(position);
     search_path.first().map(|s| s.to_string())
+}
+
+fn hover_procedure(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let procedure_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+
+    let root = file.syntax();
+    let procedure_name_node = procedure_ptr.to_node(root);
+
+    let create_procedure = procedure_name_node
+        .ancestors()
+        .find_map(ast::CreateProcedure::cast)?;
+
+    format_create_procedure(&create_procedure, binder)
+}
+
+fn format_create_procedure(
+    create_procedure: &ast::CreateProcedure,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let path = create_procedure.path()?;
+    let segment = path.segment()?;
+    let name = segment.name()?;
+    let procedure_name = name.syntax().text().to_string();
+
+    let schema = if let Some(qualifier) = path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        procedure_schema(create_procedure, binder)?
+    };
+
+    let param_list = create_procedure.param_list()?;
+    let params = param_list.syntax().text().to_string();
+
+    Some(format!("procedure {}.{}{}", schema, procedure_name, params))
+}
+
+fn procedure_schema(
+    create_procedure: &ast::CreateProcedure,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let position = create_procedure.syntax().text_range().start();
+    let search_path = binder.search_path_at(position);
+    search_path.first().map(|s| s.to_string())
+}
+
+fn hover_routine(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let routine_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+
+    let root = file.syntax();
+    let routine_name_node = routine_ptr.to_node(root);
+
+    if let Some(create_function) = routine_name_node
+        .ancestors()
+        .find_map(ast::CreateFunction::cast)
+    {
+        return format_create_function(&create_function, binder);
+    }
+
+    if let Some(create_aggregate) = routine_name_node
+        .ancestors()
+        .find_map(ast::CreateAggregate::cast)
+    {
+        return format_create_aggregate(&create_aggregate, binder);
+    }
+
+    if let Some(create_procedure) = routine_name_node
+        .ancestors()
+        .find_map(ast::CreateProcedure::cast)
+    {
+        return format_create_procedure(&create_procedure, binder);
+    }
+
+    None
 }
 
 #[cfg(test)]
@@ -1850,9 +1978,263 @@ with t as (
 select COLUMN1$0, COLUMN2 from t;
 "), @r"
         hover: column t.column1
-          ╭▸ 
+          ╭▸
         5 │ select COLUMN1, COLUMN2 from t;
           ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_procedure() {
+        assert_snapshot!(check_hover("
+create procedure foo() language sql as $$ select 1 $$;
+drop procedure foo$0();
+"), @r"
+        hover: procedure public.foo()
+          ╭▸ 
+        3 │ drop procedure foo();
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_procedure_with_schema() {
+        assert_snapshot!(check_hover("
+create procedure myschema.foo() language sql as $$ select 1 $$;
+drop procedure myschema.foo$0();
+"), @r"
+        hover: procedure myschema.foo()
+          ╭▸ 
+        3 │ drop procedure myschema.foo();
+          ╰╴                          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_procedure_definition() {
+        assert_snapshot!(check_hover("
+create procedure foo$0() language sql as $$ select 1 $$;
+"), @r"
+        hover: procedure public.foo()
+          ╭▸ 
+        2 │ create procedure foo() language sql as $$ select 1 $$;
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_procedure_with_explicit_schema() {
+        assert_snapshot!(check_hover("
+create procedure myschema.foo$0() language sql as $$ select 1 $$;
+"), @r"
+        hover: procedure myschema.foo()
+          ╭▸ 
+        2 │ create procedure myschema.foo() language sql as $$ select 1 $$;
+          ╰╴                            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_procedure_with_search_path() {
+        assert_snapshot!(check_hover(r#"
+set search_path to myschema;
+create procedure foo() language sql as $$ select 1 $$;
+drop procedure foo$0();
+"#), @r"
+        hover: procedure myschema.foo()
+          ╭▸ 
+        4 │ drop procedure foo();
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_procedure_overloaded() {
+        assert_snapshot!(check_hover("
+create procedure add(complex) language sql as $$ select null $$;
+create procedure add(bigint) language sql as $$ select 1 $$;
+drop procedure add$0(complex);
+"), @r"
+        hover: procedure public.add(complex)
+          ╭▸ 
+        4 │ drop procedure add(complex);
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_procedure_second_overload() {
+        assert_snapshot!(check_hover("
+create procedure add(complex) language sql as $$ select null $$;
+create procedure add(bigint) language sql as $$ select 1 $$;
+drop procedure add$0(bigint);
+"), @r"
+        hover: procedure public.add(bigint)
+          ╭▸ 
+        4 │ drop procedure add(bigint);
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_call_procedure() {
+        assert_snapshot!(check_hover("
+create procedure foo() language sql as $$ select 1 $$;
+call foo$0();
+"), @r"
+        hover: procedure public.foo()
+          ╭▸ 
+        3 │ call foo();
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_call_procedure_with_schema() {
+        assert_snapshot!(check_hover("
+create procedure public.foo() language sql as $$ select 1 $$;
+call public.foo$0();
+"), @r"
+        hover: procedure public.foo()
+          ╭▸ 
+        3 │ call public.foo();
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_call_procedure_with_search_path() {
+        assert_snapshot!(check_hover(r#"
+set search_path to myschema;
+create procedure foo() language sql as $$ select 1 $$;
+call foo$0();
+"#), @r"
+        hover: procedure myschema.foo()
+          ╭▸ 
+        4 │ call foo();
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_call_procedure_with_params() {
+        assert_snapshot!(check_hover("
+create procedure add(a int, b int) language sql as $$ select a + b $$;
+call add$0(1, 2);
+"), @r"
+        hover: procedure public.add(a int, b int)
+          ╭▸ 
+        3 │ call add(1, 2);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_function() {
+        assert_snapshot!(check_hover("
+create function foo() returns int as $$ select 1 $$ language sql;
+drop routine foo$0();
+"), @r"
+        hover: function public.foo() returns int
+          ╭▸ 
+        3 │ drop routine foo();
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_aggregate() {
+        assert_snapshot!(check_hover("
+create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+drop routine myavg$0(int);
+"), @r"
+        hover: aggregate public.myavg(int)
+          ╭▸ 
+        3 │ drop routine myavg(int);
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_procedure() {
+        assert_snapshot!(check_hover("
+create procedure foo() language sql as $$ select 1 $$;
+drop routine foo$0();
+"), @r"
+        hover: procedure public.foo()
+          ╭▸ 
+        3 │ drop routine foo();
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_with_schema() {
+        assert_snapshot!(check_hover("
+set search_path to public;
+create function foo() returns int as $$ select 1 $$ language sql;
+drop routine public.foo$0();
+"), @r"
+        hover: function public.foo() returns int
+          ╭▸ 
+        4 │ drop routine public.foo();
+          ╰╴                      ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_with_search_path() {
+        assert_snapshot!(check_hover(r#"
+set search_path to myschema;
+create function foo() returns int as $$ select 1 $$ language sql;
+drop routine foo$0();
+"#), @r"
+        hover: function myschema.foo() returns int
+          ╭▸ 
+        4 │ drop routine foo();
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_overloaded() {
+        assert_snapshot!(check_hover("
+create function add(complex) returns complex as $$ select null $$ language sql;
+create function add(bigint) returns bigint as $$ select 1 $$ language sql;
+drop routine add$0(complex);
+"), @r"
+        hover: function public.add(complex) returns complex
+          ╭▸ 
+        4 │ drop routine add(complex);
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_prefers_function_over_procedure() {
+        assert_snapshot!(check_hover("
+create function foo() returns int as $$ select 1 $$ language sql;
+create procedure foo() language sql as $$ select 1 $$;
+drop routine foo$0();
+"), @r"
+        hover: function public.foo() returns int
+          ╭▸ 
+        4 │ drop routine foo();
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_routine_prefers_aggregate_over_procedure() {
+        assert_snapshot!(check_hover("
+create aggregate foo(int) (sfunc = int4_avg_accum, stype = _int8);
+create procedure foo(int) language sql as $$ select 1 $$;
+drop routine foo$0(int);
+"), @r"
+        hover: aggregate public.foo(int)
+          ╭▸ 
+        4 │ drop routine foo(int);
+          ╰╴               ─ hover
         ");
     }
 }

@@ -16,6 +16,9 @@ enum NameRefContext {
     DropIndex,
     DropFunction,
     DropAggregate,
+    DropProcedure,
+    DropRoutine,
+    CallProcedure,
     DropSchema,
     CreateIndex,
     CreateIndexColumn,
@@ -103,6 +106,57 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 params.as_deref(),
                 position,
             )
+        }
+        NameRefContext::DropProcedure => {
+            let function_sig = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::FunctionSig::cast)?;
+            let path = function_sig.path()?;
+            let procedure_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let params = extract_param_signature(&function_sig);
+            let position = name_ref.syntax().text_range().start();
+            resolve_procedure(
+                binder,
+                &procedure_name,
+                &schema,
+                params.as_deref(),
+                position,
+            )
+        }
+        NameRefContext::DropRoutine => {
+            let function_sig = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::FunctionSig::cast)?;
+            let path = function_sig.path()?;
+            let routine_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let params = extract_param_signature(&function_sig);
+            let position = name_ref.syntax().text_range().start();
+
+            if let Some(ptr) =
+                resolve_function(binder, &routine_name, &schema, params.as_deref(), position)
+            {
+                return Some(ptr);
+            }
+
+            if let Some(ptr) =
+                resolve_aggregate(binder, &routine_name, &schema, params.as_deref(), position)
+            {
+                return Some(ptr);
+            }
+
+            resolve_procedure(binder, &routine_name, &schema, params.as_deref(), position)
+        }
+        NameRefContext::CallProcedure => {
+            let call = name_ref.syntax().ancestors().find_map(ast::Call::cast)?;
+            let path = call.path()?;
+            let procedure_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_procedure(binder, &procedure_name, &schema, None, position)
         }
         NameRefContext::DropSchema | NameRefContext::SchemaQualifier => {
             let schema_name = Name::from_node(name_ref);
@@ -260,6 +314,15 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         }
         if ast::DropAggregate::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropAggregate);
+        }
+        if ast::DropProcedure::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::DropProcedure);
+        }
+        if ast::DropRoutine::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::DropRoutine);
+        }
+        if ast::Call::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::CallProcedure);
         }
         if ast::DropSchema::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropSchema);
@@ -436,6 +499,23 @@ fn resolve_aggregate(
         params,
         position,
         SymbolKind::Aggregate,
+    )
+}
+
+fn resolve_procedure(
+    binder: &Binder,
+    procedure_name: &Name,
+    schema: &Option<Schema>,
+    params: Option<&[Name]>,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    resolve_for_kind_with_params(
+        binder,
+        procedure_name,
+        schema,
+        params,
+        position,
+        SymbolKind::Procedure,
     )
 }
 
