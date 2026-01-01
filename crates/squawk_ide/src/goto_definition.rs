@@ -2851,4 +2851,155 @@ select f.b$0 from t as f(x);
           ╰╴         ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_join_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table messages(id int, user_id int, message text);
+select * from users join messages$0 on users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        3 │ create table messages(id int, user_id int, message text);
+          │              ──────── 2. destination
+        4 │ select * from users join messages on users.id = messages.user_id;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_qualified_column_from_joined_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table messages(id int, user_id int, message text);
+select messages.user_id$0 from users join messages on users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        3 │ create table messages(id int, user_id int, message text);
+          │                               ─────── 2. destination
+        4 │ select messages.user_id from users join messages on users.id = messages.user_id;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_qualified_column_from_base_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table messages(id int, user_id int, message text);
+select users.id$0 from users join messages on users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ create table messages(id int, user_id int, message text);
+        4 │ select users.id from users join messages on users.id = messages.user_id;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_multiple_joins() {
+        assert_snapshot!(goto("
+create table users(id int, name text);
+create table messages(id int, user_id int, message text);
+create table comments(id int, message_id int, text text);
+select comments.text$0 from users
+  join messages on users.id = messages.user_id
+  join comments on messages.id = comments.message_id;
+"), @r"
+          ╭▸ 
+        4 │ create table comments(id int, message_id int, text text);
+          │                                               ──── 2. destination
+        5 │ select comments.text from users
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_with_aliases() {
+        assert_snapshot!(goto("
+create table users(id int, name text);
+create table messages(id int, user_id int, message text);
+select m.message$0 from users as u join messages as m on u.id = m.user_id;
+"), @r"
+          ╭▸ 
+        3 │ create table messages(id int, user_id int, message text);
+          │                                            ─────── 2. destination
+        4 │ select m.message from users as u join messages as m on u.id = m.user_id;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_unqualified_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table messages(id int, user_id int, message text);
+select message$0 from users join messages on users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        3 │ create table messages(id int, user_id int, message text);
+          │                                            ─────── 2. destination
+        4 │ select message from users join messages on users.id = messages.user_id;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_with_many_tables() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table messages(id int, user_id int, message text);
+create table logins(id int, user_id int, at timestamptz);
+create table posts(id int, user_id int, post text);
+
+select post$0 
+  from users
+    join messages 
+      on users.id = messages.user_id
+      join logins
+        on users.id = logins.user_id
+        join posts
+          on users.id = posts.user_id
+"), @r"
+          ╭▸ 
+        5 │ create table posts(id int, user_id int, post text);
+          │                                         ──── 2. destination
+        6 │
+        7 │ select post 
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_with_schema() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.users(id int, email text);
+create table foo.messages(id int, user_id int, message text);
+select foo.messages.message$0 from foo.users join foo.messages on foo.users.id = foo.messages.user_id;
+"), @r"
+          ╭▸ 
+        4 │ create table foo.messages(id int, user_id int, message text);
+          │                                                ─────── 2. destination
+        5 │ select foo.messages.message from foo.users join foo.messages on foo.users.id = foo.messages.user_id;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_left_join() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create table messages(id int, user_id int, message text);
+select messages.message$0 from users left join messages on users.id = messages.user_id;
+"), @r"
+          ╭▸ 
+        3 │ create table messages(id int, user_id int, message text);
+          │                                            ─────── 2. destination
+        4 │ select messages.message from users left join messages on users.id = messages.user_id;
+          ╰╴                      ─ 1. source
+        ");
+    }
 }
