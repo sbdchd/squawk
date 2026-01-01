@@ -95,7 +95,7 @@ fn inlay_hint_insert(
                 let col_name = resolve::extract_column_name(&col)?;
                 let target = table_arg_list
                     .as_ref()
-                    .and_then(|list| resolve::find_column_in_table(list, &col_name));
+                    .and_then(|list| resolve::find_column_in_table_args(list, &col_name));
                 Some((col_name, target))
             })
             .collect()
