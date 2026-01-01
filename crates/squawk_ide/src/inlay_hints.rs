@@ -108,7 +108,7 @@ fn inlay_hint_insert(
                 if let ast::TableArg::Column(column) = arg
                     && let Some(name) = column.name()
                 {
-                    let col_name = Name::new(name.syntax().text().to_string());
+                    let col_name = Name::from_node(&name);
                     let target = Some(name.syntax().text_range());
                     Some((col_name, target))
                 } else {

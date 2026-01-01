@@ -1,6 +1,6 @@
 use la_arena::Idx;
 use smol_str::SmolStr;
-use squawk_syntax::SyntaxNodePtr;
+use squawk_syntax::{SyntaxNodePtr, ast};
 use std::fmt;
 
 use crate::quote::normalize_identifier;
@@ -13,7 +13,7 @@ pub(crate) struct Schema(pub(crate) Name);
 
 impl Schema {
     pub(crate) fn new(name: impl Into<SmolStr>) -> Self {
-        Schema(Name::new(name))
+        Schema(Name::from_string(name))
     }
 }
 
@@ -24,8 +24,13 @@ impl fmt::Display for Schema {
 }
 
 impl Name {
-    pub(crate) fn new(text: impl Into<SmolStr>) -> Self {
+    pub(crate) fn from_string(text: impl Into<SmolStr>) -> Self {
         let text = text.into();
+        let normalized = normalize_identifier(&text);
+        Name(normalized.into())
+    }
+    pub(crate) fn from_node(node: &impl ast::NameLike) -> Self {
+        let text = node.syntax().text().to_string();
         let normalized = normalize_identifier(&text);
         Name(normalized.into())
     }
@@ -61,11 +66,11 @@ mod test {
     use super::*;
     #[test]
     fn name_case_insensitive_compare() {
-        assert_eq!(Name::new("foo"), Name::new("FOO"));
+        assert_eq!(Name::from_string("foo"), Name::from_string("FOO"));
     }
 
     #[test]
     fn name_quote_comparing() {
-        assert_eq!(Name::new(r#""foo""#), Name::new("foo"));
+        assert_eq!(Name::from_string(r#""foo""#), Name::from_string("foo"));
     }
 }

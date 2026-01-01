@@ -116,7 +116,7 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
         return;
     };
 
-    let index_name = Name::new(name.syntax().text().to_string());
+    let index_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
     let Some(schema) = b.current_search_path().first().cloned() else {
@@ -195,7 +195,7 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
         return;
     };
 
-    let schema_name = Name::new(schema_name_node.syntax().text().to_string());
+    let schema_name = Name::from_node(&schema_name_node);
     let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
 
     let schema_id = b.symbols.alloc(Symbol {
@@ -213,10 +213,10 @@ fn item_name(path: &ast::Path) -> Option<Name> {
     let segment = path.segment()?;
 
     if let Some(name) = segment.name() {
-        return Some(Name::new(name.syntax().text().to_string()));
+        return Some(Name::from_node(&name));
     }
     if let Some(name) = segment.name_ref() {
-        return Some(Name::new(name.syntax().text().to_string()));
+        return Some(Name::from_node(&name));
     }
 
     None
@@ -240,7 +240,7 @@ fn schema_name(b: &Binder, path: &ast::Path, is_temp: bool) -> Option<Schema> {
         .and_then(|q| q.segment())
         .and_then(|s| s.name_ref())
     {
-        return Some(Schema(Name::new(name_ref.syntax().text().to_string())));
+        return Some(Schema(Name::from_node(&name_ref)));
     }
 
     if is_temp {
@@ -339,7 +339,7 @@ fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Nam
             && let Some(segment) = path.segment()
             && let Some(name_ref) = segment.name_ref()
         {
-            params.push(Name::new(name_ref.syntax().text().to_string()));
+            params.push(Name::from_node(&name_ref));
         }
     }
     (!params.is_empty()).then_some(params)
