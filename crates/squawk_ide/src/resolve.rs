@@ -925,6 +925,27 @@ fn resolve_update_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     let column_name = Name::from_node(name_ref);
 
     let update = name_ref.syntax().ancestors().find_map(ast::Update::cast)?;
+
+    // `update t set a = b from u`
+    if let Some(from_clause) = update.from_clause() {
+        for from_item in from_clause.from_items() {
+            if let Some(result) = resolve_from_item_for_column(binder, &from_item, name_ref) {
+                return Some(result);
+            }
+        }
+
+        for join_expr in from_clause.join_exprs() {
+            if let Some(result) =
+                resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
+                    resolve_from_item_for_column(binder, from_item, name_ref)
+                })
+            {
+                return Some(result);
+            }
+        }
+    }
+
+    // `update t set a = b`
     let relation_name = update.relation_name()?;
     let path = relation_name.path()?;
 
@@ -1131,8 +1152,10 @@ fn find_parent_with_clause(node: &SyntaxNode) -> Option<ast::WithClause> {
             select.with_clause()
         } else if let Some(delete) = ast::Delete::cast(x.clone()) {
             delete.with_clause()
-        } else if let Some(insert) = ast::Insert::cast(x) {
+        } else if let Some(insert) = ast::Insert::cast(x.clone()) {
             insert.with_clause()
+        } else if let Some(update) = ast::Update::cast(x) {
+            update.with_clause()
         } else {
             None
         }
