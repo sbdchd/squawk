@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.35.0 - 2026-01-02
+
+### Added
+
+- ide: add goto def & hover support for types in casts (#799)
+- ide: add initial goto def support for types (#798)
+- ide: support ctes with update (#797)
+- ide: hover with update (#796)
+- ide: goto def with update (#795)
+- ide: goto def with insert/delete & CTE (#794)
+- ide: goto def for joins (#793)
+- ide: goto def & hover with procedures (#792)
+- ide: table alias goto def support (#791)
+- ide: hover for create aggregate (#789)
+- ide: goto def for aggregates (#788)
+- ide: cte improvements, subqueries, values, union select (#787)
+- ide: code action to remove redundant alias (#785)
+- ide: add hover to cte table & columns (#784)
+- ide: support more CTEs in goto def (#783)
+- ide: goto def with cte & select (#782)
+- ide: code action for making inferred column alias explicit (#781)
+- playground: inlay hints, doc symbols, hover, goto def/refs, actions (#779)
+- ide: add columns to document symbols (#778)
+- ide: add document symbols (#777)
+- ide: support hover & goto def for function call style columns in where (#776)
+- ide: support func call syntax in select (#775)
+- ide: support goto def on schema (#774)
+- ide: support hover for delete, insert, and select targets (#773)
+- ide: goto def & hover tables refs in from clause (#772)
+- ide: inlay hints for insert & add goto def for hints (#771)
+- ide: goto def for insert and delete (#770)
+- ide: inlay hints for function calls (#769)
+- ide: function call goto def and hover (#768)
+- ide: add hover for create function (#767)
+- ide: goto def with create & drop function (#766)
+- ide: add hover for create index (#765)
+- ide: add hover for create table (#764)
+- ide: add hover for column in create index (#763)
+- ide: goto def on create/drop index (#762)
+- ide: add basic find refs support (#760)
+
+### Fixed
+
+- parser: fix parsing group by all in CTE (#780)
+- ide: fix goto def with temp table (#761)
+
 ## v2.34.0 - 2025-12-22
 
 ### Added
