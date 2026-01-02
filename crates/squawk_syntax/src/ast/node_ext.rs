@@ -231,8 +231,15 @@ pub(crate) fn text_of_first_token(node: &SyntaxNode) -> TokenText<'_> {
 
 impl ast::HasParamList for ast::FunctionSig {}
 impl ast::HasParamList for ast::Aggregate {}
+
 impl ast::NameLike for ast::Name {}
 impl ast::NameLike for ast::NameRef {}
+
+impl ast::HasWithClause for ast::Select {}
+impl ast::HasWithClause for ast::SelectInto {}
+impl ast::HasWithClause for ast::Insert {}
+impl ast::HasWithClause for ast::Update {}
+impl ast::HasWithClause for ast::Delete {}
 
 #[test]
 fn index_expr() {
