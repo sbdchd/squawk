@@ -2568,7 +2568,7 @@ CreateView =
   'create' OrReplace? ('temp' | 'temporary')? 'recursive'? 'view' Path ColumnList?
   WithParams?
   'as' query:SelectVariant
-  ('with' ('cascaded' | 'local') 'check' 'option')
+  ('with' ('cascaded' | 'local')? 'check' 'option')?
 
 Prepare =
   'prepare' Name 'as' PreparableStmt

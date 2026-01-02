@@ -133,6 +133,23 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         if let Some(create_schema) = name.syntax().ancestors().find_map(ast::CreateSchema::cast) {
             return format_create_schema(&create_schema);
         }
+
+        // create view t(x) as select 1;
+        //               ^
+        if let Some(column_list) = name.syntax().ancestors().find_map(ast::ColumnList::cast)
+            && let Some(create_view) = column_list
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateView::cast)
+        {
+            return format_view_column(&create_view, Name::from_node(&name), &binder);
+        }
+
+        // create view t as select 1;
+        //             ^
+        if let Some(create_view) = name.syntax().ancestors().find_map(ast::CreateView::cast) {
+            return format_create_view(&create_view, &binder);
+        }
     }
 
     None
@@ -168,6 +185,16 @@ fn hover_column(
             Name::from_string(column_name_node.text().to_string())
         };
         return Some(format!("column {}.{}", cte_name, column_name));
+    }
+
+    // create view v(a) as select 1;
+    // select a from v;
+    //        ^
+    if let Some(create_view) = column_name_node.ancestors().find_map(ast::CreateView::cast)
+        && let Some(column_name) =
+            ast::Name::cast(column_name_node.clone()).map(|name| Name::from_node(&name))
+    {
+        return format_view_column(&create_view, column_name, binder);
     }
 
     let column = column_name_node.ancestors().find_map(ast::Column::cast)?;
@@ -233,6 +260,13 @@ fn hover_table(
         return format_with_table(&with_table);
     }
 
+    // create view v as select 1 a;
+    // select a from v;
+    //               ^
+    if let Some(create_view) = table_name_node.ancestors().find_map(ast::CreateView::cast) {
+        return format_create_view(&create_view, binder);
+    }
+
     let create_table = table_name_node
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
@@ -289,6 +323,48 @@ fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder)
     Some(format!("table {}.{}{}", schema, table_name, args))
 }
 
+fn format_create_view(create_view: &ast::CreateView, binder: &binder::Binder) -> Option<String> {
+    let path = create_view.path()?;
+    let segment = path.segment()?;
+    let view_name = segment.name()?.syntax().text().to_string();
+
+    let schema = if let Some(qualifier) = path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        view_schema(create_view, binder)?
+    };
+
+    let column_list = create_view
+        .column_list()
+        .map(|cl| cl.syntax().text().to_string())
+        .unwrap_or_default();
+
+    let query = create_view.query()?.syntax().text().to_string();
+
+    Some(format!(
+        "view {}.{}{} as {}",
+        schema, view_name, column_list, query
+    ))
+}
+
+fn format_view_column(
+    create_view: &ast::CreateView,
+    column_name: Name,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let path = create_view.path()?;
+    let segment = path.segment()?;
+    let view_name = Name::from_node(&segment.name()?);
+
+    let schema = if let Some(qualifier) = path.qualifier() {
+        Name::from_string(qualifier.syntax().text().to_string())
+    } else {
+        Name::from_string(view_schema(create_view, binder)?)
+    };
+
+    Some(format!("column {}.{}.{}", schema, view_name, column_name))
+}
+
 fn format_with_table(with_table: &ast::WithTable) -> Option<String> {
     let name = with_table.name()?.syntax().text().to_string();
     let query = with_table.query()?.syntax().text().to_string();
@@ -302,6 +378,17 @@ fn table_schema(create_table: &ast::CreateTable, binder: &binder::Binder) -> Opt
     }
 
     let position = create_table.syntax().text_range().start();
+    let search_path = binder.search_path_at(position);
+    search_path.first().map(|s| s.to_string())
+}
+
+fn view_schema(create_view: &ast::CreateView, binder: &binder::Binder) -> Option<String> {
+    let is_temp = create_view.temp_token().is_some() || create_view.temporary_token().is_some();
+    if is_temp {
+        return Some("pg_temp".to_string());
+    }
+
+    let position = create_view.syntax().text_range().start();
     let search_path = binder.search_path_at(position);
     search_path.first().map(|s| s.to_string())
 }
@@ -412,6 +499,9 @@ fn is_table_ref(name_ref: &ast::NameRef) -> bool {
 
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropTable::can_cast(ancestor.kind()) {
+            return true;
+        }
+        if ast::DropView::can_cast(ancestor.kind()) {
             return true;
         }
         if ast::Table::can_cast(ancestor.kind()) {
@@ -2642,6 +2732,132 @@ update users set email = new_data.email from new_data where new_data.id$0 = user
           ╭▸ 
         6 │ update users set email = new_data.email from new_data where new_data.id = users.id;
           ╰╴                                                                      ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_view_definition() {
+        assert_snapshot!(check_hover("
+create view v$0 as select 1;
+"), @r"
+        hover: view public.v as select 1
+          ╭▸ 
+        2 │ create view v as select 1;
+          ╰╴            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_view_definition_with_schema() {
+        assert_snapshot!(check_hover("
+create view myschema.v$0 as select 1;
+"), @r"
+        hover: view myschema.v as select 1
+          ╭▸ 
+        2 │ create view myschema.v as select 1;
+          ╰╴                     ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_temp_view_definition() {
+        assert_snapshot!(check_hover("
+create temp view v$0 as select 1;
+"), @r"
+        hover: view pg_temp.v as select 1
+          ╭▸ 
+        2 │ create temp view v as select 1;
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_view_with_column_list() {
+        assert_snapshot!(check_hover("
+create view v(col1$0) as select 1;
+"), @r"
+        hover: column public.v.col1
+          ╭▸ 
+        2 │ create view v(col1) as select 1;
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_from_view() {
+        assert_snapshot!(check_hover("
+create view v as select 1;
+select * from v$0;
+"), @r"
+        hover: view public.v as select 1
+          ╭▸ 
+        3 │ select * from v;
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_from_view_column_list() {
+        assert_snapshot!(check_hover("
+create view v(a) as select 1;
+select a$0 from v;
+"), @r"
+        hover: column public.v.a
+          ╭▸ 
+        3 │ select a from v;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_from_view_column_list_overrides_target() {
+        assert_snapshot!(check_hover("
+create view v(a) as select 1, 2 b;
+select a, b$0 from v;
+"), @r"
+        hover: column public.v.b
+          ╭▸ 
+        3 │ select a, b from v;
+          ╰╴          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_from_view_target_list() {
+        assert_snapshot!(check_hover("
+create view v as select 1 a, 2 b;
+select a$0, b from v;
+"), @r"
+        hover: column public.v.a
+          ╭▸ 
+        3 │ select a, b from v;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_from_view_with_schema() {
+        assert_snapshot!(check_hover("
+create view myschema.v as select 1;
+select * from myschema.v$0;
+"), @r"
+        hover: view myschema.v as select 1
+          ╭▸ 
+        3 │ select * from myschema.v;
+          ╰╴                       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_view() {
+        assert_snapshot!(check_hover("
+create view v as select 1;
+drop view v$0;
+"), @r"
+        hover: view public.v as select 1
+          ╭▸ 
+        3 │ drop view v;
+          ╰╴          ─ hover
         ");
     }
 }
