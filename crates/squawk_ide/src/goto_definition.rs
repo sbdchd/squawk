@@ -458,6 +458,48 @@ drop type int4_range$0;
     }
 
     #[test]
+    fn goto_cast_operator() {
+        assert_snapshot!(goto("
+create type foo as enum ('a', 'b');
+select x::foo$0;
+"), @r"
+          ╭▸ 
+        2 │ create type foo as enum ('a', 'b');
+          │             ─── 2. destination
+        3 │ select x::foo;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_function() {
+        assert_snapshot!(goto("
+create type bar as enum ('x', 'y');
+select cast(x as bar$0);
+"), @r"
+          ╭▸ 
+        2 │ create type bar as enum ('x', 'y');
+          │             ─── 2. destination
+        3 │ select cast(x as bar);
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_with_schema() {
+        assert_snapshot!(goto("
+create type public.baz as enum ('m', 'n');
+select x::public.baz$0;
+"), @r"
+          ╭▸ 
+        2 │ create type public.baz as enum ('m', 'n');
+          │                    ─── 2. destination
+        3 │ select x::public.baz;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
     fn begin_to_rollback() {
         assert_snapshot!(goto(
             "
