@@ -393,8 +393,10 @@ fn convert_document_symbol(
         detail: symbol.detail,
         kind: match symbol.kind {
             squawk_ide::document_symbols::DocumentSymbolKind::Table => "table",
+            squawk_ide::document_symbols::DocumentSymbolKind::View => "view",
             squawk_ide::document_symbols::DocumentSymbolKind::Function => "function",
             squawk_ide::document_symbols::DocumentSymbolKind::Type => "type",
+            squawk_ide::document_symbols::DocumentSymbolKind::Enum => "enum",
             squawk_ide::document_symbols::DocumentSymbolKind::Column => "column",
             squawk_ide::document_symbols::DocumentSymbolKind::Variant => "variant",
         }
