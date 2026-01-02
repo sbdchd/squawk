@@ -213,6 +213,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             resolve_select_qualified_column_table(binder, name_ref)
         }
         NameRefClass::SelectQualifiedColumn => resolve_select_qualified_column(binder, name_ref),
+        NameRefClass::CompositeTypeField => resolve_composite_type_field(binder, name_ref),
         NameRefClass::InsertColumn => resolve_insert_column(binder, name_ref),
         NameRefClass::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
         NameRefClass::UpdateWhereColumn | NameRefClass::UpdateSetColumn => {
@@ -1340,4 +1341,103 @@ fn extract_param_signature(node: &impl ast::HasParamList) -> Option<Vec<Name>> {
         }
     }
     (!params.is_empty()).then_some(params)
+}
+
+fn unwrap_paren_expr(expr: ast::Expr) -> Option<ast::NameRef> {
+    let mut current = expr;
+    for _ in 0..10_000 {
+        match current {
+            ast::Expr::ParenExpr(paren_expr) => {
+                current = paren_expr.expr()?;
+            }
+            ast::Expr::NameRef(nr) => return Some(nr),
+            _ => return None,
+        }
+    }
+    None
+}
+
+fn resolve_composite_type_field(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+    let field_name = Name::from_node(name_ref);
+    let field_expr = name_ref.syntax().parent().and_then(ast::FieldExpr::cast)?;
+    let base = field_expr.base()?;
+
+    let base_name_ref = unwrap_paren_expr(base)?;
+    let root = &name_ref.syntax().ancestors().last()?;
+
+    let (type_name, schema) =
+        if let Some(type_info) = resolve_composite_type_from_column(binder, &base_name_ref, root) {
+            type_info
+        } else {
+            resolve_composite_type_from_cast(binder, &base_name_ref, root)?
+        };
+
+    let position = name_ref.syntax().text_range().start();
+    let type_ptr = resolve_type(binder, &type_name, &schema, position)?;
+    let type_node = type_ptr.to_node(root);
+
+    let create_type = type_node.ancestors().find_map(ast::CreateType::cast)?;
+    let column_list = create_type.column_list()?;
+
+    for column in column_list.columns() {
+        if let Some(col_name) = column.name()
+            && Name::from_node(&col_name) == field_name
+        {
+            return Some(SyntaxNodePtr::new(col_name.syntax()));
+        }
+    }
+
+    None
+}
+
+fn resolve_composite_type_from_column(
+    binder: &Binder,
+    base_name_ref: &ast::NameRef,
+    root: &SyntaxNode,
+) -> Option<(Name, Option<Schema>)> {
+    let column_ptr = resolve_select_column(binder, base_name_ref)?;
+    let column_node = column_ptr.to_node(root);
+    let column = column_node.ancestors().find_map(ast::Column::cast)?;
+    let ty = column.ty()?;
+    extract_type_name_and_schema(&ty)
+}
+
+fn resolve_composite_type_from_cast(
+    binder: &Binder,
+    base_name_ref: &ast::NameRef,
+    root: &SyntaxNode,
+) -> Option<(Name, Option<Schema>)> {
+    let column_ptr = resolve_select_column(binder, base_name_ref)?;
+    let column_node = column_ptr.to_node(root);
+    let target = column_node.ancestors().find_map(ast::Target::cast)?;
+    let ast::Expr::CastExpr(cast_expr) = target.expr()? else {
+        return None;
+    };
+    let ty = cast_expr.ty()?;
+    extract_type_name_and_schema(&ty)
+}
+
+fn extract_type_name_and_schema(ty: &ast::Type) -> Option<(Name, Option<Schema>)> {
+    match ty {
+        ast::Type::PathType(path_type) => {
+            let path = path_type.path()?;
+            let type_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            Some((type_name, schema))
+        }
+        ast::Type::ExprType(expr_type) => {
+            let expr = expr_type.expr()?;
+            if let ast::Expr::FieldExpr(field_expr) = expr
+                && let Some(field) = field_expr.field()
+                && let Some(ast::Expr::NameRef(schema_name_ref)) = field_expr.base()
+            {
+                let type_name = Name::from_node(&field);
+                let schema = Some(Schema(Name::from_node(&schema_name_ref)));
+                Some((type_name, schema))
+            } else {
+                None
+            }
+        }
+        _ => None,
+    }
 }

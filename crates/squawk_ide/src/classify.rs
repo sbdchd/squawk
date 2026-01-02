@@ -20,6 +20,7 @@ pub(crate) enum NameRefClass {
     SelectColumn,
     SelectQualifiedColumnTable,
     SelectQualifiedColumn,
+    CompositeTypeField,
     InsertTable,
     InsertColumn,
     DeleteTable,
@@ -116,6 +117,8 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                     && matches!(base, ast::Expr::NameRef(_) | ast::Expr::FieldExpr(_))
                 {
                     return Some(NameRefClass::SelectQualifiedColumn);
+                } else if let Some(ast::Expr::ParenExpr(_)) = field_expr.base() {
+                    return Some(NameRefClass::CompositeTypeField);
                 } else {
                     return Some(NameRefClass::SelectQualifiedColumnTable);
                 }
