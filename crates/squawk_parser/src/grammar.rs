@@ -3433,7 +3433,7 @@ fn join_using_clause(p: &mut Parser<'_>) {
     let m = p.start();
     // USING ( join_column [, ...] )
     p.expect(USING_KW);
-    column_list(p);
+    column_ref_list(p);
     opt_alias(p);
     m.complete(p, JOIN_USING_CLAUSE);
 }
@@ -3643,12 +3643,12 @@ fn column(p: &mut Parser<'_>, kind: &ColumnDefKind) -> CompletedMarker {
 }
 
 // [ ( column_name [, ... ] ) ]
-fn opt_column_list(p: &mut Parser<'_>) -> bool {
+fn opt_column_ref_list(p: &mut Parser<'_>) -> bool {
     opt_column_list_with(p, ColumnDefKind::NameRef)
 }
 
-fn column_list(p: &mut Parser<'_>) {
-    if !opt_column_list(p) {
+fn column_ref_list(p: &mut Parser<'_>) {
+    if !opt_column_ref_list(p) {
         p.error("expected column list");
     }
 }
@@ -3657,7 +3657,7 @@ fn opt_include_columns(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(INCLUDE_KW) {
         let m = p.start();
         p.bump(INCLUDE_KW);
-        column_list(p);
+        column_ref_list(p);
         Some(m.complete(p, CONSTRAINT_INCLUDE_CLAUSE))
     } else {
         None
@@ -3711,14 +3711,14 @@ fn referential_action(p: &mut Parser<'_>) {
             let m = p.start();
             p.expect(SET_KW);
             p.expect(NULL_KW);
-            opt_column_list(p);
+            opt_column_ref_list(p);
             m.complete(p, SET_NULL_COLUMNS);
         }
         SET_KW => {
             let m = p.start();
             p.bump(SET_KW);
             p.expect(DEFAULT_KW);
-            opt_column_list(p);
+            opt_column_ref_list(p);
             m.complete(p, SET_DEFAULT_COLUMNS);
         }
         _ => {
@@ -4111,7 +4111,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             // [ NULLS [ NOT ] DISTINCT ] ( column_name [, ... ] ) index_parameters
             } else {
                 opt_nulls_not_distinct(p);
-                column_list(p);
+                column_ref_list(p);
                 opt_index_parameters(p);
             }
             UNIQUE_CONSTRAINT
@@ -4126,7 +4126,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
                 using_index(p);
             // ( column_name [, ... ] ) index_parameters
             } else {
-                column_list(p);
+                column_ref_list(p);
                 opt_index_parameters(p);
             }
             PRIMARY_KEY_CONSTRAINT
@@ -4152,10 +4152,10 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             // must be in a foreign key constraint
             p.expect(FOREIGN_KW);
             p.expect(KEY_KW);
-            column_list(p);
+            column_ref_list(p);
             p.expect(REFERENCES_KW);
             path_name_ref(p);
-            opt_column_list(p);
+            opt_column_ref_list(p);
             opt_match_type(p);
             opt_foreign_key_actions(p);
             FOREIGN_KEY_CONSTRAINT
@@ -9105,7 +9105,7 @@ fn publication_object(p: &mut Parser<'_>) {
             path_name_ref(p);
         }
         p.eat(STAR);
-        opt_column_list(p);
+        opt_column_ref_list(p);
         opt_constraint_where_clause(p);
     }
     m.complete(p, PUBLICATION_OBJECT);
@@ -10532,7 +10532,7 @@ fn merge_action(p: &mut Parser<'_>) {
         INSERT_KW => {
             p.bump(INSERT_KW);
             // [ ( column_name [, ...] ) ]
-            opt_column_list(p);
+            opt_column_ref_list(p);
             // [ OVERRIDING { SYSTEM | USER } VALUE ]
             if p.eat(OVERRIDING_KW) {
                 if !p.eat(SYSTEM_KW) && !p.eat(USER_KW) {
@@ -10614,7 +10614,7 @@ fn grant(p: &mut Parser<'_>) -> CompletedMarker {
     // ALL [ PRIVILEGES ]
     if p.eat(ALL_KW) {
         p.eat(PRIVILEGES_KW);
-        opt_column_list(p);
+        opt_column_ref_list(p);
     } else if !p.at(TO_KW) {
         revoke_command_list(p);
     }
@@ -10815,7 +10815,7 @@ fn privileges(p: &mut Parser<'_>) {
         revoke_command_list(p);
     }
     // [ ( column_name [, ...] ) ]
-    opt_column_list(p);
+    opt_column_ref_list(p);
     m.complete(p, PRIVILEGES);
 }
 
@@ -10848,7 +10848,7 @@ fn revoke_command(p: &mut Parser<'_>) {
         }
     }
     // [ ( column_name [, ...] ) ]
-    opt_column_list(p);
+    opt_column_ref_list(p);
     m.complete(p, REVOKE_COMMAND);
 }
 
@@ -11694,7 +11694,7 @@ fn opt_table_and_columns(p: &mut Parser<'_>) -> bool {
         m.abandon(p);
         return false;
     }
-    opt_column_list(p);
+    opt_column_ref_list(p);
     m.complete(p, TABLE_AND_COLUMNS);
     true
 }
@@ -11918,7 +11918,7 @@ fn copy(p: &mut Parser<'_>) -> CompletedMarker {
         // table_name
         path_name_ref(p);
         // [ ( column_name [, ...] ) ]
-        opt_column_list(p);
+        opt_column_ref_list(p);
     }
     if p.eat(FROM_KW) {
         // STDIN
@@ -12296,7 +12296,7 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     path_name_ref(p);
     opt_as_alias_with_as(p);
     // [ ( column_name [, ...] ) ]
-    opt_column_list(p);
+    opt_column_ref_list(p);
     // [ OVERRIDING { SYSTEM | USER } VALUE ]
     if p.eat(OVERRIDING_KW) {
         let _ = p.eat(SYSTEM_KW) || p.expect(USER_KW);
@@ -12443,7 +12443,7 @@ fn opt_set_column(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // ( column_name [, ...] ) = [ ROW ] ( { expression | DEFAULT } [, ...] ) |
     // ( column_name [, ...] ) = ( sub-SELECT )
     if p.at(L_PAREN) {
-        column_list(p);
+        column_ref_list(p);
         p.expect(EQ);
         set_expr_list_or_paren_select(p);
         Some(m.complete(p, SET_MULTIPLE_COLUMNS))
