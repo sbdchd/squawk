@@ -47,11 +47,64 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::Select(select) => {
+                symbols.extend(cte_table_symbols(select));
+            }
+            ast::Stmt::SelectInto(select_into) => {
+                symbols.extend(cte_table_symbols(select_into));
+            }
+            ast::Stmt::Insert(insert) => {
+                symbols.extend(cte_table_symbols(insert));
+            }
+            ast::Stmt::Update(update) => {
+                symbols.extend(cte_table_symbols(update));
+            }
+            ast::Stmt::Delete(delete) => {
+                symbols.extend(cte_table_symbols(delete));
+            }
+
             _ => {}
         }
     }
 
     symbols
+}
+
+fn cte_table_symbols(stmt: impl ast::HasWithClause) -> Vec<DocumentSymbol> {
+    let Some(with_clause) = stmt.with_clause() else {
+        return vec![];
+    };
+
+    with_clause
+        .with_tables()
+        .filter_map(create_cte_table_symbol)
+        .collect()
+}
+
+fn create_cte_table_symbol(with_table: ast::WithTable) -> Option<DocumentSymbol> {
+    let name_node = with_table.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = with_table.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    let mut children = vec![];
+    if let Some(column_list) = with_table.column_list() {
+        for column in column_list.columns() {
+            if let Some(column_symbol) = create_column_symbol(column) {
+                children.push(column_symbol);
+            }
+        }
+    }
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Table,
+        full_range,
+        focus_range,
+        children,
+    })
 }
 
 fn create_table_symbol(
@@ -558,5 +611,65 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
     #[test]
     fn non_create_statements() {
         symbols_not_found("select * from users;")
+    }
+
+    #[test]
+    fn cte_table() {
+        assert_snapshot!(
+            symbols("
+with recent_users as (
+  select id, email as user_email
+  from users
+)
+select * from recent_users;
+"),
+            @r"
+        info: table: recent_users
+          ╭▸ 
+        2 │   with recent_users as (
+          │        │━━━━━━━━━━━
+          │        │
+          │ ┌──────focus range
+          │ │
+        3 │ │   select id, email as user_email
+        4 │ │   from users
+        5 │ │ )
+          ╰╴└─┘ full range
+        "
+        );
+    }
+
+    #[test]
+    fn cte_table_with_column_list() {
+        assert_snapshot!(
+            symbols("
+with t(a, b, c) as (
+  select 1, 2, 3
+)
+select * from t;
+"),
+            @r"
+        info: table: t
+          ╭▸ 
+        2 │   with t(a, b, c) as (
+          │        ━ focus range
+          │ ┌──────┘
+          │ │
+        3 │ │   select 1, 2, 3
+        4 │ │ )
+          │ └─┘ full range
+          │
+          ⸬  
+        2 │   with t(a, b, c) as (
+          │          ┯  ┯  ┯
+          │          │  │  │
+          │          │  │  full range for `column: c`
+          │          │  │  focus range
+          │          │  full range for `column: b`
+          │          │  focus range
+          │          full range for `column: a`
+          ╰╴         focus range
+        "
+        );
     }
 }

@@ -55,6 +55,7 @@ pub use self::{
         // HasGenericParams, HasLoopBody,
         HasName,
         HasParamList,
+        HasWithClause,
         NameLike,
     },
 };

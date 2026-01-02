@@ -11,6 +11,13 @@ pub trait HasName: AstNode {
 
 pub trait NameLike: AstNode {}
 
+pub trait HasWithClause: AstNode {
+    #[inline]
+    fn with_clause(&self) -> Option<ast::WithClause> {
+        support::child(self.syntax())
+    }
+}
+
 pub trait HasArgList: AstNode {
     fn arg_list(&self) -> Option<ast::ArgList> {
         support::child(self.syntax())
