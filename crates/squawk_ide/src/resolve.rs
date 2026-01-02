@@ -37,6 +37,7 @@ enum NameRefContext {
     UpdateSetColumn,
     UpdateFromTable,
     SchemaQualifier,
+    TypeReference,
 }
 
 pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
@@ -83,10 +84,28 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_index(binder, &index_name, &schema, position)
         }
-        NameRefContext::DropType => {
-            let path = find_containing_path(name_ref)?;
-            let type_name = extract_table_name(&path)?;
-            let schema = extract_schema_name(&path);
+        NameRefContext::DropType | NameRefContext::TypeReference => {
+            let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
+                && let Some(field_expr) = ast::FieldExpr::cast(parent)
+                && field_expr
+                    .field()
+                    .is_some_and(|field| field.syntax() == name_ref.syntax())
+            {
+                let type_name = Name::from_node(name_ref);
+                let schema = if let Some(base) = field_expr.base()
+                    && let ast::Expr::NameRef(schema_name_ref) = base
+                {
+                    Some(Schema(Name::from_node(&schema_name_ref)))
+                } else {
+                    None
+                };
+                (type_name, schema)
+            } else {
+                let path = find_containing_path(name_ref)?;
+                let type_name = extract_table_name(&path)?;
+                let schema = extract_schema_name(&path);
+                (type_name, schema)
+            };
             let position = name_ref.syntax().text_range().start();
             resolve_type(binder, &type_name, &schema, position)
         }
@@ -307,11 +326,18 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
             .is_some();
 
         let mut in_from_clause = false;
+        let mut in_cast_expr = false;
         for ancestor in parent.ancestors() {
+            if ast::CastExpr::can_cast(ancestor.kind()) {
+                in_cast_expr = true;
+            }
             if ast::FromClause::can_cast(ancestor.kind()) {
                 in_from_clause = true;
             }
             if ast::Select::can_cast(ancestor.kind()) && !in_from_clause {
+                if in_cast_expr {
+                    return Some(NameRefContext::TypeReference);
+                }
                 if is_base_of_outer_field_expr {
                     return Some(NameRefContext::SelectQualifiedColumnTable);
                 } else if let Some(base) = field_expr.base()
@@ -337,7 +363,11 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         return Some(NameRefContext::SchemaQualifier);
     }
 
+    let mut in_type = false;
     for ancestor in name_ref.syntax().ancestors() {
+        if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
+            in_type = true;
+        }
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropTable);
         }
@@ -349,6 +379,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         }
         if ast::DropType::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropType);
+        }
+        if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
+            return Some(NameRefContext::TypeReference);
         }
         if ast::DropFunction::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropFunction);

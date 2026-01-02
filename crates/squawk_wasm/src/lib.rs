@@ -396,6 +396,7 @@ fn convert_document_symbol(
             squawk_ide::document_symbols::DocumentSymbolKind::Function => "function",
             squawk_ide::document_symbols::DocumentSymbolKind::Type => "type",
             squawk_ide::document_symbols::DocumentSymbolKind::Column => "column",
+            squawk_ide::document_symbols::DocumentSymbolKind::Variant => "variant",
         }
         .to_string(),
         start_line: full_start_wide.line,

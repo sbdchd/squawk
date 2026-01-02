@@ -339,6 +339,7 @@ fn handle_document_symbol(
                 DocumentSymbolKind::Function => SymbolKind::FUNCTION,
                 DocumentSymbolKind::Type => SymbolKind::CLASS,
                 DocumentSymbolKind::Column => SymbolKind::FIELD,
+                DocumentSymbolKind::Variant => SymbolKind::ENUM_MEMBER,
             },
             tags: None,
             range,

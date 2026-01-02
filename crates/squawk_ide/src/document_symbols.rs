@@ -1,7 +1,7 @@
 use rowan::TextRange;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::binder;
+use crate::binder::{self, extract_string_literal};
 use crate::resolve::{resolve_function_info, resolve_table_info, resolve_type_info};
 
 #[derive(Debug)]
@@ -10,6 +10,7 @@ pub enum DocumentSymbolKind {
     Function,
     Type,
     Column,
+    Variant,
 }
 
 #[derive(Debug)]
@@ -126,13 +127,28 @@ fn create_type_symbol(
     let full_range = create_type.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
+    let mut children = vec![];
+    if let Some(variant_list) = create_type.variant_list() {
+        for variant in variant_list.variants() {
+            if let Some(variant_symbol) = create_variant_symbol(variant) {
+                children.push(variant_symbol);
+            }
+        }
+    } else if let Some(column_list) = create_type.column_list() {
+        for column in column_list.columns() {
+            if let Some(column_symbol) = create_column_symbol(column) {
+                children.push(column_symbol);
+            }
+        }
+    }
+
     Some(DocumentSymbol {
         name,
         detail: None,
         kind: DocumentSymbolKind::Type,
         full_range,
         focus_range,
-        children: vec![],
+        children,
     })
 }
 
@@ -149,6 +165,23 @@ fn create_column_symbol(column: ast::Column) -> Option<DocumentSymbol> {
         name,
         detail,
         kind: DocumentSymbolKind::Column,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_variant_symbol(variant: ast::Variant) -> Option<DocumentSymbol> {
+    let literal = variant.literal()?;
+    let name = extract_string_literal(&literal)?;
+
+    let full_range = variant.syntax().text_range();
+    let focus_range = literal.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Variant,
         full_range,
         focus_range,
         children: vec![],
@@ -197,6 +230,7 @@ mod tests {
             DocumentSymbolKind::Function => "function",
             DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Column => "column",
+            DocumentSymbolKind::Variant => "variant",
         };
 
         let title = if let Some(detail) = &symbol.detail {
@@ -227,10 +261,14 @@ mod tests {
                 .map(|child| {
                     let kind = match child.kind {
                         DocumentSymbolKind::Column => "column",
-                        _ => unreachable!("only columns can be children"),
+                        DocumentSymbolKind::Variant => "variant",
+                        _ => unreachable!("only columns and variants can be children"),
                     };
-                    let detail = &child.detail.as_ref().unwrap();
-                    format!("{}: {} {}", kind, child.name, detail)
+                    if let Some(detail) = &child.detail {
+                        format!("{}: {} {}", kind, child.name, detail)
+                    } else {
+                        format!("{}: {}", kind, child.name)
+                    }
                 })
                 .collect();
 
@@ -392,7 +430,16 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
           │ ┬───────────┯━━━━━───────────────────────────────
           │ │           │
           │ │           focus range
-          ╰╴full range
+          │ full range
+          │
+          ⸬  
+        1 │ create type status as enum ('active', 'inactive');
+          │                             ┯━━━━━━━  ┯━━━━━━━━━
+          │                             │         │
+          │                             │         full range for `variant: inactive`
+          │                             │         focus range
+          │                             full range for `variant: active`
+          ╰╴                            focus range
         "
         );
     }
@@ -408,7 +455,43 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
           │ ┬───────────┯━━━━━────────────────────────
           │ │           │
           │ │           focus range
-          ╰╴full range
+          │ full range
+          │
+          ⸬  
+        1 │ create type person as (name text, age int);
+          │                        ┯━━━─────  ┯━━────
+          │                        │          │
+          │                        │          full range for `column: age int`
+          │                        │          focus range
+          │                        full range for `column: name text`
+          ╰╴                       focus range
+        "
+        );
+    }
+
+    #[test]
+    fn create_type_composite_multiple_columns() {
+        assert_snapshot!(
+            symbols("create type address as (street text, city text, zip varchar(10));"),
+            @r"
+        info: type: public.address
+          ╭▸ 
+        1 │ create type address as (street text, city text, zip varchar(10));
+          │ ┬───────────┯━━━━━━─────────────────────────────────────────────
+          │ │           │
+          │ │           focus range
+          │ full range
+          │
+          ⸬  
+        1 │ create type address as (street text, city text, zip varchar(10));
+          │                         ┯━━━━━─────  ┯━━━─────  ┯━━────────────
+          │                         │            │          │
+          │                         │            │          full range for `column: zip varchar(10)`
+          │                         │            │          focus range
+          │                         │            full range for `column: city text`
+          │                         │            focus range
+          │                         full range for `column: street text`
+          ╰╴                        focus range
         "
         );
     }
@@ -424,7 +507,45 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
           │ ┬────────────────────┯━━━━━───────────────────────────────
           │ │                    │
           │ │                    focus range
-          ╰╴full range
+          │ full range
+          │
+          ⸬  
+        1 │ create type myschema.status as enum ('active', 'inactive');
+          │                                      ┯━━━━━━━  ┯━━━━━━━━━
+          │                                      │         │
+          │                                      │         full range for `variant: inactive`
+          │                                      │         focus range
+          │                                      full range for `variant: active`
+          ╰╴                                     focus range
+        "
+        );
+    }
+
+    #[test]
+    fn create_type_enum_multiple_variants() {
+        assert_snapshot!(
+            symbols("create type priority as enum ('low', 'medium', 'high', 'urgent');"),
+            @r"
+        info: type: public.priority
+          ╭▸ 
+        1 │ create type priority as enum ('low', 'medium', 'high', 'urgent');
+          │ ┬───────────┯━━━━━━━────────────────────────────────────────────
+          │ │           │
+          │ │           focus range
+          │ full range
+          │
+          ⸬  
+        1 │ create type priority as enum ('low', 'medium', 'high', 'urgent');
+          │                               ┯━━━━  ┯━━━━━━━  ┯━━━━━  ┯━━━━━━━
+          │                               │      │         │       │
+          │                               │      │         │       full range for `variant: urgent`
+          │                               │      │         │       focus range
+          │                               │      │         full range for `variant: high`
+          │                               │      │         focus range
+          │                               │      full range for `variant: medium`
+          │                               │      focus range
+          │                               full range for `variant: low`
+          ╰╴                              focus range
         "
         );
     }

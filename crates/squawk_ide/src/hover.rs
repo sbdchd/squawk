@@ -16,6 +16,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             return hover_column(file, &name_ref, &binder);
         }
 
+        if is_type_ref(&name_ref) {
+            return hover_type(file, &name_ref, &binder);
+        }
+
         if is_select_column(&name_ref) {
             // Try hover as column first
             if let Some(result) = hover_column(file, &name_ref, &binder) {
@@ -43,10 +47,6 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
         if is_index_ref(&name_ref) {
             return hover_index(file, &name_ref, &binder);
-        }
-
-        if is_type_ref(&name_ref) {
-            return hover_type(file, &name_ref, &binder);
         }
 
         if is_function_ref(&name_ref) {
@@ -461,8 +461,15 @@ fn is_index_ref(name_ref: &ast::NameRef) -> bool {
 }
 
 fn is_type_ref(name_ref: &ast::NameRef) -> bool {
+    let mut in_type = false;
     for ancestor in name_ref.syntax().ancestors() {
+        if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
+            in_type = true;
+        }
         if ast::DropType::can_cast(ancestor.kind()) {
+            return true;
+        }
+        if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
             return true;
         }
     }
@@ -1339,6 +1346,45 @@ drop type int4_range$0;
           ╭▸ 
         3 │ drop type int4_range;
           ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cast_operator() {
+        assert_snapshot!(check_hover("
+create type foo as enum ('a', 'b');
+select x::foo$0;
+"), @r"
+        hover: type public.foo as enum ('a', 'b')
+          ╭▸ 
+        3 │ select x::foo;
+          ╰╴            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cast_function() {
+        assert_snapshot!(check_hover("
+create type bar as enum ('x', 'y');
+select cast(x as bar$0);
+"), @r"
+        hover: type public.bar as enum ('x', 'y')
+          ╭▸ 
+        3 │ select cast(x as bar);
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cast_with_schema() {
+        assert_snapshot!(check_hover("
+create type myschema.baz as enum ('m', 'n');
+select x::myschema.baz$0;
+"), @r"
+        hover: type myschema.baz as enum ('m', 'n')
+          ╭▸ 
+        3 │ select x::myschema.baz;
+          ╰╴                     ─ hover
         ");
     }
 

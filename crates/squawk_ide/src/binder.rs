@@ -375,7 +375,7 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
     }
 }
 
-fn extract_string_literal(literal: &ast::Literal) -> Option<String> {
+pub(crate) fn extract_string_literal(literal: &ast::Literal) -> Option<String> {
     let text = literal.syntax().text().to_string();
 
     if text.starts_with('\'') && text.ends_with('\'') && text.len() >= 2 {
