@@ -51,6 +51,7 @@ pub(crate) enum SymbolKind {
     Procedure,
     Schema,
     Type,
+    View,
 }
 
 #[derive(Clone, Debug)]

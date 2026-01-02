@@ -11293,7 +11293,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(VIEW_KW);
     path_name(p);
     // [ ( column_name [, ...] ) ]
-    opt_column_list(p);
+    opt_column_list_with(p, ColumnDefKind::Name);
     // [ WITH ( view_option_name [= view_option_value] [, ... ] ) ]
     // TODO: this can be more specific
     opt_with_params(p);

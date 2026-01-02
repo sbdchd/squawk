@@ -15,6 +15,7 @@ enum NameRefContext {
     Table,
     DropIndex,
     DropType,
+    DropView,
     DropFunction,
     DropAggregate,
     DropProcedure,
@@ -75,7 +76,12 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             }
 
             let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position)
+
+            if let Some(ptr) = resolve_table(binder, &table_name, &schema, position) {
+                return Some(ptr);
+            }
+
+            resolve_view(binder, &table_name, &schema, position)
         }
         NameRefContext::DropIndex => {
             let path = find_containing_path(name_ref)?;
@@ -108,6 +114,13 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             };
             let position = name_ref.syntax().text_range().start();
             resolve_type(binder, &type_name, &schema, position)
+        }
+        NameRefContext::DropView => {
+            let path = find_containing_path(name_ref)?;
+            let view_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_view(binder, &view_name, &schema, position)
         }
         NameRefContext::DropFunction => {
             let function_sig = name_ref
@@ -255,7 +268,12 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             }
 
             let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position)
+
+            if let Some(ptr) = resolve_table(binder, &table_name, &schema, position) {
+                return Some(ptr);
+            }
+
+            resolve_view(binder, &table_name, &schema, position)
         }
     }
 }
@@ -380,6 +398,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         if ast::DropType::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropType);
         }
+        if ast::DropView::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::DropView);
+        }
         if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
             return Some(NameRefContext::TypeReference);
         }
@@ -493,6 +514,15 @@ fn resolve_type(
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     resolve_for_kind(binder, type_name, schema, position, SymbolKind::Type)
+}
+
+fn resolve_view(
+    binder: &Binder,
+    view_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    resolve_for_kind(binder, view_name, schema, position, SymbolKind::View)
 }
 
 fn resolve_for_kind(
@@ -739,6 +769,7 @@ fn resolve_select_qualified_column_table(
     resolve_table(binder, &table_name, &schema, position)
 }
 
+// TODO: this is similar to resolve_from_item_for_column, maybe we can simplify
 fn resolve_select_qualified_column(
     binder: &Binder,
     name_ref: &ast::NameRef,
@@ -843,23 +874,36 @@ fn resolve_select_qualified_column(
         }
     };
 
-    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
-
     let root = &name_ref.syntax().ancestors().last()?;
-    let table_name_node = table_ptr.to_node(root);
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTable::cast)?;
 
-    // 1. Try to find a matching column (columns take precedence)
+    if let Some(table_ptr) = resolve_table(binder, &table_name, &schema, position) {
+        let table_name_node = table_ptr.to_node(root);
 
-    if let Some(ptr) = find_column_in_create_table(&create_table, &column_name) {
-        return Some(ptr);
+        if let Some(create_table) = table_name_node.ancestors().find_map(ast::CreateTable::cast) {
+            // 1. Try to find a matching column (columns take precedence)
+            if let Some(ptr) = find_column_in_create_table(&create_table, &column_name) {
+                return Some(ptr);
+            }
+            // 2. No column found, check for field-style function call
+            // e.g., select t.b from t where b is a function that takes t as an argument
+            return resolve_function(binder, &column_name, &schema, None, position);
+        }
     }
 
-    // 2. No column found, check for field-style function call
-    // e.g., select t.b from t where b is a function that takes t as an argument
-    resolve_function(binder, &column_name, &schema, None, position)
+    // ditto as above but with views
+    if let Some(view_ptr) = resolve_view(binder, &table_name, &schema, position) {
+        let view_name_node = view_ptr.to_node(root);
+
+        if let Some(create_view) = view_name_node.ancestors().find_map(ast::CreateView::cast) {
+            if let Some(ptr) = find_column_in_create_view(&create_view, &column_name) {
+                return Some(ptr);
+            }
+
+            return resolve_function(binder, &column_name, &schema, None, position);
+        }
+    }
+
+    None
 }
 
 fn resolve_from_item_for_column(
@@ -895,26 +939,42 @@ fn resolve_from_item_for_column(
     }
 
     let position = name_ref.syntax().text_range().start();
-    let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
-
     let root = &name_ref.syntax().ancestors().last()?;
-    let table_name_node = table_ptr.to_node(root);
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTable::cast)?;
-    // 1. try to find a matching column
-    if let Some(ptr) = find_column_in_create_table(&create_table, &column_name) {
-        return Some(ptr);
+
+    if let Some(table_ptr) = resolve_table(binder, &table_name, &schema, position) {
+        let table_name_node = table_ptr.to_node(root);
+
+        if let Some(create_table) = table_name_node.ancestors().find_map(ast::CreateTable::cast) {
+            // 1. try to find a matching column
+            if let Some(ptr) = find_column_in_create_table(&create_table, &column_name) {
+                return Some(ptr);
+            }
+
+            // 2. No column found, check if the name matches the table name.
+            // For example, in:
+            // ```sql
+            // create table t(a int);
+            // select t from t;
+            // ```
+            if column_name == table_name {
+                return Some(table_ptr);
+            }
+        }
     }
 
-    // 2. No column found, check if the name matches the table name.
-    // For example, in:
-    // ```sql
-    // create table t(a int);
-    // select t from t;
-    // ```
-    if column_name == table_name {
-        return Some(table_ptr);
+    // ditto as above but with view
+    if let Some(view_ptr) = resolve_view(binder, &table_name, &schema, position) {
+        let view_name_node = view_ptr.to_node(root);
+
+        if let Some(create_view) = view_name_node.ancestors().find_map(ast::CreateView::cast) {
+            if let Some(ptr) = find_column_in_create_view(&create_view, &column_name) {
+                return Some(ptr);
+            }
+
+            if column_name == table_name {
+                return Some(view_ptr);
+            }
+        }
     }
 
     None
@@ -1184,6 +1244,54 @@ pub(crate) fn find_column_in_create_table(
             None
         }
     })
+}
+
+// TODO: this is similar to the CTE funcs, maybe we can simplify
+fn find_column_in_create_view(
+    create_view: &ast::CreateView,
+    column_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    let column_list_len = if let Some(column_list) = create_view.column_list() {
+        for column in column_list.columns() {
+            if let Some(col_name) = column.name()
+                && Name::from_node(&col_name) == *column_name
+            {
+                return Some(SyntaxNodePtr::new(col_name.syntax()));
+            }
+        }
+        column_list.columns().count()
+    } else {
+        0
+    };
+
+    let query = create_view.query()?;
+    let select = match query {
+        ast::SelectVariant::Select(s) => s,
+        ast::SelectVariant::ParenSelect(ps) => match ps.select()? {
+            ast::SelectVariant::Select(s) => s,
+            _ => return None,
+        },
+        _ => return None,
+    };
+
+    let select_clause = select.select_clause()?;
+    let target_list = select_clause.target_list()?;
+
+    for (idx, target) in target_list.targets().enumerate() {
+        if idx < column_list_len {
+            continue;
+        }
+
+        if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
+            if let Some(col_name_str) = col_name.to_string()
+                && Name::from_string(col_name_str) == *column_name
+            {
+                return Some(SyntaxNodePtr::new(&node));
+            }
+        }
+    }
+
+    None
 }
 
 fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
