@@ -45,6 +45,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             return hover_index(file, &name_ref, &binder);
         }
 
+        if is_type_ref(&name_ref) {
+            return hover_type(file, &name_ref, &binder);
+        }
+
         if is_function_ref(&name_ref) {
             return hover_function(file, &name_ref, &binder);
         }
@@ -96,6 +100,10 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
         if let Some(create_index) = name.syntax().ancestors().find_map(ast::CreateIndex::cast) {
             return format_create_index(&create_index, &binder);
+        }
+
+        if let Some(create_type) = name.syntax().ancestors().find_map(ast::CreateType::cast) {
+            return format_create_type(&create_type, &binder);
         }
 
         if let Some(create_function) = name
@@ -249,6 +257,21 @@ fn hover_index(
     format_create_index(&create_index, binder)
 }
 
+fn hover_type(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let type_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+
+    let root = file.syntax();
+    let type_name_node = type_ptr.to_node(root);
+
+    let create_type = type_name_node.ancestors().find_map(ast::CreateType::cast)?;
+
+    format_create_type(&create_type, binder)
+}
+
 // Insert inferred schema into the create table hover info
 fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder) -> Option<String> {
     let path = create_table.path()?;
@@ -303,6 +326,44 @@ fn format_create_index(create_index: &ast::CreateIndex, binder: &binder::Binder)
 
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
     let position = create_index.syntax().text_range().start();
+    let search_path = binder.search_path_at(position);
+    search_path.first().map(|s| s.to_string())
+}
+
+fn format_create_type(create_type: &ast::CreateType, binder: &binder::Binder) -> Option<String> {
+    let path = create_type.path()?;
+    let segment = path.segment()?;
+    let type_name = segment.name()?.syntax().text().to_string();
+
+    let schema = if let Some(qualifier) = path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        type_schema(create_type, binder)?
+    };
+
+    if let Some(variant_list) = create_type.variant_list() {
+        let variants = variant_list.syntax().text().to_string();
+        return Some(format!(
+            "type {}.{} as enum {}",
+            schema, type_name, variants
+        ));
+    }
+
+    if let Some(column_list) = create_type.column_list() {
+        let columns = column_list.syntax().text().to_string();
+        return Some(format!("type {}.{} as {}", schema, type_name, columns));
+    }
+
+    if let Some(attribute_list) = create_type.attribute_list() {
+        let attributes = attribute_list.syntax().text().to_string();
+        return Some(format!("type {}.{} {}", schema, type_name, attributes));
+    }
+
+    Some(format!("type {}.{}", schema, type_name))
+}
+
+fn type_schema(create_type: &ast::CreateType, binder: &binder::Binder) -> Option<String> {
+    let position = create_type.syntax().text_range().start();
     let search_path = binder.search_path_at(position);
     search_path.first().map(|s| s.to_string())
 }
@@ -393,6 +454,15 @@ fn is_table_ref(name_ref: &ast::NameRef) -> bool {
 fn is_index_ref(name_ref: &ast::NameRef) -> bool {
     for ancestor in name_ref.syntax().ancestors() {
         if ast::DropIndex::can_cast(ancestor.kind()) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_type_ref(name_ref: &ast::NameRef) -> bool {
+    for ancestor in name_ref.syntax().ancestors() {
+        if ast::DropType::can_cast(ancestor.kind()) {
             return true;
         }
     }
@@ -1169,6 +1239,106 @@ drop index idx_x$0;
           ╭▸ 
         4 │ drop index idx_x;
           ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_type_definition() {
+        assert_snapshot!(check_hover("
+create type status$0 as enum ('active', 'inactive');
+"), @r"
+        hover: type public.status as enum ('active', 'inactive')
+          ╭▸ 
+        2 │ create type status as enum ('active', 'inactive');
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_type_definition_with_schema() {
+        assert_snapshot!(check_hover("
+create type myschema.status$0 as enum ('active', 'inactive');
+"), @r"
+        hover: type myschema.status as enum ('active', 'inactive')
+          ╭▸ 
+        2 │ create type myschema.status as enum ('active', 'inactive');
+          ╰╴                          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_type() {
+        assert_snapshot!(check_hover("
+create type status as enum ('active', 'inactive');
+drop type status$0;
+"), @r"
+        hover: type public.status as enum ('active', 'inactive')
+          ╭▸ 
+        3 │ drop type status;
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_type_with_schema() {
+        assert_snapshot!(check_hover("
+create type myschema.status as enum ('active', 'inactive');
+drop type myschema.status$0;
+"), @r"
+        hover: type myschema.status as enum ('active', 'inactive')
+          ╭▸ 
+        3 │ drop type myschema.status;
+          ╰╴                        ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_type_composite() {
+        assert_snapshot!(check_hover("
+create type person$0 as (name text, age int);
+"), @r"
+        hover: type public.person as (name text, age int)
+          ╭▸ 
+        2 │ create type person as (name text, age int);
+          ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_type_composite() {
+        assert_snapshot!(check_hover("
+create type person as (name text, age int);
+drop type person$0;
+"), @r"
+        hover: type public.person as (name text, age int)
+          ╭▸ 
+        3 │ drop type person;
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_type_range() {
+        assert_snapshot!(check_hover("
+create type int4_range$0 as range (subtype = int4);
+"), @r"
+        hover: type public.int4_range (subtype = int4)
+          ╭▸ 
+        2 │ create type int4_range as range (subtype = int4);
+          ╰╴                     ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_type_range() {
+        assert_snapshot!(check_hover("
+create type int4_range as range (subtype = int4);
+drop type int4_range$0;
+"), @r"
+        hover: type public.int4_range (subtype = int4)
+          ╭▸ 
+        3 │ drop type int4_range;
+          ╰╴                   ─ hover
         ");
     }
 

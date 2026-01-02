@@ -50,6 +50,7 @@ pub(crate) enum SymbolKind {
     Aggregate,
     Procedure,
     Schema,
+    Type,
 }
 
 #[derive(Clone, Debug)]

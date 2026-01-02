@@ -370,6 +370,94 @@ create table t();
     }
 
     #[test]
+    fn goto_drop_type() {
+        assert_snapshot!(goto("
+create type t as enum ('a', 'b');
+drop type t$0;
+"), @r"
+          ╭▸ 
+        2 │ create type t as enum ('a', 'b');
+          │             ─ 2. destination
+        3 │ drop type t;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_type_with_schema() {
+        assert_snapshot!(goto("
+create type public.t as enum ('a', 'b');
+drop type t$0;
+"), @r"
+          ╭▸ 
+        2 │ create type public.t as enum ('a', 'b');
+          │                    ─ 2. destination
+        3 │ drop type t;
+          ╰╴          ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create type foo.t as enum ('a', 'b');
+drop type foo.t$0;
+"), @r"
+          ╭▸ 
+        2 │ create type foo.t as enum ('a', 'b');
+          │                 ─ 2. destination
+        3 │ drop type foo.t;
+          ╰╴              ─ 1. source
+        ");
+
+        goto_not_found(
+            "
+create type t as enum ('a', 'b');
+drop type foo.t$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_drop_type_defined_after() {
+        assert_snapshot!(goto("
+drop type t$0;
+create type t as enum ('a', 'b');
+"), @r"
+          ╭▸ 
+        2 │ drop type t;
+          │           ─ 1. source
+        3 │ create type t as enum ('a', 'b');
+          ╰╴            ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_drop_type_composite() {
+        assert_snapshot!(goto("
+create type person as (name text, age int);
+drop type person$0;
+"), @r"
+          ╭▸ 
+        2 │ create type person as (name text, age int);
+          │             ────── 2. destination
+        3 │ drop type person;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_type_range() {
+        assert_snapshot!(goto("
+create type int4_range as range (subtype = int4);
+drop type int4_range$0;
+"), @r"
+          ╭▸ 
+        2 │ create type int4_range as range (subtype = int4);
+          │             ────────── 2. destination
+        3 │ drop type int4_range;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
     fn begin_to_rollback() {
         assert_snapshot!(goto(
             "

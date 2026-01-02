@@ -2,12 +2,13 @@ use rowan::TextRange;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder;
-use crate::resolve::{resolve_function_info, resolve_table_info};
+use crate::resolve::{resolve_function_info, resolve_table_info, resolve_type_info};
 
 #[derive(Debug)]
 pub enum DocumentSymbolKind {
     Table,
     Function,
+    Type,
     Column,
 }
 
@@ -37,6 +38,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateFunction(create_function) => {
                 if let Some(symbol) = create_function_symbol(&binder, create_function) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateType(create_type) => {
+                if let Some(symbol) = create_type_symbol(&binder, create_type) {
                     symbols.push(symbol);
                 }
             }
@@ -106,6 +112,30 @@ fn create_function_symbol(
     })
 }
 
+fn create_type_symbol(
+    binder: &binder::Binder,
+    create_type: ast::CreateType,
+) -> Option<DocumentSymbol> {
+    let path = create_type.path()?;
+    let segment = path.segment()?;
+    let name_node = segment.name()?;
+
+    let (schema, type_name) = resolve_type_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, type_name);
+
+    let full_range = create_type.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Type,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_column_symbol(column: ast::Column) -> Option<DocumentSymbol> {
     let name_node = column.name()?;
     let name = name_node.syntax().text().to_string();
@@ -165,6 +195,7 @@ mod tests {
         let kind = match symbol.kind {
             DocumentSymbolKind::Table => "table",
             DocumentSymbolKind::Function => "function",
+            DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Column => "column",
         };
 
@@ -348,6 +379,54 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
           │ │                         focus range
           ╰╴full range
         ");
+    }
+
+    #[test]
+    fn create_type() {
+        assert_snapshot!(
+            symbols("create type status as enum ('active', 'inactive');"),
+            @r"
+        info: type: public.status
+          ╭▸ 
+        1 │ create type status as enum ('active', 'inactive');
+          │ ┬───────────┯━━━━━───────────────────────────────
+          │ │           │
+          │ │           focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_type_composite() {
+        assert_snapshot!(
+            symbols("create type person as (name text, age int);"),
+            @r"
+        info: type: public.person
+          ╭▸ 
+        1 │ create type person as (name text, age int);
+          │ ┬───────────┯━━━━━────────────────────────
+          │ │           │
+          │ │           focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_type_with_schema() {
+        assert_snapshot!(
+            symbols("create type myschema.status as enum ('active', 'inactive');"),
+            @r"
+        info: type: myschema.status
+          ╭▸ 
+        1 │ create type myschema.status as enum ('active', 'inactive');
+          │ ┬────────────────────┯━━━━━───────────────────────────────
+          │ │                    │
+          │ │                    focus range
+          ╰╴full range
+        "
+        );
     }
 
     #[test]

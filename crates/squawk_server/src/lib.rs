@@ -337,6 +337,7 @@ fn handle_document_symbol(
             kind: match sym.kind {
                 DocumentSymbolKind::Table => SymbolKind::STRUCT,
                 DocumentSymbolKind::Function => SymbolKind::FUNCTION,
+                DocumentSymbolKind::Type => SymbolKind::CLASS,
                 DocumentSymbolKind::Column => SymbolKind::FIELD,
             },
             tags: None,
