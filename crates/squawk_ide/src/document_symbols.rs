@@ -2,13 +2,17 @@ use rowan::TextRange;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder::{self, extract_string_literal};
-use crate::resolve::{resolve_function_info, resolve_table_info, resolve_type_info};
+use crate::resolve::{
+    resolve_function_info, resolve_table_info, resolve_type_info, resolve_view_info,
+};
 
 #[derive(Debug)]
 pub enum DocumentSymbolKind {
     Table,
+    View,
     Function,
     Type,
+    Enum,
     Column,
     Variant,
 }
@@ -44,6 +48,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateType(create_type) => {
                 if let Some(symbol) = create_type_symbol(&binder, create_type) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateView(create_view) => {
+                if let Some(symbol) = create_view_symbol(&binder, create_view) {
                     symbols.push(symbol);
                 }
             }
@@ -142,6 +151,39 @@ fn create_table_symbol(
     })
 }
 
+fn create_view_symbol(
+    binder: &binder::Binder,
+    create_view: ast::CreateView,
+) -> Option<DocumentSymbol> {
+    let path = create_view.path()?;
+    let segment = path.segment()?;
+    let name_node = segment.name()?;
+
+    let (schema, view_name) = resolve_view_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, view_name);
+
+    let full_range = create_view.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    let mut children = vec![];
+    if let Some(column_list) = create_view.column_list() {
+        for column in column_list.columns() {
+            if let Some(column_symbol) = create_column_symbol(column) {
+                children.push(column_symbol);
+            }
+        }
+    }
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::View,
+        full_range,
+        focus_range,
+        children,
+    })
+}
+
 fn create_function_symbol(
     binder: &binder::Binder,
     create_function: ast::CreateFunction,
@@ -198,7 +240,11 @@ fn create_type_symbol(
     Some(DocumentSymbol {
         name,
         detail: None,
-        kind: DocumentSymbolKind::Type,
+        kind: if create_type.variant_list().is_some() {
+            DocumentSymbolKind::Enum
+        } else {
+            DocumentSymbolKind::Type
+        },
         full_range,
         focus_range,
         children,
@@ -280,8 +326,10 @@ mod tests {
     fn symbol_to_group<'a>(symbol: &DocumentSymbol, sql: &'a str) -> Group<'a> {
         let kind = match symbol.kind {
             DocumentSymbolKind::Table => "table",
+            DocumentSymbolKind::View => "view",
             DocumentSymbolKind::Function => "function",
             DocumentSymbolKind::Type => "type",
+            DocumentSymbolKind::Enum => "enum",
             DocumentSymbolKind::Column => "column",
             DocumentSymbolKind::Variant => "variant",
         };
@@ -477,7 +525,7 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
         assert_snapshot!(
             symbols("create type status as enum ('active', 'inactive');"),
             @r"
-        info: type: public.status
+        info: enum: public.status
           ╭▸ 
         1 │ create type status as enum ('active', 'inactive');
           │ ┬───────────┯━━━━━───────────────────────────────
@@ -554,7 +602,7 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
         assert_snapshot!(
             symbols("create type myschema.status as enum ('active', 'inactive');"),
             @r"
-        info: type: myschema.status
+        info: enum: myschema.status
           ╭▸ 
         1 │ create type myschema.status as enum ('active', 'inactive');
           │ ┬────────────────────┯━━━━━───────────────────────────────
@@ -579,7 +627,7 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
         assert_snapshot!(
             symbols("create type priority as enum ('low', 'medium', 'high', 'urgent');"),
             @r"
-        info: type: public.priority
+        info: enum: public.priority
           ╭▸ 
         1 │ create type priority as enum ('low', 'medium', 'high', 'urgent');
           │ ┬───────────┯━━━━━━━────────────────────────────────────────────
