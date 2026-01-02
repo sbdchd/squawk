@@ -1511,6 +1511,10 @@ pub(crate) fn resolve_type_info(binder: &Binder, path: &ast::Path) -> Option<(Sc
     resolve_symbol_info(binder, path, SymbolKind::Type)
 }
 
+pub(crate) fn resolve_view_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
+    resolve_symbol_info(binder, path, SymbolKind::View)
+}
+
 fn resolve_symbol_info(
     binder: &Binder,
     path: &ast::Path,
