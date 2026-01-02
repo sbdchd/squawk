@@ -143,6 +143,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
             in_type = true;
         }
+        if in_type {
+            return Some(NameRefClass::TypeReference);
+        }
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTable);
         }
