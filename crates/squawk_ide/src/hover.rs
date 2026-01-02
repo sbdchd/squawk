@@ -1,3 +1,4 @@
+use crate::classify::{NameClass, NameRefClass, classify_name, classify_name_ref};
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use crate::{binder, symbols::Name};
@@ -10,145 +11,97 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
     let binder = binder::bind(file);
 
-    // TODO: can we use the classify_name_ref_context function from goto def here?
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        if is_column_ref(&name_ref) {
-            return hover_column(file, &name_ref, &binder);
-        }
-
-        if is_type_ref(&name_ref) {
-            return hover_type(file, &name_ref, &binder);
-        }
-
-        if is_select_column(&name_ref) {
-            // Try hover as column first
-            if let Some(result) = hover_column(file, &name_ref, &binder) {
-                return Some(result);
+        let context = classify_name_ref(&name_ref)?;
+        match context {
+            NameRefClass::CreateIndexColumn
+            | NameRefClass::InsertColumn
+            | NameRefClass::DeleteWhereColumn
+            | NameRefClass::UpdateWhereColumn
+            | NameRefClass::UpdateSetColumn => return hover_column(file, &name_ref, &binder),
+            NameRefClass::TypeReference | NameRefClass::DropType => {
+                return hover_type(file, &name_ref, &binder);
             }
-            // If no column, try as function (handles field-style function calls like `t.b`)
-            if let Some(result) = hover_function(file, &name_ref, &binder) {
-                return Some(result);
+            NameRefClass::SelectColumn | NameRefClass::SelectQualifiedColumn => {
+                // Try hover as column first
+                if let Some(result) = hover_column(file, &name_ref, &binder) {
+                    return Some(result);
+                }
+                // If no column, try as function (handles field-style function calls like `t.b`)
+                if let Some(result) = hover_function(file, &name_ref, &binder) {
+                    return Some(result);
+                }
+                // Finally try as table (handles case like `select t from t;` where t is the table)
+                return hover_table(file, &name_ref, &binder);
             }
-            // Finally try as table (handles case like `select t from t;` where t is the table)
-            return hover_table(file, &name_ref, &binder);
-        }
-
-        if is_table_ref(&name_ref) {
-            return hover_table(file, &name_ref, &binder);
-        }
-
-        if is_select_from_table(&name_ref) {
-            return hover_table(file, &name_ref, &binder);
-        }
-
-        if is_update_from_table(&name_ref) {
-            return hover_table(file, &name_ref, &binder);
-        }
-
-        if is_index_ref(&name_ref) {
-            return hover_index(file, &name_ref, &binder);
-        }
-
-        if is_function_ref(&name_ref) {
-            return hover_function(file, &name_ref, &binder);
-        }
-
-        if is_aggregate_ref(&name_ref) {
-            return hover_aggregate(file, &name_ref, &binder);
-        }
-
-        if is_procedure_ref(&name_ref) {
-            return hover_procedure(file, &name_ref, &binder);
-        }
-
-        if is_routine_ref(&name_ref) {
-            return hover_routine(file, &name_ref, &binder);
-        }
-
-        if is_call_procedure(&name_ref) {
-            return hover_procedure(file, &name_ref, &binder);
-        }
-
-        if is_select_function_call(&name_ref) {
-            // Try function first, but fall back to column if no function found
-            // (handles function-call-style column access like `select a(t)`)
-            if let Some(result) = hover_function(file, &name_ref, &binder) {
-                return Some(result);
+            NameRefClass::Table
+            | NameRefClass::DropTable
+            | NameRefClass::DropView
+            | NameRefClass::CreateIndex
+            | NameRefClass::InsertTable
+            | NameRefClass::DeleteTable
+            | NameRefClass::UpdateTable
+            | NameRefClass::SelectFromTable
+            | NameRefClass::UpdateFromTable
+            | NameRefClass::SelectQualifiedColumnTable => {
+                return hover_table(file, &name_ref, &binder);
             }
-            return hover_column(file, &name_ref, &binder);
-        }
-
-        if is_schema_ref(&name_ref) {
-            return hover_schema(file, &name_ref, &binder);
+            NameRefClass::DropIndex => return hover_index(file, &name_ref, &binder),
+            NameRefClass::DropFunction => return hover_function(file, &name_ref, &binder),
+            NameRefClass::DropAggregate => return hover_aggregate(file, &name_ref, &binder),
+            NameRefClass::DropProcedure | NameRefClass::CallProcedure => {
+                return hover_procedure(file, &name_ref, &binder);
+            }
+            NameRefClass::DropRoutine => return hover_routine(file, &name_ref, &binder),
+            NameRefClass::SelectFunctionCall => {
+                // Try function first, but fall back to column if no function found
+                // (handles function-call-style column access like `select a(t)`)
+                if let Some(result) = hover_function(file, &name_ref, &binder) {
+                    return Some(result);
+                }
+                return hover_column(file, &name_ref, &binder);
+            }
+            NameRefClass::SchemaQualifier | NameRefClass::DropSchema => {
+                return hover_schema(file, &name_ref, &binder);
+            }
         }
     }
 
     if let Some(name) = ast::Name::cast(parent) {
-        if let Some(column) = name.syntax().parent().and_then(ast::Column::cast)
-            && let Some(create_table) = column.syntax().ancestors().find_map(ast::CreateTable::cast)
-        {
-            return hover_column_definition(&create_table, &column, &binder);
-        }
-
-        if let Some(create_table) = name.syntax().ancestors().find_map(ast::CreateTable::cast) {
-            return format_create_table(&create_table, &binder);
-        }
-
-        if let Some(with_table) = name.syntax().parent().and_then(ast::WithTable::cast) {
-            return format_with_table(&with_table);
-        }
-
-        if let Some(create_index) = name.syntax().ancestors().find_map(ast::CreateIndex::cast) {
-            return format_create_index(&create_index, &binder);
-        }
-
-        if let Some(create_type) = name.syntax().ancestors().find_map(ast::CreateType::cast) {
-            return format_create_type(&create_type, &binder);
-        }
-
-        if let Some(create_function) = name
-            .syntax()
-            .ancestors()
-            .find_map(ast::CreateFunction::cast)
-        {
-            return format_create_function(&create_function, &binder);
-        }
-
-        if let Some(create_aggregate) = name
-            .syntax()
-            .ancestors()
-            .find_map(ast::CreateAggregate::cast)
-        {
-            return format_create_aggregate(&create_aggregate, &binder);
-        }
-
-        if let Some(create_procedure) = name
-            .syntax()
-            .ancestors()
-            .find_map(ast::CreateProcedure::cast)
-        {
-            return format_create_procedure(&create_procedure, &binder);
-        }
-
-        if let Some(create_schema) = name.syntax().ancestors().find_map(ast::CreateSchema::cast) {
-            return format_create_schema(&create_schema);
-        }
-
-        // create view t(x) as select 1;
-        //               ^
-        if let Some(column_list) = name.syntax().ancestors().find_map(ast::ColumnList::cast)
-            && let Some(create_view) = column_list
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateView::cast)
-        {
-            return format_view_column(&create_view, Name::from_node(&name), &binder);
-        }
-
-        // create view t as select 1;
-        //             ^
-        if let Some(create_view) = name.syntax().ancestors().find_map(ast::CreateView::cast) {
-            return format_create_view(&create_view, &binder);
+        let context = classify_name(&name)?;
+        match context {
+            NameClass::ColumnDefinition {
+                create_table,
+                column,
+            } => return hover_column_definition(&create_table, &column, &binder),
+            NameClass::CreateTable(create_table) => {
+                return format_create_table(&create_table, &binder);
+            }
+            NameClass::WithTable(with_table) => return format_with_table(&with_table),
+            NameClass::CreateIndex(create_index) => {
+                return format_create_index(&create_index, &binder);
+            }
+            NameClass::CreateType(create_type) => {
+                return format_create_type(&create_type, &binder);
+            }
+            NameClass::CreateFunction(create_function) => {
+                return format_create_function(&create_function, &binder);
+            }
+            NameClass::CreateAggregate(create_aggregate) => {
+                return format_create_aggregate(&create_aggregate, &binder);
+            }
+            NameClass::CreateProcedure(create_procedure) => {
+                return format_create_procedure(&create_procedure, &binder);
+            }
+            NameClass::CreateSchema(create_schema) => {
+                return format_create_schema(&create_schema);
+            }
+            NameClass::ViewColumnList { create_view, name } => {
+                return format_view_column(&create_view, Name::from_node(&name), &binder);
+            }
+            NameClass::CreateView(create_view) => {
+                return format_create_view(&create_view, &binder);
+            }
         }
     }
 
@@ -453,248 +406,6 @@ fn type_schema(create_type: &ast::CreateType, binder: &binder::Binder) -> Option
     let position = create_type.syntax().text_range().start();
     let search_path = binder.search_path_at(position);
     search_path.first().map(|s| s.to_string())
-}
-
-fn is_column_ref(name_ref: &ast::NameRef) -> bool {
-    let mut in_partition_item = false;
-    let mut in_column_list = false;
-    let mut in_where_clause = false;
-    let mut in_set_clause = false;
-
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::PartitionItem::can_cast(ancestor.kind()) {
-            in_partition_item = true;
-        }
-        if ast::CreateIndex::can_cast(ancestor.kind()) {
-            return in_partition_item;
-        }
-        if ast::ColumnList::can_cast(ancestor.kind()) {
-            in_column_list = true;
-        }
-        if ast::Insert::can_cast(ancestor.kind()) {
-            return in_column_list;
-        }
-        if ast::WhereClause::can_cast(ancestor.kind()) {
-            in_where_clause = true;
-        }
-        if ast::SetClause::can_cast(ancestor.kind()) {
-            in_set_clause = true;
-        }
-        if ast::Delete::can_cast(ancestor.kind()) {
-            return in_where_clause;
-        }
-        if ast::Update::can_cast(ancestor.kind()) {
-            return in_where_clause || in_set_clause;
-        }
-    }
-    false
-}
-
-fn is_table_ref(name_ref: &ast::NameRef) -> bool {
-    let mut in_partition_item = false;
-    let mut in_column_list = false;
-    let mut in_where_clause = false;
-    let mut in_set_clause = false;
-    let mut in_from_clause = false;
-
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::DropTable::can_cast(ancestor.kind()) {
-            return true;
-        }
-        if ast::DropView::can_cast(ancestor.kind()) {
-            return true;
-        }
-        if ast::Table::can_cast(ancestor.kind()) {
-            return true;
-        }
-        if ast::ColumnList::can_cast(ancestor.kind()) {
-            in_column_list = true;
-        }
-        if ast::Insert::can_cast(ancestor.kind()) {
-            return !in_column_list;
-        }
-        if ast::WhereClause::can_cast(ancestor.kind()) {
-            in_where_clause = true;
-        }
-        if ast::SetClause::can_cast(ancestor.kind()) {
-            in_set_clause = true;
-        }
-        if ast::FromClause::can_cast(ancestor.kind()) {
-            in_from_clause = true;
-        }
-        if ast::Delete::can_cast(ancestor.kind()) {
-            return !in_where_clause;
-        }
-        if ast::Update::can_cast(ancestor.kind()) {
-            return !in_where_clause && !in_set_clause && !in_from_clause;
-        }
-        if ast::DropIndex::can_cast(ancestor.kind()) {
-            return false;
-        }
-        if ast::PartitionItem::can_cast(ancestor.kind()) {
-            in_partition_item = true;
-        }
-        if ast::CreateIndex::can_cast(ancestor.kind()) {
-            return !in_partition_item;
-        }
-    }
-    false
-}
-
-fn is_index_ref(name_ref: &ast::NameRef) -> bool {
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::DropIndex::can_cast(ancestor.kind()) {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_type_ref(name_ref: &ast::NameRef) -> bool {
-    let mut in_type = false;
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
-            in_type = true;
-        }
-        if ast::DropType::can_cast(ancestor.kind()) {
-            return true;
-        }
-        if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_function_ref(name_ref: &ast::NameRef) -> bool {
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::DropFunction::can_cast(ancestor.kind()) {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_aggregate_ref(name_ref: &ast::NameRef) -> bool {
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::DropAggregate::can_cast(ancestor.kind()) {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_procedure_ref(name_ref: &ast::NameRef) -> bool {
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::DropProcedure::can_cast(ancestor.kind()) {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_routine_ref(name_ref: &ast::NameRef) -> bool {
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::DropRoutine::can_cast(ancestor.kind()) {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_call_procedure(name_ref: &ast::NameRef) -> bool {
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::Call::can_cast(ancestor.kind()) {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_select_function_call(name_ref: &ast::NameRef) -> bool {
-    let mut in_call_expr = false;
-    let mut in_arg_list = false;
-
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::ArgList::can_cast(ancestor.kind()) {
-            in_arg_list = true;
-        }
-        if ast::CallExpr::can_cast(ancestor.kind()) {
-            in_call_expr = true;
-        }
-        if ast::Select::can_cast(ancestor.kind()) && in_call_expr && !in_arg_list {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_select_from_table(name_ref: &ast::NameRef) -> bool {
-    let mut in_from_clause = false;
-
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::FromClause::can_cast(ancestor.kind()) {
-            in_from_clause = true;
-        }
-        if ast::Select::can_cast(ancestor.kind()) && in_from_clause {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_update_from_table(name_ref: &ast::NameRef) -> bool {
-    let mut in_from_clause = false;
-
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::FromClause::can_cast(ancestor.kind()) {
-            in_from_clause = true;
-        }
-        if ast::Update::can_cast(ancestor.kind()) && in_from_clause {
-            return true;
-        }
-    }
-    false
-}
-
-fn is_select_column(name_ref: &ast::NameRef) -> bool {
-    let mut in_call_expr = false;
-    let mut in_arg_list = false;
-    let mut in_from_clause = false;
-
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::ArgList::can_cast(ancestor.kind()) {
-            in_arg_list = true;
-        }
-        if ast::CallExpr::can_cast(ancestor.kind()) {
-            in_call_expr = true;
-        }
-        if ast::FromClause::can_cast(ancestor.kind()) {
-            in_from_clause = true;
-        }
-        if ast::Select::can_cast(ancestor.kind()) {
-            // if we're inside a call expr but not inside an arg list, this is a function call
-            if in_call_expr && !in_arg_list {
-                return false;
-            }
-            // if we're in FROM clause, this is a table reference, not a column
-            if in_from_clause {
-                return false;
-            }
-            // anything else in SELECT (target list, WHERE, ORDER BY, etc.) is a column
-            return true;
-        }
-    }
-    false
-}
-
-fn is_schema_ref(name_ref: &ast::NameRef) -> bool {
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::DropSchema::can_cast(ancestor.kind()) {
-            return true;
-        }
-    }
-    false
 }
 
 fn hover_schema(

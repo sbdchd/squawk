@@ -5,59 +5,28 @@ use squawk_syntax::{
 };
 
 use crate::binder::Binder;
+use crate::classify::{NameRefClass, classify_name_ref};
 use crate::column_name::ColumnName;
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
 
-#[derive(Debug)]
-enum NameRefContext {
-    DropTable,
-    Table,
-    DropIndex,
-    DropType,
-    DropView,
-    DropFunction,
-    DropAggregate,
-    DropProcedure,
-    DropRoutine,
-    CallProcedure,
-    DropSchema,
-    CreateIndex,
-    CreateIndexColumn,
-    SelectFunctionCall,
-    SelectFromTable,
-    SelectColumn,
-    SelectQualifiedColumnTable,
-    SelectQualifiedColumn,
-    InsertTable,
-    InsertColumn,
-    DeleteTable,
-    DeleteWhereColumn,
-    UpdateTable,
-    UpdateWhereColumn,
-    UpdateSetColumn,
-    UpdateFromTable,
-    SchemaQualifier,
-    TypeReference,
-}
-
 pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
-    let context = classify_name_ref_context(name_ref)?;
+    let context = classify_name_ref(name_ref)?;
 
     match context {
-        NameRefContext::DropTable
-        | NameRefContext::Table
-        | NameRefContext::CreateIndex
-        | NameRefContext::InsertTable
-        | NameRefContext::DeleteTable
-        | NameRefContext::UpdateTable => {
+        NameRefClass::DropTable
+        | NameRefClass::Table
+        | NameRefClass::CreateIndex
+        | NameRefClass::InsertTable
+        | NameRefClass::DeleteTable
+        | NameRefClass::UpdateTable => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
             resolve_table(binder, &table_name, &schema, position)
         }
-        NameRefContext::SelectFromTable => {
+        NameRefClass::SelectFromTable => {
             let table_name = Name::from_node(name_ref);
             let schema = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
@@ -83,14 +52,14 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 
             resolve_view(binder, &table_name, &schema, position)
         }
-        NameRefContext::DropIndex => {
+        NameRefClass::DropIndex => {
             let path = find_containing_path(name_ref)?;
             let index_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
             resolve_index(binder, &index_name, &schema, position)
         }
-        NameRefContext::DropType | NameRefContext::TypeReference => {
+        NameRefClass::DropType | NameRefClass::TypeReference => {
             let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
                 && field_expr
@@ -115,14 +84,14 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_type(binder, &type_name, &schema, position)
         }
-        NameRefContext::DropView => {
+        NameRefClass::DropView => {
             let path = find_containing_path(name_ref)?;
             let view_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
             resolve_view(binder, &view_name, &schema, position)
         }
-        NameRefContext::DropFunction => {
+        NameRefClass::DropFunction => {
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
@@ -134,7 +103,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_function(binder, &function_name, &schema, params.as_deref(), position)
         }
-        NameRefContext::DropAggregate => {
+        NameRefClass::DropAggregate => {
             let aggregate = name_ref
                 .syntax()
                 .ancestors()
@@ -152,7 +121,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 position,
             )
         }
-        NameRefContext::DropProcedure => {
+        NameRefClass::DropProcedure => {
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
@@ -170,7 +139,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 position,
             )
         }
-        NameRefContext::DropRoutine => {
+        NameRefClass::DropRoutine => {
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
@@ -195,7 +164,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 
             resolve_procedure(binder, &routine_name, &schema, params.as_deref(), position)
         }
-        NameRefContext::CallProcedure => {
+        NameRefClass::CallProcedure => {
             let call = name_ref.syntax().ancestors().find_map(ast::Call::cast)?;
             let path = call.path()?;
             let procedure_name = extract_table_name(&path)?;
@@ -203,11 +172,11 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_procedure(binder, &procedure_name, &schema, None, position)
         }
-        NameRefContext::DropSchema | NameRefContext::SchemaQualifier => {
+        NameRefClass::DropSchema | NameRefClass::SchemaQualifier => {
             let schema_name = Name::from_node(name_ref);
             resolve_schema(binder, &schema_name)
         }
-        NameRefContext::SelectFunctionCall => {
+        NameRefClass::SelectFunctionCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
             {
@@ -238,18 +207,18 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 
             None
         }
-        NameRefContext::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
-        NameRefContext::SelectColumn => resolve_select_column(binder, name_ref),
-        NameRefContext::SelectQualifiedColumnTable => {
+        NameRefClass::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
+        NameRefClass::SelectColumn => resolve_select_column(binder, name_ref),
+        NameRefClass::SelectQualifiedColumnTable => {
             resolve_select_qualified_column_table(binder, name_ref)
         }
-        NameRefContext::SelectQualifiedColumn => resolve_select_qualified_column(binder, name_ref),
-        NameRefContext::InsertColumn => resolve_insert_column(binder, name_ref),
-        NameRefContext::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
-        NameRefContext::UpdateWhereColumn | NameRefContext::UpdateSetColumn => {
+        NameRefClass::SelectQualifiedColumn => resolve_select_qualified_column(binder, name_ref),
+        NameRefClass::InsertColumn => resolve_insert_column(binder, name_ref),
+        NameRefClass::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
+        NameRefClass::UpdateWhereColumn | NameRefClass::UpdateSetColumn => {
             resolve_update_where_column(binder, name_ref)
         }
-        NameRefContext::UpdateFromTable => {
+        NameRefClass::UpdateFromTable => {
             let table_name = Name::from_node(name_ref);
             let schema = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
@@ -276,217 +245,6 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             resolve_view(binder, &table_name, &schema, position)
         }
     }
-}
-
-fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> {
-    let mut in_partition_item = false;
-    let mut in_call_expr = false;
-    let mut in_arg_list = false;
-    let mut in_column_list = false;
-    let mut in_where_clause = false;
-    let mut in_from_clause = false;
-    let mut in_set_clause = false;
-
-    // TODO: can we combine this if and the one that follows?
-    if let Some(parent) = name_ref.syntax().parent()
-        && let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
-        && let Some(base) = field_expr.base()
-        && let ast::Expr::NameRef(base_name_ref) = base
-        // check that the name_ref we're looking at in the field expr is the
-        // base name_ref, i.e., the schema, rather than the item
-        && base_name_ref.syntax() == name_ref.syntax()
-    {
-        let is_function_call = field_expr
-            .syntax()
-            .parent()
-            .and_then(ast::CallExpr::cast)
-            .is_some();
-        let is_schema_table_col = field_expr
-            .syntax()
-            .parent()
-            .and_then(ast::FieldExpr::cast)
-            .is_some();
-
-        let mut in_from_clause = false;
-        for ancestor in parent.ancestors() {
-            if ast::FromClause::can_cast(ancestor.kind()) {
-                in_from_clause = true;
-            }
-            if ast::Select::can_cast(ancestor.kind()) && !in_from_clause {
-                if is_function_call || is_schema_table_col {
-                    return Some(NameRefContext::SchemaQualifier);
-                } else {
-                    return Some(NameRefContext::SelectQualifiedColumnTable);
-                }
-            }
-        }
-        return Some(NameRefContext::SchemaQualifier);
-    }
-
-    if let Some(parent) = name_ref.syntax().parent()
-        && let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
-        && field_expr
-            .field()
-            // we're at the field in a FieldExpr, i.e., foo.bar
-            //                                              ^^^
-            .is_some_and(|field_name_ref| field_name_ref.syntax() == name_ref.syntax())
-            // we're not inside a call expr
-        && field_expr
-            .syntax()
-            .parent()
-            .and_then(ast::CallExpr::cast)
-            .is_none()
-    {
-        let is_base_of_outer_field_expr = field_expr
-            .syntax()
-            .parent()
-            .and_then(ast::FieldExpr::cast)
-            .is_some();
-
-        let mut in_from_clause = false;
-        let mut in_cast_expr = false;
-        for ancestor in parent.ancestors() {
-            if ast::CastExpr::can_cast(ancestor.kind()) {
-                in_cast_expr = true;
-            }
-            if ast::FromClause::can_cast(ancestor.kind()) {
-                in_from_clause = true;
-            }
-            if ast::Select::can_cast(ancestor.kind()) && !in_from_clause {
-                if in_cast_expr {
-                    return Some(NameRefContext::TypeReference);
-                }
-                if is_base_of_outer_field_expr {
-                    return Some(NameRefContext::SelectQualifiedColumnTable);
-                } else if let Some(base) = field_expr.base()
-                    && matches!(base, ast::Expr::NameRef(_) | ast::Expr::FieldExpr(_))
-                {
-                    return Some(NameRefContext::SelectQualifiedColumn);
-                } else {
-                    return Some(NameRefContext::SelectQualifiedColumnTable);
-                }
-            }
-        }
-    }
-
-    if let Some(parent) = name_ref.syntax().parent()
-        && let Some(inner_path) = ast::PathSegment::cast(parent)
-            .and_then(|p| p.syntax().parent().and_then(ast::Path::cast))
-        && let Some(outer_path) = inner_path
-            .syntax()
-            .parent()
-            .and_then(|p| ast::Path::cast(p).and_then(|p| p.qualifier()))
-        && outer_path.syntax() == inner_path.syntax()
-    {
-        return Some(NameRefContext::SchemaQualifier);
-    }
-
-    let mut in_type = false;
-    for ancestor in name_ref.syntax().ancestors() {
-        if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
-            in_type = true;
-        }
-        if ast::DropTable::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropTable);
-        }
-        if ast::Table::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::Table);
-        }
-        if ast::DropIndex::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropIndex);
-        }
-        if ast::DropType::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropType);
-        }
-        if ast::DropView::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropView);
-        }
-        if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
-            return Some(NameRefContext::TypeReference);
-        }
-        if ast::DropFunction::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropFunction);
-        }
-        if ast::DropAggregate::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropAggregate);
-        }
-        if ast::DropProcedure::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropProcedure);
-        }
-        if ast::DropRoutine::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropRoutine);
-        }
-        if ast::Call::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::CallProcedure);
-        }
-        if ast::DropSchema::can_cast(ancestor.kind()) {
-            return Some(NameRefContext::DropSchema);
-        }
-        if ast::PartitionItem::can_cast(ancestor.kind()) {
-            in_partition_item = true;
-        }
-        if ast::CreateIndex::can_cast(ancestor.kind()) {
-            if in_partition_item {
-                return Some(NameRefContext::CreateIndexColumn);
-            }
-            return Some(NameRefContext::CreateIndex);
-        }
-        if ast::ArgList::can_cast(ancestor.kind()) {
-            in_arg_list = true;
-        }
-        if ast::CallExpr::can_cast(ancestor.kind()) {
-            in_call_expr = true;
-        }
-        if ast::FromClause::can_cast(ancestor.kind()) {
-            in_from_clause = true;
-        }
-        if ast::Select::can_cast(ancestor.kind()) {
-            if in_call_expr && !in_arg_list {
-                return Some(NameRefContext::SelectFunctionCall);
-            }
-            if in_from_clause {
-                return Some(NameRefContext::SelectFromTable);
-            }
-            // Classify as SelectColumn for target list, WHERE, ORDER BY, GROUP BY, etc.
-            // (anything in SELECT except FROM clause)
-            return Some(NameRefContext::SelectColumn);
-        }
-        if ast::ColumnList::can_cast(ancestor.kind()) {
-            in_column_list = true;
-        }
-        if ast::Insert::can_cast(ancestor.kind()) {
-            if in_column_list {
-                return Some(NameRefContext::InsertColumn);
-            }
-            return Some(NameRefContext::InsertTable);
-        }
-        if ast::WhereClause::can_cast(ancestor.kind()) {
-            in_where_clause = true;
-        }
-        if ast::SetClause::can_cast(ancestor.kind()) {
-            in_set_clause = true;
-        }
-        if ast::Delete::can_cast(ancestor.kind()) {
-            if in_where_clause {
-                return Some(NameRefContext::DeleteWhereColumn);
-            }
-            return Some(NameRefContext::DeleteTable);
-        }
-        if ast::Update::can_cast(ancestor.kind()) {
-            if in_where_clause {
-                return Some(NameRefContext::UpdateWhereColumn);
-            }
-            if in_set_clause {
-                return Some(NameRefContext::UpdateSetColumn);
-            }
-            if in_from_clause {
-                return Some(NameRefContext::UpdateFromTable);
-            }
-            return Some(NameRefContext::UpdateTable);
-        }
-    }
-
-    None
 }
 
 fn resolve_table(
