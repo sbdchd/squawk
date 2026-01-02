@@ -444,6 +444,22 @@ drop type person$0;
     }
 
     #[test]
+    fn goto_composite_type_field() {
+        assert_snapshot!(goto("
+create type person_info as (name text, email text);
+create table user(id int, member person_info);
+select (member).name$0 from user;
+"), @r"
+          ╭▸ 
+        2 │ create type person_info as (name text, email text);
+          │                             ──── 2. destination
+        3 │ create table user(id int, member person_info);
+        4 │ select (member).name from user;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_type_range() {
         assert_snapshot!(goto("
 create type int4_range as range (subtype = int4);
@@ -699,6 +715,114 @@ select x::public.baz$0;
           │                    ─── 2. destination
         3 │ select x::public.baz;
           ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_composite_type() {
+        assert_snapshot!(goto("
+create type person_info as (name varchar(50), age int);
+select ('Alice', 30)::person_info$0;
+"), @r"
+          ╭▸ 
+        2 │ create type person_info as (name varchar(50), age int);
+          │             ─────────── 2. destination
+        3 │ select ('Alice', 30)::person_info;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_composite_type_in_cte() {
+        assert_snapshot!(goto("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info$0 as member
+)
+select * from team;
+"), @r"
+          ╭▸ 
+        2 │ create type person_info as (name varchar(50), age int);
+          │             ─────────── 2. destination
+        3 │ with team as (
+        4 │     select 1 as id, ('Alice', 30)::person_info as member
+          ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_composite_type_field_name() {
+        assert_snapshot!(goto("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info as member
+)
+select (member).name$0, (member).age from team;
+"), @r"
+          ╭▸ 
+        2 │ create type person_info as (name varchar(50), age int);
+          │                             ──── 2. destination
+          ‡
+        6 │ select (member).name, (member).age from team;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_composite_type_field_in_where() {
+        assert_snapshot!(goto("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info as member
+    union all
+    select 2, ('Bob', 25)::person_info
+)
+select (member).name, (member).age
+from team
+where (member).age$0 >= 18;
+"), @r"
+           ╭▸ 
+         2 │ create type person_info as (name varchar(50), age int);
+           │                                               ─── 2. destination
+           ‡
+        10 │ where (member).age >= 18;
+           ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_composite_type_field_base() {
+        assert_snapshot!(goto("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info as member
+)
+select (member$0).age from team;
+"), @r"
+          ╭▸ 
+        4 │     select 1 as id, ('Alice', 30)::person_info as member
+          │                                                   ────── 2. destination
+        5 │ )
+        6 │ select (member).age from team;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_composite_type_field_nested_parens() {
+        assert_snapshot!(goto("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info as member
+)
+select ((((member))).name$0) from team;
+"), @r"
+          ╭▸ 
+        2 │ create type person_info as (name varchar(50), age int);
+          │                             ──── 2. destination
+          ‡
+        6 │ select ((((member))).name) from team;
+          ╰╴                        ─ 1. source
         ");
     }
 

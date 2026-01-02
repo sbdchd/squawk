@@ -22,6 +22,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::TypeReference | NameRefClass::DropType => {
                 return hover_type(file, &name_ref, &binder);
             }
+            NameRefClass::CompositeTypeField => {
+                return hover_composite_type_field(file, &name_ref, &binder);
+            }
             NameRefClass::SelectColumn | NameRefClass::SelectQualifiedColumn => {
                 // Try hover as column first
                 if let Some(result) = hover_column(file, &name_ref, &binder) {
@@ -172,6 +175,41 @@ fn hover_column(
         &table_name,
         &column_name,
         &ty.syntax().text(),
+    ))
+}
+
+fn hover_composite_type_field(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let field_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let root = file.syntax();
+    let field_name_node = field_ptr.to_node(root);
+
+    let column = field_name_node.ancestors().find_map(ast::Column::cast)?;
+    let field_name = column.name()?.syntax().text().to_string();
+    let ty = column.ty()?;
+
+    let create_type = column
+        .syntax()
+        .ancestors()
+        .find_map(ast::CreateType::cast)?;
+    let type_path = create_type.path()?;
+    let type_name = type_path.segment()?.name()?.syntax().text().to_string();
+
+    let schema = if let Some(qualifier) = type_path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        type_schema(&create_type, binder)?
+    };
+
+    Some(format!(
+        "field {}.{}.{} {}",
+        schema,
+        type_name,
+        field_name,
+        ty.syntax().text()
     ))
 }
 
@@ -2569,6 +2607,54 @@ drop view v$0;
           ╭▸ 
         3 │ drop view v;
           ╰╴          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_composite_type_field() {
+        assert_snapshot!(check_hover("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info as member
+)
+select (member).name$0, (member).age from team;
+"), @r"
+        hover: field public.person_info.name varchar(50)
+          ╭▸ 
+        6 │ select (member).name, (member).age from team;
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_composite_type_field_age() {
+        assert_snapshot!(check_hover("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info as member
+)
+select (member).name, (member).age$0 from team;
+"), @r"
+        hover: field public.person_info.age int
+          ╭▸ 
+        6 │ select (member).name, (member).age from team;
+          ╰╴                                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_composite_type_field_nested_parens() {
+        assert_snapshot!(check_hover("
+create type person_info as (name varchar(50), age int);
+with team as (
+    select 1 as id, ('Alice', 30)::person_info as member
+)
+select ((((member))).name$0) from team;
+"), @r"
+        hover: field public.person_info.name varchar(50)
+          ╭▸ 
+        6 │ select ((((member))).name) from team;
+          ╰╴                        ─ hover
         ");
     }
 }
