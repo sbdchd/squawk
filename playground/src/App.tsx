@@ -238,6 +238,193 @@ function assertNever(x: never): never {
   throw new Error(`expected never, got ${x}`)
 }
 
+let monacoGlobalProvidersRegistered = false
+// Only want to register these once, otherwise we'll end up with multiple
+// providers running and get dupe results for things like hover
+function registerMonacoProviders() {
+  if (monacoGlobalProvidersRegistered) {
+    return
+  }
+  monacoGlobalProvidersRegistered = true
+  const languageConfig = monaco.languages.setLanguageConfiguration("pgsql", {
+    comments: {
+      lineComment: "--",
+      blockComment: ["/*", "*/"],
+    },
+    brackets: [
+      ["{", "}"],
+      ["[", "]"],
+      ["(", ")"],
+    ],
+    autoClosingPairs: [
+      { open: "{", close: "}" },
+      { open: "[", close: "]" },
+      { open: "(", close: ")" },
+      { open: '"', close: '"', notIn: ["string"] },
+      { open: "$$", close: "$$", notIn: ["string", "comment"] },
+      { open: "E'", close: "'", notIn: ["string", "comment"] },
+      { open: "e'", close: "'", notIn: ["string", "comment"] },
+      { open: "U&'", close: "'", notIn: ["string", "comment"] },
+      { open: "u&'", close: "'", notIn: ["string", "comment"] },
+      { open: "B'", close: "'", notIn: ["string", "comment"] },
+      { open: "b'", close: "'", notIn: ["string", "comment"] },
+      { open: "X'", close: "'", notIn: ["string", "comment"] },
+      { open: "x'", close: "'", notIn: ["string", "comment"] },
+      { open: "N'", close: "'", notIn: ["string", "comment"] },
+      { open: "'", close: "'", notIn: ["string", "comment"] },
+      { open: "/*", close: " */", notIn: ["string", "comment"] },
+    ],
+    surroundingPairs: [
+      { open: "{", close: "}" },
+      { open: "[", close: "]" },
+      { open: "(", close: ")" },
+      { open: '"', close: '"' },
+      { open: "'", close: "'" },
+      { open: "`", close: "`" },
+      { open: "$$", close: "$$" },
+    ],
+    onEnterRules: [
+      {
+        beforeText: /^\s*--.*$/,
+        afterText: /\S/,
+        action: {
+          indentAction: monaco.languages.IndentAction.None,
+          appendText: "-- ",
+        },
+      },
+      {
+        beforeText: /^\s*\/\*/,
+        afterText: /^\s*\*\/$/,
+        action: {
+          indentAction: monaco.languages.IndentAction.IndentOutdent,
+          appendText: " * ",
+        },
+      },
+      {
+        beforeText: /^\s*\/\*(?!.*\*\/).*$/,
+        action: {
+          indentAction: monaco.languages.IndentAction.None,
+          appendText: " * ",
+        },
+      },
+      {
+        beforeText: /^\s*\*(?!\/).*$/,
+        action: {
+          indentAction: monaco.languages.IndentAction.None,
+          appendText: "* ",
+        },
+      },
+    ],
+  })
+  monaco.languages.register({ id: "rast" })
+  const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
+    tokenizer: {
+      // via: https://github.com/rust-lang/rust-analyzer/blob/9691da7707ea7c50922fe1647b1c2af47934b9fa/editors/code/ra_syntax_tree.tmGrammar.json#L16C17-L16C17
+      root: [
+        // Node type (entity.name.class)
+        [/^[\s]*([A-Z_][A-Z_0-9]*?)@/, "entity.identifier.type"],
+
+        // Node range index (constant.numeric)
+        [/\d+/, "number"],
+
+        // Token text (string)
+        [/"[^"]*"/, "string"],
+      ],
+    },
+  })
+
+  const codeActionProvider = monaco.languages.registerCodeActionProvider(
+    "pgsql",
+    {
+      provideCodeActions: (model, _range, context) => {
+        const actions: monaco.languages.CodeAction[] = []
+        for (const marker of context.markers) {
+          if (marker.source === "squawk") {
+            const key = createMarkerKey(marker)
+            const fix = fixesRef.get(key)
+            if (fix) {
+              const edits = fix.edits.map(
+                (edit): monaco.languages.IWorkspaceTextEdit => {
+                  return {
+                    resource: model.uri,
+                    versionId: model.getVersionId(),
+                    textEdit: {
+                      range: new monaco.Range(
+                        edit.start_line_number + 1,
+                        edit.start_column + 1,
+                        edit.end_line_number + 1,
+                        edit.end_column + 1,
+                      ),
+                      text: edit.text,
+                    },
+                  }
+                },
+              )
+              actions.push({
+                title: fix.title,
+                diagnostics: [marker],
+                kind: "quickfix",
+                edit: {
+                  edits,
+                },
+                isPreferred: true,
+              })
+            }
+          }
+        }
+
+        return {
+          actions,
+          dispose: () => {},
+        }
+      },
+    },
+  )
+
+  const hoverProvider = monaco.languages.registerHoverProvider("pgsql", {
+    provideHover,
+  })
+
+  const definitionProvider = monaco.languages.registerDefinitionProvider(
+    "pgsql",
+    {
+      provideDefinition,
+    },
+  )
+
+  const referencesProvider = monaco.languages.registerReferenceProvider(
+    "pgsql",
+    {
+      provideReferences,
+    },
+  )
+
+  const documentSymbolProvider =
+    monaco.languages.registerDocumentSymbolProvider("pgsql", {
+      provideDocumentSymbols,
+    })
+
+  const inlayHintsProvider = monaco.languages.registerInlayHintsProvider(
+    "pgsql",
+    {
+      provideInlayHints,
+    },
+  )
+  return () => {
+    languageConfig.dispose()
+    codeActionProvider.dispose()
+    hoverProvider.dispose()
+    definitionProvider.dispose()
+    referencesProvider.dispose()
+    documentSymbolProvider.dispose()
+    inlayHintsProvider.dispose()
+    tokenProvider.dispose()
+  }
+}
+
+// TODO: this is hacky
+let fixesRef: Map<string, Fix> = new Map()
+
 function Editor({
   onChange,
   autoFocus,
@@ -263,7 +450,6 @@ function Editor({
   const autoFocusRef = useRef(autoFocus)
   const settingsInitial = useRef(settings)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
-  const fixesRef = useRef<Map<string, Fix>>(new Map())
 
   useEffect(() => {
     if (markers == null) {
@@ -277,7 +463,7 @@ function Editor({
         fixesMap.set(key, marker.fix)
       }
     }
-    fixesRef.current = fixesMap
+    fixesRef = fixesMap
 
     const model = editorRef.current?.getModel()
     if (model != null) {
@@ -286,6 +472,7 @@ function Editor({
   }, [markers])
 
   useLayoutEffect(() => {
+    registerMonacoProviders()
     const editor = monaco.editor.create(
       divRef.current!,
       settingsInitial.current,
@@ -296,170 +483,6 @@ function Editor({
     editor.onDidBlurEditorText(() => {
       onSaveText(editor.getValue())
     })
-    monaco.languages.setLanguageConfiguration("pgsql", {
-      comments: {
-        lineComment: "--",
-        blockComment: ["/*", "*/"],
-      },
-      brackets: [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"],
-      ],
-      autoClosingPairs: [
-        { open: "{", close: "}" },
-        { open: "[", close: "]" },
-        { open: "(", close: ")" },
-        { open: '"', close: '"', notIn: ["string"] },
-        { open: "$$", close: "$$", notIn: ["string", "comment"] },
-        { open: "E'", close: "'", notIn: ["string", "comment"] },
-        { open: "e'", close: "'", notIn: ["string", "comment"] },
-        { open: "U&'", close: "'", notIn: ["string", "comment"] },
-        { open: "u&'", close: "'", notIn: ["string", "comment"] },
-        { open: "B'", close: "'", notIn: ["string", "comment"] },
-        { open: "b'", close: "'", notIn: ["string", "comment"] },
-        { open: "X'", close: "'", notIn: ["string", "comment"] },
-        { open: "x'", close: "'", notIn: ["string", "comment"] },
-        { open: "N'", close: "'", notIn: ["string", "comment"] },
-        { open: "'", close: "'", notIn: ["string", "comment"] },
-        { open: "/*", close: " */", notIn: ["string", "comment"] },
-      ],
-      surroundingPairs: [
-        { open: "{", close: "}" },
-        { open: "[", close: "]" },
-        { open: "(", close: ")" },
-        { open: '"', close: '"' },
-        { open: "'", close: "'" },
-        { open: "`", close: "`" },
-        { open: "$$", close: "$$" },
-      ],
-      onEnterRules: [
-        {
-          beforeText: /^\s*--.*$/,
-          afterText: /\S/,
-          action: {
-            indentAction: monaco.languages.IndentAction.None,
-            appendText: "-- ",
-          },
-        },
-        {
-          beforeText: /^\s*\/\*/,
-          afterText: /^\s*\*\/$/,
-          action: {
-            indentAction: monaco.languages.IndentAction.IndentOutdent,
-            appendText: " * ",
-          },
-        },
-        {
-          beforeText: /^\s*\/\*(?!.*\*\/).*$/,
-          action: {
-            indentAction: monaco.languages.IndentAction.None,
-            appendText: " * ",
-          },
-        },
-        {
-          beforeText: /^\s*\*(?!\/).*$/,
-          action: {
-            indentAction: monaco.languages.IndentAction.None,
-            appendText: "* ",
-          },
-        },
-      ],
-    })
-    monaco.languages.register({ id: "rast" })
-    const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
-      tokenizer: {
-        // via: https://github.com/rust-lang/rust-analyzer/blob/9691da7707ea7c50922fe1647b1c2af47934b9fa/editors/code/ra_syntax_tree.tmGrammar.json#L16C17-L16C17
-        root: [
-          // Node type (entity.name.class)
-          [/^[\s]*([A-Z_][A-Z_0-9]*?)@/, "entity.identifier.type"],
-
-          // Node range index (constant.numeric)
-          [/\d+/, "number"],
-
-          // Token text (string)
-          [/"[^"]*"/, "string"],
-        ],
-      },
-    })
-
-    const codeActionProvider = monaco.languages.registerCodeActionProvider(
-      "pgsql",
-      {
-        provideCodeActions: (model, _range, context) => {
-          const actions: monaco.languages.CodeAction[] = []
-          for (const marker of context.markers) {
-            if (marker.source === "squawk") {
-              const key = createMarkerKey(marker)
-              const fix = fixesRef.current.get(key)
-              if (fix) {
-                const edits = fix.edits.map(
-                  (edit): monaco.languages.IWorkspaceTextEdit => {
-                    return {
-                      resource: model.uri,
-                      versionId: model.getVersionId(),
-                      textEdit: {
-                        range: new monaco.Range(
-                          edit.start_line_number + 1,
-                          edit.start_column + 1,
-                          edit.end_line_number + 1,
-                          edit.end_column + 1,
-                        ),
-                        text: edit.text,
-                      },
-                    }
-                  },
-                )
-                actions.push({
-                  title: fix.title,
-                  diagnostics: [marker],
-                  kind: "quickfix",
-                  edit: {
-                    edits,
-                  },
-                  isPreferred: true,
-                })
-              }
-            }
-          }
-
-          return {
-            actions,
-            dispose: () => {},
-          }
-        },
-      },
-    )
-
-    const hoverProvider = monaco.languages.registerHoverProvider("pgsql", {
-      provideHover,
-    })
-
-    const definitionProvider = monaco.languages.registerDefinitionProvider(
-      "pgsql",
-      {
-        provideDefinition,
-      },
-    )
-
-    const referencesProvider = monaco.languages.registerReferenceProvider(
-      "pgsql",
-      {
-        provideReferences,
-      },
-    )
-
-    const documentSymbolProvider =
-      monaco.languages.registerDocumentSymbolProvider("pgsql", {
-        provideDocumentSymbols,
-      })
-
-    const inlayHintsProvider = monaco.languages.registerInlayHintsProvider(
-      "pgsql",
-      {
-        provideInlayHints,
-      },
-    )
 
     editor.onDidChangeModelContent(() => {
       onChangeText(editor.getValue())
@@ -470,14 +493,8 @@ function Editor({
     editorRef.current = editor
     return () => {
       editorRef.current = null
-      codeActionProvider.dispose()
-      hoverProvider.dispose()
-      definitionProvider.dispose()
-      referencesProvider.dispose()
-      documentSymbolProvider.dispose()
-      inlayHintsProvider.dispose()
+
       editor?.dispose()
-      tokenProvider.dispose()
     }
   }, [])
   useEffect(() => {
