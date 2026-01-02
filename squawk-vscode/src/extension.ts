@@ -144,6 +144,12 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
   )
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand("squawk.restartServer", async () => {
+      await restartServer(context)
+    }),
+  )
+
   context.subscriptions.push(onClientStateChange)
 
   await startServer(context)
@@ -309,6 +315,12 @@ async function stopServer() {
   await client.stop()
 
   log.info("server stopped")
+}
+
+async function restartServer(context: vscode.ExtensionContext) {
+  log.info("restart server")
+  await stopServer()
+  await startServer(context)
 }
 
 // Based on rust-analyzer's SyntaxTree support:
