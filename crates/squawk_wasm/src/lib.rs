@@ -394,6 +394,7 @@ fn convert_document_symbol(
         kind: match symbol.kind {
             squawk_ide::document_symbols::DocumentSymbolKind::Table => "table",
             squawk_ide::document_symbols::DocumentSymbolKind::Function => "function",
+            squawk_ide::document_symbols::DocumentSymbolKind::Type => "type",
             squawk_ide::document_symbols::DocumentSymbolKind::Column => "column",
         }
         .to_string(),

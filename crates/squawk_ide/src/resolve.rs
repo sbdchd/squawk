@@ -14,6 +14,7 @@ enum NameRefContext {
     DropTable,
     Table,
     DropIndex,
+    DropType,
     DropFunction,
     DropAggregate,
     DropProcedure,
@@ -81,6 +82,13 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
             resolve_index(binder, &index_name, &schema, position)
+        }
+        NameRefContext::DropType => {
+            let path = find_containing_path(name_ref)?;
+            let type_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_type(binder, &type_name, &schema, position)
         }
         NameRefContext::DropFunction => {
             let function_sig = name_ref
@@ -339,6 +347,9 @@ fn classify_name_ref_context(name_ref: &ast::NameRef) -> Option<NameRefContext> 
         if ast::DropIndex::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropIndex);
         }
+        if ast::DropType::can_cast(ancestor.kind()) {
+            return Some(NameRefContext::DropType);
+        }
         if ast::DropFunction::can_cast(ancestor.kind()) {
             return Some(NameRefContext::DropFunction);
         }
@@ -440,6 +451,15 @@ fn resolve_index(
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     resolve_for_kind(binder, index_name, schema, position, SymbolKind::Index)
+}
+
+fn resolve_type(
+    binder: &Binder,
+    type_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    resolve_for_kind(binder, type_name, schema, position, SymbolKind::Type)
 }
 
 fn resolve_for_kind(
@@ -1344,6 +1364,10 @@ pub(crate) fn resolve_table_info(binder: &Binder, path: &ast::Path) -> Option<(S
 
 pub(crate) fn resolve_function_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
     resolve_symbol_info(binder, path, SymbolKind::Function)
+}
+
+pub(crate) fn resolve_type_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
+    resolve_symbol_info(binder, path, SymbolKind::Type)
 }
 
 fn resolve_symbol_info(

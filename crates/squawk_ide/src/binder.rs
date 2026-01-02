@@ -83,6 +83,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateAggregate(create_aggregate) => bind_create_aggregate(b, create_aggregate),
         ast::Stmt::CreateProcedure(create_procedure) => bind_create_procedure(b, create_procedure),
         ast::Stmt::CreateSchema(create_schema) => bind_create_schema(b, create_schema),
+        ast::Stmt::CreateType(create_type) => bind_create_type(b, create_type),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -236,6 +237,32 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
 
     let root = b.root_scope();
     b.scopes[root].insert(schema_name, schema_id);
+}
+
+fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
+    let Some(path) = create_type.path() else {
+        return;
+    };
+
+    let Some(type_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let type_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Type,
+        ptr: name_ptr,
+        schema,
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(type_name, type_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
