@@ -444,6 +444,62 @@ drop type person$0;
     }
 
     #[test]
+    fn goto_create_table_type_reference() {
+        assert_snapshot!(goto("
+create type person_info as (name text, email text);
+create table user(id int, member person_info$0);
+"), @r"
+          ╭▸ 
+        2 │ create type person_info as (name text, email text);
+          │             ─────────── 2. destination
+        3 │ create table user(id int, member person_info);
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_type_reference_enum() {
+        assert_snapshot!(goto("
+create type mood as enum ('sad', 'ok', 'happy');
+create table users(id int, mood mood$0);
+"), @r"
+          ╭▸ 
+        2 │ create type mood as enum ('sad', 'ok', 'happy');
+          │             ──── 2. destination
+        3 │ create table users(id int, mood mood);
+          ╰╴                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_type_reference_range() {
+        assert_snapshot!(goto("
+create type int4_range as range (subtype = int4);
+create table metrics(id int, span int4_range$0);
+"), @r"
+          ╭▸ 
+        2 │ create type int4_range as range (subtype = int4);
+          │             ────────── 2. destination
+        3 │ create table metrics(id int, span int4_range);
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_type_reference_input_output() {
+        assert_snapshot!(goto("
+create type myint (input = myintin, output = myintout, like = int4);
+create table data(id int, value myint$0);
+"), @r"
+          ╭▸ 
+        2 │ create type myint (input = myintin, output = myintout, like = int4);
+          │             ───── 2. destination
+        3 │ create table data(id int, value myint);
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_composite_type_field() {
         assert_snapshot!(goto("
 create type person_info as (name text, email text);
