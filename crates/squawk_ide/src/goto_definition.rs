@@ -458,6 +458,209 @@ drop type int4_range$0;
     }
 
     #[test]
+    fn goto_drop_view() {
+        assert_snapshot!(goto("
+create view v as select 1;
+drop view v$0;
+"), @r"
+          ╭▸ 
+        2 │ create view v as select 1;
+          │             ─ 2. destination
+        3 │ drop view v;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_view_with_schema() {
+        assert_snapshot!(goto("
+create view public.v as select 1;
+drop view v$0;
+"), @r"
+          ╭▸ 
+        2 │ create view public.v as select 1;
+          │                    ─ 2. destination
+        3 │ drop view v;
+          ╰╴          ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create view foo.v as select 1;
+drop view foo.v$0;
+"), @r"
+          ╭▸ 
+        2 │ create view foo.v as select 1;
+          │                 ─ 2. destination
+        3 │ drop view foo.v;
+          ╰╴              ─ 1. source
+        ");
+
+        goto_not_found(
+            "
+create view v as select 1;
+drop view foo.v$0;
+",
+        );
+    }
+
+    #[test]
+    fn goto_drop_temp_view() {
+        assert_snapshot!(goto("
+create temp view v as select 1;
+drop view v$0;
+"), @r"
+          ╭▸ 
+        2 │ create temp view v as select 1;
+          │                  ─ 2. destination
+        3 │ drop view v;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_view() {
+        assert_snapshot!(goto("
+create view v as select 1;
+select * from v$0;
+"), @r"
+          ╭▸ 
+        2 │ create view v as select 1;
+          │             ─ 2. destination
+        3 │ select * from v;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_view_with_schema() {
+        assert_snapshot!(goto("
+create view public.v as select 1;
+select * from public.v$0;
+"), @r"
+          ╭▸ 
+        2 │ create view public.v as select 1;
+          │                    ─ 2. destination
+        3 │ select * from public.v;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_column() {
+        assert_snapshot!(goto("
+create view v as select 1 as a;
+select a$0 from v;
+"), @r"
+          ╭▸ 
+        2 │ create view v as select 1 as a;
+          │                              ─ 2. destination
+        3 │ select a from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_column_qualified() {
+        assert_snapshot!(goto("
+create view v as select 1 as a;
+select v.a$0 from v;
+"), @r"
+          ╭▸ 
+        2 │ create view v as select 1 as a;
+          │                              ─ 2. destination
+        3 │ select v.a from v;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_with_explicit_column_list() {
+        assert_snapshot!(goto("
+create view v(col1) as select 1;
+select * from v$0;
+"), @r"
+          ╭▸ 
+        2 │ create view v(col1) as select 1;
+          │             ─ 2. destination
+        3 │ select * from v;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_column_with_explicit_column_list() {
+        assert_snapshot!(goto("
+    create view v(col1) as select 1;
+    select col1$0 from v;
+    "), @r"
+          ╭▸ 
+        2 │     create view v(col1) as select 1;
+          │                   ──── 2. destination
+        3 │     select col1 from v;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_column_with_schema() {
+        assert_snapshot!(goto("
+create view public.v as select 1 as a;
+select a$0 from public.v;
+"), @r"
+          ╭▸ 
+        2 │ create view public.v as select 1 as a;
+          │                                     ─ 2. destination
+        3 │ select a from public.v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_multiple_columns() {
+        assert_snapshot!(goto("
+create view v as select 1 as a, 2 as b;
+select b$0 from v;
+"), @r"
+          ╭▸ 
+        2 │ create view v as select 1 as a, 2 as b;
+          │                                      ─ 2. destination
+        3 │ select b from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_column_from_table() {
+        assert_snapshot!(goto("
+create table t(x int, y int);
+create view v as select x, y from t;
+select x$0 from v;
+"), @r"
+          ╭▸ 
+        3 │ create view v as select x, y from t;
+          │                         ─ 2. destination
+        4 │ select x from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_column_with_table_preference() {
+        assert_snapshot!(goto("
+create table v(a int);
+create view vw as select 1 as a;
+select a$0 from v;
+"), @r"
+          ╭▸ 
+        2 │ create table v(a int);
+          │                ─ 2. destination
+        3 │ create view vw as select 1 as a;
+        4 │ select a from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cast_operator() {
         assert_snapshot!(goto("
 create type foo as enum ('a', 'b');

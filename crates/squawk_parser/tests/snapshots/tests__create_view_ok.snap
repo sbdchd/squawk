@@ -352,7 +352,7 @@ SOURCE_FILE
     COLUMN_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "n"
       R_PAREN ")"
     WHITESPACE " "
@@ -430,17 +430,17 @@ SOURCE_FILE
     COLUMN_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n"

@@ -84,6 +84,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateProcedure(create_procedure) => bind_create_procedure(b, create_procedure),
         ast::Stmt::CreateSchema(create_schema) => bind_create_schema(b, create_schema),
         ast::Stmt::CreateType(create_type) => bind_create_type(b, create_type),
+        ast::Stmt::CreateView(create_view) => bind_create_view(b, create_view),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -263,6 +264,33 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
 
     let root = b.root_scope();
     b.scopes[root].insert(type_name, type_id);
+}
+
+fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
+    let Some(path) = create_view.path() else {
+        return;
+    };
+
+    let Some(view_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+    let is_temp = create_view.temp_token().is_some() || create_view.temporary_token().is_some();
+
+    let Some(schema) = schema_name(b, &path, is_temp) else {
+        return;
+    };
+
+    let view_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::View,
+        ptr: name_ptr,
+        schema,
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(view_name, view_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
