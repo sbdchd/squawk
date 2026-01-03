@@ -193,23 +193,26 @@ pub fn goto_definition(content: String, line: u32, col: u32) -> Result<JsValue, 
     let offset = position_to_offset(&line_index, line, col)?;
     let result = squawk_ide::goto_definition::goto_definition(parse.tree(), offset);
 
-    let response = result.map(|range| {
-        let start = line_index.line_col(range.start());
-        let end = line_index.line_col(range.end());
-        let start_wide = line_index
-            .to_wide(line_index::WideEncoding::Utf16, start)
-            .unwrap();
-        let end_wide = line_index
-            .to_wide(line_index::WideEncoding::Utf16, end)
-            .unwrap();
+    let response: Vec<LocationRange> = result
+        .into_iter()
+        .map(|range| {
+            let start = line_index.line_col(range.start());
+            let end = line_index.line_col(range.end());
+            let start_wide = line_index
+                .to_wide(line_index::WideEncoding::Utf16, start)
+                .unwrap();
+            let end_wide = line_index
+                .to_wide(line_index::WideEncoding::Utf16, end)
+                .unwrap();
 
-        LocationRange {
-            start_line: start_wide.line,
-            start_column: start_wide.col,
-            end_line: end_wide.line,
-            end_column: end_wide.col,
-        }
-    });
+            LocationRange {
+                start_line: start_wide.line,
+                start_column: start_wide.col,
+                end_line: end_wide.line,
+                end_column: end_wide.col,
+            }
+        })
+        .collect();
 
     serde_wasm_bindgen::to_value(&response).map_err(into_error)
 }

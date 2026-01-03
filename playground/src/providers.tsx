@@ -155,28 +155,28 @@ export async function provideHover(
 export async function provideDefinition(
   model: monaco.editor.ITextModel,
   position: monaco.Position,
-): Promise<monaco.languages.Definition | null> {
+): Promise<Array<monaco.languages.Location> | null> {
   const content = model.getValue()
   if (!content) return null
 
   try {
-    const result = goto_definition(
+    const results = goto_definition(
       content,
       position.lineNumber - 1,
       position.column - 1,
     )
 
-    if (!result) return null
+    if (!results) return null
 
-    return {
+    return results.map((results) => ({
       uri: model.uri,
       range: {
-        startLineNumber: result.start_line + 1,
-        startColumn: result.start_column + 1,
-        endLineNumber: result.end_line + 1,
-        endColumn: result.end_column + 1,
+        startLineNumber: results.start_line + 1,
+        startColumn: results.start_column + 1,
+        endLineNumber: results.end_line + 1,
+        endColumn: results.end_column + 1,
       },
-    }
+    }))
   } catch (e) {
     console.error("Error in provideDefinition:", e)
     return null

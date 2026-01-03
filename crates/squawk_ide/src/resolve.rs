@@ -1,4 +1,5 @@
 use rowan::TextSize;
+use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxNode, SyntaxNodePtr,
     ast::{self, AstNode},
@@ -10,7 +11,10 @@ use crate::column_name::ColumnName;
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
 
-pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+pub(crate) fn resolve_name_ref(
+    binder: &Binder,
+    name_ref: &ast::NameRef,
+) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
     let context = classify_name_ref(name_ref)?;
 
     match context {
@@ -24,7 +28,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position)
+            resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::SelectFromTable => {
             let table_name = Name::from_node(name_ref);
@@ -41,23 +45,23 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             if schema.is_none()
                 && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
             {
-                return Some(cte_ptr);
+                return Some(smallvec![cte_ptr]);
             }
 
             let position = name_ref.syntax().text_range().start();
 
             if let Some(ptr) = resolve_table(binder, &table_name, &schema, position) {
-                return Some(ptr);
+                return Some(smallvec![ptr]);
             }
 
-            resolve_view(binder, &table_name, &schema, position)
+            resolve_view(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropIndex => {
             let path = find_containing_path(name_ref)?;
             let index_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_index(binder, &index_name, &schema, position)
+            resolve_index(binder, &index_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropType | NameRefClass::TypeReference => {
             let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
@@ -82,25 +86,39 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 (type_name, schema)
             };
             let position = name_ref.syntax().text_range().start();
-            resolve_type(binder, &type_name, &schema, position)
+            resolve_type(binder, &type_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropView | NameRefClass::DropMaterializedView => {
             let path = find_containing_path(name_ref)?;
             let view_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_view(binder, &view_name, &schema, position)
+            resolve_view(binder, &view_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropSequence => {
             let path = find_containing_path(name_ref)?;
             let sequence_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_sequence(binder, &sequence_name, &schema, position)
+            resolve_sequence(binder, &sequence_name, &schema, position).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::DropDatabase => {
+            let database_name = Name::from_node(name_ref);
+            resolve_database(binder, &database_name).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::SequenceOwnedByColumn => {
+            let sequence_option = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::SequenceOption::cast)?;
+            let path = sequence_option.path()?;
+            let column_name = Name::from_node(name_ref);
+            let table_path = path.qualifier()?;
+            resolve_column_for_path(binder, &table_path, column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::Tablespace => {
             let tablespace_name = Name::from_node(name_ref);
-            resolve_tablespace(binder, &tablespace_name)
+            resolve_tablespace(binder, &tablespace_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ForeignKeyTable => {
             let foreign_key = name_ref
@@ -111,7 +129,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position)
+            resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ForeignKeyColumn => {
             let foreign_key = name_ref
@@ -120,7 +138,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .find_map(ast::ForeignKeyConstraint::cast)?;
             let path = foreign_key.path()?;
             let column_name = Name::from_node(name_ref);
-            resolve_column_for_path(binder, &path, column_name)
+            resolve_column_for_path(binder, &path, column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ForeignKeyLocalColumn => {
             let create_table = name_ref
@@ -128,7 +146,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::CheckConstraintColumn => {
             let create_table = name_ref
@@ -136,7 +154,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::GeneratedColumn => {
             let create_table = name_ref
@@ -144,7 +162,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::UniqueConstraintColumn => {
             let create_table = name_ref
@@ -152,7 +170,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::PrimaryKeyConstraintColumn => {
             let create_table = name_ref
@@ -160,7 +178,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::NotNullConstraintColumn => {
             let create_table = name_ref
@@ -168,7 +186,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ExcludeConstraintColumn => {
             let create_table = name_ref
@@ -176,7 +194,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::PartitionByColumn => {
             let create_table = name_ref
@@ -184,14 +202,14 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 .ancestors()
                 .find_map(ast::CreateTable::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name)
+            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::PartitionOfTable => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position)
+            resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::LikeTable => {
             let like_clause = name_ref
@@ -202,14 +220,14 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position)
+            resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::InheritsTable => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position)
+            resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropFunction => {
             let function_sig = name_ref
@@ -222,6 +240,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let params = extract_param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
             resolve_function(binder, &function_name, &schema, params.as_deref(), position)
+                .map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropAggregate => {
             let aggregate = name_ref
@@ -240,6 +259,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 params.as_deref(),
                 position,
             )
+            .map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropProcedure => {
             let function_sig = name_ref
@@ -258,6 +278,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
                 params.as_deref(),
                 position,
             )
+            .map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropRoutine => {
             let function_sig = name_ref
@@ -273,16 +294,17 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             if let Some(ptr) =
                 resolve_function(binder, &routine_name, &schema, params.as_deref(), position)
             {
-                return Some(ptr);
+                return Some(smallvec![ptr]);
             }
 
             if let Some(ptr) =
                 resolve_aggregate(binder, &routine_name, &schema, params.as_deref(), position)
             {
-                return Some(ptr);
+                return Some(smallvec![ptr]);
             }
 
             resolve_procedure(binder, &routine_name, &schema, params.as_deref(), position)
+                .map(|ptr| smallvec![ptr])
         }
         NameRefClass::CallProcedure => {
             let call = name_ref.syntax().ancestors().find_map(ast::Call::cast)?;
@@ -291,10 +313,26 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
             resolve_procedure(binder, &procedure_name, &schema, None, position)
+                .map(|ptr| smallvec![ptr])
         }
         NameRefClass::DropSchema | NameRefClass::SchemaQualifier | NameRefClass::CreateSchema => {
             let schema_name = Name::from_node(name_ref);
-            resolve_schema(binder, &schema_name)
+            resolve_schema(binder, &schema_name).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::DefaultConstraintFunctionCall => {
+            let schema = if let Some(parent_node) = name_ref.syntax().parent()
+                && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
+            {
+                let base = field_expr.base()?;
+                let schema_name_ref = ast::NameRef::cast(base.syntax().clone())?;
+                Some(Schema(Name::from_node(&schema_name_ref)))
+            } else {
+                None
+            };
+            let function_name = Name::from_node(name_ref);
+            let position = name_ref.syntax().text_range().start();
+            resolve_function(binder, &function_name, &schema, None, position)
+                .map(|ptr| smallvec![ptr])
         }
         NameRefClass::SelectFunctionCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
@@ -311,12 +349,12 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 
             // functions take precedence
             if let Some(ptr) = resolve_function(binder, &function_name, &schema, None, position) {
-                return Some(ptr);
+                return Some(smallvec![ptr]);
             }
 
             // aggregates take precedence over function-call-style column access
             if let Some(ptr) = resolve_aggregate(binder, &function_name, &schema, None, position) {
-                return Some(ptr);
+                return Some(smallvec![ptr]);
             }
 
             // if no function found, check if this is function-call-style column access
@@ -327,23 +365,36 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             if schema.is_none()
                 && let Some(ptr) = resolve_fn_call_column(binder, name_ref)
             {
-                return Some(ptr);
+                return Some(smallvec![ptr]);
             }
 
             None
         }
-        NameRefClass::CreateIndexColumn => resolve_create_index_column(binder, name_ref),
-        NameRefClass::SelectColumn => resolve_select_column(binder, name_ref),
+        NameRefClass::CreateIndexColumn => {
+            resolve_create_index_column(binder, name_ref).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::SelectColumn => {
+            resolve_select_column(binder, name_ref).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SelectQualifiedColumnTable => {
-            resolve_select_qualified_column_table(binder, name_ref)
+            resolve_select_qualified_column_table(binder, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::SelectQualifiedColumn => resolve_select_qualified_column(binder, name_ref),
-        NameRefClass::CompositeTypeField => resolve_composite_type_field(binder, name_ref),
-        NameRefClass::InsertColumn => resolve_insert_column(binder, name_ref),
-        NameRefClass::DeleteWhereColumn => resolve_delete_where_column(binder, name_ref),
+        NameRefClass::SelectQualifiedColumn => {
+            resolve_select_qualified_column(binder, name_ref).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::CompositeTypeField => {
+            resolve_composite_type_field(binder, name_ref).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::InsertColumn => {
+            resolve_insert_column(binder, name_ref).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::DeleteWhereColumn => {
+            resolve_delete_where_column(binder, name_ref).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::UpdateWhereColumn | NameRefClass::UpdateSetColumn => {
-            resolve_update_where_column(binder, name_ref)
+            resolve_update_where_column(binder, name_ref).map(|ptr| smallvec![ptr])
         }
+        NameRefClass::JoinUsingColumn => resolve_join_using_columns(binder, name_ref),
         NameRefClass::UpdateFromTable => {
             let table_name = Name::from_node(name_ref);
             let schema = if let Some(parent) = name_ref.syntax().parent()
@@ -359,16 +410,16 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             if schema.is_none()
                 && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
             {
-                return Some(cte_ptr);
+                return Some(smallvec![cte_ptr]);
             }
 
             let position = name_ref.syntax().text_range().start();
 
             if let Some(ptr) = resolve_table(binder, &table_name, &schema, position) {
-                return Some(ptr);
+                return Some(smallvec![ptr]);
             }
 
-            resolve_view(binder, &table_name, &schema, position)
+            resolve_view(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
     }
 }
@@ -429,6 +480,15 @@ fn resolve_tablespace(binder: &Binder, tablespace_name: &Name) -> Option<SyntaxN
     let symbol_id = symbols.iter().copied().find(|id| {
         let symbol = &binder.symbols[*id];
         symbol.kind == SymbolKind::Tablespace
+    })?;
+    Some(binder.symbols[symbol_id].ptr)
+}
+
+fn resolve_database(binder: &Binder, database_name: &Name) -> Option<SyntaxNodePtr> {
+    let symbols = binder.scopes[binder.root_scope()].get(database_name)?;
+    let symbol_id = symbols.iter().copied().find(|id| {
+        let symbol = &binder.symbols[*id];
+        symbol.kind == SymbolKind::Database
     })?;
     Some(binder.symbols[symbol_id].ptr)
 }
@@ -701,9 +761,7 @@ fn resolve_select_qualified_column(
     {
         (
             Name::from_node(&table_field),
-            Some(Schema(Name::from_node(
-                &schema_name_ref
-            ))),
+            Some(Schema(Name::from_node(&schema_name_ref))),
         )
     } else {
         return None;
@@ -940,6 +998,48 @@ fn resolve_delete_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Opti
     let path = relation_name.path()?;
 
     resolve_column_for_path(binder, &path, column_name)
+}
+
+fn resolve_join_using_columns(
+    binder: &Binder,
+    name_ref: &ast::NameRef,
+) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
+    let join_expr = name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::JoinExpr::cast)?;
+
+    let mut results: SmallVec<[SyntaxNodePtr; 1]> = SmallVec::new();
+
+    collect_from_join_expr(&join_expr, &mut results, &|from_item: &ast::FromItem| {
+        resolve_from_item_for_column(binder, from_item, name_ref)
+    });
+
+    (!results.is_empty()).then_some(results)
+}
+
+fn collect_from_join_expr<F>(
+    join_expr: &ast::JoinExpr,
+    results: &mut SmallVec<[SyntaxNodePtr; 1]>,
+    try_resolve: &F,
+) where
+    F: Fn(&ast::FromItem) -> Option<SyntaxNodePtr>,
+{
+    if let Some(nested_join) = join_expr.join_expr() {
+        collect_from_join_expr(&nested_join, results, try_resolve);
+    }
+    if let Some(from_item) = join_expr.from_item()
+        && let Some(result) = try_resolve(&from_item)
+    {
+        results.push(result);
+    }
+    if let Some(join) = join_expr.join()
+        && let Some(from_item) = join.from_item()
+    {
+        if let Some(result) = try_resolve(&from_item) {
+            results.push(result);
+        }
+    }
 }
 
 fn resolve_update_where_column(binder: &Binder, name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {

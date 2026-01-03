@@ -20,8 +20,8 @@ pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<TextRang
         match_ast! {
             match node {
                 ast::NameRef(name_ref) => {
-                    if let Some(found) = resolve::resolve_name_ref(&binder, &name_ref)
-                      && found == target
+                    if let Some(found_refs) = resolve::resolve_name_ref(&binder, &name_ref)
+                        && found_refs.contains(&target)
                     {
                         refs.push(name_ref.syntax().text_range());
                     }
@@ -49,10 +49,12 @@ fn find_target(file: &ast::SourceFile, offset: TextSize, binder: &Binder) -> Opt
         return Some(SyntaxNodePtr::new(name.syntax()));
     }
 
-    if let Some(name_ref) = ast::NameRef::cast(parent.clone())
-        && let Some(ptr) = resolve::resolve_name_ref(binder, &name_ref)
-    {
-        return Some(ptr);
+    if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
+        // TODO: I think we want to return a list of targets so we can support cases like:
+        // select * from t join u using (id);
+        //                               ^ find refs
+        return resolve::resolve_name_ref(binder, &name_ref)
+            .and_then(|ptrs| ptrs.into_iter().next());
     }
 
     None

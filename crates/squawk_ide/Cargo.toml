@@ -20,6 +20,7 @@ annotate-snippets.workspace = true
 log.workspace = true
 smol_str.workspace = true
 la-arena.workspace = true
+smallvec.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

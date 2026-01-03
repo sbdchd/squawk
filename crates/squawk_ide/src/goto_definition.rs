@@ -2,14 +2,19 @@ use crate::binder;
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::{TextRange, TextSize};
+use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
 
-pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRange> {
-    let token = token_from_offset(&file, offset)?;
-    let parent = token.parent()?;
+pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> SmallVec<[TextRange; 1]> {
+    let Some(token) = token_from_offset(&file, offset) else {
+        return smallvec![];
+    };
+    let Some(parent) = token.parent() else {
+        return smallvec![];
+    };
 
     // goto def on case exprs
     if (token.kind() == SyntaxKind::WHEN_KW && parent.kind() == SyntaxKind::WHEN_CLAUSE)
@@ -20,7 +25,7 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRa
             if let Some(case_expr) = ast::CaseExpr::cast(parent)
                 && let Some(case_token) = case_expr.case_token()
             {
-                return Some(case_token.text_range());
+                return smallvec![case_token.text_range()];
             }
         }
     }
@@ -28,14 +33,14 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRa
     // goto def on COMMIT -> BEGIN/START TRANSACTION
     if ast::Commit::can_cast(parent.kind()) {
         if let Some(begin_range) = find_preceding_begin(&file, token.text_range().start()) {
-            return Some(begin_range);
+            return smallvec![begin_range];
         }
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind()) {
         if let Some(begin_range) = find_preceding_begin(&file, token.text_range().start()) {
-            return Some(begin_range);
+            return smallvec![begin_range];
         }
     }
 
@@ -43,23 +48,25 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> Option<TextRa
     if ast::Begin::can_cast(parent.kind()) {
         if let Some(end_range) = find_following_commit_or_rollback(&file, token.text_range().end())
         {
-            return Some(end_range);
+            return smallvec![end_range];
         }
     }
 
     if let Some(name) = ast::Name::cast(parent.clone()) {
-        return Some(name.syntax().text_range());
+        return smallvec![name.syntax().text_range()];
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         let binder_output = binder::bind(&file);
-        if let Some(ptr) = resolve::resolve_name_ref(&binder_output, &name_ref) {
-            let node = ptr.to_node(file.syntax());
-            return Some(node.text_range());
+        if let Some(ptrs) = resolve::resolve_name_ref(&binder_output, &name_ref) {
+            return ptrs
+                .iter()
+                .map(|ptr| ptr.to_node(file.syntax()).text_range())
+                .collect();
         }
     }
 
-    return None;
+    smallvec![]
 }
 
 fn find_preceding_begin(file: &ast::SourceFile, before: TextSize) -> Option<TextRange> {
@@ -113,22 +120,26 @@ mod test {
         let parse = ast::SourceFile::parse(&sql);
         assert_eq!(parse.errors(), vec![]);
         let file: ast::SourceFile = parse.tree();
-        if let Some(result) = goto_definition(file, offset) {
+        let results = goto_definition(file, offset);
+        if !results.is_empty() {
             let offset: usize = offset.into();
-            let group = Level::INFO.primary_title("definition").element(
-                Snippet::source(&sql)
-                    .fold(true)
-                    .annotation(
-                        AnnotationKind::Context
-                            .span(result.into())
-                            .label("2. destination"),
-                    )
-                    .annotation(
-                        AnnotationKind::Context
-                            .span(offset..offset + 1)
-                            .label("1. source"),
-                    ),
+            let mut snippet = Snippet::source(&sql).fold(true);
+
+            for (i, result) in results.iter().enumerate() {
+                snippet = snippet.annotation(
+                    AnnotationKind::Context
+                        .span((*result).into())
+                        .label(format!("{}. destination", i + 2)),
+                );
+            }
+
+            snippet = snippet.annotation(
+                AnnotationKind::Context
+                    .span(offset..offset + 1)
+                    .label("1. source"),
             );
+
+            let group = Level::INFO.primary_title("definition").element(snippet);
             let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
             return Some(
                 renderer
@@ -247,6 +258,22 @@ drop sequence s$0;
     }
 
     #[test]
+    fn goto_create_sequence_owned_by() {
+        assert_snapshot!(goto("
+create table t(c serial);
+create sequence s
+  owned by t.c$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t(c serial);
+          │                ─ 2. destination
+        3 │ create sequence s
+        4 │   owned by t.c;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_tablespace() {
         assert_snapshot!(goto("
 create tablespace ts location '/tmp/ts';
@@ -271,6 +298,48 @@ create table t (a int) tablespace b$0ar;
           │                   ─── 2. destination
         3 │ create table t (a int) tablespace bar;
           ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_database() {
+        assert_snapshot!(goto("
+create database mydb;
+drop database my$0db;
+"), @r"
+          ╭▸ 
+        2 │ create database mydb;
+          │                 ──── 2. destination
+        3 │ drop database mydb;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_database_defined_after() {
+        assert_snapshot!(goto("
+drop database my$0db;
+create database mydb;
+"), @r"
+          ╭▸ 
+        2 │ drop database mydb;
+          │                ─ 1. source
+        3 │ create database mydb;
+          ╰╴                ──── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_database_definition_returns_self() {
+        assert_snapshot!(goto("
+create database my$0db;
+"), @r"
+          ╭▸ 
+        2 │ create database mydb;
+          │                 ┬┬──
+          │                 ││
+          │                 │1. source
+          ╰╴                2. destination
         ");
     }
 
@@ -1938,6 +2007,23 @@ select foo$0(1);
           ‡
         8 │ select foo(1);
           ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_default_constraint_function_call() {
+        assert_snapshot!(goto("
+create function f() returns int as 'select 1' language sql;
+create table t(
+  a int default f$0()
+);
+"), @r"
+          ╭▸ 
+        2 │ create function f() returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        3 │ create table t(
+        4 │   a int default f()
+          ╰╴                ─ 1. source
         ");
     }
 
@@ -3939,6 +4025,53 @@ select messages.message$0 from users left join messages on users.id = messages.u
           │                                            ─────── 2. destination
         4 │ select messages.message from users left join messages on users.id = messages.user_id;
           ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_on_table_qualifier() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+select * from t join u on u$0.a = t.a;
+"), @r"
+          ╭▸ 
+        3 │ create table u(a int);
+          │              ─ 2. destination
+        4 │ select * from t join u on u.a = t.a;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_on_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+select * from t join u on u.a$0 = t.a;
+"), @r"
+          ╭▸ 
+        3 │ create table u(a int);
+          │                ─ 2. destination
+        4 │ select * from t join u on u.a = t.a;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_using_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+select * from t join u using (a$0);
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create table u(a int);
+          │                ─ 3. destination
+        4 │ select * from t join u using (a);
+          ╰╴                              ─ 1. source
         ");
     }
 
