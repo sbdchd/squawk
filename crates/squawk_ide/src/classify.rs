@@ -9,7 +9,9 @@ pub(crate) enum NameRefClass {
     DropView,
     DropMaterializedView,
     DropSequence,
+    SequenceOwnedByColumn,
     Tablespace,
+    DropDatabase,
     ForeignKeyTable,
     ForeignKeyColumn,
     ForeignKeyLocalColumn,
@@ -32,6 +34,7 @@ pub(crate) enum NameRefClass {
     CreateSchema,
     CreateIndex,
     CreateIndexColumn,
+    DefaultConstraintFunctionCall,
     SelectFunctionCall,
     SelectFromTable,
     SelectColumn,
@@ -46,6 +49,7 @@ pub(crate) enum NameRefClass {
     UpdateWhereColumn,
     UpdateSetColumn,
     UpdateFromTable,
+    JoinUsingColumn,
     SchemaQualifier,
     TypeReference,
 }
@@ -56,6 +60,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     let mut in_column_list = false;
     let mut in_where_clause = false;
     let mut in_from_clause = false;
+    let mut in_on_clause = false;
     let mut in_set_clause = false;
     let mut in_constraint_exclusion_list = false;
     let mut in_constraint_include_clause = false;
@@ -83,11 +88,15 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             .is_some();
 
         let mut in_from_clause = false;
+        let mut in_on_clause = false;
         for ancestor in parent.ancestors() {
+            if ast::OnClause::can_cast(ancestor.kind()) {
+                in_on_clause = true;
+            }
             if ast::FromClause::can_cast(ancestor.kind()) {
                 in_from_clause = true;
             }
-            if ast::Select::can_cast(ancestor.kind()) && !in_from_clause {
+            if ast::Select::can_cast(ancestor.kind()) && (!in_from_clause || in_on_clause) {
                 if is_function_call || is_schema_table_col {
                     return Some(NameRefClass::SchemaQualifier);
                 } else {
@@ -119,15 +128,19 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             .is_some();
 
         let mut in_from_clause = false;
+        let mut in_on_clause = false;
         let mut in_cast_expr = false;
         for ancestor in parent.ancestors() {
+            if ast::OnClause::can_cast(ancestor.kind()) {
+                in_on_clause = true;
+            }
             if ast::CastExpr::can_cast(ancestor.kind()) {
                 in_cast_expr = true;
             }
             if ast::FromClause::can_cast(ancestor.kind()) {
                 in_from_clause = true;
             }
-            if ast::Select::can_cast(ancestor.kind()) && !in_from_clause {
+            if ast::Select::can_cast(ancestor.kind()) && (!in_from_clause || in_on_clause) {
                 if in_cast_expr {
                     return Some(NameRefClass::TypeReference);
                 }
@@ -190,6 +203,15 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::DropSequence::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropSequence);
+        }
+        if ast::DropDatabase::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropDatabase);
+        }
+        if let Some(sequence_option) = ast::SequenceOption::cast(ancestor.clone())
+            && sequence_option.owned_token().is_some()
+            && sequence_option.by_token().is_some()
+        {
+            return Some(NameRefClass::SequenceOwnedByColumn);
         }
         if ast::DropTablespace::can_cast(ancestor.kind())
             || ast::Tablespace::can_cast(ancestor.kind())
@@ -296,6 +318,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::CallExpr::can_cast(ancestor.kind()) {
             in_call_expr = true;
         }
+        if ast::DefaultConstraint::can_cast(ancestor.kind()) && in_call_expr && !in_arg_list {
+            return Some(NameRefClass::DefaultConstraintFunctionCall);
+        }
+        if ast::OnClause::can_cast(ancestor.kind()) {
+            in_on_clause = true;
+        }
         if ast::FromClause::can_cast(ancestor.kind()) {
             in_from_clause = true;
         }
@@ -303,7 +331,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             if in_call_expr && !in_arg_list {
                 return Some(NameRefClass::SelectFunctionCall);
             }
-            if in_from_clause {
+            if in_from_clause && !in_on_clause {
                 return Some(NameRefClass::SelectFromTable);
             }
             // Classify as SelectColumn for target list, WHERE, ORDER BY, GROUP BY, etc.
@@ -330,6 +358,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 return Some(NameRefClass::InsertColumn);
             }
             return Some(NameRefClass::InsertTable);
+        }
+        if ast::JoinUsingClause::can_cast(ancestor.kind()) && in_column_list {
+            return Some(NameRefClass::JoinUsingColumn);
         }
         if ast::WhereClause::can_cast(ancestor.kind()) {
             in_where_clause = true;
@@ -371,6 +402,7 @@ pub(crate) enum NameClass {
     CreateIndex(ast::CreateIndex),
     CreateSequence(ast::CreateSequence),
     CreateTablespace(ast::CreateTablespace),
+    CreateDatabase(ast::CreateDatabase),
     CreateType(ast::CreateType),
     CreateFunction(ast::CreateFunction),
     CreateAggregate(ast::CreateAggregate),
@@ -410,6 +442,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(create_tablespace) = ast::CreateTablespace::cast(ancestor.clone()) {
             return Some(NameClass::CreateTablespace(create_tablespace));
+        }
+        if let Some(create_database) = ast::CreateDatabase::cast(ancestor.clone()) {
+            return Some(NameClass::CreateDatabase(create_database));
         }
         if let Some(create_type) = ast::CreateType::cast(ancestor.clone()) {
             return Some(NameClass::CreateType(create_type));

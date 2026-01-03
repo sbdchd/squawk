@@ -70,7 +70,7 @@ export function goto_definition(
   content: string,
   line: number,
   column: number,
-): LocationRange | null {
+): Array<LocationRange> {
   return goto_definition_(content, line, column)
 }
 

@@ -1885,6 +1885,7 @@ dependencies = [
  "line-index",
  "log",
  "rowan",
+ "smallvec",
  "smol_str",
  "squawk-linter",
  "squawk-syntax",

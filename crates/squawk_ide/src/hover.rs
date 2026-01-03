@@ -25,7 +25,8 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::PrimaryKeyConstraintColumn
             | NameRefClass::NotNullConstraintColumn
             | NameRefClass::ExcludeConstraintColumn
-            | NameRefClass::PartitionByColumn => {
+            | NameRefClass::PartitionByColumn
+            | NameRefClass::JoinUsingColumn => {
                 return hover_column(file, &name_ref, &binder);
             }
             NameRefClass::TypeReference | NameRefClass::DropType => {
@@ -63,10 +64,13 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::PartitionOfTable => {
                 return hover_table(file, &name_ref, &binder);
             }
-            NameRefClass::ForeignKeyColumn | NameRefClass::ForeignKeyLocalColumn => {
+            NameRefClass::ForeignKeyColumn
+            | NameRefClass::ForeignKeyLocalColumn
+            | NameRefClass::SequenceOwnedByColumn => {
                 return hover_column(file, &name_ref, &binder);
             }
             NameRefClass::DropSequence => return hover_sequence(file, &name_ref, &binder),
+            NameRefClass::DropDatabase => return hover_database(file, &name_ref, &binder),
             NameRefClass::Tablespace => return hover_tablespace(file, &name_ref, &binder),
             NameRefClass::DropIndex => return hover_index(file, &name_ref, &binder),
             NameRefClass::DropFunction => return hover_function(file, &name_ref, &binder),
@@ -75,6 +79,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 return hover_procedure(file, &name_ref, &binder);
             }
             NameRefClass::DropRoutine => return hover_routine(file, &name_ref, &binder),
+            NameRefClass::DefaultConstraintFunctionCall => {
+                return hover_function(file, &name_ref, &binder);
+            }
             NameRefClass::SelectFunctionCall => {
                 // Try function first, but fall back to column if no function found
                 // (handles function-call-style column access like `select a(t)`)
@@ -110,6 +117,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateTablespace(create_tablespace) => {
                 return format_create_tablespace(&create_tablespace);
+            }
+            NameClass::CreateDatabase(create_database) => {
+                return format_create_database(&create_database);
             }
             NameClass::CreateType(create_type) => {
                 return format_create_type(&create_type, &binder);
@@ -152,13 +162,31 @@ fn hover_column(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let column_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let column_ptrs = resolve::resolve_name_ref(binder, name_ref)?;
 
     let root = file.syntax();
+    let results: Vec<String> = column_ptrs
+        .iter()
+        .filter_map(|column_ptr| format_hover_for_column_ptr(binder, root, column_ptr, name_ref))
+        .collect();
+
+    if results.is_empty() {
+        return None;
+    }
+
+    Some(results.join("\n"))
+}
+
+fn format_hover_for_column_ptr(
+    binder: &binder::Binder,
+    root: &squawk_syntax::SyntaxNode,
+    column_ptr: &squawk_syntax::SyntaxNodePtr,
+    name_ref: &ast::NameRef,
+) -> Option<String> {
     let column_name_node = column_ptr.to_node(root);
 
     if let Some(with_table) = column_name_node.ancestors().find_map(ast::WithTable::cast) {
-        let cte_name = with_table.name()?.syntax().text().to_string();
+        let cte_name = with_table.name()?;
         let column_name = if column_name_node
             .ancestors()
             .any(|a| ast::Values::can_cast(a.kind()))
@@ -167,7 +195,11 @@ fn hover_column(
         } else {
             Name::from_string(column_name_node.text().to_string())
         };
-        return Some(format!("column {}.{}", cte_name, column_name));
+        return Some(format!(
+            "column {}.{}",
+            cte_name.syntax().text(),
+            column_name
+        ));
     }
 
     // create view v(a) as select 1;
@@ -181,7 +213,7 @@ fn hover_column(
     }
 
     let column = column_name_node.ancestors().find_map(ast::Column::cast)?;
-    let column_name = column.name()?.syntax().text().to_string();
+    let column_name = column.name()?;
     let ty = column.ty()?;
 
     let create_table = column
@@ -189,7 +221,7 @@ fn hover_column(
         .ancestors()
         .find_map(ast::CreateTable::cast)?;
     let path = create_table.path()?;
-    let table_name = path.segment()?.name()?.syntax().text().to_string();
+    let table_name = path.segment()?.name()?;
 
     let schema = if let Some(qualifier) = path.qualifier() {
         qualifier.syntax().text().to_string()
@@ -199,8 +231,8 @@ fn hover_column(
 
     Some(format_column(
         &schema,
-        &table_name,
-        &column_name,
+        &table_name.syntax().text().to_string(),
+        &column_name.syntax().text().to_string(),
         &ty.syntax().text(),
     ))
 }
@@ -210,7 +242,9 @@ fn hover_composite_type_field(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let field_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let field_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
     let root = file.syntax();
     let field_name_node = field_ptr.to_node(root);
 
@@ -269,7 +303,9 @@ fn hover_table(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let table_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let table_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let table_name_node = table_ptr.to_node(root);
@@ -297,7 +333,9 @@ fn hover_index(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let index_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let index_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let index_name_node = index_ptr.to_node(root);
@@ -314,7 +352,9 @@ fn hover_sequence(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let sequence_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let sequence_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let sequence_name_node = sequence_ptr.to_node(root);
@@ -331,10 +371,25 @@ fn hover_tablespace(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let tablespace_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let tablespace_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
     let root = file.syntax();
     let tablespace_name_node = tablespace_ptr.to_node(root);
     Some(format!("tablespace {}", tablespace_name_node.text()))
+}
+
+fn hover_database(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let database_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
+    let root = file.syntax();
+    let database_name_node = database_ptr.to_node(root);
+    Some(format!("database {}", database_name_node.text()))
 }
 
 fn hover_type(
@@ -342,7 +397,9 @@ fn hover_type(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let type_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let type_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let type_name_node = type_ptr.to_node(root);
@@ -494,6 +551,11 @@ fn format_create_tablespace(create_tablespace: &ast::CreateTablespace) -> Option
     Some(format!("tablespace {}", name))
 }
 
+fn format_create_database(create_database: &ast::CreateDatabase) -> Option<String> {
+    let name = create_database.name()?.syntax().text().to_string();
+    Some(format!("database {}", name))
+}
+
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
     let position = create_index.syntax().text_range().start();
     let search_path = binder.search_path_at(position);
@@ -543,7 +605,9 @@ fn hover_schema(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let schema_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let schema_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let schema_name_node = schema_ptr.to_node(root);
@@ -577,7 +641,9 @@ fn hover_function(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let function_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let function_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let function_name_node = function_ptr.to_node(root);
@@ -630,7 +696,9 @@ fn hover_aggregate(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let aggregate_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let aggregate_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let aggregate_name_node = aggregate_ptr.to_node(root);
@@ -677,7 +745,9 @@ fn hover_procedure(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let procedure_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let procedure_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let procedure_name_node = procedure_ptr.to_node(root);
@@ -724,7 +794,9 @@ fn hover_routine(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let routine_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let routine_ptr = resolve::resolve_name_ref(binder, name_ref)?
+        .into_iter()
+        .next()?;
 
     let root = file.syntax();
     let routine_name_node = routine_ptr.to_node(root);
@@ -2786,6 +2858,21 @@ select ((((member))).name$0) from team;
           ╭▸ 
         6 │ select ((((member))).name) from team;
           ╰╴                        ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_join_using_column() {
+        assert_snapshot!(check_hover("
+create table t(id int);
+create table u(id int);
+select * from t join u using (id$0);
+"), @r"
+        hover: column public.t.id int
+              column public.u.id int
+          ╭▸ 
+        4 │ select * from t join u using (id);
+          ╰╴                               ─ hover
         ");
     }
 }

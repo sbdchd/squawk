@@ -92,6 +92,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateTablespace(create_tablespace) => {
             bind_create_tablespace(b, create_tablespace)
         }
+        ast::Stmt::CreateDatabase(create_database) => bind_create_database(b, create_database),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -382,6 +383,25 @@ fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespa
 
     let root = b.root_scope();
     b.scopes[root].insert(tablespace_name, tablespace_id);
+}
+
+fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
+    let Some(name) = create_database.name() else {
+        return;
+    };
+
+    let database_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let database_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Database,
+        ptr: name_ptr,
+        schema: Schema::new("pg_database"),
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(database_name, database_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

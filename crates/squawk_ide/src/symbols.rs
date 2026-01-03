@@ -54,6 +54,7 @@ pub(crate) enum SymbolKind {
     View,
     Sequence,
     Tablespace,
+    Database,
 }
 
 #[derive(Clone, Debug)]
