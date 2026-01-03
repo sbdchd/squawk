@@ -9,6 +9,7 @@ use crate::resolve::{
 
 #[derive(Debug)]
 pub enum DocumentSymbolKind {
+    Schema,
     Table,
     View,
     MaterializedView,
@@ -40,6 +41,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
 
     for stmt in file.stmts() {
         match stmt {
+            ast::Stmt::CreateSchema(create_schema) => {
+                if let Some(symbol) = create_schema_symbol(create_schema) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreateTable(create_table) => {
                 if let Some(symbol) = create_table_symbol(&binder, create_table) {
                     symbols.push(symbol);
@@ -132,6 +138,37 @@ fn create_cte_table_symbol(with_table: ast::WithTable) -> Option<DocumentSymbol>
         full_range,
         focus_range,
         children,
+    })
+}
+
+fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymbol> {
+    let (name, focus_range) = if let Some(name_node) = create_schema.name() {
+        (
+            name_node.syntax().text().to_string(),
+            name_node.syntax().text_range(),
+        )
+    } else if let Some(schema_name_ref) = create_schema
+        .schema_authorization()
+        .and_then(|authorization| authorization.role())
+        .and_then(|role| role.name_ref())
+    {
+        (
+            schema_name_ref.syntax().text().to_string(),
+            schema_name_ref.syntax().text_range(),
+        )
+    } else {
+        return None;
+    };
+
+    let full_range = create_schema.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Schema,
+        full_range,
+        focus_range,
+        children: vec![],
     })
 }
 
@@ -425,6 +462,7 @@ mod tests {
 
     fn symbol_to_group<'a>(symbol: &DocumentSymbol, sql: &'a str) -> Group<'a> {
         let kind = match symbol.kind {
+            DocumentSymbolKind::Schema => "schema",
             DocumentSymbolKind::Table => "table",
             DocumentSymbolKind::View => "view",
             DocumentSymbolKind::MaterializedView => "materialized view",
@@ -527,6 +565,36 @@ create table users (
           │     │
           │     full range for `column: email citext`
           ╰╴    focus range
+        ");
+    }
+
+    #[test]
+    fn create_schema() {
+        assert_snapshot!(symbols("
+create schema foo;
+"), @r"
+        info: schema: foo
+          ╭▸ 
+        2 │ create schema foo;
+          │ ┬─────────────┯━━
+          │ │             │
+          │ │             focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_schema_authorization() {
+        assert_snapshot!(symbols("
+create schema authorization foo;
+"), @r"
+        info: schema: foo
+          ╭▸ 
+        2 │ create schema authorization foo;
+          │ ┬───────────────────────────┯━━
+          │ │                           │
+          │ │                           focus range
+          ╰╴full range
         ");
     }
 

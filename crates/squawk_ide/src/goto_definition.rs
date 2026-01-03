@@ -233,6 +233,34 @@ drop table t$0;
     }
 
     #[test]
+    fn goto_drop_sequence() {
+        assert_snapshot!(goto("
+create sequence s;
+drop sequence s$0;
+"), @r"
+          ╭▸ 
+        2 │ create sequence s;
+          │                 ─ 2. destination
+        3 │ drop sequence s;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_sequence_with_schema() {
+        assert_snapshot!(goto("
+create sequence foo.s;
+drop sequence foo.s$0;
+"), @r"
+          ╭▸ 
+        2 │ create sequence foo.s;
+          │                     ─ 2. destination
+        3 │ drop sequence foo.s;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_table_with_schema() {
         assert_snapshot!(goto("
 create table public.t();
@@ -318,6 +346,286 @@ create table t$0(x bigint, y bigint);
           │              │
           │              2. destination
           ╰╴             1. source
+        ");
+    }
+
+    #[test]
+    fn goto_foreign_key_references_table() {
+        assert_snapshot!(goto("
+create table foo(id int);
+create table bar(
+  id int,
+  foo_id int,
+  foreign key (foo_id) references foo$0(id)
+);
+"), @r"
+          ╭▸ 
+        2 │ create table foo(id int);
+          │              ─── 2. destination
+          ‡
+        6 │   foreign key (foo_id) references foo(id)
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_foreign_key_references_column() {
+        assert_snapshot!(goto("
+create table foo(id int);
+create table bar(
+  id int,
+  foo_id int,
+  foreign key (foo_id) references foo(id$0)
+);
+"), @r"
+          ╭▸ 
+        2 │ create table foo(id int);
+          │                  ── 2. destination
+          ‡
+        6 │   foreign key (foo_id) references foo(id)
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_foreign_key_local_column() {
+        assert_snapshot!(goto("
+create table bar(
+  id int,
+  foo_id int,
+  foreign key (foo_id$0) references foo(id)
+);
+"), @r"
+          ╭▸ 
+        4 │   foo_id int,
+          │   ────── 2. destination
+        5 │   foreign key (foo_id) references foo(id)
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_check_constraint_column() {
+        assert_snapshot!(goto("
+create table t (
+  b int check (b > 10),
+  c int check (c$0 > 10) no inherit
+);
+"), @r"
+          ╭▸ 
+        4 │   c int check (c > 10) no inherit
+          │   ┬            ─ 1. source
+          │   │
+          ╰╴  2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_generated_column() {
+        assert_snapshot!(goto("
+create table t (
+  a int,
+  b int generated always as (
+    a$0 * 2
+  ) stored
+);
+"), @r"
+          ╭▸ 
+        3 │   a int,
+          │   ─ 2. destination
+        4 │   b int generated always as (
+        5 │     a * 2
+          ╰╴    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_check_constraint_column() {
+        assert_snapshot!(goto("
+create table t (
+  a int,
+  b text,
+  check (a$0 > b)
+);
+"), @r"
+          ╭▸ 
+        3 │   a int,
+          │   ─ 2. destination
+        4 │   b text,
+        5 │   check (a > b)
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_unique_constraint_column() {
+        assert_snapshot!(goto("
+create table t (
+  a int,
+  b text,
+  unique (a$0)
+);
+"), @r"
+          ╭▸ 
+        3 │   a int,
+          │   ─ 2. destination
+        4 │   b text,
+        5 │   unique (a)
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_primary_key_constraint_column() {
+        assert_snapshot!(goto("
+create table t (
+  id bigint generated always as identity,
+  inserted_at timestamptz not null default now(),
+  primary key (id, inserted_at$0)
+);
+"), @r"
+          ╭▸ 
+        4 │   inserted_at timestamptz not null default now(),
+          │   ─────────── 2. destination
+        5 │   primary key (id, inserted_at)
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_not_null_constraint_column() {
+        assert_snapshot!(goto("
+create table t (
+  id integer,
+  name text,
+  not null name$0
+);
+"), @r"
+          ╭▸ 
+        4 │   name text,
+          │   ──── 2. destination
+        5 │   not null name
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_exclude_constraint_column() {
+        assert_snapshot!(goto("
+create table circles (
+  c circle,
+  exclude using gist (c$0 with &&)
+);
+"), @r"
+          ╭▸ 
+        3 │   c circle,
+          │   ─ 2. destination
+        4 │   exclude using gist (c with &&)
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_exclude_constraint_include_column() {
+        assert_snapshot!(goto("
+create table t (
+  a int,
+  b text,
+  exclude using btree ( a with > ) 
+    include (a$0, b)
+);
+"), @r"
+          ╭▸ 
+        3 │   a int,
+          │   ─ 2. destination
+          ‡
+        6 │     include (a, b)
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_exclude_constraint_where_column() {
+        assert_snapshot!(goto("
+create table t (
+  a int,
+  b text,
+  exclude using btree ( a with > ) 
+    where ( a$0 > 10 and b like '%foo' )
+);
+"), @r"
+          ╭▸ 
+        3 │   a int,
+          │   ─ 2. destination
+          ‡
+        6 │     where ( a > 10 and b like '%foo' )
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_partition_by_column() {
+        assert_snapshot!(goto("
+create table t (
+  id bigint generated always as identity,
+  inserted_at timestamptz not null default now()
+) partition by range (inserted_at$0);
+"), @r"
+          ╭▸ 
+        4 │   inserted_at timestamptz not null default now()
+          │   ─────────── 2. destination
+        5 │ ) partition by range (inserted_at);
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_partition_of_table() {
+        assert_snapshot!(goto("
+create table t ();
+create table t_2026_01_02 partition of t$0
+    for values from ('2026-01-02') to ('2026-01-03');
+"), @r"
+          ╭▸ 
+        2 │ create table t ();
+          │              ─ 2. destination
+        3 │ create table t_2026_01_02 partition of t
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_like_clause() {
+        assert_snapshot!(goto("
+create table large_data_table(a text);
+create table t (
+  a text,
+  like large_data_table$0,
+  b integer
+);
+"), @r"
+          ╭▸ 
+        2 │ create table large_data_table(a text);
+          │              ──────────────── 2. destination
+          ‡
+        5 │   like large_data_table,
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_inherits() {
+        assert_snapshot!(goto("
+create table bar(a int);
+create table t (a int)
+inherits (foo.bar, bar$0, buzz);
+"), @r"
+          ╭▸ 
+        2 │ create table bar(a int);
+          │              ─── 2. destination
+        3 │ create table t (a int)
+        4 │ inherits (foo.bar, bar, buzz);
+          ╰╴                     ─ 1. source
         ");
     }
 
@@ -2109,6 +2417,20 @@ select a$0 from ((select 1 a));
           ╭▸ 
         2 │ select a from ((select 1 a));
           ╰╴       ─ 1. source       ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column_star_table() {
+        assert_snapshot!(goto("
+create table foo.t(a int);
+select a$0 from (select * from foo.t);
+"), @r"
+          ╭▸ 
+        2 │ create table foo.t(a int);
+          │                    ─ 2. destination
+        3 │ select a from (select * from foo.t);
+          ╰╴       ─ 1. source
         ");
     }
 

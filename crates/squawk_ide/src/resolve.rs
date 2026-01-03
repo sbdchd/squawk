@@ -91,6 +91,122 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_view(binder, &view_name, &schema, position)
         }
+        NameRefClass::DropSequence => {
+            let path = find_containing_path(name_ref)?;
+            let sequence_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_sequence(binder, &sequence_name, &schema, position)
+        }
+        NameRefClass::ForeignKeyTable => {
+            let foreign_key = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::ForeignKeyConstraint::cast)?;
+            let path = foreign_key.path()?;
+            let table_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_table(binder, &table_name, &schema, position)
+        }
+        NameRefClass::ForeignKeyColumn => {
+            let foreign_key = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::ForeignKeyConstraint::cast)?;
+            let path = foreign_key.path()?;
+            let column_name = Name::from_node(name_ref);
+            resolve_column_for_path(binder, &path, column_name)
+        }
+        NameRefClass::ForeignKeyLocalColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::CheckConstraintColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::GeneratedColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::UniqueConstraintColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::PrimaryKeyConstraintColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::NotNullConstraintColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::ExcludeConstraintColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::PartitionByColumn => {
+            let create_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateTable::cast)?;
+            let column_name = Name::from_node(name_ref);
+            find_column_in_create_table(&create_table, &column_name)
+        }
+        NameRefClass::PartitionOfTable => {
+            let path = find_containing_path(name_ref)?;
+            let table_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_table(binder, &table_name, &schema, position)
+        }
+        NameRefClass::LikeTable => {
+            let like_clause = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::LikeClause::cast)?;
+            let path = like_clause.path()?;
+            let table_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_table(binder, &table_name, &schema, position)
+        }
+        NameRefClass::InheritsTable => {
+            let path = find_containing_path(name_ref)?;
+            let table_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_table(binder, &table_name, &schema, position)
+        }
         NameRefClass::DropFunction => {
             let function_sig = name_ref
                 .syntax()
@@ -287,6 +403,21 @@ fn resolve_view(
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     resolve_for_kind(binder, view_name, schema, position, SymbolKind::View)
+}
+
+fn resolve_sequence(
+    binder: &Binder,
+    sequence_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    resolve_for_kind(
+        binder,
+        sequence_name,
+        schema,
+        position,
+        SymbolKind::Sequence,
+    )
 }
 
 fn resolve_for_kind(
@@ -677,11 +808,11 @@ fn resolve_from_item_for_column(
 ) -> Option<SyntaxNodePtr> {
     let column_name = Name::from_node(name_ref);
     if let Some(paren_select) = from_item.paren_select() {
-        return resolve_subquery_column(&paren_select, &column_name);
+        return resolve_subquery_column(binder, &paren_select, name_ref, &column_name);
     }
 
     if let Some(paren_expr) = from_item.paren_expr() {
-        return resolve_column_from_paren_expr(&paren_expr, &column_name);
+        return resolve_column_from_paren_expr(binder, &paren_expr, name_ref, &column_name);
     }
 
     let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
@@ -1189,7 +1320,9 @@ fn resolve_cte_column(
 }
 
 fn resolve_subquery_column(
+    binder: &Binder,
     paren_select: &ast::ParenSelect,
+    name_ref: &ast::NameRef,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
     let select_variant = paren_select.select()?;
@@ -1207,6 +1340,27 @@ fn resolve_subquery_column(
             {
                 return Some(SyntaxNodePtr::new(&node));
             }
+            if matches!(col_name, ColumnName::Star) {
+                if let Some(from_clause) = subquery_select.from_clause() {
+                    for from_item in from_clause.from_items() {
+                        if let Some(result) =
+                            resolve_from_item_for_column(binder, &from_item, name_ref)
+                        {
+                            return Some(result);
+                        }
+                    }
+
+                    for join_expr in from_clause.join_exprs() {
+                        if let Some(result) =
+                            resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
+                                resolve_from_item_for_column(binder, from_item, name_ref)
+                            })
+                        {
+                            return Some(result);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1214,7 +1368,9 @@ fn resolve_subquery_column(
 }
 
 fn resolve_column_from_paren_expr(
+    binder: &Binder,
     paren_expr: &ast::ParenExpr,
+    name_ref: &ast::NameRef,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
     if let Some(select) = paren_expr.select() {
@@ -1234,13 +1390,13 @@ fn resolve_column_from_paren_expr(
     }
 
     if let Some(ast::Expr::ParenExpr(paren_expr)) = paren_expr.expr() {
-        return resolve_column_from_paren_expr(&paren_expr, column_name);
+        return resolve_column_from_paren_expr(binder, &paren_expr, name_ref, column_name);
     }
 
     if let Some(from_item) = paren_expr.from_item()
         && let Some(paren_select) = from_item.paren_select()
     {
-        return resolve_subquery_column(&paren_select, column_name);
+        return resolve_subquery_column(binder, &paren_select, name_ref, column_name);
     }
 
     None

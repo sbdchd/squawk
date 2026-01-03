@@ -88,6 +88,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateMaterializedView(create_view) => {
             bind_create_materialized_view(b, create_view)
         }
+        ast::Stmt::CreateSequence(create_sequence) => bind_create_sequence(b, create_sequence),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -329,6 +330,34 @@ fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMateria
 
     let root = b.root_scope();
     b.scopes[root].insert(view_name, view_id);
+}
+
+fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
+    let Some(path) = create_sequence.path() else {
+        return;
+    };
+
+    let Some(sequence_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+    let is_temp =
+        create_sequence.temp_token().is_some() || create_sequence.temporary_token().is_some();
+
+    let Some(schema) = schema_name(b, &path, is_temp) else {
+        return;
+    };
+
+    let sequence_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Sequence,
+        ptr: name_ptr,
+        schema,
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(sequence_name, sequence_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
