@@ -2414,11 +2414,11 @@ pub struct CheckConstraint {
 }
 impl CheckConstraint {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn constraint_name(&self) -> Option<ConstraintName> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2436,10 +2436,6 @@ impl CheckConstraint {
     #[inline]
     pub fn check_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CHECK_KW)
-    }
-    #[inline]
-    pub fn constraint_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
 }
 
@@ -2960,6 +2956,21 @@ impl ConstraintIndexTablespace {
     #[inline]
     pub fn using_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::USING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConstraintName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConstraintName {
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn constraint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
 }
 
@@ -7287,16 +7298,12 @@ impl ExcludeConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn constraint_name(&self) -> Option<ConstraintName> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn where_condition_clause(&self) -> Option<WhereConditionClause> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn constraint_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
     pub fn exclude_token(&self) -> Option<SyntaxToken> {
@@ -7671,11 +7678,11 @@ pub struct ForeignKeyConstraint {
 }
 impl ForeignKeyConstraint {
     #[inline]
-    pub fn match_type(&self) -> Option<MatchType> {
+    pub fn constraint_name(&self) -> Option<ConstraintName> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn match_type(&self) -> Option<MatchType> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7689,10 +7696,6 @@ impl ForeignKeyConstraint {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn constraint_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
     pub fn foreign_token(&self) -> Option<SyntaxToken> {
@@ -12213,7 +12216,7 @@ impl PrimaryKeyConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn constraint_name(&self) -> Option<ConstraintName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12223,10 +12226,6 @@ impl PrimaryKeyConstraint {
     #[inline]
     pub fn using_index(&self) -> Option<UsingIndex> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn constraint_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
     pub fn key_token(&self) -> Option<SyntaxToken> {
@@ -12472,15 +12471,15 @@ pub struct ReferencesConstraint {
 }
 impl ReferencesConstraint {
     #[inline]
+    pub fn column(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn constraint_name(&self) -> Option<ConstraintName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn match_type(&self) -> Option<MatchType> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name(&self) -> Option<Name> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12492,7 +12491,7 @@ impl ReferencesConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn table(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12502,10 +12501,6 @@ impl ReferencesConstraint {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn constraint_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
     pub fn references_token(&self) -> Option<SyntaxToken> {
@@ -15328,7 +15323,7 @@ impl UniqueConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn constraint_name(&self) -> Option<ConstraintName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15342,10 +15337,6 @@ impl UniqueConstraint {
     #[inline]
     pub fn using_index(&self) -> Option<UsingIndex> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn constraint_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
     pub fn unique_token(&self) -> Option<SyntaxToken> {
@@ -18949,6 +18940,24 @@ impl AstNode for ConstraintIndexTablespace {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::CONSTRAINT_INDEX_TABLESPACE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConstraintName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONSTRAINT_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

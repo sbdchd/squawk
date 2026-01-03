@@ -69,7 +69,8 @@ fn not_valid_validate_in_transaction(
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
                             if add_constraint.not_valid().is_some()
                                 && let Some(constraint) = add_constraint.constraint()
-                                && let Some(constraint_name) = constraint.name()
+                                && let Some(constraint_name) =
+                                    constraint.constraint_name().and_then(|c| c.name())
                             {
                                 not_valid_names.insert(Identifier::new(&constraint_name.text()));
                             }

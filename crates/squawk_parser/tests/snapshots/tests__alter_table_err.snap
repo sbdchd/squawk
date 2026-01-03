@@ -103,10 +103,11 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE " "
       NOT_NULL_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "id_not_null"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "id_not_null"
         WHITESPACE " "
         NOT_KW "not"
         WHITESPACE " "

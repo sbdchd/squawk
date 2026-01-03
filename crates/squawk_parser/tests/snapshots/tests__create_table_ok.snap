@@ -1533,10 +1533,11 @@ SOURCE_FILE
                 INT_KW "int"
         WHITESPACE " "
         NULL_CONSTRAINT
-          CONSTRAINT_KW "constraint"
-          WHITESPACE " "
-          NAME
-            IDENT "foo"
+          CONSTRAINT_NAME
+            CONSTRAINT_KW "constraint"
+            WHITESPACE " "
+            NAME
+              IDENT "foo"
           WHITESPACE " "
           NULL_KW "null"
       WHITESPACE "\n"
@@ -1646,10 +1647,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       CHECK_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "foo"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "foo"
         WHITESPACE " "
         CHECK_KW "check"
         WHITESPACE " "
@@ -2393,10 +2395,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       CHECK_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "foo"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "foo"
         WHITESPACE " "
         CHECK_KW "check"
         WHITESPACE " "

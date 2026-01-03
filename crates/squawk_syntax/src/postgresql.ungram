@@ -574,8 +574,11 @@ Role =
 RoleList =
   Role (',' Role)*
 
+ConstraintName =
+  'constraint' Name
+
 CheckConstraint  =
-  ('constraint' Name)
+  ConstraintName?
   'check' '(' Expr ')'
   NoInherit?
 
@@ -621,7 +624,7 @@ NullsNotDistinct =
   'nulls' 'not' 'distinct'
 
 UniqueConstraint =
-  ('constraint' Name)
+  ConstraintName?
   'unique'
   (
     UsingIndex
@@ -629,7 +632,7 @@ UniqueConstraint =
   )
 
 PrimaryKeyConstraint =
-  ('constraint' Name)
+  ConstraintName?
   'primary' 'key' (UsingIndex | ColumnList PartitionItemList?)
 
 SetNullColumns =
@@ -677,7 +680,7 @@ MatchType =
 
 
 ForeignKeyConstraint =
-  ('constraint' Name)
+  ConstraintName?
   'foreign' 'key' from_columns:ColumnList 'references' Path to_columns:ColumnList
   MatchType?
   OnDeleteAction?
@@ -721,8 +724,8 @@ GeneratedConstraint =
   ('always' 'as' '(' Expr ')' 'stored' | ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList? )
 
 ReferencesConstraint =
-  ('constraint' Name)
-  'references' Path '(' NameRef ')'
+  ConstraintName?
+  'references' table:Path ('(' column:NameRef ')')?
   MatchType?
   OnDeleteAction?
   OnUpdateAction?
@@ -1734,7 +1737,7 @@ WhereConditionClause =
   'where' '(' Expr ')'
 
 ExcludeConstraint =
-  ('constraint' Name)
+  ConstraintName?
   'exclude' ConstraintIndexMethod? ConstraintExclusionList
   WhereConditionClause?
 

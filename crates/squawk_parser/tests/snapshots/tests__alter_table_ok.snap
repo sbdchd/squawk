@@ -2247,10 +2247,11 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE " "
       UNIQUE_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "some_name"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "some_name"
         WHITESPACE " "
         UNIQUE_KW "unique"
         WHITESPACE " "
@@ -3192,10 +3193,11 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE " "
       UNIQUE_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "c"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "c"
         WHITESPACE " "
         UNIQUE_KW "unique"
         WHITESPACE " "
@@ -3223,10 +3225,11 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE " "
       PRIMARY_KEY_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "c"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "c"
         WHITESPACE " "
         PRIMARY_KW "primary"
         WHITESPACE " "
@@ -3258,10 +3261,11 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE " "
       CHECK_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "foo_not_null"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "foo_not_null"
         WHITESPACE "\n  "
         CHECK_KW "check"
         WHITESPACE " "
@@ -3868,10 +3872,11 @@ SOURCE_FILE
       ADD_KW "add"
       WHITESPACE " "
       FOREIGN_KEY_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "foo_bar_id_fkey"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "foo_bar_id_fkey"
         WHITESPACE " "
         FOREIGN_KW "foreign"
         WHITESPACE " "

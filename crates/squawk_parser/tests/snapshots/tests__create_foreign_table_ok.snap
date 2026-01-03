@@ -104,10 +104,11 @@ SOURCE_FILE
                 IDENT "\"fr_FR\""
         WHITESPACE "\n    "
         NOT_NULL_CONSTRAINT
-          CONSTRAINT_KW "constraint"
-          WHITESPACE " "
-          NAME
-            IDENT "c"
+          CONSTRAINT_NAME
+            CONSTRAINT_KW "constraint"
+            WHITESPACE " "
+            NAME
+              IDENT "c"
           WHITESPACE "\n    "
           NOT_KW "not"
           WHITESPACE " "
@@ -169,10 +170,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       CHECK_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "fooo"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "fooo"
         WHITESPACE "\n    "
         CHECK_KW "check"
         WHITESPACE " "

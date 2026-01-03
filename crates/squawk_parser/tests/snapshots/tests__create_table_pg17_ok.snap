@@ -182,10 +182,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       FOREIGN_KEY_CONSTRAINT
-        CONSTRAINT_KW "CONSTRAINT"
-        WHITESPACE " "
-        NAME
-          IDENT "order_address"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "CONSTRAINT"
+          WHITESPACE " "
+          NAME
+            IDENT "order_address"
         WHITESPACE " "
         FOREIGN_KW "FOREIGN"
         WHITESPACE " "
@@ -336,10 +337,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       PRIMARY_KEY_CONSTRAINT
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        NAME
-          IDENT "pk"
+        CONSTRAINT_NAME
+          CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          NAME
+            IDENT "pk"
         WHITESPACE " \n        "
         PRIMARY_KW "primary"
         WHITESPACE " "
