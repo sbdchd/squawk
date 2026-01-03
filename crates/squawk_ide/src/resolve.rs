@@ -84,7 +84,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_type(binder, &type_name, &schema, position)
         }
-        NameRefClass::DropView => {
+        NameRefClass::DropView | NameRefClass::DropMaterializedView => {
             let path = find_containing_path(name_ref)?;
             let view_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -172,7 +172,7 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_procedure(binder, &procedure_name, &schema, None, position)
         }
-        NameRefClass::DropSchema | NameRefClass::SchemaQualifier => {
+        NameRefClass::DropSchema | NameRefClass::SchemaQualifier | NameRefClass::CreateSchema => {
             let schema_name = Name::from_node(name_ref);
             resolve_schema(binder, &schema_name)
         }
@@ -191,6 +191,11 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
 
             // functions take precedence
             if let Some(ptr) = resolve_function(binder, &function_name, &schema, None, position) {
+                return Some(ptr);
+            }
+
+            // aggregates take precedence over function-call-style column access
+            if let Some(ptr) = resolve_aggregate(binder, &function_name, &schema, None, position) {
                 return Some(ptr);
             }
 
@@ -1266,11 +1271,32 @@ pub(crate) fn resolve_function_info(binder: &Binder, path: &ast::Path) -> Option
     resolve_symbol_info(binder, path, SymbolKind::Function)
 }
 
+pub(crate) fn resolve_aggregate_info(
+    binder: &Binder,
+    path: &ast::Path,
+) -> Option<(Schema, String)> {
+    resolve_symbol_info(binder, path, SymbolKind::Aggregate)
+}
+
+pub(crate) fn resolve_procedure_info(
+    binder: &Binder,
+    path: &ast::Path,
+) -> Option<(Schema, String)> {
+    resolve_symbol_info(binder, path, SymbolKind::Procedure)
+}
+
 pub(crate) fn resolve_type_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
     resolve_symbol_info(binder, path, SymbolKind::Type)
 }
 
 pub(crate) fn resolve_view_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
+    resolve_symbol_info(binder, path, SymbolKind::View)
+}
+
+pub(crate) fn resolve_materialized_view_info(
+    binder: &Binder,
+    path: &ast::Path,
+) -> Option<(Schema, String)> {
     resolve_symbol_info(binder, path, SymbolKind::View)
 }
 

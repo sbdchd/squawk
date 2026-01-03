@@ -85,6 +85,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateSchema(create_schema) => bind_create_schema(b, create_schema),
         ast::Stmt::CreateType(create_type) => bind_create_type(b, create_type),
         ast::Stmt::CreateView(create_view) => bind_create_view(b, create_view),
+        ast::Stmt::CreateMaterializedView(create_view) => {
+            bind_create_materialized_view(b, create_view)
+        }
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -222,12 +225,21 @@ fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure)
 }
 
 fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
-    let Some(schema_name_node) = create_schema.name() else {
+    let (schema_name, name_ptr) = if let Some(schema_name_node) = create_schema.name() {
+        let schema_name = Name::from_node(&schema_name_node);
+        let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
+        (schema_name, name_ptr)
+    } else if let Some(schema_name_ref) = create_schema
+        .schema_authorization()
+        .and_then(|authorization| authorization.role())
+        .and_then(|role| role.name_ref())
+    {
+        let schema_name = Name::from_node(&schema_name_ref);
+        let name_ptr = SyntaxNodePtr::new(schema_name_ref.syntax());
+        (schema_name, name_ptr)
+    } else {
         return;
     };
-
-    let schema_name = Name::from_node(&schema_name_node);
-    let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
 
     let schema_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Schema,
@@ -279,6 +291,32 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
     let is_temp = create_view.temp_token().is_some() || create_view.temporary_token().is_some();
 
     let Some(schema) = schema_name(b, &path, is_temp) else {
+        return;
+    };
+
+    let view_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::View,
+        ptr: name_ptr,
+        schema,
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(view_name, view_id);
+}
+
+fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMaterializedView) {
+    let Some(path) = create_view.path() else {
+        return;
+    };
+
+    let Some(view_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+
+    let Some(schema) = schema_name(b, &path, false) else {
         return;
     };
 

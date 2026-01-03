@@ -3,14 +3,18 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder::{self, extract_string_literal};
 use crate::resolve::{
-    resolve_function_info, resolve_table_info, resolve_type_info, resolve_view_info,
+    resolve_aggregate_info, resolve_function_info, resolve_materialized_view_info,
+    resolve_procedure_info, resolve_table_info, resolve_type_info, resolve_view_info,
 };
 
 #[derive(Debug)]
 pub enum DocumentSymbolKind {
     Table,
     View,
+    MaterializedView,
     Function,
+    Aggregate,
+    Procedure,
     Type,
     Enum,
     Column,
@@ -46,6 +50,16 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::CreateAggregate(create_aggregate) => {
+                if let Some(symbol) = create_aggregate_symbol(&binder, create_aggregate) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateProcedure(create_procedure) => {
+                if let Some(symbol) = create_procedure_symbol(&binder, create_procedure) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreateType(create_type) => {
                 if let Some(symbol) = create_type_symbol(&binder, create_type) {
                     symbols.push(symbol);
@@ -53,6 +67,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateView(create_view) => {
                 if let Some(symbol) = create_view_symbol(&binder, create_view) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateMaterializedView(create_view) => {
+                if let Some(symbol) = create_materialized_view_symbol(&binder, create_view) {
                     symbols.push(symbol);
                 }
             }
@@ -184,6 +203,39 @@ fn create_view_symbol(
     })
 }
 
+fn create_materialized_view_symbol(
+    binder: &binder::Binder,
+    create_view: ast::CreateMaterializedView,
+) -> Option<DocumentSymbol> {
+    let path = create_view.path()?;
+    let segment = path.segment()?;
+    let name_node = segment.name()?;
+
+    let (schema, view_name) = resolve_materialized_view_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, view_name);
+
+    let full_range = create_view.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    let mut children = vec![];
+    if let Some(column_list) = create_view.column_list() {
+        for column in column_list.columns() {
+            if let Some(column_symbol) = create_column_symbol(column) {
+                children.push(column_symbol);
+            }
+        }
+    }
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::MaterializedView,
+        full_range,
+        focus_range,
+        children,
+    })
+}
+
 fn create_function_symbol(
     binder: &binder::Binder,
     create_function: ast::CreateFunction,
@@ -202,6 +254,54 @@ fn create_function_symbol(
         name,
         detail: None,
         kind: DocumentSymbolKind::Function,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_aggregate_symbol(
+    binder: &binder::Binder,
+    create_aggregate: ast::CreateAggregate,
+) -> Option<DocumentSymbol> {
+    let path = create_aggregate.path()?;
+    let segment = path.segment()?;
+    let name_node = segment.name()?;
+
+    let (schema, aggregate_name) = resolve_aggregate_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, aggregate_name);
+
+    let full_range = create_aggregate.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Aggregate,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_procedure_symbol(
+    binder: &binder::Binder,
+    create_procedure: ast::CreateProcedure,
+) -> Option<DocumentSymbol> {
+    let path = create_procedure.path()?;
+    let segment = path.segment()?;
+    let name_node = segment.name()?;
+
+    let (schema, procedure_name) = resolve_procedure_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, procedure_name);
+
+    let full_range = create_procedure.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Procedure,
         full_range,
         focus_range,
         children: vec![],
@@ -327,7 +427,10 @@ mod tests {
         let kind = match symbol.kind {
             DocumentSymbolKind::Table => "table",
             DocumentSymbolKind::View => "view",
+            DocumentSymbolKind::MaterializedView => "materialized view",
             DocumentSymbolKind::Function => "function",
+            DocumentSymbolKind::Aggregate => "aggregate",
+            DocumentSymbolKind::Procedure => "procedure",
             DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Enum => "enum",
             DocumentSymbolKind::Column => "column",
@@ -438,6 +541,54 @@ create table users (
           │ ┬───────────────┯━━━━───────────────────────────────────────────────
           │ │               │
           │ │               focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_materialized_view() {
+        assert_snapshot!(
+            symbols("create materialized view reports as select 1;"),
+            @r"
+        info: materialized view: public.reports
+          ╭▸ 
+        1 │ create materialized view reports as select 1;
+          │ ┬────────────────────────┯━━━━━━────────────
+          │ │                        │
+          │ │                        focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_aggregate() {
+        assert_snapshot!(
+            symbols("create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);"),
+            @r"
+        info: aggregate: public.myavg
+          ╭▸ 
+        1 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
+          │ ┬────────────────┯━━━━─────────────────────────────────────────────
+          │ │                │
+          │ │                focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_procedure() {
+        assert_snapshot!(
+            symbols("create procedure hello() language sql as $$ select 1; $$;"),
+            @r"
+        info: procedure: public.hello
+          ╭▸ 
+        1 │ create procedure hello() language sql as $$ select 1; $$;
+          │ ┬────────────────┯━━━━──────────────────────────────────
+          │ │                │
+          │ │                focus range
           ╰╴full range
         "
         );

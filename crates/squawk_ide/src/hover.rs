@@ -40,6 +40,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::Table
             | NameRefClass::DropTable
             | NameRefClass::DropView
+            | NameRefClass::DropMaterializedView
             | NameRefClass::CreateIndex
             | NameRefClass::InsertTable
             | NameRefClass::DeleteTable
@@ -64,7 +65,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 }
                 return hover_column(file, &name_ref, &binder);
             }
-            NameRefClass::SchemaQualifier | NameRefClass::DropSchema => {
+            NameRefClass::SchemaQualifier
+            | NameRefClass::DropSchema
+            | NameRefClass::CreateSchema => {
                 return hover_schema(file, &name_ref, &binder);
             }
         }
@@ -456,13 +459,27 @@ fn hover_schema(
     let root = file.syntax();
     let schema_name_node = schema_ptr.to_node(root);
 
-    let create_schema = ast::CreateSchema::cast(schema_name_node.parent()?)?;
+    let create_schema = schema_name_node
+        .ancestors()
+        .find_map(ast::CreateSchema::cast)?;
 
     format_create_schema(&create_schema)
 }
 
+fn create_schema_name(create_schema: &ast::CreateSchema) -> Option<String> {
+    if let Some(schema_name) = create_schema.name() {
+        return Some(schema_name.syntax().text().to_string());
+    }
+
+    create_schema
+        .schema_authorization()
+        .and_then(|authorization| authorization.role())
+        .and_then(|role| role.name_ref())
+        .map(|name_ref| name_ref.syntax().text().to_string())
+}
+
 fn format_create_schema(create_schema: &ast::CreateSchema) -> Option<String> {
-    let schema_name = create_schema.name()?.syntax().text().to_string();
+    let schema_name = create_schema_name(create_schema)?;
     Some(format!("schema {}", schema_name))
 }
 
@@ -1894,6 +1911,31 @@ create schema foo$0;
           ╭▸ 
         2 │ create schema foo;
           ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_schema_authorization() {
+        assert_snapshot!(check_hover("
+create schema authorization foo$0;
+"), @r"
+        hover: schema foo
+          ╭▸ 
+        2 │ create schema authorization foo;
+          ╰╴                              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_drop_schema_authorization() {
+        assert_snapshot!(check_hover("
+create schema authorization foo;
+drop schema foo$0;
+"), @r"
+        hover: schema foo
+          ╭▸ 
+        3 │ drop schema foo;
+          ╰╴              ─ hover
         ");
     }
 

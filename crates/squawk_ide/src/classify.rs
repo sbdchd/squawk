@@ -7,12 +7,14 @@ pub(crate) enum NameRefClass {
     DropIndex,
     DropType,
     DropView,
+    DropMaterializedView,
     DropFunction,
     DropAggregate,
     DropProcedure,
     DropRoutine,
     CallProcedure,
     DropSchema,
+    CreateSchema,
     CreateIndex,
     CreateIndexColumn,
     SelectFunctionCall,
@@ -139,12 +141,16 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     }
 
     let mut in_type = false;
+    let mut in_schema_authorization = false;
     for ancestor in name_ref.syntax().ancestors() {
         if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
             in_type = true;
         }
         if in_type {
             return Some(NameRefClass::TypeReference);
+        }
+        if ast::SchemaAuthorization::can_cast(ancestor.kind()) {
+            in_schema_authorization = true;
         }
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTable);
@@ -160,6 +166,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::DropView::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropView);
+        }
+        if ast::DropMaterializedView::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropMaterializedView);
         }
         if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
             return Some(NameRefClass::TypeReference);
@@ -181,6 +190,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::DropSchema::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropSchema);
+        }
+        if in_schema_authorization
+            && let Some(create_schema) = ast::CreateSchema::cast(ancestor.clone())
+            && create_schema.name().is_none()
+        {
+            return Some(NameRefClass::CreateSchema);
         }
         if ast::PartitionItem::can_cast(ancestor.kind()) {
             in_partition_item = true;
