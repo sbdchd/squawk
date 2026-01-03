@@ -89,6 +89,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
             bind_create_materialized_view(b, create_view)
         }
         ast::Stmt::CreateSequence(create_sequence) => bind_create_sequence(b, create_sequence),
+        ast::Stmt::CreateTablespace(create_tablespace) => {
+            bind_create_tablespace(b, create_tablespace)
+        }
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -358,6 +361,27 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
 
     let root = b.root_scope();
     b.scopes[root].insert(sequence_name, sequence_id);
+}
+
+fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespace) {
+    let Some(name) = create_tablespace.name() else {
+        return;
+    };
+
+    let tablespace_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let tablespace_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Tablespace,
+        ptr: name_ptr,
+        // TODO: tablespaces don't actually have schemas so we should think
+        // about this more
+        schema: Schema::new("pg_tablespace"),
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(tablespace_name, tablespace_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

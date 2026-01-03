@@ -53,6 +53,7 @@ pub(crate) enum SymbolKind {
     Type,
     View,
     Sequence,
+    Tablespace,
 }
 
 #[derive(Clone, Debug)]
