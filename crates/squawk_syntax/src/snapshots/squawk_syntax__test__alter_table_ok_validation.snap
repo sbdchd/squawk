@@ -25,10 +25,11 @@ SOURCE_FILE@0..470
       ADD_KW@95..98 "add"
       WHITESPACE@98..99 " "
       CHECK_CONSTRAINT@99..233
-        CONSTRAINT_KW@99..109 "constraint"
-        WHITESPACE@109..110 " "
-        NAME@110..136
-          IDENT@110..136 "widget_config_schema_ ..."
+        CONSTRAINT_NAME@99..136
+          CONSTRAINT_KW@99..109 "constraint"
+          WHITESPACE@109..110 " "
+          NAME@110..136
+            IDENT@110..136 "widget_config_schema_ ..."
         WHITESPACE@136..137 " "
         CHECK_KW@137..142 "check"
         WHITESPACE@142..143 " "
@@ -90,10 +91,11 @@ SOURCE_FILE@0..470
       ADD_KW@283..286 "add"
       WHITESPACE@286..287 " "
       CHECK_CONSTRAINT@287..459
-        CONSTRAINT_KW@287..297 "constraint"
-        WHITESPACE@297..298 " "
-        NAME@298..343
-          IDENT@298..343 "widget_instance_confi ..."
+        CONSTRAINT_NAME@287..343
+          CONSTRAINT_KW@287..297 "constraint"
+          WHITESPACE@297..298 " "
+          NAME@298..343
+            IDENT@298..343 "widget_instance_confi ..."
         WHITESPACE@343..344 " "
         CHECK_KW@344..349 "check"
         WHITESPACE@349..350 " "

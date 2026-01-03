@@ -60,10 +60,11 @@ SOURCE_FILE
         STRING "'fooooo'"
     WHITESPACE "\n  "
     CHECK_CONSTRAINT
-      CONSTRAINT_KW "constraint"
-      WHITESPACE " "
-      NAME
-        IDENT "c"
+      CONSTRAINT_NAME
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "c"
       WHITESPACE " "
       CHECK_KW "check"
       WHITESPACE " "

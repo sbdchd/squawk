@@ -590,6 +590,26 @@ FROM (
 WHERE total_amount > 1000;
 ```
 
+### Rule: implicit column name in references
+
+```sql
+create table u(
+  id int primary key
+);
+create table t(
+  u_id int references u
+--                    ^quickfix
+);
+
+-- becomes
+
+create table t(
+  u_id int references u(id)
+);
+```
+
+and vice versa
+
 ### Rule: aggregate free `having` condition
 
 ```sql

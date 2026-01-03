@@ -466,6 +466,72 @@ create table bar(
     }
 
     #[test]
+    fn goto_foreign_key_on_delete_set_null_column() {
+        assert_snapshot!(goto("
+create table users (
+  user_id integer not null,
+  primary key (user_id)
+);
+
+create table posts (
+  post_id integer not null,
+  author_id integer,
+  primary key (post_id),
+  foreign key (author_id) references users on delete set null (author_id$0)
+);
+"), @r"
+           ╭▸ 
+         9 │   author_id integer,
+           │   ───────── 2. destination
+        10 │   primary key (post_id),
+        11 │   foreign key (author_id) references users on delete set null (author_id)
+           ╰╴                                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_references_constraint_table() {
+        assert_snapshot!(goto("
+create table t (
+  id serial primary key
+);
+
+create table u (
+  id serial primary key,
+  t_id int references t$0
+);
+"), @r"
+          ╭▸ 
+        2 │ create table t (
+          │              ─ 2. destination
+          ‡
+        8 │   t_id int references t
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_references_constraint_column() {
+        assert_snapshot!(goto("
+create table t (
+  id serial primary key
+);
+
+create table u (
+  id serial primary key,
+  t_id int references t(id$0)
+);
+"), @r"
+          ╭▸ 
+        3 │   id serial primary key
+          │   ── 2. destination
+          ‡
+        8 │   t_id int references t(id)
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_foreign_key_references_column() {
         assert_snapshot!(goto("
 create table foo(id int);
@@ -2914,6 +2980,20 @@ select t$0 from t;
         2 │ create table t(x bigint, y bigint);
           │              ─ 2. destination
         3 │ select t from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_table_star_expansion() {
+        assert_snapshot!(goto("
+create table t(id int, a int);
+select t$0.* from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(id int, a int);
+          │              ─ 2. destination
+        3 │ select t.* from t;
           ╰╴       ─ 1. source
         ");
     }

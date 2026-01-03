@@ -121,22 +121,29 @@ pub(crate) fn resolve_name_ref(
             resolve_tablespace(binder, &tablespace_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ForeignKeyTable => {
-            let foreign_key = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::ForeignKeyConstraint::cast)?;
-            let path = foreign_key.path()?;
+            let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
             resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ForeignKeyColumn => {
-            let foreign_key = name_ref
+            // TODO: the ast is too flat here
+            let path = if let Some(foreign_key) = name_ref
                 .syntax()
                 .ancestors()
-                .find_map(ast::ForeignKeyConstraint::cast)?;
-            let path = foreign_key.path()?;
+                .find_map(ast::ForeignKeyConstraint::cast)
+            {
+                foreign_key.path()?
+            } else if let Some(references_constraint) = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::ReferencesConstraint::cast)
+            {
+                references_constraint.table()?
+            } else {
+                return None;
+            };
             let column_name = Name::from_node(name_ref);
             resolve_column_for_path(binder, &path, column_name).map(|ptr| smallvec![ptr])
         }
@@ -678,6 +685,7 @@ fn resolve_select_qualified_column_table(
     let explicit_schema = if field_expr
         .field()
         .is_some_and(|f| f.syntax() == name_ref.syntax())
+        && field_expr.star_token().is_none()
     {
         // if we're at the field `bar` in `foo.bar`
         if let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? {

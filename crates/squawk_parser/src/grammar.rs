@@ -3760,9 +3760,7 @@ fn opt_column_constraint(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    if p.eat(CONSTRAINT_KW) {
-        name(p);
-    }
+    opt_constraint_name(p);
     match opt_constraint_inner(p) {
         Some(kind) => {
             opt_constraint_option_list(p);
@@ -4087,9 +4085,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at_ts(TABLE_CONSTRAINT_FIRST));
     let m = p.start();
     // [ CONSTRAINT constraint_name ]
-    if p.eat(CONSTRAINT_KW) {
-        name(p);
-    }
+    opt_constraint_name(p);
     // CHECK ( expression ) [ NO INHERIT ]
     let kind = match p.current() {
         CHECK_KW => {
@@ -7167,9 +7163,7 @@ fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // { NOT NULL | CHECK (expression) }
 fn domain_constraint(p: &mut Parser<'_>) {
     let m = p.start();
-    if p.eat(CONSTRAINT_KW) {
-        name(p);
-    }
+    opt_constraint_name(p);
     if p.eat(NOT_KW) {
         p.expect(NULL_KW);
         m.complete(p, NOT_NULL_CONSTRAINT);
@@ -7182,6 +7176,16 @@ fn domain_constraint(p: &mut Parser<'_>) {
         m.complete(p, CHECK_CONSTRAINT);
     } else {
         p.error("expected NOT NULL or CHECK constraint");
+        m.abandon(p);
+    }
+}
+
+fn opt_constraint_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.eat(CONSTRAINT_KW) {
+        name(p);
+        m.complete(p, CONSTRAINT_NAME);
+    } else {
         m.abandon(p);
     }
 }

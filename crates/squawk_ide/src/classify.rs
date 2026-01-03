@@ -66,6 +66,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     let mut in_constraint_include_clause = false;
     let mut in_constraint_where_clause = false;
     let mut in_partition_item = false;
+    let mut in_set_null_columns = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -115,6 +116,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             //                                              ^^^
             .is_some_and(|field_name_ref| field_name_ref.syntax() == name_ref.syntax())
             // we're not inside a call expr
+        && field_expr.star_token().is_none()
         && field_expr
             .syntax()
             .parent()
@@ -220,6 +222,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         {
             return Some(NameRefClass::Tablespace);
         }
+        if ast::SetNullColumns::can_cast(ancestor.kind()) {
+            in_set_null_columns = true;
+        }
         if let Some(foreign_key) = ast::ForeignKeyConstraint::cast(ancestor.clone()) {
             if in_column_list {
                 // TODO: ast is too "flat" here, we need a unique node for to
@@ -241,7 +246,28 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 {
                     return Some(NameRefClass::ForeignKeyLocalColumn);
                 }
+                if in_set_null_columns {
+                    return Some(NameRefClass::ForeignKeyLocalColumn);
+                }
             } else {
+                return Some(NameRefClass::ForeignKeyTable);
+            }
+        }
+        if let Some(references_constraint) = ast::ReferencesConstraint::cast(ancestor.clone()) {
+            if let Some(column_ref) = references_constraint.column()
+                && column_ref
+                    .syntax()
+                    .text_range()
+                    .contains_range(name_ref.syntax().text_range())
+            {
+                return Some(NameRefClass::ForeignKeyColumn);
+            }
+            if let Some(path) = references_constraint.table()
+                && path
+                    .syntax()
+                    .text_range()
+                    .contains_range(name_ref.syntax().text_range())
+            {
                 return Some(NameRefClass::ForeignKeyTable);
             }
         }
