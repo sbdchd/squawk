@@ -2,6 +2,7 @@ use crate::binder::{self, Binder};
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::{TextRange, TextSize};
+use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxNodePtr,
     ast::{self, AstNode},
@@ -10,7 +11,7 @@ use squawk_syntax::{
 
 pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<TextRange> {
     let binder = binder::bind(file);
-    let Some(target) = find_target(file, offset, &binder) else {
+    let Some(targets) = find_targets(file, offset, &binder) else {
         return vec![];
     };
 
@@ -21,14 +22,14 @@ pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<TextRang
             match node {
                 ast::NameRef(name_ref) => {
                     if let Some(found_refs) = resolve::resolve_name_ref(&binder, &name_ref)
-                        && found_refs.contains(&target)
+                        && found_refs.iter().any(|ptr| targets.contains(ptr))
                     {
                         refs.push(name_ref.syntax().text_range());
                     }
                 },
                 ast::Name(name) => {
                     let found = SyntaxNodePtr::new(name.syntax());
-                    if found == target {
+                    if targets.contains(&found) {
                         refs.push(name.syntax().text_range());
                     }
                 },
@@ -41,20 +42,20 @@ pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<TextRang
     refs
 }
 
-fn find_target(file: &ast::SourceFile, offset: TextSize, binder: &Binder) -> Option<SyntaxNodePtr> {
+fn find_targets(
+    file: &ast::SourceFile,
+    offset: TextSize,
+    binder: &Binder,
+) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
     let token = token_from_offset(file, offset)?;
     let parent = token.parent()?;
 
     if let Some(name) = ast::Name::cast(parent.clone()) {
-        return Some(SyntaxNodePtr::new(name.syntax()));
+        return Some(smallvec![SyntaxNodePtr::new(name.syntax())]);
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        // TODO: I think we want to return a list of targets so we can support cases like:
-        // select * from t join u using (id);
-        //                               ^ find refs
-        return resolve::resolve_name_ref(binder, &name_ref)
-            .and_then(|ptrs| ptrs.into_iter().next());
+        return resolve::resolve_name_ref(binder, &name_ref);
     }
 
     None
@@ -140,6 +141,26 @@ table users;
           │            2. reference
         4 │ table users;
           ╰╴      ───── 3. reference
+        ");
+    }
+
+    #[test]
+    fn join_using_column() {
+        assert_snapshot!(find_refs("
+create table t(id int);
+create table u(id int);
+select * from t join u using (id$0);
+"), @r"
+          ╭▸ 
+        2 │ create table t(id int);
+          │                ── 1. reference
+        3 │ create table u(id int);
+          │                ── 2. reference
+        4 │ select * from t join u using (id);
+          │                               ┬┬
+          │                               ││
+          │                               │0. query
+          ╰╴                              3. reference
         ");
     }
 
