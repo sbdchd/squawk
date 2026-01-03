@@ -98,6 +98,10 @@ pub(crate) fn resolve_name_ref(binder: &Binder, name_ref: &ast::NameRef) -> Opti
             let position = name_ref.syntax().text_range().start();
             resolve_sequence(binder, &sequence_name, &schema, position)
         }
+        NameRefClass::Tablespace => {
+            let tablespace_name = Name::from_node(name_ref);
+            resolve_tablespace(binder, &tablespace_name)
+        }
         NameRefClass::ForeignKeyTable => {
             let foreign_key = name_ref
                 .syntax()
@@ -418,6 +422,15 @@ fn resolve_sequence(
         position,
         SymbolKind::Sequence,
     )
+}
+
+fn resolve_tablespace(binder: &Binder, tablespace_name: &Name) -> Option<SyntaxNodePtr> {
+    let symbols = binder.scopes[binder.root_scope()].get(tablespace_name)?;
+    let symbol_id = symbols.iter().copied().find(|id| {
+        let symbol = &binder.symbols[*id];
+        symbol.kind == SymbolKind::Tablespace
+    })?;
+    Some(binder.symbols[symbol_id].ptr)
 }
 
 fn resolve_for_kind(

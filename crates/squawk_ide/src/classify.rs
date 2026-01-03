@@ -9,6 +9,7 @@ pub(crate) enum NameRefClass {
     DropView,
     DropMaterializedView,
     DropSequence,
+    Tablespace,
     ForeignKeyTable,
     ForeignKeyColumn,
     ForeignKeyLocalColumn,
@@ -190,6 +191,13 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::DropSequence::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropSequence);
         }
+        if ast::DropTablespace::can_cast(ancestor.kind())
+            || ast::Tablespace::can_cast(ancestor.kind())
+            || ast::SetTablespace::can_cast(ancestor.kind())
+            || ast::ConstraintIndexTablespace::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Tablespace);
+        }
         if let Some(foreign_key) = ast::ForeignKeyConstraint::cast(ancestor.clone()) {
             if in_column_list {
                 // TODO: ast is too "flat" here, we need a unique node for to
@@ -362,6 +370,7 @@ pub(crate) enum NameClass {
     WithTable(ast::WithTable),
     CreateIndex(ast::CreateIndex),
     CreateSequence(ast::CreateSequence),
+    CreateTablespace(ast::CreateTablespace),
     CreateType(ast::CreateType),
     CreateFunction(ast::CreateFunction),
     CreateAggregate(ast::CreateAggregate),
@@ -398,6 +407,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(create_sequence) = ast::CreateSequence::cast(ancestor.clone()) {
             return Some(NameClass::CreateSequence(create_sequence));
+        }
+        if let Some(create_tablespace) = ast::CreateTablespace::cast(ancestor.clone()) {
+            return Some(NameClass::CreateTablespace(create_tablespace));
         }
         if let Some(create_type) = ast::CreateType::cast(ancestor.clone()) {
             return Some(NameClass::CreateType(create_type));

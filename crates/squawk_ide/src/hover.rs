@@ -67,6 +67,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 return hover_column(file, &name_ref, &binder);
             }
             NameRefClass::DropSequence => return hover_sequence(file, &name_ref, &binder),
+            NameRefClass::Tablespace => return hover_tablespace(file, &name_ref, &binder),
             NameRefClass::DropIndex => return hover_index(file, &name_ref, &binder),
             NameRefClass::DropFunction => return hover_function(file, &name_ref, &binder),
             NameRefClass::DropAggregate => return hover_aggregate(file, &name_ref, &binder),
@@ -106,6 +107,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateSequence(create_sequence) => {
                 return format_create_sequence(&create_sequence, &binder);
+            }
+            NameClass::CreateTablespace(create_tablespace) => {
+                return format_create_tablespace(&create_tablespace);
             }
             NameClass::CreateType(create_type) => {
                 return format_create_type(&create_type, &binder);
@@ -322,6 +326,17 @@ fn hover_sequence(
     format_create_sequence(&create_sequence, binder)
 }
 
+fn hover_tablespace(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let tablespace_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+    let root = file.syntax();
+    let tablespace_name_node = tablespace_ptr.to_node(root);
+    Some(format!("tablespace {}", tablespace_name_node.text()))
+}
+
 fn hover_type(
     file: &ast::SourceFile,
     name_ref: &ast::NameRef,
@@ -472,6 +487,11 @@ fn format_create_sequence(
     };
 
     Some(format!("sequence {}.{}", schema, sequence_name))
+}
+
+fn format_create_tablespace(create_tablespace: &ast::CreateTablespace) -> Option<String> {
+    let name = create_tablespace.name()?.syntax().text().to_string();
+    Some(format!("tablespace {}", name))
 }
 
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {

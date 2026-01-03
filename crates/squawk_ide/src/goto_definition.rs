@@ -247,6 +247,34 @@ drop sequence s$0;
     }
 
     #[test]
+    fn goto_drop_tablespace() {
+        assert_snapshot!(goto("
+create tablespace ts location '/tmp/ts';
+drop tablespace ts$0;
+"), @r"
+          ╭▸ 
+        2 │ create tablespace ts location '/tmp/ts';
+          │                   ── 2. destination
+        3 │ drop tablespace ts;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_tablespace() {
+        assert_snapshot!(goto("
+create tablespace bar location '/tmp/ts';
+create table t (a int) tablespace b$0ar;
+"), @r"
+          ╭▸ 
+        2 │ create tablespace bar location '/tmp/ts';
+          │                   ─── 2. destination
+        3 │ create table t (a int) tablespace bar;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_sequence_with_schema() {
         assert_snapshot!(goto("
 create sequence foo.s;
