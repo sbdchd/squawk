@@ -335,6 +335,7 @@ fn handle_document_symbol(
             name: sym.name,
             detail: sym.detail,
             kind: match sym.kind {
+                DocumentSymbolKind::Schema => SymbolKind::NAMESPACE,
                 DocumentSymbolKind::Table => SymbolKind::STRUCT,
                 DocumentSymbolKind::View => SymbolKind::STRUCT,
                 DocumentSymbolKind::MaterializedView => SymbolKind::STRUCT,

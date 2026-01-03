@@ -18,7 +18,16 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::InsertColumn
             | NameRefClass::DeleteWhereColumn
             | NameRefClass::UpdateWhereColumn
-            | NameRefClass::UpdateSetColumn => return hover_column(file, &name_ref, &binder),
+            | NameRefClass::UpdateSetColumn
+            | NameRefClass::CheckConstraintColumn
+            | NameRefClass::GeneratedColumn
+            | NameRefClass::UniqueConstraintColumn
+            | NameRefClass::PrimaryKeyConstraintColumn
+            | NameRefClass::NotNullConstraintColumn
+            | NameRefClass::ExcludeConstraintColumn
+            | NameRefClass::PartitionByColumn => {
+                return hover_column(file, &name_ref, &binder);
+            }
             NameRefClass::TypeReference | NameRefClass::DropType => {
                 return hover_type(file, &name_ref, &binder);
             }
@@ -47,9 +56,17 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::UpdateTable
             | NameRefClass::SelectFromTable
             | NameRefClass::UpdateFromTable
-            | NameRefClass::SelectQualifiedColumnTable => {
+            | NameRefClass::SelectQualifiedColumnTable
+            | NameRefClass::ForeignKeyTable
+            | NameRefClass::LikeTable
+            | NameRefClass::InheritsTable
+            | NameRefClass::PartitionOfTable => {
                 return hover_table(file, &name_ref, &binder);
             }
+            NameRefClass::ForeignKeyColumn | NameRefClass::ForeignKeyLocalColumn => {
+                return hover_column(file, &name_ref, &binder);
+            }
+            NameRefClass::DropSequence => return hover_sequence(file, &name_ref, &binder),
             NameRefClass::DropIndex => return hover_index(file, &name_ref, &binder),
             NameRefClass::DropFunction => return hover_function(file, &name_ref, &binder),
             NameRefClass::DropAggregate => return hover_aggregate(file, &name_ref, &binder),
@@ -86,6 +103,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameClass::WithTable(with_table) => return format_with_table(&with_table),
             NameClass::CreateIndex(create_index) => {
                 return format_create_index(&create_index, &binder);
+            }
+            NameClass::CreateSequence(create_sequence) => {
+                return format_create_sequence(&create_sequence, &binder);
             }
             NameClass::CreateType(create_type) => {
                 return format_create_type(&create_type, &binder);
@@ -285,6 +305,23 @@ fn hover_index(
     format_create_index(&create_index, binder)
 }
 
+fn hover_sequence(
+    file: &ast::SourceFile,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let sequence_ptr = resolve::resolve_name_ref(binder, name_ref)?;
+
+    let root = file.syntax();
+    let sequence_name_node = sequence_ptr.to_node(root);
+
+    let create_sequence = sequence_name_node
+        .ancestors()
+        .find_map(ast::CreateSequence::cast)?;
+
+    format_create_sequence(&create_sequence, binder)
+}
+
 fn hover_type(
     file: &ast::SourceFile,
     name_ref: &ast::NameRef,
@@ -387,6 +424,21 @@ fn view_schema(create_view: &ast::CreateView, binder: &binder::Binder) -> Option
     search_path.first().map(|s| s.to_string())
 }
 
+fn sequence_schema(
+    create_sequence: &ast::CreateSequence,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let is_temp =
+        create_sequence.temp_token().is_some() || create_sequence.temporary_token().is_some();
+    if is_temp {
+        return Some("pg_temp".to_string());
+    }
+
+    let position = create_sequence.syntax().text_range().start();
+    let search_path = binder.search_path_at(position);
+    search_path.first().map(|s| s.to_string())
+}
+
 fn format_create_index(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
     let index_name = create_index.name()?.syntax().text().to_string();
 
@@ -403,6 +455,23 @@ fn format_create_index(create_index: &ast::CreateIndex, binder: &binder::Binder)
         "index {}.{} on {}.{}{}",
         index_schema, index_name, table_schema, table_name, columns
     ))
+}
+
+fn format_create_sequence(
+    create_sequence: &ast::CreateSequence,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let path = create_sequence.path()?;
+    let segment = path.segment()?;
+    let sequence_name = segment.name()?.syntax().text().to_string();
+
+    let schema = if let Some(qualifier) = path.qualifier() {
+        qualifier.syntax().text().to_string()
+    } else {
+        sequence_schema(create_sequence, binder)?
+    };
+
+    Some(format!("sequence {}.{}", schema, sequence_name))
 }
 
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {

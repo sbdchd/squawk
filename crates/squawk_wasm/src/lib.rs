@@ -392,6 +392,7 @@ fn convert_document_symbol(
         name: symbol.name,
         detail: symbol.detail,
         kind: match symbol.kind {
+            squawk_ide::document_symbols::DocumentSymbolKind::Schema => "schema",
             squawk_ide::document_symbols::DocumentSymbolKind::Table => "table",
             squawk_ide::document_symbols::DocumentSymbolKind::View => "view",
             squawk_ide::document_symbols::DocumentSymbolKind::MaterializedView => {

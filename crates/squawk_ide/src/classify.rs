@@ -8,6 +8,20 @@ pub(crate) enum NameRefClass {
     DropType,
     DropView,
     DropMaterializedView,
+    DropSequence,
+    ForeignKeyTable,
+    ForeignKeyColumn,
+    ForeignKeyLocalColumn,
+    CheckConstraintColumn,
+    GeneratedColumn,
+    UniqueConstraintColumn,
+    PrimaryKeyConstraintColumn,
+    NotNullConstraintColumn,
+    ExcludeConstraintColumn,
+    PartitionByColumn,
+    PartitionOfTable,
+    LikeTable,
+    InheritsTable,
     DropFunction,
     DropAggregate,
     DropProcedure,
@@ -36,13 +50,16 @@ pub(crate) enum NameRefClass {
 }
 
 pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass> {
-    let mut in_partition_item = false;
     let mut in_call_expr = false;
     let mut in_arg_list = false;
     let mut in_column_list = false;
     let mut in_where_clause = false;
     let mut in_from_clause = false;
     let mut in_set_clause = false;
+    let mut in_constraint_exclusion_list = false;
+    let mut in_constraint_include_clause = false;
+    let mut in_constraint_where_clause = false;
+    let mut in_partition_item = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -170,6 +187,62 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::DropMaterializedView::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropMaterializedView);
         }
+        if ast::DropSequence::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropSequence);
+        }
+        if let Some(foreign_key) = ast::ForeignKeyConstraint::cast(ancestor.clone()) {
+            if in_column_list {
+                // TODO: ast is too "flat" here, we need a unique node for to
+                // and from columns to differentiate which would help us avoid
+                // this
+                if let Some(to_columns) = foreign_key.to_columns()
+                    && to_columns
+                        .syntax()
+                        .text_range()
+                        .contains_range(name_ref.syntax().text_range())
+                {
+                    return Some(NameRefClass::ForeignKeyColumn);
+                }
+                if let Some(from_columns) = foreign_key.from_columns()
+                    && from_columns
+                        .syntax()
+                        .text_range()
+                        .contains_range(name_ref.syntax().text_range())
+                {
+                    return Some(NameRefClass::ForeignKeyLocalColumn);
+                }
+            } else {
+                return Some(NameRefClass::ForeignKeyTable);
+            }
+        }
+        if ast::CheckConstraint::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::CheckConstraintColumn);
+        }
+        if ast::GeneratedConstraint::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::GeneratedColumn);
+        }
+        if in_column_list && ast::UniqueConstraint::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::UniqueConstraintColumn);
+        }
+        if in_column_list && ast::PrimaryKeyConstraint::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::PrimaryKeyConstraintColumn);
+        }
+        if ast::NotNullConstraint::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::NotNullConstraintColumn);
+        }
+        if (in_constraint_exclusion_list
+            || in_constraint_include_clause
+            || in_constraint_where_clause)
+            && ast::ExcludeConstraint::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::ExcludeConstraintColumn);
+        }
+        if ast::LikeClause::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::LikeTable);
+        }
+        if ast::Inherits::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::InheritsTable);
+        }
         if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
             return Some(NameRefClass::TypeReference);
         }
@@ -197,14 +270,17 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         {
             return Some(NameRefClass::CreateSchema);
         }
-        if ast::PartitionItem::can_cast(ancestor.kind()) {
-            in_partition_item = true;
-        }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
             if in_partition_item {
                 return Some(NameRefClass::CreateIndexColumn);
             }
             return Some(NameRefClass::CreateIndex);
+        }
+        if in_partition_item && ast::CreateTable::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::PartitionByColumn);
+        }
+        if ast::PartitionOf::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::PartitionOfTable);
         }
         if ast::ArgList::can_cast(ancestor.kind()) {
             in_arg_list = true;
@@ -228,6 +304,18 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::ColumnList::can_cast(ancestor.kind()) {
             in_column_list = true;
+        }
+        if ast::ConstraintExclusionList::can_cast(ancestor.kind()) {
+            in_constraint_exclusion_list = true;
+        }
+        if ast::ConstraintIncludeClause::can_cast(ancestor.kind()) {
+            in_constraint_include_clause = true;
+        }
+        if ast::WhereConditionClause::can_cast(ancestor.kind()) {
+            in_constraint_where_clause = true;
+        }
+        if ast::PartitionItem::can_cast(ancestor.kind()) {
+            in_partition_item = true;
         }
         if ast::Insert::can_cast(ancestor.kind()) {
             if in_column_list {
@@ -273,6 +361,7 @@ pub(crate) enum NameClass {
     CreateTable(ast::CreateTable),
     WithTable(ast::WithTable),
     CreateIndex(ast::CreateIndex),
+    CreateSequence(ast::CreateSequence),
     CreateType(ast::CreateType),
     CreateFunction(ast::CreateFunction),
     CreateAggregate(ast::CreateAggregate),
@@ -306,6 +395,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(create_index) = ast::CreateIndex::cast(ancestor.clone()) {
             return Some(NameClass::CreateIndex(create_index));
+        }
+        if let Some(create_sequence) = ast::CreateSequence::cast(ancestor.clone()) {
+            return Some(NameClass::CreateSequence(create_sequence));
         }
         if let Some(create_type) = ast::CreateType::cast(ancestor.clone()) {
             return Some(NameClass::CreateType(create_type));

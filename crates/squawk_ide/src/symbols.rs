@@ -52,6 +52,7 @@ pub(crate) enum SymbolKind {
     Schema,
     Type,
     View,
+    Sequence,
 }
 
 #[derive(Clone, Debug)]
