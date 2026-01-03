@@ -544,6 +544,20 @@ drop view v$0;
     }
 
     #[test]
+    fn goto_drop_materialized_view() {
+        assert_snapshot!(goto("
+create materialized view v as select 1;
+drop materialized view v$0;
+"), @r"
+          ╭▸ 
+        2 │ create materialized view v as select 1;
+          │                          ─ 2. destination
+        3 │ drop materialized view v;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_view_with_schema() {
         assert_snapshot!(goto("
 create view public.v as select 1;
@@ -598,6 +612,20 @@ select * from v$0;
           ╭▸ 
         2 │ create view v as select 1;
           │             ─ 2. destination
+        3 │ select * from v;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_materialized_view() {
+        assert_snapshot!(goto("
+create materialized view v as select 1;
+select * from v$0;
+"), @r"
+          ╭▸ 
+        2 │ create materialized view v as select 1;
+          │                          ─ 2. destination
         3 │ select * from v;
           ╰╴              ─ 1. source
         ");
@@ -1558,6 +1586,26 @@ select foo$0();
     }
 
     #[test]
+    fn goto_select_aggregate_call() {
+        assert_snapshot!(goto("
+create aggregate foo(int) (
+  sfunc = int4pl,
+  stype = int,
+  initcond = '0'
+);
+
+select foo$0(1);
+"), @r"
+          ╭▸ 
+        2 │ create aggregate foo(int) (
+          │                  ─── 2. destination
+          ‡
+        8 │ select foo(1);
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_select_function_call_with_schema() {
         assert_snapshot!(goto("
 create function public.foo() returns int as $$ select 1 $$ language sql;
@@ -2486,6 +2534,34 @@ drop schema foo$0;
           ╭▸ 
         2 │ create schema foo;
           │               ─── 2. destination
+        3 │ drop schema foo;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_schema_authorization() {
+        assert_snapshot!(goto("
+create schema authorization foo$0;
+"), @r"
+          ╭▸ 
+        2 │ create schema authorization foo;
+          │                             ┬─┬
+          │                             │ │
+          │                             │ 1. source
+          ╰╴                            2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_drop_schema_authorization() {
+        assert_snapshot!(goto("
+create schema authorization foo;
+drop schema foo$0;
+"), @r"
+          ╭▸ 
+        2 │ create schema authorization foo;
+          │                             ─── 2. destination
         3 │ drop schema foo;
           ╰╴              ─ 1. source
         ");

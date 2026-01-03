@@ -337,7 +337,10 @@ fn handle_document_symbol(
             kind: match sym.kind {
                 DocumentSymbolKind::Table => SymbolKind::STRUCT,
                 DocumentSymbolKind::View => SymbolKind::STRUCT,
+                DocumentSymbolKind::MaterializedView => SymbolKind::STRUCT,
                 DocumentSymbolKind::Function => SymbolKind::FUNCTION,
+                DocumentSymbolKind::Aggregate => SymbolKind::FUNCTION,
+                DocumentSymbolKind::Procedure => SymbolKind::FUNCTION,
                 DocumentSymbolKind::Type => SymbolKind::CLASS,
                 DocumentSymbolKind::Enum => SymbolKind::ENUM,
                 DocumentSymbolKind::Column => SymbolKind::FIELD,
