@@ -62,7 +62,7 @@ pub(crate) enum SymbolKind {
 pub(crate) struct Symbol {
     pub(crate) kind: SymbolKind,
     pub(crate) ptr: SyntaxNodePtr,
-    pub(crate) schema: Schema,
+    pub(crate) schema: Option<Schema>,
     pub(crate) params: Option<Vec<Name>>,
 }
 
