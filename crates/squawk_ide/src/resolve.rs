@@ -24,7 +24,9 @@ pub(crate) fn resolve_name_ref(
         | NameRefClass::CreateIndex
         | NameRefClass::InsertTable
         | NameRefClass::DeleteTable
-        | NameRefClass::UpdateTable => {
+        | NameRefClass::UpdateTable
+        | NameRefClass::PartitionOfTable
+        | NameRefClass::InheritsTable => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -107,6 +109,13 @@ pub(crate) fn resolve_name_ref(
             let database_name = Name::from_node(name_ref);
             resolve_database(binder, &database_name).map(|ptr| smallvec![ptr])
         }
+        NameRefClass::DropServer
+        | NameRefClass::AlterServer
+        | NameRefClass::CreateServer
+        | NameRefClass::ForeignTableServerName => {
+            let server_name = Name::from_node(name_ref);
+            resolve_server(binder, &server_name).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SequenceOwnedByColumn => {
             let sequence_option = name_ref
                 .syntax()
@@ -149,76 +158,20 @@ pub(crate) fn resolve_name_ref(
             let column_name = Name::from_node(name_ref);
             resolve_column_for_path(binder, root, &path, column_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::ForeignKeyLocalColumn => {
+        NameRefClass::GeneratedColumn
+        | NameRefClass::CheckConstraintColumn
+        | NameRefClass::UniqueConstraintColumn
+        | NameRefClass::PrimaryKeyConstraintColumn
+        | NameRefClass::NotNullConstraintColumn
+        | NameRefClass::ExcludeConstraintColumn
+        | NameRefClass::PartitionByColumn
+        | NameRefClass::ForeignKeyLocalColumn => {
             let create_table = name_ref
                 .syntax()
                 .ancestors()
-                .find_map(ast::CreateTable::cast)?;
+                .find_map(ast::CreateTableLike::cast)?;
             let column_name = Name::from_node(name_ref);
             find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::CheckConstraintColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTable::cast)?;
-            let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::GeneratedColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTable::cast)?;
-            let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::UniqueConstraintColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTable::cast)?;
-            let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::PrimaryKeyConstraintColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTable::cast)?;
-            let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::NotNullConstraintColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTable::cast)?;
-            let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::ExcludeConstraintColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTable::cast)?;
-            let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::PartitionByColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTable::cast)?;
-            let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::PartitionOfTable => {
-            let path = find_containing_path(name_ref)?;
-            let table_name = extract_table_name(&path)?;
-            let schema = extract_schema_name(&path);
-            let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::LikeTable => {
             let like_clause = name_ref
@@ -226,13 +179,6 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::LikeClause::cast)?;
             let path = like_clause.path()?;
-            let table_name = extract_table_name(&path)?;
-            let schema = extract_schema_name(&path);
-            let position = name_ref.syntax().text_range().start();
-            resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::InheritsTable => {
-            let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
@@ -498,6 +444,15 @@ fn resolve_database(binder: &Binder, database_name: &Name) -> Option<SyntaxNodeP
     let symbol_id = symbols.iter().copied().find(|id| {
         let symbol = &binder.symbols[*id];
         symbol.kind == SymbolKind::Database
+    })?;
+    Some(binder.symbols[symbol_id].ptr)
+}
+
+fn resolve_server(binder: &Binder, server_name: &Name) -> Option<SyntaxNodePtr> {
+    let symbols = binder.scopes[binder.root_scope()].get(server_name)?;
+    let symbol_id = symbols.iter().copied().find(|id| {
+        let symbol = &binder.symbols[*id];
+        symbol.kind == SymbolKind::Server
     })?;
     Some(binder.symbols[symbol_id].ptr)
 }
@@ -1751,8 +1706,7 @@ fn collect_tables_from_item(
 pub(crate) enum TableSource {
     WithTable(ast::WithTable),
     CreateView(ast::CreateView),
-    CreateTable(ast::CreateTable),
-    CreateForeignTable(ast::CreateForeignTable),
+    CreateTable(ast::CreateTableLike),
 }
 
 pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
@@ -1765,12 +1719,8 @@ pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
             return Some(TableSource::CreateView(create_view));
         }
 
-        if let Some(create_table) = ast::CreateTable::cast(ancestor.clone()) {
+        if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
             return Some(TableSource::CreateTable(create_table));
-        }
-
-        if let Some(create_foreign_table) = ast::CreateForeignTable::cast(ancestor) {
-            return Some(TableSource::CreateForeignTable(create_foreign_table));
         }
     }
 
@@ -2063,7 +2013,7 @@ pub(crate) fn resolve_insert_create_table(
     root: &SyntaxNode,
     binder: &Binder,
     insert: &ast::Insert,
-) -> Option<ast::CreateTable> {
+) -> Option<ast::CreateTableLike> {
     let path = insert.path()?;
     let table_name = extract_table_name(&path)?;
     let schema = extract_schema_name(&path);
@@ -2072,7 +2022,9 @@ pub(crate) fn resolve_insert_create_table(
     let table_ptr = resolve_table(binder, &table_name, &schema, position)?;
     let table_name_node = table_ptr.to_node(root);
 
-    table_name_node.ancestors().find_map(ast::CreateTable::cast)
+    table_name_node
+        .ancestors()
+        .find_map(ast::CreateTableLike::cast)
 }
 
 pub(crate) fn resolve_table_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {

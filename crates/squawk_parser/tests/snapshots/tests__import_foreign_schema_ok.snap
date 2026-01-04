@@ -15,9 +15,9 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE "\n  "
-    FROM_SERVER
-      FROM_KW "from"
-      WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
       NAME_REF
@@ -54,9 +54,9 @@ SOURCE_FILE
         IDENT "t2"
       R_PAREN ")"
     WHITESPACE "\n    "
-    FROM_SERVER
-      FROM_KW "FROM"
-      WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
       NAME_REF
@@ -81,9 +81,9 @@ SOURCE_FILE
     NAME_REF
       IDENT "a"
     WHITESPACE "\n  "
-    FROM_SERVER
-      FROM_KW "from"
-      WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
       NAME_REF
@@ -120,9 +120,9 @@ SOURCE_FILE
     NAME_REF
       IDENT "a"
     WHITESPACE "\n  "
-    FROM_SERVER
-      FROM_KW "from"
-      WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
       NAME_REF
@@ -167,9 +167,9 @@ SOURCE_FILE
     NAME_REF
       IDENT "foreign_films"
     WHITESPACE "\n    "
-    FROM_SERVER
-      FROM_KW "FROM"
-      WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
       NAME_REF
@@ -208,9 +208,9 @@ SOURCE_FILE
         IDENT "directors"
       R_PAREN ")"
     WHITESPACE "\n    "
-    FROM_SERVER
-      FROM_KW "FROM"
-      WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
       NAME_REF

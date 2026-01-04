@@ -8017,12 +8017,18 @@ fn alter_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(MAPPING_KW);
     p.expect(FOR_KW);
     role(p);
-    p.expect(SERVER_KW);
-    name_ref(p);
+    server_name(p);
     if !opt_alter_option_list(p) {
         p.error("expected options");
     }
     m.complete(p, ALTER_USER_MAPPING)
+}
+
+fn server_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(SERVER_KW);
+    name_ref(p);
+    m.complete(p, SERVER_NAME);
 }
 
 const ALTER_OPTION_FIRST: TokenSet =
@@ -8724,8 +8730,7 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
         }
         opt_inherits_tables(p);
     }
-    p.expect(SERVER_KW);
-    name_ref(p);
+    server_name(p);
     opt_alter_option_list(p);
     m.complete(p, CREATE_FOREIGN_TABLE)
 }
@@ -9489,9 +9494,7 @@ fn create_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(USER_KW) {
         role(p);
     }
-    p.eat(SERVER_KW);
-    // server_name
-    name_ref(p);
+    server_name(p);
     opt_alter_option_list(p);
     m.complete(p, CREATE_USER_MAPPING)
 }
@@ -10168,9 +10171,7 @@ fn drop_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(USER_KW) {
         role(p);
     }
-    p.eat(SERVER_KW);
-    // server_name
-    name_ref(p);
+    server_name(p);
     m.complete(p, DROP_USER_MAPPING)
 }
 
@@ -10322,7 +10323,8 @@ fn import_foreign_schema(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(R_PAREN);
         m.complete(p, kind);
     }
-    from_server(p);
+    p.expect(FROM_KW);
+    server_name(p);
     into_schema(p);
     opt_alter_option_list(p);
     m.complete(p, IMPORT_FOREIGN_SCHEMA)
@@ -10334,15 +10336,6 @@ fn into_schema(p: &mut Parser<'_>) {
     p.expect(INTO_KW);
     name_ref(p);
     m.complete(p, INTO_SCHEMA);
-}
-
-// FROM SERVER server_name
-fn from_server(p: &mut Parser<'_>) {
-    let m = p.start();
-    p.expect(FROM_KW);
-    p.expect(SERVER_KW);
-    name_ref(p);
-    m.complete(p, FROM_SERVER);
 }
 
 // LOCK [ TABLE ] [ ONLY ] name [ * ] [, ...] [ IN lockmode MODE ] [ NOWAIT ]

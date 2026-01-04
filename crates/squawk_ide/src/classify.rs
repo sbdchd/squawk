@@ -12,6 +12,10 @@ pub(crate) enum NameRefClass {
     SequenceOwnedByColumn,
     Tablespace,
     DropDatabase,
+    DropServer,
+    AlterServer,
+    CreateServer,
+    ForeignTableServerName,
     ForeignKeyTable,
     ForeignKeyColumn,
     ForeignKeyLocalColumn,
@@ -209,6 +213,18 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::DropDatabase::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropDatabase);
         }
+        if ast::DropServer::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropServer);
+        }
+        if ast::AlterServer::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AlterServer);
+        }
+        if ast::CreateServer::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::CreateServer);
+        }
+        if ast::ServerName::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::ForeignTableServerName);
+        }
         if let Some(sequence_option) = ast::SequenceOption::cast(ancestor.clone())
             && sequence_option.owned_token().is_some()
             && sequence_option.by_token().is_some()
@@ -333,7 +349,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
             return Some(NameRefClass::CreateIndex);
         }
-        if in_partition_item && ast::CreateTable::can_cast(ancestor.kind()) {
+        if in_partition_item && ast::CreateTableLike::can_cast(ancestor.kind()) {
             return Some(NameRefClass::PartitionByColumn);
         }
         if ast::PartitionOf::can_cast(ancestor.kind()) {
@@ -421,20 +437,16 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
 #[derive(Debug)]
 pub(crate) enum NameClass {
     ColumnDefinition {
-        create_table: ast::CreateTable,
+        create_table: ast::CreateTableLike,
         column: ast::Column,
     },
-    ColumnDefinitionForeignTable {
-        create_foreign_table: ast::CreateForeignTable,
-        column: ast::Column,
-    },
-    CreateTable(ast::CreateTable),
-    CreateForeignTable(ast::CreateForeignTable),
+    CreateTable(ast::CreateTableLike),
     WithTable(ast::WithTable),
     CreateIndex(ast::CreateIndex),
     CreateSequence(ast::CreateSequence),
     CreateTablespace(ast::CreateTablespace),
     CreateDatabase(ast::CreateDatabase),
+    CreateServer(ast::CreateServer),
     CreateType(ast::CreateType),
     CreateFunction(ast::CreateFunction),
     CreateAggregate(ast::CreateAggregate),
@@ -457,7 +469,7 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         if !has_column_list && ast::ColumnList::can_cast(ancestor.kind()) {
             has_column_list = true;
         }
-        if let Some(create_table) = ast::CreateTable::cast(ancestor.clone()) {
+        if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
             if let Some(column) = column_parent {
                 return Some(NameClass::ColumnDefinition {
                     create_table,
@@ -465,15 +477,6 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
                 });
             }
             return Some(NameClass::CreateTable(create_table));
-        }
-        if let Some(create_foreign_table) = ast::CreateForeignTable::cast(ancestor.clone()) {
-            if let Some(column) = column_parent {
-                return Some(NameClass::ColumnDefinitionForeignTable {
-                    create_foreign_table,
-                    column,
-                });
-            }
-            return Some(NameClass::CreateForeignTable(create_foreign_table));
         }
         if let Some(create_index) = ast::CreateIndex::cast(ancestor.clone()) {
             return Some(NameClass::CreateIndex(create_index));
@@ -486,6 +489,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(create_database) = ast::CreateDatabase::cast(ancestor.clone()) {
             return Some(NameClass::CreateDatabase(create_database));
+        }
+        if let Some(create_server) = ast::CreateServer::cast(ancestor.clone()) {
+            return Some(NameClass::CreateServer(create_server));
         }
         if let Some(create_type) = ast::CreateType::cast(ancestor.clone()) {
             return Some(NameClass::CreateType(create_type));

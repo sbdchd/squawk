@@ -2076,7 +2076,7 @@ AlterUser =
   'alter' 'user' Role
 
 AlterUserMapping =
-  'alter' 'user' 'mapping' 'for' Role 'server' NameRef AlterOptionList
+  'alter' 'user' 'mapping' 'for' Role ServerName AlterOptionList
 
 AlterView =
   'alter' 'view' Path
@@ -2159,8 +2159,11 @@ CreateForeignTable =
   TableArgList?
   Inherits?
   PartitionType?
-  ('server' NameRef)
+  ServerName
   AlterOptionList?
+
+ServerName =
+  'server' NameRef
 
 CreateGroup =
   'create' 'group' Name RoleOptionList
@@ -2273,7 +2276,7 @@ TransformToFunc =
 
 CreateUserMapping =
   'create' 'user' 'mapping' IfNotExists? 'for' Role
-  'server' NameRef
+  ServerName
   AlterOptionList?
 
 CreateUser =
@@ -2435,7 +2438,7 @@ DropUser =
   'drop' 'user' IfExists? (NameRef (',' NameRef)*)
 
 DropUserMapping =
-  'drop' 'user' 'mapping' IfExists? 'for' Role 'server' NameRef
+  'drop' 'user' 'mapping' IfExists? 'for' Role ServerName
 
 DropView =
   'drop' 'view' IfExists? Path
@@ -2465,7 +2468,7 @@ ExplainStmt =
 ImportForeignSchema =
   'import' 'foreign' 'schema' NameRef
   (LimitToTables | ExceptTables)?
-  FromServer
+  'from' ServerName
   IntoSchema
   AlterOptionList?
 
@@ -2474,9 +2477,6 @@ LimitToTables =
 
 ExceptTables = 
   'except' (NameRef (',' NameRef)*)
-
-FromServer =
-  'from' 'server' NameRef
 
 IntoSchema =
   'into' NameRef

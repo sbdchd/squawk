@@ -11,6 +11,9 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
+[lib]
+doctest = false
+
 [dependencies]
 squawk-syntax.workspace = true
 squawk-linter.workspace = true
