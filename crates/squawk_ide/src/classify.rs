@@ -254,6 +254,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
         }
         if let Some(references_constraint) = ast::ReferencesConstraint::cast(ancestor.clone()) {
+            // TODO: the ast is too flat here
             if let Some(column_ref) = references_constraint.column()
                 && column_ref
                     .syntax()

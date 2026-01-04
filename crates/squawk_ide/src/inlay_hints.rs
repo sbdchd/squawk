@@ -3,7 +3,10 @@ use crate::binder::Binder;
 use crate::resolve;
 use crate::symbols::Name;
 use rowan::{TextRange, TextSize};
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::{
+    SyntaxNode,
+    ast::{self, AstNode},
+};
 
 /// `VSCode` has some theming options based on these types.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,12 +26,13 @@ pub struct InlayHint {
 pub fn inlay_hints(file: &ast::SourceFile) -> Vec<InlayHint> {
     let mut hints = vec![];
     let binder = binder::bind(file);
+    let root = file.syntax();
 
-    for node in file.syntax().descendants() {
+    for node in root.descendants() {
         if let Some(call_expr) = ast::CallExpr::cast(node.clone()) {
-            inlay_hint_call_expr(&mut hints, file, &binder, call_expr);
+            inlay_hint_call_expr(&mut hints, root, &binder, call_expr);
         } else if let Some(insert) = ast::Insert::cast(node) {
-            inlay_hint_insert(&mut hints, file, &binder, insert);
+            inlay_hint_insert(&mut hints, root, &binder, insert);
         }
     }
 
@@ -37,7 +41,7 @@ pub fn inlay_hints(file: &ast::SourceFile) -> Vec<InlayHint> {
 
 fn inlay_hint_call_expr(
     hints: &mut Vec<InlayHint>,
-    file: &ast::SourceFile,
+    root: &SyntaxNode,
     binder: &Binder,
     call_expr: ast::CallExpr,
 ) -> Option<()> {
@@ -50,11 +54,10 @@ fn inlay_hint_call_expr(
         ast::FieldExpr::cast(expr.syntax().clone())?.field()?
     };
 
-    let function_ptr = resolve::resolve_name_ref(binder, &name_ref)?
+    let function_ptr = resolve::resolve_name_ref(binder, root, &name_ref)?
         .into_iter()
         .next()?;
 
-    let root = file.syntax();
     let function_name_node = function_ptr.to_node(root);
 
     if let Some(create_function) = function_name_node
@@ -81,13 +84,13 @@ fn inlay_hint_call_expr(
 
 fn inlay_hint_insert(
     hints: &mut Vec<InlayHint>,
-    file: &ast::SourceFile,
+    root: &SyntaxNode,
     binder: &Binder,
     insert: ast::Insert,
 ) -> Option<()> {
     let values = insert.values()?;
     let row_list = values.row_list()?;
-    let create_table = resolve::resolve_insert_create_table(file, binder, &insert);
+    let create_table = resolve::resolve_insert_create_table(root, binder, &insert);
 
     let columns: Vec<(Name, Option<TextRange>)> = if let Some(column_list) = insert.column_list() {
         // `insert into t(a, b, c) values (1, 2, 3)`
