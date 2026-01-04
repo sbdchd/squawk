@@ -5019,7 +5019,7 @@ reindex database appdb$0;
         2 │ create database appdb;
           │                 ───── 2. destination
         3 │ reindex database appdb;
-          ╰╴                   ─── 1. source
+          ╰╴                     ─ 1. source
         ");
     }
 
@@ -5033,7 +5033,7 @@ reindex system systemdb$0;
         2 │ create database systemdb;
           │                 ──────── 2. destination
         3 │ reindex system systemdb;
-          ╰╴                 ─────── 1. source
+          ╰╴                      ─ 1. source
         ");
     }
 }
