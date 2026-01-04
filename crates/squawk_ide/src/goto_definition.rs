@@ -245,7 +245,7 @@ drop table t$0;
     }
 
     #[test]
-    fn goto_definition_on_dot_prefers_previous_token() {
+    fn goto_definition_prefers_previous_token() {
         assert_snapshot!(goto("
 create table t(a int);
 select t.$0a from t;
@@ -255,6 +255,50 @@ select t.$0a from t;
           │              ─ 2. destination
         3 │ select t.a from t;
           ╰╴        ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create type ty as (a int, b int);
+with t as (select '(1,2)'::ty c)
+select (c)$0.a from t;
+"), @r"
+          ╭▸ 
+        3 │ with t as (select '(1,2)'::ty c)
+          │                               ─ 2. destination
+        4 │ select (c).a from t;
+          ╰╴         ─ 1. source
+        ");
+        assert_snapshot!(goto("
+create function f() returns int as 'select 1' language sql;
+select f($0);
+"), @r"
+          ╭▸ 
+        2 │ create function f() returns int as 'select 1' language sql;
+          │                 ─ 2. destination
+        3 │ select f();
+          ╰╴        ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+with t as (select array[1,2,3]::int[] c)
+select c[$01] from t;
+"), @r"
+          ╭▸ 
+        2 │ with t as (select array[1,2,3]::int[] c)
+          │                                       ─ 2. destination
+        3 │ select c[1] from t;
+          ╰╴        ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+with t as (select array[1,2,3]::int[] c, 1 b)
+select c[b]$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ with t as (select array[1,2,3]::int[] c, 1 b)
+          │                                            ─ 2. destination
+        3 │ select c[b] from t;
+          ╰╴          ─ 1. source
         ");
     }
 
