@@ -307,7 +307,7 @@ mod tests {
         let root = file.syntax();
 
         let mut range = TextRange::empty(offset);
-        let mut results = Vec::new();
+        let mut results = vec![];
 
         for _ in 0..20 {
             let new_range = extend_selection(root, range);

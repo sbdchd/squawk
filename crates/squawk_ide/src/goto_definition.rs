@@ -58,7 +58,8 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> SmallVec<[Tex
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         let binder_output = binder::bind(&file);
-        if let Some(ptrs) = resolve::resolve_name_ref(&binder_output, &name_ref) {
+        let root = file.syntax();
+        if let Some(ptrs) = resolve::resolve_name_ref(&binder_output, root, &name_ref) {
             return ptrs
                 .iter()
                 .map(|ptr| ptr.to_node(file.syntax()).text_range())
@@ -240,6 +241,34 @@ drop table t$0;
           │              ─ 2. destination
         3 │ drop table t;
           ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_definition_on_dot_prefers_previous_token() {
+        assert_snapshot!(goto("
+create table t(a int);
+select t.$0a from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ select t.a from t;
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_table_star() {
+        assert_snapshot!(goto("
+with t as (select 1 a)
+select t$0.* from t;
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a)
+          │      ─ 2. destination
+        3 │ select t.* from t;
+          ╰╴       ─ 1. source
         ");
     }
 
@@ -2416,6 +2445,32 @@ select a$0 from x;
     }
 
     #[test]
+    fn goto_cte_qualified_column_prefers_cte_over_table() {
+        assert_snapshot!(goto("
+create table u(id int, b int);
+with u as (select 1 id, 2 b)
+select u.id$0 from u;
+"), @r"
+          ╭▸ 
+        3 │ with u as (select 1 id, 2 b)
+          │                     ── 2. destination
+        4 │ select u.id from u;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_qualified_column() {
+        assert_snapshot!(goto("
+select t.a$0 from (select 1 a) t;
+"), @r"
+          ╭▸ 
+        2 │ select t.a from (select 1 a) t;
+          ╰╴         ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_cte_multiple_columns() {
         assert_snapshot!(goto("
 with x as (select 1 as a, 2 as b)
@@ -2470,6 +2525,50 @@ select a$0 from y;
           │                     ─ 2. destination
         3 │      y as (select * from t)
         4 │ select a from y;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_qualified_star_join_column() {
+        assert_snapshot!(goto("
+create table u(id int, b int);
+create table t(id int, a int);
+
+with k as (
+    select u.* from t join u on a = b
+)
+select b$0 from k;
+"), @r"
+          ╭▸ 
+        2 │ create table u(id int, b int);
+          │                        ─ 2. destination
+          ‡
+        8 │ select b from k;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_qualified_star_join_column_with_partial_column_list() {
+        assert_snapshot!(goto("
+with
+  u as (
+    select 1 id, 2 b
+  ),
+  t as (
+    select 1 id, 2 a
+  ),
+  k(x) as (
+    select u.* from t join u on a = b
+  )
+select b$0 from k;
+"), @r"
+          ╭▸ 
+        4 │     select 1 id, 2 b
+          │                    ─ 2. destination
+          ‡
+       12 │ select b from k;
           ╰╴       ─ 1. source
         ");
     }
@@ -2612,6 +2711,32 @@ select a$0 from (select * from foo.t);
         3 │ select a from (select * from foo.t);
           ╰╴       ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_subquery_column_qualified_star_join() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(b int);
+select b$0 from (select u.* from t join u on a = b);
+"), @r"
+          ╭▸ 
+        3 │ create table u(b int);
+          │                ─ 2. destination
+        4 │ select b from (select u.* from t join u on a = b);
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column_qualified_star_join_not_found() {
+        goto_not_found(
+            "
+create table t(a int);
+create table u(b int);
+select a$0 from (select u.* from t join u on a = b);
+",
+        );
     }
 
     #[test]

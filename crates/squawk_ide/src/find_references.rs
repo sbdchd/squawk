@@ -3,6 +3,7 @@ use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::{TextRange, TextSize};
 use smallvec::{SmallVec, smallvec};
+use squawk_syntax::SyntaxNode;
 use squawk_syntax::{
     SyntaxNodePtr,
     ast::{self, AstNode},
@@ -11,17 +12,17 @@ use squawk_syntax::{
 
 pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<TextRange> {
     let binder = binder::bind(file);
-    let Some(targets) = find_targets(file, offset, &binder) else {
+    let root = file.syntax();
+    let Some(targets) = find_targets(file, root, offset, &binder) else {
         return vec![];
     };
 
     let mut refs = vec![];
-
     for node in file.syntax().descendants() {
         match_ast! {
             match node {
                 ast::NameRef(name_ref) => {
-                    if let Some(found_refs) = resolve::resolve_name_ref(&binder, &name_ref)
+                    if let Some(found_refs) = resolve::resolve_name_ref(&binder, root, &name_ref)
                         && found_refs.iter().any(|ptr| targets.contains(ptr))
                     {
                         refs.push(name_ref.syntax().text_range());
@@ -44,6 +45,7 @@ pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<TextRang
 
 fn find_targets(
     file: &ast::SourceFile,
+    root: &SyntaxNode,
     offset: TextSize,
     binder: &Binder,
 ) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
@@ -55,7 +57,7 @@ fn find_targets(
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        return resolve::resolve_name_ref(binder, &name_ref);
+        return resolve::resolve_name_ref(binder, root, &name_ref);
     }
 
     None
