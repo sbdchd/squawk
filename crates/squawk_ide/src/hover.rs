@@ -54,7 +54,11 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::NotNullConstraintColumn
             | NameRefClass::ExcludeConstraintColumn
             | NameRefClass::PartitionByColumn
-            | NameRefClass::JoinUsingColumn => {
+            | NameRefClass::JoinUsingColumn
+            | NameRefClass::ForeignKeyColumn
+            | NameRefClass::ForeignKeyLocalColumn
+            | NameRefClass::SequenceOwnedByColumn
+            | NameRefClass::AlterTableColumn => {
                 return hover_column(root, &name_ref, &binder);
             }
             NameRefClass::TypeReference | NameRefClass::DropType => {
@@ -89,16 +93,19 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::ForeignKeyTable
             | NameRefClass::LikeTable
             | NameRefClass::InheritsTable
-            | NameRefClass::PartitionOfTable => {
+            | NameRefClass::PartitionOfTable
+            | NameRefClass::TruncateTable
+            | NameRefClass::LockTable
+            | NameRefClass::VacuumTable
+            | NameRefClass::AlterTable
+            | NameRefClass::ReindexTable
+            | NameRefClass::RefreshMaterializedView => {
                 return hover_table(root, &name_ref, &binder);
             }
-            NameRefClass::ForeignKeyColumn
-            | NameRefClass::ForeignKeyLocalColumn
-            | NameRefClass::SequenceOwnedByColumn => {
-                return hover_column(root, &name_ref, &binder);
-            }
             NameRefClass::DropSequence => return hover_sequence(root, &name_ref, &binder),
-            NameRefClass::DropDatabase => return hover_database(root, &name_ref, &binder),
+            NameRefClass::DropDatabase
+            | NameRefClass::ReindexDatabase
+            | NameRefClass::ReindexSystem => return hover_database(root, &name_ref, &binder),
             NameRefClass::DropServer
             | NameRefClass::AlterServer
             | NameRefClass::CreateServer
@@ -106,16 +113,17 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 return hover_server(root, &name_ref, &binder);
             }
             NameRefClass::Tablespace => return hover_tablespace(root, &name_ref, &binder),
-            NameRefClass::DropIndex => return hover_index(root, &name_ref, &binder),
-            NameRefClass::DropFunction => return hover_function(root, &name_ref, &binder),
+            NameRefClass::DropIndex | NameRefClass::ReindexIndex => {
+                return hover_index(root, &name_ref, &binder);
+            }
+            NameRefClass::DropFunction | NameRefClass::DefaultConstraintFunctionCall => {
+                return hover_function(root, &name_ref, &binder);
+            }
             NameRefClass::DropAggregate => return hover_aggregate(root, &name_ref, &binder),
             NameRefClass::DropProcedure | NameRefClass::CallProcedure => {
                 return hover_procedure(root, &name_ref, &binder);
             }
             NameRefClass::DropRoutine => return hover_routine(root, &name_ref, &binder),
-            NameRefClass::DefaultConstraintFunctionCall => {
-                return hover_function(root, &name_ref, &binder);
-            }
             NameRefClass::SelectFunctionCall => {
                 // Try function first, but fall back to column if no function found
                 // (handles function-call-style column access like `select a(t)`)
@@ -126,7 +134,8 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameRefClass::SchemaQualifier
             | NameRefClass::DropSchema
-            | NameRefClass::CreateSchema => {
+            | NameRefClass::CreateSchema
+            | NameRefClass::ReindexSchema => {
                 return hover_schema(root, &name_ref, &binder);
             }
         }
@@ -367,6 +376,9 @@ fn hover_table_from_ptr(
     match resolve::find_table_source(&table_name_node)? {
         resolve::TableSource::WithTable(with_table) => format_with_table(&with_table),
         resolve::TableSource::CreateView(create_view) => format_create_view(&create_view, binder),
+        resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
+            format_create_materialized_view(&create_materialized_view, binder)
+        }
         resolve::TableSource::CreateTable(create_table) => {
             format_create_table(&create_table, binder)
         }
@@ -461,6 +473,9 @@ fn hover_qualified_star_columns(
         resolve::TableSource::CreateView(create_view) => {
             hover_qualified_star_columns_from_view(&create_view, binder)
         }
+        resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
+            hover_qualified_star_columns_from_materialized_view(&create_materialized_view, binder)
+        }
     }
 }
 
@@ -519,6 +534,29 @@ fn hover_qualified_star_columns_from_view(
 
     let schema_str = schema.to_string();
     let column_names = resolve::collect_view_column_names(create_view);
+    let results: Vec<String> = column_names
+        .iter()
+        .map(|column_name| {
+            ColumnHover::schema_table_column(&schema_str, &view_name, &column_name.to_string())
+        })
+        .collect();
+
+    if results.is_empty() {
+        return None;
+    }
+
+    Some(results.join("\n"))
+}
+
+fn hover_qualified_star_columns_from_materialized_view(
+    create_materialized_view: &ast::CreateMaterializedView,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let path = create_materialized_view.path()?;
+    let (schema, view_name) = resolve::resolve_view_info(binder, &path)?;
+
+    let schema_str = schema.to_string();
+    let column_names = resolve::collect_materialized_view_column_names(create_materialized_view);
     let results: Vec<String> = column_names
         .iter()
         .map(|column_name| {
@@ -725,6 +763,31 @@ fn format_create_view(create_view: &ast::CreateView, binder: &binder::Binder) ->
 
     Some(format!(
         "view {}.{}{} as {}",
+        schema, view_name, column_list, query
+    ))
+}
+
+fn format_create_materialized_view(
+    create_materialized_view: &ast::CreateMaterializedView,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let path = create_materialized_view.path()?;
+    let (schema, view_name) = resolve::resolve_view_info(binder, &path)?;
+    let schema = schema.to_string();
+
+    let column_list = create_materialized_view
+        .column_list()
+        .map(|cl| cl.syntax().text().to_string())
+        .unwrap_or_default();
+
+    let query = create_materialized_view
+        .query()?
+        .syntax()
+        .text()
+        .to_string();
+
+    Some(format!(
+        "materialized view {}.{}{} as {}",
         schema, view_name, column_list, query
     ))
 }
@@ -3169,6 +3232,150 @@ select * from t join u using (id$0);
           ╭▸ 
         4 │ select * from t join u using (id);
           ╰╴                               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_truncate_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+truncate table users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ truncate table users;
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_truncate_table_without_table_keyword() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+truncate users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ truncate users;
+          ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_lock_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+lock table users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ lock table users;
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_lock_table_without_table_keyword() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+lock users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ lock users;
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_vacuum_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+vacuum users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ vacuum users;
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_vacuum_with_analyze() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+vacuum analyze users$0;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ vacuum analyze users;
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_alter_table() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+alter table users$0 alter email set not null;
+"), @r"
+        hover: table public.users(id int, email text)
+          ╭▸ 
+        3 │ alter table users alter email set not null;
+          ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_alter_table_column() {
+        assert_snapshot!(check_hover("
+create table users(id int, email text);
+alter table users alter email$0 set not null;
+"), @r"
+        hover: column public.users.email text
+          ╭▸ 
+        3 │ alter table users alter email set not null;
+          ╰╴                            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_refresh_materialized_view() {
+        assert_snapshot!(check_hover("
+create materialized view mv as select 1;
+refresh materialized view mv$0;
+"), @r"
+        hover: materialized view public.mv as select 1
+          ╭▸ 
+        3 │ refresh materialized view mv;
+          ╰╴                           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_reindex_table() {
+        assert_snapshot!(check_hover("
+create table users(id int);
+reindex table users$0;
+"), @r"
+        hover: table public.users(id int)
+          ╭▸ 
+        3 │ reindex table users;
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_reindex_index() {
+        assert_snapshot!(check_hover("
+create table t(c int);
+create index idx on t(c);
+reindex index idx$0;
+"), @r"
+        hover: index public.idx on public.t(c)
+          ╭▸ 
+        4 │ reindex index idx;
+          ╰╴                ─ hover
         ");
     }
 }

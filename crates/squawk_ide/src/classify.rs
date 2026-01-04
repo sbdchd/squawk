@@ -56,6 +56,17 @@ pub(crate) enum NameRefClass {
     JoinUsingColumn,
     SchemaQualifier,
     TypeReference,
+    TruncateTable,
+    LockTable,
+    VacuumTable,
+    AlterTable,
+    AlterTableColumn,
+    RefreshMaterializedView,
+    ReindexTable,
+    ReindexIndex,
+    ReindexSchema,
+    ReindexDatabase,
+    ReindexSystem,
 }
 
 pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass> {
@@ -191,6 +202,41 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTable);
+        }
+        if ast::Truncate::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::TruncateTable);
+        }
+        if ast::Lock::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::LockTable);
+        }
+        if ast::Vacuum::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::VacuumTable);
+        }
+        if ast::AlterColumn::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AlterTableColumn);
+        }
+        if ast::AlterTable::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AlterTable);
+        }
+        if ast::Refresh::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::RefreshMaterializedView);
+        }
+        if let Some(reindex) = ast::Reindex::cast(ancestor.clone()) {
+            if reindex.table_token().is_some() {
+                return Some(NameRefClass::ReindexTable);
+            }
+            if reindex.index_token().is_some() {
+                return Some(NameRefClass::ReindexIndex);
+            }
+            if reindex.schema_token().is_some() {
+                return Some(NameRefClass::ReindexSchema);
+            }
+            if reindex.database_token().is_some() {
+                return Some(NameRefClass::ReindexDatabase);
+            }
+            if reindex.system_token().is_some() {
+                return Some(NameRefClass::ReindexSystem);
+            }
         }
         if ast::Table::can_cast(ancestor.kind()) {
             return Some(NameRefClass::Table);

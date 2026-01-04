@@ -4780,4 +4780,260 @@ update users set email = new_data.column2$0 from new_data where users.id = new_d
           ╰╴                                        ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_truncate_table() {
+        assert_snapshot!(goto("
+create table t();
+truncate table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
+        3 │ truncate table t;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_truncate_table_without_table_keyword() {
+        assert_snapshot!(goto("
+create table t();
+truncate t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
+        3 │ truncate t;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_truncate_multiple_tables() {
+        assert_snapshot!(goto("
+create table t1();
+create table t2();
+truncate t1, t2$0;
+"), @r"
+          ╭▸ 
+        3 │ create table t2();
+          │              ── 2. destination
+        4 │ truncate t1, t2;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_lock_table() {
+        assert_snapshot!(goto("
+create table t();
+lock table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
+        3 │ lock table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_lock_table_without_table_keyword() {
+        assert_snapshot!(goto("
+create table t();
+lock t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t();
+          │              ─ 2. destination
+        3 │ lock t;
+          ╰╴     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_lock_multiple_tables() {
+        assert_snapshot!(goto("
+create table t1();
+create table t2();
+lock t1, t2$0;
+"), @r"
+          ╭▸ 
+        3 │ create table t2();
+          │              ── 2. destination
+        4 │ lock t1, t2;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_vacuum_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+vacuum users$0;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ vacuum users;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_vacuum_multiple_tables() {
+        assert_snapshot!(goto("
+create table t1();
+create table t2();
+vacuum t1, t2$0;
+"), @r"
+          ╭▸ 
+        3 │ create table t2();
+          │              ── 2. destination
+        4 │ vacuum t1, t2;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+alter table users$0 alter email set not null;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ alter table users alter email set not null;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+alter table users alter email$0 set not null;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ alter table users alter email set not null;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_column_with_column_keyword() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+alter table users alter column email$0 set not null;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ alter table users alter column email set not null;
+          ╰╴                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_refresh_materialized_view() {
+        assert_snapshot!(goto("
+create materialized view mv as select 1;
+refresh materialized view mv$0;
+"), @r"
+          ╭▸ 
+        2 │ create materialized view mv as select 1;
+          │                          ── 2. destination
+        3 │ refresh materialized view mv;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_refresh_materialized_view_concurrently() {
+        assert_snapshot!(goto("
+create materialized view mv as select 1;
+refresh materialized view concurrently mv$0;
+"), @r"
+          ╭▸ 
+        2 │ create materialized view mv as select 1;
+          │                          ── 2. destination
+        3 │ refresh materialized view concurrently mv;
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_reindex_table() {
+        assert_snapshot!(goto("
+create table users(id int);
+reindex table users$0;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │              ───── 2. destination
+        3 │ reindex table users;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_reindex_index() {
+        assert_snapshot!(goto("
+create table t(c int);
+create index idx on t(c);
+reindex index idx$0;
+"), @r"
+          ╭▸ 
+        3 │ create index idx on t(c);
+          │              ─── 2. destination
+        4 │ reindex index idx;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_reindex_schema() {
+        assert_snapshot!(goto("
+create schema app;
+reindex schema app$0;
+"), @r"
+          ╭▸ 
+        2 │ create schema app;
+          │               ─── 2. destination
+        3 │ reindex schema app;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_reindex_database() {
+        assert_snapshot!(goto("
+create database appdb;
+reindex database appdb$0;
+"), @r"
+          ╭▸ 
+        2 │ create database appdb;
+          │                 ───── 2. destination
+        3 │ reindex database appdb;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_reindex_system() {
+        assert_snapshot!(goto("
+create database systemdb;
+reindex system systemdb$0;
+"), @r"
+          ╭▸ 
+        2 │ create database systemdb;
+          │                 ──────── 2. destination
+        3 │ reindex system systemdb;
+          ╰╴                      ─ 1. source
+        ");
+    }
 }
