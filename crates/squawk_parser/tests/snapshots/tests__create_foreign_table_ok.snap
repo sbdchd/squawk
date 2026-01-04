@@ -20,10 +20,11 @@ SOURCE_FILE
       L_PAREN "("
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -212,10 +213,11 @@ SOURCE_FILE
             IDENT "bar"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -264,10 +266,11 @@ SOURCE_FILE
     PARTITION_DEFAULT
       DEFAULT_KW "default"
     WHITESPACE "\n    "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned"
@@ -369,10 +372,11 @@ SOURCE_FILE
     PARTITION_DEFAULT
       DEFAULT_KW "default"
     WHITESPACE "\n    "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
     WHITESPACE "\n    "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -451,10 +455,11 @@ SOURCE_FILE
           IDENT "b"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_from"
@@ -532,10 +537,11 @@ SOURCE_FILE
         MINVALUE_KW "minvalue"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_with"
@@ -594,10 +600,11 @@ SOURCE_FILE
       INT_NUMBER "2"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with schema"
@@ -634,10 +641,11 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "cal_server"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "cal_server"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"

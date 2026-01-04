@@ -417,6 +417,62 @@ create database my$0db;
     }
 
     #[test]
+    fn goto_drop_server() {
+        assert_snapshot!(goto("
+create server myserver foreign data wrapper fdw;
+drop server my$0server;
+"), @r"
+          ╭▸ 
+        2 │ create server myserver foreign data wrapper fdw;
+          │               ──────── 2. destination
+        3 │ drop server myserver;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_server_defined_after() {
+        assert_snapshot!(goto("
+drop server my$0server;
+create server myserver foreign data wrapper fdw;
+"), @r"
+          ╭▸ 
+        2 │ drop server myserver;
+          │              ─ 1. source
+        3 │ create server myserver foreign data wrapper fdw;
+          ╰╴              ──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_alter_server() {
+        assert_snapshot!(goto("
+create server myserver foreign data wrapper fdw;
+alter server my$0server options (add foo 'bar');
+"), @r"
+          ╭▸ 
+        2 │ create server myserver foreign data wrapper fdw;
+          │               ──────── 2. destination
+        3 │ alter server myserver options (add foo 'bar');
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_server_definition_returns_self() {
+        assert_snapshot!(goto("
+create server my$0server foreign data wrapper fdw;
+"), @r"
+          ╭▸ 
+        2 │ create server myserver foreign data wrapper fdw;
+          │               ┬┬──────
+          │               ││
+          │               │1. source
+          ╰╴              2. destination
+        ");
+    }
+
+    #[test]
     fn goto_drop_sequence_with_schema() {
         assert_snapshot!(goto("
 create sequence foo.s;
@@ -550,6 +606,51 @@ select a from ft$0;
           ‡
         5 │ select a from ft;
           ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_foreign_table_server_name() {
+        assert_snapshot!(goto("
+create server myserver foreign data wrapper fdw;
+create foreign table ft(a int)
+  server my$0server;
+"), @r"
+          ╭▸ 
+        2 │ create server myserver foreign data wrapper fdw;
+          │               ──────── 2. destination
+        3 │ create foreign table ft(a int)
+        4 │   server myserver;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_foreign_table_server_name_defined_after() {
+        assert_snapshot!(goto("
+create foreign table ft(a int)
+  server my$0server;
+create server myserver foreign data wrapper fdw;
+"), @r"
+          ╭▸ 
+        3 │   server myserver;
+          │           ─ 1. source
+        4 │ create server myserver foreign data wrapper fdw;
+          ╰╴              ──────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_user_mapping_server_name() {
+        assert_snapshot!(goto("
+create server myserver foreign data wrapper fdw;
+create user mapping for current_user server my$0server;
+"), @r"
+          ╭▸ 
+        2 │ create server myserver foreign data wrapper fdw;
+          │               ──────── 2. destination
+        3 │ create user mapping for current_user server myserver;
+          ╰╴                                             ─ 1. source
         ");
     }
 

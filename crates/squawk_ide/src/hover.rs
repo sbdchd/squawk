@@ -1,4 +1,5 @@
 use crate::classify::{NameClass, NameRefClass, classify_name, classify_name_ref};
+use crate::column_name::ColumnName;
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use crate::{binder, symbols::Name};
@@ -98,6 +99,12 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameRefClass::DropSequence => return hover_sequence(root, &name_ref, &binder),
             NameRefClass::DropDatabase => return hover_database(root, &name_ref, &binder),
+            NameRefClass::DropServer
+            | NameRefClass::AlterServer
+            | NameRefClass::CreateServer
+            | NameRefClass::ForeignTableServerName => {
+                return hover_server(root, &name_ref, &binder);
+            }
             NameRefClass::Tablespace => return hover_tablespace(root, &name_ref, &binder),
             NameRefClass::DropIndex => return hover_index(root, &name_ref, &binder),
             NameRefClass::DropFunction => return hover_function(root, &name_ref, &binder),
@@ -132,17 +139,8 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 create_table,
                 column,
             } => return hover_column_definition(&create_table, &column, &binder),
-            NameClass::ColumnDefinitionForeignTable {
-                create_foreign_table,
-                column,
-            } => {
-                return hover_column_definition(&create_foreign_table, &column, &binder);
-            }
             NameClass::CreateTable(create_table) => {
                 return format_create_table(&create_table, &binder);
-            }
-            NameClass::CreateForeignTable(create_foreign_table) => {
-                return format_create_foreign_table(&create_foreign_table, &binder);
             }
             NameClass::WithTable(with_table) => return format_with_table(&with_table),
             NameClass::CreateIndex(create_index) => {
@@ -156,6 +154,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateDatabase(create_database) => {
                 return format_create_database(&create_database);
+            }
+            NameClass::CreateServer(create_server) => {
+                return format_create_server(&create_server);
             }
             NameClass::CreateType(create_type) => {
                 return format_create_type(&create_type, &binder);
@@ -369,9 +370,6 @@ fn hover_table_from_ptr(
         resolve::TableSource::CreateTable(create_table) => {
             format_create_table(&create_table, binder)
         }
-        resolve::TableSource::CreateForeignTable(create_foreign_table) => {
-            format_create_foreign_table(&create_foreign_table, binder)
-        }
     }
 }
 
@@ -459,9 +457,6 @@ fn hover_qualified_star_columns(
         }
         resolve::TableSource::CreateTable(create_table) => {
             hover_qualified_star_columns_from_table(&create_table, binder)
-        }
-        resolve::TableSource::CreateForeignTable(create_foreign_table) => {
-            hover_qualified_star_columns_from_table(&create_foreign_table, binder)
         }
         resolve::TableSource::CreateView(create_view) => {
             hover_qualified_star_columns_from_view(&create_view, binder)
@@ -551,6 +546,7 @@ fn hover_qualified_star_columns_from_subquery(
     let target_list = select_clause.target_list()?;
 
     let mut results = vec![];
+    let subquery_alias = subquery_alias_name(paren_select);
 
     for target in target_list.targets() {
         if target.star_token().is_some() {
@@ -560,6 +556,13 @@ fn hover_qualified_star_columns_from_subquery(
                     results.push(columns)
                 }
             }
+            continue;
+        }
+
+        if let Some(result) =
+            hover_subquery_target_column(root, &target, subquery_alias.as_ref(), binder)
+        {
+            results.push(result);
         }
     }
 
@@ -568,6 +571,38 @@ fn hover_qualified_star_columns_from_subquery(
     }
 
     Some(results.join("\n"))
+}
+
+fn subquery_alias_name(paren_select: &ast::ParenSelect) -> Option<Name> {
+    let from_item = paren_select
+        .syntax()
+        .ancestors()
+        .find_map(ast::FromItem::cast)?;
+    let alias_name = from_item.alias()?.name()?;
+    Some(Name::from_node(&alias_name))
+}
+
+fn hover_subquery_target_column(
+    root: &SyntaxNode,
+    target: &ast::Target,
+    subquery_alias: Option<&Name>,
+    binder: &binder::Binder,
+) -> Option<String> {
+    if let Some(alias) = subquery_alias
+        && let Some((col_name, _node)) = ColumnName::from_target(target.clone())
+        && let Some(col_name) = col_name.to_string()
+    {
+        return Some(ColumnHover::table_column(&alias.to_string(), &col_name));
+    }
+
+    match target.expr()? {
+        ast::Expr::NameRef(name_ref) => hover_column(root, &name_ref, binder),
+        ast::Expr::FieldExpr(field_expr) => {
+            let field = field_expr.field()?;
+            hover_column(root, &field, binder)
+        }
+        _ => None,
+    }
 }
 
 fn hover_index(
@@ -630,6 +665,18 @@ fn hover_database(
     Some(format!("database {}", database_name_node.text()))
 }
 
+fn hover_server(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let server_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let server_name_node = server_ptr.to_node(root);
+    Some(format!("server {}", server_name_node.text()))
+}
+
 fn hover_type(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -646,29 +693,22 @@ fn hover_type(
     format_create_type(&create_type, binder)
 }
 
-// Insert inferred schema into the create table hover info
-fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder) -> Option<String> {
+fn format_create_table(
+    create_table: &impl ast::HasCreateTable,
+    binder: &binder::Binder,
+) -> Option<String> {
     let path = create_table.path()?;
     let (schema, table_name) = resolve::resolve_table_info(binder, &path)?;
     let schema = schema.to_string();
     let args = create_table.table_arg_list()?.syntax().text().to_string();
 
-    Some(format!("table {}.{}{}", schema, table_name, args))
-}
+    let foreign = if create_table.syntax().kind() == SyntaxKind::CREATE_FOREIGN_TABLE {
+        "foreign "
+    } else {
+        ""
+    };
 
-fn format_create_foreign_table(
-    create_foreign_table: &ast::CreateForeignTable,
-    binder: &binder::Binder,
-) -> Option<String> {
-    let path = create_foreign_table.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(binder, &path)?;
-    let schema = schema.to_string();
-    let args = create_foreign_table
-        .table_arg_list()
-        .map(|list| list.syntax().text().to_string())
-        .unwrap_or_default();
-
-    Some(format!("foreign table {}.{}{}", schema, table_name, args))
+    Some(format!("{foreign}table {schema}.{table_name}{args}"))
 }
 
 fn format_create_view(create_view: &ast::CreateView, binder: &binder::Binder) -> Option<String> {
@@ -745,6 +785,11 @@ fn format_create_tablespace(create_tablespace: &ast::CreateTablespace) -> Option
 fn format_create_database(create_database: &ast::CreateDatabase) -> Option<String> {
     let name = create_database.name()?.syntax().text().to_string();
     Some(format!("database {}", name))
+}
+
+fn format_create_server(create_server: &ast::CreateServer) -> Option<String> {
+    let name = create_server.name()?.syntax().text().to_string();
+    Some(format!("server {}", name))
 }
 
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
@@ -2499,6 +2544,19 @@ select *$0 from (select *, *, * from u);
               column u.b
           ╭▸ 
         3 │ select * from (select *, *, * from u);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_star_with_subquery_from_table() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+select *$0 from (select a from t);
+"), @r"
+        hover: column public.t.a int
+          ╭▸ 
+        3 │ select * from (select a from t);
           ╰╴       ─ hover
         ");
     }

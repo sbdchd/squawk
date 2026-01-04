@@ -17,10 +17,11 @@ SOURCE_FILE
     ROLE
       CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n    "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
     WHITESPACE "\n    "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"

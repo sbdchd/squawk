@@ -55,6 +55,7 @@ pub(crate) enum SymbolKind {
     Sequence,
     Tablespace,
     Database,
+    Server,
 }
 
 #[derive(Clone, Debug)]

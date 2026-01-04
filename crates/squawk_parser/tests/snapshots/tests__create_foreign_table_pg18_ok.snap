@@ -30,10 +30,11 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- like clause is >=pg18"
@@ -88,9 +89,10 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "remote_server"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "remote_server"
   SEMICOLON ";"
   WHITESPACE "\n\n"

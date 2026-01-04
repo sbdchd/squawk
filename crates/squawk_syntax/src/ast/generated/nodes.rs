@@ -1638,11 +1638,11 @@ impl AlterUserMapping {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn role(&self) -> Option<Role> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn server_name(&self) -> Option<ServerName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1656,10 +1656,6 @@ impl AlterUserMapping {
     #[inline]
     pub fn mapping_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MAPPING_KW)
-    }
-    #[inline]
-    pub fn server_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
     #[inline]
     pub fn user_token(&self) -> Option<SyntaxToken> {
@@ -3504,10 +3500,6 @@ impl CreateForeignTable {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn partition_of(&self) -> Option<PartitionOf> {
         support::child(&self.syntax)
     }
@@ -3517,6 +3509,10 @@ impl CreateForeignTable {
     }
     #[inline]
     pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn server_name(&self) -> Option<ServerName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3530,10 +3526,6 @@ impl CreateForeignTable {
     #[inline]
     pub fn foreign_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
-    }
-    #[inline]
-    pub fn server_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
     #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
@@ -4926,11 +4918,11 @@ impl CreateUserMapping {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn role(&self) -> Option<Role> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn server_name(&self) -> Option<ServerName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4944,10 +4936,6 @@ impl CreateUserMapping {
     #[inline]
     pub fn mapping_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MAPPING_KW)
-    }
-    #[inline]
-    pub fn server_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
     #[inline]
     pub fn user_token(&self) -> Option<SyntaxToken> {
@@ -7012,11 +7000,11 @@ impl DropUserMapping {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn role(&self) -> Option<Role> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn server_name(&self) -> Option<ServerName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7030,10 +7018,6 @@ impl DropUserMapping {
     #[inline]
     pub fn mapping_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MAPPING_KW)
-    }
-    #[inline]
-    pub fn server_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
     #[inline]
     pub fn user_token(&self) -> Option<SyntaxToken> {
@@ -7833,25 +7817,6 @@ impl FromItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct FromServer {
-    pub(crate) syntax: SyntaxNode,
-}
-impl FromServer {
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn from_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FROM_KW)
-    }
-    #[inline]
-    pub fn server_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SERVER_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FromTable {
     pub(crate) syntax: SyntaxNode,
 }
@@ -8279,10 +8244,6 @@ impl ImportForeignSchema {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn from_server(&self) -> Option<FromServer> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn into_schema(&self) -> Option<IntoSchema> {
         support::child(&self.syntax)
     }
@@ -8295,8 +8256,16 @@ impl ImportForeignSchema {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn server_name(&self) -> Option<ServerName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn foreign_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
     }
     #[inline]
     pub fn import_token(&self) -> Option<SyntaxToken> {
@@ -13869,6 +13838,21 @@ impl Serializable {
     #[inline]
     pub fn serializable_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SERIALIZABLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ServerName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ServerName {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn server_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
 }
 
@@ -21672,24 +21656,6 @@ impl AstNode for FromItem {
         &self.syntax
     }
 }
-impl AstNode for FromServer {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FROM_SERVER
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for FromTable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -26248,6 +26214,24 @@ impl AstNode for Serializable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SERIALIZABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ServerName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SERVER_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

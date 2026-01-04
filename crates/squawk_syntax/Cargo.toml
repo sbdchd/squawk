@@ -10,6 +10,9 @@ documentation.workspace = true
 homepage.workspace = true
 repository.workspace = true
 
+[lib]
+doctest = false
+
 [dependencies]
 squawk-parser.workspace = true
 rowan.workspace = true

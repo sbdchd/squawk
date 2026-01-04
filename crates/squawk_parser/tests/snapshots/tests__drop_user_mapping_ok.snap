@@ -16,10 +16,11 @@ SOURCE_FILE
     WHITESPACE " "
     USER_KW "user"
     WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -41,9 +42,10 @@ SOURCE_FILE
     ROLE
       CURRENT_ROLE_KW "current_role"
     WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "some_server_name"
+    SERVER_NAME
+      SERVER_KW "server"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "some_server_name"
   SEMICOLON ";"
   WHITESPACE "\n\n"
