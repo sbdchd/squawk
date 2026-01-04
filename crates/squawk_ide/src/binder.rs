@@ -118,7 +118,7 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
     let table_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Table,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params: None,
     });
 
@@ -141,7 +141,7 @@ fn bind_create_foreign_table(b: &mut Binder, create_foreign_table: ast::CreateFo
     let table_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Table,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params: None,
     });
 
@@ -164,7 +164,7 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
     let index_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Index,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params: None,
     });
 
@@ -192,7 +192,7 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
     let function_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Function,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params,
     });
 
@@ -220,7 +220,7 @@ fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate)
     let aggregate_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Aggregate,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params,
     });
 
@@ -248,7 +248,7 @@ fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure)
     let procedure_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Procedure,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params,
     });
 
@@ -276,7 +276,7 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
     let schema_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Schema,
         ptr: name_ptr,
-        schema: Schema(schema_name.clone()),
+        schema: Some(Schema(schema_name.clone())),
         params: None,
     });
 
@@ -302,7 +302,7 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
     let type_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Type,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params: None,
     });
 
@@ -329,7 +329,7 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
     let view_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::View,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params: None,
     });
 
@@ -355,7 +355,7 @@ fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMateria
     let view_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::View,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params: None,
     });
 
@@ -383,7 +383,7 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
     let sequence_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Sequence,
         ptr: name_ptr,
-        schema,
+        schema: Some(schema),
         params: None,
     });
 
@@ -402,9 +402,7 @@ fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespa
     let tablespace_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Tablespace,
         ptr: name_ptr,
-        // TODO: tablespaces don't actually have schemas so we should think
-        // about this more
-        schema: Schema::new("pg_tablespace"),
+        schema: None,
         params: None,
     });
 
@@ -423,7 +421,7 @@ fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
     let database_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Database,
         ptr: name_ptr,
-        schema: Schema::new("pg_database"),
+        schema: None,
         params: None,
     });
 
@@ -442,7 +440,7 @@ fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
     let server_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Server,
         ptr: name_ptr,
-        schema: Schema::new("pg_foreign_server"),
+        schema: None,
         params: None,
     });
 

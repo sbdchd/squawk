@@ -469,7 +469,7 @@ fn resolve_for_kind(
     if let Some(schema) = schema {
         let symbol_id = symbols.iter().copied().find(|id| {
             let symbol = &binder.symbols[*id];
-            symbol.kind == kind && &symbol.schema == schema
+            symbol.kind == kind && symbol.schema.as_ref() == Some(schema)
         })?;
         return Some(binder.symbols[symbol_id].ptr);
     } else {
@@ -477,7 +477,7 @@ fn resolve_for_kind(
         for search_schema in search_path {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &binder.symbols[*id];
-                symbol.kind == kind && &symbol.schema == search_schema
+                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
             }) {
                 return Some(binder.symbols[symbol_id].ptr);
             }
@@ -505,7 +505,7 @@ fn resolve_for_kind_with_params(
                 (_, None) => true,
                 _ => false,
             };
-            symbol.kind == kind && &symbol.schema == schema && params_match
+            symbol.kind == kind && symbol.schema.as_ref() == Some(schema) && params_match
         })?;
         return Some(binder.symbols[symbol_id].ptr);
     } else {
@@ -519,7 +519,7 @@ fn resolve_for_kind_with_params(
                     (_, None) => true,
                     _ => false,
                 };
-                symbol.kind == kind && &symbol.schema == search_schema && params_match
+                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema) && params_match
             }) {
                 return Some(binder.symbols[symbol_id].ptr);
             }
@@ -2153,20 +2153,20 @@ fn resolve_symbol_info(
         let schema_normalized = Schema::new(schema_name);
         let symbol_id = symbols.iter().copied().find(|id| {
             let symbol = &binder.symbols[*id];
-            symbol.kind == kind && symbol.schema == schema_normalized
+            symbol.kind == kind && symbol.schema.as_ref() == Some(&schema_normalized)
         })?;
         let symbol = &binder.symbols[symbol_id];
-        return Some((symbol.schema.clone(), name_str));
+        return Some((symbol.schema.clone()?, name_str));
     } else {
         let position = path.syntax().text_range().start();
         let search_path = binder.search_path_at(position);
         for search_schema in search_path {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &binder.symbols[*id];
-                symbol.kind == kind && &symbol.schema == search_schema
+                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
             }) {
                 let symbol = &binder.symbols[symbol_id];
-                return Some((symbol.schema.clone(), name_str));
+                return Some((symbol.schema.clone()?, name_str));
             }
         }
     }
