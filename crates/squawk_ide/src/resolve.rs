@@ -26,7 +26,12 @@ pub(crate) fn resolve_name_ref(
         | NameRefClass::DeleteTable
         | NameRefClass::UpdateTable
         | NameRefClass::PartitionOfTable
-        | NameRefClass::InheritsTable => {
+        | NameRefClass::InheritsTable
+        | NameRefClass::TruncateTable
+        | NameRefClass::LockTable
+        | NameRefClass::VacuumTable
+        | NameRefClass::AlterTable
+        | NameRefClass::ReindexTable => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -59,7 +64,7 @@ pub(crate) fn resolve_name_ref(
 
             resolve_view(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropIndex => {
+        NameRefClass::DropIndex | NameRefClass::ReindexIndex => {
             let path = find_containing_path(name_ref)?;
             let index_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -91,7 +96,9 @@ pub(crate) fn resolve_name_ref(
             let position = name_ref.syntax().text_range().start();
             resolve_type(binder, &type_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropView | NameRefClass::DropMaterializedView => {
+        NameRefClass::DropView
+        | NameRefClass::DropMaterializedView
+        | NameRefClass::RefreshMaterializedView => {
             let path = find_containing_path(name_ref)?;
             let view_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -105,7 +112,9 @@ pub(crate) fn resolve_name_ref(
             let position = name_ref.syntax().text_range().start();
             resolve_sequence(binder, &sequence_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropDatabase => {
+        NameRefClass::ReindexDatabase
+        | NameRefClass::ReindexSystem
+        | NameRefClass::DropDatabase => {
             let database_name = Name::from_node(name_ref);
             resolve_database(binder, &database_name).map(|ptr| smallvec![ptr])
         }
@@ -375,6 +384,21 @@ pub(crate) fn resolve_name_ref(
             }
 
             resolve_view(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::AlterTableColumn => {
+            let column_name = Name::from_node(name_ref);
+            let alter_table = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::AlterTable::cast)?;
+            let relation_name = alter_table.relation_name()?;
+            let path = relation_name.path()?;
+            resolve_column_for_path(binder, root, &path, column_name).map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::ReindexSchema => {
+            let path = find_containing_path(name_ref)?;
+            let schema_name = extract_table_name(&path)?;
+            resolve_schema(binder, &schema_name).map(|ptr| smallvec![ptr])
         }
     }
 }
@@ -1706,6 +1730,7 @@ fn collect_tables_from_item(
 pub(crate) enum TableSource {
     WithTable(ast::WithTable),
     CreateView(ast::CreateView),
+    CreateMaterializedView(ast::CreateMaterializedView),
     CreateTable(ast::CreateTableLike),
 }
 
@@ -1717,6 +1742,13 @@ pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
 
         if let Some(create_view) = ast::CreateView::cast(ancestor.clone()) {
             return Some(TableSource::CreateView(create_view));
+        }
+
+        if let Some(create_materialized_view) = ast::CreateMaterializedView::cast(ancestor.clone())
+        {
+            return Some(TableSource::CreateMaterializedView(
+                create_materialized_view,
+            ));
         }
 
         if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
@@ -2099,6 +2131,39 @@ pub(crate) fn collect_view_column_names(create_view: &ast::CreateView) -> Vec<Na
     };
 
     collect_target_list_column_names(&target_list)
+}
+
+pub(crate) fn collect_materialized_view_column_names(
+    create_materialized_view: &ast::CreateMaterializedView,
+) -> Vec<Name> {
+    if let Some(column_list) = create_materialized_view.column_list() {
+        let columns = collect_column_names_from_column_list(&column_list);
+        if !columns.is_empty() {
+            return columns;
+        }
+    }
+
+    let Some(select) = select_from_materialized_view_query(create_materialized_view) else {
+        return vec![];
+    };
+    let Some(select_clause) = select.select_clause() else {
+        return vec![];
+    };
+    let Some(target_list) = select_clause.target_list() else {
+        return vec![];
+    };
+
+    collect_target_list_column_names(&target_list)
+}
+
+fn select_from_materialized_view_query(
+    create_materialized_view: &ast::CreateMaterializedView,
+) -> Option<ast::Select> {
+    let query = create_materialized_view.query()?;
+    match query {
+        ast::SelectVariant::Select(select) => Some(select),
+        _ => None,
+    }
 }
 
 pub(crate) fn collect_with_table_column_names(with_table: &ast::WithTable) -> Vec<Name> {
