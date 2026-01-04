@@ -520,6 +520,40 @@ create table t$0(x bigint, y bigint);
     }
 
     #[test]
+    fn goto_foreign_table_column() {
+        assert_snapshot!(goto("
+create foreign table ft(a int)
+  server s;
+
+select a$0 from ft;
+"), @r"
+          ╭▸ 
+        2 │ create foreign table ft(a int)
+          │                         ─ 2. destination
+          ‡
+        5 │ select a from ft;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_foreign_table_definition() {
+        assert_snapshot!(goto("
+create foreign table ft(a int)
+  server s;
+
+select a from ft$0;
+"), @r"
+          ╭▸ 
+        2 │ create foreign table ft(a int)
+          │                      ── 2. destination
+          ‡
+        5 │ select a from ft;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_foreign_key_references_table() {
         assert_snapshot!(goto("
 create table foo(id int);

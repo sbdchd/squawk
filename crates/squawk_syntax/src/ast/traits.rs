@@ -3,13 +3,19 @@
 use crate::ast;
 use crate::ast::{AstNode, support};
 
-pub trait HasName: AstNode {
-    fn name(&self) -> Option<ast::Name> {
+pub trait NameLike: AstNode {}
+
+pub trait HasCreateTable: AstNode {
+    #[inline]
+    fn path(&self) -> Option<ast::Path> {
+        support::child(self.syntax())
+    }
+
+    #[inline]
+    fn table_arg_list(&self) -> Option<ast::TableArgList> {
         support::child(self.syntax())
     }
 }
-
-pub trait NameLike: AstNode {}
 
 pub trait HasWithClause: AstNode {
     #[inline]
@@ -18,26 +24,8 @@ pub trait HasWithClause: AstNode {
     }
 }
 
-pub trait HasArgList: AstNode {
-    fn arg_list(&self) -> Option<ast::ArgList> {
-        support::child(self.syntax())
-    }
-}
-
 pub trait HasParamList: AstNode {
     fn param_list(&self) -> Option<ast::ParamList> {
-        support::child(self.syntax())
-    }
-}
-
-pub trait HasIfExists: AstNode {
-    fn if_exists(&self) -> Option<ast::IfExists> {
-        support::child(self.syntax())
-    }
-}
-
-pub trait HasIfNotExists: AstNode {
-    fn if_not_exists(&self) -> Option<ast::IfNotExists> {
         support::child(self.syntax())
     }
 }

@@ -666,7 +666,7 @@ fn resolve_column_for_path(
 
     let create_table = table_name_node
         .ancestors()
-        .find_map(ast::CreateTable::cast)?;
+        .find_map(ast::CreateTableLike::cast)?;
 
     find_column_in_create_table(&create_table, &column_name)
 }
@@ -882,8 +882,10 @@ fn resolve_select_qualified_column(
 
     if let Some(table_ptr) = resolve_table(binder, &table_name, &schema, position) {
         let table_name_node = table_ptr.to_node(root);
-
-        if let Some(create_table) = table_name_node.ancestors().find_map(ast::CreateTable::cast) {
+        if let Some(create_table) = table_name_node
+            .ancestors()
+            .find_map(ast::CreateTableLike::cast)
+        {
             // 1. Try to find a matching column (columns take precedence)
             if let Some(ptr) = find_column_in_create_table(&create_table, &column_name) {
                 return Some(ptr);
@@ -950,7 +952,10 @@ fn resolve_column_from_table_or_view(
     if let Some(table_ptr) = resolve_table(binder, table_name, schema, position) {
         let table_name_node = table_ptr.to_node(root);
 
-        if let Some(create_table) = table_name_node.ancestors().find_map(ast::CreateTable::cast) {
+        if let Some(create_table) = table_name_node
+            .ancestors()
+            .find_map(ast::CreateTableLike::cast)
+        {
             // 1. try to find a matching column
             if let Some(ptr) = find_column_in_create_table(&create_table, column_name) {
                 return Some(ptr);
@@ -1204,7 +1209,7 @@ fn resolve_from_item_for_fn_call_column(
     let table_name_node = table_ptr.to_node(root);
     let create_table = table_name_node
         .ancestors()
-        .find_map(ast::CreateTable::cast)?;
+        .find_map(ast::CreateTableLike::cast)?;
 
     find_column_in_create_table(&create_table, column_name)
 }
@@ -1324,19 +1329,18 @@ pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
 }
 
 pub(crate) fn find_column_in_create_table(
-    create_table: &ast::CreateTable,
+    create_table: &impl ast::HasCreateTable,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
-    create_table.table_arg_list()?.args().find_map(|arg| {
-        if let ast::TableArg::Column(column) = arg
+    for arg in create_table.table_arg_list()?.args() {
+        if let ast::TableArg::Column(column) = &arg
             && let Some(name) = column.name()
             && Name::from_node(&name) == *column_name
         {
             return Some(SyntaxNodePtr::new(name.syntax()));
-        } else {
-            None
         }
-    })
+    }
+    None
 }
 
 // TODO: this is similar to the CTE funcs, maybe we can simplify
@@ -1748,6 +1752,7 @@ pub(crate) enum TableSource {
     WithTable(ast::WithTable),
     CreateView(ast::CreateView),
     CreateTable(ast::CreateTable),
+    CreateForeignTable(ast::CreateForeignTable),
 }
 
 pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
@@ -1760,8 +1765,12 @@ pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
             return Some(TableSource::CreateView(create_view));
         }
 
-        if let Some(create_table) = ast::CreateTable::cast(ancestor) {
+        if let Some(create_table) = ast::CreateTable::cast(ancestor.clone()) {
             return Some(TableSource::CreateTable(create_table));
+        }
+
+        if let Some(create_foreign_table) = ast::CreateForeignTable::cast(ancestor) {
+            return Some(TableSource::CreateForeignTable(create_foreign_table));
         }
     }
 
@@ -1880,7 +1889,10 @@ fn count_columns_for_from_item(
     if let Some(table_ptr) = resolve_table(binder, &table_name, &schema, position) {
         let table_name_node = table_ptr.to_node(root);
 
-        if let Some(create_table) = table_name_node.ancestors().find_map(ast::CreateTable::cast) {
+        if let Some(create_table) = table_name_node
+            .ancestors()
+            .find_map(ast::CreateTableLike::cast)
+        {
             let mut count: usize = 0;
             if let Some(args) = create_table.table_arg_list() {
                 for arg in args.args() {
@@ -2104,7 +2116,7 @@ pub(crate) fn resolve_sequence_info(binder: &Binder, path: &ast::Path) -> Option
     resolve_symbol_info(binder, path, SymbolKind::Sequence)
 }
 
-pub(crate) fn collect_table_columns(create_table: &ast::CreateTable) -> Vec<ast::Column> {
+pub(crate) fn collect_table_columns(create_table: &impl ast::HasCreateTable) -> Vec<ast::Column> {
     let mut columns = vec![];
     if let Some(arg_list) = create_table.table_arg_list() {
         for arg in arg_list.args() {
