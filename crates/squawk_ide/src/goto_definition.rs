@@ -4996,6 +4996,21 @@ reindex index idx$0;
     }
 
     #[test]
+    fn goto_select_exists_column() {
+        assert_snapshot!(goto("
+select exists$0 from (
+  select exists(select 1)
+);
+"), @r"
+          ╭▸ 
+        2 │ select exists from (
+          │             ─ 1. source
+        3 │   select exists(select 1)
+          ╰╴         ──────────────── 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_reindex_schema() {
         assert_snapshot!(goto("
 create schema app;

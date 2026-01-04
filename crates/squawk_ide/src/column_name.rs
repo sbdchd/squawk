@@ -214,6 +214,144 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             return Some((ColumnName::UnknownColumn(None), node));
         }
         ast::Expr::CallExpr(call_expr) => {
+            if let Some(exists_fn) = call_expr.exists_fn() {
+                return Some((
+                    ColumnName::Column("exists".to_string()),
+                    exists_fn.syntax().clone(),
+                ));
+            }
+            if let Some(extract_fn) = call_expr.extract_fn() {
+                return Some((
+                    ColumnName::Column("extract".to_string()),
+                    extract_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_exists_fn) = call_expr.json_exists_fn() {
+                return Some((
+                    ColumnName::Column("json_exists".to_string()),
+                    json_exists_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_array_fn) = call_expr.json_array_fn() {
+                return Some((
+                    ColumnName::Column("json_array".to_string()),
+                    json_array_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_object_fn) = call_expr.json_object_fn() {
+                return Some((
+                    ColumnName::Column("json_object".to_string()),
+                    json_object_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_object_agg_fn) = call_expr.json_object_agg_fn() {
+                return Some((
+                    ColumnName::Column("json_objectagg".to_string()),
+                    json_object_agg_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_array_agg_fn) = call_expr.json_array_agg_fn() {
+                return Some((
+                    ColumnName::Column("json_arrayagg".to_string()),
+                    json_array_agg_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_query_fn) = call_expr.json_query_fn() {
+                return Some((
+                    ColumnName::Column("json_query".to_string()),
+                    json_query_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_scalar_fn) = call_expr.json_scalar_fn() {
+                return Some((
+                    ColumnName::Column("json_scalar".to_string()),
+                    json_scalar_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_serialize_fn) = call_expr.json_serialize_fn() {
+                return Some((
+                    ColumnName::Column("json_serialize".to_string()),
+                    json_serialize_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_value_fn) = call_expr.json_value_fn() {
+                return Some((
+                    ColumnName::Column("json_value".to_string()),
+                    json_value_fn.syntax().clone(),
+                ));
+            }
+            if let Some(json_fn) = call_expr.json_fn() {
+                return Some((
+                    ColumnName::Column("json".to_string()),
+                    json_fn.syntax().clone(),
+                ));
+            }
+            if let Some(substring_fn) = call_expr.substring_fn() {
+                return Some((
+                    ColumnName::Column("substring".to_string()),
+                    substring_fn.syntax().clone(),
+                ));
+            }
+            if let Some(position_fn) = call_expr.position_fn() {
+                return Some((
+                    ColumnName::Column("position".to_string()),
+                    position_fn.syntax().clone(),
+                ));
+            }
+            if let Some(overlay_fn) = call_expr.overlay_fn() {
+                return Some((
+                    ColumnName::Column("overlay".to_string()),
+                    overlay_fn.syntax().clone(),
+                ));
+            }
+            if let Some(trim_fn) = call_expr.trim_fn() {
+                return Some((
+                    ColumnName::Column("trim".to_string()),
+                    trim_fn.syntax().clone(),
+                ));
+            }
+            if let Some(xml_root_fn) = call_expr.xml_root_fn() {
+                return Some((
+                    ColumnName::Column("xml_root".to_string()),
+                    xml_root_fn.syntax().clone(),
+                ));
+            }
+            if let Some(xml_serialize_fn) = call_expr.xml_serialize_fn() {
+                return Some((
+                    ColumnName::Column("xml_serialize".to_string()),
+                    xml_serialize_fn.syntax().clone(),
+                ));
+            }
+            if let Some(xml_element_fn) = call_expr.xml_element_fn() {
+                return Some((
+                    ColumnName::Column("xml_element".to_string()),
+                    xml_element_fn.syntax().clone(),
+                ));
+            }
+            if let Some(xml_forest_fn) = call_expr.xml_forest_fn() {
+                return Some((
+                    ColumnName::Column("xml_forest".to_string()),
+                    xml_forest_fn.syntax().clone(),
+                ));
+            }
+            if let Some(xml_exists_fn) = call_expr.xml_exists_fn() {
+                return Some((
+                    ColumnName::Column("xml_exists".to_string()),
+                    xml_exists_fn.syntax().clone(),
+                ));
+            }
+            if let Some(xml_parse_fn) = call_expr.xml_parse_fn() {
+                return Some((
+                    ColumnName::Column("xml_parse".to_string()),
+                    xml_parse_fn.syntax().clone(),
+                ));
+            }
+            if let Some(xml_pi_fn) = call_expr.xml_pi_fn() {
+                return Some((
+                    ColumnName::Column("xml_pi".to_string()),
+                    xml_pi_fn.syntax().clone(),
+                ));
+            }
             if let Some(func_name) = call_expr.expr() {
                 match func_name {
                     ast::Expr::ArrayExpr(_)
@@ -333,6 +471,31 @@ fn examples() {
     // func
     assert_snapshot!(name("count(*)"), @"count");
     assert_snapshot!(name("schema.func_name(1)"), @"func_name");
+
+    // special funcs
+    assert_snapshot!(name("extract(year from now())"), @"extract");
+    assert_snapshot!(name("exists(select 1)"), @"exists");
+    assert_snapshot!(name(r#"json_exists('{"a":1}', '$.a')"#), @"json_exists");
+    assert_snapshot!(name("json_array(1, 2)"), @"json_array");
+    assert_snapshot!(name("json_object('a': 1)"), @"json_object");
+    assert_snapshot!(name("json_objectagg('a': 1)"), @"json_objectagg");
+    assert_snapshot!(name("json_arrayagg(1)"), @"json_arrayagg");
+    assert_snapshot!(name(r#"json_query('{"a":1}', '$.a')"#), @"json_query");
+    assert_snapshot!(name("json_scalar(1)"), @"json_scalar");
+    assert_snapshot!(name(r#"json_serialize('{"a":1}')"#), @"json_serialize");
+    assert_snapshot!(name(r#"json_value('{"a":1}', '$.a')"#), @"json_value");
+    assert_snapshot!(name(r#"json('{"a":1}')"#), @"json");
+    assert_snapshot!(name("substring('hello' from 2 for 3)"), @"substring");
+    assert_snapshot!(name("position('a' in 'abc')"), @"position");
+    assert_snapshot!(name("overlay('hello' placing 'X' from 2)"), @"overlay");
+    assert_snapshot!(name("trim('  hi  ')"), @"trim");
+    assert_snapshot!(name("xmlroot('<a/>', version '1.0')"), @"xml_root");
+    assert_snapshot!(name("xmlserialize(document '<a/>' as text)"), @"xml_serialize");
+    assert_snapshot!(name("xmlelement(name foo, 'bar')"), @"xml_element");
+    assert_snapshot!(name("xmlforest('bar' as foo)"), @"xml_forest");
+    assert_snapshot!(name("xmlexists('//a' passing '<a/>')"), @"xml_exists");
+    assert_snapshot!(name("xmlparse(document '<a/>')"), @"xml_parse");
+    assert_snapshot!(name("xmlpi(name foo, 'bar')"), @"xml_pi");
 
     // index
     assert_snapshot!(name("foo[bar]"), @"foo");
