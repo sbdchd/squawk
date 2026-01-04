@@ -36,7 +36,6 @@ use crate::syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken};
 use squawk_parser::SyntaxKind;
 
 pub use self::{
-    // generated::{nodes::*, tokens::*},
     generated::tokens::*,
     nodes::*,
     // node_ext::{
@@ -46,18 +45,7 @@ pub use self::{
     // },
     // operators::{ArithOp, BinaryOp, CmpOp, LogicOp, Ordering, RangeOp, UnaryOp},
     // token_ext::{CommentKind, CommentPlacement, CommentShape, IsString, QuoteOffsets, Radix},
-    traits::{
-        // AttrDocCommentIter, DocCommentIter,
-        HasArgList, // HasAttrs, HasDocComments, HasGenericArgs,
-        HasIfExists,
-        HasIfNotExists, // HasTypeBounds,
-        // HasVisibility,
-        // HasGenericParams, HasLoopBody,
-        HasName,
-        HasParamList,
-        HasWithClause,
-        NameLike,
-    },
+    traits::{HasCreateTable, HasParamList, HasWithClause, NameLike},
 };
 
 /// The main trait to go from untyped `SyntaxNode`  to a typed ast. The

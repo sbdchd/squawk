@@ -132,8 +132,17 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 create_table,
                 column,
             } => return hover_column_definition(&create_table, &column, &binder),
+            NameClass::ColumnDefinitionForeignTable {
+                create_foreign_table,
+                column,
+            } => {
+                return hover_column_definition(&create_foreign_table, &column, &binder);
+            }
             NameClass::CreateTable(create_table) => {
                 return format_create_table(&create_table, &binder);
+            }
+            NameClass::CreateForeignTable(create_foreign_table) => {
+                return format_create_foreign_table(&create_foreign_table, &binder);
             }
             NameClass::WithTable(with_table) => return format_with_table(&with_table),
             NameClass::CreateIndex(create_index) => {
@@ -268,7 +277,7 @@ fn format_hover_for_column_node(
     let create_table = column
         .syntax()
         .ancestors()
-        .find_map(ast::CreateTable::cast)?;
+        .find_map(ast::CreateTableLike::cast)?;
     let path = create_table.path()?;
     let (schema, table_name) = resolve::resolve_table_info(binder, &path)?;
 
@@ -314,7 +323,7 @@ fn hover_composite_type_field(
 }
 
 fn hover_column_definition(
-    create_table: &ast::CreateTable,
+    create_table: &impl ast::HasCreateTable,
     column: &ast::Column,
     binder: &binder::Binder,
 ) -> Option<String> {
@@ -359,6 +368,9 @@ fn hover_table_from_ptr(
         resolve::TableSource::CreateView(create_view) => format_create_view(&create_view, binder),
         resolve::TableSource::CreateTable(create_table) => {
             format_create_table(&create_table, binder)
+        }
+        resolve::TableSource::CreateForeignTable(create_foreign_table) => {
+            format_create_foreign_table(&create_foreign_table, binder)
         }
     }
 }
@@ -448,6 +460,9 @@ fn hover_qualified_star_columns(
         resolve::TableSource::CreateTable(create_table) => {
             hover_qualified_star_columns_from_table(&create_table, binder)
         }
+        resolve::TableSource::CreateForeignTable(create_foreign_table) => {
+            hover_qualified_star_columns_from_table(&create_foreign_table, binder)
+        }
         resolve::TableSource::CreateView(create_view) => {
             hover_qualified_star_columns_from_view(&create_view, binder)
         }
@@ -455,7 +470,7 @@ fn hover_qualified_star_columns(
 }
 
 fn hover_qualified_star_columns_from_table(
-    create_table: &ast::CreateTable,
+    create_table: &impl ast::HasCreateTable,
     binder: &binder::Binder,
 ) -> Option<String> {
     let path = create_table.path()?;
@@ -639,6 +654,21 @@ fn format_create_table(create_table: &ast::CreateTable, binder: &binder::Binder)
     let args = create_table.table_arg_list()?.syntax().text().to_string();
 
     Some(format!("table {}.{}{}", schema, table_name, args))
+}
+
+fn format_create_foreign_table(
+    create_foreign_table: &ast::CreateForeignTable,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let path = create_foreign_table.path()?;
+    let (schema, table_name) = resolve::resolve_table_info(binder, &path)?;
+    let schema = schema.to_string();
+    let args = create_foreign_table
+        .table_arg_list()
+        .map(|list| list.syntax().text().to_string())
+        .unwrap_or_default();
+
+    Some(format!("foreign table {}.{}{}", schema, table_name, args))
 }
 
 fn format_create_view(create_view: &ast::CreateView, binder: &binder::Binder) -> Option<String> {

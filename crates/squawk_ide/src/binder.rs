@@ -78,6 +78,9 @@ fn bind_file(b: &mut Binder, file: &ast::SourceFile) {
 fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
     match stmt {
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
+        ast::Stmt::CreateForeignTable(create_foreign_table) => {
+            bind_create_foreign_table(b, create_foreign_table)
+        }
         ast::Stmt::CreateIndex(create_index) => bind_create_index(b, create_index),
         ast::Stmt::CreateFunction(create_function) => bind_create_function(b, create_function),
         ast::Stmt::CreateAggregate(create_aggregate) => bind_create_aggregate(b, create_aggregate),
@@ -108,6 +111,29 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
     let name_ptr = path_to_ptr(&path);
     let is_temp = create_table.temp_token().is_some() || create_table.temporary_token().is_some();
     let Some(schema) = schema_name(b, &path, is_temp) else {
+        return;
+    };
+
+    let table_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Table,
+        ptr: name_ptr,
+        schema,
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(table_name, table_id);
+}
+
+fn bind_create_foreign_table(b: &mut Binder, create_foreign_table: ast::CreateForeignTable) {
+    let Some(path) = create_foreign_table.path() else {
+        return;
+    };
+    let Some(table_name) = item_name(&path) else {
+        return;
+    };
+    let name_ptr = path_to_ptr(&path);
+    let Some(schema) = schema_name(b, &path, false) else {
         return;
     };
 

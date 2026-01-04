@@ -424,7 +424,12 @@ pub(crate) enum NameClass {
         create_table: ast::CreateTable,
         column: ast::Column,
     },
+    ColumnDefinitionForeignTable {
+        create_foreign_table: ast::CreateForeignTable,
+        column: ast::Column,
+    },
     CreateTable(ast::CreateTable),
+    CreateForeignTable(ast::CreateForeignTable),
     WithTable(ast::WithTable),
     CreateIndex(ast::CreateIndex),
     CreateSequence(ast::CreateSequence),
@@ -460,6 +465,15 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
                 });
             }
             return Some(NameClass::CreateTable(create_table));
+        }
+        if let Some(create_foreign_table) = ast::CreateForeignTable::cast(ancestor.clone()) {
+            if let Some(column) = column_parent {
+                return Some(NameClass::ColumnDefinitionForeignTable {
+                    create_foreign_table,
+                    column,
+                });
+            }
+            return Some(NameClass::CreateForeignTable(create_foreign_table));
         }
         if let Some(create_index) = ast::CreateIndex::cast(ancestor.clone()) {
             return Some(NameClass::CreateIndex(create_index));

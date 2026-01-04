@@ -241,6 +241,10 @@ impl ast::HasWithClause for ast::Insert {}
 impl ast::HasWithClause for ast::Update {}
 impl ast::HasWithClause for ast::Delete {}
 
+impl ast::HasCreateTable for ast::CreateTable {}
+impl ast::HasCreateTable for ast::CreateForeignTable {}
+impl ast::HasCreateTable for ast::CreateTableLike {}
+
 #[test]
 fn index_expr() {
     let source_code = "
