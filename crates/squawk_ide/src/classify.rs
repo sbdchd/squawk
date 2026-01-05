@@ -49,6 +49,7 @@ pub(crate) enum NameRefClass {
     InsertColumn,
     DeleteTable,
     DeleteWhereColumn,
+    DeleteUsingTable,
     UpdateTable,
     UpdateWhereColumn,
     UpdateSetColumn,
@@ -61,6 +62,7 @@ pub(crate) enum NameRefClass {
     VacuumTable,
     AlterTable,
     AlterTableColumn,
+    AlterTableDropColumn,
     RefreshMaterializedView,
     ReindexTable,
     ReindexIndex,
@@ -82,6 +84,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     let mut in_constraint_where_clause = false;
     let mut in_partition_item = false;
     let mut in_set_null_columns = false;
+    let mut in_using_clause = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -214,6 +217,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::AlterColumn::can_cast(ancestor.kind()) {
             return Some(NameRefClass::AlterTableColumn);
+        }
+        if ast::DropColumn::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AlterTableDropColumn);
         }
         if ast::AlterTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::AlterTable);
@@ -457,9 +463,15 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::SetClause::can_cast(ancestor.kind()) {
             in_set_clause = true;
         }
+        if ast::UsingClause::can_cast(ancestor.kind()) {
+            in_using_clause = true;
+        }
         if ast::Delete::can_cast(ancestor.kind()) {
             if in_where_clause {
                 return Some(NameRefClass::DeleteWhereColumn);
+            }
+            if in_using_clause {
+                return Some(NameRefClass::DeleteUsingTable);
             }
             return Some(NameRefClass::DeleteTable);
         }

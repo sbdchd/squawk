@@ -38,7 +38,9 @@ pub(crate) fn resolve_name_ref(
             let position = name_ref.syntax().text_range().start();
             resolve_table(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::SelectFromTable => {
+        NameRefClass::SelectFromTable
+        | NameRefClass::UpdateFromTable
+        | NameRefClass::DeleteUsingTable => {
             let table_name = Name::from_node(name_ref);
             let schema = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
@@ -359,33 +361,7 @@ pub(crate) fn resolve_name_ref(
             resolve_update_where_column(binder, root, name_ref).map(|ptr| smallvec![ptr])
         }
         NameRefClass::JoinUsingColumn => resolve_join_using_columns(binder, root, name_ref),
-        NameRefClass::UpdateFromTable => {
-            let table_name = Name::from_node(name_ref);
-            let schema = if let Some(parent) = name_ref.syntax().parent()
-                && let Some(field_expr) = ast::FieldExpr::cast(parent)
-                && let Some(base) = field_expr.base()
-                && let Some(schema_name_ref) = ast::NameRef::cast(base.syntax().clone())
-            {
-                Some(Schema(Name::from_node(&schema_name_ref)))
-            } else {
-                None
-            };
-
-            if schema.is_none()
-                && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
-            {
-                return Some(smallvec![cte_ptr]);
-            }
-
-            let position = name_ref.syntax().text_range().start();
-
-            if let Some(ptr) = resolve_table(binder, &table_name, &schema, position) {
-                return Some(smallvec![ptr]);
-            }
-
-            resolve_view(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::AlterTableColumn => {
+        NameRefClass::AlterTableColumn | NameRefClass::AlterTableDropColumn => {
             let column_name = Name::from_node(name_ref);
             let alter_table = name_ref
                 .syntax()
@@ -1436,6 +1412,9 @@ fn resolve_cte_column(
             let query = with_table.query()?;
 
             if let ast::WithQuery::Values(values) = query {
+                if column_list_len > 0 {
+                    continue;
+                }
                 if let Some(num_str) = column_name.0.strip_prefix("column")
                     && let Ok(col_num) = num_str.parse::<usize>()
                     && col_num > 0
@@ -1446,6 +1425,12 @@ fn resolve_cte_column(
                     return Some(SyntaxNodePtr::new(expr.syntax()));
                 }
                 continue;
+            }
+
+            if column_list_len == 0
+                && let Some(column) = column_in_with_query(&query, binder, root, column_name)
+            {
+                return Some(column);
             }
 
             let Some(cte_select) = select_from_with_query(query) else {
@@ -1510,6 +1495,53 @@ fn resolve_cte_column(
                 }
 
                 column_index = column_list_end;
+            }
+        }
+    }
+
+    None
+}
+
+fn column_in_with_query(
+    query: &ast::WithQuery,
+    binder: &Binder,
+    root: &SyntaxNode,
+    column_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    let (returning_clause, path) = match query {
+        ast::WithQuery::Delete(delete) => (
+            delete.returning_clause(),
+            delete.relation_name().and_then(|r| r.path()),
+        ),
+        ast::WithQuery::Insert(insert) => (insert.returning_clause(), insert.path()),
+        ast::WithQuery::Merge(merge) => (
+            merge.returning_clause(),
+            merge.relation_name().and_then(|r| r.path()),
+        ),
+        ast::WithQuery::Update(update) => (
+            update.returning_clause(),
+            update.relation_name().and_then(|r| r.path()),
+        ),
+        ast::WithQuery::Select(_)
+        | ast::WithQuery::CompoundSelect(_)
+        | ast::WithQuery::Table(_)
+        | ast::WithQuery::Values(_)
+        | ast::WithQuery::ParenSelect(_) => return None,
+    };
+
+    let target_list = returning_clause?.target_list()?;
+    let path = path?;
+    for target in target_list.targets() {
+        if let Some((col_name, node)) = ColumnName::from_target(target) {
+            if let Some(col_name_str) = col_name.to_string()
+                && Name::from_string(col_name_str) == *column_name
+            {
+                return Some(SyntaxNodePtr::new(&node));
+            }
+            if matches!(col_name, ColumnName::Star)
+                && let Some(ptr) = resolve_column_for_path(binder, root, &path, column_name.clone())
+            {
+                return Some(ptr);
             }
         }
     }
@@ -2190,6 +2222,10 @@ pub(crate) fn collect_with_table_column_names(with_table: &ast::WithTable) -> Ve
         return results;
     }
 
+    if let Some(columns) = columns_from_returning_clause(&query) {
+        return columns;
+    }
+
     let Some(cte_select) = select_from_with_query(query) else {
         return vec![];
     };
@@ -2201,6 +2237,27 @@ pub(crate) fn collect_with_table_column_names(with_table: &ast::WithTable) -> Ve
     };
 
     collect_target_list_column_names(&target_list)
+}
+
+fn columns_from_returning_clause(query: &ast::WithQuery) -> Option<Vec<Name>> {
+    let returning_clause = match query {
+        ast::WithQuery::Delete(delete) => delete.returning_clause(),
+        ast::WithQuery::Insert(insert) => insert.returning_clause(),
+        ast::WithQuery::Merge(merge) => merge.returning_clause(),
+        ast::WithQuery::Update(update) => update.returning_clause(),
+        ast::WithQuery::Select(_)
+        | ast::WithQuery::CompoundSelect(_)
+        | ast::WithQuery::Table(_)
+        | ast::WithQuery::Values(_)
+        | ast::WithQuery::ParenSelect(_) => None,
+    };
+    if let Some(returning_clause) = returning_clause {
+        if let Some(target_list) = returning_clause.target_list() {
+            return Some(collect_target_list_column_names(&target_list));
+        }
+        return Some(vec![]);
+    }
+    None
 }
 
 fn resolve_symbol_info(
