@@ -47,13 +47,29 @@ pub(crate) enum NameRefClass {
     CompositeTypeField,
     InsertTable,
     InsertColumn,
+    InsertQualifiedColumnTable,
     DeleteTable,
     DeleteWhereColumn,
+    DeleteQualifiedColumnTable,
     DeleteUsingTable,
     UpdateTable,
     UpdateWhereColumn,
     UpdateSetColumn,
     UpdateFromTable,
+    UpdateSetQualifiedColumnTable,
+    UpdateReturningColumn,
+    InsertReturningColumn,
+    DeleteReturningColumn,
+    MergeReturningColumn,
+    MergeWhenColumn,
+    MergeOnColumn,
+    MergeQualifiedColumnTable,
+    MergeUsingTable,
+    MergeTable,
+    UpdateReturningQualifiedColumnTable,
+    InsertReturningQualifiedColumnTable,
+    DeleteReturningQualifiedColumnTable,
+    MergeReturningQualifiedColumnTable,
     JoinUsingColumn,
     SchemaQualifier,
     TypeReference,
@@ -85,6 +101,8 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     let mut in_partition_item = false;
     let mut in_set_null_columns = false;
     let mut in_using_clause = false;
+    let mut in_returning_clause = false;
+    let mut in_when_clause = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -108,12 +126,88 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
 
         let mut in_from_clause = false;
         let mut in_on_clause = false;
+        let mut in_returning_clause = false;
+        let mut in_set_clause = false;
+        let mut in_where_clause = false;
+        let mut in_when_clause = false;
         for ancestor in parent.ancestors() {
             if ast::OnClause::can_cast(ancestor.kind()) {
                 in_on_clause = true;
             }
             if ast::FromClause::can_cast(ancestor.kind()) {
                 in_from_clause = true;
+            }
+            if ast::ReturningClause::can_cast(ancestor.kind()) {
+                in_returning_clause = true;
+            }
+            if ast::SetClause::can_cast(ancestor.kind()) {
+                in_set_clause = true;
+            }
+            if ast::WhereClause::can_cast(ancestor.kind()) {
+                in_where_clause = true;
+            }
+            if ast::MergeWhenMatched::can_cast(ancestor.kind()) {
+                in_when_clause = true;
+            }
+            if ast::Update::can_cast(ancestor.kind()) {
+                if in_returning_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::UpdateReturningQualifiedColumnTable);
+                    }
+                } else if in_set_clause || in_where_clause || in_from_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::UpdateSetQualifiedColumnTable);
+                    }
+                }
+            }
+            if ast::Insert::can_cast(ancestor.kind()) {
+                if in_returning_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::InsertReturningQualifiedColumnTable);
+                    }
+                } else if !in_from_clause && !in_on_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::InsertQualifiedColumnTable);
+                    }
+                }
+            }
+            if ast::Delete::can_cast(ancestor.kind()) {
+                if in_returning_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::DeleteReturningQualifiedColumnTable);
+                    }
+                } else if in_where_clause || in_using_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::DeleteQualifiedColumnTable);
+                    }
+                }
+            }
+            if ast::Merge::can_cast(ancestor.kind()) {
+                if in_returning_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::MergeReturningQualifiedColumnTable);
+                    }
+                } else if in_on_clause || in_when_clause {
+                    if is_function_call || is_schema_table_col {
+                        return Some(NameRefClass::SchemaQualifier);
+                    } else {
+                        return Some(NameRefClass::MergeQualifiedColumnTable);
+                    }
+                }
             }
             if ast::Select::can_cast(ancestor.kind()) && (!in_from_clause || in_on_clause) {
                 if is_function_call || is_schema_table_col {
@@ -150,6 +244,8 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         let mut in_from_clause = false;
         let mut in_on_clause = false;
         let mut in_cast_expr = false;
+        let mut in_when_clause = false;
+        let mut in_returning_clause = false;
         for ancestor in parent.ancestors() {
             if ast::OnClause::can_cast(ancestor.kind()) {
                 in_on_clause = true;
@@ -159,6 +255,21 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
             if ast::FromClause::can_cast(ancestor.kind()) {
                 in_from_clause = true;
+            }
+            if ast::MergeWhenMatched::can_cast(ancestor.kind()) {
+                in_when_clause = true;
+            }
+            if ast::ReturningClause::can_cast(ancestor.kind()) {
+                in_returning_clause = true;
+            }
+            if ast::Merge::can_cast(ancestor.kind())
+                && (in_on_clause || in_when_clause || in_returning_clause)
+            {
+                if let Some(base) = field_expr.base()
+                    && matches!(base, ast::Expr::NameRef(_) | ast::Expr::FieldExpr(_))
+                {
+                    return Some(NameRefClass::SelectQualifiedColumn);
+                }
             }
             if ast::Select::can_cast(ancestor.kind()) && (!in_from_clause || in_on_clause) {
                 if in_cast_expr {
@@ -449,6 +560,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_partition_item = true;
         }
         if ast::Insert::can_cast(ancestor.kind()) {
+            if in_returning_clause {
+                return Some(NameRefClass::InsertReturningColumn);
+            }
             if in_column_list {
                 return Some(NameRefClass::InsertColumn);
             }
@@ -466,7 +580,16 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::UsingClause::can_cast(ancestor.kind()) {
             in_using_clause = true;
         }
+        if ast::UsingOnClause::can_cast(ancestor.kind()) {
+            in_using_clause = true;
+        }
+        if ast::ReturningClause::can_cast(ancestor.kind()) {
+            in_returning_clause = true;
+        }
         if ast::Delete::can_cast(ancestor.kind()) {
+            if in_returning_clause {
+                return Some(NameRefClass::DeleteReturningColumn);
+            }
             if in_where_clause {
                 return Some(NameRefClass::DeleteWhereColumn);
             }
@@ -476,6 +599,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             return Some(NameRefClass::DeleteTable);
         }
         if ast::Update::can_cast(ancestor.kind()) {
+            if in_returning_clause {
+                return Some(NameRefClass::UpdateReturningColumn);
+            }
             if in_where_clause {
                 return Some(NameRefClass::UpdateWhereColumn);
             }
@@ -486,6 +612,24 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 return Some(NameRefClass::UpdateFromTable);
             }
             return Some(NameRefClass::UpdateTable);
+        }
+        if ast::MergeWhenMatched::can_cast(ancestor.kind()) {
+            in_when_clause = true;
+        }
+        if ast::Merge::can_cast(ancestor.kind()) {
+            if in_returning_clause {
+                return Some(NameRefClass::MergeReturningColumn);
+            }
+            if in_when_clause {
+                return Some(NameRefClass::MergeWhenColumn);
+            }
+            if in_on_clause {
+                return Some(NameRefClass::MergeOnColumn);
+            }
+            if in_using_clause {
+                return Some(NameRefClass::MergeUsingTable);
+            }
+            return Some(NameRefClass::MergeTable);
         }
     }
 

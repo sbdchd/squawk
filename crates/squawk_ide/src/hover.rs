@@ -47,6 +47,12 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::DeleteWhereColumn
             | NameRefClass::UpdateWhereColumn
             | NameRefClass::UpdateSetColumn
+            | NameRefClass::UpdateReturningColumn
+            | NameRefClass::InsertReturningColumn
+            | NameRefClass::DeleteReturningColumn
+            | NameRefClass::MergeReturningColumn
+            | NameRefClass::MergeWhenColumn
+            | NameRefClass::MergeOnColumn
             | NameRefClass::CheckConstraintColumn
             | NameRefClass::GeneratedColumn
             | NameRefClass::UniqueConstraintColumn
@@ -86,12 +92,22 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::DropMaterializedView
             | NameRefClass::CreateIndex
             | NameRefClass::InsertTable
+            | NameRefClass::InsertQualifiedColumnTable
             | NameRefClass::DeleteTable
+            | NameRefClass::DeleteQualifiedColumnTable
             | NameRefClass::DeleteUsingTable
+            | NameRefClass::MergeUsingTable
             | NameRefClass::UpdateTable
             | NameRefClass::SelectFromTable
             | NameRefClass::UpdateFromTable
             | NameRefClass::SelectQualifiedColumnTable
+            | NameRefClass::UpdateSetQualifiedColumnTable
+            | NameRefClass::MergeQualifiedColumnTable
+            | NameRefClass::UpdateReturningQualifiedColumnTable
+            | NameRefClass::InsertReturningQualifiedColumnTable
+            | NameRefClass::DeleteReturningQualifiedColumnTable
+            | NameRefClass::MergeReturningQualifiedColumnTable
+            | NameRefClass::MergeTable
             | NameRefClass::ForeignKeyTable
             | NameRefClass::LikeTable
             | NameRefClass::InheritsTable
