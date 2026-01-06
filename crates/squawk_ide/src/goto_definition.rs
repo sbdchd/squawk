@@ -5951,4 +5951,90 @@ merge into old
           ╰╴                       ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_merge_returning_with_aliases_before_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x
+  using y on true
+  when matched then do nothing
+  returning
+    with (old as before, new as after)
+      before$0.a, after.a;
+"
+        ), @r"
+          ╭▸ 
+        8 │     with (old as before, new as after)
+          │                  ────── 2. destination
+        9 │       before.a, after.a;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_with_aliases_before_column() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x
+  using y on true
+  when matched then do nothing
+  returning
+    with (old as before, new as after)
+      before.a$0, after.a;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │                ─ 2. destination
+          ‡
+        9 │       before.a, after.a;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_with_aliases_after_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x
+  using y on true
+  when matched then do nothing
+  returning
+    with (old as before, new as after)
+      before.a, after$0.a;
+"
+        ), @r"
+          ╭▸ 
+        8 │     with (old as before, new as after)
+          │                                 ───── 2. destination
+        9 │       before.a, after.a;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_with_aliases_after_column() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x
+  using y on true
+  when matched then do nothing
+  returning
+    with (old as before, new as after)
+      before.a, after.a$0;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │                ─ 2. destination
+          ‡
+        9 │       before.a, after.a;
+          ╰╴                      ─ 1. source
+        ");
+    }
 }

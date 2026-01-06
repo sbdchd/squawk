@@ -810,8 +810,14 @@ fn resolve_select_qualified_column_ptr(
         let path = relation_name.path()?;
         let merge_table_name = extract_table_name(&path)?;
 
-        // Check if this is the alias or the table name
-        if let Some(alias) = merge.alias()
+        // Check `returning with (old as alias, new as alias)`
+        if let Some(returning_clause) = merge.returning_clause()
+            && let Some(option_list) = returning_clause.returning_option_list()
+            && is_table_name_in_option_list(option_list, &column_table_name)
+        {
+            (merge_table_name, None)
+            // Check if this is the alias or the table name
+        } else if let Some(alias) = merge.alias()
             && let Some(alias_name) = alias.name()
             && Name::from_node(&alias_name) == column_table_name
         {
@@ -976,6 +982,18 @@ fn resolve_select_qualified_column_ptr(
     }
 
     None
+}
+
+fn is_table_name_in_option_list(option_list: ast::ReturningOptionList, table_name: &Name) -> bool {
+    for option in option_list.returning_options() {
+        if let Some(name) = option.name()
+            && let option_name = Name::from_node(&name)
+            && option_name == *table_name
+        {
+            return true;
+        }
+    }
+    false
 }
 
 enum ResolvedTableName {
@@ -2832,6 +2850,19 @@ fn resolve_merge_table_name_ptr(
     let relation_name = merge.relation_name()?;
     let path = relation_name.path()?;
     let merge_table_name = extract_table_name(&path)?;
+
+    // Check `returning with (old as alias, new as alias)`
+    if let Some(returning_clause) = merge.returning_clause()
+        && let Some(option_list) = returning_clause.returning_option_list()
+    {
+        for option in option_list.returning_options() {
+            if let Some(name) = option.name()
+                && Name::from_node(&name) == table_name
+            {
+                return Some(SyntaxNodePtr::new(name.syntax()));
+            }
+        }
+    }
 
     // Check target table alias
     if let Some(alias) = merge.alias()
