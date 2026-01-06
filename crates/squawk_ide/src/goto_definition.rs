@@ -2810,6 +2810,77 @@ select x$0 from t;
     }
 
     #[test]
+    fn goto_cte_insert_returning_star_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with inserted as (
+  insert into t values (1, 2), (3, 4)
+  returning *
+)
+select a$0 from inserted;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        7 │ select a from inserted;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_delete_returning_star_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with deleted as (
+  delete from t
+  returning *
+)
+select a$0 from deleted;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        7 │ select a from deleted;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_update_returning_star_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with updated as (
+  update t set a = 42
+  returning *
+)
+select a$0 from updated;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        7 │ select a from updated;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_update_returning_column_list_overwrites_column() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+with updated(c) as (
+  update t set a = 10
+  returning a
+)
+select a$0 from updated;
+",
+        );
+    }
+
+    #[test]
     fn goto_cte_column_list_overwrites_column() {
         goto_not_found(
             "
@@ -3143,6 +3214,52 @@ delete from users where id$0 = 1 and active = true;
           │                    ── 2. destination
         3 │ delete from users where id = 1 and active = true;
           ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_table() {
+        assert_snapshot!(goto("
+create table t(id int, f_id int);
+create table f(id int, name text);
+delete from t using f$0 where f_id = f.id and f.name = 'foo';
+"), @r"
+          ╭▸ 
+        3 │ create table f(id int, name text);
+          │              ─ 2. destination
+        4 │ delete from t using f where f_id = f.id and f.name = 'foo';
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_table_with_schema() {
+        assert_snapshot!(goto("
+create table t(id int, f_id int);
+create table public.f(id int, name text);
+delete from t using public.f$0 where f_id = f.id;
+"), @r"
+          ╭▸ 
+        3 │ create table public.f(id int, name text);
+          │                     ─ 2. destination
+        4 │ delete from t using public.f where f_id = f.id;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_column_in_where() {
+        assert_snapshot!(goto("
+create table t(id int, f_id int);
+create table f(id int, name text);
+delete from t using f where f_id = f.id$0 and f.name = 'foo';
+"), @r"
+          ╭▸ 
+        2 │ create table t(id int, f_id int);
+          │                ── 2. destination
+        3 │ create table f(id int, name text);
+        4 │ delete from t using f where f_id = f.id and f.name = 'foo';
+          ╰╴                                      ─ 1. source
         ");
     }
 
@@ -3737,6 +3854,44 @@ select a$0 from t;
           │                 ─ 2. destination
           ‡
         7 │ select a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_insert_returning_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with inserted as (
+  insert into t values (1, 2), (3, 4)
+  returning a, b
+)
+select a$0 from inserted;
+"), @r"
+          ╭▸ 
+        5 │   returning a, b
+          │             ─ 2. destination
+        6 │ )
+        7 │ select a from inserted;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_insert_returning_aliased_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with inserted as (
+  insert into t values (1, 2), (3, 4)
+  returning a as x
+)
+select x$0 from inserted;
+"), @r"
+          ╭▸ 
+        5 │   returning a as x
+          │                  ─ 2. destination
+        6 │ )
+        7 │ select x from inserted;
           ╰╴       ─ 1. source
         ");
     }
@@ -4939,6 +5094,48 @@ alter table users alter column email$0 set not null;
     }
 
     #[test]
+    fn goto_alter_table_add_column() {
+        assert_snapshot!(goto("
+create table users(id int);
+alter table users$0 add column email text;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int);
+          │              ───── 2. destination
+        3 │ alter table users add column email text;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_drop_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+alter table users drop column email$0;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ alter table users drop column email;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_drop_column_table_name() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+alter table users$0 drop column email;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ alter table users drop column email;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_refresh_materialized_view() {
         assert_snapshot!(goto("
 create materialized view mv as select 1;
@@ -5049,6 +5246,709 @@ reindex system systemdb$0;
           │                 ──────── 2. destination
         3 │ reindex system systemdb;
           ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_aliased_column() {
+        assert_snapshot!(goto(
+            "
+create table t(a int, b int);
+with u(x, y) as (
+  select 1, 2
+),
+merged as (
+  merge into t
+    using u
+      on t.a = u.x
+  when matched then
+    do nothing
+  when not matched then
+    do nothing
+  returning a as x, b as y
+)
+select x$0 from merged;
+",
+        ), @r"
+           ╭▸ 
+        14 │   returning a as x, b as y
+           │                  ─ 2. destination
+        15 │ )
+        16 │ select x from merged;
+           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_update_returning_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with updated(c) as (
+  update t set a = 10
+  returning a, b
+)
+select c, b$0 from updated;"
+        ), @r"
+          ╭▸ 
+        5 │   returning a, b
+          │                ─ 2. destination
+        6 │ )
+        7 │ select c, b from updated;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_column_to_table_def() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with updated(c) as (
+  update t set a = 10
+  returning a, b$0
+)
+select c, b from updated;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+          ‡
+        5 │   returning a, b
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_returning_column_to_table_def() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with inserted as (
+  insert into t values (1, 2)
+  returning a$0, b
+)
+select a, b from inserted;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        5 │   returning a, b
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_returning_column_to_table_def() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with deleted as (
+  delete from t
+  returning a, b$0
+)
+select a, b from deleted;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+          ‡
+        5 │   returning a, b
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_qualified_star_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t set a = 10
+returning t$0.*;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ update t set a = 10
+        4 │ returning t.*;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_returning_qualified_star_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t values (1, 2)
+returning t$0.*;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ insert into t values (1, 2)
+        4 │ returning t.*;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_returning_qualified_star_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t
+returning t$0.*;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ delete from t
+        4 │ returning t.*;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_alias_in_set_clause() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t as f set f$0.a = 10;"
+        ), @r"
+          ╭▸ 
+        3 │ update t as f set f.a = 10;
+          │             ┬     ─ 1. source
+          │             │
+          ╰╴            2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_update_alias_in_where_clause() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t as f set a = 10 where f$0.b = 5;"
+        ), @r"
+          ╭▸ 
+        3 │ update t as f set a = 10 where f.b = 5;
+          ╰╴            ─ 2. destination   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_alias_in_from_clause() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(c int);
+update t as f set a = 10 from u where f$0.b = u.c;"
+        ), @r"
+          ╭▸ 
+        4 │ update t as f set a = 10 from u where f.b = u.c;
+          ╰╴            ─ 2. destination          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_alias_in_on_conflict() {
+        assert_snapshot!(goto("
+create table t(a int primary key, b int);
+insert into t as f values (1, 2) on conflict (f$0.a) do nothing;"
+        ), @r"
+          ╭▸ 
+        3 │ insert into t as f values (1, 2) on conflict (f.a) do nothing;
+          ╰╴                 ─ 2. destination             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_alias_in_returning() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t as f values (1, 2) returning f$0.a;"
+        ), @r"
+          ╭▸ 
+        3 │ insert into t as f values (1, 2) returning f.a;
+          ╰╴                 ─ 2. destination          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_alias_returning_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t as f values (1, 2) returning f.a$0;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ insert into t as f values (1, 2) returning f.a;
+          ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_from_alias() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t as f where f$0.a = 10;"
+        ), @r"
+          ╭▸ 
+        3 │ delete from t as f where f.a = 10;
+          │                  ┬       ─ 1. source
+          │                  │
+          ╰╴                 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_delete_from_alias_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t as f where f.a$0 = 10;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ delete from t as f where f.a = 10;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_from_alias_returning() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t as f returning f$0.a"
+        ), @r"
+          ╭▸ 
+        3 │ delete from t as f returning f.a
+          │                  ┬           ─ 1. source
+          │                  │
+          ╰╴                 2. destination
+        ");
+
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t as f returning f.a$0"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ delete from t as f returning f.a
+          ╰╴                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_alias_on_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, b int);
+merge into t as f
+  using u on u.a = f$0.a
+  when matched then do nothing;
+"
+
+        ), @r"
+          ╭▸ 
+        4 │ merge into t as f
+          │                 ─ 2. destination
+        5 │   using u on u.a = f.a
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_alias_on_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, b int);
+merge into t as f
+  using u on u.a = f.a$0
+  when matched then do nothing;
+"
+
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        5 │   using u on u.a = f.a
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_alias_returning() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, b int);
+merge into t as f
+  using u on u.a = f.a
+  when matched then do nothing
+  returning f$0.a;
+"
+
+        ), @r"
+          ╭▸ 
+        4 │ merge into t as f
+          │                 ─ 2. destination
+          ‡
+        7 │   returning f.a;
+          ╰╴            ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, b int);
+merge into t as f
+  using u on u.a = f.a
+  when matched then do nothing
+  returning f.a$0;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        7 │   returning f.a;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_table_in_when_clause() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, b int);
+merge into t
+  using u on true
+  when matched and u$0.a = t.a
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table u(a int, b int);
+          │              ─ 2. destination
+          ‡
+        6 │   when matched and u.a = t.a
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_table_column_in_when_clause() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, b int);
+merge into t
+  using u on true
+  when matched and u.a$0 = t.a
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table u(a int, b int);
+          │                ─ 2. destination
+          ‡
+        6 │   when matched and u.a = t.a
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_unqualified_column_target_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x
+  using y
+    on true
+  when matched and a$0 = c
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │                ─ 2. destination
+          ‡
+        7 │   when matched and a = c
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_unqualified_column_source_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x
+  using y
+    on true
+  when matched and a = c$0
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table y(c int, d int);
+          │                ─ 2. destination
+          ‡
+        7 │   when matched and a = c
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_into_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x$0
+  using y
+    on true
+  when matched and a = c
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │              ─ 2. destination
+        3 │ create table y(c int, d int);
+        4 │ merge into x
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_clause_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x
+  using y$0
+    on true
+  when matched and a = c
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table y(c int, d int);
+          │              ─ 2. destination
+        4 │ merge into x
+        5 │   using y
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_using_clause_alias() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x as g
+  using y as k
+    on true
+  when matched and a = k.c$0
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table y(c int, d int);
+          │                ─ 2. destination
+          ‡
+        7 │   when matched and a = k.c
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_on_clause_unqualified_source_column() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x as g
+  using y as k
+    on g.a = c$0 and a = c
+  when matched and g.a = k.c
+    then do nothing;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table y(c int, d int);
+          │                ─ 2. destination
+          ‡
+        6 │     on g.a = c and a = c
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_old_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x as g
+  using y as k
+    on g.a = c and a = k.c
+  when matched and g.a = k.c
+    then do nothing
+  returning old$0.a, new.a;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │              ─ 2. destination
+          ‡
+        9 │   returning old.a, new.a;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_old_column() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x as g
+  using y as k
+    on g.a = c and a = k.c
+  when matched and g.a = k.c
+    then do nothing
+  returning old.a$0, new.a;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │                ─ 2. destination
+          ‡
+        9 │   returning old.a, new.a;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_new_table() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x as g
+  using y as k
+    on g.a = c and a = k.c
+  when matched and g.a = k.c
+    then do nothing
+  returning old.a, new$0.a;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │              ─ 2. destination
+          ‡
+        9 │   returning old.a, new.a;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_new_column() {
+        assert_snapshot!(goto("
+create table x(a int, b int);
+create table y(c int, d int);
+merge into x as g
+  using y as k
+    on g.a = c and a = k.c
+  when matched and g.a = k.c
+    then do nothing
+  returning old.a, new.a$0;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table x(a int, b int);
+          │                ─ 2. destination
+          ‡
+        9 │   returning old.a, new.a;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_with_tables_named_old_new_old_table() {
+        assert_snapshot!(goto("
+create table old(a int, b int);
+create table new(c int, d int);
+merge into old
+  using new
+    on true
+  when matched
+    then do nothing
+  returning old$0.a, new.d;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table old(a int, b int);
+          │              ─── 2. destination
+          ‡
+        9 │   returning old.a, new.d;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_with_tables_named_old_new_old_column() {
+        assert_snapshot!(goto("
+create table old(a int, b int);
+create table new(c int, d int);
+merge into old
+  using new
+    on true
+  when matched
+    then do nothing
+  returning old.a$0, new.d;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table old(a int, b int);
+          │                  ─ 2. destination
+          ‡
+        9 │   returning old.a, new.d;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_with_tables_named_old_new_new_table() {
+        assert_snapshot!(goto("
+create table old(a int, b int);
+create table new(c int, d int);
+merge into old
+  using new
+    on true
+  when matched
+    then do nothing
+  returning old.a, new$0.d;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table new(c int, d int);
+          │              ─── 2. destination
+          ‡
+        9 │   returning old.a, new.d;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_with_tables_named_old_new_new_column() {
+        assert_snapshot!(goto("
+create table old(a int, b int);
+create table new(c int, d int);
+merge into old
+  using new
+    on true
+  when matched
+    then do nothing
+  returning old.a, new.d$0;
+"
+        ), @r"
+          ╭▸ 
+        3 │ create table new(c int, d int);
+          │                         ─ 2. destination
+          ‡
+        9 │   returning old.a, new.d;
+          ╰╴                       ─ 1. source
         ");
     }
 }

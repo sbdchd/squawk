@@ -47,6 +47,12 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::DeleteWhereColumn
             | NameRefClass::UpdateWhereColumn
             | NameRefClass::UpdateSetColumn
+            | NameRefClass::UpdateReturningColumn
+            | NameRefClass::InsertReturningColumn
+            | NameRefClass::DeleteReturningColumn
+            | NameRefClass::MergeReturningColumn
+            | NameRefClass::MergeWhenColumn
+            | NameRefClass::MergeOnColumn
             | NameRefClass::CheckConstraintColumn
             | NameRefClass::GeneratedColumn
             | NameRefClass::UniqueConstraintColumn
@@ -58,7 +64,8 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::ForeignKeyColumn
             | NameRefClass::ForeignKeyLocalColumn
             | NameRefClass::SequenceOwnedByColumn
-            | NameRefClass::AlterTableColumn => {
+            | NameRefClass::AlterTableColumn
+            | NameRefClass::AlterTableDropColumn => {
                 return hover_column(root, &name_ref, &binder);
             }
             NameRefClass::TypeReference | NameRefClass::DropType => {
@@ -85,11 +92,22 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::DropMaterializedView
             | NameRefClass::CreateIndex
             | NameRefClass::InsertTable
+            | NameRefClass::InsertQualifiedColumnTable
             | NameRefClass::DeleteTable
+            | NameRefClass::DeleteQualifiedColumnTable
+            | NameRefClass::DeleteUsingTable
+            | NameRefClass::MergeUsingTable
             | NameRefClass::UpdateTable
             | NameRefClass::SelectFromTable
             | NameRefClass::UpdateFromTable
             | NameRefClass::SelectQualifiedColumnTable
+            | NameRefClass::UpdateSetQualifiedColumnTable
+            | NameRefClass::MergeQualifiedColumnTable
+            | NameRefClass::UpdateReturningQualifiedColumnTable
+            | NameRefClass::InsertReturningQualifiedColumnTable
+            | NameRefClass::DeleteReturningQualifiedColumnTable
+            | NameRefClass::MergeReturningQualifiedColumnTable
+            | NameRefClass::MergeTable
             | NameRefClass::ForeignKeyTable
             | NameRefClass::LikeTable
             | NameRefClass::InheritsTable
@@ -3376,6 +3394,33 @@ reindex index idx$0;
           ╭▸ 
         4 │ reindex index idx;
           ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_star_from_cte() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+with u(x, y) as (
+  select 1, 2
+),
+merged as (
+  merge into t
+    using u
+      on t.a = u.x
+  when matched then
+    do nothing
+  when not matched then
+    do nothing
+  returning a as x, b as y
+)
+select *$0 from merged;
+"), @r"
+        hover: column merged.x
+              column merged.y
+           ╭▸ 
+        16 │ select * from merged;
+           ╰╴       ─ hover
         ");
     }
 }

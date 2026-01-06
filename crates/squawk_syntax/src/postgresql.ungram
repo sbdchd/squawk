@@ -157,7 +157,7 @@ JsonObjectAggFn =
     JsonKeyValue?
     JsonNullClause?
     JsonKeysUniqueClause?
-    ReturningClause?
+    JsonReturningClause?
   ')'
 
 JsonArrayAggFn =
@@ -1406,6 +1406,7 @@ Merge =
   'merge' 'into' RelationName Alias? 
   UsingOnClause
   MergeWhenClause*
+  ReturningClause?
 
 Declare =
   'declare' Name

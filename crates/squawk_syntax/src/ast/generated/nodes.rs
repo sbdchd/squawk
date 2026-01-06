@@ -9395,7 +9395,7 @@ impl JsonObjectAggFn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn returning_clause(&self) -> Option<ReturningClause> {
+    pub fn json_returning_clause(&self) -> Option<JsonReturningClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -10208,6 +10208,10 @@ impl Merge {
     }
     #[inline]
     pub fn relation_name(&self) -> Option<RelationName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn returning_clause(&self) -> Option<ReturningClause> {
         support::child(&self.syntax)
     }
     #[inline]
