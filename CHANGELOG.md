@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: goto def create/alter/drop server (#821)
 - ide: goto def foreign tables (#820)
 - ide: use previous token in more cases of punctuation (#819)
-- ide: support hover with * in queries (#818)
+- ide: support hover with `*` in queries (#818)
 - ide: goto def support for references column constraints & `select t.* from t;` (#817)
 - ide: support find references for join using clause (#816)
 - ide: goto def using clause in join (#815)
