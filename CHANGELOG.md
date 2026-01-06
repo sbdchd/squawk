@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.36.0 - 2026-01-06
+
+### Added
+
+- ide: goto def support for merge (#826),(#825)
+- ide: goto def truncate, lock, vacuum, alter table column, refresh (#823)
+- ide: document symbol support for create view (#807)
+- ide: goto def create/alter/drop server (#821)
+- ide: goto def foreign tables (#820)
+- ide: use previous token in more cases of punctuation (#819)
+- ide: support hover with `*` in queries (#818)
+- ide: goto def support for references column constraints & `select t.* from t;` (#817)
+- ide: support find references for join using clause (#816)
+- ide: goto def using clause in join (#815)
+- ide: goto def for tablespace (#814)
+- ide: better goto def with create table (#813)
+- ide: mat view goto def/hover, agg/procedure/mat view doc symbols (#812)
+- ide: better goto def support for types (#811)
+- ide: composite field goto def & hover (#810)
+- ide: document symbol support for CTEs (#806)
+- ide: hover for views (#804)
+- ide: goto def with create view (#802)
+- vscode: restart server command (#808)
+
+### Fixed
+
+- ide: fix column name for special cased functions (#824)
+- playground: fix dupe hover results in editor (#805)
+
 ## v2.35.0 - 2026-01-02
 
 ### Added
