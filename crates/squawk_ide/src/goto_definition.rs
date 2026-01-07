@@ -6037,4 +6037,256 @@ merge into x
           ╰╴                      ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_insert_returning_old_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t values (1, 2), (3, 4)
+returning old$0.a, new.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ insert into t values (1, 2), (3, 4)
+        4 │ returning old.a, new.b;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_returning_old_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t values (1, 2), (3, 4)
+returning old.a$0, new.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ insert into t values (1, 2), (3, 4)
+        4 │ returning old.a, new.b;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_returning_new_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t values (1, 2), (3, 4)
+returning old.a, new$0.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ insert into t values (1, 2), (3, 4)
+        4 │ returning old.a, new.b;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_returning_new_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t values (1, 2), (3, 4)
+returning old.a, new.b$0;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ insert into t values (1, 2), (3, 4)
+        4 │ returning old.a, new.b;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_old_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t set a = 42
+returning old$0.a, new.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ update t set a = 42
+        4 │ returning old.a, new.b;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_old_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t set a = 42
+returning old.a$0, new.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ update t set a = 42
+        4 │ returning old.a, new.b;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_new_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t set a = 42
+returning old.a, new$0.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ update t set a = 42
+        4 │ returning old.a, new.b;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_returning_new_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t set a = 42
+returning old.a, new.b$0;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ update t set a = 42
+        4 │ returning old.a, new.b;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_returning_old_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t
+returning old$0.a, new.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ delete from t
+        4 │ returning old.a, new.b;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_returning_old_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t
+returning old.a$0, new.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ delete from t
+        4 │ returning old.a, new.b;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_returning_new_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t
+returning old.a, new$0.b;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ delete from t
+        4 │ returning old.a, new.b;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_returning_new_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t
+returning old.a, new.b$0;
+"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ delete from t
+        4 │ returning old.a, new.b;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_as_old_alias() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+insert into t as old values (1, 2)
+returning old$0.a, new.a;
+"
+        ), @r"
+          ╭▸ 
+        3 │ insert into t as old values (1, 2)
+          │                  ─── 2. destination
+        4 │ returning old.a, new.a;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_as_old_alias() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+delete from t as old
+returning old$0.a, new.a;
+"
+        ), @r"
+          ╭▸ 
+        3 │ delete from t as old
+          │                  ─── 2. destination
+        4 │ returning old.a, new.a;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_as_old_alias() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+update t as old set a = 42
+returning old$0.a, new.a;
+"
+        ), @r"
+          ╭▸ 
+        3 │ update t as old set a = 42
+          │             ─── 2. destination
+        4 │ returning old.a, new.a;
+          ╰╴            ─ 1. source
+        ");
+    }
 }
