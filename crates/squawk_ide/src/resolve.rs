@@ -383,11 +383,10 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::InsertReturningColumn => {
             resolve_insert_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::MergeReturningColumn | NameRefClass::MergeOnColumn => {
+        NameRefClass::MergeWhenColumn
+        | NameRefClass::MergeReturningColumn
+        | NameRefClass::MergeOnColumn => {
             resolve_merge_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::MergeWhenColumn => {
-            resolve_merge_when_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
         }
         NameRefClass::MergeQualifiedColumnTable
         | NameRefClass::MergeReturningQualifiedColumnTable => {
@@ -403,8 +402,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::AlterTable::cast)?;
-            let relation_name = alter_table.relation_name()?;
-            let path = relation_name.path()?;
+            let path = alter_table.relation_name()?.path()?;
             resolve_column_for_path(binder, root, &path, column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ReindexSchema => {
@@ -635,8 +633,7 @@ fn resolve_create_index_column_ptr(
         .syntax()
         .ancestors()
         .find_map(ast::CreateIndex::cast)?;
-    let relation_name = create_index.relation_name()?;
-    let path = relation_name.path()?;
+    let path = create_index.relation_name()?.path()?;
 
     resolve_column_for_path(binder, root, &path, column_name)
 }
@@ -762,6 +759,56 @@ fn resolve_select_qualified_column_table_name_ptr(
     resolve_table_name_ptr(binder, &table_name, &schema, position)
 }
 
+enum ReturningClauseMatch {
+    ReturningAlias(ast::Name),
+    TableAlias(ast::Name),
+    PseudoTable,
+    Table,
+}
+
+fn match_table_in_returning_clause(
+    table_name: &Name,
+    stmt_table_name: &Name,
+    alias: Option<ast::Alias>,
+    returning_clause: Option<ast::ReturningClause>,
+) -> Option<ReturningClauseMatch> {
+    // Check `returning with (old as alias, new as alias)`
+    if let Some(returning_clause) = returning_clause
+        && let Some(option_list) = returning_clause.returning_option_list()
+    {
+        for option in option_list.returning_options() {
+            if let Some(name) = option.name()
+                && Name::from_node(&name) == *table_name
+            {
+                return Some(ReturningClauseMatch::ReturningAlias(name));
+            }
+        }
+    }
+
+    if let Some(alias) = alias
+        && let Some(alias_name) = alias.name()
+        && Name::from_node(&alias_name) == *table_name
+    {
+        return Some(ReturningClauseMatch::TableAlias(alias_name));
+    }
+
+    let old_name = Name::from_string("old");
+    let new_name = Name::from_string("new");
+    if *table_name == old_name || *table_name == new_name {
+        return Some(ReturningClauseMatch::PseudoTable);
+    }
+
+    if *stmt_table_name == *table_name {
+        return Some(ReturningClauseMatch::Table);
+    }
+
+    None
+}
+
+fn extract_table_schema_from_path(path: &ast::Path) -> Option<(Name, Option<Schema>)> {
+    Some((extract_table_name(path)?, extract_schema_name(path)))
+}
+
 // TODO: this is similar to resolve_from_item_for_column, maybe we can simplify
 fn resolve_select_qualified_column_ptr(
     binder: &Binder,
@@ -805,62 +852,54 @@ fn resolve_select_qualified_column_ptr(
         .ancestors()
         .find_map(ast::Merge::cast)
     {
-        // Handle MERGE statements
-        let relation_name = merge.relation_name()?;
-        let path = relation_name.path()?;
-        let merge_table_name = extract_table_name(&path)?;
-
-        // Check `returning with (old as alias, new as alias)`
-        if let Some(returning_clause) = merge.returning_clause()
-            && let Some(option_list) = returning_clause.returning_option_list()
-            && is_table_name_in_option_list(option_list, &column_table_name)
+        let found_in_using = if let Some(using_on) = merge.using_on_clause()
+            && let Some(from_item) = using_on.from_item()
         {
-            (merge_table_name, None)
-            // Check if this is the alias or the table name
-        } else if let Some(alias) = merge.alias()
-            && let Some(alias_name) = alias.name()
-            && Name::from_node(&alias_name) == column_table_name
-        {
-            (merge_table_name, extract_schema_name(&path))
-        } else if merge_table_name == column_table_name {
-            (merge_table_name, extract_schema_name(&path))
-        } else {
-            // Try to find in USING clause first
-            let found_in_using = if let Some(using_on) = merge.using_on_clause()
-                && let Some(from_item) = using_on.from_item()
+            if let Some(item_name_ref) = from_item.name_ref()
+                && let item_name = Name::from_node(&item_name_ref)
+                && item_name == column_table_name
             {
-                if let Some(item_name_ref) = from_item.name_ref()
-                    && let item_name = Name::from_node(&item_name_ref)
-                    && item_name == column_table_name
-                {
-                    Some((item_name, None))
-                } else if let Some(alias) = from_item.alias()
-                    && let Some(alias_name) = alias.name()
-                    && let alias_name = Name::from_node(&alias_name)
-                    && alias_name == column_table_name
-                {
-                    Some((alias_name, None))
-                } else {
-                    None
-                }
+                Some((item_name, None))
+            } else if let Some(alias) = from_item.alias()
+                && let Some(alias_name) = alias.name()
+                && let alias_name = Name::from_node(&alias_name)
+                && alias_name == column_table_name
+            {
+                Some((alias_name, None))
             } else {
                 None
-            };
-
-            if let Some(result) = found_in_using {
-                result
-            } else {
-                // Fallback: check for OLD and NEW pseudo-tables in MERGE RETURNING clause
-                let old_name = Name::from_string("old");
-                let new_name = Name::from_string("new");
-                if column_table_name == old_name || column_table_name == new_name {
-                    // Both OLD and NEW refer to the target table
-                    (merge_table_name, extract_schema_name(&path))
-                } else {
-                    return None;
-                }
             }
+        } else {
+            None
+        };
+
+        if let Some(result) = found_in_using {
+            result
+        } else {
+            let path = merge.relation_name()?.path()?;
+            extract_table_schema_from_path(&path)?
         }
+    } else if let Some(insert) = column_name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::Insert::cast)
+    {
+        let path = insert.path()?;
+        extract_table_schema_from_path(&path)?
+    } else if let Some(update) = column_name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::Update::cast)
+    {
+        let path = update.relation_name()?.path()?;
+        extract_table_schema_from_path(&path)?
+    } else if let Some(delete) = column_name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::Delete::cast)
+    {
+        let path = delete.relation_name()?.path()?;
+        extract_table_schema_from_path(&path)?
     } else {
         let select = column_name_ref
             .syntax()
@@ -982,18 +1021,6 @@ fn resolve_select_qualified_column_ptr(
     }
 
     None
-}
-
-fn is_table_name_in_option_list(option_list: ast::ReturningOptionList, table_name: &Name) -> bool {
-    for option in option_list.returning_options() {
-        if let Some(name) = option.name()
-            && let option_name = Name::from_node(&name)
-            && option_name == *table_name
-        {
-            return true;
-        }
-    }
-    false
 }
 
 enum ResolvedTableName {
@@ -1232,8 +1259,7 @@ fn resolve_delete_column_ptr(
         .syntax()
         .ancestors()
         .find_map(ast::Delete::cast)?;
-    let relation_name = delete.relation_name()?;
-    let path = relation_name.path()?;
+    let path = delete.relation_name()?.path()?;
 
     resolve_column_for_path(binder, root, &path, column_name)
 }
@@ -1315,8 +1341,7 @@ fn resolve_update_column_ptr(
     }
 
     // `update t set a = b`
-    let relation_name = update.relation_name()?;
-    let path = relation_name.path()?;
+    let path = update.relation_name()?.path()?;
 
     resolve_column_for_path(binder, root, &path, column_name)
 }
@@ -2718,30 +2743,6 @@ fn extract_type_name_and_schema(ty: &ast::Type) -> Option<(Name, Option<Schema>)
     }
 }
 
-fn resolve_merge_when_column_ptr(
-    binder: &Binder,
-    root: &SyntaxNode,
-    table_name_ref: &ast::NameRef,
-) -> Option<SyntaxNodePtr> {
-    let column_name = Name::from_node(table_name_ref);
-    let merge = table_name_ref
-        .syntax()
-        .ancestors()
-        .find_map(ast::Merge::cast)?;
-
-    // Try resolving in source table first
-    if let Some(using_on) = merge.using_on_clause()
-        && let Some(from_item) = using_on.from_item()
-        && let Some(ptr) = resolve_from_item_column_ptr(binder, root, &from_item, table_name_ref)
-    {
-        return Some(ptr);
-    }
-
-    let relation_name = merge.relation_name()?;
-    let path = relation_name.path()?;
-    resolve_column_for_path(binder, root, &path, column_name)
-}
-
 fn resolve_merge_column_ptr(
     binder: &Binder,
     root: &SyntaxNode,
@@ -2761,80 +2762,94 @@ fn resolve_merge_column_ptr(
         return Some(ptr);
     }
 
-    let relation_name = merge.relation_name()?;
-    let path = relation_name.path()?;
+    let path = merge.relation_name()?.path()?;
     resolve_column_for_path(binder, root, &path, column_name)
+}
+
+// TODO: I think we could use trait(s) here to simplify this and have the
+// callers pass in the stmt instead of the fields.
+fn resolve_table_in_returning_clause(
+    binder: &Binder,
+    table_name_ref: &ast::NameRef,
+    alias: Option<ast::Alias>,
+    path: &ast::Path,
+    returning_clause: Option<ast::ReturningClause>,
+) -> Option<SyntaxNodePtr> {
+    let table_name = Name::from_node(table_name_ref);
+    let stmt_table_name = extract_table_name(path)?;
+
+    let matched =
+        match_table_in_returning_clause(&table_name, &stmt_table_name, alias, returning_clause)?;
+
+    let schema = extract_schema_name(path);
+    let position = table_name_ref.syntax().text_range().start();
+
+    match matched {
+        ReturningClauseMatch::ReturningAlias(name) => Some(SyntaxNodePtr::new(name.syntax())),
+        ReturningClauseMatch::TableAlias(alias_name) => {
+            Some(SyntaxNodePtr::new(alias_name.syntax()))
+        }
+        ReturningClauseMatch::PseudoTable => {
+            resolve_table_name_ptr(binder, &stmt_table_name, &schema, position)
+        }
+        ReturningClauseMatch::Table => {
+            resolve_table_name_ptr(binder, &table_name, &schema, position)
+        }
+    }
 }
 
 fn resolve_insert_table_name_ptr(
     binder: &Binder,
     table_name_ref: &ast::NameRef,
 ) -> Option<SyntaxNodePtr> {
-    let table_name = Name::from_node(table_name_ref);
     let insert = table_name_ref
         .syntax()
         .ancestors()
         .find_map(ast::Insert::cast)?;
-
-    if let Some(alias) = insert.alias()
-        && let Some(alias_name) = alias.name()
-        && Name::from_node(&alias_name) == table_name
-    {
-        return Some(SyntaxNodePtr::new(alias_name.syntax()));
-    }
-
     let path = insert.path()?;
-    let schema = extract_schema_name(&path);
-    let position = table_name_ref.syntax().text_range().start();
-    resolve_table_name_ptr(binder, &table_name, &schema, position)
+    resolve_table_in_returning_clause(
+        binder,
+        table_name_ref,
+        insert.alias(),
+        &path,
+        insert.returning_clause(),
+    )
 }
 
 fn resolve_delete_table_name_ptr(
     binder: &Binder,
     table_name_ref: &ast::NameRef,
 ) -> Option<SyntaxNodePtr> {
-    let table_name = Name::from_node(table_name_ref);
     let delete = table_name_ref
         .syntax()
         .ancestors()
         .find_map(ast::Delete::cast)?;
-
-    if let Some(alias) = delete.alias()
-        && let Some(alias_name) = alias.name()
-        && Name::from_node(&alias_name) == table_name
-    {
-        return Some(SyntaxNodePtr::new(alias_name.syntax()));
-    }
-
-    let relation_name = delete.relation_name()?;
-    let path = relation_name.path()?;
-    let schema = extract_schema_name(&path);
-    let position = table_name_ref.syntax().text_range().start();
-    resolve_table_name_ptr(binder, &table_name, &schema, position)
+    let path = delete.relation_name()?.path()?;
+    resolve_table_in_returning_clause(
+        binder,
+        table_name_ref,
+        delete.alias(),
+        &path,
+        delete.returning_clause(),
+    )
 }
 
 fn resolve_update_table_name_ptr(
     binder: &Binder,
     table_name_ref: &ast::NameRef,
 ) -> Option<SyntaxNodePtr> {
-    let table_name = Name::from_node(table_name_ref);
     let update = table_name_ref
         .syntax()
         .ancestors()
         .find_map(ast::Update::cast)?;
-
-    if let Some(alias) = update.alias()
-        && let Some(alias_name) = alias.name()
-        && Name::from_node(&alias_name) == table_name
-    {
-        return Some(SyntaxNodePtr::new(alias_name.syntax()));
-    }
-
-    let relation_name = update.relation_name()?;
-    let path = relation_name.path()?;
-    let schema = extract_schema_name(&path);
-    let position = table_name_ref.syntax().text_range().start();
-    resolve_table_name_ptr(binder, &table_name, &schema, position)
+    let path = update.relation_name()?.path()?;
+    resolve_table_in_returning_clause(
+        binder,
+        table_name_ref,
+        update.alias(),
+        &path,
+        update.returning_clause(),
+    )
 }
 
 fn resolve_merge_table_name_ptr(
@@ -2847,32 +2862,9 @@ fn resolve_merge_table_name_ptr(
         .ancestors()
         .find_map(ast::Merge::cast)?;
 
-    let relation_name = merge.relation_name()?;
-    let path = relation_name.path()?;
-    let merge_table_name = extract_table_name(&path)?;
+    let path = merge.relation_name()?.path()?;
 
-    // Check `returning with (old as alias, new as alias)`
-    if let Some(returning_clause) = merge.returning_clause()
-        && let Some(option_list) = returning_clause.returning_option_list()
-    {
-        for option in option_list.returning_options() {
-            if let Some(name) = option.name()
-                && Name::from_node(&name) == table_name
-            {
-                return Some(SyntaxNodePtr::new(name.syntax()));
-            }
-        }
-    }
-
-    // Check target table alias
-    if let Some(alias) = merge.alias()
-        && let Some(alias_name) = alias.name()
-        && Name::from_node(&alias_name) == table_name
-    {
-        return Some(SyntaxNodePtr::new(alias_name.syntax()));
-    }
-
-    // Check USING clause for the source table
+    // Check USING clause for the source table - MERGE-specific
     if let Some(using_on) = merge.using_on_clause()
         && let Some(from_item) = using_on.from_item()
     {
@@ -2892,23 +2884,11 @@ fn resolve_merge_table_name_ptr(
         }
     }
 
-    if merge_table_name == table_name {
-        let schema = extract_schema_name(&path);
-        let position = table_name_ref.syntax().text_range().start();
-        return resolve_table_name_ptr(binder, &table_name, &schema, position);
-    }
-
-    // Check for OLD and NEW pseudo-tables in MERGE RETURNING clause (fallback)
-    let old_name = Name::from_string("old");
-    let new_name = Name::from_string("new");
-    if table_name == old_name || table_name == new_name {
-        // Both OLD and NEW refer to the target table
-        let schema = extract_schema_name(&path);
-        let position = table_name_ref.syntax().text_range().start();
-        return resolve_table_name_ptr(binder, &merge_table_name, &schema, position);
-    }
-
-    let schema = extract_schema_name(&path);
-    let position = table_name_ref.syntax().text_range().start();
-    resolve_table_name_ptr(binder, &table_name, &schema, position)
+    resolve_table_in_returning_clause(
+        binder,
+        table_name_ref,
+        merge.alias(),
+        &path,
+        merge.returning_clause(),
+    )
 }
