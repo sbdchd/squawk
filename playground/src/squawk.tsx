@@ -9,6 +9,7 @@ import initWasm, {
   document_symbols as document_symbols_,
   code_actions as code_actions_,
   inlay_hints as inlay_hints_,
+  selection_ranges as selection_ranges_,
 } from "./pkg/squawk_wasm"
 
 export type TextEdit = {
@@ -80,6 +81,13 @@ export function find_references(
   column: number,
 ): LocationRange[] {
   return find_references_(content, line, column)
+}
+
+export function selection_ranges(
+  content: string,
+  positions: Array<{ line: number; column: number }>,
+): SelectionRange[][] {
+  return selection_ranges_(content, positions)
 }
 
 export function useErrors(text: string) {
@@ -163,4 +171,11 @@ interface InlayHint {
   column: number
   label: string
   kind: string
+}
+
+export interface SelectionRange {
+  start_line: number
+  start_column: number
+  end_line: number
+  end_column: number
 }
