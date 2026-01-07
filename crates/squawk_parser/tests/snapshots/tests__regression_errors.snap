@@ -1,6 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/regression_suite/errors.sql
+input_file: postgres/regression_suite/errors.sql
 ---
 ---
 error[syntax-error]: expected relation name
@@ -75,14 +75,10 @@ error[syntax-error]: expected command, found INT_NUMBER
     ╭▸ 
 150 │ drop aggregate 314159 (int);
     ╰╴               ━
-error[syntax-error]: expected R_PAREN
+error[syntax-error]: expected command, found L_PAREN
     ╭▸ 
 150 │ drop aggregate 314159 (int);
-    ╰╴                       ━
-error[syntax-error]: expected SEMICOLON
-    ╭▸ 
-150 │ drop aggregate 314159 (int);
-    ╰╴                       ━
+    ╰╴                      ━
 error[syntax-error]: expected command, found INT_KW
     ╭▸ 
 150 │ drop aggregate 314159 (int);
@@ -107,6 +103,14 @@ error[syntax-error]: expected command, found INT_NUMBER
     ╭▸ 
 169 │ drop function 314159();
     ╰╴              ━
+error[syntax-error]: expected command, found L_PAREN
+    ╭▸ 
+169 │ drop function 314159();
+    ╰╴                    ━
+error[syntax-error]: expected command, found R_PAREN
+    ╭▸ 
+169 │ drop function 314159();
+    ╰╴                     ━
 error[syntax-error]: expected path name
     ╭▸ 
 179 │ drop type;

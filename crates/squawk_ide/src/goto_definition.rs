@@ -6039,6 +6039,95 @@ merge into x
     }
 
     #[test]
+    fn goto_merge_when_not_matched_insert_values_qualified_column() {
+        assert_snapshot!(goto("
+create table inventory (
+    product_id int,
+    quantity int,
+    updated_at timestamp
+);
+create table orders (
+    id int,
+    product_id int,
+    qty int
+);
+merge into inventory as t
+using orders as o
+  on t.product_id = o.product_id
+when matched then
+  do nothing
+when not matched then
+  insert values (o$0.product_id, o.qty, now());
+"
+        ), @r"
+           ╭▸ 
+        13 │ using orders as o
+           │                 ─ 2. destination
+           ‡
+        18 │   insert values (o.product_id, o.qty, now());
+           ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_when_not_matched_insert_values_qualified_column_field() {
+        assert_snapshot!(goto("
+create table inventory (
+    product_id int,
+    quantity int,
+    updated_at timestamp
+);
+create table orders (
+    id int,
+    product_id int,
+    qty int
+);
+merge into inventory as t
+using orders as o
+  on t.product_id = o.product_id
+when matched then
+  do nothing
+when not matched then
+  insert values (o.product_id$0, o.qty, now());
+"
+        ), @r"
+           ╭▸ 
+         9 │     product_id int,
+           │     ────────── 2. destination
+           ‡
+        18 │   insert values (o.product_id, o.qty, now());
+           ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_when_not_matched_insert_values_unqualified_column() {
+        assert_snapshot!(goto("
+create table inventory (
+    product_id int,
+    quantity int
+);
+create table orders (
+    product_id int,
+    qty int
+);
+merge into inventory as t
+using orders as o
+  on t.product_id = o.product_id
+when not matched then
+  insert values (product_id$0, qty);
+"
+        ), @r"
+           ╭▸ 
+         7 │     product_id int,
+           │     ────────── 2. destination
+           ‡
+        14 │   insert values (product_id, qty);
+           ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_insert_returning_old_table() {
         assert_snapshot!(goto("
 create table t(a int, b int);
@@ -6287,6 +6376,81 @@ returning old$0.a, new.a;
           │             ─── 2. destination
         4 │ returning old.a, new.a;
           ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_cte_column_unqualified() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with u(x, y) as (
+  select 1, 2
+)
+merge into t
+  using u on true
+when matched then
+  do nothing
+when not matched then
+  do nothing
+returning x$0, u.y;
+"
+        ), @r"
+           ╭▸ 
+         3 │ with u(x, y) as (
+           │        ─ 2. destination
+           ‡
+        12 │ returning x, u.y;
+           ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_cte_column_qualified_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with u(x, y) as (
+  select 1, 2
+)
+merge into t
+  using u on true
+when matched then
+  do nothing
+when not matched then
+  do nothing
+returning x, u$0.y;
+"
+        ), @r"
+           ╭▸ 
+         3 │ with u(x, y) as (
+           │      ─ 2. destination
+           ‡
+        12 │ returning x, u.y;
+           ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_returning_cte_column_qualified_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with u(x, y) as (
+  select 1, 2
+)
+merge into t
+  using u on true
+when matched then
+  do nothing
+when not matched then
+  do nothing
+returning x, u.y$0;
+"
+        ), @r"
+           ╭▸ 
+         3 │ with u(x, y) as (
+           │           ─ 2. destination
+           ‡
+        12 │ returning x, u.y;
+           ╰╴               ─ 1. source
         ");
     }
 }

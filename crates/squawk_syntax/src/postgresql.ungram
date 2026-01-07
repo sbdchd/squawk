@@ -971,6 +971,7 @@ JoinExpr =
   (FromItem | JoinExpr) Join
 
 ParenSelect =
+  WithClause?
  '('
   select:SelectVariant
  ')'
@@ -1260,9 +1261,11 @@ RowList =
   (Row (',' Row)*)
 
 Values =
+  WithClause?
   'values' RowList
 
 Table =
+  WithClause?
   'table' RelationName
 
 Insert =
@@ -1403,6 +1406,7 @@ MergeAction =
 | MergeDoNothing
 
 Merge =
+  WithClause?
   'merge' 'into' RelationName Alias? 
   UsingOnClause
   MergeWhenClause*

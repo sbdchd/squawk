@@ -48,6 +48,7 @@ select localtimestamp(5);
 -- array_select
 -- array with subquery
 select array(select oid from pg_proc where proname like 'bytea%');
+select array(((select 1)));
 
 -- positional_param
 select $1;

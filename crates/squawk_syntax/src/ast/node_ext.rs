@@ -229,6 +229,13 @@ pub(crate) fn text_of_first_token(node: &SyntaxNode) -> TokenText<'_> {
     }
 }
 
+impl ast::WithQuery {
+    #[inline]
+    pub fn with_clause(&self) -> Option<ast::WithClause> {
+        support::child(self.syntax())
+    }
+}
+
 impl ast::HasParamList for ast::FunctionSig {}
 impl ast::HasParamList for ast::Aggregate {}
 

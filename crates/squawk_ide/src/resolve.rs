@@ -1596,14 +1596,8 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
 
 fn find_parent_with_clause(node: &SyntaxNode) -> Option<ast::WithClause> {
     node.ancestors().find_map(|x| {
-        if let Some(select) = ast::Select::cast(x.clone()) {
-            select.with_clause()
-        } else if let Some(delete) = ast::Delete::cast(x.clone()) {
-            delete.with_clause()
-        } else if let Some(insert) = ast::Insert::cast(x.clone()) {
-            insert.with_clause()
-        } else if let Some(update) = ast::Update::cast(x) {
-            update.with_clause()
+        if let Some(query) = ast::WithQuery::cast(x) {
+            query.with_clause()
         } else {
             None
         }
@@ -1934,55 +1928,95 @@ fn qualified_star_table_name(field_expr: &ast::FieldExpr) -> Option<Name> {
     }
 }
 
-pub(crate) fn resolve_qualified_star_table(
+pub(crate) fn resolve_qualified_star_table_ptr(
     binder: &Binder,
     field_expr: &ast::FieldExpr,
 ) -> Option<SyntaxNodePtr> {
     let table_name = qualified_star_table_name(field_expr)?;
-    let select = field_expr
-        .syntax()
-        .ancestors()
-        .find_map(ast::Select::cast)?;
-    let from_clause = select.from_clause()?;
-    let from_item = find_from_item_in_from_clause(&from_clause, &table_name)?;
-    let (table_name, schema) = table_and_schema_from_from_item(&from_item)?;
     let position = field_expr.syntax().text_range().start();
 
-    if let Some(table_name_ptr) = resolve_table_name_ptr(binder, &table_name, &schema, position) {
-        return Some(table_name_ptr);
-    }
+    for ancestor in field_expr.syntax().ancestors() {
+        if let Some(select) = ast::Select::cast(ancestor.clone()) {
+            let from_clause = select.from_clause()?;
+            let from_item = find_from_item_in_from_clause(&from_clause, &table_name)?;
+            let (table_name, schema) = table_and_schema_from_from_item(&from_item)?;
 
-    if let Some(view_name_ptr) = resolve_view_name_ptr(binder, &table_name, &schema, position) {
-        return Some(view_name_ptr);
-    }
+            if let Some(table_name_ptr) =
+                resolve_table_name_ptr(binder, &table_name, &schema, position)
+            {
+                return Some(table_name_ptr);
+            }
 
-    if schema.is_none()
-        && let Some(name_ref) = from_item.name_ref()
-    {
-        return resolve_cte_table(&name_ref, &table_name);
+            if let Some(view_name_ptr) =
+                resolve_view_name_ptr(binder, &table_name, &schema, position)
+            {
+                return Some(view_name_ptr);
+            }
+
+            if schema.is_none()
+                && let Some(name_ref) = from_item.name_ref()
+            {
+                return resolve_cte_table(&name_ref, &table_name);
+            }
+
+            return None;
+        }
+
+        if let Some(update) = ast::Update::cast(ancestor.clone()) {
+            let path = update.relation_name()?.path()?;
+            return resolve_table_or_view_or_cte_ptrs(binder, position, &path)?
+                .into_iter()
+                .next();
+        }
+
+        if let Some(insert) = ast::Insert::cast(ancestor.clone()) {
+            let path = insert.path()?;
+            return resolve_table_or_view_or_cte_ptrs(binder, position, &path)?
+                .into_iter()
+                .next();
+        }
+
+        if let Some(delete) = ast::Delete::cast(ancestor.clone()) {
+            let path = delete.relation_name()?.path()?;
+            return resolve_table_or_view_or_cte_ptrs(binder, position, &path)?
+                .into_iter()
+                .next();
+        }
+
+        if let Some(merge) = ast::Merge::cast(ancestor) {
+            let path = merge.relation_name()?.path()?;
+            return resolve_table_or_view_or_cte_ptrs(binder, position, &path)?
+                .into_iter()
+                .next();
+        }
     }
 
     None
 }
 
-pub(crate) fn resolve_unqualified_star_tables(
+fn resolve_table_or_view_or_cte_ptrs(
     binder: &Binder,
-    target: &ast::Target,
+    position: TextSize,
+    path: &ast::Path,
 ) -> Option<Vec<SyntaxNodePtr>> {
-    target.star_token()?;
-
-    let select = target.syntax().ancestors().find_map(ast::Select::cast)?;
-    let from_clause = select.from_clause()?;
-    let position = target.syntax().text_range().start();
+    let (table_name, schema) = extract_table_schema_from_path(path)?;
 
     let mut results = vec![];
 
-    for from_item in from_clause.from_items() {
-        collect_tables_from_item(binder, position, &from_item, &mut results);
+    if let Some(table_name_ptr) = resolve_table_name_ptr(binder, &table_name, &schema, position) {
+        results.push(table_name_ptr);
     }
 
-    for join_expr in from_clause.join_exprs() {
-        collect_tables_from_join_expr(binder, position, &join_expr, &mut results);
+    if let Some(view_name_ptr) = resolve_view_name_ptr(binder, &table_name, &schema, position) {
+        results.push(view_name_ptr);
+    }
+
+    if schema.is_none()
+        && let Some(segment) = path.segment()
+        && let Some(name_ref) = segment.name_ref()
+        && let Some(cte_ptr) = resolve_cte_table(&name_ref, &table_name)
+    {
+        results.push(cte_ptr);
     }
 
     if results.is_empty() {
@@ -1992,7 +2026,91 @@ pub(crate) fn resolve_unqualified_star_tables(
     Some(results)
 }
 
-pub(crate) fn resolve_unqualified_star_tables_in_arg_list(
+fn resolve_table_from_update_ptrs(
+    binder: &Binder,
+    position: TextSize,
+    update: &ast::Update,
+) -> Option<Vec<SyntaxNodePtr>> {
+    let path = update.relation_name()?.path()?;
+    resolve_table_or_view_or_cte_ptrs(binder, position, &path)
+}
+
+fn resolve_table_from_insert_ptrs(
+    binder: &Binder,
+    position: TextSize,
+    insert: &ast::Insert,
+) -> Option<Vec<SyntaxNodePtr>> {
+    let path = insert.path()?;
+    resolve_table_or_view_or_cte_ptrs(binder, position, &path)
+}
+
+fn resolve_table_from_delete_ptrs(
+    binder: &Binder,
+    position: TextSize,
+    delete: &ast::Delete,
+) -> Option<Vec<SyntaxNodePtr>> {
+    let path = delete.relation_name()?.path()?;
+    resolve_table_or_view_or_cte_ptrs(binder, position, &path)
+}
+
+fn resolve_table_from_merge_ptrs(
+    binder: &Binder,
+    position: TextSize,
+    merge: &ast::Merge,
+) -> Option<Vec<SyntaxNodePtr>> {
+    let path = merge.relation_name()?.path()?;
+    resolve_table_or_view_or_cte_ptrs(binder, position, &path)
+}
+
+pub(crate) fn resolve_unqualified_star_table_ptrs(
+    binder: &Binder,
+    target: &ast::Target,
+) -> Option<Vec<SyntaxNodePtr>> {
+    target.star_token()?;
+
+    let position = target.syntax().text_range().start();
+
+    for ancestor in target.syntax().ancestors() {
+        if let Some(select) = ast::Select::cast(ancestor.clone()) {
+            let from_clause = select.from_clause()?;
+            let mut results = vec![];
+
+            for from_item in from_clause.from_items() {
+                collect_tables_from_item(binder, position, &from_item, &mut results);
+            }
+
+            for join_expr in from_clause.join_exprs() {
+                collect_table_ptrs_from_join_expr(binder, position, &join_expr, &mut results);
+            }
+
+            if results.is_empty() {
+                return None;
+            }
+
+            return Some(results);
+        }
+
+        if let Some(update) = ast::Update::cast(ancestor.clone()) {
+            return resolve_table_from_update_ptrs(binder, position, &update);
+        }
+
+        if let Some(insert) = ast::Insert::cast(ancestor.clone()) {
+            return resolve_table_from_insert_ptrs(binder, position, &insert);
+        }
+
+        if let Some(delete) = ast::Delete::cast(ancestor.clone()) {
+            return resolve_table_from_delete_ptrs(binder, position, &delete);
+        }
+
+        if let Some(merge) = ast::Merge::cast(ancestor) {
+            return resolve_table_from_merge_ptrs(binder, position, &merge);
+        }
+    }
+
+    None
+}
+
+pub(crate) fn resolve_unqualified_star_in_arg_list_ptrs(
     binder: &Binder,
     arg_list: &ast::ArgList,
 ) -> Option<Vec<SyntaxNodePtr>> {
@@ -2007,7 +2125,7 @@ pub(crate) fn resolve_unqualified_star_tables_in_arg_list(
     }
 
     for join_expr in from_clause.join_exprs() {
-        collect_tables_from_join_expr(binder, position, &join_expr, &mut results);
+        collect_table_ptrs_from_join_expr(binder, position, &join_expr, &mut results);
     }
 
     if results.is_empty() {
@@ -2017,14 +2135,14 @@ pub(crate) fn resolve_unqualified_star_tables_in_arg_list(
     Some(results)
 }
 
-fn collect_tables_from_join_expr(
+fn collect_table_ptrs_from_join_expr(
     binder: &Binder,
     position: TextSize,
     join_expr: &ast::JoinExpr,
     results: &mut Vec<SyntaxNodePtr>,
 ) {
     if let Some(nested) = join_expr.join_expr() {
-        collect_tables_from_join_expr(binder, position, &nested, results);
+        collect_table_ptrs_from_join_expr(binder, position, &nested, results);
     }
 
     if let Some(from_item) = join_expr.from_item() {
@@ -2871,6 +2989,9 @@ fn resolve_merge_table_name_ptr(
         if let Some(item_name_ref) = from_item.name_ref() {
             let item_name = Name::from_node(&item_name_ref);
             if item_name == table_name {
+                if let Some(cte_ptr) = resolve_cte_table(table_name_ref, &table_name) {
+                    return Some(cte_ptr);
+                }
                 let position = table_name_ref.syntax().text_range().start();
                 return resolve_table_name_ptr(binder, &item_name, &None, position);
             }
