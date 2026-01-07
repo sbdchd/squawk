@@ -6,6 +6,7 @@ import {
   goto_definition,
   hover,
   inlay_hints,
+  selection_ranges,
   DocumentSymbol,
 } from "./squawk"
 
@@ -208,6 +209,37 @@ export async function provideReferences(
     }))
   } catch (e) {
     console.error("Error in provideReferences:", e)
+    return []
+  }
+}
+
+export async function provideSelectionRanges(
+  model: monaco.editor.ITextModel,
+  positions: monaco.Position[],
+): Promise<monaco.languages.SelectionRange[][]> {
+  const content = model.getValue()
+  if (!content) return []
+
+  try {
+    const wasmPositions = positions.map((pos) => ({
+      line: pos.lineNumber - 1,
+      column: pos.column - 1,
+    }))
+
+    const results = selection_ranges(content, wasmPositions)
+
+    return results.map((ranges) =>
+      ranges.map((range) => ({
+        range: {
+          startLineNumber: range.start_line + 1,
+          startColumn: range.start_column + 1,
+          endLineNumber: range.end_line + 1,
+          endColumn: range.end_column + 1,
+        },
+      })),
+    )
+  } catch (e) {
+    console.error("Error in provideSelectionRanges:", e)
     return []
   }
 }

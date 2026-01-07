@@ -1,6 +1,8 @@
 use line_index::LineIndex;
 use log::info;
-use serde::Serialize;
+use rowan::TextRange;
+use serde::{Deserialize, Serialize};
+use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
 use web_sys::js_sys::Error;
 
@@ -456,10 +458,71 @@ pub fn inlay_hints(content: String) -> Result<JsValue, Error> {
     serde_wasm_bindgen::to_value(&converted).map_err(into_error)
 }
 
+#[derive(Deserialize)]
+struct Position {
+    line: u32,
+    column: u32,
+}
+
+#[wasm_bindgen]
+pub fn selection_ranges(content: String, positions: Vec<JsValue>) -> Result<JsValue, Error> {
+    let parse = squawk_syntax::SourceFile::parse(&content);
+    let line_index = LineIndex::new(&content);
+    let tree = parse.tree();
+    let root = tree.syntax();
+
+    let mut results: Vec<Vec<WasmSelectionRange>> = vec![];
+
+    for pos in positions {
+        let pos: Position = serde_wasm_bindgen::from_value(pos).map_err(into_error)?;
+        let offset = position_to_offset(&line_index, pos.line, pos.column)?;
+
+        let mut ranges = vec![];
+        let mut range = TextRange::new(offset, offset);
+
+        for _ in 0..20 {
+            let next = squawk_ide::expand_selection::extend_selection(root, range);
+            if next == range {
+                break;
+            }
+
+            let start = line_index.line_col(next.start());
+            let end = line_index.line_col(next.end());
+            let start_wide = line_index
+                .to_wide(line_index::WideEncoding::Utf16, start)
+                .unwrap();
+            let end_wide = line_index
+                .to_wide(line_index::WideEncoding::Utf16, end)
+                .unwrap();
+
+            ranges.push(WasmSelectionRange {
+                start_line: start_wide.line,
+                start_column: start_wide.col,
+                end_line: end_wide.line,
+                end_column: end_wide.col,
+            });
+
+            range = next;
+        }
+
+        results.push(ranges);
+    }
+
+    serde_wasm_bindgen::to_value(&results).map_err(into_error)
+}
+
 #[derive(Serialize)]
 struct WasmInlayHint {
     line: u32,
     column: u32,
     label: String,
     kind: String,
+}
+
+#[derive(Serialize)]
+struct WasmSelectionRange {
+    start_line: u32,
+    start_column: u32,
+    end_line: u32,
+    end_column: u32,
 }
