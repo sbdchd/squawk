@@ -408,7 +408,7 @@ fn hover_qualified_star(
     field_expr: &ast::FieldExpr,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let table_ptr = resolve::resolve_qualified_star_table(binder, field_expr)?;
+    let table_ptr = resolve::resolve_qualified_star_table_ptr(binder, field_expr)?;
     hover_qualified_star_columns(root, &table_ptr, binder)
 }
 
@@ -417,7 +417,7 @@ fn hover_unqualified_star(
     target: &ast::Target,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let table_ptrs = resolve::resolve_unqualified_star_tables(binder, target)?;
+    let table_ptrs = resolve::resolve_unqualified_star_table_ptrs(binder, target)?;
     let mut results = vec![];
     for table_ptr in table_ptrs {
         if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
@@ -437,7 +437,7 @@ fn hover_unqualified_star_in_arg_list(
     arg_list: &ast::ArgList,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let table_ptrs = resolve::resolve_unqualified_star_tables_in_arg_list(binder, arg_list)?;
+    let table_ptrs = resolve::resolve_unqualified_star_in_arg_list_ptrs(binder, arg_list)?;
     let mut results = vec![];
     for table_ptr in table_ptrs {
         if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
@@ -606,7 +606,7 @@ fn hover_qualified_star_columns_from_subquery(
 
     for target in target_list.targets() {
         if target.star_token().is_some() {
-            let table_ptrs = resolve::resolve_unqualified_star_tables(binder, &target)?;
+            let table_ptrs = resolve::resolve_unqualified_star_table_ptrs(binder, &target)?;
             for table_ptr in table_ptrs {
                 if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
                     results.push(columns)
@@ -3421,6 +3421,181 @@ select *$0 from merged;
            ╭▸ 
         16 │ select * from merged;
            ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_update_returning_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+update t set a = 1
+returning *$0;
+"), @r"
+        hover: column public.t.a int
+              column public.t.b int
+          ╭▸ 
+        4 │ returning *;
+          ╰╴          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_insert_returning_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+insert into t values (1, 2)
+returning *$0;
+"), @r"
+        hover: column public.t.a int
+              column public.t.b int
+          ╭▸ 
+        4 │ returning *;
+          ╰╴          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_delete_returning_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+delete from t
+returning *$0;
+"), @r"
+        hover: column public.t.a int
+              column public.t.b int
+          ╭▸ 
+        4 │ returning *;
+          ╰╴          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+merge into t
+  using (select 1 as x, 2 as y) u
+    on t.a = u.x
+  when matched then
+    do nothing
+returning *$0;
+"), @r"
+        hover: column public.t.a int
+              column public.t.b int
+          ╭▸ 
+        8 │ returning *;
+          ╰╴          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_qualified_star_old() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+merge into t
+  using (select 1 as x, 2 as y) u
+    on t.a = u.x
+  when matched then
+    update set a = 99
+returning old$0.*;
+"), @r"
+        hover: table public.t(a int, b int)
+          ╭▸ 
+        8 │ returning old.*;
+          ╰╴            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_qualified_star_new() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+merge into t
+  using (select 1 as x, 2 as y) u
+    on t.a = u.x
+  when matched then
+    update set a = 99
+returning new$0.*;
+"), @r"
+        hover: table public.t(a int, b int)
+          ╭▸ 
+        8 │ returning new.*;
+          ╰╴            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_qualified_star_table() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+merge into t
+  using (select 1 as x, 2 as y) u
+    on t.a = u.x
+  when matched then
+    update set a = 99
+returning t$0.*;
+"), @r"
+        hover: table public.t(a int, b int)
+          ╭▸ 
+        8 │ returning t.*;
+          ╰╴          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_qualified_star_old_on_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+merge into t
+  using (select 1 as x, 2 as y) u
+    on t.a = u.x
+  when matched then
+    update set a = 99
+returning old.*$0;
+"), @r"
+        hover: column public.t.a int
+              column public.t.b int
+          ╭▸ 
+        8 │ returning old.*;
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_qualified_star_new_on_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+merge into t
+  using (select 1 as x, 2 as y) u
+    on t.a = u.x
+  when matched then
+    update set a = 99
+returning new.*$0;
+"), @r"
+        hover: column public.t.a int
+              column public.t.b int
+          ╭▸ 
+        8 │ returning new.*;
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_merge_returning_qualified_star_table_on_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+merge into t
+  using (select 1 as x, 2 as y) u
+    on t.a = u.x
+  when matched then
+    update set a = 99
+returning t.*$0;
+"), @r"
+        hover: column public.t.a int
+              column public.t.b int
+          ╭▸ 
+        8 │ returning t.*;
+          ╰╴            ─ hover
         ");
     }
 }

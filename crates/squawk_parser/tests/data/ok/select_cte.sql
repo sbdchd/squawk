@@ -133,3 +133,7 @@ SET dismissed_at = current_timestamp
 WHERE notification_id IN (
   SELECT notification_id FROM ranked_notifications WHERE rn > 1
 );
+
+-- paren select cte
+with t as (select 1)
+(select 1);

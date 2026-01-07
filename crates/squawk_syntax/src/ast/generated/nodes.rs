@@ -10219,6 +10219,10 @@ impl Merge {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn into_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INTO_KW)
     }
@@ -11748,6 +11752,10 @@ pub struct ParenSelect {
 impl ParenSelect {
     #[inline]
     pub fn select(&self) -> Option<SelectVariant> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14881,6 +14889,10 @@ impl Table {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
     }
@@ -15553,6 +15565,10 @@ pub struct Values {
 impl Values {
     #[inline]
     pub fn row_list(&self) -> Option<RowList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
     }
     #[inline]

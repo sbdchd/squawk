@@ -1475,4 +1475,39 @@ SOURCE_FILE
           WHITESPACE "\n"
           R_PAREN ")"
   SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- paren select cte"
+  WHITESPACE "\n"
+  PAREN_SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    L_PAREN "("
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
   WHITESPACE "\n"

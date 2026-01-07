@@ -558,6 +558,32 @@ SOURCE_FILE
                     STRING "'bytea%'"
             R_PAREN ")"
   SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_PAREN "("
+            PAREN_EXPR
+              L_PAREN "("
+              PAREN_EXPR
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
+              R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- positional_param"
   WHITESPACE "\n"

@@ -124,6 +124,7 @@ fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMa
 }
 
 const SELECT_FIRST: TokenSet = TokenSet::new(&[SELECT_KW, TABLE_KW, WITH_KW, VALUES_KW]);
+const PAREN_SELECT_FIRST: TokenSet = TokenSet::new(&[L_PAREN]).union(SELECT_FIRST);
 
 fn tuple_expr(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(L_PAREN) || p.at(ROW_KW));
@@ -2649,7 +2650,7 @@ fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             break;
         }
         if !p.eat(COMMA) {
-            if p.at_ts(WITH_FOLLOW) {
+            if p.at_ts(WITH_FOLLOW) || (p.at(L_PAREN) && p.nth_at_ts(1, PAREN_SELECT_FIRST)) {
                 break;
             } else {
                 p.error("missing comma");
@@ -5799,7 +5800,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (GRANT_KW, _) => Some(grant(p)),
         (IMPORT_KW, FOREIGN_KW) => Some(import_foreign_schema(p)),
         (INSERT_KW, _) => Some(insert(p, None)),
-        (L_PAREN, _) if p.nth_at_ts(1, SELECT_FIRST) || p.at(L_PAREN) => {
+        (L_PAREN, _) if p.nth_at_ts(1, PAREN_SELECT_FIRST) => {
             // can have select nested in parens, i.e., ((select 1));
             opt_paren_select(p, None)
         }
@@ -12585,6 +12586,10 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
         INSERT_KW => Some(insert(p, Some(m))),
         UPDATE_KW => Some(update(p, Some(m))),
         MERGE_KW => Some(merge(p, Some(m))),
+        L_PAREN if p.nth_at_ts(1, PAREN_SELECT_FIRST) => {
+            // can have select nested in parens, i.e., ((select 1));
+            opt_paren_select(p, Some(m))
+        }
         _ => {
             m.abandon(p);
             p.error(format!(

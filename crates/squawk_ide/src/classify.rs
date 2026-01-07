@@ -146,7 +146,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             if ast::WhereClause::can_cast(ancestor.kind()) {
                 in_where_clause = true;
             }
-            if ast::MergeWhenMatched::can_cast(ancestor.kind()) {
+            if ast::MergeWhenClause::can_cast(ancestor.kind()) {
                 in_when_clause = true;
             }
             if ast::Update::can_cast(ancestor.kind()) {
@@ -256,7 +256,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             if ast::FromClause::can_cast(ancestor.kind()) {
                 in_from_clause = true;
             }
-            if ast::MergeWhenMatched::can_cast(ancestor.kind()) {
+            if ast::MergeWhenClause::can_cast(ancestor.kind()) {
                 in_when_clause = true;
             }
             if ast::ReturningClause::can_cast(ancestor.kind()) {
@@ -613,7 +613,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
             return Some(NameRefClass::UpdateTable);
         }
-        if ast::MergeWhenMatched::can_cast(ancestor.kind()) {
+        if ast::MergeWhenClause::can_cast(ancestor.kind()) {
             in_when_clause = true;
         }
         if ast::Merge::can_cast(ancestor.kind()) {
