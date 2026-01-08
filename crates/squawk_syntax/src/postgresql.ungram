@@ -1067,7 +1067,7 @@ IfNotExists =
   'if' 'not' 'exists'
 
 PartitionOf =
-  'partition' 'of' Type
+  'partition' 'of' Path
 
 PreserveRows =
   'preserve' 'rows'

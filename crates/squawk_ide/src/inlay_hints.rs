@@ -100,7 +100,7 @@ fn inlay_hint_insert(
                 let col_name = resolve::extract_column_name(&col)?;
                 let target = create_table
                     .as_ref()
-                    .and_then(|x| resolve::find_column_in_create_table(x, &col_name))
+                    .and_then(|x| resolve::find_column_in_create_table(binder, root, x, &col_name))
                     .map(|x| x.text_range());
                 Some((col_name, target))
             })

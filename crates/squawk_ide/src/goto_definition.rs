@@ -966,6 +966,58 @@ create table t_2026_01_02 partition of t$0
     }
 
     #[test]
+    fn goto_table_partition_of_cycle() {
+        goto_not_found(
+            "
+create table part1 partition of part2
+    for values from ('2026-01-02') to ('2026-01-03');
+create table part2 partition of part1
+    for values from ('2026-01-02') to ('2026-01-03');
+select a$0 from part2;
+",
+        );
+    }
+
+    #[test]
+    fn goto_partition_table_column() {
+        assert_snapshot!(goto("
+create table part (
+  a int,
+  inserted_at timestamptz not null default now()
+) partition by range (inserted_at);
+create table part_2026_01_02 partition of part
+    for values from ('2026-01-02') to ('2026-01-03');
+select a$0 from part_2026_01_02;
+"), @r"
+          ╭▸ 
+        3 │   a int,
+          │   ─ 2. destination
+          ‡
+        8 │ select a from part_2026_01_02;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_index_attach_partition() {
+        assert_snapshot!(goto("
+create table t (
+  inserted_at timestamptz not null default now()
+) partition by range (inserted_at);
+create table part partition of t
+    for values from ('2026-01-02') to ('2026-01-03');
+alter index t attach partition part$0;
+"), @r"
+          ╭▸ 
+        5 │ create table part partition of t
+          │              ──── 2. destination
+        6 │     for values from ('2026-01-02') to ('2026-01-03');
+        7 │ alter index t attach partition part;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_like_clause() {
         assert_snapshot!(goto("
 create table large_data_table(a text);
@@ -997,6 +1049,138 @@ inherits (foo.bar, bar$0, buzz);
         3 │ create table t (a int)
         4 │ inherits (foo.bar, bar, buzz);
           ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_like_clause_columns() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(like t, c int);
+select a$0, c from u;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create table u(like t, c int);
+        4 │ select a, c from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_like_clause_local_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(like t, c int);
+select a, c$0 from u;
+"), @r"
+          ╭▸ 
+        3 │ create table u(like t, c int);
+          │                        ─ 2. destination
+        4 │ select a, c from u;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_like_clause_multi() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(x int, y int);
+create table k(like t, like u, c int);
+select y$0 from k;
+"), @r"
+          ╭▸ 
+        3 │ create table u(x int, y int);
+          │                       ─ 2. destination
+        4 │ create table k(like t, like u, c int);
+        5 │ select y from k;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_inherits_column() {
+        assert_snapshot!(goto("
+create table t (
+  a int, b text
+);
+create table u (
+  c int
+) inherits (t);
+select a$0 from u;
+"), @r"
+          ╭▸ 
+        3 │   a int, b text
+          │   ─ 2. destination
+          ‡
+        8 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_inherits_local_column() {
+        assert_snapshot!(goto("
+create table t (
+  a int, b text
+);
+create table u (
+  c int
+) inherits (t);
+select c$0 from u;
+"), @r"
+          ╭▸ 
+        6 │   c int
+          │   ─ 2. destination
+        7 │ ) inherits (t);
+        8 │ select c from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_inherits_multiple_parents() {
+        assert_snapshot!(goto("
+create table t1 (
+  a int
+);
+create table t2 (
+  b text
+);
+create table u (
+  c int
+) inherits (t1, t2);
+select b$0 from u;
+"), @r"
+           ╭▸ 
+         6 │   b text
+           │   ─ 2. destination
+           ‡
+        11 │ select b from u;
+           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_foreign_table_inherits_column() {
+        assert_snapshot!(goto("
+create server myserver foreign data wrapper postgres_fdw;
+create table t (
+  a int, b text
+);
+create foreign table u (
+  c int
+) inherits (t) server myserver;
+select a$0 from u;
+"), @r"
+          ╭▸ 
+        4 │   a int, b text
+          │   ─ 2. destination
+          ‡
+        9 │ select a from u;
+          ╰╴       ─ 1. source
         ");
     }
 
