@@ -117,7 +117,8 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::VacuumTable
             | NameRefClass::AlterTable
             | NameRefClass::ReindexTable
-            | NameRefClass::RefreshMaterializedView => {
+            | NameRefClass::RefreshMaterializedView
+            | NameRefClass::AttachPartition => {
                 return hover_table(root, &name_ref, &binder);
             }
             NameRefClass::DropSequence => return hover_sequence(root, &name_ref, &binder),
@@ -227,6 +228,10 @@ impl ColumnHover {
     }
     fn schema_table_column(schema: &str, table_name: &str, column_name: &str) -> String {
         format!("column {schema}.{table_name}.{column_name}")
+    }
+
+    fn anon_column(col_name: &str) -> String {
+        format!("column {}", col_name)
     }
 }
 
@@ -486,7 +491,7 @@ fn hover_qualified_star_columns(
             hover_qualified_star_columns_from_cte(&with_table)
         }
         resolve::TableSource::CreateTable(create_table) => {
-            hover_qualified_star_columns_from_table(&create_table, binder)
+            hover_qualified_star_columns_from_table(root, &create_table, binder)
         }
         resolve::TableSource::CreateView(create_view) => {
             hover_qualified_star_columns_from_view(&create_view, binder)
@@ -498,13 +503,14 @@ fn hover_qualified_star_columns(
 }
 
 fn hover_qualified_star_columns_from_table(
+    root: &SyntaxNode,
     create_table: &impl ast::HasCreateTable,
     binder: &binder::Binder,
 ) -> Option<String> {
     let path = create_table.path()?;
     let (schema, table_name) = resolve::resolve_table_info(binder, &path)?;
     let schema = schema.to_string();
-    let results: Vec<String> = resolve::collect_table_columns(create_table)
+    let results: Vec<String> = resolve::collect_table_columns(binder, root, create_table)
         .into_iter()
         .filter_map(|column| {
             let column_name = Name::from_node(&column.name()?);
@@ -651,14 +657,26 @@ fn hover_subquery_target_column(
         return Some(ColumnHover::table_column(&alias.to_string(), &col_name));
     }
 
-    match target.expr()? {
+    let result = match target.expr()? {
         ast::Expr::NameRef(name_ref) => hover_column(root, &name_ref, binder),
         ast::Expr::FieldExpr(field_expr) => {
             let field = field_expr.field()?;
             hover_column(root, &field, binder)
         }
         _ => None,
+    };
+
+    if result.is_some() {
+        return result;
     }
+
+    if let Some((col_name, _node)) = ColumnName::from_target(target.clone())
+        && let Some(col_name) = col_name.to_string()
+    {
+        return Some(ColumnHover::anon_column(&col_name));
+    }
+
+    None
 }
 
 fn hover_index(
@@ -2643,6 +2661,30 @@ select *$0 from (select a from t);
     }
 
     #[test]
+    fn hover_on_star_with_subquery_literal() {
+        assert_snapshot!(check_hover("
+select *$0 from (select 1);
+"), @r"
+        hover: column ?column?
+          ╭▸ 
+        2 │ select * from (select 1);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_star_with_subquery_literal_with_alias() {
+        assert_snapshot!(check_hover("
+select *$0 from (select 1) as sub;
+"), @r"
+        hover: column sub.?column?
+          ╭▸ 
+        2 │ select * from (select 1) as sub;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
     fn hover_on_view_qualified_star() {
         assert_snapshot!(check_hover("
 create view v as select 1 id, 2 b;
@@ -3596,6 +3638,139 @@ returning t.*$0;
           ╭▸ 
         8 │ returning t.*;
           ╰╴            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_partition_table_column() {
+        assert_snapshot!(check_hover("
+create table part (
+  a int,
+  inserted_at timestamptz not null default now()
+) partition by range (inserted_at);
+create table part_2026_01_02 partition of part
+    for values from ('2026-01-02') to ('2026-01-03');
+select a$0 from part_2026_01_02;
+"), @r"
+        hover: column public.part.a int
+          ╭▸ 
+        8 │ select a from part_2026_01_02;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_like_multi_star() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+create table u(x int, y int);
+create table k(like t, like u, c int);
+select *$0 from k;
+"), @r"
+        hover: column public.k.a int
+              column public.k.b int
+              column public.k.x int
+              column public.k.y int
+              column public.k.c int
+          ╭▸ 
+        5 │ select * from k;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_star() {
+        assert_snapshot!(check_hover("
+create table t (
+  a int, b text
+);
+create table u (
+  c int
+) inherits (t);
+select *$0 from u;
+"), @r"
+        hover: column public.u.a int
+              column public.u.b text
+              column public.u.c int
+          ╭▸ 
+        8 │ select * from u;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_column() {
+        assert_snapshot!(check_hover("
+create table t (
+  a int, b text
+);
+create table u (
+  c int
+) inherits (t);
+select a$0 from u;
+"), @r"
+        hover: column public.t.a int
+          ╭▸ 
+        8 │ select a from u;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_local_column() {
+        assert_snapshot!(check_hover("
+create table t (
+  a int, b text
+);
+create table u (
+  c int
+) inherits (t);
+select c$0 from u;
+"), @r"
+        hover: column public.u.c int
+          ╭▸ 
+        8 │ select c from u;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_multiple_parents() {
+        assert_snapshot!(check_hover("
+create table t1 (
+  a int
+);
+create table t2 (
+  b text
+);
+create table u (
+  c int
+) inherits (t1, t2);
+select b$0 from u;
+"), @r"
+        hover: column public.t2.b text
+           ╭▸ 
+        11 │ select b from u;
+           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_foreign_table_inherits_column() {
+        assert_snapshot!(check_hover("
+create server myserver foreign data wrapper postgres_fdw;
+create table t (
+  a int, b text
+);
+create foreign table u (
+  c int
+) inherits (t) server myserver;
+select a$0 from u;
+"), @r"
+        hover: column public.t.a int
+          ╭▸ 
+        9 │ select a from u;
+          ╰╴       ─ hover
         ");
     }
 }

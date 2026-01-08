@@ -11989,7 +11989,7 @@ pub struct PartitionOf {
 }
 impl PartitionOf {
     #[inline]
-    pub fn ty(&self) -> Option<Type> {
+    pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
     #[inline]

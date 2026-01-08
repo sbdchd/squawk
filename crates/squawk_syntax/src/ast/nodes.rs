@@ -21,6 +21,10 @@ impl CreateTableLike {
     pub fn table_arg_list(&self) -> Option<ast::TableArgList> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn inherits(&self) -> Option<ast::Inherits> {
+        support::child(&self.syntax)
+    }
 }
 impl AstNode for CreateTableLike {
     #[inline]

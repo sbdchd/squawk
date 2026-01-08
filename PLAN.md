@@ -504,6 +504,31 @@ select (x * 2) + 4;
 
 related: https://eslint.style/rules/no-extra-parens
 
+### Rule: no-constant-condition
+
+```sql
+select a from t where false = true;
+--                    ^^^^^^^^^^^^ constant condition
+
+select case when 1 = 2 then 2 else 3 end;
+--               ^^^^^ constant condition
+```
+
+related: https://eslint.org/docs/latest/rules/no-constant-condition
+
+### Rule: with query missing returning clause
+
+```sql
+create table t(a int, b int);
+create table u(a int, b int);
+with x as (merge into t
+  using u on true
+  when matched then do nothing)
+select * from x;
+-- Query 1 ERROR at Line 19: : ERROR:  WITH query "x" does not have a RETURNING clause
+-- LINE 6:     select * from x;
+```
+
 ### Rule: dialect: now() to dest
 
 should support various fixes so people can write in one dialect of SQL and have it easily convert to the other one

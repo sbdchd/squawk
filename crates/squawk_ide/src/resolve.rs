@@ -32,7 +32,8 @@ pub(crate) fn resolve_name_ref(
         | NameRefClass::VacuumTable
         | NameRefClass::AlterTable
         | NameRefClass::ReindexTable
-        | NameRefClass::MergeTable => {
+        | NameRefClass::MergeTable
+        | NameRefClass::AttachPartition => {
             let path = find_containing_path(name_ref)?;
             let table_name = extract_table_name(&path)?;
             let schema = extract_schema_name(&path);
@@ -187,7 +188,8 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::CreateTableLike::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(&create_table, &column_name).map(|ptr| smallvec![ptr])
+            find_column_in_create_table(binder, root, &create_table, &column_name)
+                .map(|ptr| smallvec![ptr])
         }
         NameRefClass::LikeTable => {
             let like_clause = name_ref
@@ -654,7 +656,7 @@ fn resolve_column_for_path(
                 find_column_in_create_view(&create_view, &column_name)
             }
             ResolvedTableName::Table(create_table_like) => {
-                find_column_in_create_table(&create_table_like, &column_name)
+                find_column_in_create_table(binder, root, &create_table_like, &column_name)
             }
         }
     } else {
@@ -1010,7 +1012,9 @@ fn resolve_select_qualified_column_ptr(
             }
             ResolvedTableName::Table(create_table_like) => {
                 // 1. Try to find a matching column (columns take precedence)
-                if let Some(ptr) = find_column_in_create_table(&create_table_like, &column_name) {
+                if let Some(ptr) =
+                    find_column_in_create_table(binder, root, &create_table_like, &column_name)
+                {
                     return Some(ptr);
                 }
                 // 2. No column found, check for field-style function call
@@ -1125,6 +1129,31 @@ fn resolve_column_from_table_or_view(
     schema: &Option<Schema>,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
+    resolve_column_from_table_or_view_impl(
+        binder,
+        root,
+        name_ref,
+        table_name,
+        schema,
+        column_name,
+        0,
+    )
+}
+
+fn resolve_column_from_table_or_view_impl(
+    binder: &Binder,
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    table_name: &Name,
+    schema: &Option<Schema>,
+    column_name: &Name,
+    depth: u32,
+) -> Option<SyntaxNodePtr> {
+    if depth > 40 {
+        log::info!("max resolve depth reached, probably in a cycle");
+        return None;
+    }
+
     let position = name_ref.syntax().text_range().start();
 
     if let Some(table_name_ptr) = resolve_table_name_ptr(binder, table_name, schema, position) {
@@ -1135,11 +1164,30 @@ fn resolve_column_from_table_or_view(
             .find_map(ast::CreateTableLike::cast)
         {
             // 1. try to find a matching column
-            if let Some(ptr) = find_column_in_create_table(&create_table, column_name) {
+            if let Some(ptr) = find_column_in_create_table(binder, root, &create_table, column_name)
+            {
                 return Some(ptr);
             }
 
-            // 2. No column found, check if the name matches the table name.
+            // 2. No column found, check if this is a partitioned table
+            if let Some(create_table_node) = ast::CreateTable::cast(create_table.syntax().clone())
+                && let Some(partition_of) = create_table_node.partition_of()
+                && let Some(parent_path) = partition_of.path()
+            {
+                let parent_table_name = extract_table_name(&parent_path)?;
+                let parent_schema = extract_schema_name(&parent_path);
+                return resolve_column_from_table_or_view_impl(
+                    binder,
+                    root,
+                    name_ref,
+                    &parent_table_name,
+                    &parent_schema,
+                    column_name,
+                    depth + 1,
+                );
+            }
+
+            // 3. No column found, check if the name matches the table name.
             // For example, in:
             // ```sql
             // create table t(a int);
@@ -1402,7 +1450,7 @@ fn resolve_from_item_for_fn_call_column(
         .ancestors()
         .find_map(ast::CreateTableLike::cast)?;
 
-    find_column_in_create_table(&create_table, column_name)
+    find_column_in_create_table(binder, root, &create_table, column_name)
 }
 
 fn table_and_schema_from_from_item(from_item: &ast::FromItem) -> Option<(Name, Option<Schema>)> {
@@ -1520,17 +1568,79 @@ pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
 }
 
 pub(crate) fn find_column_in_create_table(
+    binder: &Binder,
+    root: &SyntaxNode,
     create_table: &impl ast::HasCreateTable,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
+    find_column_in_create_table_impl(binder, root, create_table, column_name, 0)
+}
+
+fn find_column_in_create_table_impl(
+    binder: &Binder,
+    root: &SyntaxNode,
+    create_table: &impl ast::HasCreateTable,
+    column_name: &Name,
+    depth: usize,
+) -> Option<SyntaxNodePtr> {
+    if depth > 40 {
+        log::info!("max depth reached, probably in a cycle");
+        return None;
+    }
+
     for arg in create_table.table_arg_list()?.args() {
-        if let ast::TableArg::Column(column) = &arg
-            && let Some(name) = column.name()
-            && Name::from_node(&name) == *column_name
-        {
-            return Some(SyntaxNodePtr::new(name.syntax()));
+        match &arg {
+            ast::TableArg::Column(column) => {
+                if let Some(name) = column.name()
+                    && Name::from_node(&name) == *column_name
+                {
+                    return Some(SyntaxNodePtr::new(name.syntax()));
+                }
+            }
+            ast::TableArg::LikeClause(like_clause) => {
+                let path = like_clause.path()?;
+                let table_name = extract_table_name(&path)?;
+                let schema = extract_schema_name(&path);
+                let position = path.syntax().text_range().start();
+
+                if let Some(ResolvedTableName::Table(source_table)) =
+                    resolve_table_name(binder, root, &table_name, &schema, position)
+                    && let Some(ptr) = find_column_in_create_table_impl(
+                        binder,
+                        root,
+                        &source_table,
+                        column_name,
+                        depth + 1,
+                    )
+                {
+                    return Some(ptr);
+                }
+            }
+            ast::TableArg::TableConstraint(_) => (),
         }
     }
+
+    if let Some(inherits) = create_table.inherits() {
+        for path in inherits.paths() {
+            let table_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = path.syntax().text_range().start();
+
+            if let Some(ResolvedTableName::Table(parent_table)) =
+                resolve_table_name(binder, root, &table_name, &schema, position)
+                && let Some(ptr) = find_column_in_create_table_impl(
+                    binder,
+                    root,
+                    &parent_table,
+                    column_name,
+                    depth + 1,
+                )
+            {
+                return Some(ptr);
+            }
+        }
+    }
+
     None
 }
 
@@ -2526,15 +2636,70 @@ pub(crate) fn resolve_sequence_info(binder: &Binder, path: &ast::Path) -> Option
     resolve_symbol_info(binder, path, SymbolKind::Sequence)
 }
 
-pub(crate) fn collect_table_columns(create_table: &impl ast::HasCreateTable) -> Vec<ast::Column> {
+pub(crate) fn collect_table_columns(
+    binder: &Binder,
+    root: &SyntaxNode,
+    create_table: &impl ast::HasCreateTable,
+) -> Vec<ast::Column> {
+    collect_table_columns_impl(binder, root, create_table, 0)
+}
+
+// TODO: combine with find_column_in_create_table_impl
+fn collect_table_columns_impl(
+    binder: &Binder,
+    root: &SyntaxNode,
+    create_table: &impl ast::HasCreateTable,
+    depth: usize,
+) -> Vec<ast::Column> {
+    if depth > 40 {
+        log::info!("max depth reached, probably in a cycle");
+        return vec![];
+    }
+
     let mut columns = vec![];
-    if let Some(arg_list) = create_table.table_arg_list() {
-        for arg in arg_list.args() {
-            if let ast::TableArg::Column(column) = arg {
-                columns.push(column);
+
+    if let Some(inherits) = create_table.inherits() {
+        for path in inherits.paths() {
+            if let Some(table_name) = extract_table_name(&path) {
+                let schema = extract_schema_name(&path);
+                let position = path.syntax().text_range().start();
+                if let Some(ResolvedTableName::Table(parent_table)) =
+                    resolve_table_name(binder, root, &table_name, &schema, position)
+                {
+                    let inherited_columns =
+                        collect_table_columns_impl(binder, root, &parent_table, depth + 1);
+                    columns.extend(inherited_columns);
+                }
             }
         }
     }
+
+    if let Some(arg_list) = create_table.table_arg_list() {
+        for arg in arg_list.args() {
+            match &arg {
+                ast::TableArg::Column(column) => {
+                    columns.push(column.clone());
+                }
+                ast::TableArg::LikeClause(like_clause) => {
+                    if let Some(path) = like_clause.path()
+                        && let Some(table_name) = extract_table_name(&path)
+                    {
+                        let schema = extract_schema_name(&path);
+                        let position = path.syntax().text_range().start();
+                        if let Some(ResolvedTableName::Table(source_table)) =
+                            resolve_table_name(binder, root, &table_name, &schema, position)
+                        {
+                            let like_columns =
+                                collect_table_columns_impl(binder, root, &source_table, depth + 1);
+                            columns.extend(like_columns);
+                        }
+                    }
+                }
+                ast::TableArg::TableConstraint(_) => (),
+            }
+        }
+    }
+
     columns
 }
 

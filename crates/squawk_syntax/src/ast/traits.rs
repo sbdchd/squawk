@@ -15,6 +15,11 @@ pub trait HasCreateTable: AstNode {
     fn table_arg_list(&self) -> Option<ast::TableArgList> {
         support::child(self.syntax())
     }
+
+    #[inline]
+    fn inherits(&self) -> Option<ast::Inherits> {
+        support::child(self.syntax())
+    }
 }
 
 pub trait HasWithClause: AstNode {

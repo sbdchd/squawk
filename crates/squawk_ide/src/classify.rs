@@ -85,6 +85,7 @@ pub(crate) enum NameRefClass {
     ReindexSchema,
     ReindexDatabase,
     ReindexSystem,
+    AttachPartition,
 }
 
 pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass> {
@@ -334,6 +335,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::AlterTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::AlterTable);
+        }
+        if ast::AttachPartition::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AttachPartition);
         }
         if ast::Refresh::can_cast(ancestor.kind()) {
             return Some(NameRefClass::RefreshMaterializedView);
