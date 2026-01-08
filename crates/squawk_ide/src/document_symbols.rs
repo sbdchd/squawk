@@ -3,8 +3,8 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder::{self, extract_string_literal};
 use crate::resolve::{
-    resolve_aggregate_info, resolve_function_info, resolve_materialized_view_info,
-    resolve_procedure_info, resolve_table_info, resolve_type_info, resolve_view_info,
+    resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_table_info,
+    resolve_type_info, resolve_view_info,
 };
 
 #[derive(Debug)]
@@ -122,23 +122,13 @@ fn create_cte_table_symbol(with_table: ast::WithTable) -> Option<DocumentSymbol>
     let full_range = with_table.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
-    let mut children = vec![];
-    if let Some(column_list) = with_table.column_list() {
-        for column in column_list.columns() {
-            if let Some(column_symbol) = create_column_symbol(column) {
-                children.push(column_symbol);
-            }
-        }
-    }
-
-    Some(DocumentSymbol {
+    symbols_from_column_list(
+        with_table.column_list(),
         name,
-        detail: None,
-        kind: DocumentSymbolKind::Table,
         full_range,
         focus_range,
-        children,
-    })
+        DocumentSymbolKind::Table,
+    )
 }
 
 fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymbol> {
@@ -221,8 +211,24 @@ fn create_view_symbol(
     let full_range = create_view.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
+    symbols_from_column_list(
+        create_view.column_list(),
+        name,
+        full_range,
+        focus_range,
+        DocumentSymbolKind::View,
+    )
+}
+
+fn symbols_from_column_list(
+    column_list: Option<ast::ColumnList>,
+    name: String,
+    full_range: TextRange,
+    focus_range: TextRange,
+    kind: DocumentSymbolKind,
+) -> Option<DocumentSymbol> {
     let mut children = vec![];
-    if let Some(column_list) = create_view.column_list() {
+    if let Some(column_list) = column_list {
         for column in column_list.columns() {
             if let Some(column_symbol) = create_column_symbol(column) {
                 children.push(column_symbol);
@@ -233,13 +239,14 @@ fn create_view_symbol(
     Some(DocumentSymbol {
         name,
         detail: None,
-        kind: DocumentSymbolKind::View,
+        kind,
         full_range,
         focus_range,
         children,
     })
 }
 
+// TODO: combine with create_view_symbol
 fn create_materialized_view_symbol(
     binder: &binder::Binder,
     create_view: ast::CreateMaterializedView,
@@ -248,29 +255,19 @@ fn create_materialized_view_symbol(
     let segment = path.segment()?;
     let name_node = segment.name()?;
 
-    let (schema, view_name) = resolve_materialized_view_info(binder, &path)?;
+    let (schema, view_name) = resolve_view_info(binder, &path)?;
     let name = format!("{}.{}", schema.0, view_name);
 
     let full_range = create_view.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
-    let mut children = vec![];
-    if let Some(column_list) = create_view.column_list() {
-        for column in column_list.columns() {
-            if let Some(column_symbol) = create_column_symbol(column) {
-                children.push(column_symbol);
-            }
-        }
-    }
-
-    Some(DocumentSymbol {
+    symbols_from_column_list(
+        create_view.column_list(),
         name,
-        detail: None,
-        kind: DocumentSymbolKind::MaterializedView,
         full_range,
         focus_range,
-        children,
-    })
+        DocumentSymbolKind::MaterializedView,
+    )
 }
 
 fn create_function_symbol(

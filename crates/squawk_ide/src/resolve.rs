@@ -2625,13 +2625,6 @@ pub(crate) fn resolve_view_info(binder: &Binder, path: &ast::Path) -> Option<(Sc
     resolve_symbol_info(binder, path, SymbolKind::View)
 }
 
-pub(crate) fn resolve_materialized_view_info(
-    binder: &Binder,
-    path: &ast::Path,
-) -> Option<(Schema, String)> {
-    resolve_symbol_info(binder, path, SymbolKind::View)
-}
-
 pub(crate) fn resolve_sequence_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
     resolve_symbol_info(binder, path, SymbolKind::Sequence)
 }

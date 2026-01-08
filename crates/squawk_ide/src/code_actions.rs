@@ -36,6 +36,8 @@ pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeA
     unquote_identifier(&mut actions, &file, offset);
     add_explicit_alias(&mut actions, &file, offset);
     remove_redundant_alias(&mut actions, &file, offset);
+    rewrite_cast_to_double_colon(&mut actions, &file, offset);
+    rewrite_double_colon_to_cast(&mut actions, &file, offset);
     Some(actions)
 }
 
@@ -429,6 +431,62 @@ fn remove_redundant_alias(
         title: "Remove redundant alias".to_owned(),
         edits: vec![Edit::delete(TextRange::new(expr_end, alias_end))],
         kind: ActionKind::QuickFix,
+    });
+
+    Some(())
+}
+
+fn rewrite_cast_to_double_colon(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let cast_expr = token.parent_ancestors().find_map(ast::CastExpr::cast)?;
+
+    if cast_expr.colon_colon().is_some() {
+        return None;
+    }
+
+    let expr = cast_expr.expr()?;
+    let ty = cast_expr.ty()?;
+
+    let expr_text = expr.syntax().text();
+    let type_text = ty.syntax().text();
+
+    let replacement = format!("{}::{}", expr_text, type_text);
+
+    actions.push(CodeAction {
+        title: "Rewrite cast function".to_owned(),
+        edits: vec![Edit::replace(cast_expr.syntax().text_range(), replacement)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn rewrite_double_colon_to_cast(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let cast_expr = token.parent_ancestors().find_map(ast::CastExpr::cast)?;
+
+    cast_expr.colon_colon()?;
+
+    let expr = cast_expr.expr()?;
+    let ty = cast_expr.ty()?;
+
+    let expr_text = expr.syntax().text();
+    let type_text = ty.syntax().text();
+
+    let replacement = format!("cast({} as {})", expr_text, type_text);
+
+    actions.push(CodeAction {
+        title: "Rewrite as cast operator".to_owned(),
+        edits: vec![Edit::replace(cast_expr.syntax().text_range(), replacement)],
+        kind: ActionKind::RefactorRewrite,
     });
 
     Some(())
@@ -1143,6 +1201,128 @@ mod test {
         assert!(code_action_not_applicable(
             remove_redundant_alias,
             "select col_name$0 from t;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_simple() {
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            "select ca$0st(foo as text) from t;"),
+            @"select foo::text from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_on_column() {
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            "select cast(col_na$0me as int) from t;"),
+            @"select col_name::int from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_on_type() {
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            "select cast(x as bigi$0nt) from t;"),
+            @"select x::bigint from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_qualified_type() {
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            "select cast(x as pg_cata$0log.text) from t;"),
+            @"select x::pg_catalog.text from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_expression() {
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            "select ca$0st(1 + 2 as bigint) from t;"),
+            @"select 1 + 2::bigint from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_not_applicable_already_double_colon() {
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            "select foo::te$0xt from t;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_not_applicable_outside_cast() {
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            "select fo$0o from t;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_double_colon_to_cast_simple() {
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            "select foo::te$0xt from t;"),
+            @"select cast(foo as text) from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_double_colon_to_cast_on_column() {
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            "select col_na$0me::int from t;"),
+            @"select cast(col_name as int) from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_double_colon_to_cast_on_type() {
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            "select x::bigi$0nt from t;"),
+            @"select cast(x as bigint) from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_double_colon_to_cast_qualified_type() {
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            "select x::pg_cata$0log.text from t;"),
+            @"select cast(x as pg_catalog.text) from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_double_colon_to_cast_expression() {
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            "select 1 + 2::bigi$0nt from t;"),
+            @"select 1 + cast(2 as bigint) from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_double_colon_to_cast_not_applicable_already_cast() {
+        assert!(code_action_not_applicable(
+            rewrite_double_colon_to_cast,
+            "select ca$0st(foo as text) from t;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_double_colon_to_cast_not_applicable_outside_cast() {
+        assert!(code_action_not_applicable(
+            rewrite_double_colon_to_cast,
+            "select fo$0o from t;"
         ));
     }
 }

@@ -126,6 +126,7 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
     b.scopes[root].insert(table_name, table_id);
 }
 
+// TODO: combine with bind_create_table
 fn bind_create_foreign_table(b: &mut Binder, create_foreign_table: ast::CreateForeignTable) {
     let Some(path) = create_foreign_table.path() else {
         return;
@@ -337,6 +338,7 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
     b.scopes[root].insert(view_name, view_id);
 }
 
+// TODO: combine with create_view
 fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMaterializedView) {
     let Some(path) = create_view.path() else {
         return;
