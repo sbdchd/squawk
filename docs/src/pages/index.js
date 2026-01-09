@@ -228,7 +228,7 @@ function Home() {
                 styles.getStarted
               )}
               style={{minWidth: "400px"}}
-              to="https://marketplace.visualstudio.com/items?itemName=squawk.squawk-vscode">
+              to="https://marketplace.visualstudio.com/items?itemName=sbdchd.squawk">
               Install VSCode Extension
             </Link>
 
