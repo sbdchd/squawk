@@ -3517,20 +3517,25 @@ SOURCE_FILE
           NAME_REF
             IDENT "foo"
     WHITESPACE " "
-    OWNED_KW "owned"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    OWNED_BY_ROLES
+      OWNED_KW "owned"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          NAME_REF
+            IDENT "c"
     WHITESPACE " \n"
     SET_TABLESPACE
       SET_KW "set"
@@ -3562,12 +3567,15 @@ SOURCE_FILE
           NAME_REF
             IDENT "foo"
     WHITESPACE " "
-    OWNED_KW "owned"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "bar"
+    OWNED_BY_ROLES
+      OWNED_KW "owned"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          NAME_REF
+            IDENT "bar"
     WHITESPACE "\n"
     SET_TABLESPACE
       SET_KW "set"

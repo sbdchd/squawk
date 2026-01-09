@@ -260,18 +260,19 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE "\n  "
-    OWNED_KW "owned"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    ROLE_LIST
-      ROLE
-        CURRENT_USER_KW "current_user"
-      COMMA ","
+    OWNED_BY_ROLES
+      OWNED_KW "owned"
       WHITESPACE " "
-      ROLE
-        NAME_REF
-          IDENT "u"
+      BY_KW "by"
+      WHITESPACE " "
+      ROLE_LIST
+        ROLE
+          CURRENT_USER_KW "current_user"
+        COMMA ","
+        WHITESPACE " "
+        ROLE
+          NAME_REF
+            IDENT "u"
     WHITESPACE "\n  "
     SET_KW "set"
     WHITESPACE " "

@@ -10,6 +10,9 @@ slug: /
 ```shell
 npm install -g squawk-cli
 
+# or
+pip install squawk-cli
+
 # or install binaries directly via the releases page
 https://github.com/sbdchd/squawk/releases
 ```

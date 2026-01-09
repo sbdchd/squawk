@@ -669,7 +669,19 @@ pub struct AlterIndex {
 }
 impl AlterIndex {
     #[inline]
+    pub fn alter_index_action(&self) -> Option<AlterIndexAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn owned_by_roles(&self) -> Option<OwnedByRoles> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -677,12 +689,32 @@ impl AlterIndex {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
     #[inline]
+    pub fn in_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IN_KW)
+    }
+    #[inline]
     pub fn index_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INDEX_KW)
+    }
+    #[inline]
+    pub fn nowait_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOWAIT_KW)
+    }
+    #[inline]
+    pub fn set_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+    #[inline]
+    pub fn tablespace_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
     }
 }
 
@@ -754,11 +786,11 @@ impl AlterMaterializedView {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn owned_by_roles(&self) -> Option<OwnedByRoles> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -768,10 +800,6 @@ impl AlterMaterializedView {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-    #[inline]
-    pub fn by_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::BY_KW)
     }
     #[inline]
     pub fn in_token(&self) -> Option<SyntaxToken> {
@@ -784,10 +812,6 @@ impl AlterMaterializedView {
     #[inline]
     pub fn nowait_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NOWAIT_KW)
-    }
-    #[inline]
-    pub fn owned_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OWNED_KW)
     }
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
@@ -11580,6 +11604,25 @@ impl OverlayFn {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OwnedByRoles {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OwnedByRoles {
+    #[inline]
+    pub fn role_list(&self) -> Option<RoleList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn by_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BY_KW)
+    }
+    #[inline]
+    pub fn owned_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OWNED_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OwnerTo {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16545,6 +16588,18 @@ pub enum AlterDomainAction {
     SetNotNull(SetNotNull),
     SetSchema(SetSchema),
     ValidateConstraint(ValidateConstraint),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AlterIndexAction {
+    AlterSetStatistics(AlterSetStatistics),
+    AttachPartition(AttachPartition),
+    DependsOnExtension(DependsOnExtension),
+    NoDependsOnExtension(NoDependsOnExtension),
+    RenameTo(RenameTo),
+    ResetOptions(ResetOptions),
+    SetOptions(SetOptions),
+    SetTablespace(SetTablespace),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -24628,6 +24683,24 @@ impl AstNode for OverlayFn {
         &self.syntax
     }
 }
+impl AstNode for OwnedByRoles {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OWNED_BY_ROLES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for OwnerTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -28814,6 +28887,108 @@ impl From<ValidateConstraint> for AlterDomainAction {
     #[inline]
     fn from(node: ValidateConstraint) -> AlterDomainAction {
         AlterDomainAction::ValidateConstraint(node)
+    }
+}
+impl AstNode for AlterIndexAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::ALTER_SET_STATISTICS
+                | SyntaxKind::ATTACH_PARTITION
+                | SyntaxKind::DEPENDS_ON_EXTENSION
+                | SyntaxKind::NO_DEPENDS_ON_EXTENSION
+                | SyntaxKind::RENAME_TO
+                | SyntaxKind::RESET_OPTIONS
+                | SyntaxKind::SET_OPTIONS
+                | SyntaxKind::SET_TABLESPACE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::ALTER_SET_STATISTICS => {
+                AlterIndexAction::AlterSetStatistics(AlterSetStatistics { syntax })
+            }
+            SyntaxKind::ATTACH_PARTITION => {
+                AlterIndexAction::AttachPartition(AttachPartition { syntax })
+            }
+            SyntaxKind::DEPENDS_ON_EXTENSION => {
+                AlterIndexAction::DependsOnExtension(DependsOnExtension { syntax })
+            }
+            SyntaxKind::NO_DEPENDS_ON_EXTENSION => {
+                AlterIndexAction::NoDependsOnExtension(NoDependsOnExtension { syntax })
+            }
+            SyntaxKind::RENAME_TO => AlterIndexAction::RenameTo(RenameTo { syntax }),
+            SyntaxKind::RESET_OPTIONS => AlterIndexAction::ResetOptions(ResetOptions { syntax }),
+            SyntaxKind::SET_OPTIONS => AlterIndexAction::SetOptions(SetOptions { syntax }),
+            SyntaxKind::SET_TABLESPACE => AlterIndexAction::SetTablespace(SetTablespace { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            AlterIndexAction::AlterSetStatistics(it) => &it.syntax,
+            AlterIndexAction::AttachPartition(it) => &it.syntax,
+            AlterIndexAction::DependsOnExtension(it) => &it.syntax,
+            AlterIndexAction::NoDependsOnExtension(it) => &it.syntax,
+            AlterIndexAction::RenameTo(it) => &it.syntax,
+            AlterIndexAction::ResetOptions(it) => &it.syntax,
+            AlterIndexAction::SetOptions(it) => &it.syntax,
+            AlterIndexAction::SetTablespace(it) => &it.syntax,
+        }
+    }
+}
+impl From<AlterSetStatistics> for AlterIndexAction {
+    #[inline]
+    fn from(node: AlterSetStatistics) -> AlterIndexAction {
+        AlterIndexAction::AlterSetStatistics(node)
+    }
+}
+impl From<AttachPartition> for AlterIndexAction {
+    #[inline]
+    fn from(node: AttachPartition) -> AlterIndexAction {
+        AlterIndexAction::AttachPartition(node)
+    }
+}
+impl From<DependsOnExtension> for AlterIndexAction {
+    #[inline]
+    fn from(node: DependsOnExtension) -> AlterIndexAction {
+        AlterIndexAction::DependsOnExtension(node)
+    }
+}
+impl From<NoDependsOnExtension> for AlterIndexAction {
+    #[inline]
+    fn from(node: NoDependsOnExtension) -> AlterIndexAction {
+        AlterIndexAction::NoDependsOnExtension(node)
+    }
+}
+impl From<RenameTo> for AlterIndexAction {
+    #[inline]
+    fn from(node: RenameTo) -> AlterIndexAction {
+        AlterIndexAction::RenameTo(node)
+    }
+}
+impl From<ResetOptions> for AlterIndexAction {
+    #[inline]
+    fn from(node: ResetOptions) -> AlterIndexAction {
+        AlterIndexAction::ResetOptions(node)
+    }
+}
+impl From<SetOptions> for AlterIndexAction {
+    #[inline]
+    fn from(node: SetOptions) -> AlterIndexAction {
+        AlterIndexAction::SetOptions(node)
+    }
+}
+impl From<SetTablespace> for AlterIndexAction {
+    #[inline]
+    fn from(node: SetTablespace) -> AlterIndexAction {
+        AlterIndexAction::SetTablespace(node)
     }
 }
 impl AstNode for AlterMaterializedViewAction {
