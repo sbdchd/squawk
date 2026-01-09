@@ -92,7 +92,7 @@ CallExpr =
 | ExistsFn
 
 JsonArrayFn =
- 'json_array' '(' 
+ 'json_array' '('
   (
      (JsonSelectFormat (',' JsonSelectFormat)*) JsonNullClause?
    | (JsonExprFormat (',' JsonExprFormat)*)
@@ -115,17 +115,17 @@ JsonExprFormat =
 JsonEncodingClause =
   'encoding' NameRef
 
-SomeFn = 
+SomeFn =
   'some' '(' SelectVariant | Expr ')'
 
-AnyFn = 
+AnyFn =
   'any' '(' SelectVariant | Expr ')'
 
 AllFn =
   'all' '(' SelectVariant | Expr ')'
 
 ExtractFn =
-  'extract' '(' 
+  'extract' '('
     ('#ident' | 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | '@string')
     'from'
     Expr
@@ -144,12 +144,12 @@ JsonExistsFn =
 JsonObjectFn =
   'json_object' '('
     (JsonReturningClause
-    | (JsonKeyValue (',' JsonKeyValue)*) 
+    | (JsonKeyValue (',' JsonKeyValue)*)
       JsonNullClause?
       JsonKeysUniqueClause?
       JsonReturningClause?
     )
-  
+
   ')'
 
 JsonObjectAggFn =
@@ -183,7 +183,7 @@ JsonQueryFn =
 
 XmlTable =
    'xmltable'
-   '(' 
+   '('
      ('xmlnamespaces' XmlNamespaceList ',')
      XmlRowPassingClause
      XmlTableColumnList
@@ -192,7 +192,7 @@ XmlTable =
 XmlRowPassingClause =
   Expr 'passing' XmlPassingMech? Expr XmlPassingMech?
 
-XmlNamespaceList = 
+XmlNamespaceList =
   '(' (XmlNamespace (',' XmlNamespace )*) ')'
 
 XmlNamespace =
@@ -204,7 +204,7 @@ XmlPassingMech =
 | 'by' 'value'
 
 JsonTable =
-  'json_table' '(' 
+  'json_table' '('
     Expr
     JsonFormatClause?
     ','
@@ -261,7 +261,7 @@ TrimFn =
 
 XmlRootFn =
   'xmlroot' '('
-    Expr ',' 
+    Expr ','
     ('version' 'no' 'value' | 'version' Expr)
     (
       ',' 'standalone' 'yes'
@@ -283,8 +283,8 @@ XmlElementFn =
   'xmlelement' '('
     'name'
     Name
-    ( 
-      ',' 'xmlattributes' '(' 
+    (
+      ',' 'xmlattributes' '('
            XmlAttributeList
         ')'
         (',' (Expr (',' Expr)*))?
@@ -516,7 +516,7 @@ DoubleType =
   'double' 'precision'
 
 Timezone =
-  WithTimezone 
+  WithTimezone
 | WithoutTimezone
 
 TimeType =
@@ -567,8 +567,8 @@ ExprType =
 
 Role =
   'group'? NameRef
-| 'current_role' 
-| 'current_user' 
+| 'current_role'
+| 'current_user'
 | 'session_user'
 
 RoleList =
@@ -794,7 +794,7 @@ Truncate =
   ('cascade' | 'restrict')?
 
 LikeOption =
-  ('including' | 'excluding') 
+  ('including' | 'excluding')
   ('comments'
   | 'compression'
   | 'constraints'
@@ -830,7 +830,7 @@ GroupingRollup =
 GroupingSets =
   'grouping' 'sets' '(' Expr ')'
 
-GroupingCube = 
+GroupingCube =
   'cube' Expr
 
 GroupingExpr =
@@ -851,8 +851,8 @@ LimitClause =
 FetchClause =
   'fetch'
   ('first' | 'next')
-  Expr? 
-  ('row' | 'rows') 
+  Expr?
+  ('row' | 'rows')
   ('only' | 'with' 'ties')
 
 OffsetClause =
@@ -1017,9 +1017,9 @@ NotDeferrable =
   'not' 'deferrable'
 
 TransactionMode =
-  Serializable 
-| RepeatableRead 
-| ReadCommitted 
+  Serializable
+| RepeatableRead
+| ReadCommitted
 | ReadUncommitted
 | ReadWrite
 | ReadOnly
@@ -1100,14 +1100,14 @@ UsingMethod =
 
 PartitionBy =
   'partition' 'by' (
-      'range' 
+      'range'
       | '#ident'  // list | hash
   ) PartitionItemList
 
 CreateTable =
-  'create' 
+  'create'
   (('global' | 'local')? ('temporary' | 'temp' | 'unlogged' ))?
-  'table' IfNotExists? Path 
+  'table' IfNotExists? Path
   PartitionOf?
   OfType?
   TableArgList
@@ -1119,7 +1119,7 @@ CreateTable =
   Tablespace?
 
 CreateIndex =
-  'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName 
+  'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName
   UsingMethod?
   PartitionItemList
   ConstraintIncludeClause?
@@ -1315,14 +1315,14 @@ SetColumn =
   SetSingleColumn
 | SetMultipleColumns
 
-SetSingleColumn = 
+SetSingleColumn =
   Column
   '='
   SetExpr
 
 SetMultipleColumns =
-  ColumnList 
-  '=' 
+  ColumnList
+  '='
   (SetExprList | ParenSelect)
 
 SetExprList =
@@ -1369,15 +1369,15 @@ Notify =
   'notify' NameRef (',' Literal)?
 
 MergeWhenMatched =
-  'when' 'matched' 
+  'when' 'matched'
   ('and' Expr)? 'then' MergeAction
 
 MergeWhenNotMatchedSource =
-  'when' 'not' 'matched' 'by' 'source' 
+  'when' 'not' 'matched' 'by' 'source'
   ('and' Expr)? 'then' MergeAction
 
 MergeWhenNotMatchedTarget =
-  'when' 'not' 'matched' ('by' 'target')? 
+  'when' 'not' 'matched' ('by' 'target')?
   ('and' Expr)? 'then' MergeAction
 
 MergeWhenClause =
@@ -1407,7 +1407,7 @@ MergeAction =
 
 Merge =
   WithClause?
-  'merge' 'into' RelationName Alias? 
+  'merge' 'into' RelationName Alias?
   UsingOnClause
   MergeWhenClause*
   ReturningClause?
@@ -1447,11 +1447,11 @@ CreateTableAs =
   (WithData | WithNoData)?
 
 CreateMaterializedView =
-  'create' 'materialized' 'view' IfNotExists? Path ColumnList? 
+  'create' 'materialized' 'view' IfNotExists? Path ColumnList?
   UsingMethod?
   WithParams?
   Tablespace?
-  'as' 
+  'as'
   query:SelectVariant
   (WithData | WithNoData)?
 
@@ -1584,13 +1584,13 @@ WithoutTimezone =
   'without' 'time' 'zone'
 
 AttributeOption =
-  (Name | Name '.' Name) 
+  (Name | Name '.' Name)
   ('=' AttributeValue)?
 
 AttributeValue =
   Literal
-| 'none' 
-| 'operator' '(' Op ')' 
+| 'none'
+| 'operator' '(' Op ')'
 | Op
 | Type
 
@@ -1715,7 +1715,7 @@ FromClause =
 XmlTableColumnList =
   (XmlTableColumn (',' XmlTableColumn)*)
 
-XmlTableColumn = 
+XmlTableColumn =
   Name Type XmlColumnOptionList?
 | Name 'for' 'ordinality'
 
@@ -1735,7 +1735,7 @@ ConstraintIndexMethod =
 ConstraintExclusionList =
   '(' (ConstraintExclusion (',' ConstraintExclusion)*) ')'
 
-ConstraintExclusion = 
+ConstraintExclusion =
  Expr 'with' Op
 
 WhereConditionClause =
@@ -1811,8 +1811,8 @@ AlterPolicy =
   'alter' 'policy' NameRef OnTable
   (RenameTo
   | 'to' RoleList
-  | 'using' '(' Expr ')' 
-  | 'with' 'check' '(' Expr ')' 
+  | 'using' '(' Expr ')'
+  | 'with' 'check' '(' Expr ')'
   )?
 
 AlterOperatorFamily =
@@ -1876,7 +1876,7 @@ DependsOnExtension =
 AlterMaterializedView =
   'alter' 'materialized' 'view'
   (
-    'all' 'in' 'tablespace' NameRef ('owned' 'by' RoleList)? 'set' 'tablespace' Name 'nowait'?
+    'all' 'in' 'tablespace' NameRef OwnedByRoles? 'set' 'tablespace' Name 'nowait'?
   | IfExists? Path action:AlterMaterializedViewAction*
   )
 
@@ -1888,7 +1888,23 @@ AlterLanguage =
   (RenameTo | OwnerTo)?
 
 AlterIndex =
-  'alter' 'index' IfExists? Path
+  'alter' 'index' (
+  'all' 'in' 'tablespace' Path OwnedByRoles? 'set' 'tablespace' NameRef 'nowait'?
+| IfExists? Path AlterIndexAction
+)
+
+OwnedByRoles =
+  'owned' 'by' RoleList
+
+AlterIndexAction =
+  AttachPartition
+| DependsOnExtension
+| NoDependsOnExtension
+| ResetOptions
+| RenameTo
+| SetTablespace
+| SetOptions
+| AlterSetStatistics
 
 AlterGroup =
   'alter' 'group' Role
@@ -1911,10 +1927,10 @@ AlterFunction =
   'restrict'?
 
 AlterForeignTable =
-  'alter' 'foreign' 'table' IfExists? RelationName 
-  (RenameTo 
-  | RenameColumn 
-  | SetSchema 
+  'alter' 'foreign' 'table' IfExists? RelationName
+  (RenameTo
+  | RenameColumn
+  | SetSchema
   | AlterTableAction*
   )
 
@@ -1932,8 +1948,8 @@ FdwOption =
   'options' AlterOptionList
 | 'handler' Path
 | 'validator' Path
-| 'no' 'handler' 
-| 'no' 'validator' 
+| 'no' 'handler'
+| 'no' 'validator'
 
 AlterEventTrigger =
   'alter' 'event' 'trigger' NameRef
@@ -1957,7 +1973,7 @@ GrantDefaultPrivileges =
 RevokeDefaultPrivileges =
   'revoke' ('grant' 'option' 'for')? Privileges 'on' PrivilegeTarget 'from' RoleList ('cascade' | 'restrict')?
 
-Privileges = 
+Privileges =
   'all' 'privileges'? ColumnList?
 | RevokeCommandList ColumnList?
 
@@ -2020,7 +2036,7 @@ AlterCollation =
   | SetSchema
   )
 
-RefreshVersion = 
+RefreshVersion =
   'refresh' 'version'
 
 AlterAggregate =
@@ -2103,14 +2119,14 @@ CommentOn =
   ('null' | Literal)
 
 Cluster =
-  'cluster' 
-  ('verbose' | OptionItemList)? 
+  'cluster'
+  ('verbose' | OptionItemList)?
   Path?
   UsingMethod?
 
 CreateAccessMethod =
   'create' 'access' 'method' name:Path
-  'type' ('table' | 'index') 
+  'type' ('table' | 'index')
   HandlerClause
 
 HandlerClause =
@@ -2129,8 +2145,8 @@ CreateCollation =
   'create' 'collation' Path
 
 CreateConversion =
-  'create' 'default'? 'conversion' Path 
-  'for' Literal 
+  'create' 'default'? 'conversion' Path
+  'for' Literal
   'to' Literal
   'from' Path
 
@@ -2184,7 +2200,7 @@ CreateLanguage =
   ('handler' Path ('inline' Path)? ('validator' Path)?)?
 
 CreateOperator =
-  'create' 'operator' 
+  'create' 'operator'
   Path?
   Op
   AttributeList
@@ -2195,7 +2211,7 @@ CreateOperatorClass =
   'as'
   OperatorClassOptionList
 
-OperatorClassOptionList = 
+OperatorClassOptionList =
   (OpClassOption (',' OpClassOption)*)
 
 CreateOperatorFamily =
@@ -2477,10 +2493,10 @@ ImportForeignSchema =
   IntoSchema
   AlterOptionList?
 
-LimitToTables = 
+LimitToTables =
   'limit' 'to' (NameRef (',' NameRef)*)
 
-ExceptTables = 
+ExceptTables =
   'except' (NameRef (',' NameRef)*)
 
 IntoSchema =
@@ -2497,7 +2513,7 @@ Refresh =
   (WithData | WithNoData)?
 
 Grant =
-  'grant' 
+  'grant'
   (('all' 'privileges'?) | RevokeCommandList)
   'on' ('table' (Path (',' Path)*) | 'all' 'tables' 'in' 'schema' (NameRef (',' NameRef)*))
   'to' RoleList
@@ -2647,10 +2663,10 @@ VacuumOption =
   Literal?
 
 Copy =
-  'copy' 
+  'copy'
   ('(' PreparableStmt ')' | 'binary'? Path ColumnList?)
   (
-    ('from' ('stdin' | 'program'? Literal)) 
+    ('from' ('stdin' | 'program'? Literal))
     | ('to' ('stdout' | 'program'? Literal))
   )
   'with'?

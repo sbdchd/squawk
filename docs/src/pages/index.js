@@ -23,11 +23,10 @@ const features = [
     ),
   },
   {
-    title: "Open Source",
+    title: "VSCode Support",
     description: (
       <>
-        <code>squawk</code> is open source and written in Rust. Install it with{" "}
-        <code>npm install squawk-cli</code>.
+        Squawk's language server and <a href="https://marketplace.visualstudio.com/items?itemName=squawk.squawk-vscode">VSCode extension</a> provides linting in your editor.
       </>
     ),
   },
@@ -215,17 +214,25 @@ function Home() {
         <div className="container">
           <h1 className="hero__title">Squawk</h1>
           <p className="hero__subtitle">
-            A linter for Postgres migrations & SQL
+            A linter and language server for Postgres migrations & SQL
           </p>
-          <div className={styles.buttons}>
+          <div className={styles.buttons} style={{display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: "0.5rem"}}>
+              <code style={{fontSize: '1rem', margin: 0, color: '#333', fontFamily: 'monospace', padding: "0.5rem 1rem", flexGrow: 1}}>
+                npm install -g squawk-cli
+              </code>
+            </div>
             <Link
               className={clsx(
                 "button button--secondary button--lg",
                 styles.getStarted
               )}
-              to={useBaseUrl("docs/")}>
-              Get Started
+              style={{minWidth: "400px"}}
+              to="https://marketplace.visualstudio.com/items?itemName=squawk.squawk-vscode">
+              Install VSCode Extension
             </Link>
+
+            <Link to={useBaseUrl("docs/")} style={{color: "white"}}>See other install methods</Link>
           </div>
         </div>
       </header>

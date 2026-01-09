@@ -6435,10 +6435,7 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(IN_KW);
         p.expect(TABLESPACE_KW);
         name_ref(p);
-        if p.eat(OWNED_KW) {
-            p.expect(BY_KW);
-            role_list(p);
-        }
+        opt_owned_by_roles(p);
         p.expect(SET_KW);
         p.expect(TABLESPACE_KW);
         name(p);
@@ -13717,12 +13714,22 @@ fn alter_table(p: &mut Parser<'_>) -> CompletedMarker {
     relation_name(p);
     // ALTER TABLE ALL IN TABLESPACE name [ OWNED BY role_name [, ... ] ]
     //     SET TABLESPACE new_tablespace [ NOWAIT ]
-    if all_in_tablespace && p.eat(OWNED_KW) {
-        p.expect(BY_KW);
-        name_ref_list(p);
+    if all_in_tablespace {
+        opt_owned_by_roles(p);
     }
     opt_alter_table_action_list(p);
     m.complete(p, ALTER_TABLE)
+}
+
+fn opt_owned_by_roles(p: &mut Parser<'_>) {
+    if !p.at(OWNED_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump(OWNED_KW);
+    p.expect(BY_KW);
+    role_list(p);
+    m.complete(p, OWNED_BY_ROLES);
 }
 
 const ALTER_TABLE_ACTION_FIRST: TokenSet = TokenSet::new(&[

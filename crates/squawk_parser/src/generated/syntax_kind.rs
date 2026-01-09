@@ -967,6 +967,7 @@ pub enum SyntaxKind {
     OR_REPLACE,
     OVERLAY_FN,
     OVER_CLAUSE,
+    OWNED_BY_ROLES,
     OWNER_TO,
     PARALLEL_FUNC_OPTION,
     PARAM,
