@@ -457,7 +457,7 @@ fn rewrite_cast_to_double_colon(
     let replacement = format!("{}::{}", expr_text, type_text);
 
     actions.push(CodeAction {
-        title: "Rewrite cast function".to_owned(),
+        title: "Rewrite as cast operator `::`".to_owned(),
         edits: vec![Edit::replace(cast_expr.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
@@ -484,7 +484,7 @@ fn rewrite_double_colon_to_cast(
     let replacement = format!("cast({} as {})", expr_text, type_text);
 
     actions.push(CodeAction {
-        title: "Rewrite as cast operator".to_owned(),
+        title: "Rewrite as cast function `cast()`".to_owned(),
         edits: vec![Edit::replace(cast_expr.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });

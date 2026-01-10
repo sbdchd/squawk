@@ -685,6 +685,27 @@ SOURCE_FILE
             END_KW "end"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- select without semi and trailing create table"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "users"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
   SELECT
@@ -811,7 +832,13 @@ error[syntax-error]: expected an expression, found END_KW
    ╭▸ 
 65 │ select case when 1 then 2 else end;
    ╰╴                              ━
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+68 │   select
+   │ ┏━━━━━━━┛
+69 │ ┃
+   ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
-68 │ select 1,
+73 │ select 1,
    ╰╴        ━

@@ -4,25 +4,27 @@ use log::info;
 use lsp_server::{Connection, Message, Notification, Response};
 use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
-    CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
-    DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    DocumentSymbol, DocumentSymbolParams, GotoDefinitionParams, GotoDefinitionResponse, Hover,
-    HoverContents, HoverParams, HoverProviderCapability, InitializeParams, InlayHint,
-    InlayHintKind, InlayHintLabel, InlayHintLabelPart, InlayHintParams, LanguageString, Location,
-    MarkedString, OneOf, PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
-    SelectionRangeProviderCapability, ServerCapabilities, SymbolKind, TextDocumentSyncCapability,
-    TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
+    CodeActionProviderCapability, CodeActionResponse, Command, CompletionOptions, CompletionParams,
+    CompletionResponse, Diagnostic, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
+    DidOpenTextDocumentParams, DocumentSymbol, DocumentSymbolParams, GotoDefinitionParams,
+    GotoDefinitionResponse, Hover, HoverContents, HoverParams, HoverProviderCapability,
+    InitializeParams, InlayHint, InlayHintKind, InlayHintLabel, InlayHintLabelPart,
+    InlayHintParams, LanguageString, Location, MarkedString, OneOf, PublishDiagnosticsParams,
+    ReferenceParams, SelectionRangeParams, SelectionRangeProviderCapability, ServerCapabilities,
+    SymbolKind, TextDocumentSyncCapability, TextDocumentSyncKind, Url, WorkDoneProgressOptions,
+    WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
     },
     request::{
-        CodeActionRequest, DocumentSymbolRequest, GotoDefinition, HoverRequest, InlayHintRequest,
-        References, Request, SelectionRangeRequest,
+        CodeActionRequest, Completion, DocumentSymbolRequest, GotoDefinition, HoverRequest,
+        InlayHintRequest, References, Request, SelectionRangeRequest,
     },
 };
 use rowan::TextRange;
 use squawk_ide::code_actions::code_actions;
+use squawk_ide::completion::completion;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
@@ -69,6 +71,15 @@ pub fn run() -> Result<()> {
         hover_provider: Some(HoverProviderCapability::Simple(true)),
         inlay_hint_provider: Some(OneOf::Left(true)),
         document_symbol_provider: Some(OneOf::Left(true)),
+        completion_provider: Some(CompletionOptions {
+            resolve_provider: Some(false),
+            trigger_characters: None,
+            all_commit_characters: None,
+            work_done_progress_options: WorkDoneProgressOptions {
+                work_done_progress: None,
+            },
+            completion_item: None,
+        }),
         ..Default::default()
     })
     .unwrap();
@@ -123,6 +134,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     }
                     DocumentSymbolRequest::METHOD => {
                         handle_document_symbol(&connection, req, &documents)?;
+                    }
+                    Completion::METHOD => {
+                        handle_completion(&connection, req, &documents)?;
                     }
                     "squawk/syntaxTree" => {
                         handle_syntax_tree(&connection, req, &documents)?;
@@ -475,6 +489,47 @@ fn handle_references(
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&locations).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
+fn handle_completion(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
+    let params: CompletionParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document_position.text_document.uri;
+    let position = params.text_document_position.position;
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse = SourceFile::parse(content);
+    let file = parse.tree();
+    let line_index = LineIndex::new(content);
+
+    let Some(offset) = lsp_utils::offset(&line_index, position) else {
+        let resp = Response {
+            id: req.id,
+            result: Some(serde_json::to_value(CompletionResponse::Array(vec![])).unwrap()),
+            error: None,
+        };
+        connection.sender.send(Message::Response(resp))?;
+        return Ok(());
+    };
+
+    let completion_items = completion(&file, offset)
+        .into_iter()
+        .map(lsp_utils::completion_item)
+        .collect();
+
+    let result = CompletionResponse::Array(completion_items);
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&result).unwrap()),
         error: None,
     };
 

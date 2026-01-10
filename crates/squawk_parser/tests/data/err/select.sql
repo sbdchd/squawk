@@ -64,5 +64,10 @@ select case when then x end;
 -- case missing else expr
 select case when 1 then 2 else end;
 
+-- select without semi and trailing create table
+select
+
+create table users ();
+
 -- trailing comma at EOF
 select 1,
