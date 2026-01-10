@@ -89,8 +89,7 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
         let leaf_range = match root.token_at_offset(offset) {
             rowan::TokenAtOffset::None => return None,
             rowan::TokenAtOffset::Single(l) => {
-                let kind = l.kind();
-                if kind.is_string() || kind == SyntaxKind::COMMENT {
+                if l.kind().is_string_or_comment() {
                     extend_single_word_in_comment_or_string(&l, offset)
                         .unwrap_or_else(|| l.text_range())
                 } else {

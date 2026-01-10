@@ -1,8 +1,5 @@
 use rowan::TextSize;
-use squawk_syntax::{
-    SyntaxKind,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionItem> {
     let Some(token) = file.syntax().token_at_offset(offset).right_biased() else {
@@ -13,7 +10,7 @@ pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionIte
     // We don't support completions inside comments since we don't have doc
     // comments a la JSDoc.
     // And we don't have string literal types so we bail out early for strings too.
-    if token.kind() == SyntaxKind::COMMENT || token.kind().is_string() {
+    if token.kind().is_string_or_comment() {
         return vec![];
     }
 

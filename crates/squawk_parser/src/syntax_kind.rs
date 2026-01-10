@@ -24,10 +24,11 @@ impl SyntaxKind {
     }
 
     #[inline]
-    pub fn is_string(self) -> bool {
+    pub fn is_string_or_comment(self) -> bool {
         matches!(
             self,
-            SyntaxKind::STRING
+            SyntaxKind::COMMENT
+                | SyntaxKind::STRING
                 | SyntaxKind::BYTE_STRING
                 | SyntaxKind::BIT_STRING
                 | SyntaxKind::DOLLAR_QUOTED_STRING

@@ -100,7 +100,7 @@ pub(crate) fn completion_item(
         kind: Some(kind),
         detail: item.detail,
         insert_text: item.insert_text,
-        insert_text_format: insert_text_format,
+        insert_text_format,
         ..Default::default()
     }
 }
