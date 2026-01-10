@@ -33,6 +33,8 @@ use squawk_syntax::{
     ast::{self, AstToken},
 };
 
+use crate::tokens::is_string_or_comment;
+
 const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::ALTER_OPTION_LIST,
     SyntaxKind::ARG_LIST,
@@ -89,7 +91,7 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
         let leaf_range = match root.token_at_offset(offset) {
             rowan::TokenAtOffset::None => return None,
             rowan::TokenAtOffset::Single(l) => {
-                if l.kind().is_string_or_comment() {
+                if is_string_or_comment(l.kind()) {
                     extend_single_word_in_comment_or_string(&l, offset)
                         .unwrap_or_else(|| l.text_range())
                 } else {
