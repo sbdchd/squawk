@@ -4878,6 +4878,7 @@ const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     R_BRACK,
     RETURNING_KW,
     SEMICOLON,
+    CREATE_KW,
     EOF,
 ])
 .union(COMPOUND_SELECT_FIRST);

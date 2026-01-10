@@ -58,6 +58,7 @@ xshell = "0.2.7"
 proc-macro2 = "1.0.95"
 snapbox = { version = "0.6.0", features = ["diff", "term-svg", "cmd"] }
 smallvec = "1.13.2"
+tabled = "0.17.0"
 
 # local
 # we have to make the versions explicit otherwise `cargo publish` won't work

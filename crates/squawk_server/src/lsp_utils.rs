@@ -75,6 +75,36 @@ pub(crate) fn code_action(
     }
 }
 
+pub(crate) fn completion_item(
+    item: squawk_ide::completion::CompletionItem,
+) -> lsp_types::CompletionItem {
+    use squawk_ide::completion::{CompletionInsertTextFormat, CompletionItemKind};
+
+    let kind = match item.kind {
+        CompletionItemKind::Keyword => lsp_types::CompletionItemKind::KEYWORD,
+        CompletionItemKind::Table => lsp_types::CompletionItemKind::STRUCT,
+        CompletionItemKind::Column => lsp_types::CompletionItemKind::FIELD,
+        CompletionItemKind::Function => lsp_types::CompletionItemKind::FUNCTION,
+        CompletionItemKind::Schema => lsp_types::CompletionItemKind::MODULE,
+        CompletionItemKind::Type => lsp_types::CompletionItemKind::CLASS,
+        CompletionItemKind::Snippet => lsp_types::CompletionItemKind::SNIPPET,
+    };
+
+    let insert_text_format = item.insert_text_format.map(|x| match x {
+        CompletionInsertTextFormat::PlainText => lsp_types::InsertTextFormat::PLAIN_TEXT,
+        CompletionInsertTextFormat::Snippet => lsp_types::InsertTextFormat::SNIPPET,
+    });
+
+    lsp_types::CompletionItem {
+        label: item.label,
+        kind: Some(kind),
+        detail: item.detail,
+        insert_text: item.insert_text,
+        insert_text_format: insert_text_format,
+        ..Default::default()
+    }
+}
+
 pub(crate) fn range(line_index: &LineIndex, range: TextRange) -> lsp_types::Range {
     let start = line_index.line_col(range.start());
     let end = line_index.line_col(range.end());

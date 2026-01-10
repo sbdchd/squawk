@@ -22,4 +22,16 @@ impl SyntaxKind {
     pub fn is_trivia(self) -> bool {
         matches!(self, SyntaxKind::WHITESPACE | SyntaxKind::COMMENT)
     }
+
+    #[inline]
+    pub fn is_string(self) -> bool {
+        matches!(
+            self,
+            SyntaxKind::STRING
+                | SyntaxKind::BYTE_STRING
+                | SyntaxKind::BIT_STRING
+                | SyntaxKind::DOLLAR_QUOTED_STRING
+                | SyntaxKind::ESC_STRING
+        )
+    }
 }

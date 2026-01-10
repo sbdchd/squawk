@@ -27,6 +27,7 @@ smallvec.workspace = true
 
 [dev-dependencies]
 insta.workspace = true
+tabled.workspace = true
 
 [lints]
 workspace = true

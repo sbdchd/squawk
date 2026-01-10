@@ -78,15 +78,6 @@ pub fn extend_selection(root: &SyntaxNode, range: TextRange) -> TextRange {
 }
 
 fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange> {
-    let string_kinds = [
-        SyntaxKind::COMMENT,
-        SyntaxKind::STRING,
-        SyntaxKind::BYTE_STRING,
-        SyntaxKind::BIT_STRING,
-        SyntaxKind::DOLLAR_QUOTED_STRING,
-        SyntaxKind::ESC_STRING,
-    ];
-
     if range.is_empty() {
         let offset = range.start();
         let mut leaves = root.token_at_offset(offset);
@@ -98,7 +89,8 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
         let leaf_range = match root.token_at_offset(offset) {
             rowan::TokenAtOffset::None => return None,
             rowan::TokenAtOffset::Single(l) => {
-                if string_kinds.contains(&l.kind()) {
+                let kind = l.kind();
+                if kind.is_string() || kind == SyntaxKind::COMMENT {
                     extend_single_word_in_comment_or_string(&l, offset)
                         .unwrap_or_else(|| l.text_range())
                 } else {
