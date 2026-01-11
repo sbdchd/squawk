@@ -690,7 +690,7 @@ SOURCE_FILE
   SELECT
     SELECT_CLAUSE
       SELECT_KW "select"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n"
   CREATE_TABLE
     CREATE_KW "create"
     WHITESPACE " "
@@ -704,6 +704,117 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- select do"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE " \n"
+  DO
+    DO_KW "do"
+    WHITESPACE " "
+    LITERAL
+      STRING "'begin null; end'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select grant"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE " \n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        SELECT_KW "select"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_LIST
+      ROLE
+        NAME_REF
+          IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select end"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE "\n"
+  COMMIT
+    END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select analyze/analyse"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE "\n"
+  ANALYZE
+    ANALYZE_KW "analyze"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE "\n"
+  ANALYZE
+    ANALYSE_KW "analyse"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select with"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
@@ -836,9 +947,41 @@ error[syntax-error]: expected SEMICOLON
    ╭▸ 
 68 │   select
    │ ┏━━━━━━━┛
-69 │ ┃
+69 │ ┃ create table users ();
+   ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+73 │ select 
+   ╰╴      ━
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+77 │ select 
+   ╰╴      ━
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+81 │   select
+   │ ┏━━━━━━━┛
+82 │ ┃ end;
+   ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+85 │   select
+   │ ┏━━━━━━━┛
+86 │ ┃ analyze;
+   ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+88 │   select
+   │ ┏━━━━━━━┛
+89 │ ┃ analyse;
+   ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+93 │   select
+   │ ┏━━━━━━━┛
+94 │ ┃ with t as (select 1)
    ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
-73 │ select 1,
+98 │ select 1,
    ╰╴        ━

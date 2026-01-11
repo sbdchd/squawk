@@ -66,8 +66,33 @@ select case when 1 then 2 else end;
 
 -- select without semi and trailing create table
 select
-
 create table users ();
+
+
+-- select do
+select 
+do 'begin null; end';
+
+-- select grant
+select 
+grant select on t to u;
+
+-- select end
+select
+end;
+
+-- select analyze/analyse
+select
+analyze;
+
+select
+analyse;
+
+-- select with
+
+select
+with t as (select 1)
+select * from t;
 
 -- trailing comma at EOF
 select 1,
