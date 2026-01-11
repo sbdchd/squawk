@@ -7,15 +7,16 @@ use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 use crate::scope::{Scope, ScopeId};
 use crate::symbols::{Name, Schema, Symbol, SymbolKind};
 
-pub(crate) struct SearchPathChange {
+struct SearchPathChange {
     position: TextSize,
     search_path: Vec<Schema>,
 }
 
 pub(crate) struct Binder {
-    pub(crate) scopes: Arena<Scope>,
-    pub(crate) symbols: Arena<Symbol>,
-    pub(crate) search_path_changes: Vec<SearchPathChange>,
+    // TODO: doesn't seem like we need this with our resolve setup
+    scopes: Arena<Scope>,
+    symbols: Arena<Symbol>,
+    search_path_changes: Vec<SearchPathChange>,
 }
 
 impl Binder {
@@ -32,12 +33,105 @@ impl Binder {
         }
     }
 
-    pub(crate) fn root_scope(&self) -> ScopeId {
+    fn root_scope(&self) -> ScopeId {
         self.scopes
             .iter()
             .next()
             .map(|(id, _)| id)
             .expect("root scope must exist")
+    }
+
+    pub(crate) fn lookup(&self, name: &Name, kind: SymbolKind) -> Option<SyntaxNodePtr> {
+        let symbols = self.scopes[self.root_scope()].get(name)?;
+        let symbol_id = symbols.iter().copied().find(|id| {
+            let symbol = &self.symbols[*id];
+            symbol.kind == kind
+        })?;
+        Some(self.symbols[symbol_id].ptr)
+    }
+
+    pub(crate) fn lookup_with(
+        &self,
+        name: &Name,
+        kind: SymbolKind,
+        position: TextSize,
+        schema: &Option<Schema>,
+    ) -> Option<SyntaxNodePtr> {
+        let symbols = self.scopes[self.root_scope()].get(name)?;
+
+        let search_paths = match schema {
+            Some(s) => std::slice::from_ref(s),
+            None => self.search_path_at(position),
+        };
+
+        for search_schema in search_paths {
+            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
+                let symbol = &self.symbols[*id];
+                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
+            }) {
+                return Some(self.symbols[symbol_id].ptr);
+            }
+        }
+        None
+    }
+
+    pub(crate) fn lookup_with_params(
+        &self,
+        name: &Name,
+        kind: SymbolKind,
+        position: TextSize,
+        schema: &Option<Schema>,
+        params: Option<&[Name]>,
+    ) -> Option<SyntaxNodePtr> {
+        let symbols = self.scopes[self.root_scope()].get(name)?;
+
+        let search_paths = match schema {
+            Some(s) => std::slice::from_ref(s),
+            None => self.search_path_at(position),
+        };
+
+        for search_schema in search_paths {
+            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
+                let symbol = &self.symbols[*id];
+                let params_match = match (&symbol.params, params) {
+                    (Some(sym_params), Some(req_params)) => sym_params.as_slice() == req_params,
+                    (None, None) => true,
+                    (_, None) => true,
+                    _ => false,
+                };
+                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema) && params_match
+            }) {
+                return Some(self.symbols[symbol_id].ptr);
+            }
+        }
+        None
+    }
+
+    pub(crate) fn lookup_info(
+        &self,
+        name_str: String,
+        schema: &Option<String>,
+        kind: SymbolKind,
+        position: TextSize,
+    ) -> Option<(Schema, String)> {
+        let name_normalized = Name::from_string(name_str.clone());
+        let symbols = self.scopes[self.root_scope()].get(&name_normalized)?;
+
+        let search_paths = match schema {
+            Some(schema_name) => &[Schema::new(schema_name)],
+            None => self.search_path_at(position),
+        };
+
+        for search_schema in search_paths {
+            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
+                let symbol = &self.symbols[*id];
+                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
+            }) {
+                let symbol = &self.symbols[symbol_id];
+                return Some((symbol.schema.clone()?, name_str));
+            }
+        }
+        None
     }
 
     fn current_search_path(&self) -> &[Schema] {
