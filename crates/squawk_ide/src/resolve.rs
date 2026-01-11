@@ -421,7 +421,7 @@ fn resolve_table_name_ptr(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    resolve_for_kind(binder, table_name, schema, position, SymbolKind::Table)
+    binder.lookup_with(table_name, SymbolKind::Table, position, schema)
 }
 
 fn resolve_index_name_ptr(
@@ -430,7 +430,7 @@ fn resolve_index_name_ptr(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    resolve_for_kind(binder, index_name, schema, position, SymbolKind::Index)
+    binder.lookup_with(index_name, SymbolKind::Index, position, schema)
 }
 
 fn resolve_type_name_ptr(
@@ -439,7 +439,7 @@ fn resolve_type_name_ptr(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    resolve_for_kind(binder, type_name, schema, position, SymbolKind::Type)
+    binder.lookup_with(type_name, SymbolKind::Type, position, schema)
 }
 
 fn resolve_view_name_ptr(
@@ -448,7 +448,7 @@ fn resolve_view_name_ptr(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    resolve_for_kind(binder, view_name, schema, position, SymbolKind::View)
+    binder.lookup_with(view_name, SymbolKind::View, position, schema)
 }
 
 fn resolve_sequence_name_ptr(
@@ -457,69 +457,19 @@ fn resolve_sequence_name_ptr(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    resolve_for_kind(
-        binder,
-        sequence_name,
-        schema,
-        position,
-        SymbolKind::Sequence,
-    )
+    binder.lookup_with(sequence_name, SymbolKind::Sequence, position, schema)
 }
 
 fn resolve_tablespace_name_ptr(binder: &Binder, tablespace_name: &Name) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(tablespace_name)?;
-    let symbol_id = symbols.iter().copied().find(|id| {
-        let symbol = &binder.symbols[*id];
-        symbol.kind == SymbolKind::Tablespace
-    })?;
-    Some(binder.symbols[symbol_id].ptr)
+    binder.lookup(tablespace_name, SymbolKind::Tablespace)
 }
 
 fn resolve_database_name_ptr(binder: &Binder, database_name: &Name) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(database_name)?;
-    let symbol_id = symbols.iter().copied().find(|id| {
-        let symbol = &binder.symbols[*id];
-        symbol.kind == SymbolKind::Database
-    })?;
-    Some(binder.symbols[symbol_id].ptr)
+    binder.lookup(database_name, SymbolKind::Database)
 }
 
 fn resolve_server_name_ptr(binder: &Binder, server_name: &Name) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(server_name)?;
-    let symbol_id = symbols.iter().copied().find(|id| {
-        let symbol = &binder.symbols[*id];
-        symbol.kind == SymbolKind::Server
-    })?;
-    Some(binder.symbols[symbol_id].ptr)
-}
-
-fn resolve_for_kind(
-    binder: &Binder,
-    name: &Name,
-    schema: &Option<Schema>,
-    position: TextSize,
-    kind: SymbolKind,
-) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(name)?;
-
-    if let Some(schema) = schema {
-        let symbol_id = symbols.iter().copied().find(|id| {
-            let symbol = &binder.symbols[*id];
-            symbol.kind == kind && symbol.schema.as_ref() == Some(schema)
-        })?;
-        return Some(binder.symbols[symbol_id].ptr);
-    } else {
-        let search_path = binder.search_path_at(position);
-        for search_schema in search_path {
-            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
-                let symbol = &binder.symbols[*id];
-                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
-            }) {
-                return Some(binder.symbols[symbol_id].ptr);
-            }
-        }
-    }
-    None
+    binder.lookup(server_name, SymbolKind::Server)
 }
 
 fn resolve_for_kind_with_params(
@@ -530,38 +480,7 @@ fn resolve_for_kind_with_params(
     position: TextSize,
     kind: SymbolKind,
 ) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(name)?;
-
-    if let Some(schema) = schema {
-        let symbol_id = symbols.iter().copied().find(|id| {
-            let symbol = &binder.symbols[*id];
-            let params_match = match (&symbol.params, params) {
-                (Some(sym_params), Some(req_params)) => sym_params.as_slice() == req_params,
-                (None, None) => true,
-                (_, None) => true,
-                _ => false,
-            };
-            symbol.kind == kind && symbol.schema.as_ref() == Some(schema) && params_match
-        })?;
-        return Some(binder.symbols[symbol_id].ptr);
-    } else {
-        let search_path = binder.search_path_at(position);
-        for search_schema in search_path {
-            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
-                let symbol = &binder.symbols[*id];
-                let params_match = match (&symbol.params, params) {
-                    (Some(sym_params), Some(req_params)) => sym_params.as_slice() == req_params,
-                    (None, None) => true,
-                    (_, None) => true,
-                    _ => false,
-                };
-                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema) && params_match
-            }) {
-                return Some(binder.symbols[symbol_id].ptr);
-            }
-        }
-    }
-    None
+    binder.lookup_with_params(name, kind, position, schema, params)
 }
 
 fn resolve_function(
@@ -616,12 +535,7 @@ fn resolve_procedure(
 }
 
 fn resolve_schema(binder: &Binder, schema_name: &Name) -> Option<SyntaxNodePtr> {
-    let symbols = binder.scopes[binder.root_scope()].get(schema_name)?;
-    let symbol_id = symbols.iter().copied().find(|id| {
-        let symbol = &binder.symbols[*id];
-        symbol.kind == SymbolKind::Schema
-    })?;
-    Some(binder.symbols[symbol_id].ptr)
+    binder.lookup(schema_name, SymbolKind::Schema)
 }
 
 fn resolve_create_index_column_ptr(
@@ -2819,32 +2733,8 @@ fn resolve_symbol_info(
 ) -> Option<(Schema, String)> {
     let name_str = extract_table_name_from_path(path)?;
     let schema = extract_schema_from_path(path);
-
-    let name_normalized = Name::from_string(name_str.clone());
-    let symbols = binder.scopes[binder.root_scope()].get(&name_normalized)?;
-
-    if let Some(schema_name) = schema {
-        let schema_normalized = Schema::new(schema_name);
-        let symbol_id = symbols.iter().copied().find(|id| {
-            let symbol = &binder.symbols[*id];
-            symbol.kind == kind && symbol.schema.as_ref() == Some(&schema_normalized)
-        })?;
-        let symbol = &binder.symbols[symbol_id];
-        return Some((symbol.schema.clone()?, name_str));
-    } else {
-        let position = path.syntax().text_range().start();
-        let search_path = binder.search_path_at(position);
-        for search_schema in search_path {
-            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
-                let symbol = &binder.symbols[*id];
-                symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
-            }) {
-                let symbol = &binder.symbols[symbol_id];
-                return Some((symbol.schema.clone()?, name_str));
-            }
-        }
-    }
-    None
+    let position = path.syntax().text_range().start();
+    binder.lookup_info(name_str, &schema, kind, position)
 }
 
 fn collect_column_names_from_column_list(column_list: &ast::ColumnList) -> Vec<Name> {
