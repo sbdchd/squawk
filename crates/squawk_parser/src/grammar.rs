@@ -4878,8 +4878,17 @@ const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     R_BRACK,
     RETURNING_KW,
     SEMICOLON,
-    CREATE_KW,
     EOF,
+    // start of another stmt that is also a reserved keyword, aka it can't be a
+    // unquoted column name
+    CREATE_KW,
+    DO_KW,
+    CREATE_KW,
+    GRANT_KW,
+    END_KW,
+    ANALYZE_KW,
+    ANALYSE_KW,
+    WITH_KW,
 ])
 .union(COMPOUND_SELECT_FIRST);
 
