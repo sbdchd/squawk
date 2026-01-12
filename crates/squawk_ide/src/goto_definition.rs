@@ -3244,6 +3244,79 @@ select a$0 from (select u.* from t join u on a = b);
     }
 
     #[test]
+    fn goto_subquery_column_alias_list() {
+        assert_snapshot!(goto("
+select c$0, t.c from (select 1) t(c);
+"), @r"
+          ╭▸ 
+        2 │ select c, t.c from (select 1) t(c);
+          ╰╴       ─ 1. source              ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column_alias_list_qualified() {
+        assert_snapshot!(goto("
+select t.c$0 from (select 1) t(c);
+"), @r"
+          ╭▸ 
+        2 │ select t.c from (select 1) t(c);
+          ╰╴         ─ 1. source         ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_column_alias_list_multiple() {
+        assert_snapshot!(goto("
+select b$0 from (select 1, 2) t(a, b);
+"), @r"
+          ╭▸ 
+        2 │ select b from (select 1, 2) t(a, b);
+          ╰╴       ─ 1. source               ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_cte_column_alias_list() {
+        assert_snapshot!(goto("
+with x as (select 1)
+select c$0 from x t(c);
+"), @r"
+          ╭▸ 
+        3 │ select c from x t(c);
+          │        ┬          ─ 2. destination
+          │        │
+          ╰╴       1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_column_alias_list_qualified() {
+        assert_snapshot!(goto("
+with x as (select 1)
+select t.c$0 from x t(c);
+"), @r"
+          ╭▸ 
+        3 │ select t.c from x t(c);
+          │          ┬          ─ 2. destination
+          │          │
+          ╰╴         1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_column_alias_list_multiple() {
+        assert_snapshot!(goto("
+with x as (select 1, 2)
+select b$0 from x t(a, b);
+"), @r"
+          ╭▸ 
+        3 │ select b from x t(a, b);
+          ╰╴       ─ 1. source   ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_insert_table() {
         assert_snapshot!(goto("
 create table users(id int, email text);
