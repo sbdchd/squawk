@@ -173,7 +173,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
     match stmt {
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
         ast::Stmt::CreateForeignTable(create_foreign_table) => {
-            bind_create_foreign_table(b, create_foreign_table)
+            bind_create_table(b, create_foreign_table)
         }
         ast::Stmt::CreateIndex(create_index) => bind_create_index(b, create_index),
         ast::Stmt::CreateFunction(create_function) => bind_create_function(b, create_function),
@@ -197,7 +197,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
     }
 }
 
-fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
+fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
     let Some(path) = create_table.path() else {
         return;
     };
@@ -213,36 +213,20 @@ fn bind_create_table(b: &mut Binder, create_table: ast::CreateTable) {
     let table_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Table,
         ptr: name_ptr,
-        schema: Some(schema),
+        schema: Some(schema.clone()),
         params: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(table_name, table_id);
-}
-
-// TODO: combine with bind_create_table
-fn bind_create_foreign_table(b: &mut Binder, create_foreign_table: ast::CreateForeignTable) {
-    let Some(path) = create_foreign_table.path() else {
-        return;
-    };
-    let Some(table_name) = item_name(&path) else {
-        return;
-    };
-    let name_ptr = path_to_ptr(&path);
-    let Some(schema) = schema_name(b, &path, false) else {
-        return;
-    };
-
-    let table_id = b.symbols.alloc(Symbol {
-        kind: SymbolKind::Table,
+    let type_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Type,
         ptr: name_ptr,
         schema: Some(schema),
         params: None,
     });
 
     let root = b.root_scope();
-    b.scopes[root].insert(table_name, table_id);
+    b.scopes[root].insert(table_name.clone(), table_id);
+    b.scopes[root].insert(table_name, type_id);
 }
 
 fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {

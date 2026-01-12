@@ -1377,6 +1377,20 @@ create table user(id int, member person_info$0);
     }
 
     #[test]
+    fn goto_function_param_table_type() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create function b(t$0) returns int as 'select 1' language sql;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create function b(t) returns int as 'select 1' language sql;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_type_reference_enum() {
         assert_snapshot!(goto("
 create type mood as enum ('sad', 'ok', 'happy');
