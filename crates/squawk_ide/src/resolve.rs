@@ -40,6 +40,24 @@ pub(crate) fn resolve_name_ref(
             let position = name_ref.syntax().text_range().start();
             resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
+        NameRefClass::NamedArgParameter => {
+            let (function_name, schema) = find_func_call_from_named_arg(name_ref)?;
+            let param_name = Name::from_node(name_ref);
+            let position = name_ref.syntax().text_range().start();
+
+            // TODO: this should be one lookup
+            let function_ptr = binder
+                .lookup_with(&function_name, SymbolKind::Function, position, &schema)
+                .or_else(|| {
+                    binder.lookup_with(&function_name, SymbolKind::Procedure, position, &schema)
+                })
+                .or_else(|| {
+                    binder.lookup_with(&function_name, SymbolKind::Aggregate, position, &schema)
+                })?;
+
+            let param_ptr = find_param_in_func_def(root, function_ptr, &param_name)?;
+            Some(smallvec![param_ptr])
+        }
         NameRefClass::SelectFromTable
         | NameRefClass::UpdateFromTable
         | NameRefClass::MergeUsingTable
@@ -3068,4 +3086,68 @@ fn resolve_merge_table_name_ptr(
         &path,
         merge.returning_clause(),
     )
+}
+
+fn find_func_call_from_named_arg(name_ref: &ast::NameRef) -> Option<(Name, Option<Schema>)> {
+    for a in name_ref.syntax().ancestors() {
+        if let Some(call_expr) = ast::CallExpr::cast(a.clone()) {
+            return match call_expr.expr()? {
+                ast::Expr::NameRef(func_name_ref) => {
+                    let func_name = Name::from_node(&func_name_ref);
+                    Some((func_name, None))
+                }
+                ast::Expr::FieldExpr(field_expr) => {
+                    let func_name_ref = field_expr.field()?;
+                    let func_name = Name::from_node(&func_name_ref);
+
+                    let schema = if let Some(base) = field_expr.base()
+                        && let ast::Expr::NameRef(schema_name_ref) = base
+                    {
+                        Some(Schema(Name::from_node(&schema_name_ref)))
+                    } else {
+                        None
+                    };
+
+                    Some((func_name, schema))
+                }
+                _ => None,
+            };
+        } else if let Some(call) = ast::Call::cast(a) {
+            let path = call.path()?;
+            let function_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            return Some((function_name, schema));
+        }
+    }
+    None
+}
+
+fn find_param_in_func_def(
+    root: &SyntaxNode,
+    function_ptr: SyntaxNodePtr,
+    param_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    let function_node = function_ptr.to_node(root);
+
+    let param_list = function_node.ancestors().find_map(|a| {
+        if let Some(create_func) = ast::CreateFunction::cast(a.clone()) {
+            create_func.param_list()
+        } else if let Some(create_proc) = ast::CreateProcedure::cast(a.clone()) {
+            create_proc.param_list()
+        } else if let Some(create_aggregate) = ast::CreateAggregate::cast(a) {
+            create_aggregate.param_list()
+        } else {
+            None
+        }
+    })?;
+
+    for param in param_list.params() {
+        if let Some(name) = param.name()
+            && Name::from_node(&name) == *param_name
+        {
+            return Some(SyntaxNodePtr::new(name.syntax()));
+        }
+    }
+
+    None
 }

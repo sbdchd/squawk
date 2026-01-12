@@ -2,7 +2,10 @@ use crate::classify::{NameClass, NameRefClass, classify_name, classify_name_ref}
 use crate::column_name::ColumnName;
 use crate::offsets::token_from_offset;
 use crate::resolve;
-use crate::{binder, symbols::Name};
+use crate::{
+    binder,
+    symbols::{Name, Schema},
+};
 use rowan::TextSize;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::{
@@ -159,6 +162,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::CreateSchema
             | NameRefClass::ReindexSchema => {
                 return hover_schema(root, &name_ref, &binder);
+            }
+            NameRefClass::NamedArgParameter => {
+                return hover_named_arg_parameter(root, &name_ref, &binder);
             }
         }
     }
@@ -996,6 +1002,71 @@ fn hover_function(
         .find_map(ast::CreateFunction::cast)?;
 
     format_create_function(&create_function, binder)
+}
+
+fn hover_named_arg_parameter(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let param_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let param_name_node = param_ptr.to_node(root);
+    let param = param_name_node.ancestors().find_map(ast::Param::cast)?;
+    let param_name = param.name().map(|name| Name::from_node(&name))?;
+    let param_type = param.ty().map(|ty| ty.syntax().text().to_string());
+
+    for ancestor in param_name_node.ancestors() {
+        if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
+            let path = create_function.path()?;
+            let (schema, function_name) = resolve::resolve_function_info(binder, &path)?;
+            return Some(format_param_hover(
+                schema,
+                function_name,
+                param_name,
+                param_type,
+            ));
+        }
+        if let Some(create_procedure) = ast::CreateProcedure::cast(ancestor.clone()) {
+            let path = create_procedure.path()?;
+            let (schema, procedure_name) = resolve::resolve_procedure_info(binder, &path)?;
+            return Some(format_param_hover(
+                schema,
+                procedure_name,
+                param_name,
+                param_type,
+            ));
+        }
+        if let Some(create_aggregate) = ast::CreateAggregate::cast(ancestor) {
+            let path = create_aggregate.path()?;
+            let (schema, aggregate_name) = resolve::resolve_aggregate_info(binder, &path)?;
+            return Some(format_param_hover(
+                schema,
+                aggregate_name,
+                param_name,
+                param_type,
+            ));
+        }
+    }
+
+    None
+}
+
+fn format_param_hover(
+    schema: Schema,
+    routine_name: String,
+    param_name: Name,
+    param_type: Option<String>,
+) -> String {
+    if let Some(param_type) = param_type {
+        return format!(
+            "parameter {}.{}.{} {}",
+            schema, routine_name, param_name, param_type
+        );
+    }
+
+    format!("parameter {}.{}.{}", schema, routine_name, param_name)
 }
 
 fn format_create_function(
@@ -1906,6 +1977,46 @@ select add$0(1, 2);
           ╭▸ 
         3 │ select add(1, 2);
           ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_named_arg_param() {
+        assert_snapshot!(check_hover("
+create function foo(bar_param int) returns int as $$ select 1 $$ language sql;
+select foo(bar_param$0 := 5);
+"), @r"
+        hover: parameter public.foo.bar_param int
+          ╭▸ 
+        3 │ select foo(bar_param := 5);
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_named_arg_param_schema_qualified() {
+        assert_snapshot!(check_hover("
+create schema s;
+create function s.foo(my_param int) returns int as $$ select 1 $$ language sql;
+select s.foo(my_param$0 := 10);
+"), @r"
+        hover: parameter s.foo.my_param int
+          ╭▸ 
+        4 │ select s.foo(my_param := 10);
+          ╰╴                    ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_named_arg_param_procedure() {
+        assert_snapshot!(check_hover("
+create procedure proc(param_x int) as 'select 1' language sql;
+call proc(param_x$0 := 42);
+"), @r"
+        hover: parameter public.proc.param_x int
+          ╭▸ 
+        3 │ call proc(param_x := 42);
+          ╰╴                ─ hover
         ");
     }
 
