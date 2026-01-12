@@ -1,4 +1,7 @@
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::{
+    SyntaxKind,
+    ast::{self, AstNode},
+};
 
 #[derive(Debug)]
 pub(crate) enum NameRefClass {
@@ -88,6 +91,39 @@ pub(crate) enum NameRefClass {
     ReindexDatabase,
     ReindexSystem,
     AttachPartition,
+    NamedArgParameter,
+}
+
+fn is_special_fn(kind: SyntaxKind) -> bool {
+    matches!(
+        kind,
+        SyntaxKind::EXTRACT_FN
+            | SyntaxKind::JSON_EXISTS_FN
+            | SyntaxKind::JSON_ARRAY_FN
+            | SyntaxKind::JSON_OBJECT_FN
+            | SyntaxKind::JSON_OBJECT_AGG_FN
+            | SyntaxKind::JSON_ARRAY_AGG_FN
+            | SyntaxKind::JSON_QUERY_FN
+            | SyntaxKind::JSON_SCALAR_FN
+            | SyntaxKind::JSON_SERIALIZE_FN
+            | SyntaxKind::JSON_VALUE_FN
+            | SyntaxKind::JSON_FN
+            | SyntaxKind::SUBSTRING_FN
+            | SyntaxKind::POSITION_FN
+            | SyntaxKind::OVERLAY_FN
+            | SyntaxKind::TRIM_FN
+            | SyntaxKind::XML_ROOT_FN
+            | SyntaxKind::XML_SERIALIZE_FN
+            | SyntaxKind::XML_ELEMENT_FN
+            | SyntaxKind::XML_FOREST_FN
+            | SyntaxKind::XML_EXISTS_FN
+            | SyntaxKind::XML_PARSE_FN
+            | SyntaxKind::XML_PI_FN
+            | SyntaxKind::SOME_FN
+            | SyntaxKind::ANY_FN
+            | SyntaxKind::ALL_FN
+            | SyntaxKind::EXISTS_FN
+    )
 }
 
 pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass> {
@@ -106,6 +142,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     let mut in_using_clause = false;
     let mut in_returning_clause = false;
     let mut in_when_clause = false;
+    let mut in_special_sql_fn = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -530,6 +567,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::PartitionOf::can_cast(ancestor.kind()) {
             return Some(NameRefClass::PartitionOfTable);
         }
+        if is_special_fn(ancestor.kind()) {
+            in_special_sql_fn = true;
+        }
+        if ast::NamedArg::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::NamedArgParameter);
+        }
         if ast::ArgList::can_cast(ancestor.kind()) {
             in_arg_list = true;
         }
@@ -546,7 +589,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_from_clause = true;
         }
         if ast::Select::can_cast(ancestor.kind()) {
-            if in_call_expr && !in_arg_list {
+            if in_call_expr && !in_arg_list && !in_special_sql_fn {
                 return Some(NameRefClass::SelectFunctionCall);
             }
             if in_from_clause && !in_on_clause {
@@ -742,4 +785,18 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
     }
 
     None
+}
+
+#[test]
+fn special_function() {
+    for kind in (0..SyntaxKind::__LAST as u16)
+        .map(SyntaxKind::from)
+        .filter(|kind| format!("{:?}", kind).ends_with("_FN"))
+    {
+        assert!(
+            is_special_fn(kind),
+            "unhandled special function kind: {:?}. Please update is_special_fn",
+            kind
+        )
+    }
 }

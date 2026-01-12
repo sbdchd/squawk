@@ -6693,4 +6693,132 @@ returning x, u.y$0;
            ╰╴               ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_overlay_with_cte_column() {
+        assert_snapshot!(goto("
+with t as (
+  select '1' a, '2' b, 3 start
+)
+select overlay(a placing b$0 from start) from t;
+        "), @r"
+          ╭▸ 
+        3 │   select '1' a, '2' b, 3 start
+          │                     ─ 2. destination
+        4 │ )
+        5 │ select overlay(a placing b from start) from t;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_overlay_with_cte_column_first_arg() {
+        assert_snapshot!(goto("
+with t as (
+  select '1' a, '2' b, 3 start
+)
+select overlay(a$0 placing b from start) from t;
+        "), @r"
+          ╭▸ 
+        3 │   select '1' a, '2' b, 3 start
+          │              ─ 2. destination
+        4 │ )
+        5 │ select overlay(a placing b from start) from t;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_overlay_with_cte_column_from_arg() {
+        assert_snapshot!(goto("
+with t as (
+  select '1' a, '2' b, 3 start
+)
+select overlay(a placing b from start$0) from t;
+        "), @r"
+          ╭▸ 
+        3 │   select '1' a, '2' b, 3 start
+          │                          ───── 2. destination
+        4 │ )
+        5 │ select overlay(a placing b from start) from t;
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_named_arg_to_param() {
+        assert_snapshot!(goto("
+create function foo(bar_param int) returns int as 'select 1' language sql;
+select foo(bar_param$0 := 5);
+"), @r"
+          ╭▸ 
+        2 │ create function foo(bar_param int) returns int as 'select 1' language sql;
+          │                     ───────── 2. destination
+        3 │ select foo(bar_param := 5);
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_named_arg_schema_qualified() {
+        assert_snapshot!(goto("
+create schema s;
+create function s.foo(my_param int) returns int as 'select 1' language sql;
+select s.foo(my_param$0 := 10);
+"), @r"
+          ╭▸ 
+        3 │ create function s.foo(my_param int) returns int as 'select 1' language sql;
+          │                       ──────── 2. destination
+        4 │ select s.foo(my_param := 10);
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_named_arg_multiple_params() {
+        assert_snapshot!(goto("
+create function foo(a int, b int, c int) returns int as 'select 1' language sql;
+select foo(b$0 := 2, a := 1);
+"), @r"
+          ╭▸ 
+        2 │ create function foo(a int, b int, c int) returns int as 'select 1' language sql;
+          │                            ─ 2. destination
+        3 │ select foo(b := 2, a := 1);
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_named_arg_procedure() {
+        assert_snapshot!(goto("
+create procedure proc(param_x int) as 'select 1' language sql;
+call proc(param_x$0 := 42);
+"), @r"
+          ╭▸ 
+        2 │ create procedure proc(param_x int) as 'select 1' language sql;
+          │                       ─────── 2. destination
+        3 │ call proc(param_x := 42);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_named_arg_not_found_unnamed_param() {
+        goto_not_found(
+            "
+create function foo(int) returns int as 'select 1' language sql;
+select foo(bar$0 := 5);
+",
+        );
+    }
+
+    #[test]
+    fn goto_named_arg_not_found_wrong_name() {
+        goto_not_found(
+            "
+create function foo(correct_param int) returns int as 'select 1' language sql;
+select foo(wrong_param$0 := 5);
+",
+        );
+    }
 }
