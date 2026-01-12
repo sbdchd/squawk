@@ -131,6 +131,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::ForeignTableServerName => {
                 return hover_server(root, &name_ref, &binder);
             }
+            NameRefClass::DropExtension | NameRefClass::AlterExtension => {
+                return hover_extension(root, &name_ref, &binder);
+            }
             NameRefClass::Tablespace => return hover_tablespace(root, &name_ref, &binder),
             NameRefClass::DropIndex | NameRefClass::ReindexIndex => {
                 return hover_index(root, &name_ref, &binder);
@@ -185,6 +188,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateServer(create_server) => {
                 return format_create_server(&create_server);
+            }
+            NameClass::CreateExtension(create_extension) => {
+                return format_create_extension(&create_extension);
             }
             NameClass::CreateType(create_type) => {
                 return format_create_type(&create_type, &binder);
@@ -751,6 +757,18 @@ fn hover_server(
     Some(format!("server {}", server_name_node.text()))
 }
 
+fn hover_extension(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let extension_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let extension_name_node = extension_ptr.to_node(root);
+    Some(format!("extension {}", extension_name_node.text()))
+}
+
 fn hover_type(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -889,6 +907,11 @@ fn format_create_database(create_database: &ast::CreateDatabase) -> Option<Strin
 fn format_create_server(create_server: &ast::CreateServer) -> Option<String> {
     let name = create_server.name()?.syntax().text().to_string();
     Some(format!("server {}", name))
+}
+
+fn format_create_extension(create_extension: &ast::CreateExtension) -> Option<String> {
+    let name = create_extension.name()?.syntax().text().to_string();
+    Some(format!("extension {}", name))
 }
 
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
@@ -3771,6 +3794,44 @@ select a$0 from u;
           ╭▸ 
         9 │ select a from u;
           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_extension_on_create() {
+        assert_snapshot!(check_hover("
+create extension my$0ext;
+"), @r"
+        hover: extension myext
+          ╭▸ 
+        2 │ create extension myext;
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_extension_on_drop() {
+        assert_snapshot!(check_hover("
+create extension myext;
+drop extension my$0ext;
+"), @r"
+        hover: extension myext
+          ╭▸ 
+        3 │ drop extension myext;
+          ╰╴                ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_extension_on_alter() {
+        assert_snapshot!(check_hover("
+create extension myext;
+alter extension my$0ext update to '2.0';
+"), @r"
+        hover: extension myext
+          ╭▸ 
+        3 │ alter extension myext update to '2.0';
+          ╰╴                 ─ hover
         ");
     }
 }

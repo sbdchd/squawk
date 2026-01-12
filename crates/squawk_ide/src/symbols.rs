@@ -56,6 +56,7 @@ pub(crate) enum SymbolKind {
     Tablespace,
     Database,
     Server,
+    Extension,
 }
 
 #[derive(Clone, Debug)]

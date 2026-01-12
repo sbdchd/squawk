@@ -473,6 +473,62 @@ create server my$0server foreign data wrapper fdw;
     }
 
     #[test]
+    fn goto_drop_extension() {
+        assert_snapshot!(goto("
+create extension myext;
+drop extension my$0ext;
+"), @r"
+          ╭▸ 
+        2 │ create extension myext;
+          │                  ───── 2. destination
+        3 │ drop extension myext;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_extension_defined_after() {
+        assert_snapshot!(goto("
+drop extension my$0ext;
+create extension myext;
+"), @r"
+          ╭▸ 
+        2 │ drop extension myext;
+          │                 ─ 1. source
+        3 │ create extension myext;
+          ╰╴                 ───── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_alter_extension() {
+        assert_snapshot!(goto("
+create extension myext;
+alter extension my$0ext update to '2.0';
+"), @r"
+          ╭▸ 
+        2 │ create extension myext;
+          │                  ───── 2. destination
+        3 │ alter extension myext update to '2.0';
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_extension_definition_returns_self() {
+        assert_snapshot!(goto("
+create extension my$0ext;
+"), @r"
+          ╭▸ 
+        2 │ create extension myext;
+          │                  ┬┬───
+          │                  ││
+          │                  │1. source
+          ╰╴                 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_drop_sequence_with_schema() {
         assert_snapshot!(goto("
 create sequence foo.s;

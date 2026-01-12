@@ -133,6 +133,10 @@ pub(crate) fn resolve_name_ref(
             let server_name = Name::from_node(name_ref);
             resolve_server_name_ptr(binder, &server_name).map(|ptr| smallvec![ptr])
         }
+        NameRefClass::DropExtension | NameRefClass::AlterExtension => {
+            let extension_name = Name::from_node(name_ref);
+            resolve_extension_name_ptr(binder, &extension_name).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SequenceOwnedByColumn => {
             let sequence_option = name_ref
                 .syntax()
@@ -470,6 +474,10 @@ fn resolve_database_name_ptr(binder: &Binder, database_name: &Name) -> Option<Sy
 
 fn resolve_server_name_ptr(binder: &Binder, server_name: &Name) -> Option<SyntaxNodePtr> {
     binder.lookup(server_name, SymbolKind::Server)
+}
+
+fn resolve_extension_name_ptr(binder: &Binder, extension_name: &Name) -> Option<SyntaxNodePtr> {
+    binder.lookup(extension_name, SymbolKind::Extension)
 }
 
 fn resolve_for_kind_with_params(
