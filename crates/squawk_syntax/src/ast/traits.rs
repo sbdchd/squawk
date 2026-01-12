@@ -20,12 +20,12 @@ pub trait HasCreateTable: AstNode {
 
     #[inline]
     fn temp_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax(), SyntaxKind::TEMP_KW)
+        support::token(self.syntax(), SyntaxKind::TEMP_KW)
     }
 
     #[inline]
     fn temporary_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax(), SyntaxKind::TEMPORARY_KW)
+        support::token(self.syntax(), SyntaxKind::TEMPORARY_KW)
     }
 
     #[inline]
