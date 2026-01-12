@@ -15,6 +15,8 @@ pub(crate) enum NameRefClass {
     DropServer,
     AlterServer,
     CreateServer,
+    DropExtension,
+    AlterExtension,
     ForeignTableServerName,
     ForeignKeyTable,
     ForeignKeyColumn,
@@ -389,6 +391,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::CreateServer::can_cast(ancestor.kind()) {
             return Some(NameRefClass::CreateServer);
         }
+        if ast::DropExtension::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropExtension);
+        }
+        if ast::AlterExtension::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AlterExtension);
+        }
         if ast::ServerName::can_cast(ancestor.kind()) {
             return Some(NameRefClass::ForeignTableServerName);
         }
@@ -653,6 +661,7 @@ pub(crate) enum NameClass {
     CreateTablespace(ast::CreateTablespace),
     CreateDatabase(ast::CreateDatabase),
     CreateServer(ast::CreateServer),
+    CreateExtension(ast::CreateExtension),
     CreateType(ast::CreateType),
     CreateFunction(ast::CreateFunction),
     CreateAggregate(ast::CreateAggregate),
@@ -698,6 +707,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(create_server) = ast::CreateServer::cast(ancestor.clone()) {
             return Some(NameClass::CreateServer(create_server));
+        }
+        if let Some(create_extension) = ast::CreateExtension::cast(ancestor.clone()) {
+            return Some(NameClass::CreateExtension(create_extension));
         }
         if let Some(create_type) = ast::CreateType::cast(ancestor.clone()) {
             return Some(NameClass::CreateType(create_type));
