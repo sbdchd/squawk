@@ -863,6 +863,7 @@ fn resolve_select_qualified_column_ptr(
                     &paren_select,
                     column_name_ref,
                     &column_name,
+                    Some(&alias),
                 );
             }
 
@@ -1029,7 +1030,15 @@ fn resolve_from_item_column_ptr(
 ) -> Option<SyntaxNodePtr> {
     let column_name = Name::from_node(column_name_ref);
     if let Some(paren_select) = from_item.paren_select() {
-        return resolve_subquery_column(binder, root, &paren_select, column_name_ref, &column_name);
+        let alias = from_item.alias();
+        return resolve_subquery_column(
+            binder,
+            root,
+            &paren_select,
+            column_name_ref,
+            &column_name,
+            alias.as_ref(),
+        );
     }
 
     if let Some(paren_expr) = from_item.paren_expr() {
@@ -1040,6 +1049,18 @@ fn resolve_from_item_column_ptr(
             column_name_ref,
             &column_name,
         );
+    }
+
+    if let Some(alias) = from_item.alias()
+        && let Some(column_list) = alias.column_list()
+    {
+        for col in column_list.columns() {
+            if let Some(col_name) = col.name()
+                && Name::from_node(&col_name) == column_name
+            {
+                return Some(SyntaxNodePtr::new(col_name.syntax()));
+            }
+        }
     }
 
     let (table_name, schema) = table_and_schema_from_from_item(from_item)?;
@@ -1912,6 +1933,7 @@ fn resolve_subquery_column(
     paren_select: &ast::ParenSelect,
     name_ref: &ast::NameRef,
     column_name: &Name,
+    alias: Option<&ast::Alias>,
 ) -> Option<SyntaxNodePtr> {
     let select_variant = paren_select.select()?;
     let ast::SelectVariant::Select(subquery_select) = select_variant else {
@@ -1920,6 +1942,19 @@ fn resolve_subquery_column(
 
     let select_clause = subquery_select.select_clause()?;
     let target_list = select_clause.target_list()?;
+
+    if let Some(alias) = alias
+        && let Some(column_list) = alias.column_list()
+    {
+        for col in column_list.columns() {
+            if let Some(col_name) = col.name()
+                && Name::from_node(&col_name) == *column_name
+            {
+                return Some(SyntaxNodePtr::new(col_name.syntax()));
+            }
+        }
+        return None;
+    }
 
     for target in target_list.targets() {
         if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
@@ -2511,7 +2546,15 @@ fn resolve_column_from_paren_expr(
     if let Some(from_item) = paren_expr.from_item()
         && let Some(paren_select) = from_item.paren_select()
     {
-        return resolve_subquery_column(binder, root, &paren_select, name_ref, column_name);
+        let alias = from_item.alias();
+        return resolve_subquery_column(
+            binder,
+            root,
+            &paren_select,
+            name_ref,
+            column_name,
+            alias.as_ref(),
+        );
     }
 
     None
