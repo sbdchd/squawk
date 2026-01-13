@@ -857,7 +857,7 @@ fn resolve_select_qualified_column_ptr(
             && Name::from_node(&alias_name) == column_table_name
         {
             if let Some(paren_select) = from_item.paren_select() {
-                return resolve_subquery_column(
+                return resolve_subquery_column_ptr(
                     binder,
                     root,
                     &paren_select,
@@ -1031,7 +1031,7 @@ fn resolve_from_item_column_ptr(
     let column_name = Name::from_node(column_name_ref);
     if let Some(paren_select) = from_item.paren_select() {
         let alias = from_item.alias();
-        return resolve_subquery_column(
+        return resolve_subquery_column_ptr(
             binder,
             root,
             &paren_select,
@@ -1790,6 +1790,28 @@ fn resolve_cte_column(
                 continue;
             }
 
+            if let ast::WithQuery::Table(table) = query {
+                let relation_name = table.relation_name()?;
+                let path = relation_name.path()?;
+                let (table_name, schema) = extract_table_schema_from_path(&path)?;
+
+                if schema.is_none()
+                    && let Some(nested_cte_column) =
+                        resolve_cte_column(binder, root, name_ref, &table_name, column_name)
+                {
+                    return Some(nested_cte_column);
+                }
+
+                return resolve_column_from_table_or_view(
+                    binder,
+                    root,
+                    name_ref,
+                    &table_name,
+                    &schema,
+                    column_name,
+                );
+            }
+
             if let Some(column) =
                 column_in_with_query(&query, binder, root, column_name, column_list_len)
             {
@@ -1927,7 +1949,7 @@ fn column_in_with_query(
     None
 }
 
-fn resolve_subquery_column(
+fn resolve_subquery_column_ptr(
     binder: &Binder,
     root: &SyntaxNode,
     paren_select: &ast::ParenSelect,
@@ -1936,12 +1958,6 @@ fn resolve_subquery_column(
     alias: Option<&ast::Alias>,
 ) -> Option<SyntaxNodePtr> {
     let select_variant = paren_select.select()?;
-    let ast::SelectVariant::Select(subquery_select) = select_variant else {
-        return None;
-    };
-
-    let select_clause = subquery_select.select_clause()?;
-    let target_list = select_clause.target_list()?;
 
     if let Some(alias) = alias
         && let Some(column_list) = alias.column_list()
@@ -1953,8 +1969,39 @@ fn resolve_subquery_column(
                 return Some(SyntaxNodePtr::new(col_name.syntax()));
             }
         }
-        return None;
+        if matches!(select_variant, ast::SelectVariant::Values(_)) {
+            return None;
+        }
     }
+
+    if let ast::SelectVariant::Table(table) = select_variant {
+        let relation_name = table.relation_name()?;
+        let path = relation_name.path()?;
+        let (table_name, schema) = extract_table_schema_from_path(&path)?;
+
+        if schema.is_none()
+            && let Some(cte_column_ptr) =
+                resolve_cte_column(binder, root, name_ref, &table_name, column_name)
+        {
+            return Some(cte_column_ptr);
+        }
+
+        return resolve_column_from_table_or_view(
+            binder,
+            root,
+            name_ref,
+            &table_name,
+            &schema,
+            column_name,
+        );
+    }
+
+    let ast::SelectVariant::Select(subquery_select) = select_variant else {
+        return None;
+    };
+
+    let select_clause = subquery_select.select_clause()?;
+    let target_list = select_clause.target_list()?;
 
     for target in target_list.targets() {
         if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
@@ -2547,7 +2594,7 @@ fn resolve_column_from_paren_expr(
         && let Some(paren_select) = from_item.paren_select()
     {
         let alias = from_item.alias();
-        return resolve_subquery_column(
+        return resolve_subquery_column_ptr(
             binder,
             root,
             &paren_select,
