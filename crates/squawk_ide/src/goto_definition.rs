@@ -3317,6 +3317,138 @@ select b$0 from x t(a, b);
     }
 
     #[test]
+    fn goto_values_column_alias_list() {
+        assert_snapshot!(goto("
+select c$0 from (values (1)) t(c);
+"), @r"
+          ╭▸ 
+        2 │ select c from (values (1)) t(c);
+          ╰╴       ─ 1. source           ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_values_column_alias_list_qualified() {
+        assert_snapshot!(goto("
+select t.c$0 from (values (1)) t(c);
+"), @r"
+          ╭▸ 
+        2 │ select t.c from (values (1)) t(c);
+          ╰╴         ─ 1. source           ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_values_column_alias_list_multiple() {
+        assert_snapshot!(goto("
+select b$0 from (values (1, 2)) t(a, b);
+"), @r"
+          ╭▸ 
+        2 │ select b from (values (1, 2)) t(a, b);
+          ╰╴       ─ 1. source                 ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_table_expr_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+select a$0 from (table t);
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ select a from (table t);
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_expr_column_with_cte() {
+        assert_snapshot!(goto("
+with x as (select 1 a)
+select a$0 from (table x);
+"), @r"
+          ╭▸ 
+        2 │ with x as (select 1 a)
+          │                     ─ 2. destination
+        3 │ select a from (table x);
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_expr_partial_column_alias_list() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select c, b$0 from (table t) u(c);
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b)
+          │                          ─ 2. destination
+        3 │ select c, b from (table t) u(c);
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_partial_column_alias_list() {
+        assert_snapshot!(goto("
+select x, b$0 from (select 1 a, 2 b) t(x);
+"), @r"
+          ╭▸ 
+        2 │ select x, b from (select 1 a, 2 b) t(x);
+          ╰╴          ─ 1. source           ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_table_expr_values_cte_partial_alias() {
+        assert_snapshot!(goto("
+with t as (values (1, 2), (3, 4))
+select column2$0 from (table t) u(a);
+"), @r"
+          ╭▸ 
+        2 │ with t as (values (1, 2), (3, 4))
+          │                       ─ 2. destination
+        3 │ select column2 from (table t) u(a);
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_with_table_expr() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with u as (table t)
+select a$0 from u;
+"), @r"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ with u as (table t)
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_with_table_expr_nested() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b),
+     u as (table t)
+select b$0 from u;
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b),
+          │                          ─ 2. destination
+        3 │      u as (table t)
+        4 │ select b from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_insert_table() {
         assert_snapshot!(goto("
 create table users(id int, email text);
