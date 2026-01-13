@@ -2754,6 +2754,10 @@ pub struct CompoundSelect {
 }
 impl CompoundSelect {
     #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
+    #[inline]
     pub fn except_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXCEPT_KW)
     }

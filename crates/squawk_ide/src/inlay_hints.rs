@@ -88,11 +88,9 @@ fn inlay_hint_insert(
     binder: &Binder,
     insert: ast::Insert,
 ) -> Option<()> {
-    let values = insert.values()?;
-    let row_list = values.row_list()?;
     let create_table = resolve::resolve_insert_create_table(root, binder, &insert);
 
-    let columns: Vec<(Name, Option<TextRange>)> = if let Some(column_list) = insert.column_list() {
+    let columns = if let Some(column_list) = insert.column_list() {
         // `insert into t(a, b, c) values (1, 2, 3)`
         column_list
             .columns()
@@ -124,6 +122,11 @@ fn inlay_hint_insert(
             .collect()
     };
 
+    let Some(values) = insert.values() else {
+        return inlay_hint_insert_select(hints, columns, insert.stmt()?);
+    };
+    let row_list = values.row_list()?;
+
     for row in row_list.rows() {
         for ((column_name, target), expr) in columns.iter().zip(row.exprs()) {
             let expr_start = expr.syntax().text_range().start();
@@ -137,6 +140,53 @@ fn inlay_hint_insert(
     }
 
     Some(())
+}
+
+fn inlay_hint_insert_select(
+    hints: &mut Vec<InlayHint>,
+    columns: Vec<(Name, Option<TextRange>)>,
+    stmt: ast::Stmt,
+) -> Option<()> {
+    let target_list = match stmt {
+        ast::Stmt::Select(select) => select.select_clause()?.target_list(),
+        ast::Stmt::SelectInto(select_into) => select_into.select_clause()?.target_list(),
+        ast::Stmt::ParenSelect(paren_select) => {
+            target_list_from_select_variant(paren_select.select()?)
+        }
+        _ => None,
+    }?;
+
+    for ((column_name, target), target_expr) in columns.iter().zip(target_list.targets()) {
+        let expr = target_expr.expr()?;
+        let expr_start = expr.syntax().text_range().start();
+        hints.push(InlayHint {
+            position: expr_start,
+            label: format!("{}: ", column_name),
+            kind: InlayHintKind::Parameter,
+            target: *target,
+        });
+    }
+
+    Some(())
+}
+
+fn target_list_from_select_variant(select: ast::SelectVariant) -> Option<ast::TargetList> {
+    let mut current = select;
+    for _ in 0..100 {
+        match current {
+            ast::SelectVariant::Select(select) => {
+                return select.select_clause()?.target_list();
+            }
+            ast::SelectVariant::SelectInto(select_into) => {
+                return select_into.select_clause()?.target_list();
+            }
+            ast::SelectVariant::ParenSelect(paren_select) => {
+                current = paren_select.select()?;
+            }
+            _ => return None,
+        }
+    }
+    None
 }
 
 #[cfg(test)]
@@ -346,6 +396,19 @@ insert into t values (1, 2, 3);
           ╭▸ 
         3 │ insert into t values (a: 1, b: 2, 3);
           ╰╴                      ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_select() {
+        assert_snapshot!(check_inlay_hints("
+create table t (a int, b int);
+insert into t select 1, 2;
+"), @r"
+        inlay hints:
+          ╭▸ 
+        3 │ insert into t select a: 1, b: 2;
+          ╰╴                     ───   ───
         ");
     }
 }
