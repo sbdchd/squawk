@@ -1644,7 +1644,8 @@ SelectVariant =
 
 CompoundSelect =
   lhs:SelectVariant
-  ('union' | 'intersect' | 'except')
+  ('union' | 'intersect' | 'except' )
+  'all'?
   rhs:SelectVariant
 
 SelectInto =

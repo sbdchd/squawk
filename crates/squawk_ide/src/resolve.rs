@@ -1791,8 +1791,7 @@ fn resolve_cte_column(
             }
 
             if let ast::WithQuery::Table(table) = query {
-                let relation_name = table.relation_name()?;
-                let path = relation_name.path()?;
+                let path = table.relation_name()?.path()?;
                 let (table_name, schema) = extract_table_schema_from_path(&path)?;
 
                 if schema.is_none()
@@ -1975,8 +1974,7 @@ fn resolve_subquery_column_ptr(
     }
 
     if let ast::SelectVariant::Table(table) = select_variant {
-        let relation_name = table.relation_name()?;
-        let path = relation_name.path()?;
+        let path = table.relation_name()?.path()?;
         let (table_name, schema) = extract_table_schema_from_path(&path)?;
 
         if schema.is_none()
