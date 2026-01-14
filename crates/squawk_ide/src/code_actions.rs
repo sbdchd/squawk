@@ -662,12 +662,13 @@ fn rewrite_select_as_values(
 
 fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
     let mut found_select = None;
+    let mut found_compound = None;
     for node in token.parent_ancestors() {
         if let Some(compound_select) = ast::CompoundSelect::cast(node.clone()) {
             if compound_select.union_token().is_some() && compound_select.all_token().is_some() {
-                return Some(SelectContext::Compound(compound_select));
+                found_compound = Some(SelectContext::Compound(compound_select));
             } else {
-                return None;
+                break;
             }
         }
         if found_select.is_none()
@@ -676,7 +677,7 @@ fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
             found_select = Some(SelectContext::Single(select));
         }
     }
-    found_select
+    found_compound.or(found_select)
 }
 
 #[cfg(test)]
@@ -1626,6 +1627,17 @@ mod test {
             apply_code_action(
                 rewrite_select_as_values,
                 "select 1 as column1, 2 as column2 union$0 all select 3, 4 union all select 5, 6;"
+            ),
+            @"values (1, 2), (3, 4), (5, 6);"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_multiple_rows_cursor_on_second_union() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "select 1 as column1, 2 as column2 union all select 3, 4 union$0 all select 5, 6;"
             ),
             @"values (1, 2), (3, 4), (5, 6);"
         );
