@@ -303,6 +303,76 @@ select c[b]$0 from t;
     }
 
     #[test]
+    fn goto_fetch_cursor() {
+        assert_snapshot!(goto("
+declare c scroll cursor for select * from t;
+fetch forward 5 from c$0;
+"), @r"
+          ╭▸ 
+        2 │ declare c scroll cursor for select * from t;
+          │         ─ 2. destination
+        3 │ fetch forward 5 from c;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_close_cursor() {
+        assert_snapshot!(goto("
+declare c scroll cursor for select * from t;
+close c$0;
+"), @r"
+          ╭▸ 
+        2 │ declare c scroll cursor for select * from t;
+          │         ─ 2. destination
+        3 │ close c;
+          ╰╴      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_move_cursor() {
+        assert_snapshot!(goto("
+declare c scroll cursor for select * from t;
+move forward 10 from c$0;
+"), @r"
+          ╭▸ 
+        2 │ declare c scroll cursor for select * from t;
+          │         ─ 2. destination
+        3 │ move forward 10 from c;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_current_of_cursor() {
+        assert_snapshot!(goto("
+declare c scroll cursor for select * from t;
+delete from t where current of c$0;
+"), @r"
+          ╭▸ 
+        2 │ declare c scroll cursor for select * from t;
+          │         ─ 2. destination
+        3 │ delete from t where current of c;
+          ╰╴                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_where_current_of_cursor() {
+        assert_snapshot!(goto("
+declare c scroll cursor for select * from t;
+update t set a = a + 10 where current of c$0;
+"), @r"
+          ╭▸ 
+        2 │ declare c scroll cursor for select * from t;
+          │         ─ 2. destination
+        3 │ update t set a = a + 10 where current of c;
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_with_table_star() {
         assert_snapshot!(goto("
 with t as (select 1 a)

@@ -192,6 +192,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateDatabase(create_database) => bind_create_database(b, create_database),
         ast::Stmt::CreateServer(create_server) => bind_create_server(b, create_server),
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
+        ast::Stmt::Declare(declare) => bind_declare_cursor(b, declare),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -546,6 +547,25 @@ fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension)
 
     let root = b.root_scope();
     b.scopes[root].insert(extension_name, extension_id);
+}
+
+fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
+    let Some(name) = declare.name() else {
+        return;
+    };
+
+    let cursor_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let cursor_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Cursor,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(cursor_name, cursor_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

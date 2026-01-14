@@ -20,6 +20,7 @@ pub enum DocumentSymbolKind {
     Enum,
     Column,
     Variant,
+    Cursor,
 }
 
 #[derive(Debug)]
@@ -78,6 +79,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateMaterializedView(create_view) => {
                 if let Some(symbol) = create_materialized_view_symbol(&binder, create_view) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::Declare(declare) => {
+                if let Some(symbol) = create_declare_cursor_symbol(declare) {
                     symbols.push(symbol);
                 }
             }
@@ -421,6 +427,23 @@ fn create_variant_symbol(variant: ast::Variant) -> Option<DocumentSymbol> {
     })
 }
 
+fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol> {
+    let name_node = declare.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = declare.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Cursor,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -470,6 +493,7 @@ mod tests {
             DocumentSymbolKind::Enum => "enum",
             DocumentSymbolKind::Column => "column",
             DocumentSymbolKind::Variant => "variant",
+            DocumentSymbolKind::Cursor => "cursor",
         };
 
         let title = if let Some(detail) = &symbol.detail {
@@ -865,6 +889,21 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
           ╰╴                              focus range
         "
         );
+    }
+
+    #[test]
+    fn declare_cursor() {
+        assert_snapshot!(symbols("
+declare c scroll cursor for select * from t;
+"), @r"
+        info: cursor: c
+          ╭▸ 
+        2 │ declare c scroll cursor for select * from t;
+          │ ┬───────┯──────────────────────────────────
+          │ │       │
+          │ │       focus range
+          ╰╴full range
+        ");
     }
 
     #[test]

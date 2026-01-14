@@ -92,6 +92,7 @@ pub(crate) enum NameRefClass {
     ReindexSystem,
     AttachPartition,
     NamedArgParameter,
+    Cursor,
 }
 
 fn is_special_fn(kind: SyntaxKind) -> bool {
@@ -353,6 +354,13 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::SchemaAuthorization::can_cast(ancestor.kind()) {
             in_schema_authorization = true;
+        }
+        if ast::Fetch::can_cast(ancestor.kind())
+            || ast::Move::can_cast(ancestor.kind())
+            || ast::Close::can_cast(ancestor.kind())
+            || ast::WhereCurrentOf::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Cursor);
         }
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTable);
@@ -715,6 +723,7 @@ pub(crate) enum NameClass {
         name: ast::Name,
     },
     CreateView(ast::CreateView),
+    DeclareCursor(ast::Declare),
 }
 
 pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
@@ -777,6 +786,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
                 });
             }
             return Some(NameClass::CreateView(create_view));
+        }
+        if let Some(declare) = ast::Declare::cast(ancestor.clone()) {
+            return Some(NameClass::DeclareCursor(declare));
         }
     }
 
