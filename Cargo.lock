@@ -1926,6 +1926,7 @@ version = "2.36.0"
 dependencies = [
  "annotate-snippets",
  "insta",
+ "itertools 0.14.0",
  "la-arena",
  "line-index",
  "log",
