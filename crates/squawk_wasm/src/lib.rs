@@ -410,6 +410,7 @@ fn convert_document_symbol(
             squawk_ide::document_symbols::DocumentSymbolKind::Enum => "enum",
             squawk_ide::document_symbols::DocumentSymbolKind::Column => "column",
             squawk_ide::document_symbols::DocumentSymbolKind::Variant => "variant",
+            squawk_ide::document_symbols::DocumentSymbolKind::Cursor => "cursor",
         }
         .to_string(),
         start_line: full_start_wide.line,

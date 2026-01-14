@@ -166,6 +166,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::NamedArgParameter => {
                 return hover_named_arg_parameter(root, &name_ref, &binder);
             }
+            NameRefClass::Cursor => {
+                return hover_cursor(root, &name_ref, &binder);
+            }
         }
     }
 
@@ -218,6 +221,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateView(create_view) => {
                 return format_create_view(&create_view, &binder);
+            }
+            NameClass::DeclareCursor(declare) => {
+                return format_declare_cursor(&declare);
             }
         }
     }
@@ -775,6 +781,19 @@ fn hover_extension(
     Some(format!("extension {}", extension_name_node.text()))
 }
 
+fn hover_cursor(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let cursor_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let cursor_name_node = cursor_ptr.to_node(root);
+    let declare = cursor_name_node.ancestors().find_map(ast::Declare::cast)?;
+    format_declare_cursor(&declare)
+}
+
 fn hover_type(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -789,6 +808,16 @@ fn hover_type(
     let create_type = type_name_node.ancestors().find_map(ast::CreateType::cast)?;
 
     format_create_type(&create_type, binder)
+}
+
+fn format_declare_cursor(declare: &ast::Declare) -> Option<String> {
+    let name = declare.name()?;
+    let query = declare.query()?;
+    Some(format!(
+        "cursor {} for {}",
+        name.syntax().text(),
+        query.syntax().text()
+    ))
 }
 
 fn format_create_table(
@@ -3943,6 +3972,45 @@ alter extension my$0ext update to '2.0';
           ╭▸ 
         3 │ alter extension myext update to '2.0';
           ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_fetch_cursor() {
+        assert_snapshot!(check_hover("
+declare c scroll cursor for select * from t;
+fetch forward 5 from c$0;
+"), @r"
+        hover: cursor c for select * from t
+          ╭▸ 
+        3 │ fetch forward 5 from c;
+          ╰╴                     ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_close_cursor() {
+        assert_snapshot!(check_hover("
+declare c scroll cursor for select * from t;
+close c$0;
+"), @r"
+        hover: cursor c for select * from t
+          ╭▸ 
+        3 │ close c;
+          ╰╴      ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_move_cursor() {
+        assert_snapshot!(check_hover("
+declare c scroll cursor for select * from t;
+move forward 10 from c$0;
+"), @r"
+        hover: cursor c for select * from t
+          ╭▸ 
+        3 │ move forward 10 from c;
+          ╰╴                     ─ hover
         ");
     }
 }

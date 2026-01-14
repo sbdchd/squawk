@@ -58,6 +58,12 @@ pub(crate) fn resolve_name_ref(
             let param_ptr = find_param_in_func_def(root, function_ptr, &param_name)?;
             Some(smallvec![param_ptr])
         }
+        NameRefClass::Cursor => {
+            let cursor_name = Name::from_node(name_ref);
+            binder
+                .lookup(&cursor_name, SymbolKind::Cursor)
+                .map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SelectFromTable
         | NameRefClass::UpdateFromTable
         | NameRefClass::MergeUsingTable
