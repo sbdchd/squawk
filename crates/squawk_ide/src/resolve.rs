@@ -64,6 +64,10 @@ pub(crate) fn resolve_name_ref(
                 .lookup(&cursor_name, SymbolKind::Cursor)
                 .map(|ptr| smallvec![ptr])
         }
+        NameRefClass::PreparedStatement => {
+            let statement_name = Name::from_node(name_ref);
+            resolve_prepared_statement_name_ptr(binder, &statement_name).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SelectFromTable
         | NameRefClass::UpdateFromTable
         | NameRefClass::MergeUsingTable
@@ -490,6 +494,13 @@ fn resolve_sequence_name_ptr(
 
 fn resolve_tablespace_name_ptr(binder: &Binder, tablespace_name: &Name) -> Option<SyntaxNodePtr> {
     binder.lookup(tablespace_name, SymbolKind::Tablespace)
+}
+
+fn resolve_prepared_statement_name_ptr(
+    binder: &Binder,
+    statement_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    binder.lookup(statement_name, SymbolKind::PreparedStatement)
 }
 
 fn resolve_database_name_ptr(binder: &Binder, database_name: &Name) -> Option<SyntaxNodePtr> {

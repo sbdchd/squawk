@@ -345,6 +345,34 @@ move forward 10 from c$0;
     }
 
     #[test]
+    fn goto_execute_prepared_statement() {
+        assert_snapshot!(goto("
+prepare stmt as select 1;
+execute stmt$0;
+"), @r"
+          ╭▸ 
+        2 │ prepare stmt as select 1;
+          │         ──── 2. destination
+        3 │ execute stmt;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_deallocate_prepared_statement() {
+        assert_snapshot!(goto("
+prepare stmt as select 1;
+deallocate stmt$0;
+"), @r"
+          ╭▸ 
+        2 │ prepare stmt as select 1;
+          │         ──── 2. destination
+        3 │ deallocate stmt;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_delete_where_current_of_cursor() {
         assert_snapshot!(goto("
 declare c scroll cursor for select * from t;

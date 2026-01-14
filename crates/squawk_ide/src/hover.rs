@@ -169,6 +169,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::Cursor => {
                 return hover_cursor(root, &name_ref, &binder);
             }
+            NameRefClass::PreparedStatement => {
+                return hover_prepared_statement(root, &name_ref, &binder);
+            }
         }
     }
 
@@ -224,6 +227,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::DeclareCursor(declare) => {
                 return format_declare_cursor(&declare);
+            }
+            NameClass::PrepareStatement(prepare) => {
+                return format_prepare(&prepare);
             }
         }
     }
@@ -794,6 +800,21 @@ fn hover_cursor(
     format_declare_cursor(&declare)
 }
 
+fn hover_prepared_statement(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let statement_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let statement_name_node = statement_ptr.to_node(root);
+    let prepare = statement_name_node
+        .ancestors()
+        .find_map(ast::Prepare::cast)?;
+    format_prepare(&prepare)
+}
+
 fn hover_type(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -817,6 +838,16 @@ fn format_declare_cursor(declare: &ast::Declare) -> Option<String> {
         "cursor {} for {}",
         name.syntax().text(),
         query.syntax().text()
+    ))
+}
+
+fn format_prepare(prepare: &ast::Prepare) -> Option<String> {
+    let name = prepare.name()?;
+    let stmt = prepare.preparable_stmt()?;
+    Some(format!(
+        "prepare {} as {}",
+        name.syntax().text(),
+        stmt.syntax().text()
     ))
 }
 
@@ -4011,6 +4042,44 @@ move forward 10 from c$0;
           ╭▸ 
         3 │ move forward 10 from c;
           ╰╴                     ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_prepare_statement() {
+        assert_snapshot!(check_hover("
+prepare stmt$0 as select 1;
+"), @r"
+        hover: prepare stmt as select 1
+          ╭▸ 
+        2 │ prepare stmt as select 1;
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_execute_prepared_statement() {
+        assert_snapshot!(check_hover("
+prepare stmt as select 1;
+execute stmt$0;
+"), @r"
+        hover: prepare stmt as select 1
+          ╭▸ 
+        3 │ execute stmt;
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_deallocate_prepared_statement() {
+        assert_snapshot!(check_hover("
+prepare stmt as select 1;
+deallocate stmt$0;
+"), @r"
+        hover: prepare stmt as select 1
+          ╭▸ 
+        3 │ deallocate stmt;
+          ╰╴              ─ hover
         ");
     }
 }
