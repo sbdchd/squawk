@@ -24,6 +24,7 @@ log.workspace = true
 smol_str.workspace = true
 la-arena.workspace = true
 smallvec.workspace = true
+itertools.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

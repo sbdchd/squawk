@@ -1,9 +1,11 @@
+use itertools::Itertools;
 use rowan::{TextRange, TextSize};
 use squawk_linter::Edit;
 use squawk_syntax::{
-    SyntaxKind,
+    SyntaxKind, SyntaxToken,
     ast::{self, AstNode},
 };
+use std::iter;
 
 use crate::{
     column_name::ColumnName,
@@ -32,6 +34,8 @@ pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeA
     remove_else_clause(&mut actions, &file, offset);
     rewrite_table_as_select(&mut actions, &file, offset);
     rewrite_select_as_table(&mut actions, &file, offset);
+    rewrite_values_as_select(&mut actions, &file, offset);
+    rewrite_select_as_values(&mut actions, &file, offset);
     quote_identifier(&mut actions, &file, offset);
     unquote_identifier(&mut actions, &file, offset);
     add_explicit_alias(&mut actions, &file, offset);
@@ -490,6 +494,189 @@ fn rewrite_double_colon_to_cast(
     });
 
     Some(())
+}
+
+fn rewrite_values_as_select(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let values = token.parent_ancestors().find_map(ast::Values::cast)?;
+
+    let value_token_start = values.values_token().map(|x| x.text_range().start())?;
+    let values_end = values.syntax().text_range().end();
+    // `values` but we skip over the possibly preceeding CTE
+    let values_range = TextRange::new(value_token_start, values_end);
+
+    let mut rows = values.row_list()?.rows();
+
+    let first_targets: Vec<_> = rows
+        .next()?
+        .exprs()
+        .enumerate()
+        .map(|(idx, expr)| format!("{} as column{}", expr.syntax().text(), idx + 1))
+        .collect();
+
+    if first_targets.is_empty() {
+        return None;
+    }
+
+    let mut select_parts = vec![format!("select {}", first_targets.join(", "))];
+
+    for row in rows {
+        let row_targets = row
+            .exprs()
+            .map(|e| e.syntax().text().to_string())
+            .join(", ");
+        if row_targets.is_empty() {
+            return None;
+        }
+        select_parts.push(format!("union all\nselect {}", row_targets));
+    }
+
+    let select_stmt = select_parts.join("\n");
+
+    actions.push(CodeAction {
+        title: "Rewrite as `select`".to_owned(),
+        edits: vec![Edit::replace(values_range, select_stmt)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn is_values_row_column_name(target: &ast::Target, idx: usize) -> bool {
+    let Some(as_name) = target.as_name() else {
+        return false;
+    };
+    let Some(name) = as_name.name() else {
+        return false;
+    };
+    let expected = format!("column{}", idx + 1);
+    if Name::from_node(&name) != Name::from_string(expected) {
+        return false;
+    }
+    true
+}
+
+enum SelectContext {
+    Compound(ast::CompoundSelect),
+    Single(ast::Select),
+}
+
+impl SelectContext {
+    fn iter(&self) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
+        // Ideally we'd have something like Python's `yield` and `yield from`
+        // but instead we have to do all of this to avoid creating some temp
+        // vecs
+        fn variant_iter(
+            variant: ast::SelectVariant,
+        ) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
+            match variant {
+                ast::SelectVariant::Select(select) => Some(Box::new(iter::once(select))),
+                ast::SelectVariant::CompoundSelect(compound) => compound_iter(&compound),
+                ast::SelectVariant::ParenSelect(_)
+                | ast::SelectVariant::SelectInto(_)
+                | ast::SelectVariant::Table(_)
+                | ast::SelectVariant::Values(_) => None,
+            }
+        }
+
+        fn compound_iter(
+            node: &ast::CompoundSelect,
+        ) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
+            let lhs_iter = node
+                .lhs()
+                .map(variant_iter)
+                .unwrap_or_else(|| Some(Box::new(iter::empty())))?;
+            let rhs_iter = node
+                .rhs()
+                .map(variant_iter)
+                .unwrap_or_else(|| Some(Box::new(iter::empty())))?;
+            Some(Box::new(lhs_iter.chain(rhs_iter)))
+        }
+
+        match self {
+            SelectContext::Compound(compound) => compound_iter(compound),
+            SelectContext::Single(select) => Some(Box::new(iter::once(select.clone()))),
+        }
+    }
+}
+
+fn rewrite_select_as_values(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+
+    let parent = find_select_parent(token)?;
+
+    let mut selects = parent.iter()?.peekable();
+    let select_token_start = selects
+        .peek()?
+        .select_clause()
+        .and_then(|x| x.select_token())
+        .map(|x| x.text_range().start())?;
+
+    let mut rows = vec![];
+    for (idx, select) in selects.enumerate() {
+        let exprs: Vec<String> = select
+            .select_clause()?
+            .target_list()?
+            .targets()
+            .enumerate()
+            .map(|(i, t)| {
+                if idx != 0 || is_values_row_column_name(&t, i) {
+                    t.expr().map(|expr| expr.syntax().text().to_string())
+                } else {
+                    None
+                }
+            })
+            .collect::<Option<_>>()?;
+
+        if exprs.is_empty() {
+            return None;
+        }
+
+        rows.push(format!("({})", exprs.join(", ")));
+    }
+
+    let values_stmt = format!("values {}", rows.join(", "));
+
+    let select_end = match &parent {
+        SelectContext::Compound(compound) => compound.syntax().text_range().end(),
+        SelectContext::Single(select) => select.syntax().text_range().end(),
+    };
+    let select_range = TextRange::new(select_token_start, select_end);
+
+    actions.push(CodeAction {
+        title: "Rewrite as `values`".to_owned(),
+        edits: vec![Edit::replace(select_range, values_stmt)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
+    let mut found_select = None;
+    for node in token.parent_ancestors() {
+        if let Some(compound_select) = ast::CompoundSelect::cast(node.clone()) {
+            if compound_select.union_token().is_some() && compound_select.all_token().is_some() {
+                return Some(SelectContext::Compound(compound_select));
+            } else {
+                return None;
+            }
+        }
+        if found_select.is_none()
+            && let Some(select) = ast::Select::cast(node)
+        {
+            found_select = Some(SelectContext::Single(select));
+        }
+    }
+    found_select
 }
 
 #[cfg(test)]
@@ -1323,6 +1510,246 @@ mod test {
         assert!(code_action_not_applicable(
             rewrite_double_colon_to_cast,
             "select fo$0o from t;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_values_as_select_simple() {
+        assert_snapshot!(
+            apply_code_action(rewrite_values_as_select, "valu$0es (1, 'one'), (2, 'two');"),
+            @r"
+        select 1 as column1, 'one' as column2
+        union all
+        select 2, 'two';
+        "
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_single_row() {
+        assert_snapshot!(
+            apply_code_action(rewrite_values_as_select, "val$0ues (1, 2, 3);"),
+            @"select 1 as column1, 2 as column2, 3 as column3;"
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_single_column() {
+        assert_snapshot!(
+            apply_code_action(rewrite_values_as_select, "values$0 (1);"),
+            @"select 1 as column1;"
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_multiple_rows() {
+        assert_snapshot!(
+            apply_code_action(rewrite_values_as_select, "values (1, 2), (3, 4), (5, 6$0);"),
+            @r"
+        select 1 as column1, 2 as column2
+        union all
+        select 3, 4
+        union all
+        select 5, 6;
+        "
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_with_clause() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_values_as_select,
+                "with cte as (select 1) val$0ues (1, 'one'), (2, 'two');"
+            ),
+            @r"
+        with cte as (select 1) select 1 as column1, 'one' as column2
+        union all
+        select 2, 'two';
+        "
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_complex_expressions() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_values_as_select,
+                "values (1 + 2, 'test'::text$0, array[1,2]);"
+            ),
+            @"select 1 + 2 as column1, 'test'::text as column2, array[1,2] as column3;"
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_on_values_keyword() {
+        assert_snapshot!(
+            apply_code_action(rewrite_values_as_select, "val$0ues (1, 2);"),
+            @"select 1 as column1, 2 as column2;"
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_on_row_content() {
+        assert_snapshot!(
+            apply_code_action(rewrite_values_as_select, "values (1$0, 2), (3, 4);"),
+            @r"
+        select 1 as column1, 2 as column2
+        union all
+        select 3, 4;
+        "
+        );
+    }
+
+    #[test]
+    fn rewrite_values_as_select_not_applicable_on_select() {
+        assert!(code_action_not_applicable(
+            rewrite_values_as_select,
+            "sel$0ect 1;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_values_simple() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "select 1 as column1, 'one' as column2 union all$0 select 2, 'two';"
+            ),
+            @"values (1, 'one'), (2, 'two');"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_multiple_rows() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "select 1 as column1, 2 as column2 union$0 all select 3, 4 union all select 5, 6;"
+            ),
+            @"values (1, 2), (3, 4), (5, 6);"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_single_column() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "select 1 as column1$0 union all select 2;"
+            ),
+            @"values (1), (2);"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_with_clause() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "with cte as (select 1) select 1 as column1, 'one' as column2 uni$0on all select 2, 'two';"
+            ),
+            @"with cte as (select 1) values (1, 'one'), (2, 'two');"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_complex_expressions() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "select 1 + 2 as column1, 'test'::text as column2$0 union all select 3 * 4, array[1,2]::text;"
+            ),
+            @"values (1 + 2, 'test'::text), (3 * 4, array[1,2]::text);"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_single_select() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "select 1 as column1, 2 as column2$0;"
+            ),
+            @"values (1, 2);"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_single_select_with_clause() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "with cte as (select 1) select 1 as column1$0, 'test' as column2;"
+            ),
+            @"with cte as (select 1) values (1, 'test');"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_not_applicable_union_without_all() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_values,
+            "select 1 as column1 union$0 select 2;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_values_not_applicable_wrong_column_names() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_values,
+            "select 1 as foo, 2 as bar union all$0 select 3, 4;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_values_not_applicable_missing_aliases() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_values,
+            "select 1, 2 union all$0 select 3, 4;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_values_case_insensitive_column_names() {
+        assert_snapshot!(
+            apply_code_action(
+                rewrite_select_as_values,
+                "select 1 as COLUMN1, 2 as CoLuMn2 union all$0 select 3, 4;"
+            ),
+            @"values (1, 2), (3, 4);"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_values_not_applicable_with_values() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_values,
+            "select 1 as column1, 2 as column2 union all$0 values (3, 4);"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_values_not_applicable_with_table() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_values,
+            "select 1 as column1, 2 as column2 union all$0 table foo;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_values_not_applicable_intersect() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_values,
+            "select 1 as column1, 2 as column2 inter$0sect select 3, 4;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_values_not_applicable_except() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_values,
+            "select 1 as column1, 2 as column2 exc$0ept select 3, 4;"
         ));
     }
 }
