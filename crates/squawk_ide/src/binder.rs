@@ -193,6 +193,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateServer(create_server) => bind_create_server(b, create_server),
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
         ast::Stmt::Declare(declare) => bind_declare_cursor(b, declare),
+        ast::Stmt::Prepare(prepare) => bind_prepare(b, prepare),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -566,6 +567,25 @@ fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
 
     let root = b.root_scope();
     b.scopes[root].insert(cursor_name, cursor_id);
+}
+
+fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
+    let Some(name) = prepare.name() else {
+        return;
+    };
+
+    let statement_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let statement_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::PreparedStatement,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(statement_name, statement_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

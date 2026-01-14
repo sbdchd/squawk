@@ -54,6 +54,7 @@ pub(crate) enum SymbolKind {
     View,
     Sequence,
     Cursor,
+    PreparedStatement,
     Tablespace,
     Database,
     Server,

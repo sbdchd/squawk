@@ -21,6 +21,7 @@ pub enum DocumentSymbolKind {
     Column,
     Variant,
     Cursor,
+    PreparedStatement,
 }
 
 #[derive(Debug)]
@@ -84,6 +85,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::Declare(declare) => {
                 if let Some(symbol) = create_declare_cursor_symbol(declare) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::Prepare(prepare) => {
+                if let Some(symbol) = create_prepare_symbol(prepare) {
                     symbols.push(symbol);
                 }
             }
@@ -444,6 +450,23 @@ fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol>
     })
 }
 
+fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
+    let name_node = prepare.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = prepare.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::PreparedStatement,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -494,6 +517,7 @@ mod tests {
             DocumentSymbolKind::Column => "column",
             DocumentSymbolKind::Variant => "variant",
             DocumentSymbolKind::Cursor => "cursor",
+            DocumentSymbolKind::PreparedStatement => "prepared statement",
         };
 
         let title = if let Some(detail) = &symbol.detail {
@@ -900,6 +924,21 @@ declare c scroll cursor for select * from t;
           ╭▸ 
         2 │ declare c scroll cursor for select * from t;
           │ ┬───────┯──────────────────────────────────
+          │ │       │
+          │ │       focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn prepare_statement() {
+        assert_snapshot!(symbols("
+prepare stmt as select 1;
+"), @r"
+        info: prepared statement: stmt
+          ╭▸ 
+        2 │ prepare stmt as select 1;
+          │ ┬───────┯━━━────────────
           │ │       │
           │ │       focus range
           ╰╴full range
