@@ -379,6 +379,7 @@ fn handle_document_symbol(
                 DocumentSymbolKind::Variant => SymbolKind::ENUM_MEMBER,
                 DocumentSymbolKind::Cursor => SymbolKind::VARIABLE,
                 DocumentSymbolKind::PreparedStatement => SymbolKind::VARIABLE,
+                DocumentSymbolKind::Channel => SymbolKind::EVENT,
             },
             tags: None,
             range,

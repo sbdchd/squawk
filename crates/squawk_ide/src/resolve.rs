@@ -69,6 +69,10 @@ pub(crate) fn resolve_name_ref(
             let statement_name = Name::from_node(name_ref);
             resolve_prepared_statement_name_ptr(binder, &statement_name).map(|ptr| smallvec![ptr])
         }
+        NameRefClass::NotifyChannel | NameRefClass::UnlistenChannel => {
+            let channel_name = Name::from_node(name_ref);
+            resolve_channel_name_ptr(binder, &channel_name).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SelectFromTable
         | NameRefClass::UpdateFromTable
         | NameRefClass::MergeUsingTable
@@ -547,6 +551,10 @@ fn resolve_prepared_statement_name_ptr(
     statement_name: &Name,
 ) -> Option<SyntaxNodePtr> {
     binder.lookup(statement_name, SymbolKind::PreparedStatement)
+}
+
+fn resolve_channel_name_ptr(binder: &Binder, channel_name: &Name) -> Option<SyntaxNodePtr> {
+    binder.lookup(channel_name, SymbolKind::Channel)
 }
 
 fn resolve_database_name_ptr(binder: &Binder, database_name: &Name) -> Option<SyntaxNodePtr> {

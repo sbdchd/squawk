@@ -96,6 +96,8 @@ pub(crate) enum NameRefClass {
     NamedArgParameter,
     Cursor,
     PreparedStatement,
+    NotifyChannel,
+    UnlistenChannel,
     TriggerFunctionCall,
     TriggerProcedureCall,
 }
@@ -369,6 +371,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::Execute::can_cast(ancestor.kind()) || ast::Deallocate::can_cast(ancestor.kind()) {
             return Some(NameRefClass::PreparedStatement);
+        }
+        if ast::Notify::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::NotifyChannel);
+        }
+        if ast::Unlisten::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::UnlistenChannel);
         }
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTable);
@@ -752,6 +760,7 @@ pub(crate) enum NameClass {
     CreateView(ast::CreateView),
     DeclareCursor(ast::Declare),
     PrepareStatement(ast::Prepare),
+    Listen(ast::Listen),
 }
 
 pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
@@ -823,6 +832,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(prepare) = ast::Prepare::cast(ancestor.clone()) {
             return Some(NameClass::PrepareStatement(prepare));
+        }
+        if let Some(listen) = ast::Listen::cast(ancestor.clone()) {
+            return Some(NameClass::Listen(listen));
         }
     }
 

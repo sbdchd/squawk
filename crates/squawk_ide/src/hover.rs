@@ -178,6 +178,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::PreparedStatement => {
                 return hover_prepared_statement(root, &name_ref, &binder);
             }
+            NameRefClass::NotifyChannel | NameRefClass::UnlistenChannel => {
+                return hover_channel(root, &name_ref, &binder);
+            }
         }
     }
 
@@ -239,6 +242,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::PrepareStatement(prepare) => {
                 return format_prepare(&prepare);
+            }
+            NameClass::Listen(listen) => {
+                return format_listen(&listen);
             }
         }
     }
@@ -842,6 +848,19 @@ fn hover_prepared_statement(
     format_prepare(&prepare)
 }
 
+fn hover_channel(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let channel_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let channel_name_node = channel_ptr.to_node(root);
+    let listen = channel_name_node.ancestors().find_map(ast::Listen::cast)?;
+    format_listen(&listen)
+}
+
 fn hover_type(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -876,6 +895,11 @@ fn format_prepare(prepare: &ast::Prepare) -> Option<String> {
         name.syntax().text(),
         stmt.syntax().text()
     ))
+}
+
+fn format_listen(listen: &ast::Listen) -> Option<String> {
+    let name = listen.name()?;
+    Some(format!("listen {}", name.syntax().text()))
 }
 
 fn format_create_table(
@@ -4121,6 +4145,44 @@ deallocate stmt$0;
           ╭▸ 
         3 │ deallocate stmt;
           ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_listen_definition() {
+        assert_snapshot!(check_hover("
+listen updates$0;
+"), @r"
+        hover: listen updates
+          ╭▸ 
+        2 │ listen updates;
+          ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_notify_channel() {
+        assert_snapshot!(check_hover("
+listen updates;
+notify updates$0;
+"), @r"
+        hover: listen updates
+          ╭▸ 
+        3 │ notify updates;
+          ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_unlisten_channel() {
+        assert_snapshot!(check_hover("
+listen updates;
+unlisten updates$0;
+"), @r"
+        hover: listen updates
+          ╭▸ 
+        3 │ unlisten updates;
+          ╰╴               ─ hover
         ");
     }
 }

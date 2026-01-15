@@ -387,6 +387,34 @@ deallocate stmt$0;
     }
 
     #[test]
+    fn goto_notify_channel() {
+        assert_snapshot!(goto("
+listen updates;
+notify updates$0;
+"), @r"
+          ╭▸ 
+        2 │ listen updates;
+          │        ─────── 2. destination
+        3 │ notify updates;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_unlisten_channel() {
+        assert_snapshot!(goto("
+listen updates;
+unlisten updates$0;
+"), @r"
+          ╭▸ 
+        2 │ listen updates;
+          │        ─────── 2. destination
+        3 │ unlisten updates;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_delete_where_current_of_cursor() {
         assert_snapshot!(goto("
 declare c scroll cursor for select * from t;

@@ -223,6 +223,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
         ast::Stmt::Declare(declare) => bind_declare_cursor(b, declare),
         ast::Stmt::Prepare(prepare) => bind_prepare(b, prepare),
+        ast::Stmt::Listen(listen) => bind_listen(b, listen),
         ast::Stmt::Set(set) => bind_set(b, set),
         _ => {}
     }
@@ -664,6 +665,26 @@ fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
 
     let root = b.root_scope();
     b.scopes[root].insert(statement_name, statement_id);
+}
+
+fn bind_listen(b: &mut Binder, listen: ast::Listen) {
+    let Some(name) = listen.name() else {
+        return;
+    };
+
+    let channel_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let channel_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Channel,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(channel_name, channel_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

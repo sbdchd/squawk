@@ -22,6 +22,7 @@ pub enum DocumentSymbolKind {
     Variant,
     Cursor,
     PreparedStatement,
+    Channel,
 }
 
 #[derive(Debug)]
@@ -107,6 +108,21 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::Delete(delete) => {
                 symbols.extend(cte_table_symbols(delete));
+            }
+            ast::Stmt::Listen(listen) => {
+                if let Some(symbol) = create_listen_symbol(listen) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::Notify(notify) => {
+                if let Some(symbol) = create_notify_symbol(notify) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::Unlisten(unlisten) => {
+                if let Some(symbol) = create_unlisten_symbol(unlisten) {
+                    symbols.push(symbol);
+                }
             }
 
             _ => {}
@@ -467,6 +483,57 @@ fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
     })
 }
 
+fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
+    let name_node = listen.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = listen.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: Some("listen".to_string()),
+        kind: DocumentSymbolKind::Channel,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
+    let name_node = notify.name_ref()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = notify.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: Some("notify".to_string()),
+        kind: DocumentSymbolKind::Channel,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_unlisten_symbol(unlisten: ast::Unlisten) -> Option<DocumentSymbol> {
+    let name_node = unlisten.name_ref()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = unlisten.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: Some("unlisten".to_string()),
+        kind: DocumentSymbolKind::Channel,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -518,6 +585,7 @@ mod tests {
             DocumentSymbolKind::Variant => "variant",
             DocumentSymbolKind::Cursor => "cursor",
             DocumentSymbolKind::PreparedStatement => "prepared statement",
+            DocumentSymbolKind::Channel => "channel",
         };
 
         let title = if let Some(detail) = &symbol.detail {
@@ -639,6 +707,39 @@ create schema authorization foo;
           │ ┬───────────────────────────┯━━
           │ │                           │
           │ │                           focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn listen_notify_unlisten() {
+        assert_snapshot!(symbols("
+listen updates;
+notify updates;
+unlisten updates;
+unlisten *;
+"), @r"
+        info: channel: updates listen
+          ╭▸ 
+        2 │ listen updates;
+          │ ┬──────┯━━━━━━
+          │ │      │
+          │ │      focus range
+          │ full range
+          ╰╴
+        info: channel: updates notify
+          ╭▸ 
+        3 │ notify updates;
+          │ ┬──────┯━━━━━━
+          │ │      │
+          │ │      focus range
+          ╰╴full range
+        info: channel: updates unlisten
+          ╭▸ 
+        4 │ unlisten updates;
+          │ ┬────────┯━━━━━━
+          │ │        │
+          │ │        focus range
           ╰╴full range
         ");
     }

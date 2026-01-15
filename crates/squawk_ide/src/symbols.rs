@@ -55,6 +55,7 @@ pub(crate) enum SymbolKind {
     Sequence,
     Cursor,
     PreparedStatement,
+    Channel,
     Tablespace,
     Database,
     Server,

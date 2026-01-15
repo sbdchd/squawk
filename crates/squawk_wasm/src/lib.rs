@@ -414,6 +414,7 @@ fn convert_document_symbol(
             squawk_ide::document_symbols::DocumentSymbolKind::PreparedStatement => {
                 "prepared_statement"
             }
+            squawk_ide::document_symbols::DocumentSymbolKind::Channel => "channel",
         }
         .to_string(),
         start_line: full_start_wide.line,
