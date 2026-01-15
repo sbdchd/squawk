@@ -107,6 +107,34 @@ impl Binder {
         None
     }
 
+    pub(crate) fn lookup_with_table(
+        &self,
+        name: &Name,
+        kind: SymbolKind,
+        position: TextSize,
+        schema: &Option<Schema>,
+        table: &Option<Name>,
+    ) -> Option<SyntaxNodePtr> {
+        let symbols = self.scopes[self.root_scope()].get(name)?;
+
+        let search_paths = match schema {
+            Some(s) => std::slice::from_ref(s),
+            None => self.search_path_at(position),
+        };
+
+        for search_schema in search_paths {
+            if let Some(symbol_id) = symbols.iter().copied().find(|id| {
+                let symbol = &self.symbols[*id];
+                symbol.kind == kind
+                    && symbol.schema.as_ref() == Some(search_schema)
+                    && &symbol.table == table
+            }) {
+                return Some(self.symbols[symbol_id].ptr);
+            }
+        }
+        None
+    }
+
     pub(crate) fn lookup_info(
         &self,
         name_str: String,
@@ -186,6 +214,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
             bind_create_materialized_view(b, create_view)
         }
         ast::Stmt::CreateSequence(create_sequence) => bind_create_sequence(b, create_sequence),
+        ast::Stmt::CreateTrigger(create_trigger) => bind_create_trigger(b, create_trigger),
         ast::Stmt::CreateTablespace(create_tablespace) => {
             bind_create_tablespace(b, create_tablespace)
         }
@@ -217,6 +246,7 @@ fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
         ptr: name_ptr,
         schema: Some(schema.clone()),
         params: None,
+        table: None,
     });
 
     let type_id = b.symbols.alloc(Symbol {
@@ -224,6 +254,7 @@ fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
         ptr: name_ptr,
         schema: Some(schema),
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -248,6 +279,7 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
         ptr: name_ptr,
         schema: Some(schema),
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -276,6 +308,7 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
         ptr: name_ptr,
         schema: Some(schema),
         params,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -304,6 +337,7 @@ fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate)
         ptr: name_ptr,
         schema: Some(schema),
         params,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -332,6 +366,7 @@ fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure)
         ptr: name_ptr,
         schema: Some(schema),
         params,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -360,6 +395,7 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
         ptr: name_ptr,
         schema: Some(Schema(schema_name.clone())),
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -386,6 +422,7 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
         ptr: name_ptr,
         schema: Some(schema),
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -413,6 +450,7 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
         ptr: name_ptr,
         schema: Some(schema),
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -440,6 +478,7 @@ fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMateria
         ptr: name_ptr,
         schema: Some(schema),
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -468,10 +507,43 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
         ptr: name_ptr,
         schema: Some(schema),
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
     b.scopes[root].insert(sequence_name, sequence_id);
+}
+
+fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
+    let Some(name) = create_trigger.name() else {
+        return;
+    };
+
+    let trigger_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let Some(table_path) = create_trigger.on_table().and_then(|on| on.path()) else {
+        return;
+    };
+
+    let Some(table_name) = item_name(&table_path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &table_path, false) else {
+        return;
+    };
+
+    let trigger_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Trigger,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: Some(table_name),
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(trigger_name, trigger_id);
 }
 
 fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespace) {
@@ -487,6 +559,7 @@ fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespa
         ptr: name_ptr,
         schema: None,
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -506,6 +579,7 @@ fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
         ptr: name_ptr,
         schema: None,
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -525,6 +599,7 @@ fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
         ptr: name_ptr,
         schema: None,
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -544,6 +619,7 @@ fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension)
         ptr: name_ptr,
         schema: None,
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -563,6 +639,7 @@ fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
         ptr: name_ptr,
         schema: None,
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();
@@ -582,6 +659,7 @@ fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
         ptr: name_ptr,
         schema: None,
         params: None,
+        table: None,
     });
 
     let root = b.root_scope();

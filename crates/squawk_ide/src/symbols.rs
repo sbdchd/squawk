@@ -59,6 +59,7 @@ pub(crate) enum SymbolKind {
     Database,
     Server,
     Extension,
+    Trigger,
 }
 
 #[derive(Clone, Debug)]
@@ -67,6 +68,7 @@ pub(crate) struct Symbol {
     pub(crate) ptr: SyntaxNodePtr,
     pub(crate) schema: Option<Schema>,
     pub(crate) params: Option<Vec<Name>>,
+    pub(crate) table: Option<Name>,
 }
 
 pub(crate) type SymbolId = Idx<Symbol>;

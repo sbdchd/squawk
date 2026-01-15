@@ -6,12 +6,14 @@ use squawk_syntax::{
 #[derive(Debug)]
 pub(crate) enum NameRefClass {
     DropTable,
+    DropForeignTable,
     Table,
     DropIndex,
     DropType,
     DropView,
     DropMaterializedView,
     DropSequence,
+    DropTrigger,
     SequenceOwnedByColumn,
     Tablespace,
     DropDatabase,
@@ -94,6 +96,8 @@ pub(crate) enum NameRefClass {
     NamedArgParameter,
     Cursor,
     PreparedStatement,
+    TriggerFunctionCall,
+    TriggerProcedureCall,
 }
 
 fn is_special_fn(kind: SyntaxKind) -> bool {
@@ -369,6 +373,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::DropTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTable);
         }
+        if ast::DropForeignTable::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropForeignTable);
+        }
         if ast::Truncate::can_cast(ancestor.kind()) {
             return Some(NameRefClass::TruncateTable);
         }
@@ -386,6 +393,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::AlterTable::can_cast(ancestor.kind()) {
             return Some(NameRefClass::AlterTable);
+        }
+        if ast::OnTable::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Table);
         }
         if ast::AttachPartition::can_cast(ancestor.kind()) {
             return Some(NameRefClass::AttachPartition);
@@ -427,6 +437,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::DropSequence::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropSequence);
+        }
+        if ast::DropTrigger::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropTrigger);
         }
         if ast::DropDatabase::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropDatabase);
@@ -573,6 +586,15 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
             return Some(NameRefClass::CreateIndex);
         }
+        if let Some(create_trigger) = ast::CreateTrigger::cast(ancestor.clone())
+            && in_call_expr
+            && !in_arg_list
+        {
+            if create_trigger.procedure_token().is_some() {
+                return Some(NameRefClass::TriggerProcedureCall);
+            }
+            return Some(NameRefClass::TriggerFunctionCall);
+        }
         if in_partition_item && ast::CreateTableLike::can_cast(ancestor.kind()) {
             return Some(NameRefClass::PartitionByColumn);
         }
@@ -713,6 +735,7 @@ pub(crate) enum NameClass {
     WithTable(ast::WithTable),
     CreateIndex(ast::CreateIndex),
     CreateSequence(ast::CreateSequence),
+    CreateTrigger(ast::CreateTrigger),
     CreateTablespace(ast::CreateTablespace),
     CreateDatabase(ast::CreateDatabase),
     CreateServer(ast::CreateServer),
@@ -755,6 +778,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(create_sequence) = ast::CreateSequence::cast(ancestor.clone()) {
             return Some(NameClass::CreateSequence(create_sequence));
+        }
+        if let Some(create_trigger) = ast::CreateTrigger::cast(ancestor.clone()) {
+            return Some(NameClass::CreateTrigger(create_trigger));
         }
         if let Some(create_tablespace) = ast::CreateTablespace::cast(ancestor.clone()) {
             return Some(NameClass::CreateTablespace(create_tablespace));
