@@ -245,6 +245,20 @@ drop table t$0;
     }
 
     #[test]
+    fn goto_drop_foreign_table() {
+        assert_snapshot!(goto("
+create foreign table t(a int) server s;
+drop foreign table t$0;
+"), @r"
+          ╭▸ 
+        2 │ create foreign table t(a int) server s;
+          │                      ─ 2. destination
+        3 │ drop foreign table t;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_definition_prefers_previous_token() {
         assert_snapshot!(goto("
 create table t(a int);
@@ -425,6 +439,92 @@ drop sequence s$0;
           │                 ─ 2. destination
         3 │ drop sequence s;
           ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_trigger() {
+        assert_snapshot!(goto("
+create trigger tr before insert on t for each row execute function f();
+drop trigger tr$0 on t;
+"), @r"
+          ╭▸ 
+        2 │ create trigger tr before insert on t for each row execute function f();
+          │                ── 2. destination
+        3 │ drop trigger tr on t;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_trigger_function() {
+        assert_snapshot!(goto("
+create function f() returns trigger as 'select 1' language sql;
+create trigger tr before insert on t for each row execute function f$0();
+"), @r"
+          ╭▸ 
+        2 │ create function f() returns trigger as 'select 1' language sql;
+          │                 ─ 2. destination
+        3 │ create trigger tr before insert on t for each row execute function f();
+          ╰╴                                                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_trigger_procedure() {
+        assert_snapshot!(goto("
+create procedure a() language sql as 'select 1';
+create trigger tr before truncate or delete or insert
+on t
+execute procedure a$0();
+"), @r"
+          ╭▸ 
+        2 │ create procedure a() language sql as 'select 1';
+          │                  ─ 2. destination
+          ‡
+        5 │ execute procedure a();
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_trigger_table_specific() {
+        assert_snapshot!(goto("
+create table u(a int);
+create trigger tr before truncate
+on u
+execute function noop();
+
+create table t(b int);
+create trigger tr before truncate
+on t
+execute function noop();
+
+drop trigger tr$0 on t;
+"), @r"
+           ╭▸ 
+         8 │ create trigger tr before truncate
+           │                ── 2. destination
+           ‡
+        12 │ drop trigger tr on t;
+           ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_trigger_table() {
+        assert_snapshot!(goto("
+create table t(b int);
+create trigger tr before truncate
+on t$0
+execute function noop();
+"), @r"
+          ╭▸ 
+        2 │ create table t(b int);
+          │              ─ 2. destination
+        3 │ create trigger tr before truncate
+        4 │ on t
+          ╰╴   ─ 1. source
         ");
     }
 

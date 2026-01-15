@@ -91,6 +91,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameRefClass::Table
             | NameRefClass::DropTable
+            | NameRefClass::DropForeignTable
             | NameRefClass::DropView
             | NameRefClass::DropMaterializedView
             | NameRefClass::CreateIndex
@@ -125,6 +126,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 return hover_table(root, &name_ref, &binder);
             }
             NameRefClass::DropSequence => return hover_sequence(root, &name_ref, &binder),
+            NameRefClass::DropTrigger => return hover_trigger(root, &name_ref, &binder),
             NameRefClass::DropDatabase
             | NameRefClass::ReindexDatabase
             | NameRefClass::ReindexSystem => return hover_database(root, &name_ref, &binder),
@@ -141,11 +143,15 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::DropIndex | NameRefClass::ReindexIndex => {
                 return hover_index(root, &name_ref, &binder);
             }
-            NameRefClass::DropFunction | NameRefClass::DefaultConstraintFunctionCall => {
+            NameRefClass::DropFunction
+            | NameRefClass::DefaultConstraintFunctionCall
+            | NameRefClass::TriggerFunctionCall => {
                 return hover_function(root, &name_ref, &binder);
             }
             NameRefClass::DropAggregate => return hover_aggregate(root, &name_ref, &binder),
-            NameRefClass::DropProcedure | NameRefClass::CallProcedure => {
+            NameRefClass::DropProcedure
+            | NameRefClass::CallProcedure
+            | NameRefClass::TriggerProcedureCall => {
                 return hover_procedure(root, &name_ref, &binder);
             }
             NameRefClass::DropRoutine => return hover_routine(root, &name_ref, &binder),
@@ -191,6 +197,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateSequence(create_sequence) => {
                 return format_create_sequence(&create_sequence, &binder);
+            }
+            NameClass::CreateTrigger(create_trigger) => {
+                return format_create_trigger(&create_trigger, &binder);
             }
             NameClass::CreateTablespace(create_tablespace) => {
                 return format_create_tablespace(&create_tablespace);
@@ -739,6 +748,24 @@ fn hover_sequence(
     format_create_sequence(&create_sequence, binder)
 }
 
+fn hover_trigger(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let trigger_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+
+    let trigger_name_node = trigger_ptr.to_node(root);
+
+    let create_trigger = trigger_name_node
+        .ancestors()
+        .find_map(ast::CreateTrigger::cast)?;
+
+    format_create_trigger(&create_trigger, binder)
+}
+
 fn hover_tablespace(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -958,6 +985,20 @@ fn format_create_sequence(
     let (schema, sequence_name) = resolve::resolve_sequence_info(binder, &path)?;
 
     Some(format!("sequence {}.{}", schema, sequence_name))
+}
+
+fn format_create_trigger(
+    create_trigger: &ast::CreateTrigger,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let trigger_name = create_trigger.name()?.syntax().text().to_string();
+    let on_table_path = create_trigger.on_table()?.path()?;
+
+    let (schema, table_name) = resolve::resolve_table_info(binder, &on_table_path)?;
+    Some(format!(
+        "trigger {}.{} on {}.{}",
+        schema, trigger_name, schema, table_name
+    ))
 }
 
 fn format_create_tablespace(create_tablespace: &ast::CreateTablespace) -> Option<String> {

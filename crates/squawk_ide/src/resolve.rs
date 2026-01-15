@@ -20,6 +20,7 @@ pub(crate) fn resolve_name_ref(
 
     match context {
         NameRefClass::DropTable
+        | NameRefClass::DropForeignTable
         | NameRefClass::Table
         | NameRefClass::CreateIndex
         | NameRefClass::InsertTable
@@ -146,6 +147,25 @@ pub(crate) fn resolve_name_ref(
             let schema = extract_schema_name(&path);
             let position = name_ref.syntax().text_range().start();
             resolve_sequence_name_ptr(binder, &sequence_name, &schema, position)
+                .map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::DropTrigger => {
+            let drop_trigger = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::DropTrigger::cast)?;
+            let path = drop_trigger.path()?;
+            let trigger_name = extract_table_name(&path)?;
+            let mut schema = extract_schema_name(&path);
+            let on_table_path = drop_trigger
+                .on_table()
+                .and_then(|on_table| on_table.path())?;
+            if schema.is_none() {
+                schema = extract_schema_name(&on_table_path);
+            }
+            let table_name = extract_table_name(&on_table_path)?;
+            let position = name_ref.syntax().text_range().start();
+            resolve_trigger_name_ptr(binder, &trigger_name, &schema, position, Some(table_name))
                 .map(|ptr| smallvec![ptr])
         }
         NameRefClass::ReindexDatabase
@@ -324,7 +344,7 @@ pub(crate) fn resolve_name_ref(
             let schema_name = Name::from_node(name_ref);
             resolve_schema(binder, &schema_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DefaultConstraintFunctionCall => {
+        NameRefClass::DefaultConstraintFunctionCall | NameRefClass::TriggerFunctionCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
             {
@@ -337,6 +357,22 @@ pub(crate) fn resolve_name_ref(
             let function_name = Name::from_node(name_ref);
             let position = name_ref.syntax().text_range().start();
             resolve_function(binder, &function_name, &schema, None, position)
+                .map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::TriggerProcedureCall => {
+            let schema = if let Some(parent_node) = name_ref.syntax().parent()
+                && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
+            {
+                let base = field_expr.base()?;
+                let schema_name_ref = ast::NameRef::cast(base.syntax().clone())?;
+                Some(Schema(Name::from_node(&schema_name_ref)))
+            } else {
+                None
+            };
+            let procedure_name = Name::from_node(name_ref);
+            let position = name_ref.syntax().text_range().start();
+
+            resolve_procedure(binder, &procedure_name, &schema, None, position)
                 .map(|ptr| smallvec![ptr])
         }
         NameRefClass::SelectFunctionCall => {
@@ -490,6 +526,16 @@ fn resolve_sequence_name_ptr(
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     binder.lookup_with(sequence_name, SymbolKind::Sequence, position, schema)
+}
+
+fn resolve_trigger_name_ptr(
+    binder: &Binder,
+    trigger_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+    table: Option<Name>,
+) -> Option<SyntaxNodePtr> {
+    binder.lookup_with_table(trigger_name, SymbolKind::Trigger, position, schema, &table)
 }
 
 fn resolve_tablespace_name_ptr(binder: &Binder, tablespace_name: &Name) -> Option<SyntaxNodePtr> {
