@@ -187,6 +187,10 @@ sql for benchmarks maybe?
 
   https://github.com/sirrodgepodge/rrule_plpgsql
 
+- pqrsafe
+
+  https://github.com/tanelpoder/tpt-postgres/blob/main/demos/pqrsafe.sql
+
 ### CLI
 
 from `deno`
