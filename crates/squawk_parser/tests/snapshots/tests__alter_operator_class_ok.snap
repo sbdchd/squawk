@@ -86,7 +86,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "u"
   SEMICOLON ";"
@@ -113,7 +113,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -565,14 +565,20 @@ ExprType =
   // TODO: really just FIELD_EXPR, CALL_EXPR, INDEX_EXPR
   Expr
 
-Role =
+RoleRef =
   'group'? NameRef
 | 'current_role'
 | 'current_user'
 | 'session_user'
 
-RoleList =
-  Role (',' Role)*
+Role =
+  'group'? Name
+| 'current_role'
+| 'current_user'
+| 'session_user'
+
+RoleRefList =
+  RoleRef (',' RoleRef)*
 
 ConstraintName =
   'constraint' Name
@@ -1219,7 +1225,7 @@ ValidateConstraint =
   'validate' 'constraint' NameRef
 
 OwnerTo =
-  'owner' 'to' Role
+  'owner' 'to' RoleRef
 
 RenameTo =
   'rename' 'to' Name
@@ -1250,8 +1256,8 @@ Revoke =
   'revoke' ('grant' 'option' 'for')?
   (('all' 'privileges'?) | RevokeCommandList)
   'on' ('table' (Path (',' Path)*) | 'all' 'tables' 'in' 'schema' (NameRef (',' NameRef)*))
-  'from' RoleList
-  ('granted' 'by' Role)?
+  'from' RoleRefList
+  ('granted' 'by' RoleRef)?
   ('cascade' | 'restrict')?
 
 Row =
@@ -1791,7 +1797,7 @@ AlterRoutine =
   'restrict'?
 
 AlterRole =
-  'alter' 'role' Role
+  'alter' 'role' RoleRef
 
 AlterPublication =
   'alter' 'publication' NameRef
@@ -1811,7 +1817,7 @@ AlterProcedure =
 AlterPolicy =
   'alter' 'policy' NameRef OnTable
   (RenameTo
-  | 'to' RoleList
+  | 'to' RoleRefList
   | 'using' '(' Expr ')'
   | 'with' 'check' '(' Expr ')'
   )?
@@ -1895,7 +1901,7 @@ AlterIndex =
 )
 
 OwnedByRoles =
-  'owned' 'by' RoleList
+  'owned' 'by' RoleRefList
 
 AlterIndexAction =
   AttachPartition
@@ -1908,7 +1914,7 @@ AlterIndexAction =
 | AlterSetStatistics
 
 AlterGroup =
-  'alter' 'group' Role
+  'alter' 'group' RoleRef
   (
   'add' 'user' (NameRef (',' NameRef)*)
   | 'drop' 'user' (NameRef (',' NameRef)*)
@@ -1961,7 +1967,7 @@ AlterExtension =
 
 AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
-  ('for' ('role' | 'user') RoleList)?
+  ('for' ('role' | 'user') RoleRefList)?
   ('in' 'schema' (NameRef (',' NameRef)*))?
   (
     GrantDefaultPrivileges
@@ -1969,10 +1975,10 @@ AlterDefaultPrivileges =
   )?
 
 GrantDefaultPrivileges =
-  'grant' Privileges 'on' PrivilegeTarget 'to' RoleList ('with' 'grant' 'option')?
+  'grant' Privileges 'on' PrivilegeTarget 'to' RoleRefList ('with' 'grant' 'option')?
 
 RevokeDefaultPrivileges =
-  'revoke' ('grant' 'option' 'for')? Privileges 'on' PrivilegeTarget 'from' RoleList ('cascade' | 'restrict')?
+  'revoke' ('grant' 'option' 'for')? Privileges 'on' PrivilegeTarget 'from' RoleRefList ('cascade' | 'restrict')?
 
 Privileges =
   'all' 'privileges'? ColumnList?
@@ -2095,10 +2101,10 @@ AlterType =
   'alter' 'type' Path
 
 AlterUser =
-  'alter' 'user' Role
+  'alter' 'user' RoleRef
 
 AlterUserMapping =
-  'alter' 'user' 'mapping' 'for' Role ServerName AlterOptionList
+  'alter' 'user' 'mapping' 'for' RoleRef ServerName AlterOptionList
 
 AlterView =
   'alter' 'view' Path
@@ -2222,7 +2228,7 @@ CreatePolicy =
   'create' 'policy' Name OnTable
   ('as' '#ident')?
   ('for' ('all' | 'select' | 'insert' | 'update' | 'delete'))?
-  ('to' RoleList)?
+  ('to' RoleRefList)?
   ('using' '(' Expr ')')
   ('with' 'check' '(' Expr ')')
 
@@ -2270,7 +2276,7 @@ CreateSubscription =
 
 CreateTablespace =
   'create' 'tablespace' Name
-  ('owner' Role)?
+  ('owner' RoleRef)?
   'location' Literal
   WithParams?
 
@@ -2297,7 +2303,7 @@ TransformToFunc =
   'to' 'sql' 'with' 'function' FunctionSig
 
 CreateUserMapping =
-  'create' 'user' 'mapping' IfNotExists? 'for' Role
+  'create' 'user' 'mapping' IfNotExists? 'for' RoleRef
   ServerName
   AlterOptionList?
 
@@ -2391,7 +2397,7 @@ DropOperatorClass =
   ('cascade' | 'restrict')?
 
 DropOwned =
-  'drop' 'owned' 'by' RoleList
+  'drop' 'owned' 'by' RoleRefList
   ('cascade' | 'restrict')?
 
 DropPolicy =
@@ -2460,7 +2466,7 @@ DropUser =
   'drop' 'user' IfExists? (NameRef (',' NameRef)*)
 
 DropUserMapping =
-  'drop' 'user' 'mapping' IfExists? 'for' Role ServerName
+  'drop' 'user' 'mapping' IfExists? 'for' RoleRef ServerName
 
 DropView =
   'drop' 'view' IfExists? Path
@@ -2507,7 +2513,7 @@ Lock =
   'lock' 'table'? TableList?
 
 Reassign =
-  'reassign' 'owned' 'by' old_roles:RoleList 'to' new_roles:RoleList
+  'reassign' 'owned' 'by' old_roles:RoleRefList 'to' new_roles:RoleRefList
 
 Refresh =
   'refresh' 'materialized' 'view' 'concurrently'? Path
@@ -2517,15 +2523,15 @@ Grant =
   'grant'
   (('all' 'privileges'?) | RevokeCommandList)
   'on' ('table' (Path (',' Path)*) | 'all' 'tables' 'in' 'schema' (NameRef (',' NameRef)*))
-  'to' RoleList
+  'to' RoleRefList
   ('with' 'grant' 'option')?
-  ('granted' 'by' Role)?
+  ('granted' 'by' RoleRef)?
 
 RevokeCommandList =
   (RevokeCommand (',' RevokeCommand)*)
 
 RevokeCommand =
-( Role
+( RoleRef
 | 'alter' 'system'
 | ('select' | 'insert' | 'update' | 'delete' | 'truncate' | 'references' | 'trigger' | 'ident' | 'all' | 'alter' | 'create' | 'temporary' | 'temp' | 'execute')
 )
@@ -2569,11 +2575,11 @@ SetConstraints =
   'deferred' | 'immediate'
 
 SetRole =
-  'set' ('session' | 'local')? 'role' (Role | 'none')?
+  'set' ('session' | 'local')? 'role' (RoleRef | 'none')?
 | 'reset' 'role'
 
 SetSessionAuth =
-  'set' ('session' | 'local')? 'session' 'authorization' (Role | Literal | 'default')
+  'set' ('session' | 'local')? 'session' 'authorization' (RoleRef | Literal | 'default')
 
 ResetSessionAuth =
   'reset' 'session' 'authorization'
@@ -2732,10 +2738,10 @@ DropSchema =
   ('cascade' | 'restrict')?
 
 CreateSchema =
-  'create' 'schema' IfNotExists? (SchemaAuthorization | Name) SchemaElement*
-
-SchemaAuthorization =
-  'authorization' Role
+  'create' 'schema' Name ('authorization' RoleRef)? SchemaElement*
+| 'create' 'schema' 'authorization' Role SchemaElement*
+| 'create' 'schema' IfNotExists Name ('authorization' RoleRef)?
+| 'create' 'schema' IfNotExists 'authorization' Role
 
 SchemaElement =
   CreateTable

@@ -31,7 +31,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     OWNER_KW "owner"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     LOCATION_KW "location"

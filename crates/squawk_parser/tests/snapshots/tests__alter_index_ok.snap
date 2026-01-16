@@ -450,13 +450,13 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         NAME_REF
           IDENT "r"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "

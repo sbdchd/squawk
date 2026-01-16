@@ -5296,7 +5296,7 @@ fn owner_to(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(OWNER_KW);
     p.expect(TO_KW);
-    role(p);
+    role_ref(p);
     m.complete(p, OWNER_TO)
 }
 
@@ -6099,7 +6099,7 @@ fn alter_role(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ALTER_KW);
     p.bump(ROLE_KW);
     if !p.eat(ALL_KW) {
-        role(p);
+        role_ref(p);
     }
     match p.current() {
         RENAME_KW => {
@@ -6258,11 +6258,11 @@ fn alter_policy(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn role_list(p: &mut Parser<'_>) {
     let m = p.start();
-    role(p);
+    role_ref(p);
     while !p.at(EOF) && p.eat(COMMA) {
-        role(p);
+        role_ref(p);
     }
-    m.complete(p, ROLE_LIST);
+    m.complete(p, ROLE_REF_LIST);
 }
 
 // ALTER OPERATOR FAMILY name USING index_method ADD
@@ -6525,7 +6525,7 @@ fn alter_large_object(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.expect(OWNER_KW);
     p.expect(TO_KW);
-    role(p);
+    role_ref(p);
     m.complete(p, ALTER_LARGE_OBJECT)
 }
 
@@ -6658,7 +6658,7 @@ fn alter_group(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(ALTER_KW);
     p.bump(GROUP_KW);
-    role(p);
+    role_ref(p);
     match p.current() {
         ADD_KW | DROP_KW => {
             p.bump_any();
@@ -7983,7 +7983,7 @@ fn alter_user(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ALTER_KW);
     p.bump(USER_KW);
     if !p.eat(ALL_KW) {
-        role(p);
+        role_ref(p);
     }
     // be careful of the case where we're at the IN of IN DATABASE
     if p.at(WITH_KW) || (p.at_ts(ROLE_OPTION_FIRST) && !p.nth_at(1, DATABASE_KW)) {
@@ -8024,7 +8024,7 @@ fn alter_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(USER_KW);
     p.bump(MAPPING_KW);
     p.expect(FOR_KW);
-    role(p);
+    role_ref(p);
     server_name(p);
     if !opt_alter_option_list(p) {
         p.error("expected options");
@@ -9369,7 +9369,7 @@ fn create_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(TABLESPACE_KW);
     name(p);
     if p.eat(OWNER_KW) {
-        role(p);
+        role_ref(p);
     }
     p.expect(LOCATION_KW);
     string_literal(p);
@@ -9500,7 +9500,7 @@ fn create_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(FOR_KW);
     // role | USER
     if !p.eat(USER_KW) {
-        role(p);
+        role_ref(p);
     }
     server_name(p);
     opt_alter_option_list(p);
@@ -10177,7 +10177,7 @@ fn drop_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(FOR_KW);
     // role | USER
     if !p.eat(USER_KW) {
-        role(p);
+        role_ref(p);
     }
     server_name(p);
     m.complete(p, DROP_USER_MAPPING)
@@ -10751,7 +10751,7 @@ fn privilege_target(p: &mut Parser<'_>) {
 fn opt_granted_by(p: &mut Parser<'_>) {
     if p.eat(GRANTED_KW) {
         p.expect(BY_KW);
-        role(p);
+        role_ref(p);
     }
 }
 
@@ -10843,7 +10843,7 @@ const REVOKE_COMMAND_FIRST: TokenSet = TokenSet::new(&[
 
 fn revoke_command(p: &mut Parser<'_>) {
     let m = p.start();
-    if !opt_role(p) {
+    if !opt_role_ref(p) {
         if p.eat(ALTER_KW) {
             p.expect(SYSTEM_KW);
         } else if p.at_ts(REVOKE_COMMAND_FIRST) {
@@ -10863,18 +10863,34 @@ fn revoke_command(p: &mut Parser<'_>) {
 //  | CURRENT_ROLE
 //  | CURRENT_USER
 //  | SESSION_USER
-fn role(p: &mut Parser<'_>) {
-    if !opt_role(p) {
+fn role_ref(p: &mut Parser<'_>) {
+    if !opt_role_ref(p) {
         p.error(format!("expected role, got {:?}", p.current()))
     }
 }
 
-fn opt_role(p: &mut Parser<'_>) -> bool {
+fn opt_role_ref(p: &mut Parser<'_>) -> bool {
+    opt_role_(p, ROLE_REF)
+}
+
+fn role(p: &mut Parser<'_>) -> bool {
+    opt_role_(p, ROLE)
+}
+
+fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
+    assert!(matches!(kind, ROLE | ROLE_REF));
+    let func = |p: &mut Parser<'_>| {
+        if kind == ROLE_REF {
+            name_ref(p);
+        } else {
+            name(p);
+        }
+    };
     let m = p.start();
     match p.current() {
         GROUP_KW => {
             p.bump(GROUP_KW);
-            name_ref(p);
+            func(p);
         }
         CURRENT_ROLE_KW | CURRENT_USER_KW | SESSION_USER_KW => {
             p.bump_any();
@@ -10888,14 +10904,14 @@ fn opt_role(p: &mut Parser<'_>) -> bool {
             }
         }
         _ if p.at_ts(NON_RESERVED_WORD) => {
-            name_ref(p);
+            func(p);
         }
         _ => {
             m.abandon(p);
             return false;
         }
     }
-    m.complete(p, ROLE);
+    m.complete(p, kind);
     true
 }
 
@@ -11081,7 +11097,7 @@ fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
         let _ = p.eat(SESSION_KW) || p.eat(LOCAL_KW);
         p.expect(ROLE_KW);
         if !p.eat(NONE_KW) && opt_string_literal(p).is_none() {
-            role(p);
+            role_ref(p);
         }
     }
     m.complete(p, SET_ROLE)
@@ -11098,7 +11114,7 @@ fn set_session_auth(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(SESSION_KW);
     p.expect(AUTHORIZATION_KW);
     if !p.eat(DEFAULT_KW) && opt_string_literal(p).is_none() {
-        role(p);
+        role_ref(p);
     }
     m.complete(p, SET_SESSION_AUTH)
 }
@@ -12159,17 +12175,6 @@ fn drop_schema(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, DROP_SCHEMA)
 }
 
-fn opt_schema_auth(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if p.eat(AUTHORIZATION_KW) {
-        role(p);
-        m.complete(p, SCHEMA_AUTHORIZATION);
-        return true;
-    }
-    m.abandon(p);
-    false
-}
-
 // An SQL statement defining an object to be created within the schema.
 //
 // Currently, only CREATE TABLE, CREATE VIEW, CREATE INDEX, CREATE SEQUENCE,
@@ -12237,20 +12242,26 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(SCHEMA_KW);
     let if_not_exists = opt_if_not_exists(p).is_some();
-    match (if_not_exists, opt_schema_auth(p)) {
+    match (if_not_exists, p.eat(AUTHORIZATION_KW)) {
         // CREATE SCHEMA IF NOT EXISTS AUTHORIZATION role_specification
         //                                                             ^
-        (true, true) => m.complete(p, CREATE_SCHEMA),
+        (true, true) => {
+            role(p);
+            m.complete(p, CREATE_SCHEMA)
+        }
         // CREATE SCHEMA IF NOT EXISTS schema_name [ AUTHORIZATION role_specification ]
         //                             ^
         (true, false) => {
             name(p);
-            opt_schema_auth(p);
+            if p.eat(AUTHORIZATION_KW) {
+                role_ref(p);
+            }
             m.complete(p, CREATE_SCHEMA)
         }
         // CREATE SCHEMA AUTHORIZATION role_specification [ schema_element [ ... ] ]
         //                                                ^
         (false, true) => {
+            role(p);
             opt_schema_elements(p);
             m.complete(p, CREATE_SCHEMA)
         }
@@ -12258,7 +12269,9 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
         //               ^
         (false, false) => {
             name(p);
-            opt_schema_auth(p);
+            if p.eat(AUTHORIZATION_KW) {
+                role_ref(p);
+            }
             opt_schema_elements(p);
             m.complete(p, CREATE_SCHEMA)
         }

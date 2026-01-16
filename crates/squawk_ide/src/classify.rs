@@ -43,7 +43,6 @@ pub(crate) enum NameRefClass {
     DropRoutine,
     CallProcedure,
     DropSchema,
-    CreateSchema,
     CreateIndex,
     CreateIndexColumn,
     DefaultConstraintFunctionCall,
@@ -353,16 +352,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     }
 
     let mut in_type = false;
-    let mut in_schema_authorization = false;
     for ancestor in name_ref.syntax().ancestors() {
         if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
             in_type = true;
         }
         if in_type {
             return Some(NameRefClass::TypeReference);
-        }
-        if ast::SchemaAuthorization::can_cast(ancestor.kind()) {
-            in_schema_authorization = true;
         }
         if ast::Fetch::can_cast(ancestor.kind())
             || ast::Move::can_cast(ancestor.kind())
@@ -589,12 +584,6 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::DropSchema::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropSchema);
-        }
-        if in_schema_authorization
-            && let Some(create_schema) = ast::CreateSchema::cast(ancestor.clone())
-            && create_schema.name().is_none()
-        {
-            return Some(NameRefClass::CreateSchema);
         }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
             if in_partition_item {

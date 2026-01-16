@@ -50,8 +50,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         NAME_REF
           IDENT "r"
   SEMICOLON ";"
@@ -76,18 +76,18 @@ SOURCE_FILE
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         NAME_REF
           IDENT "r"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "public"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -177,13 +177,13 @@ SOURCE_FILE
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         NAME_REF
           IDENT "r"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "

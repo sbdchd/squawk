@@ -112,18 +112,18 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_KW "role"
         WHITESPACE " "
-        ROLE_LIST
-          ROLE
+        ROLE_REF_LIST
+          ROLE_REF
             NAME_REF
               IDENT "foo"
           COMMA ","
           WHITESPACE " "
-          ROLE
+          ROLE_REF
             NAME_REF
               IDENT "bar"
           COMMA ","
           WHITESPACE " "
-          ROLE
+          ROLE_REF
             NAME_REF
               IDENT "buzz"
       WHITESPACE "\n   "
@@ -132,32 +132,32 @@ SOURCE_FILE
         WHITESPACE " "
         GROUP_KW "group"
         WHITESPACE " "
-        ROLE_LIST
-          ROLE
+        ROLE_REF_LIST
+          ROLE_REF
             NAME_REF
               IDENT "foo"
       WHITESPACE "\n   "
       ROLE_OPTION
         ROLE_KW "role"
         WHITESPACE " "
-        ROLE_LIST
-          ROLE
+        ROLE_REF_LIST
+          ROLE_REF
             NAME_REF
               IDENT "foo"
       WHITESPACE "\n   "
       ROLE_OPTION
         ADMIN_KW "admin"
         WHITESPACE " "
-        ROLE_LIST
-          ROLE
+        ROLE_REF_LIST
+          ROLE_REF
             NAME_REF
               IDENT "foo"
       WHITESPACE "\n   "
       ROLE_OPTION
         USER_KW "user"
         WHITESPACE " "
-        ROLE_LIST
-          ROLE
+        ROLE_REF_LIST
+          ROLE_REF
             NAME_REF
               IDENT "foo"
       WHITESPACE "\n   "

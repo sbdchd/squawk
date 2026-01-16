@@ -168,7 +168,6 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameRefClass::SchemaQualifier
             | NameRefClass::DropSchema
-            | NameRefClass::CreateSchema
             | NameRefClass::ReindexSchema => {
                 return hover_schema(root, &name_ref, &binder);
             }
@@ -1129,10 +1128,9 @@ fn create_schema_name(create_schema: &ast::CreateSchema) -> Option<String> {
     }
 
     create_schema
-        .schema_authorization()
-        .and_then(|authorization| authorization.role())
-        .and_then(|role| role.name_ref())
-        .map(|name_ref| name_ref.syntax().text().to_string())
+        .role()
+        .and_then(|r| r.name())
+        .map(|n| n.syntax().text().to_string())
 }
 
 fn format_create_schema(create_schema: &ast::CreateSchema) -> Option<String> {

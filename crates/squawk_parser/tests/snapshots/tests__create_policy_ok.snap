@@ -99,21 +99,21 @@ SOURCE_FILE
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         NAME_REF
           IDENT "public"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_ROLE_KW "current_role"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_USER_KW "current_user"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         SESSION_USER_KW "session_user"
     WHITESPACE "\n  "
     USING_KW "using"

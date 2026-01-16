@@ -12,28 +12,28 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         NAME_REF
           SET_KW "set"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_ROLE_KW "current_role"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_USER_KW "current_user"
       COMMA ","
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "foo"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         SESSION_USER_KW "session_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -44,14 +44,14 @@ SOURCE_FILE
     WHITESPACE " "
     BY_KW "by"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         CURRENT_USER_KW "current_user"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         CURRENT_ROLE_KW "current_role"
   SEMICOLON ";"
   WHITESPACE "\n\n"
