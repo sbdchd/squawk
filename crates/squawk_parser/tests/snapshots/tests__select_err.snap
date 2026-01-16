@@ -741,8 +741,8 @@ SOURCE_FILE
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
-    ROLE_LIST
-      ROLE
+    ROLE_REF_LIST
+      ROLE_REF
         NAME_REF
           IDENT "u"
   SEMICOLON ";"

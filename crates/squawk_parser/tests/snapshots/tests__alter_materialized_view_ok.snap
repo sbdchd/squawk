@@ -265,12 +265,12 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      ROLE_LIST
-        ROLE
+      ROLE_REF_LIST
+        ROLE_REF
           CURRENT_USER_KW "current_user"
         COMMA ","
         WHITESPACE " "
-        ROLE
+        ROLE_REF
           NAME_REF
             IDENT "u"
     WHITESPACE "\n  "

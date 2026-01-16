@@ -3522,18 +3522,18 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      ROLE_LIST
-        ROLE
+      ROLE_REF_LIST
+        ROLE_REF
           NAME_REF
             IDENT "a"
         COMMA ","
         WHITESPACE " "
-        ROLE
+        ROLE_REF
           NAME_REF
             IDENT "b"
         COMMA ","
         WHITESPACE " "
-        ROLE
+        ROLE_REF
           NAME_REF
             IDENT "c"
     WHITESPACE " \n"
@@ -3572,8 +3572,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      ROLE_LIST
-        ROLE
+      ROLE_REF_LIST
+        ROLE_REF
           NAME_REF
             IDENT "bar"
     WHITESPACE "\n"
@@ -3624,7 +3624,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "new_owner"
   SEMICOLON ";"

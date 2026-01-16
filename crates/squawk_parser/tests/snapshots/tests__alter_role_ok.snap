@@ -10,7 +10,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -28,7 +28,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE "\n  "
@@ -123,7 +123,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -143,7 +143,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -166,7 +166,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -189,7 +189,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -213,7 +213,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -237,7 +237,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -256,7 +256,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -272,7 +272,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "r"
     WHITESPACE " "
@@ -304,7 +304,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       CURRENT_USER_KW "current_user"
     WHITESPACE " "
     ROLE_OPTION_LIST

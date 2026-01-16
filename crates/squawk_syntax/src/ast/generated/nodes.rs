@@ -369,7 +369,7 @@ impl AlterDefaultPrivileges {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -638,7 +638,7 @@ impl AlterGroup {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1012,7 +1012,7 @@ impl AlterPolicy {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1121,7 +1121,7 @@ pub struct AlterRole {
 }
 impl AlterRole {
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1639,7 +1639,7 @@ pub struct AlterUser {
 }
 impl AlterUser {
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1662,7 +1662,7 @@ impl AlterUserMapping {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3931,7 +3931,7 @@ impl CreatePolicy {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4202,12 +4202,20 @@ impl CreateSchema {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn schema_authorization(&self) -> Option<SchemaAuthorization> {
+    pub fn role(&self) -> Option<Role> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn schema_elements(&self) -> AstChildren<SchemaElement> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn authorization_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AUTHORIZATION_KW)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4559,7 +4567,7 @@ impl CreateTablespace {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4946,7 +4954,7 @@ impl CreateUserMapping {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6306,7 +6314,7 @@ pub struct DropOwned {
 }
 impl DropOwned {
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7028,7 +7036,7 @@ impl DropUserMapping {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7973,11 +7981,11 @@ impl Grant {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8048,7 +8056,7 @@ impl GrantDefaultPrivileges {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11613,7 +11621,7 @@ pub struct OwnedByRoles {
 }
 impl OwnedByRoles {
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11632,7 +11640,7 @@ pub struct OwnerTo {
 }
 impl OwnerTo {
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12468,11 +12476,11 @@ pub struct Reassign {
 }
 impl Reassign {
     #[inline]
-    pub fn new_roles(&self) -> Option<RoleList> {
+    pub fn new_roles(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn old_roles(&self) -> Option<RoleList> {
+    pub fn old_roles(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13084,11 +13092,11 @@ impl Revoke {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13163,7 +13171,7 @@ pub struct RevokeCommand {
 }
 impl RevokeCommand {
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13253,7 +13261,7 @@ impl RevokeDefaultPrivileges {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_list(&self) -> Option<RoleList> {
+    pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13296,7 +13304,7 @@ pub struct Role {
 }
 impl Role {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13314,17 +13322,6 @@ impl Role {
     #[inline]
     pub fn session_user_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SESSION_USER_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RoleList {
-    pub(crate) syntax: SyntaxNode,
-}
-impl RoleList {
-    #[inline]
-    pub fn roles(&self) -> AstChildren<Role> {
-        support::children(&self.syntax)
     }
 }
 
@@ -13351,6 +13348,44 @@ impl RoleOptionList {
     #[inline]
     pub fn with_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WITH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RoleRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RoleRef {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn current_role_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_ROLE_KW)
+    }
+    #[inline]
+    pub fn current_user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_USER_KW)
+    }
+    #[inline]
+    pub fn group_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GROUP_KW)
+    }
+    #[inline]
+    pub fn session_user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SESSION_USER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RoleRefList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RoleRefList {
+    #[inline]
+    pub fn role_refs(&self) -> AstChildren<RoleRef> {
+        support::children(&self.syntax)
     }
 }
 
@@ -13454,21 +13489,6 @@ impl Savepoint {
     #[inline]
     pub fn savepoint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SAVEPOINT_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SchemaAuthorization {
-    pub(crate) syntax: SyntaxNode,
-}
-impl SchemaAuthorization {
-    #[inline]
-    pub fn role(&self) -> Option<Role> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn authorization_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AUTHORIZATION_KW)
     }
 }
 
@@ -14360,7 +14380,7 @@ pub struct SetRole {
 }
 impl SetRole {
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14429,7 +14449,7 @@ impl SetSessionAuth {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role(&self) -> Option<Role> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -26019,24 +26039,6 @@ impl AstNode for Role {
         &self.syntax
     }
 }
-impl AstNode for RoleList {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ROLE_LIST
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for RoleOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -26059,6 +26061,42 @@ impl AstNode for RoleOptionList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ROLE_OPTION_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RoleRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLE_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RoleRefList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLE_REF_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -26149,24 +26187,6 @@ impl AstNode for Savepoint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SAVEPOINT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for SchemaAuthorization {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SCHEMA_AUTHORIZATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

@@ -25,7 +25,7 @@ SOURCE_FILE
     SCHEMA_AUTHORIZATION
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "foo"
   SEMICOLON ";"
@@ -41,7 +41,7 @@ SOURCE_FILE
     SCHEMA_AUTHORIZATION
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_ROLE_KW "current_role"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -56,7 +56,7 @@ SOURCE_FILE
     SCHEMA_AUTHORIZATION
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -71,7 +71,7 @@ SOURCE_FILE
     SCHEMA_AUTHORIZATION
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         SESSION_USER_KW "session_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -80,12 +80,11 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    SCHEMA_AUTHORIZATION
-      AUTHORIZATION_KW "authorization"
-      WHITESPACE " "
-      ROLE
-        NAME_REF
-          IDENT "foo"
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    ROLE
+      NAME_REF
+        IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -122,7 +121,7 @@ SOURCE_FILE
     SCHEMA_AUTHORIZATION
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "bar"
   SEMICOLON ";"
@@ -139,12 +138,11 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    SCHEMA_AUTHORIZATION
-      AUTHORIZATION_KW "authorization"
-      WHITESPACE " "
-      ROLE
-        NAME_REF
-          IDENT "bar"
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    ROLE
+      NAME_REF
+        IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -317,7 +315,7 @@ SOURCE_FILE
     SCHEMA_AUTHORIZATION
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
-      ROLE
+      ROLE_REF
         NAME_REF
           IDENT "user_name"
   SEMICOLON ";"
@@ -478,7 +476,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    ROLE
+    ROLE_REF
       NAME_REF
         IDENT "foo"
   SEMICOLON ";"
