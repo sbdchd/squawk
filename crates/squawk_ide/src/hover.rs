@@ -142,6 +142,12 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::DropExtension | NameRefClass::AlterExtension => {
                 return hover_extension(root, &name_ref, &binder);
             }
+            NameRefClass::AlterRole
+            | NameRefClass::DropRole
+            | NameRefClass::SetRole
+            | NameRefClass::Role => {
+                return hover_role(root, &name_ref, &binder);
+            }
             NameRefClass::Tablespace => return hover_tablespace(root, &name_ref, &binder),
             NameRefClass::DropIndex | NameRefClass::ReindexIndex => {
                 return hover_index(root, &name_ref, &binder);
@@ -220,6 +226,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateExtension(create_extension) => {
                 return format_create_extension(&create_extension);
+            }
+            NameClass::CreateRole(create_role) => {
+                return format_create_role(&create_role);
             }
             NameClass::CreateType(create_type) => {
                 return format_create_type(&create_type, &binder);
@@ -843,6 +852,18 @@ fn hover_extension(
     Some(format!("extension {}", extension_name_node.text()))
 }
 
+fn hover_role(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let role_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let role_name_node = role_ptr.to_node(root);
+    Some(format!("role {}", role_name_node.text()))
+}
+
 fn hover_cursor(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -1071,6 +1092,11 @@ fn format_create_server(create_server: &ast::CreateServer) -> Option<String> {
 fn format_create_extension(create_extension: &ast::CreateExtension) -> Option<String> {
     let name = create_extension.name()?.syntax().text().to_string();
     Some(format!("extension {}", name))
+}
+
+fn format_create_role(create_role: &ast::CreateRole) -> Option<String> {
+    let name = create_role.name()?.syntax().text().to_string();
+    Some(format!("role {}", name))
 }
 
 fn index_schema(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
@@ -4095,6 +4121,70 @@ alter extension my$0ext update to '2.0';
           ╭▸ 
         3 │ alter extension myext update to '2.0';
           ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_role_on_create() {
+        assert_snapshot!(check_hover("
+create role read$0er;
+"), @r"
+        hover: role reader
+          ╭▸ 
+        2 │ create role reader;
+          ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_role_on_alter() {
+        assert_snapshot!(check_hover("
+create role reader;
+alter role read$0er rename to writer;
+"), @r"
+        hover: role reader
+          ╭▸ 
+        3 │ alter role reader rename to writer;
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_role_on_drop() {
+        assert_snapshot!(check_hover("
+create role reader;
+drop role read$0er;
+"), @r"
+        hover: role reader
+          ╭▸ 
+        3 │ drop role reader;
+          ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_role_on_set() {
+        assert_snapshot!(check_hover("
+create role reader;
+set role read$0er;
+"), @r"
+        hover: role reader
+          ╭▸ 
+        3 │ set role reader;
+          ╰╴            ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_role_on_create_tablespace_owner() {
+        assert_snapshot!(check_hover("
+create role reader;
+create tablespace t owner read$0er location 'foo';
+"), @r"
+        hover: role reader
+          ╭▸ 
+        3 │ create tablespace t owner reader location 'foo';
+          ╰╴                             ─ hover
         ");
     }
 

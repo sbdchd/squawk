@@ -381,6 +381,7 @@ fn handle_document_symbol(
                 DocumentSymbolKind::PreparedStatement => SymbolKind::VARIABLE,
                 DocumentSymbolKind::Channel => SymbolKind::EVENT,
                 DocumentSymbolKind::EventTrigger => SymbolKind::EVENT,
+                DocumentSymbolKind::Role => SymbolKind::CLASS,
             },
             tags: None,
             range,

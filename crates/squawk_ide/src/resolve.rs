@@ -193,6 +193,13 @@ pub(crate) fn resolve_name_ref(
             let extension_name = Name::from_node(name_ref);
             resolve_extension_name_ptr(binder, &extension_name).map(|ptr| smallvec![ptr])
         }
+        NameRefClass::AlterRole
+        | NameRefClass::DropRole
+        | NameRefClass::SetRole
+        | NameRefClass::Role => {
+            let role_name = Name::from_node(name_ref);
+            resolve_role_name_ptr(binder, &role_name).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SequenceOwnedByColumn => {
             let sequence_option = name_ref
                 .syntax()
@@ -578,6 +585,10 @@ fn resolve_server_name_ptr(binder: &Binder, server_name: &Name) -> Option<Syntax
 
 fn resolve_extension_name_ptr(binder: &Binder, extension_name: &Name) -> Option<SyntaxNodePtr> {
     binder.lookup(extension_name, SymbolKind::Extension)
+}
+
+fn resolve_role_name_ptr(binder: &Binder, role_name: &Name) -> Option<SyntaxNodePtr> {
+    binder.lookup(role_name, SymbolKind::Role)
 }
 
 fn resolve_for_kind_with_params(

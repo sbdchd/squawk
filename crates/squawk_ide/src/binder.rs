@@ -224,6 +224,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateDatabase(create_database) => bind_create_database(b, create_database),
         ast::Stmt::CreateServer(create_server) => bind_create_server(b, create_server),
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
+        ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role),
         ast::Stmt::Declare(declare) => bind_declare_cursor(b, declare),
         ast::Stmt::Prepare(prepare) => bind_prepare(b, prepare),
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
@@ -644,6 +645,26 @@ fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension)
 
     let root = b.root_scope();
     b.scopes[root].insert(extension_name, extension_id);
+}
+
+fn bind_create_role(b: &mut Binder, create_role: ast::CreateRole) {
+    let Some(name) = create_role.name() else {
+        return;
+    };
+
+    let role_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let role_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Role,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(role_name, role_id);
 }
 
 fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
