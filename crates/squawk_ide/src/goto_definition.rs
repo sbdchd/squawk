@@ -674,6 +674,76 @@ drop database my$0db;
     }
 
     #[test]
+    fn goto_drop_role() {
+        assert_snapshot!(goto("
+create role reader;
+drop role read$0er;
+"), @r"
+          ╭▸ 
+        2 │ create role reader;
+          │             ────── 2. destination
+        3 │ drop role reader;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_role() {
+        assert_snapshot!(goto("
+create role reader;
+alter role read$0er rename to writer;
+"), @r"
+          ╭▸ 
+        2 │ create role reader;
+          │             ────── 2. destination
+        3 │ alter role reader rename to writer;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_set_role() {
+        assert_snapshot!(goto("
+create role reader;
+set role read$0er;
+"), @r"
+          ╭▸ 
+        2 │ create role reader;
+          │             ────── 2. destination
+        3 │ set role reader;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_tablespace_owner_role() {
+        assert_snapshot!(goto("
+create role reader;
+create tablespace t owner read$0er location 'foo';
+"), @r"
+          ╭▸ 
+        2 │ create role reader;
+          │             ────── 2. destination
+        3 │ create tablespace t owner reader location 'foo';
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_role_definition_returns_self() {
+        assert_snapshot!(goto("
+create role read$0er;
+"), @r"
+          ╭▸ 
+        2 │ create role reader;
+          │             ┬──┬──
+          │             │  │
+          │             │  1. source
+          ╰╴            2. destination
+        ");
+    }
+
+    #[test]
     fn goto_drop_database_defined_after() {
         assert_snapshot!(goto("
 drop database my$0db;

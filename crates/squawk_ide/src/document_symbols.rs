@@ -17,6 +17,7 @@ pub enum DocumentSymbolKind {
     Aggregate,
     Procedure,
     EventTrigger,
+    Role,
     Type,
     Enum,
     Column,
@@ -72,6 +73,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateEventTrigger(create_event_trigger) => {
                 if let Some(symbol) = create_event_trigger_symbol(create_event_trigger) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateRole(create_role) => {
+                if let Some(symbol) = create_role_symbol(create_role) {
                     symbols.push(symbol);
                 }
             }
@@ -388,6 +394,23 @@ fn create_event_trigger_symbol(
     })
 }
 
+fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
+    let name_node = create_role.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_role.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Role,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_type_symbol(
     binder: &binder::Binder,
     create_type: ast::CreateType,
@@ -598,6 +621,7 @@ mod tests {
             DocumentSymbolKind::Aggregate => "aggregate",
             DocumentSymbolKind::Procedure => "procedure",
             DocumentSymbolKind::EventTrigger => "event trigger",
+            DocumentSymbolKind::Role => "role",
             DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Enum => "enum",
             DocumentSymbolKind::Column => "column",
@@ -841,6 +865,21 @@ unlisten *;
           ╰╴full range
         "
         );
+    }
+
+    #[test]
+    fn create_role() {
+        assert_snapshot!(symbols("
+create role reader;
+"), @r"
+        info: role: reader
+          ╭▸ 
+        2 │ create role reader;
+          │ ┬───────────┯━━━━━
+          │ │           │
+          │ │           focus range
+          ╰╴full range
+        ");
     }
 
     #[test]
