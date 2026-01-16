@@ -127,6 +127,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameRefClass::DropSequence => return hover_sequence(root, &name_ref, &binder),
             NameRefClass::DropTrigger => return hover_trigger(root, &name_ref, &binder),
+            NameRefClass::DropEventTrigger | NameRefClass::AlterEventTrigger => {
+                return hover_event_trigger(root, &name_ref, &binder);
+            }
             NameRefClass::DropDatabase
             | NameRefClass::ReindexDatabase
             | NameRefClass::ReindexSystem => return hover_database(root, &name_ref, &binder),
@@ -203,6 +206,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameClass::CreateTrigger(create_trigger) => {
                 return format_create_trigger(&create_trigger, &binder);
+            }
+            NameClass::CreateEventTrigger(create_event_trigger) => {
+                return format_create_event_trigger(&create_event_trigger);
             }
             NameClass::CreateTablespace(create_tablespace) => {
                 return format_create_tablespace(&create_tablespace);
@@ -772,6 +778,24 @@ fn hover_trigger(
     format_create_trigger(&create_trigger, binder)
 }
 
+fn hover_event_trigger(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let event_trigger_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+
+    let event_trigger_name_node = event_trigger_ptr.to_node(root);
+
+    let create_event_trigger = event_trigger_name_node
+        .ancestors()
+        .find_map(ast::CreateEventTrigger::cast)?;
+
+    format_create_event_trigger(&create_event_trigger)
+}
+
 fn hover_tablespace(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -1023,6 +1047,11 @@ fn format_create_trigger(
         "trigger {}.{} on {}.{}",
         schema, trigger_name, schema, table_name
     ))
+}
+
+fn format_create_event_trigger(create_event_trigger: &ast::CreateEventTrigger) -> Option<String> {
+    let name = create_event_trigger.name()?.syntax().text().to_string();
+    Some(format!("event trigger {}", name))
 }
 
 fn format_create_tablespace(create_tablespace: &ast::CreateTablespace) -> Option<String> {

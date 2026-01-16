@@ -172,6 +172,10 @@ pub(crate) fn resolve_name_ref(
             resolve_trigger_name_ptr(binder, &trigger_name, &schema, position, Some(table_name))
                 .map(|ptr| smallvec![ptr])
         }
+        NameRefClass::DropEventTrigger | NameRefClass::AlterEventTrigger => {
+            let event_trigger_name = Name::from_node(name_ref);
+            resolve_event_trigger_name_ptr(binder, &event_trigger_name).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::ReindexDatabase
         | NameRefClass::ReindexSystem
         | NameRefClass::DropDatabase => {
@@ -540,6 +544,13 @@ fn resolve_trigger_name_ptr(
     table: Option<Name>,
 ) -> Option<SyntaxNodePtr> {
     binder.lookup_with_table(trigger_name, SymbolKind::Trigger, position, schema, &table)
+}
+
+fn resolve_event_trigger_name_ptr(
+    binder: &Binder,
+    event_trigger_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    binder.lookup(event_trigger_name, SymbolKind::EventTrigger)
 }
 
 fn resolve_tablespace_name_ptr(binder: &Binder, tablespace_name: &Name) -> Option<SyntaxNodePtr> {

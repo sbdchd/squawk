@@ -380,6 +380,7 @@ fn handle_document_symbol(
                 DocumentSymbolKind::Cursor => SymbolKind::VARIABLE,
                 DocumentSymbolKind::PreparedStatement => SymbolKind::VARIABLE,
                 DocumentSymbolKind::Channel => SymbolKind::EVENT,
+                DocumentSymbolKind::EventTrigger => SymbolKind::EVENT,
             },
             tags: None,
             range,

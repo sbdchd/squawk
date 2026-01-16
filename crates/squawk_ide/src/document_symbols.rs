@@ -16,6 +16,7 @@ pub enum DocumentSymbolKind {
     Function,
     Aggregate,
     Procedure,
+    EventTrigger,
     Type,
     Enum,
     Column,
@@ -66,6 +67,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateProcedure(create_procedure) => {
                 if let Some(symbol) = create_procedure_symbol(&binder, create_procedure) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateEventTrigger(create_event_trigger) => {
+                if let Some(symbol) = create_event_trigger_symbol(create_event_trigger) {
                     symbols.push(symbol);
                 }
             }
@@ -370,6 +376,25 @@ fn create_procedure_symbol(
     })
 }
 
+fn create_event_trigger_symbol(
+    create_event_trigger: ast::CreateEventTrigger,
+) -> Option<DocumentSymbol> {
+    let name_node = create_event_trigger.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_event_trigger.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::EventTrigger,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_type_symbol(
     binder: &binder::Binder,
     create_type: ast::CreateType,
@@ -579,6 +604,7 @@ mod tests {
             DocumentSymbolKind::Function => "function",
             DocumentSymbolKind::Aggregate => "aggregate",
             DocumentSymbolKind::Procedure => "procedure",
+            DocumentSymbolKind::EventTrigger => "event trigger",
             DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Enum => "enum",
             DocumentSymbolKind::Column => "column",
@@ -803,6 +829,22 @@ unlisten *;
           │ ┬────────────────┯━━━━──────────────────────────────────
           │ │                │
           │ │                focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_event_trigger() {
+        assert_snapshot!(
+            symbols("create event trigger et on ddl_command_start execute function f();"),
+            @r"
+        info: event trigger: et
+          ╭▸ 
+        1 │ create event trigger et on ddl_command_start execute function f();
+          │ ┬────────────────────┯━──────────────────────────────────────────
+          │ │                    │
+          │ │                    focus range
           ╰╴full range
         "
         );

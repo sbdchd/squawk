@@ -215,6 +215,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         }
         ast::Stmt::CreateSequence(create_sequence) => bind_create_sequence(b, create_sequence),
         ast::Stmt::CreateTrigger(create_trigger) => bind_create_trigger(b, create_trigger),
+        ast::Stmt::CreateEventTrigger(create_event_trigger) => {
+            bind_create_event_trigger(b, create_event_trigger)
+        }
         ast::Stmt::CreateTablespace(create_tablespace) => {
             bind_create_tablespace(b, create_tablespace)
         }
@@ -545,6 +548,26 @@ fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
 
     let root = b.root_scope();
     b.scopes[root].insert(trigger_name, trigger_id);
+}
+
+fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEventTrigger) {
+    let Some(name) = create_event_trigger.name() else {
+        return;
+    };
+
+    let event_trigger_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let event_trigger_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::EventTrigger,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(event_trigger_name, event_trigger_id);
 }
 
 fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespace) {

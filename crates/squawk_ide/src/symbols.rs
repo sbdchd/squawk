@@ -61,6 +61,7 @@ pub(crate) enum SymbolKind {
     Server,
     Extension,
     Trigger,
+    EventTrigger,
 }
 
 #[derive(Clone, Debug)]
