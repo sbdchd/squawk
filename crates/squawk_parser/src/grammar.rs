@@ -10879,11 +10879,18 @@ fn role(p: &mut Parser<'_>) -> bool {
 
 fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
     assert!(matches!(kind, ROLE | ROLE_REF));
+    let func = |p: &mut Parser<'_>| {
+        if kind == ROLE_REF {
+            name_ref(p);
+        } else {
+            name(p);
+        }
+    };
     let m = p.start();
     match p.current() {
         GROUP_KW => {
             p.bump(GROUP_KW);
-            name_ref(p);
+            func(p);
         }
         CURRENT_ROLE_KW | CURRENT_USER_KW | SESSION_USER_KW => {
             p.bump_any();
@@ -10897,7 +10904,7 @@ fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
             }
         }
         _ if p.at_ts(NON_RESERVED_WORD) => {
-            name_ref(p);
+            func(p);
         }
         _ => {
             m.abandon(p);

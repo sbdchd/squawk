@@ -79,7 +79,7 @@ SOURCE_FILE
     AUTHORIZATION_KW "authorization"
     WHITESPACE " "
     ROLE
-      NAME_REF
+      NAME
         IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -136,7 +136,7 @@ SOURCE_FILE
     AUTHORIZATION_KW "authorization"
     WHITESPACE " "
     ROLE
-      NAME_REF
+      NAME
         IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"

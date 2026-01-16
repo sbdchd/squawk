@@ -348,7 +348,7 @@ pub(crate) fn resolve_name_ref(
             resolve_procedure(binder, &procedure_name, &schema, None, position)
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropSchema | NameRefClass::SchemaQualifier | NameRefClass::CreateSchema => {
+        NameRefClass::DropSchema | NameRefClass::SchemaQualifier => {
             let schema_name = Name::from_node(name_ref);
             resolve_schema(binder, &schema_name).map(|ptr| smallvec![ptr])
         }

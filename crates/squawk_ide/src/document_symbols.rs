@@ -171,15 +171,8 @@ fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymb
             name_node.syntax().text().to_string(),
             name_node.syntax().text_range(),
         )
-    } else if let Some(schema_name_ref) = create_schema
-        .schema_authorization()
-        .and_then(|authorization| authorization.role())
-        .and_then(|role| role.name_ref())
-    {
-        (
-            schema_name_ref.syntax().text().to_string(),
-            schema_name_ref.syntax().text_range(),
-        )
+    } else if let Some(name) = create_schema.role().and_then(|r| r.name()) {
+        (name.syntax().text().to_string(), name.syntax().text_range())
     } else {
         return None;
     };

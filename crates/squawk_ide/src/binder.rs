@@ -382,13 +382,9 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
         let schema_name = Name::from_node(&schema_name_node);
         let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
         (schema_name, name_ptr)
-    } else if let Some(schema_name_ref) = create_schema
-        .schema_authorization()
-        .and_then(|authorization| authorization.role())
-        .and_then(|role| role.name_ref())
-    {
-        let schema_name = Name::from_node(&schema_name_ref);
-        let name_ptr = SyntaxNodePtr::new(schema_name_ref.syntax());
+    } else if let Some(name) = create_schema.role().and_then(|role| role.name()) {
+        let schema_name = Name::from_node(&name);
+        let name_ptr = SyntaxNodePtr::new(name.syntax());
         (schema_name, name_ptr)
     } else {
         return;
