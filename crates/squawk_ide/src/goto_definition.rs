@@ -485,6 +485,65 @@ drop trigger tr$0 on t;
     }
 
     #[test]
+    fn goto_drop_event_trigger() {
+        assert_snapshot!(goto("
+create event trigger et on ddl_command_start execute function f();
+drop event trigger et$0;
+"), @r"
+          ╭▸ 
+        2 │ create event trigger et on ddl_command_start execute function f();
+          │                      ── 2. destination
+        3 │ drop event trigger et;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_event_trigger() {
+        assert_snapshot!(goto("
+create event trigger et on ddl_command_start execute function f();
+alter event trigger et$0 disable;
+"), @r"
+          ╭▸ 
+        2 │ create event trigger et on ddl_command_start execute function f();
+          │                      ── 2. destination
+        3 │ alter event trigger et disable;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_event_trigger_function() {
+        assert_snapshot!(goto("
+create function f() returns event_trigger as 'select 1' language sql;
+create event trigger et on ddl_command_start execute function f$0();
+"), @r"
+          ╭▸ 
+        2 │ create function f() returns event_trigger as 'select 1' language sql;
+          │                 ─ 2. destination
+        3 │ create event trigger et on ddl_command_start execute function f();
+          ╰╴                                                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_event_trigger_procedure() {
+        assert_snapshot!(goto("
+create procedure p() language sql as 'select 1';
+create event trigger tr
+  on ddl_command_end
+  execute procedure p$0();
+"), @r"
+          ╭▸ 
+        2 │ create procedure p() language sql as 'select 1';
+          │                  ─ 2. destination
+          ‡
+        5 │   execute procedure p();
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_trigger_function() {
         assert_snapshot!(goto("
 create function f() returns trigger as 'select 1' language sql;

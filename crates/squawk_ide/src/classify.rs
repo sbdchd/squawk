@@ -14,6 +14,7 @@ pub(crate) enum NameRefClass {
     DropMaterializedView,
     DropSequence,
     DropTrigger,
+    DropEventTrigger,
     SequenceOwnedByColumn,
     Tablespace,
     DropDatabase,
@@ -100,6 +101,7 @@ pub(crate) enum NameRefClass {
     UnlistenChannel,
     TriggerFunctionCall,
     TriggerProcedureCall,
+    AlterEventTrigger,
 }
 
 fn is_special_fn(kind: SyntaxKind) -> bool {
@@ -449,6 +451,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::DropTrigger::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTrigger);
         }
+        if ast::DropEventTrigger::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropEventTrigger);
+        }
         if ast::DropDatabase::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropDatabase);
         }
@@ -457,6 +462,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::AlterServer::can_cast(ancestor.kind()) {
             return Some(NameRefClass::AlterServer);
+        }
+        if ast::AlterEventTrigger::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AlterEventTrigger);
         }
         if ast::CreateServer::can_cast(ancestor.kind()) {
             return Some(NameRefClass::CreateServer);
@@ -603,6 +611,15 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
             return Some(NameRefClass::TriggerFunctionCall);
         }
+        if let Some(create_event_trigger) = ast::CreateEventTrigger::cast(ancestor.clone())
+            && in_call_expr
+            && !in_arg_list
+        {
+            if create_event_trigger.procedure_token().is_some() {
+                return Some(NameRefClass::TriggerProcedureCall);
+            }
+            return Some(NameRefClass::TriggerFunctionCall);
+        }
         if in_partition_item && ast::CreateTableLike::can_cast(ancestor.kind()) {
             return Some(NameRefClass::PartitionByColumn);
         }
@@ -744,6 +761,7 @@ pub(crate) enum NameClass {
     CreateIndex(ast::CreateIndex),
     CreateSequence(ast::CreateSequence),
     CreateTrigger(ast::CreateTrigger),
+    CreateEventTrigger(ast::CreateEventTrigger),
     CreateTablespace(ast::CreateTablespace),
     CreateDatabase(ast::CreateDatabase),
     CreateServer(ast::CreateServer),
@@ -790,6 +808,9 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         }
         if let Some(create_trigger) = ast::CreateTrigger::cast(ancestor.clone()) {
             return Some(NameClass::CreateTrigger(create_trigger));
+        }
+        if let Some(create_event_trigger) = ast::CreateEventTrigger::cast(ancestor.clone()) {
+            return Some(NameClass::CreateEventTrigger(create_event_trigger));
         }
         if let Some(create_tablespace) = ast::CreateTablespace::cast(ancestor.clone()) {
             return Some(NameClass::CreateTablespace(create_tablespace));
