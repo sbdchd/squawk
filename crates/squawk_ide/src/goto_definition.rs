@@ -59,7 +59,7 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> SmallVec<[Tex
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         let binder_output = binder::bind(&file);
         let root = file.syntax();
-        if let Some(ptrs) = resolve::resolve_name_ref(&binder_output, root, &name_ref) {
+        if let Some(ptrs) = resolve::resolve_name_ref_ptrs(&binder_output, root, &name_ref) {
             return ptrs
                 .iter()
                 .map(|ptr| ptr.to_node(file.syntax()).text_range())

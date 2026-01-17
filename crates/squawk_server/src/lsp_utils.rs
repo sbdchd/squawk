@@ -95,12 +95,23 @@ pub(crate) fn completion_item(
         CompletionInsertTextFormat::Snippet => lsp_types::InsertTextFormat::SNIPPET,
     });
 
+    let command = if item.trigger_completion_after_insert {
+        Some(lsp_types::Command {
+            title: "Trigger Completion".to_owned(),
+            command: "editor.action.triggerSuggest".to_owned(),
+            arguments: None,
+        })
+    } else {
+        None
+    };
+
     lsp_types::CompletionItem {
         label: item.label,
         kind: Some(kind),
         detail: item.detail,
         insert_text: item.insert_text,
         insert_text_format,
+        command,
         ..Default::default()
     }
 }

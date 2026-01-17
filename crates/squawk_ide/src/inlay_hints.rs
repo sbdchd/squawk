@@ -54,7 +54,7 @@ fn inlay_hint_call_expr(
         ast::FieldExpr::cast(expr.syntax().clone())?.field()?
     };
 
-    let function_ptr = resolve::resolve_name_ref(binder, root, &name_ref)?
+    let function_ptr = resolve::resolve_name_ref_ptrs(binder, root, &name_ref)?
         .into_iter()
         .next()?;
 

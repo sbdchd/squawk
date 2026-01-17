@@ -11,7 +11,7 @@ use crate::column_name::ColumnName;
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
 
-pub(crate) fn resolve_name_ref(
+pub(crate) fn resolve_name_ref_ptrs(
     binder: &Binder,
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -2296,16 +2296,7 @@ pub(crate) fn resolve_unqualified_star_table_ptrs(
     for ancestor in target.syntax().ancestors() {
         if let Some(select) = ast::Select::cast(ancestor.clone()) {
             let from_clause = select.from_clause()?;
-            let mut results = vec![];
-
-            for from_item in from_clause.from_items() {
-                collect_tables_from_item(binder, position, &from_item, &mut results);
-            }
-
-            for join_expr in from_clause.join_exprs() {
-                collect_table_ptrs_from_join_expr(binder, position, &join_expr, &mut results);
-            }
-
+            let results = table_ptrs_from_clause(binder, &from_clause);
             if results.is_empty() {
                 return None;
             }
@@ -2339,17 +2330,7 @@ pub(crate) fn resolve_unqualified_star_in_arg_list_ptrs(
 ) -> Option<Vec<SyntaxNodePtr>> {
     let select = arg_list.syntax().ancestors().find_map(ast::Select::cast)?;
     let from_clause = select.from_clause()?;
-    let position = arg_list.syntax().text_range().start();
-
-    let mut results = vec![];
-
-    for from_item in from_clause.from_items() {
-        collect_tables_from_item(binder, position, &from_item, &mut results);
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        collect_table_ptrs_from_join_expr(binder, position, &join_expr, &mut results);
-    }
+    let results = table_ptrs_from_clause(binder, &from_clause);
 
     if results.is_empty() {
         return None;
@@ -2358,30 +2339,45 @@ pub(crate) fn resolve_unqualified_star_in_arg_list_ptrs(
     Some(results)
 }
 
+pub(crate) fn table_ptrs_from_clause(
+    binder: &Binder,
+    from_clause: &ast::FromClause,
+) -> Vec<SyntaxNodePtr> {
+    let mut results = vec![];
+
+    for from_item in from_clause.from_items() {
+        collect_tables_from_item(binder, &from_item, &mut results);
+    }
+
+    for join_expr in from_clause.join_exprs() {
+        collect_table_ptrs_from_join_expr(binder, &join_expr, &mut results);
+    }
+
+    results
+}
+
 fn collect_table_ptrs_from_join_expr(
     binder: &Binder,
-    position: TextSize,
     join_expr: &ast::JoinExpr,
     results: &mut Vec<SyntaxNodePtr>,
 ) {
     if let Some(nested) = join_expr.join_expr() {
-        collect_table_ptrs_from_join_expr(binder, position, &nested, results);
+        collect_table_ptrs_from_join_expr(binder, &nested, results);
     }
 
     if let Some(from_item) = join_expr.from_item() {
-        collect_tables_from_item(binder, position, &from_item, results);
+        collect_tables_from_item(binder, &from_item, results);
     }
 
     if let Some(join) = join_expr.join()
         && let Some(from_item) = join.from_item()
     {
-        collect_tables_from_item(binder, position, &from_item, results);
+        collect_tables_from_item(binder, &from_item, results);
     }
 }
 
 fn collect_tables_from_item(
     binder: &Binder,
-    position: TextSize,
     from_item: &ast::FromItem,
     results: &mut Vec<SyntaxNodePtr>,
 ) {
@@ -2394,6 +2390,7 @@ fn collect_tables_from_item(
         return;
     };
 
+    let position = from_item.syntax().text_range().start();
     if let Some(table_name_ptr) = resolve_table_name_ptr(binder, &table_name, &schema, position) {
         results.push(table_name_ptr);
         return;
