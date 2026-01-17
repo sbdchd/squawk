@@ -448,48 +448,33 @@ fn add_schema(
     offset: TextSize,
 ) -> Option<()> {
     let token = token_from_offset(file, offset)?;
-    let (range, has_qualifier) = token.parent_ancestors().find_map(|node| {
-        if let Some(create_table) = ast::CreateTableLike::cast(node.clone()) {
-            let path = create_table.path()?;
-            return Some((path.syntax().text_range(), path.qualifier().is_some()));
+    let range = token.parent_ancestors().find_map(|node| {
+        if let Some(path) = ast::Path::cast(node.clone()) {
+            if path.qualifier().is_some() {
+                return None;
+            }
+            return Some(path.syntax().text_range());
         }
-        if let Some(create_function) = ast::CreateFunction::cast(node.clone()) {
-            let path = create_function.path()?;
-            return Some((path.syntax().text_range(), path.qualifier().is_some()));
+        if let Some(from_item) = ast::FromItem::cast(node.clone()) {
+            let name_ref = from_item.name_ref()?;
+            return Some(name_ref.syntax().text_range());
         }
-        if let Some(table) = ast::Table::cast(node.clone()) {
-            let path = table.relation_name()?.path()?;
-            return Some((path.syntax().text_range(), path.qualifier().is_some()));
-        }
-        if let Some(field_expr) = ast::FieldExpr::cast(node.clone()) {
-            let ast::Expr::NameRef(name_ref) = field_expr.base()? else {
+        if let Some(call_expr) = ast::CallExpr::cast(node) {
+            let ast::Expr::NameRef(name_ref) = call_expr.expr()? else {
                 return None;
             };
-            return Some((name_ref.syntax().text_range(), false));
-        }
-        if let Some(from_item) = ast::FromItem::cast(node) {
-            let name_ref = from_item.name_ref()?;
-            return Some((name_ref.syntax().text_range(), false));
+            return Some(name_ref.syntax().text_range());
         }
         None
     })?;
 
-    // Already have a schema (or maybe table) set
-    //
-    // TODO: we'll need to change this when we want to support things like:
-    // `select t.c from t; -> select public.t.c from t;`
-    if has_qualifier {
-        return None;
-    }
-
     if !range.contains(offset) {
         return None;
     }
-    let position = token.text_range().start();
 
+    let position = token.text_range().start();
     let binder = binder::bind(file);
     let schema = binder.search_path_at(position).first()?.to_string();
-
     let replacement = format!("{}.", schema);
 
     actions.push(CodeAction {
@@ -1072,6 +1057,15 @@ mod test {
     }
 
     #[test]
+    fn add_schema_create_type() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "create type t$0 as enum ();"),
+            @"create type public.t as enum ();"
+        );
+    }
+
+    #[test]
     fn add_schema_table_stmt() {
         assert_snapshot!(apply_code_action(
             add_schema,
@@ -1092,14 +1086,36 @@ mod test {
     }
 
     #[test]
+    fn add_schema_select_table_value() {
+        // we can't insert the schema here because:
+        // `select public.t from t` isn't valid
+        assert!(code_action_not_applicable(
+            add_schema,
+            "create table t(a text, b int);
+        select t$0 from t;"
+        ));
+    }
+
+    #[test]
+    fn add_schema_select_unqualified_column() {
+        // not applicable since we don't have the table name set
+        // we'll have another quick action to insert table names
+        assert!(code_action_not_applicable(
+            add_schema,
+            "create table t(a text, b int);
+        select a$0 from t;"
+        ));
+    }
+
+    #[test]
     fn add_schema_select_qualified_column() {
-        assert_snapshot!(apply_code_action(
+        // not valid because we haven't specified the schema on the table name
+        // `select public.t.c from t` isn't valid sql
+        assert!(code_action_not_applicable(
             add_schema,
             "create table t(c text);
-        select t$0.c from t;"),
-            @"create table t(c text);
-        select public.t.c from t;"
-        );
+        select t$0.c from t;"
+        ));
     }
 
     #[test]
@@ -1122,6 +1138,35 @@ create table myschema.t(a text, b int);"
         assert!(code_action_not_applicable(
             add_schema,
             "create table myschema.t$0(a text, b int);"
+        ));
+    }
+
+    #[test]
+    fn add_schema_function_call() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "
+create function f() returns int8
+  as 'select 1'
+  language sql;
+
+select f$0();"),
+            @"
+create function f() returns int8
+  as 'select 1'
+  language sql;
+
+select public.f();"
+        );
+    }
+
+    #[test]
+    fn add_schema_function_call_not_applicable_with_schema() {
+        assert!(code_action_not_applicable(
+            add_schema,
+            "
+create function f() returns int8 as 'select 1' language sql;
+select myschema.f$0();"
         ));
     }
 

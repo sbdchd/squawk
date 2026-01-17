@@ -16583,6 +16583,8 @@ pub enum AlterColumnOption {
     DropExpression(DropExpression),
     DropIdentity(DropIdentity),
     DropNotNull(DropNotNull),
+    Inherit(Inherit),
+    NoInherit(NoInherit),
     ResetOptions(ResetOptions),
     Restart(Restart),
     SetCompression(SetCompression),
@@ -28587,6 +28589,8 @@ impl AstNode for AlterColumnOption {
                 | SyntaxKind::DROP_EXPRESSION
                 | SyntaxKind::DROP_IDENTITY
                 | SyntaxKind::DROP_NOT_NULL
+                | SyntaxKind::INHERIT
+                | SyntaxKind::NO_INHERIT
                 | SyntaxKind::RESET_OPTIONS
                 | SyntaxKind::RESTART
                 | SyntaxKind::SET_COMPRESSION
@@ -28613,6 +28617,8 @@ impl AstNode for AlterColumnOption {
             }
             SyntaxKind::DROP_IDENTITY => AlterColumnOption::DropIdentity(DropIdentity { syntax }),
             SyntaxKind::DROP_NOT_NULL => AlterColumnOption::DropNotNull(DropNotNull { syntax }),
+            SyntaxKind::INHERIT => AlterColumnOption::Inherit(Inherit { syntax }),
+            SyntaxKind::NO_INHERIT => AlterColumnOption::NoInherit(NoInherit { syntax }),
             SyntaxKind::RESET_OPTIONS => AlterColumnOption::ResetOptions(ResetOptions { syntax }),
             SyntaxKind::RESTART => AlterColumnOption::Restart(Restart { syntax }),
             SyntaxKind::SET_COMPRESSION => {
@@ -28653,6 +28659,8 @@ impl AstNode for AlterColumnOption {
             AlterColumnOption::DropExpression(it) => &it.syntax,
             AlterColumnOption::DropIdentity(it) => &it.syntax,
             AlterColumnOption::DropNotNull(it) => &it.syntax,
+            AlterColumnOption::Inherit(it) => &it.syntax,
+            AlterColumnOption::NoInherit(it) => &it.syntax,
             AlterColumnOption::ResetOptions(it) => &it.syntax,
             AlterColumnOption::Restart(it) => &it.syntax,
             AlterColumnOption::SetCompression(it) => &it.syntax,
@@ -28698,6 +28706,18 @@ impl From<DropNotNull> for AlterColumnOption {
     #[inline]
     fn from(node: DropNotNull) -> AlterColumnOption {
         AlterColumnOption::DropNotNull(node)
+    }
+}
+impl From<Inherit> for AlterColumnOption {
+    #[inline]
+    fn from(node: Inherit) -> AlterColumnOption {
+        AlterColumnOption::Inherit(node)
+    }
+}
+impl From<NoInherit> for AlterColumnOption {
+    #[inline]
+    fn from(node: NoInherit) -> AlterColumnOption {
+        AlterColumnOption::NoInherit(node)
     }
 }
 impl From<ResetOptions> for AlterColumnOption {
