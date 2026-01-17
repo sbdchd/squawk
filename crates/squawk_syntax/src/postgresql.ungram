@@ -2995,6 +2995,8 @@ AlterColumnOption =
 | SetStorage
 | SetCompression
 | SetNotNull
+| Inherit
+| NoInherit
 
 AlterConstraint =
   'alter' 'constraint' option:AlterColumnOption
