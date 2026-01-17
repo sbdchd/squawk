@@ -22,7 +22,7 @@ pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<TextRang
         match_ast! {
             match node {
                 ast::NameRef(name_ref) => {
-                    if let Some(found_refs) = resolve::resolve_name_ref(&binder, root, &name_ref)
+                    if let Some(found_refs) = resolve::resolve_name_ref_ptrs(&binder, root, &name_ref)
                         && found_refs.iter().any(|ptr| targets.contains(ptr))
                     {
                         refs.push(name_ref.syntax().text_range());
@@ -57,7 +57,7 @@ fn find_targets(
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        return resolve::resolve_name_ref(binder, root, &name_ref);
+        return resolve::resolve_name_ref_ptrs(binder, root, &name_ref);
     }
 
     None

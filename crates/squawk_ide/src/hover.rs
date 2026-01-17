@@ -293,7 +293,7 @@ fn hover_column(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let column_ptrs = resolve::resolve_name_ref(binder, root, name_ref)?;
+    let column_ptrs = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?;
 
     let results: Vec<String> = column_ptrs
         .iter()
@@ -383,7 +383,7 @@ fn hover_composite_type_field(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let field_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let field_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let field_name_node = field_ptr.to_node(root);
@@ -435,7 +435,7 @@ fn hover_table(
         return Some(result);
     }
 
-    let table_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let table_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -737,7 +737,7 @@ fn hover_index(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let index_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let index_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -755,7 +755,7 @@ fn hover_sequence(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let sequence_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let sequence_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -773,7 +773,7 @@ fn hover_trigger(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let trigger_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let trigger_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -791,7 +791,7 @@ fn hover_event_trigger(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let event_trigger_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let event_trigger_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -809,7 +809,7 @@ fn hover_tablespace(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let tablespace_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let tablespace_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let tablespace_name_node = tablespace_ptr.to_node(root);
@@ -821,7 +821,7 @@ fn hover_database(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let database_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let database_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let database_name_node = database_ptr.to_node(root);
@@ -833,7 +833,7 @@ fn hover_server(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let server_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let server_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let server_name_node = server_ptr.to_node(root);
@@ -845,7 +845,7 @@ fn hover_extension(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let extension_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let extension_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let extension_name_node = extension_ptr.to_node(root);
@@ -857,7 +857,7 @@ fn hover_role(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let role_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let role_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let role_name_node = role_ptr.to_node(root);
@@ -869,7 +869,7 @@ fn hover_cursor(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let cursor_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let cursor_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let cursor_name_node = cursor_ptr.to_node(root);
@@ -882,7 +882,7 @@ fn hover_prepared_statement(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let statement_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let statement_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let statement_name_node = statement_ptr.to_node(root);
@@ -897,7 +897,7 @@ fn hover_channel(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let channel_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let channel_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let channel_name_node = channel_ptr.to_node(root);
@@ -910,7 +910,7 @@ fn hover_type(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let type_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let type_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -1135,7 +1135,7 @@ fn hover_schema(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let schema_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let schema_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -1169,7 +1169,7 @@ fn hover_function(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let function_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let function_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -1187,7 +1187,7 @@ fn hover_named_arg_parameter(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let param_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let param_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let param_name_node = param_ptr.to_node(root);
@@ -1271,7 +1271,7 @@ fn hover_aggregate(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let aggregate_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let aggregate_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -1302,7 +1302,7 @@ fn hover_procedure(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let procedure_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let procedure_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
 
@@ -1333,7 +1333,7 @@ fn hover_routine(
     name_ref: &ast::NameRef,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let routine_ptr = resolve::resolve_name_ref(binder, root, name_ref)?
+    let routine_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
         .into_iter()
         .next()?;
     let routine_name = routine_ptr.to_node(root);
