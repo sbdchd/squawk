@@ -1,3 +1,6 @@
+// Generated via:
+//   cargo xtask codegen
+
 use crate::{SyntaxKind, SyntaxToken, ast::AstToken};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

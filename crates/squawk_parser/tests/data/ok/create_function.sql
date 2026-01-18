@@ -415,3 +415,9 @@ create function f (foo.bar.buzz.boo, t.u[], bool)
 returns void
 as '' language sql;
 
+-- overlaps doesn't need quoting
+create function overlaps() returns int8 as 'select 1' language sql;
+
+-- like doesn't need quoting
+create function like() returns int8 as 'select 1' language sql;
+

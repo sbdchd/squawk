@@ -1,3 +1,6 @@
+// Generated via:
+//   cargo xtask codegen
+
 pub(crate) const RESERVED_KEYWORDS: &[&str] = &[
     "all",
     "analyse",

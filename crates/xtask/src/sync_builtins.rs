@@ -55,6 +55,18 @@ where n.nspname not like 'pg_temp%'
 order by n.nspname, p.proname;
 ";
 
+const BUILTIN_OPERATORS_QUERY: &str = r"
+select n.nspname, o.oprname,
+  format_type(o.oprleft, null) as left_type,
+  format_type(o.oprright, null) as right_type
+from pg_operator o
+join pg_namespace n on n.oid = o.oprnamespace
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and n.nspname <> 'public'
+order by n.nspname, o.oprname;
+";
+
 const PG_VERSION_QUERY: &str = "show server_version;";
 
 fn write_table(sql: &mut String, schema: &str, table_name: &str, columns: &[(String, String)]) {
@@ -68,7 +80,14 @@ fn write_table(sql: &mut String, schema: &str, table_name: &str, columns: &[(Str
 
 fn run_sql(query: &str) -> Result<String> {
     let output = Command::new("psql")
-        .args(["--tuples-only", "--no-align", "--command", query])
+        .args([
+            "--tuples-only",
+            "--no-align",
+            "--field-separator",
+            "\t",
+            "--command",
+            query,
+        ])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .output()
@@ -112,7 +131,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
         .lines()
         .filter(|line| !line.is_empty())
     {
-        let mut parts = line.split('|');
+        let mut parts = line.split('\t');
         let schema = parts.next().context("expected schema name")?;
         let type_name = parts.next().context("expected type name")?;
         let type_size = parts.next().context("expected type size")?;
@@ -132,7 +151,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
         .lines()
         .filter(|line| !line.is_empty())
     {
-        let mut parts = line.split('|');
+        let mut parts = line.split('\t');
         let schema = parts.next().context("expected schema name")?;
         let table_name = parts.next().context("expected table name")?;
         let col_name = parts.next().context("expected column name")?;
@@ -161,7 +180,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
         .lines()
         .filter(|line| !line.is_empty())
     {
-        let mut parts = line.split('|');
+        let mut parts = line.split('\t');
         let schema = parts.next().context("expected schema name")?;
         let func_name = parts.next().context("expected function name")?;
         let args = parts.next().context("expected function arguments")?;
@@ -169,6 +188,24 @@ pub(crate) fn sync_builtins() -> Result<()> {
         sql.push_str(&format!(
             "create function {schema}.{func_name}({args}) returns {result} language internal;\n\n"
         ));
+    }
+
+    for line in run_sql(BUILTIN_OPERATORS_QUERY)?
+        .lines()
+        .filter(|line| !line.is_empty())
+    {
+        let mut parts = line.split('\t');
+        let schema = parts.next().context("expected schema name")?;
+        let op_name = parts.next().context("expected operator name")?;
+        let left_type = parts.next().context("expected left type")?;
+        let right_type = parts.next().context("expected right type")?;
+
+        let args = match (left_type, right_type) {
+            ("-", r) => format!("rightarg = {r}"),
+            (l, "-") => format!("leftarg = {l}"),
+            (l, r) => format!("leftarg = {l}, rightarg = {r}"),
+        };
+        sql.push_str(&format!("create operator {schema}.{op_name} ({args});\n\n"));
     }
 
     let builtins_path = project_root().join("crates/squawk_ide/src/builtins.sql");
