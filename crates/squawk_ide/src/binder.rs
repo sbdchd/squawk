@@ -204,6 +204,28 @@ impl Binder {
         }
         names
     }
+
+    pub(crate) fn functions_with_single_param(&self, param_type: &Name) -> Vec<&Name> {
+        let root_scope = self.root_scope();
+        let scope = &self.scopes[root_scope];
+
+        let mut names = vec![];
+        for (name, symbol_ids) in &scope.entries {
+            for symbol_id in symbol_ids {
+                let symbol = &self.symbols[*symbol_id];
+                if symbol.kind == SymbolKind::Function
+                    && symbol
+                        .params
+                        .as_ref()
+                        .is_some_and(|p| p.len() == 1 && &p[0] == param_type)
+                {
+                    names.push(name);
+                    break;
+                }
+            }
+        }
+        names
+    }
 }
 
 pub(crate) fn bind(file: &ast::SourceFile) -> Binder {

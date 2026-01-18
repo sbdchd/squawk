@@ -1598,13 +1598,13 @@ fn find_containing_path(name_ref: &ast::NameRef) -> Option<ast::Path> {
     None
 }
 
-fn extract_table_name(path: &ast::Path) -> Option<Name> {
+pub(crate) fn extract_table_name(path: &ast::Path) -> Option<Name> {
     let segment = path.segment()?;
     let name_ref = segment.name_ref()?;
     Some(Name::from_node(&name_ref))
 }
 
-fn extract_schema_name(path: &ast::Path) -> Option<Schema> {
+pub(crate) fn extract_schema_name(path: &ast::Path) -> Option<Schema> {
     path.qualifier()
         .and_then(|q| q.segment())
         .and_then(|s| s.name_ref())
