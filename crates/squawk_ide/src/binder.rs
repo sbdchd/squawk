@@ -182,7 +182,11 @@ impl Binder {
         &self.search_path_changes[0].search_path
     }
 
-    pub(crate) fn all_symbols_by_kind(&self, kind: SymbolKind) -> Vec<&Name> {
+    pub(crate) fn all_symbols_by_kind(
+        &self,
+        kind: SymbolKind,
+        schema: Option<&Schema>,
+    ) -> Vec<&Name> {
         let root_scope = self.root_scope();
         let scope = &self.scopes[root_scope];
 
@@ -190,7 +194,9 @@ impl Binder {
         for (name, symbol_ids) in &scope.entries {
             for symbol_id in symbol_ids {
                 let symbol = &self.symbols[*symbol_id];
-                if symbol.kind == kind {
+                if symbol.kind == kind
+                    && schema.is_none_or(|schema| symbol.schema.as_ref() == Some(schema))
+                {
                     names.push(name);
                     break;
                 }
