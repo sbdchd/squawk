@@ -3,6 +3,7 @@ use anyhow::Result;
 use clap::{Args, Parser, Subcommand, arg};
 use codegen::codegen;
 use new_rule::new_lint;
+use sync_builtins::sync_builtins;
 use sync_kwlist::sync_kwlist;
 use sync_regression_suite::sync_regression_suite;
 
@@ -10,6 +11,7 @@ mod codegen;
 mod keywords;
 mod new_rule;
 mod path;
+mod sync_builtins;
 mod sync_kwlist;
 mod sync_regression_suite;
 
@@ -23,6 +25,8 @@ enum TaskName {
     NewRule(NewRuleArgs),
     #[command(long_about = "Fetch the latest regression suite from Postgres")]
     SyncRegressionSuite,
+    #[command(long_about = "Generate builtins.sql from PostgreSQL pg_type catalog")]
+    SyncBuiltins,
 }
 
 #[derive(Args, Debug)]
@@ -46,5 +50,6 @@ fn main() -> Result<()> {
         TaskName::SyncRegressionSuite => sync_regression_suite(),
         TaskName::NewRule(args) => new_lint(args),
         TaskName::Codegen => codegen(),
+        TaskName::SyncBuiltins => sync_builtins(),
     }
 }
