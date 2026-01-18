@@ -19,7 +19,7 @@ function computeSnapshotPath(sqlPath: string): string | undefined {
   // crates/parser/src/snapshots/parser__test__alter_foreign_table.snap
   return path.join(
     sourceRoot,
-    `src/snapshots/parser__test__${testName}_${ok_or_err}.snap`
+    `src/snapshots/parser__test__${testName}_${ok_or_err}.snap`,
   )
 }
 
@@ -27,7 +27,7 @@ function computeSnapshotPath(sqlPath: string): string | undefined {
 class JumpToSnapshotCodeLensProvider implements vscode.CodeLensProvider {
   public provideCodeLenses(
     document: vscode.TextDocument,
-    token: vscode.CancellationToken
+    token: vscode.CancellationToken,
   ): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
     const position = new vscode.Position(0, 0)
     const range = new vscode.Range(position, position)
@@ -52,8 +52,8 @@ export function activate(context: vscode.ExtensionContext) {
           pattern: "**/snapshots/*.snap",
         },
       ],
-      new TestSnapshotDefinitionProvider()
-    )
+      new TestSnapshotDefinitionProvider(),
+    ),
   )
 
   context.subscriptions.push(
@@ -64,8 +64,8 @@ export function activate(context: vscode.ExtensionContext) {
         // pattern: "**/test_data/**/*.sql",
         // pattern: "*.sql",
       },
-      new JumpToSnapshotCodeLensProvider()
-    )
+      new JumpToSnapshotCodeLensProvider(),
+    ),
   )
 
   context.subscriptions.push(
@@ -73,8 +73,8 @@ export function activate(context: vscode.ExtensionContext) {
       "squawk-dev.jumpToSnapshot",
       (path: string) => {
         openSnapshotPath(path)
-      }
-    )
+      },
+    ),
   )
 }
 

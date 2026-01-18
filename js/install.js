@@ -87,7 +87,7 @@ function getCachedPath(url) {
   return path.join(
     getNpmCache(),
     "squawk-cli",
-    `${digest}-${path.basename(url).replace(/[^a-zA-Z0-9.]+/g, "-")}`
+    `${digest}-${path.basename(url).replace(/[^a-zA-Z0-9.]+/g, "-")}`,
   )
 }
 
@@ -134,7 +134,7 @@ function downloadBinary() {
       "accept-encoding": "gzip, deflate, br",
     },
     redirect: "follow",
-  }).then(response => {
+  }).then((response) => {
     if (!response.ok) {
       throw new Error(`Received ${response.status}: ${response.statusText}`)
     }
@@ -147,10 +147,10 @@ function downloadBinary() {
 
     return new Promise((resolve, reject) => {
       response.body
-        .on("error", e => reject(e))
+        .on("error", (e) => reject(e))
         .pipe(decompressor)
         .pipe(fs.createWriteStream(tempPath, { mode: 0o755 }))
-        .on("error", e => reject(e))
+        .on("error", (e) => reject(e))
         .on("close", () => resolve())
     }).then(() => {
       fs.copyFileSync(tempPath, cachedPath)
@@ -162,7 +162,7 @@ function downloadBinary() {
 
 downloadBinary()
   .then(() => process.exit(0))
-  .catch(e => {
+  .catch((e) => {
     console.error(e)
     process.exit(1)
   })

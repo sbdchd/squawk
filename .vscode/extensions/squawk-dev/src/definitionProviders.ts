@@ -8,7 +8,7 @@ export class TestSnapshotDefinitionProvider
   public async provideDefinition(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken
+    token: vscode.CancellationToken,
   ): Promise<vscode.Definition | vscode.LocationLink[] | null> {
     // crates/parser/src/snapshots/parser__alter_table_test__parse_alter_column.snap
     const currentFilePath = document.uri.fsPath
@@ -25,7 +25,7 @@ export class TestSnapshotDefinitionProvider
     const workspaceRoot = path.dirname(cratesDir)
 
     const header = document.getText(
-      new Range(new Position(0, 0), new Position(3, 0))
+      new Range(new Position(0, 0), new Position(3, 0)),
     )
     let inputFilePathRel: string | null = null
     for (const line of header.split("\n")) {
@@ -47,7 +47,7 @@ export class TestSnapshotDefinitionProvider
 
 function getCursorPosition(
   document: vscode.TextDocument,
-  position: Position
+  position: Position,
 ): [number | null, number | null] {
   const cursorLine = document.lineAt(position.line).text
 
@@ -84,13 +84,13 @@ function getCursorPosition(
 async function testFuncLocation(
   testFilePath: vscode.Uri,
   cursorPosition: Position,
-  document: vscode.TextDocument
+  document: vscode.TextDocument,
 ): Promise<vscode.Location | vscode.LocationLink[] | null> {
   const testFileDoc = await vscode.workspace.openTextDocument(testFilePath)
 
   const [byteOffsetStart, byteOffsetEnd] = getCursorPosition(
     document,
-    cursorPosition
+    cursorPosition,
   )
 
   const destFunctionPositionStart = testFileDoc.positionAt(byteOffsetStart!)
@@ -116,7 +116,7 @@ async function testFuncLocation(
 
   const originSelectionRange = new Range(
     new Position(cursorPosition.line, leadingWhiteSpaceEnd),
-    new Position(cursorPosition.line, cursorLine.length)
+    new Position(cursorPosition.line, cursorLine.length),
   )
 
   return [
@@ -125,11 +125,11 @@ async function testFuncLocation(
       targetUri: testFilePath,
       targetRange: new Range(
         destFunctionPositionStart,
-        destFunctionPositionEnd
+        destFunctionPositionEnd,
       ),
       targetSelectionRange: new Range(
         destFunctionPositionStart,
-        destFunctionPositionEnd
+        destFunctionPositionEnd,
       ),
     } satisfies LocationLink,
   ]

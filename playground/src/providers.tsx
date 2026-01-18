@@ -1,6 +1,7 @@
 import * as monaco from "monaco-editor"
 import {
   code_actions,
+  completion,
   document_symbols,
   find_references,
   goto_definition,
@@ -241,5 +242,67 @@ export async function provideSelectionRanges(
   } catch (e) {
     console.error("Error in provideSelectionRanges:", e)
     return []
+  }
+}
+
+function convertCompletionKind(
+  kind: string,
+): monaco.languages.CompletionItemKind {
+  switch (kind) {
+    case "keyword":
+      return monaco.languages.CompletionItemKind.Keyword
+    case "table":
+      return monaco.languages.CompletionItemKind.Class
+    case "column":
+      return monaco.languages.CompletionItemKind.Field
+    case "function":
+      return monaco.languages.CompletionItemKind.Function
+    case "schema":
+      return monaco.languages.CompletionItemKind.Module
+    case "type":
+      return monaco.languages.CompletionItemKind.TypeParameter
+    case "snippet":
+      return monaco.languages.CompletionItemKind.Snippet
+    default:
+      return monaco.languages.CompletionItemKind.Text
+  }
+}
+
+export async function provideCompletionItems(
+  model: monaco.editor.ITextModel,
+  position: monaco.Position,
+): Promise<monaco.languages.CompletionList> {
+  const content = model.getValue()
+  if (!content) return { suggestions: [] }
+
+  try {
+    const items = completion(
+      content,
+      position.lineNumber - 1,
+      position.column - 1,
+    )
+
+    const suggestions: monaco.languages.CompletionItem[] = items.map(
+      (item) => ({
+        label: item.label,
+        kind: convertCompletionKind(item.kind),
+        detail: item.detail ?? undefined,
+        insertText: item.insert_text ?? item.label,
+        insertTextRules:
+          item.insert_text_format === "snippet"
+            ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            : undefined,
+        command: item.trigger_completion_after_insert
+          ? { id: "editor.action.triggerSuggest", title: "Trigger Suggest" }
+          : undefined,
+        sortText: item.kind === "schema" ? `z${item.label}` : item.label,
+        range: undefined as unknown as monaco.IRange,
+      }),
+    )
+
+    return { suggestions }
+  } catch (e) {
+    console.error("Error in provideCompletionItems:", e)
+    return { suggestions: [] }
   }
 }

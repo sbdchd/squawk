@@ -10,6 +10,7 @@ import initWasm, {
   code_actions as code_actions_,
   inlay_hints as inlay_hints_,
   selection_ranges as selection_ranges_,
+  completion as completion_,
 } from "./pkg/squawk_wasm"
 
 export type TextEdit = {
@@ -88,6 +89,14 @@ export function selection_ranges(
   positions: Array<{ line: number; column: number }>,
 ): SelectionRange[][] {
   return selection_ranges_(content, positions)
+}
+
+export function completion(
+  content: string,
+  line: number,
+  column: number,
+): CompletionItem[] {
+  return completion_(content, line, column)
 }
 
 export function useErrors(text: string) {
@@ -178,4 +187,13 @@ export interface SelectionRange {
   start_column: number
   end_line: number
   end_column: number
+}
+
+export interface CompletionItem {
+  label: string
+  kind: string
+  detail: string | null
+  insert_text: string | null
+  insert_text_format: string | null
+  trigger_completion_after_insert: boolean
 }
