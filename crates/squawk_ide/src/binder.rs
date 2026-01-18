@@ -28,7 +28,7 @@ impl Binder {
             symbols: Arena::new(),
             search_path_changes: vec![SearchPathChange {
                 position: TextSize::from(0),
-                search_path: vec![Schema::new("public"), Schema::new("pg_temp")],
+                search_path: vec![Schema::new("pg_catalog"), Schema::new("public"), Schema::new("pg_temp")],
             }],
         }
     }
@@ -853,7 +853,7 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
     if set.default_token().is_some() {
         b.search_path_changes.push(SearchPathChange {
             position,
-            search_path: vec![Schema::new("public"), Schema::new("pg_temp")],
+            search_path: vec![Schema::new("pg_catalog"), Schema::new("public"), Schema::new("pg_temp")],
         });
     } else {
         let mut search_path = vec![];
