@@ -533,3 +533,50 @@ struct WasmSelectionRange {
     end_line: u32,
     end_column: u32,
 }
+
+#[wasm_bindgen]
+pub fn completion(content: String, line: u32, col: u32) -> Result<JsValue, Error> {
+    let parse = squawk_syntax::SourceFile::parse(&content);
+    let line_index = LineIndex::new(&content);
+    let offset = position_to_offset(&line_index, line, col)?;
+    let items = squawk_ide::completion::completion(&parse.tree(), offset);
+
+    let converted: Vec<WasmCompletionItem> = items
+        .into_iter()
+        .map(|item| WasmCompletionItem {
+            label: item.label,
+            kind: match item.kind {
+                squawk_ide::completion::CompletionItemKind::Keyword => "keyword",
+                squawk_ide::completion::CompletionItemKind::Table => "table",
+                squawk_ide::completion::CompletionItemKind::Column => "column",
+                squawk_ide::completion::CompletionItemKind::Function => "function",
+                squawk_ide::completion::CompletionItemKind::Schema => "schema",
+                squawk_ide::completion::CompletionItemKind::Type => "type",
+                squawk_ide::completion::CompletionItemKind::Snippet => "snippet",
+            }
+            .to_string(),
+            detail: item.detail,
+            insert_text: item.insert_text,
+            insert_text_format: item.insert_text_format.map(|fmt| {
+                match fmt {
+                    squawk_ide::completion::CompletionInsertTextFormat::PlainText => "plainText",
+                    squawk_ide::completion::CompletionInsertTextFormat::Snippet => "snippet",
+                }
+                .to_string()
+            }),
+            trigger_completion_after_insert: item.trigger_completion_after_insert,
+        })
+        .collect();
+
+    serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+}
+
+#[derive(Serialize)]
+struct WasmCompletionItem {
+    label: String,
+    kind: String,
+    detail: Option<String>,
+    insert_text: Option<String>,
+    insert_text_format: Option<String>,
+    trigger_completion_after_insert: bool,
+}

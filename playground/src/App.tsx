@@ -20,6 +20,7 @@ import {
   provideReferences,
   provideDocumentSymbols,
   provideSelectionRanges,
+  provideCompletionItems,
 } from "./providers"
 
 const modes = ["Lint", "Syntax Tree", "Tokens"] as const
@@ -417,6 +418,14 @@ function registerMonacoProviders() {
       provideSelectionRanges,
     })
 
+  const completionProvider = monaco.languages.registerCompletionItemProvider(
+    "pgsql",
+    {
+      triggerCharacters: ["."],
+      provideCompletionItems,
+    },
+  )
+
   return () => {
     languageConfig.dispose()
     codeActionProvider.dispose()
@@ -426,6 +435,7 @@ function registerMonacoProviders() {
     documentSymbolProvider.dispose()
     inlayHintsProvider.dispose()
     selectionRangeProvider.dispose()
+    completionProvider.dispose()
     tokenProvider.dispose()
   }
 }

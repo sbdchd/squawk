@@ -35,7 +35,6 @@ support SQL embedded in other languages
 - https://fljd.in/en/2024/11/25/substituting-a-variable-in-a-sql-script/
 
 - https://www.timescale.com/blog/how-to-build-an-iot-pipeline-for-real-time-analytics-in-postgresql
-
   - `$__timeFrom()`, `$__timeTo()`, and `$sensor_id`
   - https://grafana.com/docs/grafana/latest/dashboards/variables/
 
@@ -1022,15 +1021,12 @@ size = 24 (0x18), align = 0x8, needs Drop
 other fields?
 
 - alignment
-
   - https://r.ena.to/blog/optimizing-postgres-table-layout-for-maximum-efficiency/
 
 - common values and distribution
-
   - https://observablehq.com/documentation/cells/data-table#data-table-cell
 
 - index size on hover
-
   - https://www.peterbe.com/plog/index-size-postgresql
 
 - data staleness -- if you have a daily batch job to calculate data, we could expose the staleness date

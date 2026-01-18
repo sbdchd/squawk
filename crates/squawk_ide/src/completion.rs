@@ -192,7 +192,7 @@ fn default_completions() -> Vec<CompletionItem> {
             detail: None,
             insert_text: Some(format!("{stmt} $0;")),
             insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: false,
+            trigger_completion_after_insert: true,
         })
         .into_iter()
         .collect()
