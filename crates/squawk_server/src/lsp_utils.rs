@@ -80,15 +80,17 @@ pub(crate) fn completion_item(
 ) -> lsp_types::CompletionItem {
     use squawk_ide::completion::{CompletionInsertTextFormat, CompletionItemKind};
 
-    let kind = match item.kind {
-        CompletionItemKind::Keyword => lsp_types::CompletionItemKind::KEYWORD,
-        CompletionItemKind::Table => lsp_types::CompletionItemKind::STRUCT,
-        CompletionItemKind::Column => lsp_types::CompletionItemKind::FIELD,
-        CompletionItemKind::Function => lsp_types::CompletionItemKind::FUNCTION,
-        CompletionItemKind::Schema => lsp_types::CompletionItemKind::MODULE,
-        CompletionItemKind::Type => lsp_types::CompletionItemKind::CLASS,
-        CompletionItemKind::Snippet => lsp_types::CompletionItemKind::SNIPPET,
+    let (sort_prefix, kind) = match item.kind {
+        CompletionItemKind::Schema => ("9", lsp_types::CompletionItemKind::MODULE),
+        CompletionItemKind::Keyword => ("0", lsp_types::CompletionItemKind::KEYWORD),
+        CompletionItemKind::Table => ("0", lsp_types::CompletionItemKind::STRUCT),
+        CompletionItemKind::Column => ("0", lsp_types::CompletionItemKind::FIELD),
+        CompletionItemKind::Function => ("0", lsp_types::CompletionItemKind::FUNCTION),
+        CompletionItemKind::Type => ("0", lsp_types::CompletionItemKind::CLASS),
+        CompletionItemKind::Snippet => ("0", lsp_types::CompletionItemKind::SNIPPET),
     };
+
+    let sort_text = Some(format!("{sort_prefix}_{}", item.label));
 
     let insert_text_format = item.insert_text_format.map(|x| match x {
         CompletionInsertTextFormat::PlainText => lsp_types::InsertTextFormat::PLAIN_TEXT,
@@ -111,6 +113,7 @@ pub(crate) fn completion_item(
         detail: item.detail,
         insert_text: item.insert_text,
         insert_text_format,
+        sort_text,
         command,
         ..Default::default()
     }

@@ -1,16 +1,17 @@
 use rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode};
 use squawk_syntax::{SyntaxKind, SyntaxToken};
+use std::collections::HashSet;
 
 use crate::binder;
 use crate::resolve;
-use crate::symbols::SymbolKind;
+use crate::symbols::{Name, Schema, SymbolKind};
 use crate::tokens::is_string_or_comment;
 
 pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionItem> {
     let Some(token) = token_at_offset(file, offset) else {
         // empty file
-        return default_completions(true);
+        return default_completions();
     };
     // We don't support completions inside comments since we don't have doc
     // comments a la JSDoc.
@@ -19,25 +20,26 @@ pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionIte
         return vec![];
     }
 
-    let binder = binder::bind(file);
-    match completion_context(token) {
-        CompletionContext::TableOnly => table_completions(&binder),
-        CompletionContext::Default(is_nested) => default_completions(!is_nested),
+    match completion_context(&token) {
+        CompletionContext::TableOnly => table_completions(file, &token),
+        CompletionContext::Default => default_completions(),
         CompletionContext::SelectClause(select_clause) => {
-            select_completions(binder, file, select_clause)
+            select_completions(file, select_clause, &token)
         }
     }
 }
 
 fn select_completions(
-    binder: binder::Binder,
     file: &ast::SourceFile,
     select_clause: ast::SelectClause,
+    token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    let binder = binder::bind(file);
     let mut completions = vec![];
-    let functions = binder.all_symbols_by_kind(SymbolKind::Function);
+    let schema = schema_qualifier_at_token(token);
+    let functions = binder.all_symbols_by_kind(SymbolKind::Function, schema.as_ref());
     completions.extend(functions.into_iter().map(|name| CompletionItem {
-        label: name.to_string(),
+        label: format!("{name}()"),
         kind: CompletionItemKind::Function,
         detail: None,
         insert_text: None,
@@ -45,7 +47,7 @@ fn select_completions(
         trigger_completion_after_insert: false,
     }));
 
-    let tables = binder.all_symbols_by_kind(SymbolKind::Table);
+    let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
     completions.extend(tables.into_iter().map(|name| CompletionItem {
         label: name.to_string(),
         kind: CompletionItemKind::Table,
@@ -54,6 +56,10 @@ fn select_completions(
         insert_text_format: None,
         trigger_completion_after_insert: false,
     }));
+
+    if schema.is_none() {
+        completions.extend(schema_completions(&binder));
+    }
 
     if let Some(parent) = select_clause.syntax().parent()
         && let Some(select) = ast::Select::cast(parent)
@@ -84,10 +90,32 @@ fn select_completions(
     return completions;
 }
 
-fn table_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
+fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
+    let default_schemas =
+        ["public", "pg_temp", "pg_catalog", "pg_toast", "postgres"].map(Name::from_string);
+    let mut names = HashSet::from(default_schemas);
+    for name in binder.all_symbols_by_kind(SymbolKind::Schema, None) {
+        names.insert(name.clone());
+    }
+
+    names
+        .into_iter()
+        .map(|name| CompletionItem {
+            label: name.to_string(),
+            kind: CompletionItemKind::Schema,
+            detail: None,
+            insert_text: None,
+            insert_text_format: None,
+            trigger_completion_after_insert: false,
+        })
+        .collect()
+}
+
+fn table_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    let binder = binder::bind(file);
     // We're in a TRUNCATE or TABLE statement, return table names
-    let tables = binder.all_symbols_by_kind(SymbolKind::Table);
-    tables
+    let tables = binder.all_symbols_by_kind(SymbolKind::Table, None);
+    let mut completions: Vec<CompletionItem> = tables
         .into_iter()
         .map(|name| CompletionItem {
             label: name.to_string(),
@@ -97,41 +125,33 @@ fn table_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
             insert_text_format: None,
             trigger_completion_after_insert: false,
         })
-        .collect()
+        .collect();
+
+    if schema_qualifier_at_token(token).is_none() {
+        completions.extend(schema_completions(&binder));
+    }
+
+    completions
 }
 
 enum CompletionContext {
     TableOnly,
-    Default(bool),
+    Default,
     SelectClause(ast::SelectClause),
 }
 
-fn completion_context(token: SyntaxToken) -> CompletionContext {
-    let mut node = token.parent();
-    let mut is_nested = false;
-    let mut kind = None;
-    while let Some(current_node) = node {
-        if ast::Stmt::can_cast(current_node.kind())
-            && current_node
-                .parent()
-                .is_some_and(|x| x.kind() == SyntaxKind::SOURCE_FILE)
-        {
-            is_nested = true;
+fn completion_context(token: &SyntaxToken) -> CompletionContext {
+    if let Some(node) = token.parent() {
+        for a in node.ancestors() {
+            if ast::Truncate::can_cast(a.kind()) || ast::Table::can_cast(a.kind()) {
+                return CompletionContext::TableOnly;
+            }
+            if let Some(select_clause) = ast::SelectClause::cast(a.clone()) {
+                return CompletionContext::SelectClause(select_clause);
+            }
         }
-        if ast::Truncate::can_cast(current_node.kind()) || ast::Table::can_cast(current_node.kind())
-        {
-            if kind.is_none() {
-                kind = Some(CompletionContext::TableOnly)
-            };
-        }
-        if let Some(select_clause) = ast::SelectClause::cast(current_node.clone()) {
-            if kind.is_none() {
-                kind = Some(CompletionContext::SelectClause(select_clause))
-            };
-        }
-        node = current_node.parent();
     }
-    kind.unwrap_or_else(|| CompletionContext::Default(is_nested))
+    CompletionContext::Default
 }
 
 fn token_at_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxToken> {
@@ -147,50 +167,35 @@ fn token_at_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxTok
     Some(token)
 }
 
-fn default_completions(at_top_level: bool) -> Vec<CompletionItem> {
-    let select_insert_text = if at_top_level {
-        "select $0;"
+fn schema_qualifier_at_token(token: &SyntaxToken) -> Option<Schema> {
+    let schema_token = if token.kind() == SyntaxKind::DOT {
+        token.prev_token()
+    } else if token.kind() == SyntaxKind::IDENT
+        && let Some(prev) = token.prev_token()
+        && prev.kind() == SyntaxKind::DOT
+    {
+        prev.prev_token()
     } else {
-        "select $0"
+        None
     };
 
-    let table_insert_text = if at_top_level {
-        "table $0;"
-    } else {
-        "table $0"
-    };
+    schema_token
+        .filter(|tk| tk.kind() == SyntaxKind::IDENT)
+        .map(|tk| Schema(Name::from_string(tk.text().to_string())))
+}
 
-    let mut completions = vec![
-        CompletionItem {
-            label: "select".to_owned(),
+fn default_completions() -> Vec<CompletionItem> {
+    ["select", "table", "truncate"]
+        .map(|stmt| CompletionItem {
+            label: stmt.to_owned(),
             kind: CompletionItemKind::Keyword,
             detail: None,
-            insert_text: Some(select_insert_text.to_owned()),
+            insert_text: Some(format!("{stmt} $0;")),
             insert_text_format: Some(CompletionInsertTextFormat::Snippet),
             trigger_completion_after_insert: false,
-        },
-        CompletionItem {
-            label: "table".to_owned(),
-            kind: CompletionItemKind::Keyword,
-            detail: None,
-            insert_text: Some(table_insert_text.to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-        },
-    ];
-
-    if at_top_level {
-        completions.push(CompletionItem {
-            label: "truncate".to_owned(),
-            kind: CompletionItemKind::Keyword,
-            detail: None,
-            insert_text: Some("truncate $0;".to_owned()),
-            insert_text_format: Some(CompletionInsertTextFormat::Snippet),
-            trigger_completion_after_insert: true,
-        });
-    }
-
-    completions
+        })
+        .into_iter()
+        .collect()
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -291,6 +296,20 @@ mod tests {
     }
 
     #[test]
+    fn completion_at_top_level() {
+        assert_snapshot!(completions("
+create table t(a int);
+$0
+"), @r"
+         label    | kind    | detail | insert_text  
+        ----------+---------+--------+--------------
+         select   | Keyword |        | select $0;   
+         table    | Keyword |        | table $0;    
+         truncate | Keyword |        | truncate $0;
+        ");
+    }
+
+    #[test]
     fn completion_in_string() {
         completions_not_found("select '$0';");
     }
@@ -306,9 +325,14 @@ mod tests {
 create table users (id int);
 truncate $0;
 "), @r"
-         label | kind  | detail | insert_text 
-        -------+-------+--------+-------------
-         users | Table |        |
+         label      | kind   | detail | insert_text 
+        ------------+--------+--------+-------------
+         pg_catalog | Schema |        |             
+         pg_temp    | Schema |        |             
+         pg_toast   | Schema |        |             
+         postgres   | Schema |        |             
+         public     | Schema |        |             
+         users      | Table  |        |
         ");
     }
 
@@ -326,10 +350,11 @@ truncate $0;
     #[test]
     fn completion_table_nested() {
         assert_snapshot!(completions("select * from ($0)"), @r"
-         label  | kind    | detail | insert_text 
-        --------+---------+--------+-------------
-         select | Keyword |        | select $0   
-         table  | Keyword |        | table $0
+         label    | kind    | detail | insert_text  
+        ----------+---------+--------+--------------
+         select   | Keyword |        | select $0;   
+         table    | Keyword |        | table $0;    
+         truncate | Keyword |        | truncate $0;
         ");
     }
 
@@ -339,9 +364,14 @@ truncate $0;
 create table users (id int);
 table $0;
 "), @r"
-         label | kind  | detail | insert_text 
-        -------+-------+--------+-------------
-         users | Table |        |
+         label      | kind   | detail | insert_text 
+        ------------+--------+--------+-------------
+         pg_catalog | Schema |        |             
+         pg_temp    | Schema |        |             
+         pg_toast   | Schema |        |             
+         postgres   | Schema |        |             
+         public     | Schema |        |             
+         users      | Table  |        |
         ");
     }
 
@@ -352,12 +382,30 @@ create table t(a text, b int);
 create function f() returns text as 'select 1::text' language sql;
 select $0 from t;
 "), @r"
+         label      | kind     | detail | insert_text 
+        ------------+----------+--------+-------------
+         a          | Column   |        |             
+         b          | Column   |        |             
+         f()        | Function |        |             
+         pg_catalog | Schema   |        |             
+         pg_temp    | Schema   |        |             
+         pg_toast   | Schema   |        |             
+         postgres   | Schema   |        |             
+         public     | Schema   |        |             
+         t          | Table    |        |
+        ");
+    }
+
+    #[test]
+    fn completion_with_schema_qualifier() {
+        assert_snapshot!(completions("
+create function f() returns int8 as 'select 1' language sql;
+create function foo.b() returns int8 as 'select 2' language sql;
+select public.$0;
+"), @r"
          label | kind     | detail | insert_text 
         -------+----------+--------+-------------
-         a     | Column   |        |             
-         b     | Column   |        |             
-         f     | Function |        |             
-         t     | Table    |        |
+         f()   | Function |        |
         ");
     }
 }
