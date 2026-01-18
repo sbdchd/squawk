@@ -1,3 +1,6 @@
+// Generated via:
+//   cargo xtask codegen
+
 use crate::syntax_kind::SyntaxKind;
 use crate::token_set::TokenSet;
 

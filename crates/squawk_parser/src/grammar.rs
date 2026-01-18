@@ -1653,7 +1653,7 @@ fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
     // TODO: does this need to be flagged?
     // Might want to disallow operators in some paths.
     // Like `create table +()` doesn't make sense.
-    if !p.at(OPERATOR_KW) && current_operator(p).is_some() {
+    if p.at_ts(OPERATOR_FIRST) && !p.at(OPERATOR_KW) && current_operator(p).is_some() {
         // check for operator kw so we can parse things like:
         //   create table operator();
 

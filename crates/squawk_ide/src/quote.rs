@@ -87,27 +87,29 @@ pub(crate) fn normalize_identifier(text: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    use insta::assert_snapshot;
+
     use super::*;
 
     #[test]
     fn quote_column_alias_handles_embedded_quotes() {
-        assert_eq!(quote_column_alias(r#"foo"bar"#), r#""foo""bar""#);
+        assert_snapshot!(quote_column_alias(r#"foo"bar"#), @r#""foo""bar""#);
     }
 
     #[test]
     fn quote_column_alias_doesnt_quote_reserved_words() {
         // Keywords are allowed as column labels in AS clauses
-        assert_eq!(quote_column_alias("case"), "case");
-        assert_eq!(quote_column_alias("array"), "array");
+        assert_snapshot!(quote_column_alias("case"), @"case");
+        assert_snapshot!(quote_column_alias("array"), @"array");
     }
 
     #[test]
     fn quote_column_alias_doesnt_quote_simple_identifiers() {
-        assert_eq!(quote_column_alias("col_name"), "col_name");
+        assert_snapshot!(quote_column_alias("col_name"), @"col_name");
     }
 
     #[test]
     fn quote_column_alias_handles_special_column_name() {
-        assert_eq!(quote_column_alias("?column?"), r#""?column?""#);
+        assert_snapshot!(quote_column_alias("?column?"), @r#""?column?""#);
     }
 }

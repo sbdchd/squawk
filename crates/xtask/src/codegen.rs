@@ -217,6 +217,12 @@ fn generate_kind_src(
     }
 }
 
+const PRELUDE: &str = "\
+// Generated via:
+//   cargo xtask codegen
+
+";
+
 fn generate_reserved_keywords_array(reserved_keywords: &[String]) -> Result<String> {
     let mut reserved_keywords = reserved_keywords
         .iter()
@@ -224,14 +230,16 @@ fn generate_reserved_keywords_array(reserved_keywords: &[String]) -> Result<Stri
         .collect::<Vec<_>>();
     reserved_keywords.sort();
 
-    Ok(reformat(
+    let output = reformat(
         quote! {
             pub(crate) const RESERVED_KEYWORDS: &[&str] = &[
                 #(#reserved_keywords),*
             ];
         }
         .to_string(),
-    ))
+    );
+
+    Ok(format!("{PRELUDE}{output}"))
 }
 
 fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
@@ -291,7 +299,7 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         .map(|name| format_ident!("{}", name))
         .collect::<Vec<_>>();
 
-    Ok(reformat(reformat(
+    let output = reformat(reformat(
         quote! {
             #![allow(bad_style, missing_docs, clippy::upper_case_acronyms)]
 
@@ -326,7 +334,9 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
             }
         }
         .to_string(),
-    ).replace("#[space_hack]", "")))
+    ).replace("#[space_hack]", ""));
+
+    Ok(format!("{PRELUDE}{output}"))
 }
 
 fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
@@ -363,7 +373,7 @@ fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
 
-    Ok(reformat(
+    let output = reformat(
         quote! {
             use crate::syntax_kind::SyntaxKind;
             use crate::token_set::TokenSet;
@@ -394,7 +404,9 @@ fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
         }
         .to_string(),
     )
-    .replace("pub(crate)", "\npub(crate)"))
+    .replace("pub(crate)", "\npub(crate)");
+
+    Ok(format!("{PRELUDE}{output}"))
 }
 
 #[derive(Debug, Default)]
@@ -879,7 +891,8 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
         #(#node_boilerplate_impls)*
         #(#enums_boilierplate_impls)*
     };
-    reformat(file.to_string()).replace("#[derive", "\n#[derive")
+    let output = reformat(file.to_string()).replace("#[derive", "\n#[derive");
+    format!("{PRELUDE}{output}")
 }
 
 fn generate_tokens(tokens: &[(&'static str, &'static str)]) -> String {
@@ -920,5 +933,6 @@ fn generate_tokens(tokens: &[(&'static str, &'static str)]) -> String {
         #(#tokens)*
     };
 
-    reformat(file.to_string()).replace("#[derive", "\n#[derive")
+    let output = reformat(file.to_string()).replace("#[derive", "\n#[derive");
+    format!("{PRELUDE}{output}")
 }

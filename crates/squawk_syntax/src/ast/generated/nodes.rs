@@ -1,3 +1,6 @@
+// Generated via:
+//   cargo xtask codegen
+
 use crate::SyntaxKind;
 use crate::ast::AstNode;
 use crate::ast::{AstChildren, support};

@@ -3225,3 +3225,77 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- overlaps doesn't need quoting"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          OVERLAPS_KW "overlaps"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select 1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- like doesn't need quoting"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          LIKE_KW "like"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select 1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
