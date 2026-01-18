@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.37.0 - 2026-01-18
+
+### Added
+
+- ide: cast function <-> cast operator code actions (#834)
+- ide: values <-> select code actions (#846, #847)
+- ide: insert schema code action (#855, #856)
+- code completion
+  - ide: delete from completion improvements (#861)
+  - ide: completion for truncate, table, select (#857)
+  - ide: code completion in playground & prettier upgrade (#859)
+  - ide: code completion for schemas (#858)
+- many goto def & hover improvements
+  - ide: goto def for create/alter/drop role (#854)
+  - ide: create/alter/drop event trigger (#852)
+  - ide: listen/notify/unlisten (#851)
+  - ide: goto def with create/drop trigger (#850)
+  - ide: goto def/hover/document symbol support for prepare stmt (#849)
+  - ide: add support for declare/fetch/move/close cursor (#848)
+  - ide: better goto def support for returning clause in insert/update/delete (#828)
+  - ide: improved goto def & hover for merge stmts (#830)
+  - ide: goto def/hover for like and inherits clauses (#832)
+  - ide: goto def nested table/values (#844)
+  - ide: goto def with column list alias (#843)
+  - ide: goto def on function using table as type (#842)
+  - ide: goto def on named params & special functions (#841)
+  - ide: goto def on extensions (#840)
+- ide: inlay hints for select in insert stmt (#845)
+- parser: improve error handling for unfinished select stmt (#838)
+- playground: expand selection support (#829)
+
+### Changed
+
+- parser: update role grammar to use refs like names (#853)
+
+### Fixed
+
+- ide: fix default search path to include pg_catalog (#864)
+
 ## v2.36.0 - 2026-01-06
 
 ### Added
