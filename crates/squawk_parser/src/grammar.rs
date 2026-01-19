@@ -2515,33 +2515,26 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         }
         let m = lhs.precede(p);
         p.bump(op);
+        if matches!(op, COLON_COLON) {
+            type_name(p);
+            let cast_expr = m.complete(p, CAST_EXPR);
+            lhs = postfix_expr(p, cast_expr, true);
+            continue;
+        }
+
         let op_bp = match associativity {
             Associativity::Left => op_bp + 1,
             Associativity::Right => op_bp,
         };
-        let rhs = expr_bp(p, op_bp, r);
-        lhs = if matches!(op, COLON_COLON) {
-            if let Some(rhs) = rhs {
-                match rhs.kind() {
-                    NAME_REF => {
-                        // wrap our previous expression in a type
-                        // TODO: can we unify types & exprs?
-                        let path_segment = rhs.precede(p).complete(p, PATH_SEGMENT);
-                        let path = path_segment.precede(p).complete(p, PATH);
-                        path.precede(p).complete(p, PATH_TYPE);
-                    }
-                    FIELD_EXPR | CALL_EXPR | INDEX_EXPR => {
-                        rhs.precede(p).complete(p, EXPR_TYPE);
-                    }
-                    _ => {}
-                }
-            };
-            m.complete(p, CAST_EXPR)
-        } else if matches!(op, FAT_ARROW | COLON_EQ) {
+        let _rhs = expr_bp(p, op_bp, r);
+        lhs = if matches!(op, FAT_ARROW | COLON_EQ) {
             m.complete(p, NAMED_ARG)
         } else {
             m.complete(p, BIN_EXPR)
         };
+    }
+    if r.order_by_allowed && p.at(ORDER_KW) {
+        opt_order_by_clause(p);
     }
     Some(lhs)
 }

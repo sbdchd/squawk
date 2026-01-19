@@ -104,12 +104,14 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                EXPR_TYPE
-                  INDEX_EXPR
-                    NAME_REF
-                      IDENT "timestamptz"
-                    L_BRACK "["
-                    R_BRACK "]"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "timestamptz"
+                  L_BRACK "["
+                  R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
               CAST_EXPR
@@ -118,12 +120,14 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                EXPR_TYPE
-                  INDEX_EXPR
-                    NAME_REF
-                      TEXT_KW "text"
-                    L_BRACK "["
-                    R_BRACK "]"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+                  L_BRACK "["
+                  R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
               CAST_EXPR
@@ -132,12 +136,14 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                EXPR_TYPE
-                  INDEX_EXPR
-                    NAME_REF
-                      IDENT "float8"
-                    L_BRACK "["
-                    R_BRACK "]"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "float8"
+                  L_BRACK "["
+                  R_BRACK "]"
               WHITESPACE "\n"
               R_PAREN ")"
   SEMICOLON ";"

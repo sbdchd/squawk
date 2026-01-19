@@ -197,6 +197,8 @@ select cast('{1}' as integer[3][3]);
 
 select '{1}'::integer[1][2][3][][][1000];
 
+select '{}'::int array[10];
+
 select array[]::integer[];
 
 -- casts

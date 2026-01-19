@@ -3952,12 +3952,14 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              EXPR_TYPE
-                INDEX_EXPR
-                  NAME_REF
-                    TEXT_KW "text"
-                  L_BRACK "["
-                  R_BRACK "]"
+              ARRAY_TYPE
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+                L_BRACK "["
+                R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -4846,11 +4848,8 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      TIMESTAMP_KW "timestamp"
+              TIME_TYPE
+                TIMESTAMP_KW "timestamp"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first contained by second"

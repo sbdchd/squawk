@@ -91,15 +91,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  BIT_KW "bit"
-                ARG_LIST
-                  L_PAREN "("
+            BIT_TYPE
+              BIT_KW "bit"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "3"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -142,15 +141,14 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              EXPR_TYPE
-                CALL_EXPR
-                  NAME_REF
-                    BIT_KW "bit"
-                  ARG_LIST
-                    L_PAREN "("
+              BIT_TYPE
+                BIT_KW "bit"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "4"
-                    R_PAREN ")"
+                  R_PAREN ")"
             COLON_COLON
               COLON ":"
               COLON ":"
@@ -173,22 +171,25 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                CALL_EXPR
-                  FIELD_EXPR
-                    NAME_REF
-                      IDENT "pg_catalog"
-                    DOT "."
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "pg_catalog"
+                  DOT "."
+                  PATH_SEGMENT
                     NAME_REF
                       VARCHAR_KW "varchar"
-                  ARG_LIST
-                    L_PAREN "("
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "1"
-                    R_PAREN ")"
-                L_BRACK "["
-                R_BRACK "]"
+                  R_PAREN ")"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -203,12 +204,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                NAME_REF
-                  INT_KW "int"
-                L_BRACK "["
-                R_BRACK "]"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INT_KW "int"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -242,12 +245,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                NAME_REF
-                  NUMERIC_KW "numeric"
-                L_BRACK "["
-                R_BRACK "]"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      NUMERIC_KW "numeric"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -266,36 +271,42 @@ SOURCE_FILE
                   COLON ":"
                   COLON ":"
                 WHITESPACE " "
-                EXPR_TYPE
-                  INDEX_EXPR
-                    NAME_REF
-                      INT_KW "int"
-                    L_BRACK "["
-                    R_BRACK "]"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          INT_KW "int"
+                  L_BRACK "["
+                  R_BRACK "]"
               WHITESPACE " "
               COLON_COLON
                 COLON ":"
                 COLON ":"
               WHITESPACE " "
-              EXPR_TYPE
-                INDEX_EXPR
-                  NAME_REF
-                    IDENT "int8"
-                  L_BRACK "["
-                  R_BRACK "]"
+              ARRAY_TYPE
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int8"
+                L_BRACK "["
+                R_BRACK "]"
             WHITESPACE " "
             COLON_COLON
               COLON ":"
               COLON ":"
             WHITESPACE " "
-            EXPR_TYPE
-              INDEX_EXPR
-                NAME_REF
-                  NUMERIC_KW "numeric"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "1"
-                R_BRACK "]"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      NUMERIC_KW "numeric"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -312,32 +323,38 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                EXPR_TYPE
-                  INDEX_EXPR
-                    NAME_REF
-                      INT_KW "int"
-                    L_BRACK "["
-                    R_BRACK "]"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          INT_KW "int"
+                  L_BRACK "["
+                  R_BRACK "]"
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              EXPR_TYPE
-                INDEX_EXPR
-                  NAME_REF
-                    IDENT "int8"
-                  L_BRACK "["
-                  R_BRACK "]"
+              ARRAY_TYPE
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int8"
+                L_BRACK "["
+                R_BRACK "]"
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                NAME_REF
-                  NUMERIC_KW "numeric"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "1"
-                R_BRACK "]"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      NUMERIC_KW "numeric"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- setof"
@@ -379,14 +396,12 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
+              SETOF_KW "setof"
+              WHITESPACE " "
               PATH
                 PATH_SEGMENT
                   NAME_REF
-                    SETOF_KW "setof"
-          WHITESPACE " "
-          AS_NAME
-            NAME
-              INT_KW "int"
+                    INT_KW "int"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- based on postgres' gram.y"
@@ -405,13 +420,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    BIT_KW "bit"
-                    WHITESPACE " "
-                    VARYING_KW "varying"
+            BIT_TYPE
+              BIT_KW "bit"
+              WHITESPACE " "
+              VARYING_KW "varying"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -426,17 +438,16 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  BIT_KW "bit"
-                  WHITESPACE " "
-                  VARYING_KW "varying"
-                ARG_LIST
-                  L_PAREN "("
+            BIT_TYPE
+              BIT_KW "bit"
+              WHITESPACE " "
+              VARYING_KW "varying"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "4"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Character"
@@ -453,11 +464,8 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    CHARACTER_KW "character"
+            CHAR_TYPE
+              CHARACTER_KW "character"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -472,13 +480,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    CHARACTER_KW "character"
-                    WHITESPACE " "
-                    VARYING_KW "varying"
+            CHAR_TYPE
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -493,11 +498,8 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    CHAR_KW "char"
+            CHAR_TYPE
+              CHAR_KW "char"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -512,13 +514,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    CHAR_KW "char"
-                    WHITESPACE " "
-                    VARYING_KW "varying"
+            CHAR_TYPE
+              CHAR_KW "char"
+              WHITESPACE " "
+              VARYING_KW "varying"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -533,11 +532,8 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    VARCHAR_KW "varchar"
+            CHAR_TYPE
+              VARCHAR_KW "varchar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -552,13 +548,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    NATIONAL_KW "national"
-                    WHITESPACE " "
-                    CHARACTER_KW "character"
+            CHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -573,15 +566,12 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    NATIONAL_KW "national"
-                    WHITESPACE " "
-                    CHARACTER_KW "character"
-                    WHITESPACE " "
-                    VARYING_KW "varying"
+            CHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHARACTER_KW "character"
+              WHITESPACE " "
+              VARYING_KW "varying"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -596,13 +586,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    NATIONAL_KW "national"
-                    WHITESPACE " "
-                    CHAR_KW "char"
+            CHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHAR_KW "char"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -617,15 +604,12 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    NATIONAL_KW "national"
-                    WHITESPACE " "
-                    CHAR_KW "char"
-                    WHITESPACE " "
-                    VARYING_KW "varying"
+            CHAR_TYPE
+              NATIONAL_KW "national"
+              WHITESPACE " "
+              CHAR_KW "char"
+              WHITESPACE " "
+              VARYING_KW "varying"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -640,11 +624,8 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    NCHAR_KW "nchar"
+            CHAR_TYPE
+              NCHAR_KW "nchar"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -659,13 +640,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    NCHAR_KW "nchar"
-                    WHITESPACE " "
-                    VARYING_KW "varying"
+            CHAR_TYPE
+              NCHAR_KW "nchar"
+              WHITESPACE " "
+              VARYING_KW "varying"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -680,14 +658,13 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                NAME_REF
-                  NCHAR_KW "nchar"
-                  WHITESPACE " "
-                  VARYING_KW "varying"
-                L_BRACK "["
-                R_BRACK "]"
+            ARRAY_TYPE
+              CHAR_TYPE
+                NCHAR_KW "nchar"
+                WHITESPACE " "
+                VARYING_KW "varying"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ConstDatetime"
@@ -704,15 +681,12 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIMESTAMP_KW "timestamp"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "2"
-                    R_PAREN ")"
+            TIME_TYPE
+              TIMESTAMP_KW "timestamp"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -727,21 +701,19 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIMESTAMP_KW "timestamp"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "2"
-                    R_PAREN ")"
-                    WHITESPACE " "
-                    WITH_KW "with"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIMESTAMP_KW "timestamp"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+              WHITESPACE " "
+              WITH_TIMEZONE
+                WITH_KW "with"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -756,21 +728,19 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIMESTAMP_KW "timestamp"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "2"
-                    R_PAREN ")"
-                    WHITESPACE " "
-                    WITHOUT_KW "without"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIMESTAMP_KW "timestamp"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+              WHITESPACE " "
+              WITHOUT_TIMEZONE
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -785,11 +755,8 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIMESTAMP_KW "timestamp"
+            TIME_TYPE
+              TIMESTAMP_KW "timestamp"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -804,17 +771,15 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIMESTAMP_KW "timestamp"
-                    WHITESPACE " "
-                    WITH_KW "with"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIMESTAMP_KW "timestamp"
+              WHITESPACE " "
+              WITH_TIMEZONE
+                WITH_KW "with"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -829,17 +794,15 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIMESTAMP_KW "timestamp"
-                    WHITESPACE " "
-                    WITHOUT_KW "without"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIMESTAMP_KW "timestamp"
+              WHITESPACE " "
+              WITHOUT_TIMEZONE
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -854,15 +817,12 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIME_KW "time"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "2"
-                    R_PAREN ")"
+            TIME_TYPE
+              TIME_KW "time"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -877,21 +837,19 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIME_KW "time"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "2"
-                    R_PAREN ")"
-                    WHITESPACE " "
-                    WITH_KW "with"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIME_KW "time"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+              WHITESPACE " "
+              WITH_TIMEZONE
+                WITH_KW "with"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -906,21 +864,19 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIME_KW "time"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "2"
-                    R_PAREN ")"
-                    WHITESPACE " "
-                    WITHOUT_KW "without"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIME_KW "time"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+              WHITESPACE " "
+              WITHOUT_TIMEZONE
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -935,11 +891,8 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIME_KW "time"
+            TIME_TYPE
+              TIME_KW "time"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -954,17 +907,15 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    WITH_KW "with"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIME_KW "time"
+              WHITESPACE " "
+              WITH_TIMEZONE
+                WITH_KW "with"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -979,17 +930,15 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    WITHOUT_KW "without"
-                    WHITESPACE " "
-                    TIME_KW "time"
-                    WHITESPACE " "
-                    ZONE_KW "zone"
+            TIME_TYPE
+              TIME_KW "time"
+              WHITESPACE " "
+              WITHOUT_TIMEZONE
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- timestamp with time zone cast"
@@ -1193,11 +1142,8 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1212,13 +1158,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    YEAR_KW "year"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              YEAR_KW "year"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1233,13 +1176,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    MONTH_KW "month"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              MONTH_KW "month"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1254,15 +1194,12 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "0"
-                    R_PAREN ")"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1277,13 +1214,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    DAY_KW "day"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              DAY_KW "day"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1298,13 +1232,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    HOUR_KW "hour"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              HOUR_KW "hour"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1319,13 +1250,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    MINUTE_KW "minute"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              MINUTE_KW "minute"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1340,13 +1268,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    SECOND_KW "second"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              SECOND_KW "second"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1361,17 +1286,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    SECOND_KW "second"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "100"
-                    R_PAREN ")"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              SECOND_KW "second"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "100"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1386,17 +1308,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    YEAR_KW "year"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    MONTH_KW "month"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              YEAR_KW "year"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              MONTH_KW "month"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1411,17 +1330,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    DAY_KW "day"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    HOUR_KW "hour"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              HOUR_KW "hour"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1436,17 +1352,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    DAY_KW "day"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    MINUTE_KW "minute"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              MINUTE_KW "minute"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1461,17 +1374,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    DAY_KW "day"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    SECOND_KW "second"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1486,21 +1396,18 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    DAY_KW "day"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    SECOND_KW "second"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "10"
-                    R_PAREN ")"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              DAY_KW "day"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1515,17 +1422,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    HOUR_KW "hour"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    MINUTE_KW "minute"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              HOUR_KW "hour"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              MINUTE_KW "minute"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1540,17 +1444,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    HOUR_KW "hour"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    SECOND_KW "second"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              HOUR_KW "hour"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1565,21 +1466,18 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    HOUR_KW "hour"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    SECOND_KW "second"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "10"
-                    R_PAREN ")"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              HOUR_KW "hour"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1594,17 +1492,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    MINUTE_KW "minute"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    SECOND_KW "second"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              MINUTE_KW "minute"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1619,21 +1514,18 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    WHITESPACE " "
-                    MINUTE_KW "minute"
-                    WHITESPACE " "
-                    TO_KW "to"
-                    WHITESPACE " "
-                    SECOND_KW "second"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "10"
-                    R_PAREN ")"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              WHITESPACE " "
+              MINUTE_KW "minute"
+              WHITESPACE " "
+              TO_KW "to"
+              WHITESPACE " "
+              SECOND_KW "second"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1648,15 +1540,12 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    INTERVAL_KW "interval"
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "10"
-                    R_PAREN ")"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- JsonType"
@@ -1732,13 +1621,16 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "foo"
+            PATH_TYPE
+              PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "foo"
                 DOT "."
-                NAME_REF
-                  IDENT "bar"
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1750,45 +1642,46 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON_COLON
-              COLON ":"
-              COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "foo"
-                  DOT "."
-                  NAME_REF
-                    IDENT "bar"
-                ARG_LIST
-                  L_PAREN "("
-                  NAME_REF
-                    IDENT "buzz"
-                  COMMA ","
-                  WHITESPACE " "
-                  NAME_REF
-                    IDENT "bizz"
-                  R_PAREN ")"
-  SEMICOLON ";"
-  WHITESPACE "\n\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            LITERAL
-              STRING "'abc'"
             COLON_COLON
               COLON ":"
               COLON ":"
             PATH_TYPE
               PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "foo"
+                DOT "."
                 PATH_SEGMENT
                   NAME_REF
-                    VARCHAR_KW "varchar"
+                    IDENT "bar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  NAME_REF
+                    IDENT "buzz"
+                COMMA ","
+                WHITESPACE " "
+                ARG
+                  NAME_REF
+                    IDENT "bizz"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'abc'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            CHAR_TYPE
+              VARCHAR_KW "varchar"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1803,15 +1696,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  VARCHAR_KW "varchar"
-                ARG_LIST
-                  L_PAREN "("
+            CHAR_TYPE
+              VARCHAR_KW "varchar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "5"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1826,18 +1718,17 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                CALL_EXPR
-                  NAME_REF
-                    VARCHAR_KW "varchar"
-                  ARG_LIST
-                    L_PAREN "("
+            ARRAY_TYPE
+              CHAR_TYPE
+                VARCHAR_KW "varchar"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "255"
-                    R_PAREN ")"
-                L_BRACK "["
-                R_BRACK "]"
+                  R_PAREN ")"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1852,14 +1743,13 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                NAME_REF
-                  VARCHAR_KW "varchar"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "5"
-                R_BRACK "]"
+            ARRAY_TYPE
+              CHAR_TYPE
+                VARCHAR_KW "varchar"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "5"
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1874,109 +1764,122 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                CALL_EXPR
-                  NAME_REF
-                    IDENT "t"
-                  ARG_LIST
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "255"
-                    R_PAREN ")"
-                L_BRACK "["
-                R_BRACK "]"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            LITERAL
-              STRING "''"
-            COLON_COLON
-              COLON ":"
-              COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "foo"
-                  DOT "."
-                  NAME_REF
-                    IDENT "buzz"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "5"
-                  R_PAREN ")"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            LITERAL
-              STRING "''"
-            COLON_COLON
-              COLON ":"
-              COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                FIELD_EXPR
-                  FIELD_EXPR
-                    NAME_REF
-                      IDENT "bar"
-                    DOT "."
-                    NAME_REF
-                      IDENT "foo"
-                  DOT "."
-                  NAME_REF
-                    IDENT "buzz"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "5"
-                R_BRACK "]"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CAST_EXPR
-            LITERAL
-              STRING "''"
-            COLON_COLON
-              COLON ":"
-              COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                CALL_EXPR
-                  FIELD_EXPR
-                    FIELD_EXPR
-                      NAME_REF
-                        IDENT "bar"
-                      DOT "."
-                      NAME_REF
-                        IDENT "foo"
-                    DOT "."
-                    NAME_REF
-                      IDENT "buzz"
-                  ARG_LIST
-                    L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "255"
-                    R_PAREN ")"
-                L_BRACK "["
-                R_BRACK "]"
+                  R_PAREN ")"
+              L_BRACK "["
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "''"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "foo"
+                DOT "."
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "buzz"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "''"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "bar"
+                    DOT "."
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "foo"
+                  DOT "."
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "buzz"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "5"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "''"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "bar"
+                    DOT "."
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "foo"
+                  DOT "."
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "buzz"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
+                    LITERAL
+                      INT_NUMBER "255"
+                  R_PAREN ")"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Numeric"
@@ -2088,15 +1991,17 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  FLOAT_KW "float"
-                ARG_LIST
-                  L_PAREN "("
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    FLOAT_KW "float"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "1"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2111,13 +2016,10 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    DOUBLE_KW "double"
-                    WHITESPACE " "
-                    PRECISION_KW "precision"
+            DOUBLE_TYPE
+              DOUBLE_KW "double"
+              WHITESPACE " "
+              PRECISION_KW "precision"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2151,23 +2053,27 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  DECIMAL_KW "decimal"
-                ARG_LIST
-                  L_PAREN "("
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    DECIMAL_KW "decimal"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "1"
-                  COMMA ","
-                  WHITESPACE " "
+                COMMA ","
+                WHITESPACE " "
+                ARG
                   LITERAL
                     INT_NUMBER "2"
-                  COMMA ","
-                  WHITESPACE " "
+                COMMA ","
+                WHITESPACE " "
+                ARG
                   LITERAL
                     INT_NUMBER "3"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2201,23 +2107,27 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  DEC_KW "dec"
-                ARG_LIST
-                  L_PAREN "("
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    DEC_KW "dec"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "1"
-                  COMMA ","
-                  WHITESPACE " "
+                COMMA ","
+                WHITESPACE " "
+                ARG
                   LITERAL
                     INT_NUMBER "2"
-                  COMMA ","
-                  WHITESPACE " "
+                COMMA ","
+                WHITESPACE " "
+                ARG
                   LITERAL
                     INT_NUMBER "3"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2251,19 +2161,22 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  NUMERIC_KW "numeric"
-                ARG_LIST
-                  L_PAREN "("
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "1"
-                  COMMA ","
-                  WHITESPACE " "
+                COMMA ","
+                WHITESPACE " "
+                ARG
                   LITERAL
                     INT_NUMBER "2"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -2297,23 +2210,26 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                CALL_EXPR
-                  NAME_REF
-                    NUMERIC_KW "numeric"
-                  ARG_LIST
-                    L_PAREN "("
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      NUMERIC_KW "numeric"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "10"
-                    COMMA ","
+                  COMMA ","
+                  ARG
                     LITERAL
                       INT_NUMBER "2"
-                    R_PAREN ")"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "10"
-                R_BRACK "]"
+                  R_PAREN ")"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "10"
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- interval_cast_trailing"
@@ -2641,15 +2557,14 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              EXPR_TYPE
-                CALL_EXPR
-                  NAME_REF
-                    CHAR_KW "char"
-                  ARG_LIST
-                    L_PAREN "("
+              CHAR_TYPE
+                CHAR_KW "char"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "1"
-                    R_PAREN ")"
+                  R_PAREN ")"
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
@@ -2671,15 +2586,14 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                EXPR_TYPE
-                  CALL_EXPR
-                    NAME_REF
-                      CHAR_KW "CHAR"
-                    ARG_LIST
-                      L_PAREN "("
+                CHAR_TYPE
+                  CHAR_KW "CHAR"
+                  ARG_LIST
+                    L_PAREN "("
+                    ARG
                       LITERAL
                         INT_NUMBER "2"
-                      R_PAREN ")"
+                    R_PAREN ")"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
@@ -2694,15 +2608,14 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              EXPR_TYPE
-                CALL_EXPR
-                  NAME_REF
-                    CHAR_KW "CHAR"
-                  ARG_LIST
-                    L_PAREN "("
+              CHAR_TYPE
+                CHAR_KW "CHAR"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "2"
-                    R_PAREN ")"
+                  R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2865,35 +2778,58 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                INDEX_EXPR
-                  INDEX_EXPR
-                    INDEX_EXPR
-                      INDEX_EXPR
-                        INDEX_EXPR
-                          NAME_REF
-                            INTEGER_KW "integer"
-                          L_BRACK "["
-                          LITERAL
-                            INT_NUMBER "1"
-                          R_BRACK "]"
-                        L_BRACK "["
-                        LITERAL
-                          INT_NUMBER "2"
-                        R_BRACK "]"
-                      L_BRACK "["
-                      LITERAL
-                        INT_NUMBER "3"
-                      R_BRACK "]"
-                    L_BRACK "["
-                    R_BRACK "]"
-                  L_BRACK "["
-                  R_BRACK "]"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "1000"
-                R_BRACK "]"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INTEGER_KW "integer"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              R_BRACK "]"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "2"
+              R_BRACK "]"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "3"
+              R_BRACK "]"
+              L_BRACK "["
+              R_BRACK "]"
+              L_BRACK "["
+              R_BRACK "]"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1000"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'{}'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INT_KW "int"
+              WHITESPACE " "
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "10"
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2910,12 +2846,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                NAME_REF
-                  INTEGER_KW "integer"
-                L_BRACK "["
-                R_BRACK "]"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INTEGER_KW "integer"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- casts"
@@ -2932,15 +2870,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  BIT_KW "bit"
-                ARG_LIST
-                  L_PAREN "("
+            BIT_TYPE
+              BIT_KW "bit"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "10"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE " "
   COMMENT "-- 0000101100"
@@ -2957,15 +2894,14 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              CALL_EXPR
-                NAME_REF
-                  BIT_KW "bit"
-                ARG_LIST
-                  L_PAREN "("
+            BIT_TYPE
+              BIT_KW "bit"
+              ARG_LIST
+                L_PAREN "("
+                ARG
                   LITERAL
                     INT_NUMBER "3"
-                  R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE " "
   COMMENT "-- 100"
@@ -3012,15 +2948,14 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              EXPR_TYPE
-                CALL_EXPR
-                  NAME_REF
-                    BIT_KW "bit"
-                  ARG_LIST
-                    L_PAREN "("
+              BIT_TYPE
+                BIT_KW "bit"
+                ARG_LIST
+                  L_PAREN "("
+                  ARG
                     LITERAL
                       INT_NUMBER "4"
-                    R_PAREN ")"
+                  R_PAREN ")"
             COLON_COLON
               COLON ":"
               COLON ":"
@@ -3045,13 +2980,16 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "pg_catalog"
+            PATH_TYPE
+              PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "pg_catalog"
                 DOT "."
-                NAME_REF
-                  IDENT "int8"
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int8"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3066,16 +3004,19 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            EXPR_TYPE
-              INDEX_EXPR
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "pg_catalog"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "pg_catalog"
                   DOT "."
-                  NAME_REF
-                    IDENT "int8"
-                L_BRACK "["
-                R_BRACK "]"
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "int8"
+              L_BRACK "["
+              R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- cast"
