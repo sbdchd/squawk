@@ -522,7 +522,26 @@ fn resolve_type_name_ptr(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    binder.lookup_with(type_name, SymbolKind::Type, position, schema)
+    if let Some(ptr) = binder.lookup_with(type_name, SymbolKind::Type, position, schema) {
+        return Some(ptr);
+    }
+
+    if schema.is_none()
+        && let Some(fallback_name) = fallback_type_alias(type_name)
+    {
+        return binder.lookup_with(&fallback_name, SymbolKind::Type, position, &None);
+    }
+
+    None
+}
+
+fn fallback_type_alias(type_name: &Name) -> Option<Name> {
+    match type_name.0.as_str() {
+        "bigint" | "bigserial" | "serial8" => Some(Name::from_string("int8")),
+        "int" | "integer" | "serial" | "serial4" => Some(Name::from_string("int4")),
+        "smallint" | "smallserial" | "serial2" => Some(Name::from_string("int2")),
+        _ => None,
+    }
 }
 
 fn resolve_view_name_ptr(

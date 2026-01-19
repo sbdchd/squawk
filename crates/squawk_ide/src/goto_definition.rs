@@ -2091,6 +2091,162 @@ select x::public.baz$0;
     }
 
     #[test]
+    fn goto_cast_bigint_falls_back_to_int8() {
+        assert_snapshot!(goto("
+create type pg_catalog.int8;
+select 1::bigint$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int8;
+          │                        ──── 2. destination
+        3 │ select 1::bigint;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_bigint_prefers_user_type() {
+        assert_snapshot!(goto("
+create type bigint;
+create type pg_catalog.int8;
+select 1::bigint$0;
+"), @r"
+          ╭▸ 
+        2 │ create type bigint;
+          │             ────── 2. destination
+        3 │ create type pg_catalog.int8;
+        4 │ select 1::bigint;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_smallserial_falls_back_to_int2() {
+        assert_snapshot!(goto("
+create type pg_catalog.int2;
+select 1::smallserial$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int2;
+          │                        ──── 2. destination
+        3 │ select 1::smallserial;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_serial2_falls_back_to_int2() {
+        assert_snapshot!(goto("
+create type pg_catalog.int2;
+select 1::serial2$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int2;
+          │                        ──── 2. destination
+        3 │ select 1::serial2;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_serial_falls_back_to_int4() {
+        assert_snapshot!(goto("
+create type pg_catalog.int4;
+select 1::serial$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int4;
+          │                        ──── 2. destination
+        3 │ select 1::serial;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_serial4_falls_back_to_int4() {
+        assert_snapshot!(goto("
+create type pg_catalog.int4;
+select 1::serial4$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int4;
+          │                        ──── 2. destination
+        3 │ select 1::serial4;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_bigserial_falls_back_to_int8() {
+        assert_snapshot!(goto("
+create type pg_catalog.int8;
+select 1::bigserial$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int8;
+          │                        ──── 2. destination
+        3 │ select 1::bigserial;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_serial8_falls_back_to_int8() {
+        assert_snapshot!(goto("
+create type pg_catalog.int8;
+select 1::serial8$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int8;
+          │                        ──── 2. destination
+        3 │ select 1::serial8;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_int_falls_back_to_int4() {
+        assert_snapshot!(goto("
+create type pg_catalog.int4;
+select 1::int$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int4;
+          │                        ──── 2. destination
+        3 │ select 1::int;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_integer_falls_back_to_int4() {
+        assert_snapshot!(goto("
+create type pg_catalog.int4;
+select 1::integer$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int4;
+          │                        ──── 2. destination
+        3 │ select 1::integer;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_smallint_falls_back_to_int2() {
+        assert_snapshot!(goto("
+create type pg_catalog.int2;
+select 1::smallint$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.int2;
+          │                        ──── 2. destination
+        3 │ select 1::smallint;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cast_composite_type() {
         assert_snapshot!(goto("
 create type person_info as (name varchar(50), age int);
