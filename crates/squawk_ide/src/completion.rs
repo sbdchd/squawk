@@ -39,10 +39,11 @@ fn select_completions(
     let mut completions = vec![];
     let schema = schema_qualifier_at_token(token);
     let functions = binder.all_symbols_by_kind(SymbolKind::Function, schema.as_ref());
+    let position = token.text_range().start();
     completions.extend(functions.into_iter().map(|name| CompletionItem {
         label: format!("{name}()"),
         kind: CompletionItemKind::Function,
-        detail: None,
+        detail: function_detail(&binder, file, name, &schema, position),
         insert_text: None,
         insert_text_format: None,
         trigger_completion_after_insert: false,
@@ -95,7 +96,13 @@ fn select_completions(
 }
 
 fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
-    let builtin_schemas = ["public", "pg_catalog", "pg_temp", "pg_toast", "postgres"];
+    let builtin_schemas = [
+        "public",
+        "pg_catalog",
+        "pg_temp",
+        "pg_toast",
+        "information_schema",
+    ];
     let mut completions: Vec<CompletionItem> = builtin_schemas
         .into_iter()
         .enumerate()
@@ -207,13 +214,15 @@ fn delete_expr_completions(
     };
 
     let has_table_qualifier = qualifier_at_token(token).is_some_and(|q| q == delete_table_name);
+    let schema = schema_qualifier_at_token(token);
+    let position = token.text_range().start();
 
     if has_table_qualifier {
         let functions = binder.functions_with_single_param(&delete_table_name);
         completions.extend(functions.into_iter().map(|name| CompletionItem {
             label: name.to_string(),
             kind: CompletionItemKind::Function,
-            detail: None,
+            detail: function_detail(&binder, file, name, &schema, position),
             insert_text: None,
             insert_text_format: None,
             trigger_completion_after_insert: false,
@@ -224,7 +233,7 @@ fn delete_expr_completions(
         completions.extend(functions.into_iter().map(|name| CompletionItem {
             label: format!("{name}()"),
             kind: CompletionItemKind::Function,
-            detail: None,
+            detail: function_detail(&binder, file, name, &schema, position),
             insert_text: None,
             insert_text_format: None,
             trigger_completion_after_insert: false,
@@ -243,7 +252,6 @@ fn delete_expr_completions(
     }
 
     let schema = resolve::extract_schema_name(&path);
-    let position = path.syntax().text_range().start();
     if let Some(table_ptr) =
         binder.lookup_with(&delete_table_name, SymbolKind::Table, position, &schema)
         && let Some(create_table) = table_ptr
@@ -339,6 +347,33 @@ fn token_at_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxTok
 
 fn schema_qualifier_at_token(token: &SyntaxToken) -> Option<Schema> {
     qualifier_at_token(token).map(Schema)
+}
+
+fn function_detail(
+    binder: &binder::Binder,
+    file: &ast::SourceFile,
+    function_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+) -> Option<String> {
+    let create_function = binder
+        .lookup_with(function_name, SymbolKind::Function, position, schema)?
+        .to_node(file.syntax())
+        .ancestors()
+        .find_map(ast::CreateFunction::cast)?;
+    let path = create_function.path()?;
+    let (schema, function_name) = resolve::resolve_function_info(binder, &path)?;
+
+    let param_list = create_function.param_list()?;
+    let params = param_list.syntax().text().to_string();
+
+    let ret_type = create_function.ret_type()?;
+    let return_type = ret_type.syntax().text().to_string();
+
+    Some(format!(
+        "{}.{}{} {}",
+        schema, function_name, params, return_type
+    ))
 }
 
 fn default_completions() -> Vec<CompletionItem> {
@@ -508,14 +543,14 @@ $0
 create table users (id int);
 truncate $0;
 "), @r"
-         label      | kind   | detail | insert_text 
-        ------------+--------+--------+-------------
-         users      | Table  |        |             
-         public     | Schema |        |             
-         pg_catalog | Schema |        |             
-         pg_temp    | Schema |        |             
-         pg_toast   | Schema |        |             
-         postgres   | Schema |        |
+         label              | kind   | detail | insert_text 
+        --------------------+--------+--------+-------------
+         users              | Table  |        |             
+         public             | Schema |        |             
+         pg_catalog         | Schema |        |             
+         pg_temp            | Schema |        |             
+         pg_toast           | Schema |        |             
+         information_schema | Schema |        |
         ");
     }
 
@@ -549,14 +584,14 @@ truncate $0;
 create table users (id int);
 table $0;
 "), @r"
-         label      | kind   | detail | insert_text 
-        ------------+--------+--------+-------------
-         users      | Table  |        |             
-         public     | Schema |        |             
-         pg_catalog | Schema |        |             
-         pg_temp    | Schema |        |             
-         pg_toast   | Schema |        |             
-         postgres   | Schema |        |
+         label              | kind   | detail | insert_text 
+        --------------------+--------+--------+-------------
+         users              | Table  |        |             
+         public             | Schema |        |             
+         pg_catalog         | Schema |        |             
+         pg_temp            | Schema |        |             
+         pg_toast           | Schema |        |             
+         information_schema | Schema |        |
         ");
     }
 
@@ -567,17 +602,17 @@ create table t(a text, b int);
 create function f() returns text as 'select 1::text' language sql;
 select $0 from t;
 "), @r"
-         label      | kind     | detail | insert_text 
-        ------------+----------+--------+-------------
-         a          | Column   |        |             
-         b          | Column   |        |             
-         t          | Table    |        |             
-         f()        | Function |        |             
-         public     | Schema   |        |             
-         pg_catalog | Schema   |        |             
-         pg_temp    | Schema   |        |             
-         pg_toast   | Schema   |        |             
-         postgres   | Schema   |        |
+         label              | kind     | detail                  | insert_text 
+        --------------------+----------+-------------------------+-------------
+         a                  | Column   |                         |             
+         b                  | Column   |                         |             
+         t                  | Table    |                         |             
+         f()                | Function | public.f() returns text |             
+         public             | Schema   |                         |             
+         pg_catalog         | Schema   |                         |             
+         pg_temp            | Schema   |                         |             
+         pg_toast           | Schema   |                         |             
+         information_schema | Schema   |                         |
         ");
     }
 
@@ -588,9 +623,9 @@ create function f() returns int8 as 'select 1' language sql;
 create function foo.b() returns int8 as 'select 2' language sql;
 select public.$0;
 "), @r"
-         label | kind     | detail | insert_text 
-        -------+----------+--------+-------------
-         f()   | Function |        |
+         label | kind     | detail                  | insert_text 
+        -------+----------+-------------------------+-------------
+         f()   | Function | public.f() returns int8 |
         ");
     }
 
@@ -612,14 +647,14 @@ truncate public.$0;
 create table users (id int);
 delete from $0;
 "), @r"
-         label      | kind   | detail | insert_text 
-        ------------+--------+--------+-------------
-         users      | Table  |        |             
-         public     | Schema |        |             
-         pg_catalog | Schema |        |             
-         pg_temp    | Schema |        |             
-         pg_toast   | Schema |        |             
-         postgres   | Schema |        |
+         label              | kind   | detail | insert_text 
+        --------------------+--------+--------+-------------
+         users              | Table  |        |             
+         public             | Schema |        |             
+         pg_catalog         | Schema |        |             
+         pg_temp            | Schema |        |             
+         pg_toast           | Schema |        |             
+         information_schema | Schema |        |
         ");
     }
 
@@ -644,12 +679,12 @@ create table t (id int, name text);
 create function is_active() returns bool as 'select true' language sql;
 delete from t where $0;
 "), @r"
-         label       | kind     | detail | insert_text 
-        -------------+----------+--------+-------------
-         id          | Column   |        |             
-         name        | Column   |        |             
-         t           | Table    |        |             
-         is_active() | Function |        |
+         label       | kind     | detail                          | insert_text 
+        -------------+----------+---------------------------------+-------------
+         id          | Column   |                                 |             
+         name        | Column   |                                 |             
+         t           | Table    |                                 |             
+         is_active() | Function | public.is_active() returns bool |
         ")
     }
 
