@@ -50,13 +50,16 @@ SOURCE_FILE@0..470
               COLON_COLON@187..189
                 COLON@187..188 ":"
                 COLON@188..189 ":"
-              EXPR_TYPE@189..220
-                FIELD_EXPR@189..220
-                  NAME_REF@189..201
-                    IDENT@189..201 "custom_types"
+              PATH_TYPE@189..220
+                PATH@189..220
+                  PATH@189..201
+                    PATH_SEGMENT@189..201
+                      NAME_REF@189..201
+                        IDENT@189..201 "custom_types"
                   DOT@201..202 "."
-                  NAME_REF@202..220
-                    IDENT@202..220 "widget_schema_type"
+                  PATH_SEGMENT@202..220
+                    NAME_REF@202..220
+                      IDENT@202..220 "widget_schema_type"
             COMMA@220..221 ","
             WHITESPACE@221..222 " "
             NAME_REF@222..228
@@ -116,13 +119,16 @@ SOURCE_FILE@0..470
               COLON_COLON@403..405
                 COLON@403..404 ":"
                 COLON@404..405 ":"
-              EXPR_TYPE@405..436
-                FIELD_EXPR@405..436
-                  NAME_REF@405..417
-                    IDENT@405..417 "custom_types"
+              PATH_TYPE@405..436
+                PATH@405..436
+                  PATH@405..417
+                    PATH_SEGMENT@405..417
+                      NAME_REF@405..417
+                        IDENT@405..417 "custom_types"
                   DOT@417..418 "."
-                  NAME_REF@418..436
-                    IDENT@418..436 "widget_schema_type"
+                  PATH_SEGMENT@418..436
+                    NAME_REF@418..436
+                      IDENT@418..436 "widget_schema_type"
             COMMA@436..437 ","
             WHITESPACE@437..438 " "
             NAME_REF@438..454
