@@ -94,9 +94,6 @@ create type pg_catalog.cstring;
 -- size: 4, align: 4
 create type pg_catalog.date;
 
--- size: -1, align: 4
-create type pg_catalog.daterange;
-
 -- size: 4, align: 4
 create type pg_catalog.event_trigger;
 
@@ -127,14 +124,8 @@ create type pg_catalog.int2vector;
 -- size: 4, align: 4
 create type pg_catalog.int4;
 
--- size: -1, align: 4
-create type pg_catalog.int4range;
-
 -- size: 8, align: 8
 create type pg_catalog.int8;
-
--- size: -1, align: 8
-create type pg_catalog.int8range;
 
 -- size: 8, align: 8
 create type pg_catalog.internal;
@@ -174,9 +165,6 @@ create type pg_catalog.name;
 
 -- size: -1, align: 4
 create type pg_catalog.numeric;
-
--- size: -1, align: 4
-create type pg_catalog.numrange;
 
 -- size: 4, align: 4
 create type pg_catalog.oid;
@@ -289,12 +277,6 @@ create type pg_catalog.tsm_handler;
 -- size: -1, align: 4
 create type pg_catalog.tsquery;
 
--- size: -1, align: 8
-create type pg_catalog.tsrange;
-
--- size: -1, align: 8
-create type pg_catalog.tstzrange;
-
 -- size: -1, align: 4
 create type pg_catalog.tsvector;
 
@@ -324,6 +306,755 @@ create type pg_catalog.xid8;
 
 -- size: -1, align: 4
 create type pg_catalog.xml;
+
+-- size: -1, align: 4
+create type pg_catalog.daterange as range (subtype = date);
+
+-- size: -1, align: 4
+create type pg_catalog.int4range as range (subtype = integer);
+
+-- size: -1, align: 8
+create type pg_catalog.int8range as range (subtype = bigint);
+
+-- size: -1, align: 4
+create type pg_catalog.numrange as range (subtype = numeric);
+
+-- size: -1, align: 8
+create type pg_catalog.tsrange as range (subtype = timestamp without time zone);
+
+-- size: -1, align: 8
+create type pg_catalog.tstzrange as range (subtype = timestamp with time zone);
+
+create view information_schema._pg_foreign_data_wrappers(oid, fdwowner, fdwoptions, foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, foreign_data_wrapper_language) as
+  select
+    null::oid,
+    null::oid,
+    null::text[],
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema._pg_foreign_servers(oid, srvoptions, foreign_server_catalog, foreign_server_name, foreign_data_wrapper_catalog, foreign_data_wrapper_name, foreign_server_type, foreign_server_version, authorization_identifier) as
+  select
+    null::oid,
+    null::text[],
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema._pg_foreign_table_columns(nspname, relname, attname, attfdwoptions) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::text[]
+;
+
+create view information_schema._pg_foreign_tables(foreign_table_catalog, foreign_table_schema, foreign_table_name, ftoptions, foreign_server_catalog, foreign_server_name, authorization_identifier) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::text[],
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema._pg_user_mappings(oid, umoptions, umuser, authorization_identifier, foreign_server_catalog, foreign_server_name, srvowner) as
+  select
+    null::oid,
+    null::text[],
+    null::oid,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.administrable_role_authorizations(grantee, role_name, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.applicable_roles(grantee, role_name, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.attributes(udt_catalog, udt_schema, udt_name, attribute_name, ordinal_position, attribute_default, is_nullable, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, attribute_udt_catalog, attribute_udt_schema, attribute_udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_derived_reference_attribute) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.character_sets(character_set_catalog, character_set_schema, character_set_name, character_repertoire, form_of_use, default_collate_catalog, default_collate_schema, default_collate_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.check_constraint_routine_usage(constraint_catalog, constraint_schema, constraint_name, specific_catalog, specific_schema, specific_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.check_constraints(constraint_catalog, constraint_schema, constraint_name, check_clause) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.collation_character_set_applicability(collation_catalog, collation_schema, collation_name, character_set_catalog, character_set_schema, character_set_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.collations(collation_catalog, collation_schema, collation_name, pad_attribute) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.column_column_usage(table_catalog, table_schema, table_name, column_name, dependent_column) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.column_domain_usage(domain_catalog, domain_schema, domain_name, table_catalog, table_schema, table_name, column_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.column_options(table_catalog, table_schema, table_name, column_name, option_name, option_value) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.column_privileges(grantor, grantee, table_catalog, table_schema, table_name, column_name, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.column_udt_usage(udt_catalog, udt_schema, udt_name, table_catalog, table_schema, table_name, column_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.columns(table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, character_octet_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, domain_catalog, domain_schema, domain_name, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, is_self_referencing, is_identity, identity_generation, identity_start, identity_increment, identity_maximum, identity_minimum, identity_cycle, is_generated, generation_expression, is_updatable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.constraint_column_usage(table_catalog, table_schema, table_name, column_name, constraint_catalog, constraint_schema, constraint_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.constraint_table_usage(table_catalog, table_schema, table_name, constraint_catalog, constraint_schema, constraint_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.data_type_privileges(object_catalog, object_schema, object_name, object_type, dtd_identifier) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.domain_constraints(constraint_catalog, constraint_schema, constraint_name, domain_catalog, domain_schema, domain_name, is_deferrable, initially_deferred) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.domain_udt_usage(udt_catalog, udt_schema, udt_name, domain_catalog, domain_schema, domain_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.domains(domain_catalog, domain_schema, domain_name, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, domain_default, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.element_types(object_catalog, object_schema, object_name, object_type, collection_type_identifier, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.enabled_roles(role_name) as
+  select
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.foreign_data_wrapper_options(foreign_data_wrapper_catalog, foreign_data_wrapper_name, option_name, option_value) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.foreign_data_wrappers(foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, library_name, foreign_data_wrapper_language) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data
+;
+
+create view information_schema.foreign_server_options(foreign_server_catalog, foreign_server_name, option_name, option_value) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.foreign_servers(foreign_server_catalog, foreign_server_name, foreign_data_wrapper_catalog, foreign_data_wrapper_name, foreign_server_type, foreign_server_version, authorization_identifier) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.foreign_table_options(foreign_table_catalog, foreign_table_schema, foreign_table_name, option_name, option_value) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.foreign_tables(foreign_table_catalog, foreign_table_schema, foreign_table_name, foreign_server_catalog, foreign_server_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.information_schema_catalog_name(catalog_name) as
+  select
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.key_column_usage(constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, column_name, ordinal_position, position_in_unique_constraint) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number
+;
+
+create view information_schema.parameters(specific_catalog, specific_schema, specific_name, ordinal_position, parameter_mode, is_result, as_locator, parameter_name, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, udt_catalog, udt_schema, udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, parameter_default) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.referential_constraints(constraint_catalog, constraint_schema, constraint_name, unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data
+;
+
+create view information_schema.role_column_grants(grantor, grantee, table_catalog, table_schema, table_name, column_name, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.role_routine_grants(grantor, grantee, specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.role_table_grants(grantor, grantee, table_catalog, table_schema, table_name, privilege_type, is_grantable, with_hierarchy) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.role_udt_grants(grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.role_usage_grants(grantor, grantee, object_catalog, object_schema, object_name, object_type, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.routine_column_usage(specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, table_catalog, table_schema, table_name, column_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.routine_privileges(grantor, grantee, specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.routine_routine_usage(specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.routine_sequence_usage(specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, sequence_catalog, sequence_schema, sequence_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.routine_table_usage(specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, table_catalog, table_schema, table_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.routines(specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema, routine_name, routine_type, module_catalog, module_schema, module_name, udt_catalog, udt_schema, udt_name, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, type_udt_catalog, type_udt_schema, type_udt_name, scope_catalog, scope_schema, scope_name, maximum_cardinality, dtd_identifier, routine_body, routine_definition, external_name, external_language, parameter_style, is_deterministic, sql_data_access, is_null_call, sql_path, schema_level_routine, max_dynamic_result_sets, is_user_defined_cast, is_implicitly_invocable, security_type, to_sql_specific_catalog, to_sql_specific_schema, to_sql_specific_name, as_locator, created, last_altered, new_savepoint_level, is_udt_dependent, result_cast_from_data_type, result_cast_as_locator, result_cast_char_max_length, result_cast_char_octet_length, result_cast_char_set_catalog, result_cast_char_set_schema, result_cast_char_set_name, result_cast_collation_catalog, result_cast_collation_schema, result_cast_collation_name, result_cast_numeric_precision, result_cast_numeric_precision_radix, result_cast_numeric_scale, result_cast_datetime_precision, result_cast_interval_type, result_cast_interval_precision, result_cast_type_udt_catalog, result_cast_type_udt_schema, result_cast_type_udt_name, result_cast_scope_catalog, result_cast_scope_schema, result_cast_scope_name, result_cast_maximum_cardinality, result_cast_dtd_identifier) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.cardinal_number,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.yes_or_no,
+    null::information_schema.time_stamp,
+    null::information_schema.time_stamp,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.schemata(catalog_name, schema_name, schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.sequences(sequence_catalog, sequence_schema, sequence_name, data_type, numeric_precision, numeric_precision_radix, numeric_scale, start_value, minimum_value, maximum_value, increment, cycle_option) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
 
 create table information_schema.sql_features (
   feature_id information_schema.character_data,
@@ -358,6 +1089,210 @@ create table information_schema.sql_sizing (
   comments information_schema.character_data
 );
 
+create view information_schema.table_constraints(constraint_catalog, constraint_schema, constraint_name, table_catalog, table_schema, table_name, constraint_type, is_deferrable, initially_deferred, enforced, nulls_distinct) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.table_privileges(grantor, grantee, table_catalog, table_schema, table_name, privilege_type, is_grantable, with_hierarchy) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.tables(table_catalog, table_schema, table_name, table_type, self_referencing_column_name, reference_generation, user_defined_type_catalog, user_defined_type_schema, user_defined_type_name, is_insertable_into, is_typed, commit_action) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data
+;
+
+create view information_schema.transforms(udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, specific_name, group_name, transform_type) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.triggered_update_columns(trigger_catalog, trigger_schema, trigger_name, event_object_catalog, event_object_schema, event_object_table, event_object_column) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.triggers(trigger_catalog, trigger_schema, trigger_name, event_manipulation, event_object_catalog, event_object_schema, event_object_table, action_order, action_condition, action_statement, action_orientation, action_timing, action_reference_old_table, action_reference_new_table, action_reference_old_row, action_reference_new_row, created) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.time_stamp
+;
+
+create view information_schema.udt_privileges(grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.usage_privileges(grantor, grantee, object_catalog, object_schema, object_name, object_type, privilege_type, is_grantable) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no
+;
+
+create view information_schema.user_defined_types(user_defined_type_catalog, user_defined_type_schema, user_defined_type_name, user_defined_type_category, is_instantiable, is_final, ordering_form, ordering_category, ordering_routine_catalog, ordering_routine_schema, ordering_routine_name, reference_type, data_type, character_maximum_length, character_octet_length, character_set_catalog, character_set_schema, character_set_name, collation_catalog, collation_schema, collation_name, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision, source_dtd_identifier, ref_dtd_identifier) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.cardinal_number,
+    null::information_schema.character_data,
+    null::information_schema.cardinal_number,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.user_mapping_options(authorization_identifier, foreign_server_catalog, foreign_server_name, option_name, option_value) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data
+;
+
+create view information_schema.user_mappings(authorization_identifier, foreign_server_catalog, foreign_server_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.view_column_usage(view_catalog, view_schema, view_name, table_catalog, table_schema, table_name, column_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.view_routine_usage(table_catalog, table_schema, table_name, specific_catalog, specific_schema, specific_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.view_table_usage(view_catalog, view_schema, view_name, table_catalog, table_schema, table_name) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier
+;
+
+create view information_schema.views(table_catalog, table_schema, table_name, view_definition, check_option, is_updatable, is_insertable_into, is_trigger_updatable, is_trigger_deletable, is_trigger_insertable_into) as
+  select
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.sql_identifier,
+    null::information_schema.character_data,
+    null::information_schema.character_data,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no,
+    null::information_schema.yes_or_no
+;
+
 create table pg_catalog.pg_aggregate (
   aggfnoid regproc,
   aggkind "char",
@@ -382,6 +1317,25 @@ create table pg_catalog.pg_aggregate (
   agginitval text,
   aggminitval text
 );
+
+create view pg_catalog.pg_aios(pid, io_id, io_generation, state, operation, off, length, target, handle_data_len, raw_result, result, target_desc, f_sync, f_localmem, f_buffered) as
+  select
+    null::integer,
+    null::integer,
+    null::bigint,
+    null::text,
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::text,
+    null::smallint,
+    null::integer,
+    null::text,
+    null::text,
+    null::boolean,
+    null::boolean,
+    null::boolean
+;
 
 create table pg_catalog.pg_am (
   oid oid,
@@ -471,6 +1425,41 @@ create table pg_catalog.pg_authid (
   rolvaliduntil timestamp with time zone
 );
 
+create view pg_catalog.pg_available_extension_versions(name, version, installed, superuser, trusted, relocatable, schema, requires, comment) as
+  select
+    null::name,
+    null::text,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::name,
+    null::name[],
+    null::text
+;
+
+create view pg_catalog.pg_available_extensions(name, default_version, installed_version, comment) as
+  select
+    null::name,
+    null::text,
+    null::text,
+    null::text
+;
+
+create view pg_catalog.pg_backend_memory_contexts(name, ident, type, level, path, total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes) as
+  select
+    null::text,
+    null::text,
+    null::text,
+    null::integer,
+    null::integer[],
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
 create table pg_catalog.pg_cast (
   oid oid,
   castsource oid,
@@ -532,6 +1521,12 @@ create table pg_catalog.pg_collation (
   collversion text
 );
 
+create view pg_catalog.pg_config(name, setting) as
+  select
+    null::text,
+    null::text
+;
+
 create table pg_catalog.pg_constraint (
   oid oid,
   conname name,
@@ -573,6 +1568,16 @@ create table pg_catalog.pg_conversion (
   conproc regproc,
   condefault boolean
 );
+
+create view pg_catalog.pg_cursors(name, statement, is_holdable, is_binary, is_scrollable, creation_time) as
+  select
+    null::text,
+    null::text,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::timestamp with time zone
+;
 
 create table pg_catalog.pg_database (
   oid oid,
@@ -654,6 +1659,17 @@ create table pg_catalog.pg_extension (
   extcondition text[]
 );
 
+create view pg_catalog.pg_file_settings(sourcefile, sourceline, seqno, name, setting, applied, error) as
+  select
+    null::text,
+    null::integer,
+    null::integer,
+    null::text,
+    null::text,
+    null::boolean,
+    null::text
+;
+
 create table pg_catalog.pg_foreign_data_wrapper (
   oid oid,
   fdwname name,
@@ -681,6 +1697,39 @@ create table pg_catalog.pg_foreign_table (
   ftoptions text[]
 );
 
+create view pg_catalog.pg_group(groname, grosysid, grolist) as
+  select
+    null::name,
+    null::oid,
+    null::oid[]
+;
+
+create view pg_catalog.pg_hba_file_rules(rule_number, file_name, line_number, type, database, user_name, address, netmask, auth_method, options, error) as
+  select
+    null::integer,
+    null::text,
+    null::integer,
+    null::text,
+    null::text[],
+    null::text[],
+    null::text,
+    null::text,
+    null::text,
+    null::text[],
+    null::text
+;
+
+create view pg_catalog.pg_ident_file_mappings(map_number, file_name, line_number, map_name, sys_name, pg_username, error) as
+  select
+    null::integer,
+    null::text,
+    null::integer,
+    null::text,
+    null::text,
+    null::text,
+    null::text
+;
+
 create table pg_catalog.pg_index (
   indexrelid oid,
   indrelid oid,
@@ -704,6 +1753,15 @@ create table pg_catalog.pg_index (
   indexprs pg_node_tree,
   indpred pg_node_tree
 );
+
+create view pg_catalog.pg_indexes(schemaname, tablename, indexname, tablespace, indexdef) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::name,
+    null::text
+;
 
 create table pg_catalog.pg_inherits (
   inhrelid oid,
@@ -743,6 +1801,37 @@ create table pg_catalog.pg_largeobject_metadata (
   lomowner oid,
   lomacl aclitem[]
 );
+
+create view pg_catalog.pg_locks(locktype, database, relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, mode, granted, fastpath, waitstart) as
+  select
+    null::text,
+    null::oid,
+    null::oid,
+    null::integer,
+    null::smallint,
+    null::text,
+    null::xid,
+    null::oid,
+    null::oid,
+    null::smallint,
+    null::text,
+    null::integer,
+    null::text,
+    null::boolean,
+    null::boolean,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_matviews(schemaname, matviewname, matviewowner, tablespace, hasindexes, ispopulated, definition) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::name,
+    null::boolean,
+    null::boolean,
+    null::text
+;
 
 create table pg_catalog.pg_namespace (
   oid oid,
@@ -806,6 +1895,18 @@ create table pg_catalog.pg_partitioned_table (
   partexprs pg_node_tree
 );
 
+create view pg_catalog.pg_policies(schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::text,
+    null::name[],
+    null::text,
+    null::text,
+    null::text
+;
+
 create table pg_catalog.pg_policy (
   oid oid,
   polname name,
@@ -816,6 +1917,27 @@ create table pg_catalog.pg_policy (
   polqual pg_node_tree,
   polwithcheck pg_node_tree
 );
+
+create view pg_catalog.pg_prepared_statements(name, statement, prepare_time, parameter_types, result_types, from_sql, generic_plans, custom_plans) as
+  select
+    null::text,
+    null::text,
+    null::timestamp with time zone,
+    null::regtype[],
+    null::regtype[],
+    null::boolean,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_prepared_xacts(transaction, gid, prepared, owner, database) as
+  select
+    null::xid,
+    null::text,
+    null::timestamp with time zone,
+    null::name,
+    null::name
+;
 
 create table pg_catalog.pg_proc (
   oid oid,
@@ -877,6 +1999,15 @@ create table pg_catalog.pg_publication_rel (
   prattrs int2vector
 );
 
+create view pg_catalog.pg_publication_tables(pubname, schemaname, tablename, attnames, rowfilter) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::name[],
+    null::text
+;
+
 create table pg_catalog.pg_range (
   rngtypid oid,
   rngsubtype oid,
@@ -892,6 +2023,39 @@ create table pg_catalog.pg_replication_origin (
   roname text
 );
 
+create view pg_catalog.pg_replication_origin_status(local_id, external_id, remote_lsn, local_lsn) as
+  select
+    null::oid,
+    null::text,
+    null::pg_lsn,
+    null::pg_lsn
+;
+
+create view pg_catalog.pg_replication_slots(slot_name, plugin, slot_type, datoid, database, temporary, active, active_pid, xmin, catalog_xmin, restart_lsn, confirmed_flush_lsn, wal_status, safe_wal_size, two_phase, two_phase_at, inactive_since, conflicting, invalidation_reason, failover, synced) as
+  select
+    null::name,
+    null::name,
+    null::text,
+    null::oid,
+    null::name,
+    null::boolean,
+    null::boolean,
+    null::integer,
+    null::xid,
+    null::xid,
+    null::pg_lsn,
+    null::pg_lsn,
+    null::text,
+    null::bigint,
+    null::boolean,
+    null::pg_lsn,
+    null::timestamp with time zone,
+    null::boolean,
+    null::text,
+    null::boolean,
+    null::boolean
+;
+
 create table pg_catalog.pg_rewrite (
   oid oid,
   rulename name,
@@ -903,6 +2067,31 @@ create table pg_catalog.pg_rewrite (
   ev_action pg_node_tree
 );
 
+create view pg_catalog.pg_roles(rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil, rolbypassrls, rolconfig, oid) as
+  select
+    null::name,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::integer,
+    null::text,
+    null::timestamp with time zone,
+    null::boolean,
+    null::text[],
+    null::oid
+;
+
+create view pg_catalog.pg_rules(schemaname, tablename, rulename, definition) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::text
+;
+
 create table pg_catalog.pg_seclabel (
   objoid oid,
   classoid oid,
@@ -910,6 +2099,18 @@ create table pg_catalog.pg_seclabel (
   provider text,
   label text
 );
+
+create view pg_catalog.pg_seclabels(objoid, classoid, objsubid, objtype, objnamespace, objname, provider, label) as
+  select
+    null::oid,
+    null::oid,
+    null::integer,
+    null::text,
+    null::oid,
+    null::text,
+    null::text,
+    null::text
+;
 
 create table pg_catalog.pg_sequence (
   seqrelid oid,
@@ -921,6 +2122,55 @@ create table pg_catalog.pg_sequence (
   seqcache bigint,
   seqcycle boolean
 );
+
+create view pg_catalog.pg_sequences(schemaname, sequencename, sequenceowner, data_type, start_value, min_value, max_value, increment_by, cycle, cache_size, last_value) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::regtype,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::boolean,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_settings(name, setting, unit, category, short_desc, extra_desc, context, vartype, source, min_val, max_val, enumvals, boot_val, reset_val, sourcefile, sourceline, pending_restart) as
+  select
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text,
+    null::text[],
+    null::text,
+    null::text,
+    null::text,
+    null::integer,
+    null::boolean
+;
+
+create view pg_catalog.pg_shadow(usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig) as
+  select
+    null::name,
+    null::oid,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::text,
+    null::timestamp with time zone,
+    null::text[]
+;
 
 create table pg_catalog.pg_shdepend (
   dbid oid,
@@ -938,12 +2188,713 @@ create table pg_catalog.pg_shdescription (
   description text
 );
 
+create view pg_catalog.pg_shmem_allocations(name, off, size, allocated_size) as
+  select
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_shmem_allocations_numa(name, numa_node, size) as
+  select
+    null::text,
+    null::integer,
+    null::bigint
+;
+
 create table pg_catalog.pg_shseclabel (
   objoid oid,
   classoid oid,
   provider text,
   label text
 );
+
+create view pg_catalog.pg_stat_activity(datid, datname, pid, leader_pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start, xact_start, query_start, state_change, wait_event_type, wait_event, state, backend_xid, backend_xmin, query_id, query, backend_type) as
+  select
+    null::oid,
+    null::name,
+    null::integer,
+    null::integer,
+    null::oid,
+    null::name,
+    null::text,
+    null::inet,
+    null::text,
+    null::integer,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::text,
+    null::text,
+    null::text,
+    null::xid,
+    null::xid,
+    null::bigint,
+    null::text,
+    null::text
+;
+
+create view pg_catalog.pg_stat_all_indexes(relid, indexrelid, schemaname, relname, indexrelname, idx_scan, last_idx_scan, idx_tup_read, idx_tup_fetch) as
+  select
+    null::oid,
+    null::oid,
+    null::name,
+    null::name,
+    null::name,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_all_tables(relid, schemaname, relname, seq_scan, last_seq_scan, seq_tup_read, idx_scan, last_idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_tup_newpage_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, n_ins_since_vacuum, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count, analyze_count, autoanalyze_count, total_vacuum_time, total_autovacuum_time, total_analyze_time, total_autoanalyze_time) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::double precision,
+    null::double precision,
+    null::double precision,
+    null::double precision
+;
+
+create view pg_catalog.pg_stat_archiver(archived_count, last_archived_wal, last_archived_time, failed_count, last_failed_wal, last_failed_time, stats_reset) as
+  select
+    null::bigint,
+    null::text,
+    null::timestamp with time zone,
+    null::bigint,
+    null::text,
+    null::timestamp with time zone,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_bgwriter(buffers_clean, maxwritten_clean, buffers_alloc, stats_reset) as
+  select
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_checkpointer(num_timed, num_requested, num_done, restartpoints_timed, restartpoints_req, restartpoints_done, write_time, sync_time, buffers_written, slru_written, stats_reset) as
+  select
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::double precision,
+    null::double precision,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_database(datid, datname, numbackends, xact_commit, xact_rollback, blks_read, blks_hit, tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted, conflicts, temp_files, temp_bytes, deadlocks, checksum_failures, checksum_last_failure, blk_read_time, blk_write_time, session_time, active_time, idle_in_transaction_time, sessions, sessions_abandoned, sessions_fatal, sessions_killed, parallel_workers_to_launch, parallel_workers_launched, stats_reset) as
+  select
+    null::oid,
+    null::name,
+    null::integer,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone,
+    null::double precision,
+    null::double precision,
+    null::double precision,
+    null::double precision,
+    null::double precision,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_database_conflicts(datid, datname, confl_tablespace, confl_lock, confl_snapshot, confl_bufferpin, confl_deadlock, confl_active_logicalslot) as
+  select
+    null::oid,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_gssapi(pid, gss_authenticated, principal, encrypted, credentials_delegated) as
+  select
+    null::integer,
+    null::boolean,
+    null::text,
+    null::boolean,
+    null::boolean
+;
+
+create view pg_catalog.pg_stat_io(backend_type, object, context, reads, read_bytes, read_time, writes, write_bytes, write_time, writebacks, writeback_time, extends, extend_bytes, extend_time, hits, evictions, reuses, fsyncs, fsync_time, stats_reset) as
+  select
+    null::text,
+    null::text,
+    null::text,
+    null::bigint,
+    null::numeric,
+    null::double precision,
+    null::bigint,
+    null::numeric,
+    null::double precision,
+    null::bigint,
+    null::double precision,
+    null::bigint,
+    null::numeric,
+    null::double precision,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::double precision,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_progress_analyze(pid, datid, datname, relid, phase, sample_blks_total, sample_blks_scanned, ext_stats_total, ext_stats_computed, child_tables_total, child_tables_done, current_child_table_relid, delay_time) as
+  select
+    null::integer,
+    null::oid,
+    null::name,
+    null::oid,
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::oid,
+    null::double precision
+;
+
+create view pg_catalog.pg_stat_progress_basebackup(pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed) as
+  select
+    null::integer,
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_progress_cluster(pid, datid, datname, relid, command, phase, cluster_index_relid, heap_tuples_scanned, heap_tuples_written, heap_blks_total, heap_blks_scanned, index_rebuild_count) as
+  select
+    null::integer,
+    null::oid,
+    null::name,
+    null::oid,
+    null::text,
+    null::text,
+    null::oid,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_progress_copy(pid, datid, datname, relid, command, type, bytes_processed, bytes_total, tuples_processed, tuples_excluded, tuples_skipped) as
+  select
+    null::integer,
+    null::oid,
+    null::name,
+    null::oid,
+    null::text,
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_progress_create_index(pid, datid, datname, relid, index_relid, command, phase, lockers_total, lockers_done, current_locker_pid, blocks_total, blocks_done, tuples_total, tuples_done, partitions_total, partitions_done) as
+  select
+    null::integer,
+    null::oid,
+    null::name,
+    null::oid,
+    null::oid,
+    null::text,
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_progress_vacuum(pid, datid, datname, relid, phase, heap_blks_total, heap_blks_scanned, heap_blks_vacuumed, index_vacuum_count, max_dead_tuple_bytes, dead_tuple_bytes, num_dead_item_ids, indexes_total, indexes_processed, delay_time) as
+  select
+    null::integer,
+    null::oid,
+    null::name,
+    null::oid,
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::double precision
+;
+
+create view pg_catalog.pg_stat_recovery_prefetch(stats_reset, prefetch, hit, skip_init, skip_new, skip_fpw, skip_rep, wal_distance, block_distance, io_depth) as
+  select
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::integer,
+    null::integer,
+    null::integer
+;
+
+create view pg_catalog.pg_stat_replication(pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start, backend_xmin, state, sent_lsn, write_lsn, flush_lsn, replay_lsn, write_lag, flush_lag, replay_lag, sync_priority, sync_state, reply_time) as
+  select
+    null::integer,
+    null::oid,
+    null::name,
+    null::text,
+    null::inet,
+    null::text,
+    null::integer,
+    null::timestamp with time zone,
+    null::xid,
+    null::text,
+    null::pg_lsn,
+    null::pg_lsn,
+    null::pg_lsn,
+    null::pg_lsn,
+    null::interval,
+    null::interval,
+    null::interval,
+    null::integer,
+    null::text,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_replication_slots(slot_name, spill_txns, spill_count, spill_bytes, stream_txns, stream_count, stream_bytes, total_txns, total_bytes, stats_reset) as
+  select
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_slru(name, blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset) as
+  select
+    null::text,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_ssl(pid, ssl, version, cipher, bits, client_dn, client_serial, issuer_dn) as
+  select
+    null::integer,
+    null::boolean,
+    null::text,
+    null::text,
+    null::integer,
+    null::text,
+    null::numeric,
+    null::text
+;
+
+create view pg_catalog.pg_stat_subscription(subid, subname, worker_type, pid, leader_pid, relid, received_lsn, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time) as
+  select
+    null::oid,
+    null::name,
+    null::text,
+    null::integer,
+    null::integer,
+    null::oid,
+    null::pg_lsn,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::pg_lsn,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_subscription_stats(subid, subname, apply_error_count, sync_error_count, confl_insert_exists, confl_update_origin_differs, confl_update_exists, confl_update_missing, confl_delete_origin_differs, confl_delete_missing, confl_multiple_unique_conflicts, stats_reset) as
+  select
+    null::oid,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_sys_indexes(relid, indexrelid, schemaname, relname, indexrelname, idx_scan, last_idx_scan, idx_tup_read, idx_tup_fetch) as
+  select
+    null::oid,
+    null::oid,
+    null::name,
+    null::name,
+    null::name,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_sys_tables(relid, schemaname, relname, seq_scan, last_seq_scan, seq_tup_read, idx_scan, last_idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_tup_newpage_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, n_ins_since_vacuum, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count, analyze_count, autoanalyze_count, total_vacuum_time, total_autovacuum_time, total_analyze_time, total_autoanalyze_time) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::double precision,
+    null::double precision,
+    null::double precision,
+    null::double precision
+;
+
+create view pg_catalog.pg_stat_user_functions(funcid, schemaname, funcname, calls, total_time, self_time) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::double precision,
+    null::double precision
+;
+
+create view pg_catalog.pg_stat_user_indexes(relid, indexrelid, schemaname, relname, indexrelname, idx_scan, last_idx_scan, idx_tup_read, idx_tup_fetch) as
+  select
+    null::oid,
+    null::oid,
+    null::name,
+    null::name,
+    null::name,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_user_tables(relid, schemaname, relname, seq_scan, last_seq_scan, seq_tup_read, idx_scan, last_idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_tup_newpage_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, n_ins_since_vacuum, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze, vacuum_count, autovacuum_count, analyze_count, autoanalyze_count, total_vacuum_time, total_autovacuum_time, total_analyze_time, total_autoanalyze_time) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::double precision,
+    null::double precision,
+    null::double precision,
+    null::double precision
+;
+
+create view pg_catalog.pg_stat_wal(wal_records, wal_fpi, wal_bytes, wal_buffers_full, stats_reset) as
+  select
+    null::bigint,
+    null::bigint,
+    null::numeric,
+    null::bigint,
+    null::timestamp with time zone
+;
+
+create view pg_catalog.pg_stat_wal_receiver(pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time, slot_name, sender_host, sender_port, conninfo) as
+  select
+    null::integer,
+    null::text,
+    null::pg_lsn,
+    null::integer,
+    null::pg_lsn,
+    null::pg_lsn,
+    null::integer,
+    null::timestamp with time zone,
+    null::timestamp with time zone,
+    null::pg_lsn,
+    null::timestamp with time zone,
+    null::text,
+    null::text,
+    null::integer,
+    null::text
+;
+
+create view pg_catalog.pg_stat_xact_all_tables(relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_tup_newpage_upd) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_xact_sys_tables(relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_tup_newpage_upd) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_stat_xact_user_functions(funcid, schemaname, funcname, calls, total_time, self_time) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::double precision,
+    null::double precision
+;
+
+create view pg_catalog.pg_stat_xact_user_tables(relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_tup_newpage_upd) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_all_indexes(relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit) as
+  select
+    null::oid,
+    null::oid,
+    null::name,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_all_sequences(relid, schemaname, relname, blks_read, blks_hit) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_all_tables(relid, schemaname, relname, heap_blks_read, heap_blks_hit, idx_blks_read, idx_blks_hit, toast_blks_read, toast_blks_hit, tidx_blks_read, tidx_blks_hit) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_sys_indexes(relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit) as
+  select
+    null::oid,
+    null::oid,
+    null::name,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_sys_sequences(relid, schemaname, relname, blks_read, blks_hit) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_sys_tables(relid, schemaname, relname, heap_blks_read, heap_blks_hit, idx_blks_read, idx_blks_hit, toast_blks_read, toast_blks_hit, tidx_blks_read, tidx_blks_hit) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_user_indexes(relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit) as
+  select
+    null::oid,
+    null::oid,
+    null::name,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_user_sequences(relid, schemaname, relname, blks_read, blks_hit) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint
+;
+
+create view pg_catalog.pg_statio_user_tables(relid, schemaname, relname, heap_blks_read, heap_blks_hit, idx_blks_read, idx_blks_hit, toast_blks_read, toast_blks_hit, tidx_blks_read, tidx_blks_hit) as
+  select
+    null::oid,
+    null::name,
+    null::name,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint,
+    null::bigint
+;
 
 create table pg_catalog.pg_statistic (
   starelid oid,
@@ -1000,6 +2951,67 @@ create table pg_catalog.pg_statistic_ext_data (
   stxdexpr pg_statistic[]
 );
 
+create view pg_catalog.pg_stats(schemaname, tablename, attname, inherited, null_frac, avg_width, n_distinct, most_common_vals, most_common_freqs, histogram_bounds, correlation, most_common_elems, most_common_elem_freqs, elem_count_histogram, range_length_histogram, range_empty_frac, range_bounds_histogram) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::boolean,
+    null::real,
+    null::integer,
+    null::real,
+    null::anyarray,
+    null::real[],
+    null::anyarray,
+    null::real,
+    null::anyarray,
+    null::real[],
+    null::real[],
+    null::anyarray,
+    null::real,
+    null::anyarray
+;
+
+create view pg_catalog.pg_stats_ext(schemaname, tablename, statistics_schemaname, statistics_name, statistics_owner, attnames, exprs, kinds, inherited, n_distinct, dependencies, most_common_vals, most_common_val_nulls, most_common_freqs, most_common_base_freqs) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::name,
+    null::name,
+    null::name[],
+    null::text[],
+    null::"char"[],
+    null::boolean,
+    null::pg_ndistinct,
+    null::pg_dependencies,
+    null::text[],
+    null::boolean[],
+    null::double precision[],
+    null::double precision[]
+;
+
+create view pg_catalog.pg_stats_ext_exprs(schemaname, tablename, statistics_schemaname, statistics_name, statistics_owner, expr, inherited, null_frac, avg_width, n_distinct, most_common_vals, most_common_freqs, histogram_bounds, correlation, most_common_elems, most_common_elem_freqs, elem_count_histogram) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::name,
+    null::name,
+    null::text,
+    null::boolean,
+    null::real,
+    null::integer,
+    null::real,
+    null::anyarray,
+    null::real[],
+    null::anyarray,
+    null::real,
+    null::anyarray,
+    null::real[],
+    null::real[]
+;
+
 create table pg_catalog.pg_subscription (
   oid oid,
   subdbid oid,
@@ -1028,6 +3040,18 @@ create table pg_catalog.pg_subscription_rel (
   srsublsn pg_lsn
 );
 
+create view pg_catalog.pg_tables(schemaname, tablename, tableowner, tablespace, hasindexes, hasrules, hastriggers, rowsecurity) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::name,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::boolean
+;
+
 create table pg_catalog.pg_tablespace (
   oid oid,
   spcname name,
@@ -1035,6 +3059,21 @@ create table pg_catalog.pg_tablespace (
   spcacl aclitem[],
   spcoptions text[]
 );
+
+create view pg_catalog.pg_timezone_abbrevs(abbrev, utc_offset, is_dst) as
+  select
+    null::text,
+    null::interval,
+    null::boolean
+;
+
+create view pg_catalog.pg_timezone_names(name, abbrev, utc_offset, is_dst) as
+  select
+    null::text,
+    null::text,
+    null::interval,
+    null::boolean
+;
 
 create table pg_catalog.pg_transform (
   oid oid,
@@ -1144,12 +3183,50 @@ create table pg_catalog.pg_type (
   typacl aclitem[]
 );
 
+create view pg_catalog.pg_user(usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig) as
+  select
+    null::name,
+    null::oid,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::boolean,
+    null::text,
+    null::timestamp with time zone,
+    null::text[]
+;
+
 create table pg_catalog.pg_user_mapping (
   oid oid,
   umuser oid,
   umserver oid,
   umoptions text[]
 );
+
+create view pg_catalog.pg_user_mappings(umid, srvid, srvname, umuser, usename, umoptions) as
+  select
+    null::oid,
+    null::oid,
+    null::name,
+    null::oid,
+    null::name,
+    null::text[]
+;
+
+create view pg_catalog.pg_views(schemaname, viewname, viewowner, definition) as
+  select
+    null::name,
+    null::name,
+    null::name,
+    null::text
+;
+
+create view pg_catalog.pg_wait_events(type, name, description) as
+  select
+    null::text,
+    null::text,
+    null::text
+;
 
 create function information_schema._pg_char_max_length(typid oid, typmod integer) returns integer language internal;
 
