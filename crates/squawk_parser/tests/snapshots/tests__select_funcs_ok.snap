@@ -3592,12 +3592,14 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                EXPR_TYPE
-                  INDEX_EXPR
-                    NAME_REF
-                      NUMERIC_KW "numeric"
-                    L_BRACK "["
-                    R_BRACK "]"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          NUMERIC_KW "numeric"
+                  L_BRACK "["
+                  R_BRACK "]"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
