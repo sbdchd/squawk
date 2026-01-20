@@ -258,6 +258,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateProcedure(create_procedure) => bind_create_procedure(b, create_procedure),
         ast::Stmt::CreateSchema(create_schema) => bind_create_schema(b, create_schema),
         ast::Stmt::CreateType(create_type) => bind_create_type(b, create_type),
+        ast::Stmt::CreateDomain(create_domain) => bind_create_domain(b, create_domain),
         ast::Stmt::CreateView(create_view) => bind_create_view(b, create_view),
         ast::Stmt::CreateMaterializedView(create_view) => {
             bind_create_materialized_view(b, create_view)
@@ -492,6 +493,33 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
             b.scopes[root].insert(multirange_name, multirange_id);
         }
     }
+}
+
+fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
+    let Some(path) = create_domain.path() else {
+        return;
+    };
+
+    let Some(domain_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let type_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Type,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(domain_name, type_id);
 }
 
 fn multirange_type_from_range(

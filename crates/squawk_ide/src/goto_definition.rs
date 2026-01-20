@@ -1862,6 +1862,48 @@ drop type int4_range$0;
     }
 
     #[test]
+    fn goto_drop_domain() {
+        assert_snapshot!(goto("
+create domain posint as integer check (value > 0);
+drop domain posint$0;
+"), @r"
+          ╭▸ 
+        2 │ create domain posint as integer check (value > 0);
+          │               ────── 2. destination
+        3 │ drop domain posint;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_to_domain() {
+        assert_snapshot!(goto("
+create domain posint as integer check (value > 0);
+select 1::posint$0;
+"), @r"
+          ╭▸ 
+        2 │ create domain posint as integer check (value > 0);
+          │               ────── 2. destination
+        3 │ select 1::posint;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_type_domain() {
+        assert_snapshot!(goto("
+create domain posint as integer check (value > 0);
+drop type posint$0;
+"), @r"
+          ╭▸ 
+        2 │ create domain posint as integer check (value > 0);
+          │               ────── 2. destination
+        3 │ drop type posint;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_view() {
         assert_snapshot!(goto("
 create view v as select 1;

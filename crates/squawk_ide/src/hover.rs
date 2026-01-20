@@ -71,7 +71,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::AlterTableDropColumn => {
                 return hover_column(root, &name_ref, &binder);
             }
-            NameRefClass::TypeReference | NameRefClass::DropType => {
+            NameRefClass::TypeReference | NameRefClass::DropType | NameRefClass::DropDomain => {
                 return hover_type(root, &name_ref, &binder);
             }
             NameRefClass::CompositeTypeField => {

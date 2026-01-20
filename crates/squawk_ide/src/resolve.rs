@@ -111,7 +111,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let position = name_ref.syntax().text_range().start();
             resolve_index_name_ptr(binder, &index_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropType | NameRefClass::TypeReference => {
+        NameRefClass::DropType | NameRefClass::DropDomain | NameRefClass::TypeReference => {
             let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
                 && field_expr
