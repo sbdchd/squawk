@@ -35,7 +35,7 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    if p.eat(BYTE_STRING) {
+    if p.eat(UNICODE_ESC_STRING) {
         if p.eat(UESCAPE_KW) {
             p.eat(STRING);
         }
@@ -4802,6 +4802,7 @@ const NUMERIC_FIRST: TokenSet = TokenSet::new(&[INT_NUMBER, FLOAT_NUMBER]);
 const STRING_FIRST: TokenSet = TokenSet::new(&[
     STRING,
     BYTE_STRING,
+    UNICODE_ESC_STRING,
     BIT_STRING,
     DOLLAR_QUOTED_STRING,
     ESC_STRING,

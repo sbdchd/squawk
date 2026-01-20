@@ -546,6 +546,7 @@ pub enum SyntaxKind {
     NULL,
     POSITIONAL_PARAM,
     STRING,
+    UNICODE_ESC_STRING,
     COMMENT,
     ERROR,
     IDENT,
