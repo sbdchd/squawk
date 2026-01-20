@@ -284,7 +284,7 @@ impl<'a> Converter<'a> {
                     err = "Missing trailing `'` symbol to terminate the unicode escape string literal";
                 }
                 // TODO: rust analzyer checks for un-escaped strings, we should too
-                SyntaxKind::BYTE_STRING
+                SyntaxKind::UNICODE_ESC_STRING
             }
             squawk_lexer::LiteralKind::EscStr { terminated } => {
                 if !terminated {

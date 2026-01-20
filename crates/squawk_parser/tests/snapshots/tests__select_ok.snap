@@ -6234,7 +6234,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            BYTE_STRING "U&' \\'"
+            UNICODE_ESC_STRING "U&' \\'"
             WHITESPACE " "
             UESCAPE_KW "UESCAPE"
             WHITESPACE " "
