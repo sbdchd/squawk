@@ -1744,7 +1744,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             LITERAL
-              BYTE_STRING "U&'\\0061\\0308bc'"
+              UNICODE_ESC_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
             IS_NORMALIZED
               IS_KW "is"
@@ -1760,7 +1760,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             LITERAL
-              BYTE_STRING "U&'\\0061\\0308bc'"
+              UNICODE_ESC_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
             IS_NORMALIZED
               IS_KW "is"
@@ -1778,7 +1778,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             LITERAL
-              BYTE_STRING "U&'\\0061\\0308bc'"
+              UNICODE_ESC_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
             IS_NORMALIZED
               IS_KW "is"
@@ -1796,7 +1796,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             LITERAL
-              BYTE_STRING "U&'\\0061\\0308bc'"
+              UNICODE_ESC_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
             IS_NORMALIZED
               IS_KW "is"
@@ -1814,7 +1814,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             LITERAL
-              BYTE_STRING "U&'\\0061\\0308bc'"
+              UNICODE_ESC_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
             IS_NORMALIZED
               IS_KW "is"
@@ -1832,7 +1832,7 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             LITERAL
-              BYTE_STRING "U&'\\0061\\0308bc'"
+              UNICODE_ESC_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
             IS_NOT
               IS_KW "is"
