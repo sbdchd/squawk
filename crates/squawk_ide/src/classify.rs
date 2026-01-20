@@ -10,6 +10,7 @@ pub(crate) enum NameRefClass {
     Table,
     DropIndex,
     DropType,
+    DropDomain,
     DropView,
     DropMaterializedView,
     DropSequence,
@@ -437,6 +438,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::DropType::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropType);
+        }
+        if ast::DropDomain::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropDomain);
         }
         if ast::DropView::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropView);
