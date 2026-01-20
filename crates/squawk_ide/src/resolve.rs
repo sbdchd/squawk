@@ -535,6 +535,74 @@ fn resolve_type_name_ptr(
     None
 }
 
+pub(crate) fn resolve_type_ptr_from_type(
+    binder: &Binder,
+    ty: &ast::Type,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    let (type_name, schema) = type_name_and_schema_from_type(ty)?;
+    resolve_type_name_ptr(binder, &type_name, &schema, position)
+}
+
+fn type_name_and_schema_from_type(ty: &ast::Type) -> Option<(Name, Option<Schema>)> {
+    match ty {
+        ast::Type::ArrayType(array_type) => {
+            let inner = array_type.ty()?;
+            type_name_and_schema_from_type(&inner)
+        }
+        ast::Type::BitType(bit_type) => {
+            let name = if bit_type.varying_token().is_some() {
+                "varbit"
+            } else {
+                "bit"
+            };
+            Some((Name::from_string(name), None))
+        }
+        ast::Type::IntervalType(_) => Some((Name::from_string("interval"), None)),
+        ast::Type::PathType(path_type) => {
+            let path = path_type.path()?;
+            let type_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            Some((type_name, schema))
+        }
+        ast::Type::ExprType(expr_type) => {
+            let expr = expr_type.expr()?;
+            if let ast::Expr::FieldExpr(field_expr) = expr
+                && let Some(field) = field_expr.field()
+                && let Some(ast::Expr::NameRef(schema_name_ref)) = field_expr.base()
+            {
+                let type_name = Name::from_node(&field);
+                let schema = Some(Schema(Name::from_node(&schema_name_ref)));
+                Some((type_name, schema))
+            } else {
+                None
+            }
+        }
+        ast::Type::CharType(char_type) => {
+            let name = if char_type.varchar_token().is_some() || char_type.varying_token().is_some()
+            {
+                "varchar"
+            } else {
+                "bpchar"
+            };
+            Some((Name::from_string(name), None))
+        }
+        ast::Type::DoubleType(_) => Some((Name::from_string("float8"), None)),
+        ast::Type::TimeType(time_type) => {
+            let mut name = if time_type.timestamp_token().is_some() {
+                "timestamp".to_string()
+            } else {
+                "time".to_string()
+            };
+            if let Some(ast::Timezone::WithTimezone(_)) = time_type.timezone() {
+                name.push_str("tz");
+            }
+            Some((Name::from_string(name), None))
+        }
+        ast::Type::PercentType(_) => None,
+    }
+}
+
 fn fallback_type_alias(type_name: &Name) -> Option<Name> {
     match type_name.0.as_str() {
         "bigint" | "bigserial" | "serial8" => Some(Name::from_string("int8")),

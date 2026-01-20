@@ -470,13 +470,85 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
     let type_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Type,
         ptr: name_ptr,
-        schema: Some(schema),
+        schema: Some(schema.clone()),
         params: None,
         table: None,
     });
 
     let root = b.root_scope();
-    b.scopes[root].insert(type_name, type_id);
+    b.scopes[root].insert(type_name.clone(), type_id);
+
+    if create_type.range_token().is_some() {
+        if let Some((multirange_name, multirange_ptr, multirange_schema)) =
+            multirange_type_from_range(b, create_type, type_name, schema, name_ptr)
+        {
+            let multirange_id = b.symbols.alloc(Symbol {
+                kind: SymbolKind::Type,
+                ptr: multirange_ptr,
+                schema: Some(multirange_schema),
+                params: None,
+                table: None,
+            });
+            b.scopes[root].insert(multirange_name, multirange_id);
+        }
+    }
+}
+
+fn multirange_type_from_range(
+    b: &Binder,
+    create_type: ast::CreateType,
+    type_name: Name,
+    schema: Schema,
+    fallback_ptr: SyntaxNodePtr,
+) -> Option<(Name, SyntaxNodePtr, Schema)> {
+    if let Some(attribute_list) = create_type.attribute_list() {
+        let multirange_key = Name::from_string("multirange_type_name");
+        for option in attribute_list.attribute_options() {
+            let Some(name) = option.name() else {
+                continue;
+            };
+            if Name::from_node(&name) != multirange_key {
+                continue;
+            }
+            if let Some(attribute_value) = option.attribute_value() {
+                if let Some(literal) = attribute_value.literal()
+                    && let Some(string_value) = extract_string_literal(&literal)
+                {
+                    let multirange_name = Name::from_string(string_value);
+                    return Some((multirange_name, fallback_ptr, schema));
+                }
+                if let Some(ast::Type::PathType(path_type)) = attribute_value.ty()
+                    && let Some(path) = path_type.path()
+                    && let Some(multirange_name) = item_name(&path)
+                {
+                    let multirange_schema = if path.qualifier().is_some() {
+                        schema_name(b, &path, false)?
+                    } else {
+                        schema
+                    };
+                    return Some((multirange_name, fallback_ptr, multirange_schema));
+                }
+            }
+        }
+    }
+
+    let multirange_name = derive_multirange_name(type_name);
+    Some((multirange_name, fallback_ptr, schema))
+}
+
+// from postgres docs:
+// > If the range type name contains the substring range, then the multirange type
+// > name is formed by replacement of the range substring with multirange in the
+// > range type name.
+// > Otherwise, the multirange type name is formed by appending a
+// > _multirange suffix to the range type name.
+fn derive_multirange_name(range_name: Name) -> Name {
+    let range_text = range_name.0.as_str();
+    if range_text.contains("range") {
+        Name::from_string(range_text.replacen("range", "multirange", 1))
+    } else {
+        Name::from_string(format!("{range_text}_multirange"))
+    }
 }
 
 fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
