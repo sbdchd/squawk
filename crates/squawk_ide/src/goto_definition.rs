@@ -67,6 +67,22 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> SmallVec<[Tex
         }
     }
 
+    let type_node = ast::Type::cast(parent.clone()).or_else(|| {
+        // special case if we're at the timezone clause inside a timezone type
+        if ast::Timezone::can_cast(parent.kind()) {
+            parent.parent().and_then(ast::Type::cast)
+        } else {
+            None
+        }
+    });
+    if let Some(ty) = type_node {
+        let binder_output = binder::bind(&file);
+        let position = token.text_range().start();
+        if let Some(ptr) = resolve::resolve_type_ptr_from_type(&binder_output, &ty, position) {
+            return smallvec![ptr.to_node(file.syntax()).text_range()];
+        }
+    }
+
     smallvec![]
 }
 
@@ -1746,6 +1762,34 @@ create function b(t$0) returns int as 'select 1' language sql;
     }
 
     #[test]
+    fn goto_function_param_time_type() {
+        assert_snapshot!(goto("
+create type timestamp;
+create function f(timestamp$0 without time zone) returns text language internal;
+"), @r"
+          ╭▸ 
+        2 │ create type timestamp;
+          │             ───────── 2. destination
+        3 │ create function f(timestamp without time zone) returns text language internal;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_time_type_no_timezone() {
+        assert_snapshot!(goto("
+create type time;
+create function f(time$0) returns text language internal;
+"), @r"
+  ╭▸ 
+2 │ create type time;
+  │             ──── 2. destination
+3 │ create function f(time) returns text language internal;
+  ╰╴                     ─ 1. source
+");
+    }
+
+    #[test]
     fn goto_create_table_type_reference_enum() {
         assert_snapshot!(goto("
 create type mood as enum ('sad', 'ok', 'happy');
@@ -2091,6 +2135,109 @@ select x::public.baz$0;
     }
 
     #[test]
+    fn goto_cast_timestamp_without_time_zone() {
+        assert_snapshot!(goto("
+create type pg_catalog.timestamp;
+select ''::timestamp without$0 time zone;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.timestamp;
+          │                        ───────── 2. destination
+        3 │ select ''::timestamp without time zone;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_timestamp_with_time_zone() {
+        assert_snapshot!(goto("
+create type pg_catalog.timestamptz;
+select ''::timestamp with$0 time zone;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.timestamptz;
+          │                        ─────────── 2. destination
+        3 │ select ''::timestamp with time zone;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_multirange_type_from_range() {
+        assert_snapshot!(goto("
+create type floatrange as range (
+  subtype = float8,
+  subtype_diff = float8mi
+);
+select '{[1.234, 5.678]}'::floatmultirange$0;
+"), @r"
+          ╭▸ 
+        2 │ create type floatrange as range (
+          │             ────────── 2. destination
+          ‡
+        6 │ select '{[1.234, 5.678]}'::floatmultirange;
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_multirange_special_type_name_string() {
+        assert_snapshot!(goto("
+create type floatrange as range (
+  subtype = float8,
+  subtype_diff = float8mi,
+  multirange_type_name = 'floatmulirangething'
+);
+select '{[1.234, 5.678]}'::floatmulirangething$0;
+"), @r"
+          ╭▸ 
+        2 │ create type floatrange as range (
+          │             ────────── 2. destination
+          ‡
+        7 │ select '{[1.234, 5.678]}'::floatmulirangething;
+          ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_multirange_special_type_name_ident() {
+        assert_snapshot!(goto("
+create type floatrange as range (
+  subtype = float8,
+  subtype_diff = float8mi,
+  multirange_type_name = floatrangemutirange
+);
+select '{[1.234, 5.678]}'::floatrangemutirange$0;
+"), @r"
+          ╭▸ 
+        2 │ create type floatrange as range (
+          │             ────────── 2. destination
+          ‡
+        7 │ select '{[1.234, 5.678]}'::floatrangemutirange;
+          ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_multirange_edge_case_type_from_range() {
+        // make sure we're calculating the multirange correctly
+        assert_snapshot!(goto("
+create type floatrangerange as range (
+  subtype = float8,
+  subtype_diff = float8mi
+);
+select '{[1.234, 5.678]}'::floatmultirangerange$0;
+"), @r"
+          ╭▸ 
+        2 │ create type floatrangerange as range (
+          │             ─────────────── 2. destination
+          ‡
+        6 │ select '{[1.234, 5.678]}'::floatmultirangerange;
+          ╰╴                                              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cast_bigint_falls_back_to_int8() {
         assert_snapshot!(goto("
 create type pg_catalog.int8;
@@ -2243,6 +2390,34 @@ select 1::smallint$0;
           │                        ──── 2. destination
         3 │ select 1::smallint;
           ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_double_precision_falls_back_to_float8() {
+        assert_snapshot!(goto("
+create type pg_catalog.float8;
+select '1'::double precision[]$0;
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.float8;
+          │                        ────── 2. destination
+        3 │ select '1'::double precision[];
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_varchar_with_modifier() {
+        assert_snapshot!(goto("
+create type pg_catalog.varchar;
+select '1'::varchar$0(1);
+"), @r"
+          ╭▸ 
+        2 │ create type pg_catalog.varchar;
+          │                        ─────── 2. destination
+        3 │ select '1'::varchar(1);
+          ╰╴                  ─ 1. source
         ");
     }
 
