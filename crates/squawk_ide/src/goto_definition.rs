@@ -2175,8 +2175,8 @@ select '{[1.234, 5.678]}'::floatmultirange$0;
         2 │ create type floatrange as range (
           │             ────────── 2. destination
           ‡
-        6 │ select '[1.234, 5.678]'::floatmultirange;
-          ╰╴                                       ─ 1. source
+        6 │ select '{[1.234, 5.678]}'::floatmultirange;
+          ╰╴                                         ─ 1. source
         ");
     }
 
@@ -2192,10 +2192,10 @@ select '{[1.234, 5.678]}'::floatmulirangething$0;
 "), @r"
           ╭▸ 
         2 │ create type floatrange as range (
-          │            ────────── 2. destination
+          │             ────────── 2. destination
           ‡
-        6 │ select '{[1.234, 5.678]}'::floatmulirangething;
-          ╰╴                            ─────────────────── 1. source
+        7 │ select '{[1.234, 5.678]}'::floatmulirangething;
+          ╰╴                                             ─ 1. source
         ");
     }
 
