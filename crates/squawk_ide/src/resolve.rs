@@ -1843,6 +1843,13 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
         if let Some(name) = with_table.name()
             && Name::from_node(&name) == *cte_name
         {
+            if with_table
+                .syntax()
+                .text_range()
+                .contains_range(name_ref.syntax().text_range())
+            {
+                continue;
+            }
             return Some(SyntaxNodePtr::new(name.syntax()));
         }
     }
