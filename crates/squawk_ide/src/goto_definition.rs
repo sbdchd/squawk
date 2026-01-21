@@ -2693,6 +2693,18 @@ drop table foo.t$0;
     }
 
     #[test]
+    fn goto_column_not_in_cte_but_in_table() {
+        // we shouldn't navigate up to the table of the same name
+        goto_not_found(
+            r"
+create table t (c int);
+with t as (select 1 a)
+select c$0 from t;
+",
+        );
+    }
+
+    #[test]
     fn goto_with_search_path_empty() {
         goto_not_found(
             r#"

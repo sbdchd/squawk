@@ -1112,10 +1112,13 @@ fn resolve_select_qualified_column_ptr(
     };
 
     if schema.is_none() {
-        if let Some(cte_column_ptr) =
-            resolve_cte_column(binder, root, column_name_ref, &table_name, &column_name)
-        {
-            return Some(cte_column_ptr);
+        if resolve_cte_table(column_name_ref, &table_name).is_some() {
+            if let Some(cte_column_ptr) =
+                resolve_cte_column(binder, root, column_name_ref, &table_name, &column_name)
+            {
+                return Some(cte_column_ptr);
+            }
+            return None;
         }
         if let Some(alias_table_name) = resolve_alias(column_name_ref, &table_name) {
             table_name = alias_table_name;
@@ -1245,11 +1248,13 @@ fn resolve_from_item_column_ptr(
 
     let (table_name, schema) = table_and_schema_from_from_item(from_item)?;
 
-    if schema.is_none()
-        && let Some(cte_column_ptr) =
+    if schema.is_none() && resolve_cte_table(column_name_ref, &table_name).is_some() {
+        if let Some(cte_column_ptr) =
             resolve_cte_column(binder, root, column_name_ref, &table_name, &column_name)
-    {
-        return Some(cte_column_ptr);
+        {
+            return Some(cte_column_ptr);
+        }
+        return None;
     }
 
     resolve_column_from_table_or_view(
@@ -1838,6 +1843,13 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
         if let Some(name) = with_table.name()
             && Name::from_node(&name) == *cte_name
         {
+            if with_table
+                .syntax()
+                .text_range()
+                .contains_range(name_ref.syntax().text_range())
+            {
+                continue;
+            }
             return Some(SyntaxNodePtr::new(name.syntax()));
         }
     }
