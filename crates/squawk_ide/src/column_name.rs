@@ -180,6 +180,12 @@ fn name_from_name_ref(name_ref: ast::NameRef, in_type: bool) -> Option<(ColumnNa
                         name_ref.syntax().clone(),
                     ));
                 }
+                SyntaxKind::REAL_KW => {
+                    return Some((
+                        ColumnName::Column("float4".to_owned()),
+                        name_ref.syntax().clone(),
+                    ));
+                }
                 _ => (),
             }
         }
@@ -555,9 +561,15 @@ fn examples() {
     assert_snapshot!(name("cast('hello' as character varying(10))"), @"varchar");
     assert_snapshot!(name("cast('hello' as char varying(5))"), @"varchar");
     assert_snapshot!(name("cast('hello' as char(5))"), @"bpchar");
+    assert_snapshot!(name("cast('hello' as character)"), @"bpchar");
+    assert_snapshot!(name("cast('hello' as bpchar)"), @"bpchar");
+
+    assert_snapshot!(name(r#"cast('hello' as "char")"#), @"char");
 
     // double types
     assert_snapshot!(name("cast(1.5 as double precision)"), @"float8");
+    // real
+    assert_snapshot!(name("cast(1.5 as real)"), @"float4");
 
     // interval types
     assert_snapshot!(name("cast('1 hour' as interval hour to minute)"), @"interval");
