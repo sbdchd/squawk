@@ -187,6 +187,65 @@ SOURCE_FILE
             IDENT "ordercol"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- extra with"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n"
+      ERROR
+        WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "f"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   SELECT
     WITH_CLAUSE
       WITH_KW "with"
@@ -345,15 +404,19 @@ error[syntax-error]: expected COMMA
    ╭▸ 
 13 │ search depth first by a, b c set ordercol
    ╰╴                          ━
+error[syntax-error]: unexpected WITH
+   ╭▸ 
+18 │ with f as (select 2)
+   ╰╴━
 error[syntax-error]: missing comma
    ╭▸ 
-19 │    ) -- <-- missing a comma
+24 │    ) -- <-- missing a comma
    ╰╴    ━
 error[syntax-error]: missing comma
    ╭▸ 
-29 │    ) -- <-- missing a comma
+34 │    ) -- <-- missing a comma
    ╰╴    ━
 error[syntax-error]: unexpected comma
    ╭▸ 
-38 │    ), -- <-- extra comma
+43 │    ), -- <-- extra comma
    ╰╴    ━
