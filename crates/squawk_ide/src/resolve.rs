@@ -390,6 +390,18 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_procedure(binder, &procedure_name, &schema, None, position)
                 .map(|ptr| smallvec![ptr])
         }
+        NameRefClass::OperatorFunctionRef => {
+            let path_type = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::PathType::cast)?;
+            let path = path_type.path()?;
+            let function_name = extract_table_name(&path)?;
+            let schema = extract_schema_name(&path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_function(binder, &function_name, &schema, None, position)
+                .map(|ptr| smallvec![ptr])
+        }
         NameRefClass::SelectFunctionCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
