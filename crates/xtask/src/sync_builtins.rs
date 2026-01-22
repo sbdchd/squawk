@@ -74,9 +74,13 @@ order by n.nspname, p.proname;
 const BUILTIN_OPERATORS_QUERY: &str = r"
 select n.nspname, o.oprname,
   format_type(o.oprleft, null) as left_type,
-  format_type(o.oprright, null) as right_type
+  format_type(o.oprright, null) as right_type,
+  pn.nspname as func_schema,
+  p.proname as func_name
 from pg_operator o
 join pg_namespace n on n.oid = o.oprnamespace
+join pg_proc p on p.oid = o.oprcode
+join pg_namespace pn on pn.oid = p.pronamespace
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
@@ -256,13 +260,17 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let op_name = parts.next().context("expected operator name")?;
         let left_type = parts.next().context("expected left type")?;
         let right_type = parts.next().context("expected right type")?;
+        let func_schema = parts.next().context("expected function schema")?;
+        let func_name = parts.next().context("expected function name")?;
 
         let args = match (left_type, right_type) {
-            ("-", r) => format!("rightarg = {r}"),
-            (l, "-") => format!("leftarg = {l}"),
-            (l, r) => format!("leftarg = {l}, rightarg = {r}"),
+            ("-", r) => format!("  rightarg = {r},\n"),
+            (l, "-") => format!("  leftarg = {l},\n"),
+            (l, r) => format!("  leftarg = {l},\n  rightarg = {r},\n"),
         };
-        sql.push_str(&format!("create operator {schema}.{op_name} ({args});\n\n"));
+        sql.push_str(&format!(
+            "create operator {schema}.{op_name} (\n{args}  function = {func_schema}.{func_name}\n);\n\n"
+        ));
     }
 
     let builtins_path = project_root().join("crates/squawk_ide/src/builtins.sql");
