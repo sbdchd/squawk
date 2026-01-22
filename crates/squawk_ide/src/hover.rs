@@ -287,6 +287,9 @@ impl ColumnHover {
     fn anon_column(col_name: &str) -> String {
         format!("column {}", col_name)
     }
+    fn anon_column_type(col_name: &str, ty: &str) -> String {
+        format!("column {} {}", col_name, ty)
+    }
 }
 
 fn hover_column(
@@ -300,7 +303,7 @@ fn hover_column(
         .iter()
         .filter_map(|column_ptr| {
             let column_name_node = column_ptr.to_node(root);
-            format_hover_for_column_node(binder, &column_name_node, name_ref)
+            format_hover_for_column_node(binder, root, &column_name_node, name_ref)
         })
         .collect();
 
@@ -313,6 +316,7 @@ fn hover_column(
 
 fn format_hover_for_column_node(
     binder: &binder::Binder,
+    root: &SyntaxNode,
     column_name_node: &squawk_syntax::SyntaxNode,
     name_ref: &ast::NameRef,
 ) -> Option<String> {
@@ -333,16 +337,36 @@ fn format_hover_for_column_node(
                 &column_name.to_string(),
             ));
         }
-        if ast::ParenSelect::can_cast(a.kind())
-            && let Some(field_expr) = name_ref.syntax().parent().and_then(ast::FieldExpr::cast)
-            && let Some(base) = field_expr.base()
-            && let ast::Expr::NameRef(table_name_ref) = base
-        {
-            let table_name = Name::from_node(&table_name_ref);
-            let column_name = Name::from_string(column_name_node.text().to_string());
-            return Some(ColumnHover::table_column(
-                &table_name.to_string(),
+        if let Some(paren_select) = ast::ParenSelect::cast(a.clone()) {
+            // Qualified access like `t.a`
+            if let Some(field_expr) = name_ref.syntax().parent().and_then(ast::FieldExpr::cast)
+                && let Some(base) = field_expr.base()
+                && let ast::Expr::NameRef(table_name_ref) = base
+            {
+                let table_name = Name::from_node(&table_name_ref);
+                let column_name = Name::from_string(column_name_node.text().to_string());
+                return Some(ColumnHover::table_column(
+                    &table_name.to_string(),
+                    &column_name.to_string(),
+                ));
+            }
+            // Unqualified access like `a` from `select a from (select 1 a)`
+            // For VALUES, use name_ref since column_name_node is the expression
+            let column_name = if column_name_node
+                .ancestors()
+                .any(|a| ast::Values::can_cast(a.kind()))
+            {
+                Name::from_node(name_ref)
+            } else {
+                Name::from_string(column_name_node.text().to_string())
+            };
+            let ty = resolve::collect_paren_select_columns_with_types(binder, root, &paren_select)
+                .into_iter()
+                .find(|(name, _)| *name == column_name)
+                .and_then(|(_, ty)| ty)?;
+            return Some(ColumnHover::anon_column_type(
                 &column_name.to_string(),
+                &ty.to_string(),
             ));
         }
 
@@ -459,6 +483,7 @@ fn hover_table_from_ptr(
         resolve::TableSource::CreateTable(create_table) => {
             format_create_table(&create_table, binder)
         }
+        resolve::TableSource::ParenSelect(paren_select) => format_paren_select(&paren_select),
     }
 }
 
@@ -552,6 +577,9 @@ fn hover_qualified_star_columns(
         }
         resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
             hover_qualified_star_columns_from_materialized_view(&create_materialized_view, binder)
+        }
+        resolve::TableSource::ParenSelect(paren_select) => {
+            hover_qualified_star_columns_from_subquery(root, &paren_select, binder)
         }
     }
 }
@@ -1026,6 +1054,11 @@ fn format_with_table(with_table: &ast::WithTable) -> Option<String> {
     let name = with_table.name()?.syntax().text().to_string();
     let query = with_table.query()?.syntax().text().to_string();
     Some(format!("with {} as ({})", name, query))
+}
+
+fn format_paren_select(paren_select: &ast::ParenSelect) -> Option<String> {
+    let query = paren_select.select()?.syntax().text().to_string();
+    Some(format!("({})", query))
 }
 
 fn format_create_index(create_index: &ast::CreateIndex, binder: &binder::Binder) -> Option<String> {
@@ -2910,6 +2943,30 @@ select COLUMN1$0, COLUMN2 from t;
         hover: column t.column1
           ╭▸ 
         5 │ select COLUMN1, COLUMN2 from t;
+          ╰╴             ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_subquery_column() {
+        assert_snapshot!(check_hover("
+select a$0 from (select 1 a);
+"), @r"
+        hover: column a integer
+          ╭▸ 
+        2 │ select a from (select 1 a);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_subquery_values_column() {
+        assert_snapshot!(check_hover("
+select column1$0 from (values (1, 'foo'));
+"), @r"
+        hover: column column1 integer
+          ╭▸ 
+        2 │ select column1 from (values (1, 'foo'));
           ╰╴             ─ hover
         ");
     }
