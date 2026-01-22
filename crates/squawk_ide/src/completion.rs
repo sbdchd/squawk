@@ -14,7 +14,8 @@ pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionIte
     };
     // We don't support completions inside comments since we don't have doc
     // comments a la JSDoc.
-    // And we don't have string literal types so we bail out early for strings too.
+    // And we don't support enums aka string literal types yet so we bail out
+    // early for strings as well
     if is_string_or_comment(token.kind()) {
         return vec![];
     }
@@ -70,24 +71,64 @@ fn select_completions(
         && let Some(from_clause) = select.from_clause()
     {
         for table_ptr in resolve::table_ptrs_from_clause(&binder, &from_clause) {
-            if let Some(create_table) = table_ptr
-                .to_node(file.syntax())
-                .ancestors()
-                .find_map(ast::CreateTableLike::cast)
-            {
-                let columns = resolve::collect_table_columns(&binder, file.syntax(), &create_table);
-                completions.extend(columns.into_iter().filter_map(|column| {
-                    let name = column.name()?;
-                    Some(CompletionItem {
-                        label: crate::symbols::Name::from_node(&name).to_string(),
+            let table_node = table_ptr.to_node(file.syntax());
+            match resolve::find_table_source(&table_node) {
+                Some(resolve::TableSource::CreateTable(create_table)) => {
+                    let columns =
+                        resolve::collect_table_columns(&binder, file.syntax(), &create_table);
+                    completions.extend(columns.into_iter().filter_map(|column| {
+                        let name = column.name()?;
+                        let detail = column.ty().map(|t| t.syntax().text().to_string());
+                        Some(CompletionItem {
+                            label: Name::from_node(&name).to_string(),
+                            kind: CompletionItemKind::Column,
+                            detail,
+                            insert_text: None,
+                            insert_text_format: None,
+                            trigger_completion_after_insert: false,
+                            sort_text: None,
+                        })
+                    }));
+                }
+                Some(resolve::TableSource::WithTable(with_table)) => {
+                    let columns = resolve::collect_with_table_columns_with_types(&with_table);
+                    completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
+                        label: name.to_string(),
                         kind: CompletionItemKind::Column,
-                        detail: None,
+                        detail: ty.map(|t| t.to_string()),
                         insert_text: None,
                         insert_text_format: None,
                         trigger_completion_after_insert: false,
                         sort_text: None,
-                    })
-                }));
+                    }));
+                }
+                Some(resolve::TableSource::CreateView(create_view)) => {
+                    let columns = resolve::collect_view_columns_with_types(&create_view);
+                    completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
+                        label: name.to_string(),
+                        kind: CompletionItemKind::Column,
+                        detail: ty.map(|t| t.to_string()),
+                        insert_text: None,
+                        insert_text_format: None,
+                        trigger_completion_after_insert: false,
+                        sort_text: None,
+                    }));
+                }
+                Some(resolve::TableSource::CreateMaterializedView(create_materialized_view)) => {
+                    let columns = resolve::collect_materialized_view_columns_with_types(
+                        &create_materialized_view,
+                    );
+                    completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
+                        label: name.to_string(),
+                        kind: CompletionItemKind::Column,
+                        detail: ty.map(|t| t.to_string()),
+                        insert_text: None,
+                        insert_text_format: None,
+                        trigger_completion_after_insert: false,
+                        sort_text: None,
+                    }));
+                }
+                None => {}
             }
         }
     }
@@ -262,10 +303,11 @@ fn delete_expr_completions(
         let columns = resolve::collect_table_columns(&binder, file.syntax(), &create_table);
         completions.extend(columns.into_iter().filter_map(|column| {
             let name = column.name()?;
+            let detail = column.ty().map(|t| t.syntax().text().to_string());
             Some(CompletionItem {
                 label: Name::from_node(&name).to_string(),
                 kind: CompletionItemKind::Column,
-                detail: None,
+                detail,
                 insert_text: None,
                 insert_text_format: None,
                 trigger_completion_after_insert: false,
@@ -604,8 +646,8 @@ select $0 from t;
 "), @r"
          label              | kind     | detail                  | insert_text 
         --------------------+----------+-------------------------+-------------
-         a                  | Column   |                         |             
-         b                  | Column   |                         |             
+         a                  | Column   | text                    |             
+         b                  | Column   | int                     |             
          t                  | Table    |                         |             
          f()                | Function | public.f() returns text |             
          public             | Schema   |                         |             
@@ -613,6 +655,42 @@ select $0 from t;
          pg_temp            | Schema   |                         |             
          pg_toast           | Schema   |                         |             
          information_schema | Schema   |                         |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_with_cte() {
+        assert_snapshot!(completions("
+with t as (select 1 a)
+select $0 from t;
+"), @r"
+         label              | kind   | detail  | insert_text 
+        --------------------+--------+---------+-------------
+         a                  | Column | integer |             
+         public             | Schema |         |             
+         pg_catalog         | Schema |         |             
+         pg_temp            | Schema |         |             
+         pg_toast           | Schema |         |             
+         information_schema | Schema |         |
+        ");
+    }
+
+    #[test]
+    fn completion_values_cte() {
+        assert_snapshot!(completions("
+with t as (values (1, 'foo', false))
+select $0 from t;
+"), @r"
+         label              | kind   | detail  | insert_text 
+        --------------------+--------+---------+-------------
+         column1            | Column | integer |             
+         column2            | Column | text    |             
+         column3            | Column | boolean |             
+         public             | Schema |         |             
+         pg_catalog         | Schema |         |             
+         pg_temp            | Schema |         |             
+         pg_toast           | Schema |         |             
+         information_schema | Schema |         |
         ");
     }
 
@@ -681,8 +759,8 @@ delete from t where $0;
 "), @r"
          label       | kind     | detail                          | insert_text 
         -------------+----------+---------------------------------+-------------
-         id          | Column   |                                 |             
-         name        | Column   |                                 |             
+         id          | Column   | int                             |             
+         name        | Column   | text                            |             
          t           | Table    |                                 |             
          is_active() | Function | public.is_active() returns bool |
         ")
@@ -696,8 +774,8 @@ delete from t returning $0;
 "), @r"
          label | kind   | detail | insert_text 
         -------+--------+--------+-------------
-         id    | Column |        |             
-         name  | Column |        |             
+         id    | Column | int    |             
+         name  | Column | text   |             
          t     | Table  |        |
         ");
     }
@@ -717,8 +795,8 @@ delete from t where t.$0;
 "), @r"
          label | kind     | detail | insert_text 
         -------+----------+--------+-------------
-         a     | Column   |        |             
-         b     | Column   |        |             
+         a     | Column   | int    |             
+         b     | Column   | text   |             
          f     | Function |        |
         ");
     }

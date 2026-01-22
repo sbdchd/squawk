@@ -8,6 +8,7 @@ use squawk_syntax::{
 use crate::binder::Binder;
 use crate::classify::{NameRefClass, classify_name_ref};
 use crate::column_name::ColumnName;
+use crate::infer::{Type, infer_type_from_expr};
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
 
@@ -2946,6 +2947,22 @@ pub(crate) fn collect_view_column_names(create_view: &ast::CreateView) -> Vec<Na
     collect_target_list_column_names(&target_list)
 }
 
+pub(crate) fn collect_view_columns_with_types(
+    create_view: &ast::CreateView,
+) -> Vec<(Name, Option<Type>)> {
+    let Some(select) = select_from_view_query(create_view) else {
+        return vec![];
+    };
+    let Some(select_clause) = select.select_clause() else {
+        return vec![];
+    };
+    let Some(target_list) = select_clause.target_list() else {
+        return vec![];
+    };
+
+    collect_target_list_columns_with_types(&target_list)
+}
+
 pub(crate) fn collect_materialized_view_column_names(
     create_materialized_view: &ast::CreateMaterializedView,
 ) -> Vec<Name> {
@@ -2967,6 +2984,22 @@ pub(crate) fn collect_materialized_view_column_names(
     };
 
     collect_target_list_column_names(&target_list)
+}
+
+pub(crate) fn collect_materialized_view_columns_with_types(
+    create_materialized_view: &ast::CreateMaterializedView,
+) -> Vec<(Name, Option<Type>)> {
+    let Some(select) = select_from_materialized_view_query(create_materialized_view) else {
+        return vec![];
+    };
+    let Some(select_clause) = select.select_clause() else {
+        return vec![];
+    };
+    let Some(target_list) = select_clause.target_list() else {
+        return vec![];
+    };
+
+    collect_target_list_columns_with_types(&target_list)
 }
 
 fn select_from_materialized_view_query(
@@ -3069,6 +3102,55 @@ fn collect_target_list_column_names(target_list: &ast::TargetList) -> Vec<Name> 
             && let Some(col_name_str) = col_name.to_string()
         {
             columns.push(Name::from_string(col_name_str));
+        }
+    }
+    columns
+}
+
+pub(crate) fn collect_with_table_columns_with_types(
+    with_table: &ast::WithTable,
+) -> Vec<(Name, Option<Type>)> {
+    let Some(query) = with_table.query() else {
+        return vec![];
+    };
+
+    if let ast::WithQuery::Values(values) = query {
+        let mut results = vec![];
+        if let Some(row_list) = values.row_list()
+            && let Some(first_row) = row_list.rows().next()
+        {
+            for (idx, expr) in first_row.exprs().enumerate() {
+                let name = Name::from_string(format!("column{}", idx + 1));
+                let ty = infer_type_from_expr(&expr);
+                results.push((name, ty));
+            }
+        }
+        return results;
+    }
+
+    let Some(cte_select) = select_from_with_query(query) else {
+        return vec![];
+    };
+    let Some(select_clause) = cte_select.select_clause() else {
+        return vec![];
+    };
+    let Some(target_list) = select_clause.target_list() else {
+        return vec![];
+    };
+
+    collect_target_list_columns_with_types(&target_list)
+}
+
+fn collect_target_list_columns_with_types(
+    target_list: &ast::TargetList,
+) -> Vec<(Name, Option<Type>)> {
+    let mut columns = vec![];
+    for target in target_list.targets() {
+        if let Some((col_name, _node)) = ColumnName::from_target(target.clone())
+            && let Some(col_name_str) = col_name.to_string()
+        {
+            let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
+            columns.push((Name::from_string(col_name_str), ty));
         }
     }
     columns

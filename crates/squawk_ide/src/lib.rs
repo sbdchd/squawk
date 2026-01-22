@@ -9,6 +9,7 @@ pub mod find_references;
 mod generated;
 pub mod goto_definition;
 pub mod hover;
+mod infer;
 pub mod inlay_hints;
 mod offsets;
 mod quote;
