@@ -13,6 +13,11 @@ with t as (select 1)
 search depth first by a, b c set ordercol
 select * from t order by ordercol;
 
+-- extra with
+with t as (select 1),
+with f as (select 2)
+select * from t;
+
 with 
    a as (
       select 1
