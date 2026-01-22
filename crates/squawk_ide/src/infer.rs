@@ -50,7 +50,7 @@ pub(crate) fn infer_type_from_expr(expr: &ast::Expr) -> Option<Type> {
     }
 }
 
-fn infer_type_from_ty(ty: &ast::Type) -> Option<Type> {
+pub(crate) fn infer_type_from_ty(ty: &ast::Type) -> Option<Type> {
     match ty {
         ast::Type::CharType(_) => Some(Type::Text),
         ast::Type::BitType(_) => Some(Type::Bit),

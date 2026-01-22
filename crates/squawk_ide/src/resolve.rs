@@ -8,7 +8,7 @@ use squawk_syntax::{
 use crate::binder::Binder;
 use crate::classify::{NameRefClass, classify_name_ref};
 use crate::column_name::ColumnName;
-use crate::infer::{Type, infer_type_from_expr};
+use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
 
@@ -2178,6 +2178,7 @@ fn resolve_subquery_column_ptr(
         }
     }
 
+    // TODO: this should just be a match stmt
     if let ast::SelectVariant::Table(table) = select_variant {
         let path = table.relation_name()?.path()?;
         let (table_name, schema) = extract_table_schema_from_path(&path)?;
@@ -2197,6 +2198,19 @@ fn resolve_subquery_column_ptr(
             &schema,
             column_name,
         );
+    }
+
+    if let ast::SelectVariant::Values(values) = select_variant {
+        if let Some(num_str) = column_name.0.strip_prefix("column")
+            && let Ok(col_num) = num_str.parse::<usize>()
+            && col_num > 0
+            && let Some(row_list) = values.row_list()
+            && let Some(first_row) = row_list.rows().next()
+            && let Some(expr) = first_row.exprs().nth(col_num - 1)
+        {
+            return Some(SyntaxNodePtr::new(expr.syntax()));
+        }
+        return None;
     }
 
     let ast::SelectVariant::Select(subquery_select) = select_variant else {
@@ -2527,9 +2541,14 @@ pub(crate) enum TableSource {
     CreateView(ast::CreateView),
     CreateMaterializedView(ast::CreateMaterializedView),
     CreateTable(ast::CreateTableLike),
+    ParenSelect(ast::ParenSelect),
 }
 
 pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
+    if let Some(paren_select) = ast::ParenSelect::cast(node.clone()) {
+        return Some(TableSource::ParenSelect(paren_select));
+    }
+
     for ancestor in node.ancestors() {
         if let Some(with_table) = ast::WithTable::cast(ancestor.clone()) {
             return Some(TableSource::WithTable(with_table));
@@ -3154,6 +3173,97 @@ fn collect_target_list_columns_with_types(
         }
     }
     columns
+}
+
+pub(crate) fn collect_paren_select_columns_with_types(
+    binder: &Binder,
+    root: &SyntaxNode,
+    paren_select: &ast::ParenSelect,
+) -> Vec<(Name, Option<Type>)> {
+    let Some(select_variant) = paren_select.select() else {
+        return vec![];
+    };
+    collect_select_variant_columns_with_types(binder, root, &select_variant)
+}
+
+fn collect_select_variant_columns_with_types(
+    binder: &Binder,
+    root: &SyntaxNode,
+    select_variant: &ast::SelectVariant,
+) -> Vec<(Name, Option<Type>)> {
+    match select_variant {
+        ast::SelectVariant::Values(values) => {
+            let mut results = vec![];
+            if let Some(row_list) = values.row_list()
+                && let Some(first_row) = row_list.rows().next()
+            {
+                for (idx, expr) in first_row.exprs().enumerate() {
+                    let name = Name::from_string(format!("column{}", idx + 1));
+                    let ty = infer_type_from_expr(&expr);
+                    results.push((name, ty));
+                }
+            }
+            results
+        }
+        ast::SelectVariant::Select(select) => {
+            let Some(select_clause) = select.select_clause() else {
+                return vec![];
+            };
+            let Some(target_list) = select_clause.target_list() else {
+                return vec![];
+            };
+            collect_target_list_columns_with_types(&target_list)
+        }
+        ast::SelectVariant::SelectInto(select_into) => {
+            let Some(select_clause) = select_into.select_clause() else {
+                return vec![];
+            };
+            let Some(target_list) = select_clause.target_list() else {
+                return vec![];
+            };
+            collect_target_list_columns_with_types(&target_list)
+        }
+        ast::SelectVariant::ParenSelect(nested) => {
+            collect_paren_select_columns_with_types(binder, root, nested)
+        }
+        ast::SelectVariant::CompoundSelect(compound) => {
+            let Some(lhs) = compound.lhs() else {
+                return vec![];
+            };
+            collect_select_variant_columns_with_types(binder, root, &lhs)
+        }
+        ast::SelectVariant::Table(table) => {
+            let Some(path) = table.relation_name().and_then(|r| r.path()) else {
+                return vec![];
+            };
+            let Some(table_name) = extract_table_name(&path) else {
+                return vec![];
+            };
+            let schema = extract_schema_name(&path);
+            let position = table.syntax().text_range().start();
+            let Some(table_ptr) =
+                binder.lookup_with(&table_name, SymbolKind::Table, position, &schema)
+            else {
+                return vec![];
+            };
+            let Some(create_table) = table_ptr
+                .to_node(root)
+                .ancestors()
+                .find_map(ast::CreateTableLike::cast)
+            else {
+                return vec![];
+            };
+            let columns = collect_table_columns(binder, root, &create_table);
+            columns
+                .into_iter()
+                .filter_map(|col| {
+                    let name = Name::from_node(&col.name()?);
+                    let ty = col.ty().and_then(|t| infer_type_from_ty(&t));
+                    Some((name, ty))
+                })
+                .collect()
+        }
+    }
 }
 
 fn select_from_view_query(create_view: &ast::CreateView) -> Option<ast::Select> {

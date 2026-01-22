@@ -128,6 +128,22 @@ fn select_completions(
                         sort_text: None,
                     }));
                 }
+                Some(resolve::TableSource::ParenSelect(paren_select)) => {
+                    let columns = resolve::collect_paren_select_columns_with_types(
+                        &binder,
+                        file.syntax(),
+                        &paren_select,
+                    );
+                    completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
+                        label: name.to_string(),
+                        kind: CompletionItemKind::Column,
+                        detail: ty.map(|t| t.to_string()),
+                        insert_text: None,
+                        insert_text_format: None,
+                        trigger_completion_after_insert: false,
+                        sort_text: None,
+                    }));
+                }
                 None => {}
             }
         }
@@ -686,6 +702,25 @@ select $0 from t;
          column1            | Column | integer |             
          column2            | Column | text    |             
          column3            | Column | boolean |             
+         public             | Schema |         |             
+         pg_catalog         | Schema |         |             
+         pg_temp            | Schema |         |             
+         pg_toast           | Schema |         |             
+         information_schema | Schema |         |
+        ");
+    }
+
+    #[test]
+    fn completion_values_subquery() {
+        assert_snapshot!(completions("
+select $0 from (values (1, 'foo', 1.5, false));
+"), @r"
+         label              | kind   | detail  | insert_text 
+        --------------------+--------+---------+-------------
+         column1            | Column | integer |             
+         column2            | Column | text    |             
+         column3            | Column | numeric |             
+         column4            | Column | boolean |             
          public             | Schema |         |             
          pg_catalog         | Schema |         |             
          pg_temp            | Schema |         |             
