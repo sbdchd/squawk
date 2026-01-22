@@ -2559,6 +2559,9 @@ const COMPOUND_SELECT_FIRST: TokenSet = TokenSet::new(&[UNION_KW, INTERSECT_KW, 
 //     [ SEARCH { BREADTH | DEPTH } FIRST BY column_name [, ...] SET search_seq_col_name ]
 //     [ CYCLE column_name [, ...] SET cycle_mark_col_name [ TO cycle_mark_value DEFAULT cycle_mark_default ] USING cycle_path_col_name ]
 fn with_query(p: &mut Parser<'_>) -> CompletedMarker {
+    if p.at(WITH_KW) {
+        p.err_and_bump("unexpected WITH");
+    }
     let m = p.start();
     name(p);
     opt_column_list_with(p, ColumnDefKind::Name);
