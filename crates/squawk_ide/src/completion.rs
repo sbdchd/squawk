@@ -75,6 +75,15 @@ fn select_completions(
         && let Some(select) = ast::Select::cast(parent)
         && let Some(from_clause) = select.from_clause()
     {
+        completions.push(CompletionItem {
+            label: "*".to_string(),
+            kind: CompletionItemKind::Operator,
+            detail: None,
+            insert_text: None,
+            insert_text_format: None,
+            trigger_completion_after_insert: false,
+            sort_text: None,
+        });
         for table_ptr in resolve::table_ptrs_from_clause(&binder, &from_clause) {
             let table_node = table_ptr.to_node(file.syntax());
             match resolve::find_table_source(&table_node) {
@@ -488,6 +497,7 @@ pub enum CompletionItemKind {
     Schema,
     Type,
     Snippet,
+    Operator,
 }
 
 impl CompletionItemKind {
@@ -499,6 +509,7 @@ impl CompletionItemKind {
             Self::Type => "1",
             Self::Snippet => "1",
             Self::Function => "2",
+            Self::Operator => "8",
             Self::Schema => "9",
         }
     }
@@ -696,6 +707,7 @@ select $0 from t;
          b                  | Column   | int                     |             
          t                  | Table    |                         |             
          f()                | Function | public.f() returns text |             
+         *                  | Operator |                         |             
          public             | Schema   |                         |             
          pg_catalog         | Schema   |                         |             
          pg_temp            | Schema   |                         |             
@@ -710,9 +722,10 @@ select $0 from t;
 create table t (c int);
 select t.$0 from t;
 "), @r"
-         label | kind   | detail | insert_text 
-        -------+--------+--------+-------------
-         c     | Column | int    |             
+         label | kind     | detail | insert_text 
+        -------+----------+--------+-------------
+         c     | Column   | int    |             
+         *     | Operator |        |
         ");
     }
 
@@ -722,14 +735,15 @@ select t.$0 from t;
 with t as (select 1 a)
 select $0 from t;
 "), @r"
-         label              | kind   | detail  | insert_text 
-        --------------------+--------+---------+-------------
-         a                  | Column | integer |             
-         public             | Schema |         |             
-         pg_catalog         | Schema |         |             
-         pg_temp            | Schema |         |             
-         pg_toast           | Schema |         |             
-         information_schema | Schema |         |
+         label              | kind     | detail  | insert_text 
+        --------------------+----------+---------+-------------
+         a                  | Column   | integer |             
+         *                  | Operator |         |             
+         public             | Schema   |         |             
+         pg_catalog         | Schema   |         |             
+         pg_temp            | Schema   |         |             
+         pg_toast           | Schema   |         |             
+         information_schema | Schema   |         |
         ");
     }
 
@@ -739,16 +753,17 @@ select $0 from t;
 with t as (values (1, 'foo', false))
 select $0 from t;
 "), @r"
-         label              | kind   | detail  | insert_text 
-        --------------------+--------+---------+-------------
-         column1            | Column | integer |             
-         column2            | Column | text    |             
-         column3            | Column | boolean |             
-         public             | Schema |         |             
-         pg_catalog         | Schema |         |             
-         pg_temp            | Schema |         |             
-         pg_toast           | Schema |         |             
-         information_schema | Schema |         |
+         label              | kind     | detail  | insert_text 
+        --------------------+----------+---------+-------------
+         column1            | Column   | integer |             
+         column2            | Column   | text    |             
+         column3            | Column   | boolean |             
+         *                  | Operator |         |             
+         public             | Schema   |         |             
+         pg_catalog         | Schema   |         |             
+         pg_temp            | Schema   |         |             
+         pg_toast           | Schema   |         |             
+         information_schema | Schema   |         |
         ");
     }
 
@@ -757,17 +772,18 @@ select $0 from t;
         assert_snapshot!(completions("
 select $0 from (values (1, 'foo', 1.5, false));
 "), @r"
-         label              | kind   | detail  | insert_text 
-        --------------------+--------+---------+-------------
-         column1            | Column | integer |             
-         column2            | Column | text    |             
-         column3            | Column | numeric |             
-         column4            | Column | boolean |             
-         public             | Schema |         |             
-         pg_catalog         | Schema |         |             
-         pg_temp            | Schema |         |             
-         pg_toast           | Schema |         |             
-         information_schema | Schema |         |
+         label              | kind     | detail  | insert_text 
+        --------------------+----------+---------+-------------
+         column1            | Column   | integer |             
+         column2            | Column   | text    |             
+         column3            | Column   | numeric |             
+         column4            | Column   | boolean |             
+         *                  | Operator |         |             
+         public             | Schema   |         |             
+         pg_catalog         | Schema   |         |             
+         pg_temp            | Schema   |         |             
+         pg_toast           | Schema   |         |             
+         information_schema | Schema   |         |
         ");
     }
 

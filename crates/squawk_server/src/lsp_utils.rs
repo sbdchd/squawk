@@ -88,6 +88,7 @@ pub(crate) fn completion_item(
         CompletionItemKind::Function => lsp_types::CompletionItemKind::FUNCTION,
         CompletionItemKind::Type => lsp_types::CompletionItemKind::CLASS,
         CompletionItemKind::Snippet => lsp_types::CompletionItemKind::SNIPPET,
+        CompletionItemKind::Operator => lsp_types::CompletionItemKind::OPERATOR,
     };
 
     let sort_text = Some(item.sort_text());

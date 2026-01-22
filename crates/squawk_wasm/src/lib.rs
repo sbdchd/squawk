@@ -553,6 +553,7 @@ pub fn completion(content: String, line: u32, col: u32) -> Result<JsValue, Error
                 squawk_ide::completion::CompletionItemKind::Schema => "schema",
                 squawk_ide::completion::CompletionItemKind::Type => "type",
                 squawk_ide::completion::CompletionItemKind::Snippet => "snippet",
+                squawk_ide::completion::CompletionItemKind::Operator => "operator",
             }
             .to_string(),
             detail: item.detail,

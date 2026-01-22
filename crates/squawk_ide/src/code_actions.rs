@@ -387,6 +387,12 @@ fn add_explicit_alias(
         return None;
     }
 
+    if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr()
+        && field_expr.star_token().is_some()
+    {
+        return None;
+    }
+
     let alias = ColumnName::from_target(target.clone()).and_then(|c| c.0.to_string())?;
 
     let expr_end = target.expr().map(|e| e.syntax().text_range().end())?;
@@ -1510,6 +1516,14 @@ select myschema.f$0();"
         assert!(code_action_not_applicable(
             add_explicit_alias,
             "select $0* from t;"
+        ));
+    }
+
+    #[test]
+    fn add_explicit_alias_not_applicable_qualified_star() {
+        assert!(code_action_not_applicable(
+            add_explicit_alias,
+            "with t as (select 1 a) select t.*$0 from t;"
         ));
     }
 
