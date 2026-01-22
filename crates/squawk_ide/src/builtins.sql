@@ -10032,1601 +10032,4756 @@ create function pg_catalog.xpath_exists(text, xml) returns boolean language inte
 
 create function pg_catalog.xpath_exists(text, xml, text[]) returns boolean language internal;
 
-create operator pg_catalog.!! (rightarg = tsquery);
-
-create operator pg_catalog.!~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.!~ (leftarg = character, rightarg = text);
-
-create operator pg_catalog.!~ (leftarg = name, rightarg = text);
-
-create operator pg_catalog.!~* (leftarg = name, rightarg = text);
-
-create operator pg_catalog.!~* (leftarg = text, rightarg = text);
-
-create operator pg_catalog.!~* (leftarg = character, rightarg = text);
-
-create operator pg_catalog.!~~ (leftarg = character, rightarg = text);
-
-create operator pg_catalog.!~~ (leftarg = name, rightarg = text);
-
-create operator pg_catalog.!~~ (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.!~~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.!~~* (leftarg = text, rightarg = text);
-
-create operator pg_catalog.!~~* (leftarg = character, rightarg = text);
-
-create operator pg_catalog.!~~* (leftarg = name, rightarg = text);
-
-create operator pg_catalog.# (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.# (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.# (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.# (leftarg = box, rightarg = box);
-
-create operator pg_catalog.# (rightarg = path);
-
-create operator pg_catalog.# (leftarg = line, rightarg = line);
-
-create operator pg_catalog.# (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.# (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.# (rightarg = polygon);
-
-create operator pg_catalog.## (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.## (leftarg = point, rightarg = line);
-
-create operator pg_catalog.## (leftarg = point, rightarg = lseg);
-
-create operator pg_catalog.## (leftarg = point, rightarg = box);
-
-create operator pg_catalog.## (leftarg = lseg, rightarg = box);
-
-create operator pg_catalog.## (leftarg = line, rightarg = lseg);
-
-create operator pg_catalog.#- (leftarg = jsonb, rightarg = text[]);
-
-create operator pg_catalog.#> (leftarg = jsonb, rightarg = text[]);
-
-create operator pg_catalog.#> (leftarg = json, rightarg = text[]);
-
-create operator pg_catalog.#>> (leftarg = json, rightarg = text[]);
-
-create operator pg_catalog.#>> (leftarg = jsonb, rightarg = text[]);
-
-create operator pg_catalog.% (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.% (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.% (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.% (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.& (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.& (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.& (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.& (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.& (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.& (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.& (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.&& (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.&& (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.&& (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.&& (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.&& (leftarg = box, rightarg = box);
-
-create operator pg_catalog.&& (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.&& (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.&& (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.&& (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog.&& (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.&< (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.&< (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.&< (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog.&< (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.&< (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.&< (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.&< (leftarg = box, rightarg = box);
-
-create operator pg_catalog.&<| (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.&<| (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.&<| (leftarg = box, rightarg = box);
-
-create operator pg_catalog.&> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.&> (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.&> (leftarg = box, rightarg = box);
-
-create operator pg_catalog.&> (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.&> (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.&> (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog.&> (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.* (leftarg = box, rightarg = point);
-
-create operator pg_catalog.* (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.* (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.* (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.* (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.* (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.* (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.* (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.* (leftarg = real, rightarg = real);
-
-create operator pg_catalog.* (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.* (leftarg = double precision, rightarg = interval);
-
-create operator pg_catalog.* (leftarg = interval, rightarg = double precision);
-
-create operator pg_catalog.* (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.* (leftarg = circle, rightarg = point);
-
-create operator pg_catalog.* (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.* (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.* (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.* (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.* (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.* (leftarg = point, rightarg = point);
-
-create operator pg_catalog.* (leftarg = path, rightarg = point);
-
-create operator pg_catalog.* (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.* (leftarg = money, rightarg = real);
-
-create operator pg_catalog.* (leftarg = real, rightarg = money);
-
-create operator pg_catalog.* (leftarg = money, rightarg = double precision);
-
-create operator pg_catalog.* (leftarg = money, rightarg = bigint);
-
-create operator pg_catalog.* (leftarg = money, rightarg = integer);
-
-create operator pg_catalog.* (leftarg = money, rightarg = smallint);
-
-create operator pg_catalog.* (leftarg = double precision, rightarg = money);
-
-create operator pg_catalog.* (leftarg = bigint, rightarg = money);
-
-create operator pg_catalog.* (leftarg = integer, rightarg = money);
-
-create operator pg_catalog.* (leftarg = smallint, rightarg = money);
-
-create operator pg_catalog.*< (leftarg = record, rightarg = record);
-
-create operator pg_catalog.*<= (leftarg = record, rightarg = record);
-
-create operator pg_catalog.*<> (leftarg = record, rightarg = record);
-
-create operator pg_catalog.*= (leftarg = record, rightarg = record);
-
-create operator pg_catalog.*> (leftarg = record, rightarg = record);
-
-create operator pg_catalog.*>= (leftarg = record, rightarg = record);
-
-create operator pg_catalog.+ (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.+ (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.+ (leftarg = pg_lsn, rightarg = numeric);
-
-create operator pg_catalog.+ (leftarg = numeric, rightarg = pg_lsn);
-
-create operator pg_catalog.+ (leftarg = aclitem[], rightarg = aclitem);
-
-create operator pg_catalog.+ (leftarg = timestamp without time zone, rightarg = interval);
-
-create operator pg_catalog.+ (leftarg = date, rightarg = integer);
-
-create operator pg_catalog.+ (leftarg = date, rightarg = interval);
-
-create operator pg_catalog.+ (leftarg = box, rightarg = point);
-
-create operator pg_catalog.+ (leftarg = integer, rightarg = date);
-
-create operator pg_catalog.+ (leftarg = interval, rightarg = timestamp with time zone);
-
-create operator pg_catalog.+ (leftarg = circle, rightarg = point);
-
-create operator pg_catalog.+ (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.+ (leftarg = timestamp with time zone, rightarg = interval);
-
-create operator pg_catalog.+ (rightarg = bigint);
-
-create operator pg_catalog.+ (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.+ (leftarg = money, rightarg = money);
-
-create operator pg_catalog.+ (leftarg = date, rightarg = time without time zone);
-
-create operator pg_catalog.+ (leftarg = date, rightarg = time with time zone);
-
-create operator pg_catalog.+ (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.+ (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.+ (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.+ (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.+ (leftarg = inet, rightarg = bigint);
-
-create operator pg_catalog.+ (leftarg = time with time zone, rightarg = interval);
-
-create operator pg_catalog.+ (leftarg = bigint, rightarg = inet);
-
-create operator pg_catalog.+ (leftarg = interval, rightarg = time without time zone);
-
-create operator pg_catalog.+ (leftarg = time without time zone, rightarg = interval);
-
-create operator pg_catalog.+ (leftarg = real, rightarg = real);
-
-create operator pg_catalog.+ (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.+ (leftarg = time without time zone, rightarg = date);
-
-create operator pg_catalog.+ (leftarg = time with time zone, rightarg = date);
-
-create operator pg_catalog.+ (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.+ (leftarg = path, rightarg = point);
-
-create operator pg_catalog.+ (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.+ (rightarg = smallint);
-
-create operator pg_catalog.+ (rightarg = integer);
-
-create operator pg_catalog.+ (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.+ (leftarg = path, rightarg = path);
-
-create operator pg_catalog.+ (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.+ (leftarg = point, rightarg = point);
-
-create operator pg_catalog.+ (leftarg = interval, rightarg = date);
-
-create operator pg_catalog.+ (leftarg = interval, rightarg = time with time zone);
-
-create operator pg_catalog.+ (leftarg = interval, rightarg = timestamp without time zone);
-
-create operator pg_catalog.+ (rightarg = real);
-
-create operator pg_catalog.+ (rightarg = double precision);
-
-create operator pg_catalog.+ (rightarg = numeric);
-
-create operator pg_catalog.+ (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.+ (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.+ (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.- (leftarg = inet, rightarg = bigint);
-
-create operator pg_catalog.- (leftarg = time with time zone, rightarg = interval);
-
-create operator pg_catalog.- (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.- (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.- (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.- (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.- (rightarg = integer);
-
-create operator pg_catalog.- (rightarg = smallint);
-
-create operator pg_catalog.- (rightarg = real);
-
-create operator pg_catalog.- (rightarg = double precision);
-
-create operator pg_catalog.- (leftarg = real, rightarg = real);
-
-create operator pg_catalog.- (leftarg = money, rightarg = money);
-
-create operator pg_catalog.- (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.- (leftarg = aclitem[], rightarg = aclitem);
-
-create operator pg_catalog.- (leftarg = jsonb, rightarg = text);
-
-create operator pg_catalog.- (leftarg = pg_lsn, rightarg = pg_lsn);
-
-create operator pg_catalog.- (leftarg = pg_lsn, rightarg = numeric);
-
-create operator pg_catalog.- (leftarg = timestamp without time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.- (leftarg = timestamp without time zone, rightarg = interval);
-
-create operator pg_catalog.- (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.- (leftarg = circle, rightarg = point);
-
-create operator pg_catalog.- (leftarg = date, rightarg = date);
-
-create operator pg_catalog.- (leftarg = date, rightarg = integer);
-
-create operator pg_catalog.- (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.- (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.- (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.- (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.- (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.- (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.- (leftarg = time without time zone, rightarg = time without time zone);
-
-create operator pg_catalog.- (leftarg = point, rightarg = point);
-
-create operator pg_catalog.- (leftarg = path, rightarg = point);
-
-create operator pg_catalog.- (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.- (rightarg = interval);
-
-create operator pg_catalog.- (leftarg = timestamp with time zone, rightarg = interval);
-
-create operator pg_catalog.- (leftarg = timestamp with time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.- (leftarg = date, rightarg = interval);
-
-create operator pg_catalog.- (leftarg = box, rightarg = point);
-
-create operator pg_catalog.- (leftarg = jsonb, rightarg = integer);
-
-create operator pg_catalog.- (leftarg = jsonb, rightarg = text[]);
-
-create operator pg_catalog.- (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.- (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.- (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.- (rightarg = numeric);
-
-create operator pg_catalog.- (rightarg = bigint);
-
-create operator pg_catalog.- (leftarg = time without time zone, rightarg = interval);
-
-create operator pg_catalog.- (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.-> (leftarg = jsonb, rightarg = integer);
-
-create operator pg_catalog.-> (leftarg = json, rightarg = integer);
-
-create operator pg_catalog.-> (leftarg = json, rightarg = text);
-
-create operator pg_catalog.-> (leftarg = jsonb, rightarg = text);
-
-create operator pg_catalog.->> (leftarg = json, rightarg = text);
-
-create operator pg_catalog.->> (leftarg = jsonb, rightarg = text);
-
-create operator pg_catalog.->> (leftarg = jsonb, rightarg = integer);
-
-create operator pg_catalog.->> (leftarg = json, rightarg = integer);
-
-create operator pg_catalog.-|- (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.-|- (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.-|- (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.-|- (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog./ (leftarg = money, rightarg = double precision);
-
-create operator pg_catalog./ (leftarg = money, rightarg = integer);
-
-create operator pg_catalog./ (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog./ (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog./ (leftarg = money, rightarg = smallint);
-
-create operator pg_catalog./ (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog./ (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog./ (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog./ (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog./ (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog./ (leftarg = interval, rightarg = double precision);
-
-create operator pg_catalog./ (leftarg = point, rightarg = point);
-
-create operator pg_catalog./ (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog./ (leftarg = path, rightarg = point);
-
-create operator pg_catalog./ (leftarg = real, rightarg = real);
-
-create operator pg_catalog./ (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog./ (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog./ (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog./ (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog./ (leftarg = money, rightarg = money);
-
-create operator pg_catalog./ (leftarg = box, rightarg = point);
-
-create operator pg_catalog./ (leftarg = money, rightarg = real);
-
-create operator pg_catalog./ (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog./ (leftarg = money, rightarg = bigint);
-
-create operator pg_catalog./ (leftarg = circle, rightarg = point);
-
-create operator pg_catalog.< (leftarg = date, rightarg = date);
-
-create operator pg_catalog.< (leftarg = xid8, rightarg = xid8);
-
-create operator pg_catalog.< (leftarg = time without time zone, rightarg = time without time zone);
-
-create operator pg_catalog.< (leftarg = uuid, rightarg = uuid);
-
-create operator pg_catalog.< (leftarg = text, rightarg = name);
-
-create operator pg_catalog.< (leftarg = text, rightarg = text);
-
-create operator pg_catalog.< (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.< (leftarg = path, rightarg = path);
-
-create operator pg_catalog.< (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.< (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.< (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.< (leftarg = time with time zone, rightarg = time with time zone);
-
-create operator pg_catalog.< (leftarg = anyenum, rightarg = anyenum);
-
-create operator pg_catalog.< (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.< (leftarg = timestamp with time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.< (leftarg = tid, rightarg = tid);
-
-create operator pg_catalog.< (leftarg = timestamp with time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.< (leftarg = boolean, rightarg = boolean);
-
-create operator pg_catalog.< (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.< (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.< (leftarg = timestamp without time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.< (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.< (leftarg = record, rightarg = record);
-
-create operator pg_catalog.< (leftarg = bit varying, rightarg = bit varying);
-
-create operator pg_catalog.< (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.< (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.< (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.< (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.< (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.< (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.< (leftarg = real, rightarg = real);
-
-create operator pg_catalog.< (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.< (leftarg = tsvector, rightarg = tsvector);
-
-create operator pg_catalog.< (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.< (leftarg = date, rightarg = timestamp without time zone);
-
-create operator pg_catalog.< (leftarg = "char", rightarg = "char");
-
-create operator pg_catalog.< (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.< (leftarg = pg_lsn, rightarg = pg_lsn);
-
-create operator pg_catalog.< (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.< (leftarg = date, rightarg = timestamp with time zone);
-
-create operator pg_catalog.< (leftarg = timestamp without time zone, rightarg = date);
-
-create operator pg_catalog.< (leftarg = timestamp with time zone, rightarg = date);
-
-create operator pg_catalog.< (leftarg = name, rightarg = text);
-
-create operator pg_catalog.< (leftarg = money, rightarg = money);
-
-create operator pg_catalog.< (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.< (leftarg = timestamp without time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.< (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.< (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.< (leftarg = box, rightarg = box);
-
-create operator pg_catalog.< (leftarg = oid, rightarg = oid);
-
-create operator pg_catalog.< (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.< (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.< (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.< (leftarg = oidvector, rightarg = oidvector);
-
-create operator pg_catalog.< (leftarg = name, rightarg = name);
-
-create operator pg_catalog.< (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.< (leftarg = character, rightarg = character);
-
-create operator pg_catalog.< (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.<-> (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.<-> (leftarg = point, rightarg = point);
-
-create operator pg_catalog.<-> (leftarg = point, rightarg = line);
-
-create operator pg_catalog.<-> (leftarg = line, rightarg = point);
-
-create operator pg_catalog.<-> (leftarg = point, rightarg = lseg);
-
-create operator pg_catalog.<-> (leftarg = lseg, rightarg = point);
-
-create operator pg_catalog.<-> (leftarg = point, rightarg = box);
-
-create operator pg_catalog.<-> (leftarg = box, rightarg = point);
-
-create operator pg_catalog.<-> (leftarg = lseg, rightarg = line);
-
-create operator pg_catalog.<-> (leftarg = line, rightarg = lseg);
-
-create operator pg_catalog.<-> (leftarg = lseg, rightarg = box);
-
-create operator pg_catalog.<-> (leftarg = box, rightarg = lseg);
-
-create operator pg_catalog.<-> (leftarg = point, rightarg = path);
-
-create operator pg_catalog.<-> (leftarg = path, rightarg = point);
-
-create operator pg_catalog.<-> (leftarg = box, rightarg = box);
-
-create operator pg_catalog.<-> (leftarg = path, rightarg = path);
-
-create operator pg_catalog.<-> (leftarg = line, rightarg = line);
-
-create operator pg_catalog.<-> (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.<-> (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.<-> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.<-> (leftarg = point, rightarg = circle);
-
-create operator pg_catalog.<-> (leftarg = circle, rightarg = point);
-
-create operator pg_catalog.<-> (leftarg = point, rightarg = polygon);
-
-create operator pg_catalog.<-> (leftarg = polygon, rightarg = point);
-
-create operator pg_catalog.<-> (leftarg = circle, rightarg = polygon);
-
-create operator pg_catalog.<-> (leftarg = polygon, rightarg = circle);
-
-create operator pg_catalog.<< (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog.<< (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.<< (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.<< (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.<< (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.<< (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.<< (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.<< (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.<< (leftarg = point, rightarg = point);
-
-create operator pg_catalog.<< (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.<< (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.<< (leftarg = box, rightarg = box);
-
-create operator pg_catalog.<< (leftarg = bit, rightarg = integer);
-
-create operator pg_catalog.<<= (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.<<| (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.<<| (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.<<| (leftarg = box, rightarg = box);
-
-create operator pg_catalog.<<| (leftarg = point, rightarg = point);
-
-create operator pg_catalog.<= (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.<= (leftarg = boolean, rightarg = boolean);
-
-create operator pg_catalog.<= (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.<= (leftarg = record, rightarg = record);
-
-create operator pg_catalog.<= (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.<= (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.<= (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.<= (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.<= (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.<= (leftarg = box, rightarg = box);
-
-create operator pg_catalog.<= (leftarg = date, rightarg = date);
-
-create operator pg_catalog.<= (leftarg = money, rightarg = money);
-
-create operator pg_catalog.<= (leftarg = timestamp with time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.<= (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.<= (leftarg = pg_lsn, rightarg = pg_lsn);
-
-create operator pg_catalog.<= (leftarg = timestamp with time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.<= (leftarg = timestamp without time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.<= (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.<= (leftarg = timestamp with time zone, rightarg = date);
-
-create operator pg_catalog.<= (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.<= (leftarg = name, rightarg = text);
-
-create operator pg_catalog.<= (leftarg = path, rightarg = path);
-
-create operator pg_catalog.<= (leftarg = timestamp without time zone, rightarg = date);
-
-create operator pg_catalog.<= (leftarg = date, rightarg = timestamp with time zone);
-
-create operator pg_catalog.<= (leftarg = date, rightarg = timestamp without time zone);
-
-create operator pg_catalog.<= (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.<= (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.<= (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.<= (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.<= (leftarg = time without time zone, rightarg = time without time zone);
-
-create operator pg_catalog.<= (leftarg = text, rightarg = name);
-
-create operator pg_catalog.<= (leftarg = text, rightarg = text);
-
-create operator pg_catalog.<= (leftarg = timestamp without time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.<= (leftarg = name, rightarg = name);
-
-create operator pg_catalog.<= (leftarg = uuid, rightarg = uuid);
-
-create operator pg_catalog.<= (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.<= (leftarg = "char", rightarg = "char");
-
-create operator pg_catalog.<= (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.<= (leftarg = real, rightarg = real);
-
-create operator pg_catalog.<= (leftarg = anyenum, rightarg = anyenum);
-
-create operator pg_catalog.<= (leftarg = oidvector, rightarg = oidvector);
-
-create operator pg_catalog.<= (leftarg = oid, rightarg = oid);
-
-create operator pg_catalog.<= (leftarg = xid8, rightarg = xid8);
-
-create operator pg_catalog.<= (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.<= (leftarg = tsvector, rightarg = tsvector);
-
-create operator pg_catalog.<= (leftarg = character, rightarg = character);
-
-create operator pg_catalog.<= (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.<= (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.<= (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.<= (leftarg = tid, rightarg = tid);
-
-create operator pg_catalog.<= (leftarg = time with time zone, rightarg = time with time zone);
-
-create operator pg_catalog.<= (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.<= (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.<= (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.<= (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.<= (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.<= (leftarg = bit varying, rightarg = bit varying);
-
-create operator pg_catalog.<= (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.<> (leftarg = oid, rightarg = oid);
-
-create operator pg_catalog.<> (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.<> (leftarg = character, rightarg = character);
-
-create operator pg_catalog.<> (leftarg = tsvector, rightarg = tsvector);
-
-create operator pg_catalog.<> (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.<> (leftarg = text, rightarg = name);
-
-create operator pg_catalog.<> (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.<> (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.<> (leftarg = timestamp with time zone, rightarg = date);
-
-create operator pg_catalog.<> (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.<> (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.<> (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.<> (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.<> (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.<> (leftarg = boolean, rightarg = boolean);
-
-create operator pg_catalog.<> (leftarg = timestamp without time zone, rightarg = date);
-
-create operator pg_catalog.<> (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.<> (leftarg = text, rightarg = text);
-
-create operator pg_catalog.<> (leftarg = time with time zone, rightarg = time with time zone);
-
-create operator pg_catalog.<> (leftarg = date, rightarg = timestamp with time zone);
-
-create operator pg_catalog.<> (leftarg = point, rightarg = point);
-
-create operator pg_catalog.<> (leftarg = date, rightarg = timestamp without time zone);
-
-create operator pg_catalog.<> (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.<> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.<> (leftarg = name, rightarg = text);
-
-create operator pg_catalog.<> (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.<> (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.<> (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.<> (leftarg = record, rightarg = record);
-
-create operator pg_catalog.<> (leftarg = uuid, rightarg = uuid);
-
-create operator pg_catalog.<> (leftarg = name, rightarg = name);
-
-create operator pg_catalog.<> (leftarg = timestamp without time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.<> (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.<> (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.<> (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.<> (leftarg = pg_lsn, rightarg = pg_lsn);
-
-create operator pg_catalog.<> (leftarg = tid, rightarg = tid);
-
-create operator pg_catalog.<> (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.<> (leftarg = bit varying, rightarg = bit varying);
-
-create operator pg_catalog.<> (leftarg = "char", rightarg = "char");
-
-create operator pg_catalog.<> (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.<> (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.<> (leftarg = xid, rightarg = xid);
-
-create operator pg_catalog.<> (leftarg = real, rightarg = real);
-
-create operator pg_catalog.<> (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.<> (leftarg = anyenum, rightarg = anyenum);
-
-create operator pg_catalog.<> (leftarg = date, rightarg = date);
-
-create operator pg_catalog.<> (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.<> (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.<> (leftarg = time without time zone, rightarg = time without time zone);
-
-create operator pg_catalog.<> (leftarg = xid, rightarg = integer);
-
-create operator pg_catalog.<> (leftarg = timestamp with time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.<> (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.<> (leftarg = xid8, rightarg = xid8);
-
-create operator pg_catalog.<> (leftarg = money, rightarg = money);
-
-create operator pg_catalog.<> (leftarg = oidvector, rightarg = oidvector);
-
-create operator pg_catalog.<> (leftarg = timestamp with time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.<> (leftarg = timestamp without time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.<> (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.<@ (leftarg = anyelement, rightarg = anymultirange);
-
-create operator pg_catalog.<@ (leftarg = lseg, rightarg = box);
-
-create operator pg_catalog.<@ (leftarg = point, rightarg = path);
-
-create operator pg_catalog.<@ (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog.<@ (leftarg = point, rightarg = box);
-
-create operator pg_catalog.<@ (leftarg = box, rightarg = box);
-
-create operator pg_catalog.<@ (leftarg = point, rightarg = circle);
-
-create operator pg_catalog.<@ (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.<@ (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.<@ (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.<@ (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.<@ (leftarg = point, rightarg = lseg);
-
-create operator pg_catalog.<@ (leftarg = lseg, rightarg = line);
-
-create operator pg_catalog.<@ (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.<@ (leftarg = point, rightarg = polygon);
-
-create operator pg_catalog.<@ (leftarg = anyelement, rightarg = anyrange);
-
-create operator pg_catalog.<@ (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.<@ (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.<@ (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.<@ (leftarg = point, rightarg = line);
-
-create operator pg_catalog.<^ (leftarg = point, rightarg = point);
-
-create operator pg_catalog.<^ (leftarg = box, rightarg = box);
-
-create operator pg_catalog.= (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.= (leftarg = time with time zone, rightarg = time with time zone);
-
-create operator pg_catalog.= (leftarg = date, rightarg = date);
-
-create operator pg_catalog.= (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.= (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.= (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.= (leftarg = character, rightarg = character);
-
-create operator pg_catalog.= (leftarg = aclitem, rightarg = aclitem);
-
-create operator pg_catalog.= (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.= (leftarg = money, rightarg = money);
-
-create operator pg_catalog.= (leftarg = timestamp with time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.= (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.= (leftarg = path, rightarg = path);
-
-create operator pg_catalog.= (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.= (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.= (leftarg = pg_lsn, rightarg = pg_lsn);
-
-create operator pg_catalog.= (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.= (leftarg = real, rightarg = real);
-
-create operator pg_catalog.= (leftarg = oidvector, rightarg = oidvector);
-
-create operator pg_catalog.= (leftarg = oid, rightarg = oid);
-
-create operator pg_catalog.= (leftarg = line, rightarg = line);
-
-create operator pg_catalog.= (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.= (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.= (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.= (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.= (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.= (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.= (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.= (leftarg = box, rightarg = box);
-
-create operator pg_catalog.= (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.= (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.= (leftarg = bit varying, rightarg = bit varying);
-
-create operator pg_catalog.= (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.= (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.= (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.= (leftarg = tid, rightarg = tid);
-
-create operator pg_catalog.= (leftarg = record, rightarg = record);
-
-create operator pg_catalog.= (leftarg = cid, rightarg = cid);
-
-create operator pg_catalog.= (leftarg = boolean, rightarg = boolean);
-
-create operator pg_catalog.= (leftarg = xid8, rightarg = xid8);
-
-create operator pg_catalog.= (leftarg = xid, rightarg = integer);
-
-create operator pg_catalog.= (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.= (leftarg = xid, rightarg = xid);
-
-create operator pg_catalog.= (leftarg = timestamp without time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.= (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.= (leftarg = text, rightarg = name);
-
-create operator pg_catalog.= (leftarg = date, rightarg = timestamp without time zone);
-
-create operator pg_catalog.= (leftarg = date, rightarg = timestamp with time zone);
-
-create operator pg_catalog.= (leftarg = timestamp without time zone, rightarg = date);
-
-create operator pg_catalog.= (leftarg = timestamp with time zone, rightarg = date);
-
-create operator pg_catalog.= (leftarg = name, rightarg = text);
-
-create operator pg_catalog.= (leftarg = timestamp without time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.= (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.= (leftarg = timestamp with time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.= (leftarg = text, rightarg = text);
-
-create operator pg_catalog.= (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.= (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.= (leftarg = name, rightarg = name);
-
-create operator pg_catalog.= (leftarg = "char", rightarg = "char");
-
-create operator pg_catalog.= (leftarg = tsvector, rightarg = tsvector);
-
-create operator pg_catalog.= (leftarg = anyenum, rightarg = anyenum);
-
-create operator pg_catalog.= (leftarg = uuid, rightarg = uuid);
-
-create operator pg_catalog.= (leftarg = time without time zone, rightarg = time without time zone);
-
-create operator pg_catalog.> (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.> (leftarg = record, rightarg = record);
-
-create operator pg_catalog.> (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.> (leftarg = tid, rightarg = tid);
-
-create operator pg_catalog.> (leftarg = boolean, rightarg = boolean);
-
-create operator pg_catalog.> (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.> (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.> (leftarg = time with time zone, rightarg = time with time zone);
-
-create operator pg_catalog.> (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.> (leftarg = oid, rightarg = oid);
-
-create operator pg_catalog.> (leftarg = date, rightarg = date);
-
-create operator pg_catalog.> (leftarg = xid8, rightarg = xid8);
-
-create operator pg_catalog.> (leftarg = oidvector, rightarg = oidvector);
-
-create operator pg_catalog.> (leftarg = real, rightarg = real);
-
-create operator pg_catalog.> (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.> (leftarg = "char", rightarg = "char");
-
-create operator pg_catalog.> (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.> (leftarg = uuid, rightarg = uuid);
-
-create operator pg_catalog.> (leftarg = pg_lsn, rightarg = pg_lsn);
-
-create operator pg_catalog.> (leftarg = name, rightarg = name);
-
-create operator pg_catalog.> (leftarg = timestamp without time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.> (leftarg = text, rightarg = name);
-
-create operator pg_catalog.> (leftarg = text, rightarg = text);
-
-create operator pg_catalog.> (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.> (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.> (leftarg = tsvector, rightarg = tsvector);
-
-create operator pg_catalog.> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.> (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.> (leftarg = character, rightarg = character);
-
-create operator pg_catalog.> (leftarg = date, rightarg = timestamp without time zone);
-
-create operator pg_catalog.> (leftarg = name, rightarg = text);
-
-create operator pg_catalog.> (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.> (leftarg = date, rightarg = timestamp with time zone);
-
-create operator pg_catalog.> (leftarg = path, rightarg = path);
-
-create operator pg_catalog.> (leftarg = timestamp without time zone, rightarg = date);
-
-create operator pg_catalog.> (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.> (leftarg = timestamp with time zone, rightarg = date);
-
-create operator pg_catalog.> (leftarg = timestamp with time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.> (leftarg = timestamp without time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.> (leftarg = time without time zone, rightarg = time without time zone);
-
-create operator pg_catalog.> (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.> (leftarg = box, rightarg = box);
-
-create operator pg_catalog.> (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.> (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.> (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.> (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.> (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.> (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.> (leftarg = money, rightarg = money);
-
-create operator pg_catalog.> (leftarg = anyenum, rightarg = anyenum);
-
-create operator pg_catalog.> (leftarg = bit varying, rightarg = bit varying);
-
-create operator pg_catalog.> (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.> (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.> (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.> (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.> (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.> (leftarg = timestamp with time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.> (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.>= (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.>= (leftarg = bigint, rightarg = smallint);
-
-create operator pg_catalog.>= (leftarg = tid, rightarg = tid);
-
-create operator pg_catalog.>= (leftarg = money, rightarg = money);
-
-create operator pg_catalog.>= (leftarg = character, rightarg = character);
-
-create operator pg_catalog.>= (leftarg = date, rightarg = timestamp with time zone);
-
-create operator pg_catalog.>= (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.>= (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.>= (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.>= (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.>= (leftarg = name, rightarg = text);
-
-create operator pg_catalog.>= (leftarg = record, rightarg = record);
-
-create operator pg_catalog.>= (leftarg = integer, rightarg = smallint);
-
-create operator pg_catalog.>= (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.>= (leftarg = date, rightarg = date);
-
-create operator pg_catalog.>= (leftarg = time with time zone, rightarg = time with time zone);
-
-create operator pg_catalog.>= (leftarg = xid8, rightarg = xid8);
-
-create operator pg_catalog.>= (leftarg = timestamp without time zone, rightarg = date);
-
-create operator pg_catalog.>= (leftarg = oid, rightarg = oid);
-
-create operator pg_catalog.>= (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.>= (leftarg = interval, rightarg = interval);
-
-create operator pg_catalog.>= (leftarg = bit varying, rightarg = bit varying);
-
-create operator pg_catalog.>= (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.>= (leftarg = oidvector, rightarg = oidvector);
-
-create operator pg_catalog.>= (leftarg = path, rightarg = path);
-
-create operator pg_catalog.>= (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.>= (leftarg = boolean, rightarg = boolean);
-
-create operator pg_catalog.>= (leftarg = real, rightarg = real);
-
-create operator pg_catalog.>= (leftarg = anyenum, rightarg = anyenum);
-
-create operator pg_catalog.>= (leftarg = timestamp with time zone, rightarg = date);
-
-create operator pg_catalog.>= (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.>= (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.>= (leftarg = "char", rightarg = "char");
-
-create operator pg_catalog.>= (leftarg = uuid, rightarg = uuid);
-
-create operator pg_catalog.>= (leftarg = timestamp with time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.>= (leftarg = time without time zone, rightarg = time without time zone);
-
-create operator pg_catalog.>= (leftarg = pg_lsn, rightarg = pg_lsn);
-
-create operator pg_catalog.>= (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.>= (leftarg = name, rightarg = name);
-
-create operator pg_catalog.>= (leftarg = real, rightarg = double precision);
-
-create operator pg_catalog.>= (leftarg = timestamp without time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.>= (leftarg = timestamp without time zone, rightarg = timestamp with time zone);
-
-create operator pg_catalog.>= (leftarg = text, rightarg = name);
-
-create operator pg_catalog.>= (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.>= (leftarg = timestamp with time zone, rightarg = timestamp without time zone);
-
-create operator pg_catalog.>= (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.>= (leftarg = text, rightarg = text);
-
-create operator pg_catalog.>= (leftarg = double precision, rightarg = real);
-
-create operator pg_catalog.>= (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.>= (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.>= (leftarg = box, rightarg = box);
-
-create operator pg_catalog.>= (leftarg = tsvector, rightarg = tsvector);
-
-create operator pg_catalog.>= (leftarg = smallint, rightarg = bigint);
-
-create operator pg_catalog.>= (leftarg = integer, rightarg = bigint);
-
-create operator pg_catalog.>= (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.>= (leftarg = date, rightarg = timestamp without time zone);
-
-create operator pg_catalog.>= (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.>= (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.>> (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.>> (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.>> (leftarg = box, rightarg = box);
-
-create operator pg_catalog.>> (leftarg = point, rightarg = point);
-
-create operator pg_catalog.>> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.>> (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.>> (leftarg = bit, rightarg = integer);
-
-create operator pg_catalog.>> (leftarg = smallint, rightarg = integer);
-
-create operator pg_catalog.>> (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.>> (leftarg = bigint, rightarg = integer);
-
-create operator pg_catalog.>> (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.>> (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.>> (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog.>>= (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.>^ (leftarg = box, rightarg = box);
-
-create operator pg_catalog.>^ (leftarg = point, rightarg = point);
-
-create operator pg_catalog.? (leftarg = jsonb, rightarg = text);
-
-create operator pg_catalog.?# (leftarg = lseg, rightarg = box);
-
-create operator pg_catalog.?# (leftarg = line, rightarg = line);
-
-create operator pg_catalog.?# (leftarg = box, rightarg = box);
-
-create operator pg_catalog.?# (leftarg = path, rightarg = path);
-
-create operator pg_catalog.?# (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.?# (leftarg = lseg, rightarg = line);
-
-create operator pg_catalog.?# (leftarg = line, rightarg = box);
-
-create operator pg_catalog.?& (leftarg = jsonb, rightarg = text[]);
-
-create operator pg_catalog.?- (rightarg = lseg);
-
-create operator pg_catalog.?- (leftarg = point, rightarg = point);
-
-create operator pg_catalog.?- (rightarg = line);
-
-create operator pg_catalog.?-| (leftarg = line, rightarg = line);
-
-create operator pg_catalog.?-| (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.?| (rightarg = line);
-
-create operator pg_catalog.?| (leftarg = point, rightarg = point);
-
-create operator pg_catalog.?| (leftarg = jsonb, rightarg = text[]);
-
-create operator pg_catalog.?| (rightarg = lseg);
-
-create operator pg_catalog.?|| (leftarg = line, rightarg = line);
-
-create operator pg_catalog.?|| (leftarg = lseg, rightarg = lseg);
-
-create operator pg_catalog.@ (rightarg = integer);
-
-create operator pg_catalog.@ (rightarg = numeric);
-
-create operator pg_catalog.@ (rightarg = smallint);
-
-create operator pg_catalog.@ (rightarg = double precision);
-
-create operator pg_catalog.@ (rightarg = real);
-
-create operator pg_catalog.@ (rightarg = bigint);
-
-create operator pg_catalog.@-@ (rightarg = path);
-
-create operator pg_catalog.@-@ (rightarg = lseg);
-
-create operator pg_catalog.@> (leftarg = polygon, rightarg = point);
-
-create operator pg_catalog.@> (leftarg = circle, rightarg = point);
-
-create operator pg_catalog.@> (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.@> (leftarg = path, rightarg = point);
-
-create operator pg_catalog.@> (leftarg = anymultirange, rightarg = anyelement);
-
-create operator pg_catalog.@> (leftarg = box, rightarg = box);
-
-create operator pg_catalog.@> (leftarg = box, rightarg = point);
-
-create operator pg_catalog.@> (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.@> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.@> (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.@> (leftarg = anyarray, rightarg = anyarray);
-
-create operator pg_catalog.@> (leftarg = anyrange, rightarg = anymultirange);
-
-create operator pg_catalog.@> (leftarg = aclitem[], rightarg = aclitem);
-
-create operator pg_catalog.@> (leftarg = anymultirange, rightarg = anymultirange);
-
-create operator pg_catalog.@> (leftarg = anyrange, rightarg = anyelement);
-
-create operator pg_catalog.@> (leftarg = anyrange, rightarg = anyrange);
-
-create operator pg_catalog.@> (leftarg = anymultirange, rightarg = anyrange);
-
-create operator pg_catalog.@? (leftarg = jsonb, rightarg = jsonpath);
-
-create operator pg_catalog.@@ (leftarg = tsvector, rightarg = tsquery);
-
-create operator pg_catalog.@@ (leftarg = tsquery, rightarg = tsvector);
-
-create operator pg_catalog.@@ (rightarg = circle);
-
-create operator pg_catalog.@@ (rightarg = polygon);
-
-create operator pg_catalog.@@ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.@@ (rightarg = box);
-
-create operator pg_catalog.@@ (leftarg = text, rightarg = tsquery);
-
-create operator pg_catalog.@@ (leftarg = jsonb, rightarg = jsonpath);
-
-create operator pg_catalog.@@ (rightarg = lseg);
-
-create operator pg_catalog.@@@ (leftarg = tsvector, rightarg = tsquery);
-
-create operator pg_catalog.@@@ (leftarg = tsquery, rightarg = tsvector);
-
-create operator pg_catalog.^ (leftarg = double precision, rightarg = double precision);
-
-create operator pg_catalog.^ (leftarg = numeric, rightarg = numeric);
-
-create operator pg_catalog.^@ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.| (leftarg = smallint, rightarg = smallint);
-
-create operator pg_catalog.| (leftarg = bit, rightarg = bit);
-
-create operator pg_catalog.| (leftarg = inet, rightarg = inet);
-
-create operator pg_catalog.| (leftarg = bigint, rightarg = bigint);
-
-create operator pg_catalog.| (leftarg = macaddr8, rightarg = macaddr8);
-
-create operator pg_catalog.| (leftarg = macaddr, rightarg = macaddr);
-
-create operator pg_catalog.| (leftarg = integer, rightarg = integer);
-
-create operator pg_catalog.|&> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.|&> (leftarg = box, rightarg = box);
-
-create operator pg_catalog.|&> (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.|/ (rightarg = double precision);
-
-create operator pg_catalog.|>> (leftarg = box, rightarg = box);
-
-create operator pg_catalog.|>> (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.|>> (leftarg = point, rightarg = point);
-
-create operator pg_catalog.|>> (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.|| (leftarg = text, rightarg = text);
-
-create operator pg_catalog.|| (leftarg = bit varying, rightarg = bit varying);
-
-create operator pg_catalog.|| (leftarg = tsvector, rightarg = tsvector);
-
-create operator pg_catalog.|| (leftarg = jsonb, rightarg = jsonb);
-
-create operator pg_catalog.|| (leftarg = anycompatiblearray, rightarg = anycompatiblearray);
-
-create operator pg_catalog.|| (leftarg = anycompatible, rightarg = anycompatiblearray);
-
-create operator pg_catalog.|| (leftarg = text, rightarg = anynonarray);
-
-create operator pg_catalog.|| (leftarg = anynonarray, rightarg = text);
-
-create operator pg_catalog.|| (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.|| (leftarg = tsquery, rightarg = tsquery);
-
-create operator pg_catalog.|| (leftarg = anycompatiblearray, rightarg = anycompatible);
-
-create operator pg_catalog.||/ (rightarg = double precision);
-
-create operator pg_catalog.~ (leftarg = character, rightarg = text);
-
-create operator pg_catalog.~ (rightarg = macaddr8);
-
-create operator pg_catalog.~ (leftarg = name, rightarg = text);
-
-create operator pg_catalog.~ (rightarg = macaddr);
-
-create operator pg_catalog.~ (rightarg = inet);
-
-create operator pg_catalog.~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~ (rightarg = bigint);
-
-create operator pg_catalog.~ (rightarg = bit);
-
-create operator pg_catalog.~ (rightarg = smallint);
-
-create operator pg_catalog.~ (rightarg = integer);
-
-create operator pg_catalog.~* (leftarg = name, rightarg = text);
-
-create operator pg_catalog.~* (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~* (leftarg = character, rightarg = text);
-
-create operator pg_catalog.~<=~ (leftarg = character, rightarg = character);
-
-create operator pg_catalog.~<=~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~<~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~<~ (leftarg = character, rightarg = character);
-
-create operator pg_catalog.~= (leftarg = point, rightarg = point);
-
-create operator pg_catalog.~= (leftarg = circle, rightarg = circle);
-
-create operator pg_catalog.~= (leftarg = box, rightarg = box);
-
-create operator pg_catalog.~= (leftarg = polygon, rightarg = polygon);
-
-create operator pg_catalog.~>=~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~>=~ (leftarg = character, rightarg = character);
-
-create operator pg_catalog.~>~ (leftarg = character, rightarg = character);
-
-create operator pg_catalog.~>~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~~ (leftarg = bytea, rightarg = bytea);
-
-create operator pg_catalog.~~ (leftarg = name, rightarg = text);
-
-create operator pg_catalog.~~ (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~~ (leftarg = character, rightarg = text);
-
-create operator pg_catalog.~~* (leftarg = character, rightarg = text);
-
-create operator pg_catalog.~~* (leftarg = text, rightarg = text);
-
-create operator pg_catalog.~~* (leftarg = name, rightarg = text);
+create operator pg_catalog.!! (
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_not
+);
+
+create operator pg_catalog.!~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.textregexne
+);
+
+create operator pg_catalog.!~ (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpcharregexne
+);
+
+create operator pg_catalog.!~ (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameregexne
+);
+
+create operator pg_catalog.!~* (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpcharicregexne
+);
+
+create operator pg_catalog.!~* (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.texticregexne
+);
+
+create operator pg_catalog.!~* (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameicregexne
+);
+
+create operator pg_catalog.!~~ (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.byteanlike
+);
+
+create operator pg_catalog.!~~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.textnlike
+);
+
+create operator pg_catalog.!~~ (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.namenlike
+);
+
+create operator pg_catalog.!~~ (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpcharnlike
+);
+
+create operator pg_catalog.!~~* (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameicnlike
+);
+
+create operator pg_catalog.!~~* (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpcharicnlike
+);
+
+create operator pg_catalog.!~~* (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.texticnlike
+);
+
+create operator pg_catalog.# (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_intersect
+);
+
+create operator pg_catalog.# (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_interpt
+);
+
+create operator pg_catalog.# (
+  rightarg = path,
+  function = pg_catalog.path_npoints
+);
+
+create operator pg_catalog.# (
+  rightarg = polygon,
+  function = pg_catalog.poly_npoints
+);
+
+create operator pg_catalog.# (
+  leftarg = line,
+  rightarg = line,
+  function = pg_catalog.line_interpt
+);
+
+create operator pg_catalog.# (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitxor
+);
+
+create operator pg_catalog.# (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2xor
+);
+
+create operator pg_catalog.# (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4xor
+);
+
+create operator pg_catalog.# (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8xor
+);
+
+create operator pg_catalog.## (
+  leftarg = point,
+  rightarg = box,
+  function = pg_catalog.close_pb
+);
+
+create operator pg_catalog.## (
+  leftarg = lseg,
+  rightarg = box,
+  function = pg_catalog.close_sb
+);
+
+create operator pg_catalog.## (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.close_lseg
+);
+
+create operator pg_catalog.## (
+  leftarg = line,
+  rightarg = lseg,
+  function = pg_catalog.close_ls
+);
+
+create operator pg_catalog.## (
+  leftarg = point,
+  rightarg = lseg,
+  function = pg_catalog.close_ps
+);
+
+create operator pg_catalog.## (
+  leftarg = point,
+  rightarg = line,
+  function = pg_catalog.close_pl
+);
+
+create operator pg_catalog.#- (
+  leftarg = jsonb,
+  rightarg = text[],
+  function = pg_catalog.jsonb_delete_path
+);
+
+create operator pg_catalog.#> (
+  leftarg = json,
+  rightarg = text[],
+  function = pg_catalog.json_extract_path
+);
+
+create operator pg_catalog.#> (
+  leftarg = jsonb,
+  rightarg = text[],
+  function = pg_catalog.jsonb_extract_path
+);
+
+create operator pg_catalog.#>> (
+  leftarg = json,
+  rightarg = text[],
+  function = pg_catalog.json_extract_path_text
+);
+
+create operator pg_catalog.#>> (
+  leftarg = jsonb,
+  rightarg = text[],
+  function = pg_catalog.jsonb_extract_path_text
+);
+
+create operator pg_catalog.% (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2mod
+);
+
+create operator pg_catalog.% (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4mod
+);
+
+create operator pg_catalog.% (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8mod
+);
+
+create operator pg_catalog.% (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_mod
+);
+
+create operator pg_catalog.& (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8and
+);
+
+create operator pg_catalog.& (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.inetand
+);
+
+create operator pg_catalog.& (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2and
+);
+
+create operator pg_catalog.& (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_and
+);
+
+create operator pg_catalog.& (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitand
+);
+
+create operator pg_catalog.& (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_and
+);
+
+create operator pg_catalog.& (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4and
+);
+
+create operator pg_catalog.&& (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_overlaps_multirange
+);
+
+create operator pg_catalog.&& (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.arrayoverlap
+);
+
+create operator pg_catalog.&& (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_overlaps_multirange
+);
+
+create operator pg_catalog.&& (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_overlap
+);
+
+create operator pg_catalog.&& (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_overlap
+);
+
+create operator pg_catalog.&& (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_overlap
+);
+
+create operator pg_catalog.&& (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_overlaps
+);
+
+create operator pg_catalog.&& (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_and
+);
+
+create operator pg_catalog.&& (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_overlap
+);
+
+create operator pg_catalog.&& (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_overlaps_range
+);
+
+create operator pg_catalog.&< (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_overleft
+);
+
+create operator pg_catalog.&< (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_overleft
+);
+
+create operator pg_catalog.&< (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_overleft
+);
+
+create operator pg_catalog.&< (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_overleft_multirange
+);
+
+create operator pg_catalog.&< (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_overleft_range
+);
+
+create operator pg_catalog.&< (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_overleft_multirange
+);
+
+create operator pg_catalog.&< (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_overleft
+);
+
+create operator pg_catalog.&<| (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_overbelow
+);
+
+create operator pg_catalog.&<| (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_overbelow
+);
+
+create operator pg_catalog.&<| (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_overbelow
+);
+
+create operator pg_catalog.&> (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_overright
+);
+
+create operator pg_catalog.&> (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_overright
+);
+
+create operator pg_catalog.&> (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_overright_multirange
+);
+
+create operator pg_catalog.&> (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_overright
+);
+
+create operator pg_catalog.&> (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_overright_range
+);
+
+create operator pg_catalog.&> (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_overright_multirange
+);
+
+create operator pg_catalog.&> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_overright
+);
+
+create operator pg_catalog.* (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_mul
+);
+
+create operator pg_catalog.* (
+  leftarg = real,
+  rightarg = money,
+  function = pg_catalog.flt4_mul_cash
+);
+
+create operator pg_catalog.* (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4mul
+);
+
+create operator pg_catalog.* (
+  leftarg = money,
+  rightarg = real,
+  function = pg_catalog.cash_mul_flt4
+);
+
+create operator pg_catalog.* (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2mul
+);
+
+create operator pg_catalog.* (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24mul
+);
+
+create operator pg_catalog.* (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42mul
+);
+
+create operator pg_catalog.* (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_intersect
+);
+
+create operator pg_catalog.* (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4mul
+);
+
+create operator pg_catalog.* (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8mul
+);
+
+create operator pg_catalog.* (
+  leftarg = double precision,
+  rightarg = interval,
+  function = pg_catalog.mul_d_interval
+);
+
+create operator pg_catalog.* (
+  leftarg = interval,
+  rightarg = double precision,
+  function = pg_catalog.interval_mul
+);
+
+create operator pg_catalog.* (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48mul
+);
+
+create operator pg_catalog.* (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84mul
+);
+
+create operator pg_catalog.* (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_mul
+);
+
+create operator pg_catalog.* (
+  leftarg = path,
+  rightarg = point,
+  function = pg_catalog.path_mul_pt
+);
+
+create operator pg_catalog.* (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_intersect
+);
+
+create operator pg_catalog.* (
+  leftarg = box,
+  rightarg = point,
+  function = pg_catalog.box_mul
+);
+
+create operator pg_catalog.* (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28mul
+);
+
+create operator pg_catalog.* (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82mul
+);
+
+create operator pg_catalog.* (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48mul
+);
+
+create operator pg_catalog.* (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84mul
+);
+
+create operator pg_catalog.* (
+  leftarg = circle,
+  rightarg = point,
+  function = pg_catalog.circle_mul_pt
+);
+
+create operator pg_catalog.* (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8mul
+);
+
+create operator pg_catalog.* (
+  leftarg = double precision,
+  rightarg = money,
+  function = pg_catalog.flt8_mul_cash
+);
+
+create operator pg_catalog.* (
+  leftarg = money,
+  rightarg = double precision,
+  function = pg_catalog.cash_mul_flt8
+);
+
+create operator pg_catalog.* (
+  leftarg = money,
+  rightarg = smallint,
+  function = pg_catalog.cash_mul_int2
+);
+
+create operator pg_catalog.* (
+  leftarg = money,
+  rightarg = integer,
+  function = pg_catalog.cash_mul_int4
+);
+
+create operator pg_catalog.* (
+  leftarg = money,
+  rightarg = bigint,
+  function = pg_catalog.cash_mul_int8
+);
+
+create operator pg_catalog.* (
+  leftarg = smallint,
+  rightarg = money,
+  function = pg_catalog.int2_mul_cash
+);
+
+create operator pg_catalog.* (
+  leftarg = integer,
+  rightarg = money,
+  function = pg_catalog.int4_mul_cash
+);
+
+create operator pg_catalog.* (
+  leftarg = bigint,
+  rightarg = money,
+  function = pg_catalog.int8_mul_cash
+);
+
+create operator pg_catalog.*< (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_image_lt
+);
+
+create operator pg_catalog.*<= (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_image_le
+);
+
+create operator pg_catalog.*<> (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_image_ne
+);
+
+create operator pg_catalog.*= (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_image_eq
+);
+
+create operator pg_catalog.*> (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_image_gt
+);
+
+create operator pg_catalog.*>= (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_image_ge
+);
+
+create operator pg_catalog.+ (
+  leftarg = date,
+  rightarg = time without time zone,
+  function = pg_catalog.datetime_pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = numeric,
+  rightarg = pg_lsn,
+  function = pg_catalog.numeric_pl_pg_lsn
+);
+
+create operator pg_catalog.+ (
+  leftarg = time without time zone,
+  rightarg = date,
+  function = pg_catalog.timedate_pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = time with time zone,
+  rightarg = date,
+  function = pg_catalog.timetzdate_pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = timestamp with time zone,
+  rightarg = interval,
+  function = pg_catalog.timestamptz_pl_interval
+);
+
+create operator pg_catalog.+ (
+  leftarg = inet,
+  rightarg = bigint,
+  function = pg_catalog.inetpl
+);
+
+create operator pg_catalog.+ (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_pl
+);
+
+create operator pg_catalog.+ (
+  rightarg = double precision,
+  function = pg_catalog.float8up
+);
+
+create operator pg_catalog.+ (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = interval,
+  rightarg = time without time zone,
+  function = pg_catalog.interval_pl_time
+);
+
+create operator pg_catalog.+ (
+  leftarg = interval,
+  rightarg = date,
+  function = pg_catalog.interval_pl_date
+);
+
+create operator pg_catalog.+ (
+  leftarg = interval,
+  rightarg = time with time zone,
+  function = pg_catalog.interval_pl_timetz
+);
+
+create operator pg_catalog.+ (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = circle,
+  rightarg = point,
+  function = pg_catalog.circle_add_pt
+);
+
+create operator pg_catalog.+ (
+  rightarg = numeric,
+  function = pg_catalog.numeric_uplus
+);
+
+create operator pg_catalog.+ (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_union
+);
+
+create operator pg_catalog.+ (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = pg_lsn,
+  rightarg = numeric,
+  function = pg_catalog.pg_lsn_pli
+);
+
+create operator pg_catalog.+ (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = integer,
+  rightarg = date,
+  function = pg_catalog.integer_pl_date
+);
+
+create operator pg_catalog.+ (
+  leftarg = date,
+  rightarg = integer,
+  function = pg_catalog.date_pli
+);
+
+create operator pg_catalog.+ (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_add
+);
+
+create operator pg_catalog.+ (
+  rightarg = bigint,
+  function = pg_catalog.int8up
+);
+
+create operator pg_catalog.+ (
+  leftarg = aclitem[],
+  rightarg = aclitem,
+  function = pg_catalog.aclinsert
+);
+
+create operator pg_catalog.+ (
+  leftarg = timestamp without time zone,
+  rightarg = interval,
+  function = pg_catalog.timestamp_pl_interval
+);
+
+create operator pg_catalog.+ (
+  leftarg = time with time zone,
+  rightarg = interval,
+  function = pg_catalog.timetz_pl_interval
+);
+
+create operator pg_catalog.+ (
+  rightarg = smallint,
+  function = pg_catalog.int2up
+);
+
+create operator pg_catalog.+ (
+  rightarg = integer,
+  function = pg_catalog.int4up
+);
+
+create operator pg_catalog.+ (
+  leftarg = path,
+  rightarg = point,
+  function = pg_catalog.path_add_pt
+);
+
+create operator pg_catalog.+ (
+  leftarg = time without time zone,
+  rightarg = interval,
+  function = pg_catalog.time_pl_interval
+);
+
+create operator pg_catalog.+ (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_add
+);
+
+create operator pg_catalog.+ (
+  leftarg = interval,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.interval_pl_timestamp
+);
+
+create operator pg_catalog.+ (
+  leftarg = interval,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.interval_pl_timestamptz
+);
+
+create operator pg_catalog.+ (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = box,
+  rightarg = point,
+  function = pg_catalog.box_add
+);
+
+create operator pg_catalog.+ (
+  leftarg = date,
+  rightarg = time with time zone,
+  function = pg_catalog.datetimetz_pl
+);
+
+create operator pg_catalog.+ (
+  rightarg = real,
+  function = pg_catalog.float4up
+);
+
+create operator pg_catalog.+ (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = bigint,
+  rightarg = inet,
+  function = pg_catalog.int8pl_inet
+);
+
+create operator pg_catalog.+ (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_add
+);
+
+create operator pg_catalog.+ (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_union
+);
+
+create operator pg_catalog.+ (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8pl
+);
+
+create operator pg_catalog.+ (
+  leftarg = date,
+  rightarg = interval,
+  function = pg_catalog.date_pl_interval
+);
+
+create operator pg_catalog.+ (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84pl
+);
+
+create operator pg_catalog.- (
+  rightarg = real,
+  function = pg_catalog.float4um
+);
+
+create operator pg_catalog.- (
+  rightarg = integer,
+  function = pg_catalog.int4um
+);
+
+create operator pg_catalog.- (
+  rightarg = smallint,
+  function = pg_catalog.int2um
+);
+
+create operator pg_catalog.- (
+  leftarg = date,
+  rightarg = date,
+  function = pg_catalog.date_mi
+);
+
+create operator pg_catalog.- (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8mi
+);
+
+create operator pg_catalog.- (
+  rightarg = double precision,
+  function = pg_catalog.float8um
+);
+
+create operator pg_catalog.- (
+  leftarg = time without time zone,
+  rightarg = time without time zone,
+  function = pg_catalog.time_mi_time
+);
+
+create operator pg_catalog.- (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.inetmi
+);
+
+create operator pg_catalog.- (
+  leftarg = inet,
+  rightarg = bigint,
+  function = pg_catalog.inetmi_int8
+);
+
+create operator pg_catalog.- (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamp_mi
+);
+
+create operator pg_catalog.- (
+  leftarg = timestamp without time zone,
+  rightarg = interval,
+  function = pg_catalog.timestamp_mi_interval
+);
+
+create operator pg_catalog.- (
+  leftarg = date,
+  rightarg = interval,
+  function = pg_catalog.date_mi_interval
+);
+
+create operator pg_catalog.- (
+  leftarg = pg_lsn,
+  rightarg = pg_lsn,
+  function = pg_catalog.pg_lsn_mi
+);
+
+create operator pg_catalog.- (
+  leftarg = pg_lsn,
+  rightarg = numeric,
+  function = pg_catalog.pg_lsn_mii
+);
+
+create operator pg_catalog.- (
+  leftarg = aclitem[],
+  rightarg = aclitem,
+  function = pg_catalog.aclremove
+);
+
+create operator pg_catalog.- (
+  rightarg = bigint,
+  function = pg_catalog.int8um
+);
+
+create operator pg_catalog.- (
+  leftarg = jsonb,
+  rightarg = text,
+  function = pg_catalog.jsonb_delete
+);
+
+create operator pg_catalog.- (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48mi
+);
+
+create operator pg_catalog.- (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8mi
+);
+
+create operator pg_catalog.- (
+  leftarg = jsonb,
+  rightarg = integer,
+  function = pg_catalog.jsonb_delete
+);
+
+create operator pg_catalog.- (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84mi
+);
+
+create operator pg_catalog.- (
+  leftarg = jsonb,
+  rightarg = text[],
+  function = pg_catalog.jsonb_delete
+);
+
+create operator pg_catalog.- (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_minus
+);
+
+create operator pg_catalog.- (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_sub
+);
+
+create operator pg_catalog.- (
+  leftarg = path,
+  rightarg = point,
+  function = pg_catalog.path_sub_pt
+);
+
+create operator pg_catalog.- (
+  leftarg = box,
+  rightarg = point,
+  function = pg_catalog.box_sub
+);
+
+create operator pg_catalog.- (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28mi
+);
+
+create operator pg_catalog.- (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82mi
+);
+
+create operator pg_catalog.- (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48mi
+);
+
+create operator pg_catalog.- (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_mi
+);
+
+create operator pg_catalog.- (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84mi
+);
+
+create operator pg_catalog.- (
+  leftarg = timestamp with time zone,
+  rightarg = interval,
+  function = pg_catalog.timestamptz_mi_interval
+);
+
+create operator pg_catalog.- (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamptz_mi
+);
+
+create operator pg_catalog.- (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_mi
+);
+
+create operator pg_catalog.- (
+  rightarg = interval,
+  function = pg_catalog.interval_um
+);
+
+create operator pg_catalog.- (
+  leftarg = circle,
+  rightarg = point,
+  function = pg_catalog.circle_sub_pt
+);
+
+create operator pg_catalog.- (
+  leftarg = date,
+  rightarg = integer,
+  function = pg_catalog.date_mii
+);
+
+create operator pg_catalog.- (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2mi
+);
+
+create operator pg_catalog.- (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4mi
+);
+
+create operator pg_catalog.- (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24mi
+);
+
+create operator pg_catalog.- (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42mi
+);
+
+create operator pg_catalog.- (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_minus
+);
+
+create operator pg_catalog.- (
+  rightarg = numeric,
+  function = pg_catalog.numeric_uminus
+);
+
+create operator pg_catalog.- (
+  leftarg = time with time zone,
+  rightarg = interval,
+  function = pg_catalog.timetz_mi_interval
+);
+
+create operator pg_catalog.- (
+  leftarg = time without time zone,
+  rightarg = interval,
+  function = pg_catalog.time_mi_interval
+);
+
+create operator pg_catalog.- (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4mi
+);
+
+create operator pg_catalog.- (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_sub
+);
+
+create operator pg_catalog.-> (
+  leftarg = json,
+  rightarg = integer,
+  function = pg_catalog.json_array_element
+);
+
+create operator pg_catalog.-> (
+  leftarg = json,
+  rightarg = text,
+  function = pg_catalog.json_object_field
+);
+
+create operator pg_catalog.-> (
+  leftarg = jsonb,
+  rightarg = integer,
+  function = pg_catalog.jsonb_array_element
+);
+
+create operator pg_catalog.-> (
+  leftarg = jsonb,
+  rightarg = text,
+  function = pg_catalog.jsonb_object_field
+);
+
+create operator pg_catalog.->> (
+  leftarg = jsonb,
+  rightarg = text,
+  function = pg_catalog.jsonb_object_field_text
+);
+
+create operator pg_catalog.->> (
+  leftarg = json,
+  rightarg = text,
+  function = pg_catalog.json_object_field_text
+);
+
+create operator pg_catalog.->> (
+  leftarg = json,
+  rightarg = integer,
+  function = pg_catalog.json_array_element_text
+);
+
+create operator pg_catalog.->> (
+  leftarg = jsonb,
+  rightarg = integer,
+  function = pg_catalog.jsonb_array_element_text
+);
+
+create operator pg_catalog.-|- (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_adjacent_multirange
+);
+
+create operator pg_catalog.-|- (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_adjacent
+);
+
+create operator pg_catalog.-|- (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_adjacent_range
+);
+
+create operator pg_catalog.-|- (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_adjacent_multirange
+);
+
+create operator pg_catalog./ (
+  leftarg = money,
+  rightarg = bigint,
+  function = pg_catalog.cash_div_int8
+);
+
+create operator pg_catalog./ (
+  leftarg = interval,
+  rightarg = double precision,
+  function = pg_catalog.interval_div
+);
+
+create operator pg_catalog./ (
+  leftarg = money,
+  rightarg = integer,
+  function = pg_catalog.cash_div_int4
+);
+
+create operator pg_catalog./ (
+  leftarg = path,
+  rightarg = point,
+  function = pg_catalog.path_div_pt
+);
+
+create operator pg_catalog./ (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82div
+);
+
+create operator pg_catalog./ (
+  leftarg = money,
+  rightarg = smallint,
+  function = pg_catalog.cash_div_int2
+);
+
+create operator pg_catalog./ (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48div
+);
+
+create operator pg_catalog./ (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_div
+);
+
+create operator pg_catalog./ (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84div
+);
+
+create operator pg_catalog./ (
+  leftarg = circle,
+  rightarg = point,
+  function = pg_catalog.circle_div_pt
+);
+
+create operator pg_catalog./ (
+  leftarg = money,
+  rightarg = real,
+  function = pg_catalog.cash_div_flt4
+);
+
+create operator pg_catalog./ (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_div
+);
+
+create operator pg_catalog./ (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4div
+);
+
+create operator pg_catalog./ (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24div
+);
+
+create operator pg_catalog./ (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84div
+);
+
+create operator pg_catalog./ (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48div
+);
+
+create operator pg_catalog./ (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42div
+);
+
+create operator pg_catalog./ (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2div
+);
+
+create operator pg_catalog./ (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4div
+);
+
+create operator pg_catalog./ (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8div
+);
+
+create operator pg_catalog./ (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28div
+);
+
+create operator pg_catalog./ (
+  leftarg = box,
+  rightarg = point,
+  function = pg_catalog.box_div
+);
+
+create operator pg_catalog./ (
+  leftarg = money,
+  rightarg = double precision,
+  function = pg_catalog.cash_div_flt8
+);
+
+create operator pg_catalog./ (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_div_cash
+);
+
+create operator pg_catalog./ (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8div
+);
+
+create operator pg_catalog.< (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = name,
+  rightarg = name,
+  function = pg_catalog.namelt
+);
+
+create operator pg_catalog.< (
+  leftarg = bit varying,
+  rightarg = bit varying,
+  function = pg_catalog.varbitlt
+);
+
+create operator pg_catalog.< (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84lt
+);
+
+create operator pg_catalog.< (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = oid,
+  rightarg = oid,
+  function = pg_catalog.oidlt
+);
+
+create operator pg_catalog.< (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamp_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = date,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.date_lt_timestamp
+);
+
+create operator pg_catalog.< (
+  leftarg = text,
+  rightarg = name,
+  function = pg_catalog.textltname
+);
+
+create operator pg_catalog.< (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.bytealt
+);
+
+create operator pg_catalog.< (
+  leftarg = date,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.date_lt_timestamptz
+);
+
+create operator pg_catalog.< (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8lt
+);
+
+create operator pg_catalog.< (
+  leftarg = timestamp without time zone,
+  rightarg = date,
+  function = pg_catalog.timestamp_lt_date
+);
+
+create operator pg_catalog.< (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitlt
+);
+
+create operator pg_catalog.< (
+  leftarg = timestamp with time zone,
+  rightarg = date,
+  function = pg_catalog.timestamptz_lt_date
+);
+
+create operator pg_catalog.< (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamp_lt_timestamptz
+);
+
+create operator pg_catalog.< (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8lt
+);
+
+create operator pg_catalog.< (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_n_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = "char",
+  rightarg = "char",
+  function = pg_catalog.charlt
+);
+
+create operator pg_catalog.< (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamptz_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4lt
+);
+
+create operator pg_catalog.< (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamptz_lt_timestamp
+);
+
+create operator pg_catalog.< (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.array_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = pg_lsn,
+  rightarg = pg_lsn,
+  function = pg_catalog.pg_lsn_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82lt
+);
+
+create operator pg_catalog.< (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpcharlt
+);
+
+create operator pg_catalog.< (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.namelttext
+);
+
+create operator pg_catalog.< (
+  leftarg = time without time zone,
+  rightarg = time without time zone,
+  function = pg_catalog.time_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2lt
+);
+
+create operator pg_catalog.< (
+  leftarg = date,
+  rightarg = date,
+  function = pg_catalog.date_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28lt
+);
+
+create operator pg_catalog.< (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84lt
+);
+
+create operator pg_catalog.< (
+  leftarg = time with time zone,
+  rightarg = time with time zone,
+  function = pg_catalog.timetz_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = boolean,
+  rightarg = boolean,
+  function = pg_catalog.boollt
+);
+
+create operator pg_catalog.< (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4lt
+);
+
+create operator pg_catalog.< (
+  leftarg = tsvector,
+  rightarg = tsvector,
+  function = pg_catalog.tsvector_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48lt
+);
+
+create operator pg_catalog.< (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = xid8,
+  rightarg = xid8,
+  function = pg_catalog.xid8lt
+);
+
+create operator pg_catalog.< (
+  leftarg = tid,
+  rightarg = tid,
+  function = pg_catalog.tidlt
+);
+
+create operator pg_catalog.< (
+  leftarg = anyenum,
+  rightarg = anyenum,
+  function = pg_catalog.enum_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42lt
+);
+
+create operator pg_catalog.< (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = uuid,
+  rightarg = uuid,
+  function = pg_catalog.uuid_lt
+);
+
+create operator pg_catalog.< (
+  leftarg = oidvector,
+  rightarg = oidvector,
+  function = pg_catalog.oidvectorlt
+);
+
+create operator pg_catalog.< (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24lt
+);
+
+create operator pg_catalog.< (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48lt
+);
+
+create operator pg_catalog.<-> (
+  leftarg = point,
+  rightarg = lseg,
+  function = pg_catalog.dist_ps
+);
+
+create operator pg_catalog.<-> (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_phrase
+);
+
+create operator pg_catalog.<-> (
+  leftarg = circle,
+  rightarg = point,
+  function = pg_catalog.dist_cpoint
+);
+
+create operator pg_catalog.<-> (
+  leftarg = line,
+  rightarg = line,
+  function = pg_catalog.line_distance
+);
+
+create operator pg_catalog.<-> (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_distance
+);
+
+create operator pg_catalog.<-> (
+  leftarg = point,
+  rightarg = line,
+  function = pg_catalog.dist_pl
+);
+
+create operator pg_catalog.<-> (
+  leftarg = line,
+  rightarg = point,
+  function = pg_catalog.dist_lp
+);
+
+create operator pg_catalog.<-> (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_distance
+);
+
+create operator pg_catalog.<-> (
+  leftarg = lseg,
+  rightarg = line,
+  function = pg_catalog.dist_sl
+);
+
+create operator pg_catalog.<-> (
+  leftarg = point,
+  rightarg = circle,
+  function = pg_catalog.dist_pc
+);
+
+create operator pg_catalog.<-> (
+  leftarg = line,
+  rightarg = lseg,
+  function = pg_catalog.dist_ls
+);
+
+create operator pg_catalog.<-> (
+  leftarg = circle,
+  rightarg = polygon,
+  function = pg_catalog.dist_cpoly
+);
+
+create operator pg_catalog.<-> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_distance
+);
+
+create operator pg_catalog.<-> (
+  leftarg = polygon,
+  rightarg = circle,
+  function = pg_catalog.dist_polyc
+);
+
+create operator pg_catalog.<-> (
+  leftarg = path,
+  rightarg = point,
+  function = pg_catalog.dist_pathp
+);
+
+create operator pg_catalog.<-> (
+  leftarg = point,
+  rightarg = path,
+  function = pg_catalog.dist_ppath
+);
+
+create operator pg_catalog.<-> (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_distance
+);
+
+create operator pg_catalog.<-> (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_distance
+);
+
+create operator pg_catalog.<-> (
+  leftarg = box,
+  rightarg = lseg,
+  function = pg_catalog.dist_bs
+);
+
+create operator pg_catalog.<-> (
+  leftarg = point,
+  rightarg = polygon,
+  function = pg_catalog.dist_ppoly
+);
+
+create operator pg_catalog.<-> (
+  leftarg = polygon,
+  rightarg = point,
+  function = pg_catalog.dist_polyp
+);
+
+create operator pg_catalog.<-> (
+  leftarg = lseg,
+  rightarg = box,
+  function = pg_catalog.dist_sb
+);
+
+create operator pg_catalog.<-> (
+  leftarg = box,
+  rightarg = point,
+  function = pg_catalog.dist_bp
+);
+
+create operator pg_catalog.<-> (
+  leftarg = point,
+  rightarg = box,
+  function = pg_catalog.dist_pb
+);
+
+create operator pg_catalog.<-> (
+  leftarg = lseg,
+  rightarg = point,
+  function = pg_catalog.dist_sp
+);
+
+create operator pg_catalog.<-> (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_distance
+);
+
+create operator pg_catalog.<< (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_left
+);
+
+create operator pg_catalog.<< (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_left
+);
+
+create operator pg_catalog.<< (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_left
+);
+
+create operator pg_catalog.<< (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_sub
+);
+
+create operator pg_catalog.<< (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4shl
+);
+
+create operator pg_catalog.<< (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_before_multirange
+);
+
+create operator pg_catalog.<< (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int8shl
+);
+
+create operator pg_catalog.<< (
+  leftarg = bit,
+  rightarg = integer,
+  function = pg_catalog.bitshiftleft
+);
+
+create operator pg_catalog.<< (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_left
+);
+
+create operator pg_catalog.<< (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_before
+);
+
+create operator pg_catalog.<< (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int2shl
+);
+
+create operator pg_catalog.<< (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_before_multirange
+);
+
+create operator pg_catalog.<< (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_before_range
+);
+
+create operator pg_catalog.<<= (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_subeq
+);
+
+create operator pg_catalog.<<| (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_below
+);
+
+create operator pg_catalog.<<| (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_below
+);
+
+create operator pg_catalog.<<| (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_below
+);
+
+create operator pg_catalog.<<| (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_below
+);
+
+create operator pg_catalog.<= (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82le
+);
+
+create operator pg_catalog.<= (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28le
+);
+
+create operator pg_catalog.<= (
+  leftarg = boolean,
+  rightarg = boolean,
+  function = pg_catalog.boolle
+);
+
+create operator pg_catalog.<= (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = xid8,
+  rightarg = xid8,
+  function = pg_catalog.xid8le
+);
+
+create operator pg_catalog.<= (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48le
+);
+
+create operator pg_catalog.<= (
+  leftarg = name,
+  rightarg = name,
+  function = pg_catalog.namele
+);
+
+create operator pg_catalog.<= (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84le
+);
+
+create operator pg_catalog.<= (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = oid,
+  rightarg = oid,
+  function = pg_catalog.oidle
+);
+
+create operator pg_catalog.<= (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8le
+);
+
+create operator pg_catalog.<= (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_n_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = "char",
+  rightarg = "char",
+  function = pg_catalog.charle
+);
+
+create operator pg_catalog.<= (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpcharle
+);
+
+create operator pg_catalog.<= (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = date,
+  rightarg = date,
+  function = pg_catalog.date_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = time without time zone,
+  rightarg = time without time zone,
+  function = pg_catalog.time_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamptz_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84le
+);
+
+create operator pg_catalog.<= (
+  leftarg = tsvector,
+  rightarg = tsvector,
+  function = pg_catalog.tsvector_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48le
+);
+
+create operator pg_catalog.<= (
+  leftarg = anyenum,
+  rightarg = anyenum,
+  function = pg_catalog.enum_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = tid,
+  rightarg = tid,
+  function = pg_catalog.tidle
+);
+
+create operator pg_catalog.<= (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = time with time zone,
+  rightarg = time with time zone,
+  function = pg_catalog.timetz_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = pg_lsn,
+  rightarg = pg_lsn,
+  function = pg_catalog.pg_lsn_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8le
+);
+
+create operator pg_catalog.<= (
+  leftarg = oidvector,
+  rightarg = oidvector,
+  function = pg_catalog.oidvectorle
+);
+
+create operator pg_catalog.<= (
+  leftarg = uuid,
+  rightarg = uuid,
+  function = pg_catalog.uuid_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4le
+);
+
+create operator pg_catalog.<= (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2le
+);
+
+create operator pg_catalog.<= (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4le
+);
+
+create operator pg_catalog.<= (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamptz_le_timestamp
+);
+
+create operator pg_catalog.<= (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamp_le_timestamptz
+);
+
+create operator pg_catalog.<= (
+  leftarg = timestamp with time zone,
+  rightarg = date,
+  function = pg_catalog.timestamptz_le_date
+);
+
+create operator pg_catalog.<= (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.array_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = timestamp without time zone,
+  rightarg = date,
+  function = pg_catalog.timestamp_le_date
+);
+
+create operator pg_catalog.<= (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitle
+);
+
+create operator pg_catalog.<= (
+  leftarg = date,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.date_le_timestamptz
+);
+
+create operator pg_catalog.<= (
+  leftarg = text,
+  rightarg = name,
+  function = pg_catalog.textlename
+);
+
+create operator pg_catalog.<= (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = date,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.date_le_timestamp
+);
+
+create operator pg_catalog.<= (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamp_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = bit varying,
+  rightarg = bit varying,
+  function = pg_catalog.varbitle
+);
+
+create operator pg_catalog.<= (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameletext
+);
+
+create operator pg_catalog.<= (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.byteale
+);
+
+create operator pg_catalog.<= (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_le
+);
+
+create operator pg_catalog.<= (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24le
+);
+
+create operator pg_catalog.<= (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42le
+);
+
+create operator pg_catalog.<> (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = pg_lsn,
+  rightarg = pg_lsn,
+  function = pg_catalog.pg_lsn_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamptz_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.array_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.namenetext
+);
+
+create operator pg_catalog.<> (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.textne
+);
+
+create operator pg_catalog.<> (
+  leftarg = xid,
+  rightarg = integer,
+  function = pg_catalog.xidneqint4
+);
+
+create operator pg_catalog.<> (
+  leftarg = tid,
+  rightarg = tid,
+  function = pg_catalog.tidne
+);
+
+create operator pg_catalog.<> (
+  leftarg = oidvector,
+  rightarg = oidvector,
+  function = pg_catalog.oidvectorne
+);
+
+create operator pg_catalog.<> (
+  leftarg = time with time zone,
+  rightarg = time with time zone,
+  function = pg_catalog.timetz_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = anyenum,
+  rightarg = anyenum,
+  function = pg_catalog.enum_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = tsvector,
+  rightarg = tsvector,
+  function = pg_catalog.tsvector_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamp_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = uuid,
+  rightarg = uuid,
+  function = pg_catalog.uuid_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = bit varying,
+  rightarg = bit varying,
+  function = pg_catalog.varbitne
+);
+
+create operator pg_catalog.<> (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = time without time zone,
+  rightarg = time without time zone,
+  function = pg_catalog.time_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = date,
+  rightarg = date,
+  function = pg_catalog.date_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpcharne
+);
+
+create operator pg_catalog.<> (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = boolean,
+  rightarg = boolean,
+  function = pg_catalog.boolne
+);
+
+create operator pg_catalog.<> (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamptz_ne_timestamp
+);
+
+create operator pg_catalog.<> (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamp_ne_timestamptz
+);
+
+create operator pg_catalog.<> (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = text,
+  rightarg = name,
+  function = pg_catalog.textnename
+);
+
+create operator pg_catalog.<> (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.byteane
+);
+
+create operator pg_catalog.<> (
+  leftarg = "char",
+  rightarg = "char",
+  function = pg_catalog.charne
+);
+
+create operator pg_catalog.<> (
+  leftarg = timestamp with time zone,
+  rightarg = date,
+  function = pg_catalog.timestamptz_ne_date
+);
+
+create operator pg_catalog.<> (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = name,
+  rightarg = name,
+  function = pg_catalog.namene
+);
+
+create operator pg_catalog.<> (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitne
+);
+
+create operator pg_catalog.<> (
+  leftarg = timestamp without time zone,
+  rightarg = date,
+  function = pg_catalog.timestamp_ne_date
+);
+
+create operator pg_catalog.<> (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = date,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.date_ne_timestamptz
+);
+
+create operator pg_catalog.<> (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24ne
+);
+
+create operator pg_catalog.<> (
+  leftarg = xid,
+  rightarg = xid,
+  function = pg_catalog.xidneq
+);
+
+create operator pg_catalog.<> (
+  leftarg = date,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.date_ne_timestamp
+);
+
+create operator pg_catalog.<> (
+  leftarg = oid,
+  rightarg = oid,
+  function = pg_catalog.oidne
+);
+
+create operator pg_catalog.<> (
+  leftarg = xid8,
+  rightarg = xid8,
+  function = pg_catalog.xid8ne
+);
+
+create operator pg_catalog.<@ (
+  leftarg = point,
+  rightarg = path,
+  function = pg_catalog.on_ppath
+);
+
+create operator pg_catalog.<@ (
+  leftarg = point,
+  rightarg = polygon,
+  function = pg_catalog.pt_contained_poly
+);
+
+create operator pg_catalog.<@ (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_contained
+);
+
+create operator pg_catalog.<@ (
+  leftarg = lseg,
+  rightarg = box,
+  function = pg_catalog.on_sb
+);
+
+create operator pg_catalog.<@ (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_contained_by
+);
+
+create operator pg_catalog.<@ (
+  leftarg = point,
+  rightarg = lseg,
+  function = pg_catalog.on_ps
+);
+
+create operator pg_catalog.<@ (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_contained_by_range
+);
+
+create operator pg_catalog.<@ (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_contained
+);
+
+create operator pg_catalog.<@ (
+  leftarg = lseg,
+  rightarg = line,
+  function = pg_catalog.on_sl
+);
+
+create operator pg_catalog.<@ (
+  leftarg = point,
+  rightarg = line,
+  function = pg_catalog.on_pl
+);
+
+create operator pg_catalog.<@ (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.arraycontained
+);
+
+create operator pg_catalog.<@ (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_contained_by_multirange
+);
+
+create operator pg_catalog.<@ (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsq_mcontained
+);
+
+create operator pg_catalog.<@ (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_contained
+);
+
+create operator pg_catalog.<@ (
+  leftarg = anyelement,
+  rightarg = anymultirange,
+  function = pg_catalog.elem_contained_by_multirange
+);
+
+create operator pg_catalog.<@ (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_contained_by_multirange
+);
+
+create operator pg_catalog.<@ (
+  leftarg = point,
+  rightarg = circle,
+  function = pg_catalog.pt_contained_circle
+);
+
+create operator pg_catalog.<@ (
+  leftarg = point,
+  rightarg = box,
+  function = pg_catalog.on_pb
+);
+
+create operator pg_catalog.<@ (
+  leftarg = anyelement,
+  rightarg = anyrange,
+  function = pg_catalog.elem_contained_by_range
+);
+
+create operator pg_catalog.<@ (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_contained
+);
+
+create operator pg_catalog.<^ (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_below
+);
+
+create operator pg_catalog.<^ (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_below_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24eq
+);
+
+create operator pg_catalog.= (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.array_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48eq
+);
+
+create operator pg_catalog.= (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84eq
+);
+
+create operator pg_catalog.= (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8eq
+);
+
+create operator pg_catalog.= (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_n_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = aclitem,
+  rightarg = aclitem,
+  function = pg_catalog.aclitemeq
+);
+
+create operator pg_catalog.= (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpchareq
+);
+
+create operator pg_catalog.= (
+  leftarg = date,
+  rightarg = date,
+  function = pg_catalog.date_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = time without time zone,
+  rightarg = time without time zone,
+  function = pg_catalog.time_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamptz_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84eq
+);
+
+create operator pg_catalog.= (
+  leftarg = tid,
+  rightarg = tid,
+  function = pg_catalog.tideq
+);
+
+create operator pg_catalog.= (
+  leftarg = xid,
+  rightarg = integer,
+  function = pg_catalog.xideqint4
+);
+
+create operator pg_catalog.= (
+  leftarg = time with time zone,
+  rightarg = time with time zone,
+  function = pg_catalog.timetz_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48eq
+);
+
+create operator pg_catalog.= (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8eq
+);
+
+create operator pg_catalog.= (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4eq
+);
+
+create operator pg_catalog.= (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = line,
+  rightarg = line,
+  function = pg_catalog.line_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.biteq
+);
+
+create operator pg_catalog.= (
+  leftarg = text,
+  rightarg = name,
+  function = pg_catalog.texteqname
+);
+
+create operator pg_catalog.= (
+  leftarg = bit varying,
+  rightarg = bit varying,
+  function = pg_catalog.varbiteq
+);
+
+create operator pg_catalog.= (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameeqtext
+);
+
+create operator pg_catalog.= (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28eq
+);
+
+create operator pg_catalog.= (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82eq
+);
+
+create operator pg_catalog.= (
+  leftarg = oid,
+  rightarg = oid,
+  function = pg_catalog.oideq
+);
+
+create operator pg_catalog.= (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.byteaeq
+);
+
+create operator pg_catalog.= (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42eq
+);
+
+create operator pg_catalog.= (
+  leftarg = oidvector,
+  rightarg = oidvector,
+  function = pg_catalog.oidvectoreq
+);
+
+create operator pg_catalog.= (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamp_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = date,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.date_eq_timestamp
+);
+
+create operator pg_catalog.= (
+  leftarg = date,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.date_eq_timestamptz
+);
+
+create operator pg_catalog.= (
+  leftarg = timestamp without time zone,
+  rightarg = date,
+  function = pg_catalog.timestamp_eq_date
+);
+
+create operator pg_catalog.= (
+  leftarg = timestamp with time zone,
+  rightarg = date,
+  function = pg_catalog.timestamptz_eq_date
+);
+
+create operator pg_catalog.= (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamp_eq_timestamptz
+);
+
+create operator pg_catalog.= (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamptz_eq_timestamp
+);
+
+create operator pg_catalog.= (
+  leftarg = "char",
+  rightarg = "char",
+  function = pg_catalog.chareq
+);
+
+create operator pg_catalog.= (
+  leftarg = boolean,
+  rightarg = boolean,
+  function = pg_catalog.booleq
+);
+
+create operator pg_catalog.= (
+  leftarg = uuid,
+  rightarg = uuid,
+  function = pg_catalog.uuid_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = pg_lsn,
+  rightarg = pg_lsn,
+  function = pg_catalog.pg_lsn_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = anyenum,
+  rightarg = anyenum,
+  function = pg_catalog.enum_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = tsvector,
+  rightarg = tsvector,
+  function = pg_catalog.tsvector_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_eq
+);
+
+create operator pg_catalog.= (
+  leftarg = cid,
+  rightarg = cid,
+  function = pg_catalog.cideq
+);
+
+create operator pg_catalog.= (
+  leftarg = xid8,
+  rightarg = xid8,
+  function = pg_catalog.xid8eq
+);
+
+create operator pg_catalog.= (
+  leftarg = xid,
+  rightarg = xid,
+  function = pg_catalog.xideq
+);
+
+create operator pg_catalog.= (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.texteq
+);
+
+create operator pg_catalog.= (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4eq
+);
+
+create operator pg_catalog.= (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2eq
+);
+
+create operator pg_catalog.= (
+  leftarg = name,
+  rightarg = name,
+  function = pg_catalog.nameeq
+);
+
+create operator pg_catalog.> (
+  leftarg = date,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.date_gt_timestamptz
+);
+
+create operator pg_catalog.> (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8gt
+);
+
+create operator pg_catalog.> (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_n_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = text,
+  rightarg = name,
+  function = pg_catalog.textgtname
+);
+
+create operator pg_catalog.> (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitgt
+);
+
+create operator pg_catalog.> (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.array_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = timestamp without time zone,
+  rightarg = date,
+  function = pg_catalog.timestamp_gt_date
+);
+
+create operator pg_catalog.> (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28gt
+);
+
+create operator pg_catalog.> (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4gt
+);
+
+create operator pg_catalog.> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = timestamp with time zone,
+  rightarg = date,
+  function = pg_catalog.timestamptz_gt_date
+);
+
+create operator pg_catalog.> (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamptz_gt_timestamp
+);
+
+create operator pg_catalog.> (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamp_gt_timestamptz
+);
+
+create operator pg_catalog.> (
+  leftarg = xid8,
+  rightarg = xid8,
+  function = pg_catalog.xid8gt
+);
+
+create operator pg_catalog.> (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42gt
+);
+
+create operator pg_catalog.> (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24gt
+);
+
+create operator pg_catalog.> (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48gt
+);
+
+create operator pg_catalog.> (
+  leftarg = "char",
+  rightarg = "char",
+  function = pg_catalog.chargt
+);
+
+create operator pg_catalog.> (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.byteagt
+);
+
+create operator pg_catalog.> (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpchargt
+);
+
+create operator pg_catalog.> (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = date,
+  rightarg = date,
+  function = pg_catalog.date_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = time without time zone,
+  rightarg = time without time zone,
+  function = pg_catalog.time_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = bit varying,
+  rightarg = bit varying,
+  function = pg_catalog.varbitgt
+);
+
+create operator pg_catalog.> (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = name,
+  rightarg = name,
+  function = pg_catalog.namegt
+);
+
+create operator pg_catalog.> (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamptz_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82gt
+);
+
+create operator pg_catalog.> (
+  leftarg = oid,
+  rightarg = oid,
+  function = pg_catalog.oidgt
+);
+
+create operator pg_catalog.> (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84gt
+);
+
+create operator pg_catalog.> (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamp_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.namegttext
+);
+
+create operator pg_catalog.> (
+  leftarg = boolean,
+  rightarg = boolean,
+  function = pg_catalog.boolgt
+);
+
+create operator pg_catalog.> (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = tsvector,
+  rightarg = tsvector,
+  function = pg_catalog.tsvector_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84gt
+);
+
+create operator pg_catalog.> (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48gt
+);
+
+create operator pg_catalog.> (
+  leftarg = tid,
+  rightarg = tid,
+  function = pg_catalog.tidgt
+);
+
+create operator pg_catalog.> (
+  leftarg = anyenum,
+  rightarg = anyenum,
+  function = pg_catalog.enum_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = time with time zone,
+  rightarg = time with time zone,
+  function = pg_catalog.timetz_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = pg_lsn,
+  rightarg = pg_lsn,
+  function = pg_catalog.pg_lsn_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = oidvector,
+  rightarg = oidvector,
+  function = pg_catalog.oidvectorgt
+);
+
+create operator pg_catalog.> (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8gt
+);
+
+create operator pg_catalog.> (
+  leftarg = date,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.date_gt_timestamp
+);
+
+create operator pg_catalog.> (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = uuid,
+  rightarg = uuid,
+  function = pg_catalog.uuid_gt
+);
+
+create operator pg_catalog.> (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4gt
+);
+
+create operator pg_catalog.> (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2gt
+);
+
+create operator pg_catalog.> (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_gt
+);
+
+create operator pg_catalog.>= (
+  leftarg = interval,
+  rightarg = interval,
+  function = pg_catalog.interval_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = integer,
+  rightarg = smallint,
+  function = pg_catalog.int42ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int24ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.byteage
+);
+
+create operator pg_catalog.>= (
+  leftarg = bit varying,
+  rightarg = bit varying,
+  function = pg_catalog.varbitge
+);
+
+create operator pg_catalog.>= (
+  leftarg = oid,
+  rightarg = oid,
+  function = pg_catalog.oidge
+);
+
+create operator pg_catalog.>= (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.namegetext
+);
+
+create operator pg_catalog.>= (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamp_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = date,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.date_ge_timestamp
+);
+
+create operator pg_catalog.>= (
+  leftarg = date,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.date_ge_timestamptz
+);
+
+create operator pg_catalog.>= (
+  leftarg = text,
+  rightarg = name,
+  function = pg_catalog.textgename
+);
+
+create operator pg_catalog.>= (
+  leftarg = xid8,
+  rightarg = xid8,
+  function = pg_catalog.xid8ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = timestamp without time zone,
+  rightarg = date,
+  function = pg_catalog.timestamp_ge_date
+);
+
+create operator pg_catalog.>= (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitge
+);
+
+create operator pg_catalog.>= (
+  leftarg = timestamp with time zone,
+  rightarg = date,
+  function = pg_catalog.timestamptz_ge_date
+);
+
+create operator pg_catalog.>= (
+  leftarg = timestamp without time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamp_ge_timestamptz
+);
+
+create operator pg_catalog.>= (
+  leftarg = name,
+  rightarg = name,
+  function = pg_catalog.namege
+);
+
+create operator pg_catalog.>= (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp without time zone,
+  function = pg_catalog.timestamptz_ge_timestamp
+);
+
+create operator pg_catalog.>= (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = uuid,
+  rightarg = uuid,
+  function = pg_catalog.uuid_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = real,
+  rightarg = real,
+  function = pg_catalog.float4ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = pg_lsn,
+  rightarg = pg_lsn,
+  function = pg_catalog.pg_lsn_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.float8ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = time with time zone,
+  rightarg = time with time zone,
+  function = pg_catalog.timetz_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = tid,
+  rightarg = tid,
+  function = pg_catalog.tidge
+);
+
+create operator pg_catalog.>= (
+  leftarg = anyenum,
+  rightarg = anyenum,
+  function = pg_catalog.enum_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = real,
+  rightarg = double precision,
+  function = pg_catalog.float48ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.array_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = tsvector,
+  rightarg = tsvector,
+  function = pg_catalog.tsvector_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = double precision,
+  rightarg = real,
+  function = pg_catalog.float84ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = timestamp with time zone,
+  rightarg = timestamp with time zone,
+  function = pg_catalog.timestamptz_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = time without time zone,
+  rightarg = time without time zone,
+  function = pg_catalog.time_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = date,
+  rightarg = date,
+  function = pg_catalog.date_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpcharge
+);
+
+create operator pg_catalog.>= (
+  leftarg = record,
+  rightarg = record,
+  function = pg_catalog.record_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = oidvector,
+  rightarg = oidvector,
+  function = pg_catalog.oidvectorge
+);
+
+create operator pg_catalog.>= (
+  leftarg = "char",
+  rightarg = "char",
+  function = pg_catalog.charge
+);
+
+create operator pg_catalog.>= (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_n_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = money,
+  rightarg = money,
+  function = pg_catalog.cash_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = boolean,
+  rightarg = boolean,
+  function = pg_catalog.boolge
+);
+
+create operator pg_catalog.>= (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int84ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = smallint,
+  rightarg = bigint,
+  function = pg_catalog.int28ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = bigint,
+  rightarg = smallint,
+  function = pg_catalog.int82ge
+);
+
+create operator pg_catalog.>= (
+  leftarg = integer,
+  rightarg = bigint,
+  function = pg_catalog.int48ge
+);
+
+create operator pg_catalog.>> (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_right
+);
+
+create operator pg_catalog.>> (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4shr
+);
+
+create operator pg_catalog.>> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_right
+);
+
+create operator pg_catalog.>> (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_after
+);
+
+create operator pg_catalog.>> (
+  leftarg = bit,
+  rightarg = integer,
+  function = pg_catalog.bitshiftright
+);
+
+create operator pg_catalog.>> (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_after_multirange
+);
+
+create operator pg_catalog.>> (
+  leftarg = bigint,
+  rightarg = integer,
+  function = pg_catalog.int8shr
+);
+
+create operator pg_catalog.>> (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_after_multirange
+);
+
+create operator pg_catalog.>> (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_after_range
+);
+
+create operator pg_catalog.>> (
+  leftarg = smallint,
+  rightarg = integer,
+  function = pg_catalog.int2shr
+);
+
+create operator pg_catalog.>> (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_sup
+);
+
+create operator pg_catalog.>> (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_right
+);
+
+create operator pg_catalog.>> (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_right
+);
+
+create operator pg_catalog.>>= (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.network_supeq
+);
+
+create operator pg_catalog.>^ (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_above_eq
+);
+
+create operator pg_catalog.>^ (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_above
+);
+
+create operator pg_catalog.? (
+  leftarg = jsonb,
+  rightarg = text,
+  function = pg_catalog.jsonb_exists
+);
+
+create operator pg_catalog.?# (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_intersect
+);
+
+create operator pg_catalog.?# (
+  leftarg = lseg,
+  rightarg = box,
+  function = pg_catalog.inter_sb
+);
+
+create operator pg_catalog.?# (
+  leftarg = line,
+  rightarg = box,
+  function = pg_catalog.inter_lb
+);
+
+create operator pg_catalog.?# (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_overlap
+);
+
+create operator pg_catalog.?# (
+  leftarg = line,
+  rightarg = line,
+  function = pg_catalog.line_intersect
+);
+
+create operator pg_catalog.?# (
+  leftarg = path,
+  rightarg = path,
+  function = pg_catalog.path_inter
+);
+
+create operator pg_catalog.?# (
+  leftarg = lseg,
+  rightarg = line,
+  function = pg_catalog.inter_sl
+);
+
+create operator pg_catalog.?& (
+  leftarg = jsonb,
+  rightarg = text[],
+  function = pg_catalog.jsonb_exists_all
+);
+
+create operator pg_catalog.?- (
+  rightarg = line,
+  function = pg_catalog.line_horizontal
+);
+
+create operator pg_catalog.?- (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_horiz
+);
+
+create operator pg_catalog.?- (
+  rightarg = lseg,
+  function = pg_catalog.lseg_horizontal
+);
+
+create operator pg_catalog.?-| (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_perp
+);
+
+create operator pg_catalog.?-| (
+  leftarg = line,
+  rightarg = line,
+  function = pg_catalog.line_perp
+);
+
+create operator pg_catalog.?| (
+  rightarg = line,
+  function = pg_catalog.line_vertical
+);
+
+create operator pg_catalog.?| (
+  rightarg = lseg,
+  function = pg_catalog.lseg_vertical
+);
+
+create operator pg_catalog.?| (
+  leftarg = jsonb,
+  rightarg = text[],
+  function = pg_catalog.jsonb_exists_any
+);
+
+create operator pg_catalog.?| (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_vert
+);
+
+create operator pg_catalog.?|| (
+  leftarg = line,
+  rightarg = line,
+  function = pg_catalog.line_parallel
+);
+
+create operator pg_catalog.?|| (
+  leftarg = lseg,
+  rightarg = lseg,
+  function = pg_catalog.lseg_parallel
+);
+
+create operator pg_catalog.@ (
+  rightarg = double precision,
+  function = pg_catalog.float8abs
+);
+
+create operator pg_catalog.@ (
+  rightarg = numeric,
+  function = pg_catalog.numeric_abs
+);
+
+create operator pg_catalog.@ (
+  rightarg = smallint,
+  function = pg_catalog.int2abs
+);
+
+create operator pg_catalog.@ (
+  rightarg = bigint,
+  function = pg_catalog.int8abs
+);
+
+create operator pg_catalog.@ (
+  rightarg = integer,
+  function = pg_catalog.int4abs
+);
+
+create operator pg_catalog.@ (
+  rightarg = real,
+  function = pg_catalog.float4abs
+);
+
+create operator pg_catalog.@-@ (
+  rightarg = path,
+  function = pg_catalog.path_length
+);
+
+create operator pg_catalog.@-@ (
+  rightarg = lseg,
+  function = pg_catalog.lseg_length
+);
+
+create operator pg_catalog.@> (
+  leftarg = anymultirange,
+  rightarg = anymultirange,
+  function = pg_catalog.multirange_contains_multirange
+);
+
+create operator pg_catalog.@> (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsq_mcontains
+);
+
+create operator pg_catalog.@> (
+  leftarg = anymultirange,
+  rightarg = anyrange,
+  function = pg_catalog.multirange_contains_range
+);
+
+create operator pg_catalog.@> (
+  leftarg = circle,
+  rightarg = point,
+  function = pg_catalog.circle_contain_pt
+);
+
+create operator pg_catalog.@> (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_contain
+);
+
+create operator pg_catalog.@> (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_contain
+);
+
+create operator pg_catalog.@> (
+  leftarg = anymultirange,
+  rightarg = anyelement,
+  function = pg_catalog.multirange_contains_elem
+);
+
+create operator pg_catalog.@> (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_contains
+);
+
+create operator pg_catalog.@> (
+  leftarg = anyrange,
+  rightarg = anymultirange,
+  function = pg_catalog.range_contains_multirange
+);
+
+create operator pg_catalog.@> (
+  leftarg = anyarray,
+  rightarg = anyarray,
+  function = pg_catalog.arraycontains
+);
+
+create operator pg_catalog.@> (
+  leftarg = box,
+  rightarg = point,
+  function = pg_catalog.box_contain_pt
+);
+
+create operator pg_catalog.@> (
+  leftarg = path,
+  rightarg = point,
+  function = pg_catalog.path_contain_pt
+);
+
+create operator pg_catalog.@> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_contain
+);
+
+create operator pg_catalog.@> (
+  leftarg = aclitem[],
+  rightarg = aclitem,
+  function = pg_catalog.aclcontains
+);
+
+create operator pg_catalog.@> (
+  leftarg = polygon,
+  rightarg = point,
+  function = pg_catalog.poly_contain_pt
+);
+
+create operator pg_catalog.@> (
+  leftarg = anyrange,
+  rightarg = anyelement,
+  function = pg_catalog.range_contains_elem
+);
+
+create operator pg_catalog.@> (
+  leftarg = anyrange,
+  rightarg = anyrange,
+  function = pg_catalog.range_contains
+);
+
+create operator pg_catalog.@? (
+  leftarg = jsonb,
+  rightarg = jsonpath,
+  function = pg_catalog.jsonb_path_exists_opr
+);
+
+create operator pg_catalog.@@ (
+  rightarg = polygon,
+  function = pg_catalog.poly_center
+);
+
+create operator pg_catalog.@@ (
+  rightarg = lseg,
+  function = pg_catalog.lseg_center
+);
+
+create operator pg_catalog.@@ (
+  rightarg = box,
+  function = pg_catalog.box_center
+);
+
+create operator pg_catalog.@@ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.ts_match_tt
+);
+
+create operator pg_catalog.@@ (
+  leftarg = tsquery,
+  rightarg = tsvector,
+  function = pg_catalog.ts_match_qv
+);
+
+create operator pg_catalog.@@ (
+  rightarg = circle,
+  function = pg_catalog.circle_center
+);
+
+create operator pg_catalog.@@ (
+  leftarg = text,
+  rightarg = tsquery,
+  function = pg_catalog.ts_match_tq
+);
+
+create operator pg_catalog.@@ (
+  leftarg = jsonb,
+  rightarg = jsonpath,
+  function = pg_catalog.jsonb_path_match_opr
+);
+
+create operator pg_catalog.@@ (
+  leftarg = tsvector,
+  rightarg = tsquery,
+  function = pg_catalog.ts_match_vq
+);
+
+create operator pg_catalog.@@@ (
+  leftarg = tsvector,
+  rightarg = tsquery,
+  function = pg_catalog.ts_match_vq
+);
+
+create operator pg_catalog.@@@ (
+  leftarg = tsquery,
+  rightarg = tsvector,
+  function = pg_catalog.ts_match_qv
+);
+
+create operator pg_catalog.^ (
+  leftarg = double precision,
+  rightarg = double precision,
+  function = pg_catalog.dpow
+);
+
+create operator pg_catalog.^ (
+  leftarg = numeric,
+  rightarg = numeric,
+  function = pg_catalog.numeric_power
+);
+
+create operator pg_catalog.^@ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.starts_with
+);
+
+create operator pg_catalog.| (
+  leftarg = smallint,
+  rightarg = smallint,
+  function = pg_catalog.int2or
+);
+
+create operator pg_catalog.| (
+  leftarg = inet,
+  rightarg = inet,
+  function = pg_catalog.inetor
+);
+
+create operator pg_catalog.| (
+  leftarg = bit,
+  rightarg = bit,
+  function = pg_catalog.bitor
+);
+
+create operator pg_catalog.| (
+  leftarg = macaddr,
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_or
+);
+
+create operator pg_catalog.| (
+  leftarg = integer,
+  rightarg = integer,
+  function = pg_catalog.int4or
+);
+
+create operator pg_catalog.| (
+  leftarg = bigint,
+  rightarg = bigint,
+  function = pg_catalog.int8or
+);
+
+create operator pg_catalog.| (
+  leftarg = macaddr8,
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_or
+);
+
+create operator pg_catalog.|&> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_overabove
+);
+
+create operator pg_catalog.|&> (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_overabove
+);
+
+create operator pg_catalog.|&> (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_overabove
+);
+
+create operator pg_catalog.|/ (
+  rightarg = double precision,
+  function = pg_catalog.dsqrt
+);
+
+create operator pg_catalog.|>> (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_above
+);
+
+create operator pg_catalog.|>> (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_above
+);
+
+create operator pg_catalog.|>> (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_above
+);
+
+create operator pg_catalog.|>> (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_above
+);
+
+create operator pg_catalog.|| (
+  leftarg = anycompatiblearray,
+  rightarg = anycompatiblearray,
+  function = pg_catalog.array_cat
+);
+
+create operator pg_catalog.|| (
+  leftarg = tsquery,
+  rightarg = tsquery,
+  function = pg_catalog.tsquery_or
+);
+
+create operator pg_catalog.|| (
+  leftarg = anycompatible,
+  rightarg = anycompatiblearray,
+  function = pg_catalog.array_prepend
+);
+
+create operator pg_catalog.|| (
+  leftarg = tsvector,
+  rightarg = tsvector,
+  function = pg_catalog.tsvector_concat
+);
+
+create operator pg_catalog.|| (
+  leftarg = jsonb,
+  rightarg = jsonb,
+  function = pg_catalog.jsonb_concat
+);
+
+create operator pg_catalog.|| (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.textcat
+);
+
+create operator pg_catalog.|| (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.byteacat
+);
+
+create operator pg_catalog.|| (
+  leftarg = bit varying,
+  rightarg = bit varying,
+  function = pg_catalog.bitcat
+);
+
+create operator pg_catalog.|| (
+  leftarg = anycompatiblearray,
+  rightarg = anycompatible,
+  function = pg_catalog.array_append
+);
+
+create operator pg_catalog.|| (
+  leftarg = anynonarray,
+  rightarg = text,
+  function = pg_catalog.anytextcat
+);
+
+create operator pg_catalog.|| (
+  leftarg = text,
+  rightarg = anynonarray,
+  function = pg_catalog.textanycat
+);
+
+create operator pg_catalog.||/ (
+  rightarg = double precision,
+  function = pg_catalog.dcbrt
+);
+
+create operator pg_catalog.~ (
+  rightarg = bigint,
+  function = pg_catalog.int8not
+);
+
+create operator pg_catalog.~ (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameregexeq
+);
+
+create operator pg_catalog.~ (
+  rightarg = macaddr,
+  function = pg_catalog.macaddr_not
+);
+
+create operator pg_catalog.~ (
+  rightarg = macaddr8,
+  function = pg_catalog.macaddr8_not
+);
+
+create operator pg_catalog.~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.textregexeq
+);
+
+create operator pg_catalog.~ (
+  rightarg = integer,
+  function = pg_catalog.int4not
+);
+
+create operator pg_catalog.~ (
+  rightarg = smallint,
+  function = pg_catalog.int2not
+);
+
+create operator pg_catalog.~ (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpcharregexeq
+);
+
+create operator pg_catalog.~ (
+  rightarg = inet,
+  function = pg_catalog.inetnot
+);
+
+create operator pg_catalog.~ (
+  rightarg = bit,
+  function = pg_catalog.bitnot
+);
+
+create operator pg_catalog.~* (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameicregexeq
+);
+
+create operator pg_catalog.~* (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpcharicregexeq
+);
+
+create operator pg_catalog.~* (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.texticregexeq
+);
+
+create operator pg_catalog.~<=~ (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpchar_pattern_le
+);
+
+create operator pg_catalog.~<=~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_pattern_le
+);
+
+create operator pg_catalog.~<~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_pattern_lt
+);
+
+create operator pg_catalog.~<~ (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpchar_pattern_lt
+);
+
+create operator pg_catalog.~= (
+  leftarg = circle,
+  rightarg = circle,
+  function = pg_catalog.circle_same
+);
+
+create operator pg_catalog.~= (
+  leftarg = point,
+  rightarg = point,
+  function = pg_catalog.point_eq
+);
+
+create operator pg_catalog.~= (
+  leftarg = polygon,
+  rightarg = polygon,
+  function = pg_catalog.poly_same
+);
+
+create operator pg_catalog.~= (
+  leftarg = box,
+  rightarg = box,
+  function = pg_catalog.box_same
+);
+
+create operator pg_catalog.~>=~ (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpchar_pattern_ge
+);
+
+create operator pg_catalog.~>=~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_pattern_ge
+);
+
+create operator pg_catalog.~>~ (
+  leftarg = character,
+  rightarg = character,
+  function = pg_catalog.bpchar_pattern_gt
+);
+
+create operator pg_catalog.~>~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.text_pattern_gt
+);
+
+create operator pg_catalog.~~ (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.namelike
+);
+
+create operator pg_catalog.~~ (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpcharlike
+);
+
+create operator pg_catalog.~~ (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.textlike
+);
+
+create operator pg_catalog.~~ (
+  leftarg = bytea,
+  rightarg = bytea,
+  function = pg_catalog.bytealike
+);
+
+create operator pg_catalog.~~* (
+  leftarg = name,
+  rightarg = text,
+  function = pg_catalog.nameiclike
+);
+
+create operator pg_catalog.~~* (
+  leftarg = text,
+  rightarg = text,
+  function = pg_catalog.texticlike
+);
+
+create operator pg_catalog.~~* (
+  leftarg = character,
+  rightarg = text,
+  function = pg_catalog.bpchariclike
+);
 
