@@ -1,3 +1,4 @@
+use crate::symbols::Name;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
@@ -106,6 +107,7 @@ pub(crate) enum NameRefClass {
     TriggerFunctionCall,
     TriggerProcedureCall,
     AlterEventTrigger,
+    OperatorFunctionRef,
 }
 
 fn is_special_fn(kind: SyntaxKind) -> bool {
@@ -354,6 +356,24 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         && outer_path.syntax() == inner_path.syntax()
     {
         return Some(NameRefClass::SchemaQualifier);
+    }
+
+    // Check for function/procedure reference in CREATE OPERATOR before the type check
+    for ancestor in name_ref.syntax().ancestors() {
+        if let Some(attr_option) = ast::AttributeOption::cast(ancestor.clone())
+            && let Some(name) = attr_option.name()
+        {
+            let attr_name = Name::from_node(&name);
+            if attr_name == Name::from_string("function")
+                || attr_name == Name::from_string("procedure")
+            {
+                for outer in attr_option.syntax().ancestors() {
+                    if ast::CreateOperator::can_cast(outer.kind()) {
+                        return Some(NameRefClass::OperatorFunctionRef);
+                    }
+                }
+            }
+        }
     }
 
     let mut in_type = false;

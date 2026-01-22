@@ -154,7 +154,8 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameRefClass::DropFunction
             | NameRefClass::DefaultConstraintFunctionCall
-            | NameRefClass::TriggerFunctionCall => {
+            | NameRefClass::TriggerFunctionCall
+            | NameRefClass::OperatorFunctionRef => {
                 return hover_function(root, &name_ref, &binder);
             }
             NameRefClass::DropAggregate => return hover_aggregate(root, &name_ref, &binder),

@@ -7780,4 +7780,32 @@ select foo(wrong_param$0 := 5);
 ",
         );
     }
+
+    #[test]
+    fn goto_operator_function_ref() {
+        assert_snapshot!(goto("
+create function pg_catalog.tsvector_concat(tsvector, tsvector) returns tsvector language internal;
+create operator pg_catalog.|| (leftarg = tsvector, rightarg = tsvector, function = pg_catalog.tsvector_concat$0);
+"), @r"
+          ╭▸ 
+        2 │ create function pg_catalog.tsvector_concat(tsvector, tsvector) returns tsvector language internal;
+          │                            ─────────────── 2. destination
+        3 │ create operator pg_catalog.|| (leftarg = tsvector, rightarg = tsvector, function = pg_catalog.tsvector_concat);
+          ╰╴                                                                                                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_operator_procedure_ref() {
+        assert_snapshot!(goto("
+create function f(int, int) returns int language internal;
+create operator ||| (leftarg = int, rightarg = int, procedure = f$0);
+"), @r"
+          ╭▸ 
+        2 │ create function f(int, int) returns int language internal;
+          │                 ─ 2. destination
+        3 │ create operator ||| (leftarg = int, rightarg = int, procedure = f);
+          ╰╴                                                                ─ 1. source
+        ");
+    }
 }
