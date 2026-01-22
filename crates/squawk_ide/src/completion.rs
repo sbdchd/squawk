@@ -7,8 +7,11 @@ use crate::resolve;
 use crate::symbols::{Name, Schema, SymbolKind};
 use crate::tokens::is_string_or_comment;
 
+const COMPLETION_MARKER: &str = "squawkCompletionMarker";
+
 pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionItem> {
-    let Some(token) = token_at_offset(file, offset) else {
+    let file = file_with_completion_marker(file, offset);
+    let Some(token) = token_at_offset(&file, offset) else {
         // empty file
         return default_completions();
     };
@@ -21,13 +24,15 @@ pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionIte
     }
 
     match completion_context(&token) {
-        CompletionContext::TableOnly => table_completions(file, &token),
+        CompletionContext::TableOnly => table_completions(&file, &token),
         CompletionContext::Default => default_completions(),
         CompletionContext::SelectClause(select_clause) => {
-            select_completions(file, select_clause, &token)
+            select_completions(&file, select_clause, &token)
         }
-        CompletionContext::DeleteClauses(delete) => delete_clauses_completions(&delete),
-        CompletionContext::DeleteExpr(delete) => delete_expr_completions(file, &delete, &token),
+        CompletionContext::DeleteClauses(delete) => {
+            delete_clauses_completions(&file, &delete, &token)
+        }
+        CompletionContext::DeleteExpr(delete) => delete_expr_completions(&file, &delete, &token),
     }
 }
 
@@ -213,8 +218,17 @@ fn table_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<Complet
     completions
 }
 
-fn delete_clauses_completions(delete: &ast::Delete) -> Vec<CompletionItem> {
+fn delete_clauses_completions(
+    file: &ast::SourceFile,
+    delete: &ast::Delete,
+    token: &SyntaxToken,
+) -> Vec<CompletionItem> {
     let mut completions = vec![];
+
+    // `delete from $0`
+    if token.kind() == SyntaxKind::FROM_KW {
+        return table_completions(file, token);
+    }
 
     if delete.using_clause().is_none() {
         completions.push(CompletionItem {
@@ -266,6 +280,7 @@ fn delete_expr_completions(
     let Some(path) = delete.relation_name().and_then(|r| r.path()) else {
         return completions;
     };
+
     let Some(delete_table_name) = resolve::extract_table_name(&path) else {
         return completions;
     };
@@ -352,6 +367,7 @@ fn qualifier_at_token(token: &SyntaxToken) -> Option<Name> {
         .map(|tk| Name::from_string(tk.text().to_string()))
 }
 
+#[derive(Debug)]
 enum CompletionContext {
     TableOnly,
     Default,
@@ -401,6 +417,20 @@ fn token_at_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxTok
         }
     }
     Some(token)
+}
+
+// In order to make completions, we do something similar to rust analyzer by
+// inserting an ident to make the parse tree parse in more cases.
+// Rust analyzer does fancier things for this, which we can investigate later.
+//
+// This helps us support `select t. from t`, which parses as `select t.from t`.
+// If we insert the ident we get, `select t.c from t`.
+fn file_with_completion_marker(file: &ast::SourceFile, offset: TextSize) -> ast::SourceFile {
+    let mut sql = file.syntax().text().to_string();
+    let offset = u32::from(offset) as usize;
+    let offset = offset.min(sql.len());
+    sql.insert_str(offset, COMPLETION_MARKER);
+    ast::SourceFile::parse(&sql).tree()
 }
 
 fn schema_qualifier_at_token(token: &SyntaxToken) -> Option<Schema> {
@@ -671,6 +701,18 @@ select $0 from t;
          pg_temp            | Schema   |                         |             
          pg_toast           | Schema   |                         |             
          information_schema | Schema   |                         |
+        ");
+    }
+
+    #[test]
+    fn completion_select_table_qualified() {
+        assert_snapshot!(completions("
+create table t (c int);
+select t.$0 from t;
+"), @r"
+         label | kind   | detail | insert_text 
+        -------+--------+--------+-------------
+         c     | Column | int    |             
         ");
     }
 
