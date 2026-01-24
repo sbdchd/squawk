@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - parser: add more nodes for create policy/alter policy ast (#884)
 - parser: cte error handling improvements (#881)
 - ide: completions for more clauses in select (#883)
-- ide: complete * in select clauses (#880)
+- ide: complete \* in select clauses (#880)
 - ide: improve select completions with completion marker (#879)
 - ide: hover support for subquery columns (#878)
 - ide: include types in completions (#877)
