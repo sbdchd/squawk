@@ -1910,6 +1910,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "squawk-fmt"
+version = "2.37.0"
+dependencies = [
+ "insta",
+ "itertools 0.14.0",
+ "squawk-syntax",
+ "tiny_pretty",
+]
+
+[[package]]
 name = "squawk-github"
 version = "2.37.0"
 dependencies = [
@@ -2241,6 +2251,12 @@ dependencies = [
  "num-conv",
  "time-core",
 ]
+
+[[package]]
+name = "tiny_pretty"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "650d82e943da333637be9f1567d33d605e76810a26464edfd7ae74f7ef181e95"
 
 [[package]]
 name = "tinystr"
