@@ -6234,23 +6234,23 @@ fn alter_policy(p: &mut Parser<'_>) -> CompletedMarker {
         if p.eat(TO_KW) {
             role_list(p);
         }
-        if p.eat(USING_KW) {
-            p.expect(L_PAREN);
-            if expr(p).is_none() {
-                p.error("expected expression");
-            }
-            p.expect(R_PAREN);
-        }
-        if p.eat(WITH_KW) {
-            p.expect(CHECK_KW);
-            p.expect(L_PAREN);
-            if expr(p).is_none() {
-                p.error("expected expression");
-            }
-            p.expect(R_PAREN);
-        }
+        opt_using_expr_clause(p);
+        opt_with_check_expr_clause(p);
     }
     m.complete(p, ALTER_POLICY)
+}
+
+fn opt_using_expr_clause(p: &mut Parser<'_>) {
+    if p.at(USING_KW) {
+        let m = p.start();
+        p.bump(USING_KW);
+        p.expect(L_PAREN);
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+        p.expect(R_PAREN);
+        m.complete(p, USING_EXPR_CLAUSE);
+    }
 }
 
 fn role_list(p: &mut Parser<'_>) {
@@ -9042,9 +9042,7 @@ fn create_policy(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(POLICY_KW);
     name(p);
     on_table(p);
-    if p.eat(AS_KW) {
-        ident(p);
-    }
+    opt_as_policy_type(p);
     if p.eat(FOR_KW) {
         let _ = p.eat(ALL_KW)
             || p.eat(SELECT_KW)
@@ -9055,22 +9053,33 @@ fn create_policy(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(TO_KW) {
         role_list(p);
     }
-    if p.eat(USING_KW) {
-        p.expect(L_PAREN);
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        p.expect(R_PAREN);
+    opt_using_expr_clause(p);
+    opt_with_check_expr_clause(p);
+    m.complete(p, CREATE_POLICY)
+}
+
+fn opt_as_policy_type(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.eat(AS_KW) {
+        ident(p);
+        m.complete(p, AS_POLICY_TYPE);
+    } else {
+        m.abandon(p);
     }
-    if p.eat(WITH_KW) {
+}
+
+fn opt_with_check_expr_clause(p: &mut Parser<'_>) {
+    if p.at(WITH_KW) {
+        let m = p.start();
+        p.bump(WITH_KW);
         p.expect(CHECK_KW);
         p.expect(L_PAREN);
         if expr(p).is_none() {
             p.error("expected expression");
         }
         p.expect(R_PAREN);
+        m.complete(p, WITH_CHECK_EXPR_CLAUSE);
     }
-    m.complete(p, CREATE_POLICY)
 }
 
 // CREATE [ OR REPLACE ] PROCEDURE

@@ -109,18 +109,19 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    USING_KW "using"
-    WHITESPACE " "
-    L_PAREN "("
-    BIN_EXPR
-      NAME_REF
-        IDENT "a"
+    USING_EXPR_CLAUSE
+      USING_KW "using"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      NAME_REF
-        IDENT "b"
-    R_PAREN ")"
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_check"
@@ -141,20 +142,21 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    CHECK_KW "check"
-    WHITESPACE " "
-    L_PAREN "("
-    BIN_EXPR
-      NAME_REF
-        IDENT "c"
+    WITH_CHECK_EXPR_CLAUSE
+      WITH_KW "with"
       WHITESPACE " "
-      R_ANGLE ">"
+      CHECK_KW "check"
       WHITESPACE " "
-      NAME_REF
-        IDENT "d"
-    R_PAREN ")"
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "d"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -187,32 +189,34 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
-    USING_KW "using"
-    WHITESPACE " "
-    L_PAREN "("
-    BIN_EXPR
-      NAME_REF
-        IDENT "a"
+    USING_EXPR_CLAUSE
+      USING_KW "using"
       WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      NAME_REF
-        IDENT "b"
-    R_PAREN ")"
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
     WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    CHECK_KW "check"
-    WHITESPACE " "
-    L_PAREN "("
-    BIN_EXPR
-      NAME_REF
-        IDENT "c"
+    WITH_CHECK_EXPR_CLAUSE
+      WITH_KW "with"
       WHITESPACE " "
-      R_ANGLE ">"
+      CHECK_KW "check"
       WHITESPACE " "
-      NAME_REF
-        IDENT "d"
-    R_PAREN ")"
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "d"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

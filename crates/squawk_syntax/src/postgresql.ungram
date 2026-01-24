@@ -1818,10 +1818,12 @@ AlterProcedure =
 AlterPolicy =
   'alter' 'policy' NameRef OnTable
   (RenameTo
-  | 'to' RoleRefList
-  | 'using' '(' Expr ')'
-  | 'with' 'check' '(' Expr ')'
-  )?
+  | (
+    ('to' RoleRefList)?
+    UsingExprClause?
+    WithCheckExprClause?
+  ))
+  
 
 AlterOperatorFamily =
   'alter' 'operator' 'family' Path 'using' NameRef
@@ -2227,11 +2229,20 @@ CreateOperatorFamily =
 
 CreatePolicy =
   'create' 'policy' Name OnTable
-  ('as' '#ident')?
+  AsPolicyType?
   ('for' ('all' | 'select' | 'insert' | 'update' | 'delete'))?
   ('to' RoleRefList)?
-  ('using' '(' Expr ')')
-  ('with' 'check' '(' Expr ')')
+  UsingExprClause?
+  WithCheckExprClause?
+
+AsPolicyType =
+  'as' '#ident'
+
+WithCheckExprClause =
+  'with' 'check' '(' Expr ')'
+
+UsingExprClause =
+  'using' '(' Expr ')'
 
 CreateProcedure =
   'create' OrReplace? 'procedure' Path ParamList option_list:FuncOptionList

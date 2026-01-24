@@ -40,9 +40,10 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "permissive"
+    AS_POLICY_TYPE
+      AS_KW "as"
+      WHITESPACE " "
+      IDENT "permissive"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
@@ -61,9 +62,10 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "restrictive"
+    AS_POLICY_TYPE
+      AS_KW "as"
+      WHITESPACE " "
+      IDENT "restrictive"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -89,9 +91,10 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "permissive"
+    AS_POLICY_TYPE
+      AS_KW "as"
+      WHITESPACE " "
+      IDENT "permissive"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -116,46 +119,48 @@ SOURCE_FILE
       ROLE_REF
         SESSION_USER_KW "session_user"
     WHITESPACE "\n  "
-    USING_KW "using"
-    WHITESPACE " "
-    L_PAREN "("
-    BIN_EXPR
+    USING_EXPR_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      L_PAREN "("
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "x"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+        WHITESPACE " "
+        AND_KW "and"
+        WHITESPACE " "
+        BIN_EXPR
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          L_ANGLE "<"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    WITH_CHECK_EXPR_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      CHECK_KW "check"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE " "
       BIN_EXPR
         NAME_REF
           IDENT "x"
         WHITESPACE " "
-        R_ANGLE ">"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "b"
-      WHITESPACE " "
-      AND_KW "and"
-      WHITESPACE " "
-      BIN_EXPR
-        LITERAL
-          INT_NUMBER "1"
-        WHITESPACE " "
         L_ANGLE "<"
         WHITESPACE " "
         LITERAL
-          INT_NUMBER "2"
-    R_PAREN ")"
-    WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    CHECK_KW "check"
-    WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE " "
-    BIN_EXPR
-      NAME_REF
-        IDENT "x"
-      WHITESPACE " "
-      L_ANGLE "<"
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-    R_PAREN ")"
+          INT_NUMBER "1"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- for_"
