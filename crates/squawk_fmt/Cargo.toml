@@ -1,0 +1,22 @@
+[package]
+name = "squawk-fmt"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[dependencies]
+tiny_pretty.workspace = true
+itertools.workspace = true
+squawk-syntax.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+
+[lints]
+workspace = true
