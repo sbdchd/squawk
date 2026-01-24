@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.38.0 - 2026-01-24
+
+### Added
+
+- parser: add more nodes for create policy/alter policy ast (#884)
+- parser: cte error handling improvements (#881)
+- ide: completions for more clauses in select (#883)
+- ide: complete \* in select clauses (#880)
+- ide: improve select completions with completion marker (#879)
+- ide: hover support for subquery columns (#878)
+- ide: include types in completions (#877)
+- ide: goto def with function param in create op (#876)
+- ide: goto def support for domains (#872)
+- ide: goto def on multiranges & timestamp timezones (#870)
+- ide: function signature in completion (#869)
+
+### Changed
+
+- ide: update cast rewrites to support `select type 'foo'` (#868)
+
+### Fixed
+
+- ide: fix column name for real type (#874)
+- ide: fix goto def with cte & table of same name (#873)
+- parser: fix unicode escape strings being parsed as byte strings (#871)
+- ide: fix type alias goto def, bigint -> int8, smallint -> int2, etc. (#867)
+- parser: fix parsing cast operator with array type (#866)
+
 ## v2.37.0 - 2026-01-18
 
 ### Added
