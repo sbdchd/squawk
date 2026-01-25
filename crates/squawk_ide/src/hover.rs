@@ -57,6 +57,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::MergeWhenColumn
             | NameRefClass::MergeOnColumn
             | NameRefClass::CheckConstraintColumn
+            | NameRefClass::PolicyColumn
             | NameRefClass::GeneratedColumn
             | NameRefClass::UniqueConstraintColumn
             | NameRefClass::PrimaryKeyConstraintColumn
@@ -127,6 +128,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             }
             NameRefClass::DropSequence => return hover_sequence(root, &name_ref, &binder),
             NameRefClass::DropTrigger => return hover_trigger(root, &name_ref, &binder),
+            NameRefClass::DropPolicy | NameRefClass::AlterPolicy => {
+                return hover_policy(root, &name_ref, &binder);
+            }
             NameRefClass::DropEventTrigger | NameRefClass::AlterEventTrigger => {
                 return hover_event_trigger(root, &name_ref, &binder);
             }
@@ -815,6 +819,24 @@ fn hover_trigger(
     format_create_trigger(&create_trigger, binder)
 }
 
+fn hover_policy(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let policy_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+
+    let policy_name_node = policy_ptr.to_node(root);
+
+    let create_policy = policy_name_node
+        .ancestors()
+        .find_map(ast::CreatePolicy::cast)?;
+
+    format_create_policy(&create_policy, binder)
+}
+
 fn hover_event_trigger(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -1100,6 +1122,20 @@ fn format_create_trigger(
     Some(format!(
         "trigger {}.{} on {}.{}",
         schema, trigger_name, schema, table_name
+    ))
+}
+
+fn format_create_policy(
+    create_policy: &ast::CreatePolicy,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let policy_name = create_policy.name()?.syntax().text().to_string();
+    let on_table_path = create_policy.on_table()?.path()?;
+
+    let (schema, table_name) = resolve::resolve_table_info(binder, &on_table_path)?;
+    Some(format!(
+        "policy {}.{} on {}.{}",
+        schema, policy_name, schema, table_name
     ))
 }
 

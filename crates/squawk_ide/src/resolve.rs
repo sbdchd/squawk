@@ -173,6 +173,22 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_trigger_name_ptr(binder, &trigger_name, &schema, position, Some(table_name))
                 .map(|ptr| smallvec![ptr])
         }
+        NameRefClass::DropPolicy | NameRefClass::AlterPolicy => {
+            let (policy_name, on_table) = name_ref.syntax().ancestors().find_map(|a| {
+                if let Some(policy) = ast::DropPolicy::cast(a.clone()) {
+                    Some((policy.name_ref(), policy.on_table()))
+                } else {
+                    ast::AlterPolicy::cast(a).map(|policy| (policy.name_ref(), policy.on_table()))
+                }
+            })?;
+            let policy_name = Name::from_node(&policy_name?);
+            let on_table_path = on_table.and_then(|on_table| on_table.path())?;
+            let schema = extract_schema_name(&on_table_path);
+            let table_name = extract_table_name(&on_table_path)?;
+            let position = name_ref.syntax().text_range().start();
+            resolve_policy_name_ptr(binder, &policy_name, &schema, position, table_name)
+                .map(|ptr| smallvec![ptr])
+        }
         NameRefClass::DropEventTrigger | NameRefClass::AlterEventTrigger => {
             let event_trigger_name = Name::from_node(name_ref);
             resolve_event_trigger_name_ptr(binder, &event_trigger_name).map(|ptr| smallvec![ptr])
@@ -257,6 +273,20 @@ pub(crate) fn resolve_name_ref_ptrs(
                 .find_map(ast::CreateTableLike::cast)?;
             let column_name = Name::from_node(name_ref);
             find_column_in_create_table(binder, root, &create_table, &column_name)
+                .map(|ptr| smallvec![ptr])
+        }
+        NameRefClass::PolicyColumn => {
+            let on_table_path = name_ref.syntax().ancestors().find_map(|n| {
+                if let Some(create_policy) = ast::CreatePolicy::cast(n.clone()) {
+                    create_policy.on_table()?.path()
+                } else if let Some(alter_policy) = ast::AlterPolicy::cast(n) {
+                    alter_policy.on_table()?.path()
+                } else {
+                    None
+                }
+            })?;
+            let column_name = Name::from_node(name_ref);
+            resolve_column_for_path(binder, root, &on_table_path, column_name)
                 .map(|ptr| smallvec![ptr])
         }
         NameRefClass::LikeTable => {
@@ -651,6 +681,22 @@ fn resolve_trigger_name_ptr(
     table: Option<Name>,
 ) -> Option<SyntaxNodePtr> {
     binder.lookup_with_table(trigger_name, SymbolKind::Trigger, position, schema, &table)
+}
+
+fn resolve_policy_name_ptr(
+    binder: &Binder,
+    policy_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+    table: Name,
+) -> Option<SyntaxNodePtr> {
+    binder.lookup_with_table(
+        policy_name,
+        SymbolKind::Policy,
+        position,
+        schema,
+        &Some(table),
+    )
 }
 
 fn resolve_event_trigger_name_ptr(

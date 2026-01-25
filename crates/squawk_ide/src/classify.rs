@@ -16,6 +16,8 @@ pub(crate) enum NameRefClass {
     DropMaterializedView,
     DropSequence,
     DropTrigger,
+    DropPolicy,
+    AlterPolicy,
     DropEventTrigger,
     SequenceOwnedByColumn,
     Tablespace,
@@ -34,6 +36,7 @@ pub(crate) enum NameRefClass {
     ForeignKeyColumn,
     ForeignKeyLocalColumn,
     CheckConstraintColumn,
+    PolicyColumn,
     GeneratedColumn,
     UniqueConstraintColumn,
     PrimaryKeyConstraintColumn,
@@ -474,6 +477,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::DropTrigger::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropTrigger);
         }
+        if ast::DropPolicy::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::DropPolicy);
+        }
+        if ast::AlterPolicy::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::AlterPolicy);
+        }
         if ast::DropEventTrigger::can_cast(ancestor.kind()) {
             return Some(NameRefClass::DropEventTrigger);
         }
@@ -578,6 +587,11 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::CheckConstraint::can_cast(ancestor.kind()) {
             return Some(NameRefClass::CheckConstraintColumn);
+        }
+        if ast::CreatePolicy::can_cast(ancestor.kind())
+            || ast::AlterPolicy::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::PolicyColumn);
         }
         if ast::GeneratedConstraint::can_cast(ancestor.kind()) {
             return Some(NameRefClass::GeneratedColumn);
