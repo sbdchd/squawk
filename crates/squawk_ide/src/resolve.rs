@@ -285,8 +285,7 @@ pub(crate) fn resolve_name_ref_ptrs(
                     None
                 }
             })?;
-            let column_name = Name::from_node(name_ref);
-            resolve_column_for_path(binder, root, &on_table_path, column_name)
+            resolve_policy_column_ptr(binder, root, &on_table_path, name_ref)
                 .map(|ptr| smallvec![ptr])
         }
         NameRefClass::PolicyQualifiedColumnTable => {
@@ -844,17 +843,43 @@ fn resolve_column_for_path(
     let schema = extract_schema_name(path);
     let position = path.syntax().text_range().start();
 
-    if let Some(resolved) = resolve_table_name(binder, root, &table_name, &schema, position) {
-        match resolved {
-            ResolvedTableName::View(create_view) => {
-                find_column_in_create_view(&create_view, &column_name)
-            }
-            ResolvedTableName::Table(create_table_like) => {
-                find_column_in_create_table(binder, root, &create_table_like, &column_name)
-            }
+    let resolved = resolve_table_name(binder, root, &table_name, &schema, position)?;
+    match resolved {
+        ResolvedTableName::View(create_view) => {
+            find_column_in_create_view(&create_view, &column_name)
         }
-    } else {
-        None
+        ResolvedTableName::Table(create_table_like) => {
+            find_column_in_create_table(binder, root, &create_table_like, &column_name)
+        }
+    }
+}
+
+fn resolve_policy_column_ptr(
+    binder: &Binder,
+    root: &SyntaxNode,
+    on_table_path: &ast::Path,
+    column_name_ref: &ast::NameRef,
+) -> Option<SyntaxNodePtr> {
+    let column_name = Name::from_node(column_name_ref);
+    let (table_name, schema) = extract_table_schema_from_path(on_table_path)?;
+    let position = column_name_ref.syntax().text_range().start();
+
+    let resolved = resolve_table_name(binder, root, &table_name, &schema, position)?;
+    match resolved {
+        ResolvedTableName::View(create_view) => {
+            if let Some(ptr) = find_column_in_create_view(&create_view, &column_name) {
+                return Some(ptr);
+            }
+            resolve_function(binder, &column_name, &schema, None, position)
+        }
+        ResolvedTableName::Table(create_table_like) => {
+            if let Some(ptr) =
+                find_column_in_create_table(binder, root, &create_table_like, &column_name)
+            {
+                return Some(ptr);
+            }
+            resolve_function(binder, &column_name, &schema, None, position)
+        }
     }
 }
 
@@ -1199,30 +1224,26 @@ fn resolve_select_qualified_column_ptr(
         }
     }
 
-    if let Some(resolved) = resolve_table_name(binder, root, &table_name, &schema, position) {
-        match resolved {
-            ResolvedTableName::View(create_view) => {
-                if let Some(ptr) = find_column_in_create_view(&create_view, &column_name) {
-                    return Some(ptr);
-                }
-
-                return resolve_function(binder, &column_name, &schema, None, position);
+    let resolved = resolve_table_name(binder, root, &table_name, &schema, position)?;
+    match resolved {
+        ResolvedTableName::View(create_view) => {
+            if let Some(ptr) = find_column_in_create_view(&create_view, &column_name) {
+                return Some(ptr);
             }
-            ResolvedTableName::Table(create_table_like) => {
-                // 1. Try to find a matching column (columns take precedence)
-                if let Some(ptr) =
-                    find_column_in_create_table(binder, root, &create_table_like, &column_name)
-                {
-                    return Some(ptr);
-                }
-                // 2. No column found, check for field-style function call
-                // e.g., select t.b from t where b is a function that takes t as an argument
-                return resolve_function(binder, &column_name, &schema, None, position);
+            return resolve_function(binder, &column_name, &schema, None, position);
+        }
+        ResolvedTableName::Table(create_table_like) => {
+            // 1. Try to find a matching column (columns take precedence)
+            if let Some(ptr) =
+                find_column_in_create_table(binder, root, &create_table_like, &column_name)
+            {
+                return Some(ptr);
             }
+            // 2. No column found, check for field-style function call
+            // e.g., select t.b from t where b is a function that takes t as an argument
+            return resolve_function(binder, &column_name, &schema, None, position);
         }
     }
-
-    None
 }
 
 enum ResolvedTableName {
