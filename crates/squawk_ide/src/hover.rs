@@ -113,6 +113,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::DeleteReturningQualifiedColumnTable
             | NameRefClass::MergeReturningQualifiedColumnTable
             | NameRefClass::MergeTable
+            | NameRefClass::PolicyQualifiedColumnTable
             | NameRefClass::ForeignKeyTable
             | NameRefClass::LikeTable
             | NameRefClass::InheritsTable
