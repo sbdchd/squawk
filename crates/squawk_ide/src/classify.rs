@@ -356,6 +356,15 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                     return Some(NameRefClass::SelectQualifiedColumnTable);
                 }
             }
+            if ast::CreatePolicy::can_cast(ancestor.kind())
+                || ast::AlterPolicy::can_cast(ancestor.kind())
+            {
+                if is_base_of_outer_field_expr {
+                    return Some(NameRefClass::PolicyQualifiedColumnTable);
+                } else {
+                    return Some(NameRefClass::PolicyColumn);
+                }
+            }
         }
     }
 

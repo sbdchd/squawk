@@ -616,6 +616,25 @@ create policy p on t
     }
 
     #[test]
+    fn goto_create_policy_field_style_function_call() {
+        assert_snapshot!(goto("
+create table t(c int);
+create function x(t) returns int8
+  as 'select 1'
+  language sql;
+create policy p on t
+  with check (t.c > 1 and t.x$0 > 0);
+"), @r"
+          ╭▸ 
+        3 │ create function x(t) returns int8
+          │                 ─ 2. destination
+          ‡
+        7 │   with check (t.c > 1 and t.x > 0);
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_alter_policy_qualified_column_table() {
         assert_snapshot!(goto("
 create table t(c int, d int);
@@ -627,6 +646,56 @@ alter policy p on t
           │              ─ 2. destination
         3 │ alter policy p on t
         4 │   with check (t.c > d);
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_policy_qualified_column() {
+        assert_snapshot!(goto("
+create table t(c int, d int);
+alter policy p on t
+  with check (t.c$0 > d);
+"), @r"
+          ╭▸ 
+        2 │ create table t(c int, d int);
+          │                ─ 2. destination
+        3 │ alter policy p on t
+        4 │   with check (t.c > d);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_policy_schema_qualified_table() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.t(c int);
+create policy p on foo.t
+  with check (foo.t$0.c > 1);
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t(c int);
+          │                  ─ 2. destination
+        4 │ create policy p on foo.t
+        5 │   with check (foo.t.c > 1);
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_policy_unqualified_table_with_schema_on_table() {
+        assert_snapshot!(goto("
+create schema foo;
+create table foo.t(c int);
+create policy p on foo.t
+  with check (t$0.c > 1);
+"), @r"
+          ╭▸ 
+        3 │ create table foo.t(c int);
+          │                  ─ 2. destination
+        4 │ create policy p on foo.t
+        5 │   with check (t.c > 1);
           ╰╴              ─ 1. source
         ");
     }

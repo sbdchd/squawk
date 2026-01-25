@@ -57,7 +57,6 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             | NameRefClass::MergeWhenColumn
             | NameRefClass::MergeOnColumn
             | NameRefClass::CheckConstraintColumn
-            | NameRefClass::PolicyColumn
             | NameRefClass::GeneratedColumn
             | NameRefClass::UniqueConstraintColumn
             | NameRefClass::PrimaryKeyConstraintColumn
@@ -78,7 +77,9 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::CompositeTypeField => {
                 return hover_composite_type_field(root, &name_ref, &binder);
             }
-            NameRefClass::SelectColumn | NameRefClass::SelectQualifiedColumn => {
+            NameRefClass::SelectColumn
+            | NameRefClass::SelectQualifiedColumn
+            | NameRefClass::PolicyColumn => {
                 // Try hover as column first
                 if let Some(result) = hover_column(root, &name_ref, &binder) {
                     return Some(result);
