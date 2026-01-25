@@ -289,6 +289,21 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_column_for_path(binder, root, &on_table_path, column_name)
                 .map(|ptr| smallvec![ptr])
         }
+        NameRefClass::PolicyQualifiedColumnTable => {
+            let on_table_path = name_ref.syntax().ancestors().find_map(|n| {
+                if let Some(create_policy) = ast::CreatePolicy::cast(n.clone()) {
+                    create_policy.on_table()?.path()
+                } else if let Some(alter_policy) = ast::AlterPolicy::cast(n) {
+                    alter_policy.on_table()?.path()
+                } else {
+                    None
+                }
+            })?;
+            let table_name = extract_table_name(&on_table_path)?;
+            let schema = extract_schema_name(&on_table_path);
+            let position = name_ref.syntax().text_range().start();
+            resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
+        }
         NameRefClass::LikeTable => {
             let like_clause = name_ref
                 .syntax()

@@ -37,6 +37,7 @@ pub(crate) enum NameRefClass {
     ForeignKeyLocalColumn,
     CheckConstraintColumn,
     PolicyColumn,
+    PolicyQualifiedColumnTable,
     GeneratedColumn,
     UniqueConstraintColumn,
     PrimaryKeyConstraintColumn,
@@ -273,6 +274,15 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                     return Some(NameRefClass::SchemaQualifier);
                 } else {
                     return Some(NameRefClass::SelectQualifiedColumnTable);
+                }
+            }
+            if ast::CreatePolicy::can_cast(ancestor.kind())
+                || ast::AlterPolicy::can_cast(ancestor.kind())
+            {
+                if is_function_call || is_schema_table_col {
+                    return Some(NameRefClass::SchemaQualifier);
+                } else {
+                    return Some(NameRefClass::PolicyQualifiedColumnTable);
                 }
             }
         }
