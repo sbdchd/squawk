@@ -279,6 +279,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::Prepare(prepare) => bind_prepare(b, prepare),
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
         ast::Stmt::Set(set) => bind_set(b, set),
+        ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
         _ => {}
     }
 }
@@ -694,6 +695,38 @@ fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
 
     let root = b.root_scope();
     b.scopes[root].insert(trigger_name, trigger_id);
+}
+
+fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
+    let Some(name) = create_policy.name() else {
+        return;
+    };
+
+    let policy_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let Some(table_path) = create_policy.on_table().and_then(|on| on.path()) else {
+        return;
+    };
+
+    let Some(table_name) = item_name(&table_path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &table_path, false) else {
+        return;
+    };
+
+    let policy_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Policy,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: Some(table_name),
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(policy_name, policy_id);
 }
 
 fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEventTrigger) {

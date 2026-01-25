@@ -501,6 +501,72 @@ drop trigger tr$0 on t;
     }
 
     #[test]
+    fn goto_drop_policy() {
+        assert_snapshot!(goto("
+create table t(c int);
+create table u(c int);
+create policy p on t;
+create policy p on u;
+drop policy if exists p$0 on t;
+"), @r"
+          ╭▸ 
+        4 │ create policy p on t;
+          │               ─ 2. destination
+        5 │ create policy p on u;
+        6 │ drop policy if exists p on t;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_policy() {
+        assert_snapshot!(goto("
+create table t(c int);
+create policy p on t;
+alter policy p$0 on t
+  with check (c > 1);
+"), @r"
+          ╭▸ 
+        3 │ create policy p on t;
+          │               ─ 2. destination
+        4 │ alter policy p on t
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_policy_column() {
+        assert_snapshot!(goto("
+create table t(c int, d int);
+create policy p on t
+  with check (c$0 > d);
+"), @r"
+          ╭▸ 
+        2 │ create table t(c int, d int);
+          │                ─ 2. destination
+        3 │ create policy p on t
+        4 │   with check (c > d);
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_policy_using_column() {
+        assert_snapshot!(goto("
+create table t(c int, d int);
+create policy p on t
+  using (c$0 > d and 1 < 2);
+"), @r"
+          ╭▸ 
+        2 │ create table t(c int, d int);
+          │                ─ 2. destination
+        3 │ create policy p on t
+        4 │   using (c > d and 1 < 2);
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_event_trigger() {
         assert_snapshot!(goto("
 create event trigger et on ddl_command_start execute function f();
