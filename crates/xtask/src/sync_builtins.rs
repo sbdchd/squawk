@@ -247,7 +247,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let args = parts.next().context("expected function arguments")?;
         let result = parts.next().context("expected function result")?;
         sql.push_str(&format!(
-            "create function {schema}.{func_name}({args}) returns {result} language internal;\n\n"
+            "create function {schema}.{func_name}({args}) returns {result}\n  language internal;\n\n"
         ));
     }
 
