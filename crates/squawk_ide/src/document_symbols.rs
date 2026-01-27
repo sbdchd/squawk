@@ -18,6 +18,7 @@ pub enum DocumentSymbolKind {
     Procedure,
     EventTrigger,
     Role,
+    Policy,
     Type,
     Enum,
     Column,
@@ -78,6 +79,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateRole(create_role) => {
                 if let Some(symbol) = create_role_symbol(create_role) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreatePolicy(create_policy) => {
+                if let Some(symbol) = create_policy_symbol(&binder, create_policy) {
                     symbols.push(symbol);
                 }
             }
@@ -411,6 +417,30 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
     })
 }
 
+fn create_policy_symbol(
+    binder: &binder::Binder,
+    create_policy: ast::CreatePolicy,
+) -> Option<DocumentSymbol> {
+    let name_node = create_policy.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let on_table_path = create_policy.on_table()?.path()?;
+    let (schema, table_name) = resolve_table_info(binder, &on_table_path)?;
+
+    let full_range = create_policy.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    let detail = format!("on {}.{}", schema.0, table_name);
+    Some(DocumentSymbol {
+        name,
+        detail: Some(detail),
+        kind: DocumentSymbolKind::Policy,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_type_symbol(
     binder: &binder::Binder,
     create_type: ast::CreateType,
@@ -622,6 +652,7 @@ mod tests {
             DocumentSymbolKind::Procedure => "procedure",
             DocumentSymbolKind::EventTrigger => "event trigger",
             DocumentSymbolKind::Role => "role",
+            DocumentSymbolKind::Policy => "policy",
             DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Enum => "enum",
             DocumentSymbolKind::Column => "column",
@@ -878,6 +909,21 @@ create role reader;
           │ ┬───────────┯━━━━━
           │ │           │
           │ │           focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_policy() {
+        assert_snapshot!(symbols("
+create policy allow_read on users;
+"), @r"
+        info: policy: allow_read on users
+          ╭▸ 
+        2 │ create policy allow_read on users;
+          │ ┬─────────────┯━━━━━━━━━─────────
+          │ │             │
+          │ │             focus range
           ╰╴full range
         ");
     }
