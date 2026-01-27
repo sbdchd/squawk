@@ -2248,6 +2248,34 @@ select v.a$0 from v;
     }
 
     #[test]
+    fn goto_create_table_as_column() {
+        assert_snapshot!(goto("
+create table t as select 1 a;
+select a$0 from t;
+"), @r"
+          ╭▸ 
+        2 │ create table t as select 1 a;
+          │                            ─ 2. destination
+        3 │ select a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_from_create_table_as() {
+        assert_snapshot!(goto("
+create table t as select 1 a;
+select a from t$0;
+"), @r"
+          ╭▸ 
+        2 │ create table t as select 1 a;
+          │              ─ 2. destination
+        3 │ select a from t;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_view_with_explicit_column_list() {
         assert_snapshot!(goto("
 create view v(col1) as select 1;
