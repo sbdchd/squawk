@@ -424,16 +424,12 @@ fn create_policy_symbol(
     let name_node = create_policy.name()?;
     let name = name_node.syntax().text().to_string();
 
-    let on_table_path = create_policy.on_table()?.path()?;
-    let (schema, table_name) = resolve_table_info(binder, &on_table_path)?;
-
     let full_range = create_policy.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
 
-    let detail = format!("on {}.{}", schema.0, table_name);
     Some(DocumentSymbol {
         name,
-        detail: Some(detail),
+        detail: None,
         kind: DocumentSymbolKind::Policy,
         full_range,
         focus_range,
@@ -916,12 +912,12 @@ create role reader;
     #[test]
     fn create_policy() {
         assert_snapshot!(symbols("
-create policy allow_read on users;
+create policy allow_read on t;
 "), @r"
-        info: policy: allow_read on users
+        info: policy: allow_read
           ╭▸ 
-        2 │ create policy allow_read on users;
-          │ ┬─────────────┯━━━━━━━━━─────────
+        2 │ create policy allow_read on t;
+          │ ┬─────────────┯━━━━━━━━━─────
           │ │             │
           │ │             focus range
           ╰╴full range
