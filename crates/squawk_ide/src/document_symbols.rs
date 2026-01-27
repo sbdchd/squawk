@@ -65,6 +65,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::CreateTableAs(create_table_as) => {
+                if let Some(symbol) = create_table_as_symbol(&binder, create_table_as) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreateForeignTable(create_foreign_table) => {
                 if let Some(symbol) = create_table_symbol(&binder, create_foreign_table) {
                     symbols.push(symbol);
@@ -286,6 +291,36 @@ fn create_table_symbol(
         full_range,
         focus_range,
         children,
+    })
+}
+
+fn create_table_as_symbol(
+    binder: &binder::Binder,
+    create_table_as: ast::CreateTableAs,
+) -> Option<DocumentSymbol> {
+    let path = create_table_as.path()?;
+    let segment = path.segment()?;
+    let name_node = if let Some(name) = segment.name() {
+        name.syntax().clone()
+    } else {
+        return None;
+    };
+
+    let (schema, table_name) = resolve_table_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, table_name);
+
+    let full_range = create_table_as.syntax().text_range();
+    let focus_range = name_node.text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Table,
+        full_range,
+        focus_range,
+        // TODO: infer the column names, we need the same for views without
+        // explicit column lists
+        children: vec![],
     })
 }
 
@@ -956,6 +991,21 @@ create table users (
           │     │
           │     full range for `column: email citext`
           ╰╴    focus range
+        ");
+    }
+
+    #[test]
+    fn create_table_as() {
+        assert_snapshot!(symbols("
+create table t as select 1 a;
+"), @r"
+        info: table: public.t
+          ╭▸ 
+        2 │ create table t as select 1 a;
+          │ ┬────────────┯──────────────
+          │ │            │
+          │ │            focus range
+          ╰╴full range
         ");
     }
 

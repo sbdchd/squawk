@@ -385,6 +385,21 @@ fn format_hover_for_column_node(
         {
             return format_view_column(&create_view, column_name, binder);
         }
+
+        if let Some(create_table_as) = ast::CreateTableAs::cast(a.clone()) {
+            let column_name = if let Some(name) = ast::Name::cast(column_name_node.clone()) {
+                Name::from_node(&name)
+            } else {
+                continue;
+            };
+            let path = create_table_as.path()?;
+            let (schema, table_name) = resolve::resolve_table_info(binder, &path)?;
+            return Some(ColumnHover::schema_table_column(
+                &schema.to_string(),
+                &table_name,
+                &column_name.to_string(),
+            ));
+        }
     }
 
     let column = column_name_node.ancestors().find_map(ast::Column::cast)?;
@@ -3610,6 +3625,19 @@ select a$0, b from v;
         hover: column public.v.a
           ╭▸ 
         3 │ select a, b from v;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_select_column_from_create_table_as() {
+        assert_snapshot!(check_hover("
+create table t as select 1 a;
+select a$0 from t;
+"), @r"
+        hover: column public.t.a
+          ╭▸ 
+        3 │ select a from t;
           ╰╴       ─ hover
         ");
     }
