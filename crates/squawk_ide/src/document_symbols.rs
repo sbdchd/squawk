@@ -3,8 +3,8 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder::{self, extract_string_literal};
 use crate::resolve::{
-    resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_table_info,
-    resolve_type_info, resolve_view_info,
+    resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_sequence_info,
+    resolve_table_info, resolve_type_info, resolve_view_info,
 };
 
 #[derive(Debug)]
@@ -18,8 +18,17 @@ pub enum DocumentSymbolKind {
     Procedure,
     EventTrigger,
     Role,
+    Policy,
     Type,
     Enum,
+    Index,
+    Domain,
+    Sequence,
+    Trigger,
+    Tablespace,
+    Database,
+    Server,
+    Extension,
     Column,
     Variant,
     Cursor,
@@ -56,6 +65,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::CreateForeignTable(create_foreign_table) => {
+                if let Some(symbol) = create_table_symbol(&binder, create_foreign_table) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreateFunction(create_function) => {
                 if let Some(symbol) = create_function_symbol(&binder, create_function) {
                     symbols.push(symbol);
@@ -71,13 +85,58 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::CreateIndex(create_index) => {
+                if let Some(symbol) = create_index_symbol(create_index) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateDomain(create_domain) => {
+                if let Some(symbol) = create_domain_symbol(&binder, create_domain) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateSequence(create_sequence) => {
+                if let Some(symbol) = create_sequence_symbol(&binder, create_sequence) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateTrigger(create_trigger) => {
+                if let Some(symbol) = create_trigger_symbol(create_trigger) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreateEventTrigger(create_event_trigger) => {
                 if let Some(symbol) = create_event_trigger_symbol(create_event_trigger) {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::CreateTablespace(create_tablespace) => {
+                if let Some(symbol) = create_tablespace_symbol(create_tablespace) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateDatabase(create_database) => {
+                if let Some(symbol) = create_database_symbol(create_database) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateServer(create_server) => {
+                if let Some(symbol) = create_server_symbol(create_server) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateExtension(create_extension) => {
+                if let Some(symbol) = create_extension_symbol(create_extension) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreateRole(create_role) => {
                 if let Some(symbol) = create_role_symbol(create_role) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreatePolicy(create_policy) => {
+                if let Some(symbol) = create_policy_symbol(create_policy) {
                     symbols.push(symbol);
                 }
             }
@@ -197,7 +256,7 @@ fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymb
 
 fn create_table_symbol(
     binder: &binder::Binder,
-    create_table: ast::CreateTable,
+    create_table: impl ast::HasCreateTable,
 ) -> Option<DocumentSymbol> {
     let path = create_table.path()?;
     let segment = path.segment()?;
@@ -375,6 +434,88 @@ fn create_procedure_symbol(
     })
 }
 
+fn create_index_symbol(create_index: ast::CreateIndex) -> Option<DocumentSymbol> {
+    let name_node = create_index.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_index.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Index,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_domain_symbol(
+    binder: &binder::Binder,
+    create_domain: ast::CreateDomain,
+) -> Option<DocumentSymbol> {
+    let path = create_domain.path()?;
+    let segment = path.segment()?;
+    let name_node = segment.name()?;
+
+    let (schema, domain_name) = resolve_type_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, domain_name);
+
+    let full_range = create_domain.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Domain,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_sequence_symbol(
+    binder: &binder::Binder,
+    create_sequence: ast::CreateSequence,
+) -> Option<DocumentSymbol> {
+    let path = create_sequence.path()?;
+    let segment = path.segment()?;
+    let name_node = segment.name()?;
+
+    let (schema, sequence_name) = resolve_sequence_info(binder, &path)?;
+    let name = format!("{}.{}", schema.0, sequence_name);
+
+    let full_range = create_sequence.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Sequence,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentSymbol> {
+    let name_node = create_trigger.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_trigger.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Trigger,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_event_trigger_symbol(
     create_event_trigger: ast::CreateEventTrigger,
 ) -> Option<DocumentSymbol> {
@@ -394,6 +535,74 @@ fn create_event_trigger_symbol(
     })
 }
 
+fn create_tablespace_symbol(create_tablespace: ast::CreateTablespace) -> Option<DocumentSymbol> {
+    let name_node = create_tablespace.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_tablespace.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Tablespace,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_database_symbol(create_database: ast::CreateDatabase) -> Option<DocumentSymbol> {
+    let name_node = create_database.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_database.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Database,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_server_symbol(create_server: ast::CreateServer) -> Option<DocumentSymbol> {
+    let name_node = create_server.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_server.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Server,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_extension_symbol(create_extension: ast::CreateExtension) -> Option<DocumentSymbol> {
+    let name_node = create_extension.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_extension.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Extension,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
     let name_node = create_role.name()?;
     let name = name_node.syntax().text().to_string();
@@ -405,6 +614,23 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
         name,
         detail: None,
         kind: DocumentSymbolKind::Role,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
+fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymbol> {
+    let name_node = create_policy.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_policy.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Policy,
         full_range,
         focus_range,
         children: vec![],
@@ -622,8 +848,17 @@ mod tests {
             DocumentSymbolKind::Procedure => "procedure",
             DocumentSymbolKind::EventTrigger => "event trigger",
             DocumentSymbolKind::Role => "role",
+            DocumentSymbolKind::Policy => "policy",
             DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Enum => "enum",
+            DocumentSymbolKind::Index => "index",
+            DocumentSymbolKind::Domain => "domain",
+            DocumentSymbolKind::Sequence => "sequence",
+            DocumentSymbolKind::Trigger => "trigger",
+            DocumentSymbolKind::Tablespace => "tablespace",
+            DocumentSymbolKind::Database => "database",
+            DocumentSymbolKind::Server => "server",
+            DocumentSymbolKind::Extension => "extension",
             DocumentSymbolKind::Column => "column",
             DocumentSymbolKind::Variant => "variant",
             DocumentSymbolKind::Cursor => "cursor",
@@ -852,6 +1087,72 @@ unlisten *;
     }
 
     #[test]
+    fn create_index() {
+        assert_snapshot!(symbols("
+create index idx_users_email on users (email);
+"), @r"
+        info: index: idx_users_email
+          ╭▸ 
+        2 │ create index idx_users_email on users (email);
+          │ ┬────────────┯━━━━━━━━━━━━━━─────────────────
+          │ │            │
+          │ │            focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_domain() {
+        assert_snapshot!(
+            symbols("create domain email_addr as text;"),
+            @r"
+        info: domain: public.email_addr
+          ╭▸ 
+        1 │ create domain email_addr as text;
+          │ ┬─────────────┯━━━━━━━━━────────
+          │ │             │
+          │ │             focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_sequence() {
+        assert_snapshot!(
+            symbols("create sequence user_id_seq;"),
+            @r"
+        info: sequence: public.user_id_seq
+          ╭▸ 
+        1 │ create sequence user_id_seq;
+          │ ┬───────────────┯━━━━━━━━━━
+          │ │               │
+          │ │               focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_trigger() {
+        assert_snapshot!(symbols("
+create trigger update_timestamp
+  before update on users
+  execute function update_modified_column();
+"), @r"
+        info: trigger: update_timestamp
+          ╭▸ 
+        2 │   create trigger update_timestamp
+          │   │              ━━━━━━━━━━━━━━━━ focus range
+          │ ┌─┘
+          │ │
+        3 │ │   before update on users
+        4 │ │   execute function update_modified_column();
+          ╰╴└───────────────────────────────────────────┘ full range
+        ");
+    }
+
+    #[test]
     fn create_event_trigger() {
         assert_snapshot!(
             symbols("create event trigger et on ddl_command_start execute function f();"),
@@ -868,6 +1169,68 @@ unlisten *;
     }
 
     #[test]
+    fn create_tablespace() {
+        assert_snapshot!(symbols("
+create tablespace dbspace location '/data/dbs';
+"), @r"
+        info: tablespace: dbspace
+          ╭▸ 
+        2 │ create tablespace dbspace location '/data/dbs';
+          │ ┬─────────────────┯━━━━━━─────────────────────
+          │ │                 │
+          │ │                 focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_database() {
+        assert_snapshot!(
+            symbols("create database mydb;"),
+            @r"
+        info: database: mydb
+          ╭▸ 
+        1 │ create database mydb;
+          │ ┬───────────────┯━━━
+          │ │               │
+          │ │               focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
+    fn create_server() {
+        assert_snapshot!(symbols("
+create server myserver foreign data wrapper postgres_fdw;
+"), @r"
+        info: server: myserver
+          ╭▸ 
+        2 │ create server myserver foreign data wrapper postgres_fdw;
+          │ ┬─────────────┯━━━━━━━──────────────────────────────────
+          │ │             │
+          │ │             focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_extension() {
+        assert_snapshot!(
+            symbols("create extension pgcrypto;"),
+            @r"
+        info: extension: pgcrypto
+          ╭▸ 
+        1 │ create extension pgcrypto;
+          │ ┬────────────────┯━━━━━━━
+          │ │                │
+          │ │                focus range
+          ╰╴full range
+        "
+        );
+    }
+
+    #[test]
     fn create_role() {
         assert_snapshot!(symbols("
 create role reader;
@@ -878,6 +1241,21 @@ create role reader;
           │ ┬───────────┯━━━━━
           │ │           │
           │ │           focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_policy() {
+        assert_snapshot!(symbols("
+create policy allow_read on t;
+"), @r"
+        info: policy: allow_read
+          ╭▸ 
+        2 │ create policy allow_read on t;
+          │ ┬─────────────┯━━━━━━━━━─────
+          │ │             │
+          │ │             focus range
           ╰╴full range
         ");
     }
@@ -1188,5 +1566,38 @@ select * from t;
           ╰╴         focus range
         "
         );
+    }
+
+    #[test]
+    fn create_foreign_table() {
+        assert_snapshot!(symbols("
+create foreign table films (
+  code char(5),
+  title varchar(40)
+) server film_server;
+"), @r"
+        info: table: public.films
+          ╭▸ 
+        2 │   create foreign table films (
+          │   │                    ━━━━━ focus range
+          │ ┌─┘
+          │ │
+        3 │ │   code char(5),
+        4 │ │   title varchar(40)
+        5 │ │ ) server film_server;
+          │ └────────────────────┘ full range
+          │
+          ⸬  
+        3 │     code char(5),
+          │     ┯━━━────────
+          │     │
+          │     full range for `column: code char(5)`
+          │     focus range
+        4 │     title varchar(40)
+          │     ┯━━━━────────────
+          │     │
+          │     full range for `column: title varchar(40)`
+          ╰╴    focus range
+        ");
     }
 }
