@@ -57,6 +57,11 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::CreateForeignTable(create_foreign_table) => {
+                if let Some(symbol) = create_table_symbol(&binder, create_foreign_table) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreateFunction(create_function) => {
                 if let Some(symbol) = create_function_symbol(&binder, create_function) {
                     symbols.push(symbol);
@@ -83,7 +88,7 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreatePolicy(create_policy) => {
-                if let Some(symbol) = create_policy_symbol(&binder, create_policy) {
+                if let Some(symbol) = create_policy_symbol(create_policy) {
                     symbols.push(symbol);
                 }
             }
@@ -203,7 +208,7 @@ fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymb
 
 fn create_table_symbol(
     binder: &binder::Binder,
-    create_table: ast::CreateTable,
+    create_table: impl ast::HasCreateTable,
 ) -> Option<DocumentSymbol> {
     let path = create_table.path()?;
     let segment = path.segment()?;
@@ -417,10 +422,7 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_policy_symbol(
-    binder: &binder::Binder,
-    create_policy: ast::CreatePolicy,
-) -> Option<DocumentSymbol> {
+fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymbol> {
     let name_node = create_policy.name()?;
     let name = name_node.syntax().text().to_string();
 
@@ -1230,5 +1232,38 @@ select * from t;
           ╰╴         focus range
         "
         );
+    }
+
+    #[test]
+    fn create_foreign_table() {
+        assert_snapshot!(symbols("
+create foreign table films (
+  code char(5),
+  title varchar(40)
+) server film_server;
+"), @r"
+        info: table: public.films
+          ╭▸ 
+        2 │   create foreign table films (
+          │   │                    ━━━━━ focus range
+          │ ┌─┘
+          │ │
+        3 │ │   code char(5),
+        4 │ │   title varchar(40)
+        5 │ │ ) server film_server;
+          │ └────────────────────┘ full range
+          │
+          ⸬  
+        3 │     code char(5),
+          │     ┯━━━────────
+          │     │
+          │     full range for `column: code char(5)`
+          │     focus range
+        4 │     title varchar(40)
+          │     ┯━━━━────────────
+          │     │
+          │     full range for `column: title varchar(40)`
+          ╰╴    focus range
+        ");
     }
 }
