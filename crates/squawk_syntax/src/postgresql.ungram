@@ -2121,9 +2121,48 @@ Analyze =
 CommentOn =
   'comment' 'on'
   (
-    // TODO: I think we'll need proper nodes for each variant of comment on
-    'table' Path
+    'access' 'method' Path
+  | 'aggregate' Aggregate
+  | 'cast' CastSig
+  | 'collation' Path
+  | 'column' Path
   | 'constraint' NameRef 'on' 'domain'? Path
+  | 'conversion' Path
+  | 'database' Path
+  | 'domain' Path
+  | 'event' 'trigger' Path
+  | 'extension' Path
+  | 'foreign' 'data' 'wrapper' Path
+  | 'foreign' 'table' Path
+  | 'function' FunctionSig
+  | 'index' Path
+  | 'large' 'object' Literal
+  | 'materialized' 'view' Path
+  | 'operator' Op '(' Type ',' Type ')'
+  | 'operator' 'class' Path UsingMethod
+  | 'operator' 'family' Path UsingMethod
+  | 'policy' NameRef 'on' Path
+  | 'procedural'? 'language' Path
+  | 'procedure' FunctionSig
+  | 'publication' Path
+  | 'role' Path
+  | 'routine' FunctionSig
+  | 'rule' NameRef 'on' Path
+  | 'schema' Path
+  | 'sequence' Path
+  | 'server' Path
+  | 'statistics' Path
+  | 'subscription' Path
+  | 'table' Path
+  | 'tablespace' Path
+  | 'text' 'search' 'configuration' Path
+  | 'text' 'search' 'dictionary' Path
+  | 'text' 'search' 'parser' Path
+  | 'text' 'search' 'template' Path
+  | 'transform' 'for' Type 'language' NameRef
+  | 'trigger' NameRef 'on' Path
+  | 'type' Path
+  | 'view' Path
   )
   'is'
   ('null' | Literal)

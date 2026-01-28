@@ -6563,6 +6563,34 @@ alter table users$0 drop column email;
     }
 
     #[test]
+    fn goto_comment_on_table() {
+        assert_snapshot!(goto("
+create table t(id int);
+comment on table t$0 is '';
+"), @r"
+          ╭▸ 
+        2 │ create table t(id int);
+          │              ─ 2. destination
+        3 │ comment on table t is '';
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_column() {
+        assert_snapshot!(goto("
+create table t(id int);
+comment on column t.id$0 is '';
+"), @r"
+          ╭▸ 
+        2 │ create table t(id int);
+          │                ── 2. destination
+        3 │ comment on column t.id is '';
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_refresh_materialized_view() {
         assert_snapshot!(goto("
 create materialized view mv as select 1;

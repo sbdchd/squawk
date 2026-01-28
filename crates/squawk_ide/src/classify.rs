@@ -6,112 +6,56 @@ use squawk_syntax::{
 
 #[derive(Debug)]
 pub(crate) enum NameRefClass {
-    DropTable,
-    DropForeignTable,
-    Table,
-    DropIndex,
-    DropType,
-    DropDomain,
-    DropView,
-    DropMaterializedView,
-    DropSequence,
-    DropTrigger,
-    DropPolicy,
-    AlterPolicy,
-    DropEventTrigger,
-    SequenceOwnedByColumn,
-    Tablespace,
-    DropDatabase,
-    DropServer,
-    AlterServer,
-    CreateServer,
-    DropExtension,
-    AlterExtension,
-    ForeignTableServerName,
-    AlterRole,
-    DropRole,
-    SetRole,
-    Role,
-    ForeignKeyTable,
-    ForeignKeyColumn,
-    ForeignKeyLocalColumn,
-    CheckConstraintColumn,
-    PolicyColumn,
-    PolicyQualifiedColumnTable,
-    GeneratedColumn,
-    UniqueConstraintColumn,
-    PrimaryKeyConstraintColumn,
-    NotNullConstraintColumn,
-    ExcludeConstraintColumn,
-    PartitionByColumn,
-    PartitionOfTable,
-    LikeTable,
-    InheritsTable,
-    DropFunction,
-    DropAggregate,
-    DropProcedure,
-    DropRoutine,
+    Aggregate,
+    AlterColumn,
     CallProcedure,
-    DropSchema,
-    CreateIndex,
-    CreateIndexColumn,
-    DefaultConstraintFunctionCall,
-    SelectFunctionCall,
-    SelectFromTable,
-    SelectColumn,
-    SelectQualifiedColumnTable,
-    SelectQualifiedColumn,
+    Channel,
     CompositeTypeField,
-    InsertTable,
+    ConstraintColumn,
+    CreateIndexColumn,
+    Cursor,
+    Database,
+    DeleteColumn,
+    DeleteQualifiedColumnTable,
+    EventTrigger,
+    Extension,
+    ForeignKeyColumn,
+    ForeignKeyTable,
+    FromTable,
+    Function,
+    FunctionCall,
+    FunctionName,
+    Index,
     InsertColumn,
     InsertQualifiedColumnTable,
-    DeleteTable,
-    DeleteWhereColumn,
-    DeleteQualifiedColumnTable,
-    DeleteUsingTable,
-    UpdateTable,
-    UpdateWhereColumn,
-    UpdateSetColumn,
-    UpdateFromTable,
-    UpdateSetQualifiedColumnTable,
-    UpdateReturningColumn,
-    InsertReturningColumn,
-    DeleteReturningColumn,
-    MergeReturningColumn,
-    MergeWhenColumn,
-    MergeOnColumn,
-    MergeQualifiedColumnTable,
-    MergeUsingTable,
-    MergeTable,
-    UpdateReturningQualifiedColumnTable,
-    InsertReturningQualifiedColumnTable,
-    DeleteReturningQualifiedColumnTable,
-    MergeReturningQualifiedColumnTable,
     JoinUsingColumn,
-    SchemaQualifier,
-    TypeReference,
-    TruncateTable,
-    LockTable,
-    VacuumTable,
-    AlterTable,
-    AlterTableColumn,
-    AlterTableDropColumn,
-    RefreshMaterializedView,
-    ReindexTable,
-    ReindexIndex,
-    ReindexSchema,
-    ReindexDatabase,
-    ReindexSystem,
-    AttachPartition,
+    LikeTable,
+    MergeColumn,
+    MergeQualifiedColumnTable,
     NamedArgParameter,
-    Cursor,
+    Policy,
+    PolicyColumn,
+    PolicyQualifiedColumnTable,
     PreparedStatement,
-    NotifyChannel,
-    UnlistenChannel,
-    TriggerFunctionCall,
-    TriggerProcedureCall,
-    AlterEventTrigger,
-    OperatorFunctionRef,
+    Procedure,
+    ProcedureCall,
+    QualifiedColumn,
+    Role,
+    Routine,
+    Schema,
+    SelectColumn,
+    SelectFunctionCall,
+    SelectQualifiedColumn,
+    SelectQualifiedColumnTable,
+    Sequence,
+    Server,
+    Table,
+    Tablespace,
+    Trigger,
+    Type,
+    UpdateColumn,
+    UpdateQualifiedColumnTable,
+    View,
 }
 
 fn is_special_fn(kind: SyntaxKind) -> bool {
@@ -210,60 +154,36 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 in_when_clause = true;
             }
             if ast::Update::can_cast(ancestor.kind()) {
-                if in_returning_clause {
+                if in_returning_clause || in_set_clause || in_where_clause || in_from_clause {
                     if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
+                        return Some(NameRefClass::Schema);
                     } else {
-                        return Some(NameRefClass::UpdateReturningQualifiedColumnTable);
-                    }
-                } else if in_set_clause || in_where_clause || in_from_clause {
-                    if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
-                    } else {
-                        return Some(NameRefClass::UpdateSetQualifiedColumnTable);
+                        return Some(NameRefClass::UpdateQualifiedColumnTable);
                     }
                 }
             }
             if ast::Insert::can_cast(ancestor.kind()) {
-                if in_returning_clause {
+                if in_returning_clause || (!in_from_clause && !in_on_clause) {
                     if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
-                    } else {
-                        return Some(NameRefClass::InsertReturningQualifiedColumnTable);
-                    }
-                } else if !in_from_clause && !in_on_clause {
-                    if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
+                        return Some(NameRefClass::Schema);
                     } else {
                         return Some(NameRefClass::InsertQualifiedColumnTable);
                     }
                 }
             }
             if ast::Delete::can_cast(ancestor.kind()) {
-                if in_returning_clause {
+                if in_returning_clause || in_where_clause || in_using_clause {
                     if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
-                    } else {
-                        return Some(NameRefClass::DeleteReturningQualifiedColumnTable);
-                    }
-                } else if in_where_clause || in_using_clause {
-                    if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
+                        return Some(NameRefClass::Schema);
                     } else {
                         return Some(NameRefClass::DeleteQualifiedColumnTable);
                     }
                 }
             }
             if ast::Merge::can_cast(ancestor.kind()) {
-                if in_returning_clause {
+                if in_returning_clause || in_on_clause || in_when_clause {
                     if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
-                    } else {
-                        return Some(NameRefClass::MergeReturningQualifiedColumnTable);
-                    }
-                } else if in_on_clause || in_when_clause {
-                    if is_function_call || is_schema_table_col {
-                        return Some(NameRefClass::SchemaQualifier);
+                        return Some(NameRefClass::Schema);
                     } else {
                         return Some(NameRefClass::MergeQualifiedColumnTable);
                     }
@@ -271,7 +191,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
             if ast::Select::can_cast(ancestor.kind()) && (!in_from_clause || in_on_clause) {
                 if is_function_call || is_schema_table_col {
-                    return Some(NameRefClass::SchemaQualifier);
+                    return Some(NameRefClass::Schema);
                 } else {
                     return Some(NameRefClass::SelectQualifiedColumnTable);
                 }
@@ -280,13 +200,13 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 || ast::AlterPolicy::can_cast(ancestor.kind())
             {
                 if is_function_call || is_schema_table_col {
-                    return Some(NameRefClass::SchemaQualifier);
+                    return Some(NameRefClass::Schema);
                 } else {
                     return Some(NameRefClass::PolicyQualifiedColumnTable);
                 }
             }
         }
-        return Some(NameRefClass::SchemaQualifier);
+        return Some(NameRefClass::Schema);
     }
 
     if let Some(parent) = name_ref.syntax().parent()
@@ -342,7 +262,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             }
             if ast::Select::can_cast(ancestor.kind()) && (!in_from_clause || in_on_clause) {
                 if in_cast_expr {
-                    return Some(NameRefClass::TypeReference);
+                    return Some(NameRefClass::Type);
                 }
                 if is_base_of_outer_field_expr {
                     return Some(NameRefClass::SelectQualifiedColumnTable);
@@ -377,7 +297,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             .and_then(|p| ast::Path::cast(p).and_then(|p| p.qualifier()))
         && outer_path.syntax() == inner_path.syntax()
     {
-        return Some(NameRefClass::SchemaQualifier);
+        return Some(NameRefClass::Schema);
     }
 
     // Check for function/procedure reference in CREATE OPERATOR before the type check
@@ -391,7 +311,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             {
                 for outer in attr_option.syntax().ancestors() {
                     if ast::CreateOperator::can_cast(outer.kind()) {
-                        return Some(NameRefClass::OperatorFunctionRef);
+                        return Some(NameRefClass::FunctionName);
                     }
                 }
             }
@@ -404,7 +324,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_type = true;
         }
         if in_type {
-            return Some(NameRefClass::TypeReference);
+            return Some(NameRefClass::Type);
         }
         if ast::Fetch::can_cast(ancestor.kind())
             || ast::Move::can_cast(ancestor.kind())
@@ -416,136 +336,103 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::Execute::can_cast(ancestor.kind()) || ast::Deallocate::can_cast(ancestor.kind()) {
             return Some(NameRefClass::PreparedStatement);
         }
-        if ast::Notify::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::NotifyChannel);
+        if ast::Notify::can_cast(ancestor.kind()) || ast::Unlisten::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Channel);
         }
-        if ast::Unlisten::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::UnlistenChannel);
-        }
-        if ast::DropTable::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropTable);
-        }
-        if ast::DropForeignTable::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropForeignTable);
-        }
-        if ast::Truncate::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::TruncateTable);
-        }
-        if ast::Lock::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::LockTable);
-        }
-        if ast::Vacuum::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::VacuumTable);
-        }
-        if ast::AlterColumn::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterTableColumn);
-        }
-        if ast::DropColumn::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterTableDropColumn);
-        }
-        if ast::AlterTable::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterTable);
-        }
-        if ast::OnTable::can_cast(ancestor.kind()) {
+        if ast::DropTable::can_cast(ancestor.kind())
+            || ast::DropForeignTable::can_cast(ancestor.kind())
+            || ast::Truncate::can_cast(ancestor.kind())
+            || ast::Lock::can_cast(ancestor.kind())
+            || ast::Vacuum::can_cast(ancestor.kind())
+            || ast::AlterTable::can_cast(ancestor.kind())
+            || ast::OnTable::can_cast(ancestor.kind())
+            || ast::AttachPartition::can_cast(ancestor.kind())
+            || ast::Table::can_cast(ancestor.kind())
+            || ast::Inherits::can_cast(ancestor.kind())
+            || ast::PartitionOf::can_cast(ancestor.kind())
+        {
             return Some(NameRefClass::Table);
         }
-        if ast::AttachPartition::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AttachPartition);
+        if ast::AlterColumn::can_cast(ancestor.kind()) || ast::DropColumn::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::AlterColumn);
         }
-        if ast::Refresh::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::RefreshMaterializedView);
+        if let Some(comment_on) = ast::CommentOn::cast(ancestor.clone()) {
+            if comment_on.table_token().is_some() {
+                return Some(NameRefClass::Table);
+            }
+            if comment_on.column_token().is_some() {
+                return Some(NameRefClass::QualifiedColumn);
+            }
         }
         if let Some(reindex) = ast::Reindex::cast(ancestor.clone()) {
             if reindex.table_token().is_some() {
-                return Some(NameRefClass::ReindexTable);
+                return Some(NameRefClass::Table);
             }
             if reindex.index_token().is_some() {
-                return Some(NameRefClass::ReindexIndex);
+                return Some(NameRefClass::Index);
             }
             if reindex.schema_token().is_some() {
-                return Some(NameRefClass::ReindexSchema);
+                return Some(NameRefClass::Schema);
             }
-            if reindex.database_token().is_some() {
-                return Some(NameRefClass::ReindexDatabase);
+            if reindex.database_token().is_some() || reindex.system_token().is_some() {
+                return Some(NameRefClass::Database);
             }
-            if reindex.system_token().is_some() {
-                return Some(NameRefClass::ReindexSystem);
-            }
-        }
-        if ast::Table::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Table);
         }
         if ast::DropIndex::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropIndex);
+            return Some(NameRefClass::Index);
         }
-        if ast::DropType::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropType);
+        if ast::DropType::can_cast(ancestor.kind()) || ast::DropDomain::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Type);
         }
-        if ast::DropDomain::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropDomain);
-        }
-        if ast::DropView::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropView);
-        }
-        if ast::DropMaterializedView::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropMaterializedView);
+        if ast::DropView::can_cast(ancestor.kind())
+            || ast::DropMaterializedView::can_cast(ancestor.kind())
+            || ast::Refresh::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::View);
         }
         if ast::DropSequence::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropSequence);
+            return Some(NameRefClass::Sequence);
         }
         if ast::DropTrigger::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropTrigger);
+            return Some(NameRefClass::Trigger);
         }
-        if ast::DropPolicy::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropPolicy);
+        if ast::DropPolicy::can_cast(ancestor.kind()) || ast::AlterPolicy::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Policy);
         }
-        if ast::AlterPolicy::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterPolicy);
-        }
-        if ast::DropEventTrigger::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropEventTrigger);
+        if ast::DropEventTrigger::can_cast(ancestor.kind())
+            || ast::AlterEventTrigger::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::EventTrigger);
         }
         if ast::DropDatabase::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropDatabase);
+            return Some(NameRefClass::Database);
         }
-        if ast::DropServer::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropServer);
+        if ast::DropServer::can_cast(ancestor.kind())
+            || ast::AlterServer::can_cast(ancestor.kind())
+            || ast::CreateServer::can_cast(ancestor.kind())
+            || ast::ServerName::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Server);
         }
-        if ast::AlterServer::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterServer);
+        if ast::DropExtension::can_cast(ancestor.kind())
+            || ast::AlterExtension::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Extension);
         }
-        if ast::AlterEventTrigger::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterEventTrigger);
-        }
-        if ast::CreateServer::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::CreateServer);
-        }
-        if ast::DropExtension::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropExtension);
-        }
-        if ast::AlterExtension::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterExtension);
-        }
-        if ast::AlterRole::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::AlterRole);
-        }
-        if ast::DropRole::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropRole);
-        }
-        if ast::SetRole::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::SetRole);
-        }
-        if ast::RoleRef::can_cast(ancestor.kind()) {
+        if ast::AlterRole::can_cast(ancestor.kind())
+            || ast::DropRole::can_cast(ancestor.kind())
+            || ast::SetRole::can_cast(ancestor.kind())
+            || ast::RoleRef::can_cast(ancestor.kind())
+        {
             return Some(NameRefClass::Role);
-        }
-        if ast::ServerName::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::ForeignTableServerName);
         }
         if let Some(sequence_option) = ast::SequenceOption::cast(ancestor.clone())
             && sequence_option.owned_token().is_some()
             && sequence_option.by_token().is_some()
         {
-            return Some(NameRefClass::SequenceOwnedByColumn);
+            return Some(NameRefClass::QualifiedColumn);
         }
         if ast::DropTablespace::can_cast(ancestor.kind())
             || ast::Tablespace::can_cast(ancestor.kind())
@@ -576,10 +463,10 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                         .text_range()
                         .contains_range(name_ref.syntax().text_range())
                 {
-                    return Some(NameRefClass::ForeignKeyLocalColumn);
+                    return Some(NameRefClass::ConstraintColumn);
                 }
                 if in_set_null_columns {
-                    return Some(NameRefClass::ForeignKeyLocalColumn);
+                    return Some(NameRefClass::ConstraintColumn);
                 }
             } else {
                 return Some(NameRefClass::ForeignKeyTable);
@@ -604,89 +491,80 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 return Some(NameRefClass::ForeignKeyTable);
             }
         }
-        if ast::CheckConstraint::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::CheckConstraintColumn);
-        }
         if ast::CreatePolicy::can_cast(ancestor.kind())
             || ast::AlterPolicy::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::PolicyColumn);
         }
-        if ast::GeneratedConstraint::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::GeneratedColumn);
+        if ast::CheckConstraint::can_cast(ancestor.kind())
+            || ast::GeneratedConstraint::can_cast(ancestor.kind())
+            || ast::NotNullConstraint::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::ConstraintColumn);
         }
-        if in_column_list && ast::UniqueConstraint::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::UniqueConstraintColumn);
-        }
-        if in_column_list && ast::PrimaryKeyConstraint::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::PrimaryKeyConstraintColumn);
-        }
-        if ast::NotNullConstraint::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::NotNullConstraintColumn);
+        if in_column_list
+            && (ast::UniqueConstraint::can_cast(ancestor.kind())
+                || ast::PrimaryKeyConstraint::can_cast(ancestor.kind()))
+        {
+            return Some(NameRefClass::ConstraintColumn);
         }
         if (in_constraint_exclusion_list
             || in_constraint_include_clause
             || in_constraint_where_clause)
             && ast::ExcludeConstraint::can_cast(ancestor.kind())
         {
-            return Some(NameRefClass::ExcludeConstraintColumn);
+            return Some(NameRefClass::ConstraintColumn);
         }
         if ast::LikeClause::can_cast(ancestor.kind()) {
             return Some(NameRefClass::LikeTable);
         }
-        if ast::Inherits::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::InheritsTable);
-        }
         if ast::CastExpr::can_cast(ancestor.kind()) && in_type {
-            return Some(NameRefClass::TypeReference);
+            return Some(NameRefClass::Type);
         }
         if ast::DropFunction::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropFunction);
+            return Some(NameRefClass::Function);
         }
         if ast::DropAggregate::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropAggregate);
+            return Some(NameRefClass::Aggregate);
         }
         if ast::DropProcedure::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropProcedure);
+            return Some(NameRefClass::Procedure);
         }
         if ast::DropRoutine::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropRoutine);
+            return Some(NameRefClass::Routine);
         }
         if ast::Call::can_cast(ancestor.kind()) {
             return Some(NameRefClass::CallProcedure);
         }
         if ast::DropSchema::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::DropSchema);
+            return Some(NameRefClass::Schema);
         }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
             if in_partition_item {
                 return Some(NameRefClass::CreateIndexColumn);
             }
-            return Some(NameRefClass::CreateIndex);
+            return Some(NameRefClass::Table);
         }
         if let Some(create_trigger) = ast::CreateTrigger::cast(ancestor.clone())
             && in_call_expr
             && !in_arg_list
         {
             if create_trigger.procedure_token().is_some() {
-                return Some(NameRefClass::TriggerProcedureCall);
+                return Some(NameRefClass::ProcedureCall);
             }
-            return Some(NameRefClass::TriggerFunctionCall);
+            return Some(NameRefClass::FunctionCall);
         }
         if let Some(create_event_trigger) = ast::CreateEventTrigger::cast(ancestor.clone())
             && in_call_expr
             && !in_arg_list
         {
             if create_event_trigger.procedure_token().is_some() {
-                return Some(NameRefClass::TriggerProcedureCall);
+                return Some(NameRefClass::ProcedureCall);
             }
-            return Some(NameRefClass::TriggerFunctionCall);
+            return Some(NameRefClass::FunctionCall);
         }
         if in_partition_item && ast::CreateTableLike::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::PartitionByColumn);
-        }
-        if ast::PartitionOf::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::PartitionOfTable);
+            return Some(NameRefClass::ConstraintColumn);
         }
         if is_special_fn(ancestor.kind()) {
             in_special_sql_fn = true;
@@ -701,7 +579,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_call_expr = true;
         }
         if ast::DefaultConstraint::can_cast(ancestor.kind()) && in_call_expr && !in_arg_list {
-            return Some(NameRefClass::DefaultConstraintFunctionCall);
+            return Some(NameRefClass::FunctionCall);
         }
         if ast::OnClause::can_cast(ancestor.kind()) {
             in_on_clause = true;
@@ -714,7 +592,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 return Some(NameRefClass::SelectFunctionCall);
             }
             if in_from_clause && !in_on_clause {
-                return Some(NameRefClass::SelectFromTable);
+                return Some(NameRefClass::FromTable);
             }
             // Classify as SelectColumn for target list, WHERE, ORDER BY, GROUP BY, etc.
             // (anything in SELECT except FROM clause)
@@ -736,13 +614,10 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_partition_item = true;
         }
         if ast::Insert::can_cast(ancestor.kind()) {
-            if in_returning_clause {
-                return Some(NameRefClass::InsertReturningColumn);
-            }
-            if in_column_list {
+            if in_returning_clause || in_column_list {
                 return Some(NameRefClass::InsertColumn);
             }
-            return Some(NameRefClass::InsertTable);
+            return Some(NameRefClass::Table);
         }
         if ast::JoinUsingClause::can_cast(ancestor.kind()) && in_column_list {
             return Some(NameRefClass::JoinUsingColumn);
@@ -763,49 +638,34 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_returning_clause = true;
         }
         if ast::Delete::can_cast(ancestor.kind()) {
-            if in_returning_clause {
-                return Some(NameRefClass::DeleteReturningColumn);
-            }
-            if in_where_clause {
-                return Some(NameRefClass::DeleteWhereColumn);
+            if in_returning_clause || in_where_clause {
+                return Some(NameRefClass::DeleteColumn);
             }
             if in_using_clause {
-                return Some(NameRefClass::DeleteUsingTable);
+                return Some(NameRefClass::FromTable);
             }
-            return Some(NameRefClass::DeleteTable);
+            return Some(NameRefClass::Table);
         }
         if ast::Update::can_cast(ancestor.kind()) {
-            if in_returning_clause {
-                return Some(NameRefClass::UpdateReturningColumn);
-            }
-            if in_where_clause {
-                return Some(NameRefClass::UpdateWhereColumn);
-            }
-            if in_set_clause {
-                return Some(NameRefClass::UpdateSetColumn);
+            if in_returning_clause || in_where_clause || in_set_clause {
+                return Some(NameRefClass::UpdateColumn);
             }
             if in_from_clause {
-                return Some(NameRefClass::UpdateFromTable);
+                return Some(NameRefClass::FromTable);
             }
-            return Some(NameRefClass::UpdateTable);
+            return Some(NameRefClass::Table);
         }
         if ast::MergeWhenClause::can_cast(ancestor.kind()) {
             in_when_clause = true;
         }
         if ast::Merge::can_cast(ancestor.kind()) {
-            if in_returning_clause {
-                return Some(NameRefClass::MergeReturningColumn);
-            }
-            if in_when_clause {
-                return Some(NameRefClass::MergeWhenColumn);
-            }
-            if in_on_clause {
-                return Some(NameRefClass::MergeOnColumn);
+            if in_when_clause || in_returning_clause || in_on_clause {
+                return Some(NameRefClass::MergeColumn);
             }
             if in_using_clause {
-                return Some(NameRefClass::MergeUsingTable);
+                return Some(NameRefClass::FromTable);
             }
-            return Some(NameRefClass::MergeTable);
+            return Some(NameRefClass::Table);
         }
     }
 

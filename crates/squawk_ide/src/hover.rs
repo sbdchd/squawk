@@ -47,31 +47,17 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
         match context {
             NameRefClass::CreateIndexColumn
             | NameRefClass::InsertColumn
-            | NameRefClass::DeleteWhereColumn
-            | NameRefClass::UpdateWhereColumn
-            | NameRefClass::UpdateSetColumn
-            | NameRefClass::UpdateReturningColumn
-            | NameRefClass::InsertReturningColumn
-            | NameRefClass::DeleteReturningColumn
-            | NameRefClass::MergeReturningColumn
-            | NameRefClass::MergeWhenColumn
-            | NameRefClass::MergeOnColumn
-            | NameRefClass::CheckConstraintColumn
-            | NameRefClass::GeneratedColumn
-            | NameRefClass::UniqueConstraintColumn
-            | NameRefClass::PrimaryKeyConstraintColumn
-            | NameRefClass::NotNullConstraintColumn
-            | NameRefClass::ExcludeConstraintColumn
-            | NameRefClass::PartitionByColumn
+            | NameRefClass::DeleteColumn
+            | NameRefClass::UpdateColumn
+            | NameRefClass::MergeColumn
+            | NameRefClass::ConstraintColumn
             | NameRefClass::JoinUsingColumn
             | NameRefClass::ForeignKeyColumn
-            | NameRefClass::ForeignKeyLocalColumn
-            | NameRefClass::SequenceOwnedByColumn
-            | NameRefClass::AlterTableColumn
-            | NameRefClass::AlterTableDropColumn => {
+            | NameRefClass::AlterColumn
+            | NameRefClass::QualifiedColumn => {
                 return hover_column(root, &name_ref, &binder);
             }
-            NameRefClass::TypeReference | NameRefClass::DropType | NameRefClass::DropDomain => {
+            NameRefClass::Type => {
                 return hover_type(root, &name_ref, &binder);
             }
             NameRefClass::CompositeTypeField => {
@@ -91,86 +77,51 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 // Finally try as table (handles case like `select t from t;` where t is the table)
                 return hover_table(root, &name_ref, &binder);
             }
-            NameRefClass::Table
-            | NameRefClass::DropTable
-            | NameRefClass::DropForeignTable
-            | NameRefClass::DropView
-            | NameRefClass::DropMaterializedView
-            | NameRefClass::CreateIndex
-            | NameRefClass::InsertTable
-            | NameRefClass::InsertQualifiedColumnTable
-            | NameRefClass::DeleteTable
-            | NameRefClass::DeleteQualifiedColumnTable
-            | NameRefClass::DeleteUsingTable
-            | NameRefClass::MergeUsingTable
-            | NameRefClass::UpdateTable
-            | NameRefClass::SelectFromTable
-            | NameRefClass::UpdateFromTable
-            | NameRefClass::SelectQualifiedColumnTable
-            | NameRefClass::UpdateSetQualifiedColumnTable
-            | NameRefClass::MergeQualifiedColumnTable
-            | NameRefClass::UpdateReturningQualifiedColumnTable
-            | NameRefClass::InsertReturningQualifiedColumnTable
-            | NameRefClass::DeleteReturningQualifiedColumnTable
-            | NameRefClass::MergeReturningQualifiedColumnTable
-            | NameRefClass::MergeTable
-            | NameRefClass::PolicyQualifiedColumnTable
+            NameRefClass::DeleteQualifiedColumnTable
             | NameRefClass::ForeignKeyTable
+            | NameRefClass::FromTable
+            | NameRefClass::InsertQualifiedColumnTable
             | NameRefClass::LikeTable
-            | NameRefClass::InheritsTable
-            | NameRefClass::PartitionOfTable
-            | NameRefClass::TruncateTable
-            | NameRefClass::LockTable
-            | NameRefClass::VacuumTable
-            | NameRefClass::AlterTable
-            | NameRefClass::ReindexTable
-            | NameRefClass::RefreshMaterializedView
-            | NameRefClass::AttachPartition => {
+            | NameRefClass::MergeQualifiedColumnTable
+            | NameRefClass::PolicyQualifiedColumnTable
+            | NameRefClass::SelectQualifiedColumnTable
+            | NameRefClass::Table
+            | NameRefClass::UpdateQualifiedColumnTable
+            | NameRefClass::View => {
                 return hover_table(root, &name_ref, &binder);
             }
-            NameRefClass::DropSequence => return hover_sequence(root, &name_ref, &binder),
-            NameRefClass::DropTrigger => return hover_trigger(root, &name_ref, &binder),
-            NameRefClass::DropPolicy | NameRefClass::AlterPolicy => {
+            NameRefClass::Sequence => return hover_sequence(root, &name_ref, &binder),
+            NameRefClass::Trigger => return hover_trigger(root, &name_ref, &binder),
+            NameRefClass::Policy => {
                 return hover_policy(root, &name_ref, &binder);
             }
-            NameRefClass::DropEventTrigger | NameRefClass::AlterEventTrigger => {
+            NameRefClass::EventTrigger => {
                 return hover_event_trigger(root, &name_ref, &binder);
             }
-            NameRefClass::DropDatabase
-            | NameRefClass::ReindexDatabase
-            | NameRefClass::ReindexSystem => return hover_database(root, &name_ref, &binder),
-            NameRefClass::DropServer
-            | NameRefClass::AlterServer
-            | NameRefClass::CreateServer
-            | NameRefClass::ForeignTableServerName => {
+            NameRefClass::Database => {
+                return hover_database(root, &name_ref, &binder);
+            }
+            NameRefClass::Server => {
                 return hover_server(root, &name_ref, &binder);
             }
-            NameRefClass::DropExtension | NameRefClass::AlterExtension => {
+            NameRefClass::Extension => {
                 return hover_extension(root, &name_ref, &binder);
             }
-            NameRefClass::AlterRole
-            | NameRefClass::DropRole
-            | NameRefClass::SetRole
-            | NameRefClass::Role => {
+            NameRefClass::Role => {
                 return hover_role(root, &name_ref, &binder);
             }
             NameRefClass::Tablespace => return hover_tablespace(root, &name_ref, &binder),
-            NameRefClass::DropIndex | NameRefClass::ReindexIndex => {
+            NameRefClass::Index => {
                 return hover_index(root, &name_ref, &binder);
             }
-            NameRefClass::DropFunction
-            | NameRefClass::DefaultConstraintFunctionCall
-            | NameRefClass::TriggerFunctionCall
-            | NameRefClass::OperatorFunctionRef => {
+            NameRefClass::Function | NameRefClass::FunctionCall | NameRefClass::FunctionName => {
                 return hover_function(root, &name_ref, &binder);
             }
-            NameRefClass::DropAggregate => return hover_aggregate(root, &name_ref, &binder),
-            NameRefClass::DropProcedure
-            | NameRefClass::CallProcedure
-            | NameRefClass::TriggerProcedureCall => {
+            NameRefClass::Aggregate => return hover_aggregate(root, &name_ref, &binder),
+            NameRefClass::Procedure | NameRefClass::CallProcedure | NameRefClass::ProcedureCall => {
                 return hover_procedure(root, &name_ref, &binder);
             }
-            NameRefClass::DropRoutine => return hover_routine(root, &name_ref, &binder),
+            NameRefClass::Routine => return hover_routine(root, &name_ref, &binder),
             NameRefClass::SelectFunctionCall => {
                 // Try function first, but fall back to column if no function found
                 // (handles function-call-style column access like `select a(t)`)
@@ -179,9 +130,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
                 }
                 return hover_column(root, &name_ref, &binder);
             }
-            NameRefClass::SchemaQualifier
-            | NameRefClass::DropSchema
-            | NameRefClass::ReindexSchema => {
+            NameRefClass::Schema => {
                 return hover_schema(root, &name_ref, &binder);
             }
             NameRefClass::NamedArgParameter => {
@@ -193,7 +142,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
             NameRefClass::PreparedStatement => {
                 return hover_prepared_statement(root, &name_ref, &binder);
             }
-            NameRefClass::NotifyChannel | NameRefClass::UnlistenChannel => {
+            NameRefClass::Channel => {
                 return hover_channel(root, &name_ref, &binder);
             }
         }
