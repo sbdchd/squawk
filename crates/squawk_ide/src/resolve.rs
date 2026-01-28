@@ -20,22 +20,7 @@ pub(crate) fn resolve_name_ref_ptrs(
     let context = classify_name_ref(name_ref)?;
 
     match context {
-        NameRefClass::DropTable
-        | NameRefClass::DropForeignTable
-        | NameRefClass::Table
-        | NameRefClass::CreateIndex
-        | NameRefClass::InsertTable
-        | NameRefClass::DeleteTable
-        | NameRefClass::UpdateTable
-        | NameRefClass::PartitionOfTable
-        | NameRefClass::InheritsTable
-        | NameRefClass::TruncateTable
-        | NameRefClass::LockTable
-        | NameRefClass::VacuumTable
-        | NameRefClass::AlterTable
-        | NameRefClass::ReindexTable
-        | NameRefClass::MergeTable
-        | NameRefClass::AttachPartition => {
+        NameRefClass::Table => {
             let path = find_containing_path(name_ref)?;
             let (table_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
@@ -69,14 +54,11 @@ pub(crate) fn resolve_name_ref_ptrs(
             let statement_name = Name::from_node(name_ref);
             resolve_prepared_statement_name_ptr(binder, &statement_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::NotifyChannel | NameRefClass::UnlistenChannel => {
+        NameRefClass::Channel => {
             let channel_name = Name::from_node(name_ref);
             resolve_channel_name_ptr(binder, &channel_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::SelectFromTable
-        | NameRefClass::UpdateFromTable
-        | NameRefClass::MergeUsingTable
-        | NameRefClass::DeleteUsingTable => {
+        NameRefClass::FromTable => {
             let table_name = Name::from_node(name_ref);
             let schema = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
@@ -104,13 +86,13 @@ pub(crate) fn resolve_name_ref_ptrs(
 
             resolve_view_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropIndex | NameRefClass::ReindexIndex => {
+        NameRefClass::Index => {
             let path = find_containing_path(name_ref)?;
             let (index_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_index_name_ptr(binder, &index_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropType | NameRefClass::DropDomain | NameRefClass::TypeReference => {
+        NameRefClass::Type => {
             let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent)
                 && field_expr
@@ -134,22 +116,20 @@ pub(crate) fn resolve_name_ref_ptrs(
             let position = name_ref.syntax().text_range().start();
             resolve_type_name_ptr(binder, &type_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropView
-        | NameRefClass::DropMaterializedView
-        | NameRefClass::RefreshMaterializedView => {
+        NameRefClass::View => {
             let path = find_containing_path(name_ref)?;
             let (view_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_view_name_ptr(binder, &view_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropSequence => {
+        NameRefClass::Sequence => {
             let path = find_containing_path(name_ref)?;
             let (sequence_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_sequence_name_ptr(binder, &sequence_name, &schema, position)
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropTrigger => {
+        NameRefClass::Trigger => {
             let drop_trigger = name_ref
                 .syntax()
                 .ancestors()
@@ -167,7 +147,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_trigger_name_ptr(binder, &trigger_name, &schema, position, Some(table_name))
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropPolicy | NameRefClass::AlterPolicy => {
+        NameRefClass::Policy => {
             let (policy_name, on_table) = name_ref.syntax().ancestors().find_map(|a| {
                 if let Some(policy) = ast::DropPolicy::cast(a.clone()) {
                     Some((policy.name_ref(), policy.on_table()))
@@ -182,40 +162,28 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_policy_name_ptr(binder, &policy_name, &schema, position, table_name)
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropEventTrigger | NameRefClass::AlterEventTrigger => {
+        NameRefClass::EventTrigger => {
             let event_trigger_name = Name::from_node(name_ref);
             resolve_event_trigger_name_ptr(binder, &event_trigger_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::ReindexDatabase
-        | NameRefClass::ReindexSystem
-        | NameRefClass::DropDatabase => {
+        NameRefClass::Database => {
             let database_name = Name::from_node(name_ref);
             resolve_database_name_ptr(binder, &database_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropServer
-        | NameRefClass::AlterServer
-        | NameRefClass::CreateServer
-        | NameRefClass::ForeignTableServerName => {
+        NameRefClass::Server => {
             let server_name = Name::from_node(name_ref);
             resolve_server_name_ptr(binder, &server_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropExtension | NameRefClass::AlterExtension => {
+        NameRefClass::Extension => {
             let extension_name = Name::from_node(name_ref);
             resolve_extension_name_ptr(binder, &extension_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::AlterRole
-        | NameRefClass::DropRole
-        | NameRefClass::SetRole
-        | NameRefClass::Role => {
+        NameRefClass::Role => {
             let role_name = Name::from_node(name_ref);
             resolve_role_name_ptr(binder, &role_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::SequenceOwnedByColumn => {
-            let sequence_option = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::SequenceOption::cast)?;
-            let path = sequence_option.path()?;
+        NameRefClass::QualifiedColumn => {
+            let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
             let column_name = Name::from_node(name_ref);
             let table_path = path.qualifier()?;
             resolve_column_for_path(binder, root, &table_path, column_name)
@@ -251,14 +219,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let column_name = Name::from_node(name_ref);
             resolve_column_for_path(binder, root, &path, column_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::GeneratedColumn
-        | NameRefClass::CheckConstraintColumn
-        | NameRefClass::UniqueConstraintColumn
-        | NameRefClass::PrimaryKeyConstraintColumn
-        | NameRefClass::NotNullConstraintColumn
-        | NameRefClass::ExcludeConstraintColumn
-        | NameRefClass::PartitionByColumn
-        | NameRefClass::ForeignKeyLocalColumn => {
+        NameRefClass::ConstraintColumn => {
             let create_table = name_ref
                 .syntax()
                 .ancestors()
@@ -305,7 +266,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let position = name_ref.syntax().text_range().start();
             resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropFunction => {
+        NameRefClass::Function => {
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
@@ -317,7 +278,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_function(binder, &function_name, &schema, params.as_deref(), position)
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropAggregate => {
+        NameRefClass::Aggregate => {
             let aggregate = name_ref
                 .syntax()
                 .ancestors()
@@ -335,7 +296,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             )
             .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropProcedure => {
+        NameRefClass::Procedure => {
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
@@ -353,7 +314,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             )
             .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropRoutine => {
+        NameRefClass::Routine => {
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
@@ -386,11 +347,11 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_procedure(binder, &procedure_name, &schema, None, position)
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DropSchema | NameRefClass::SchemaQualifier => {
+        NameRefClass::Schema => {
             let schema_name = Name::from_node(name_ref);
             resolve_schema(binder, &schema_name).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DefaultConstraintFunctionCall | NameRefClass::TriggerFunctionCall => {
+        NameRefClass::FunctionCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
             {
@@ -405,7 +366,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_function(binder, &function_name, &schema, None, position)
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::TriggerProcedureCall => {
+        NameRefClass::ProcedureCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
                 && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
             {
@@ -421,7 +382,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_procedure(binder, &procedure_name, &schema, None, position)
                 .map(|ptr| smallvec![ptr])
         }
-        NameRefClass::OperatorFunctionRef => {
+        NameRefClass::FunctionName => {
             let path_type = name_ref
                 .syntax()
                 .ancestors()
@@ -490,52 +451,34 @@ pub(crate) fn resolve_name_ref_ptrs(
         NameRefClass::InsertQualifiedColumnTable => {
             resolve_insert_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DeleteWhereColumn | NameRefClass::DeleteReturningColumn => {
+        NameRefClass::DeleteColumn => {
             resolve_delete_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::DeleteQualifiedColumnTable
-        | NameRefClass::DeleteReturningQualifiedColumnTable => {
+        NameRefClass::DeleteQualifiedColumnTable => {
             resolve_delete_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::UpdateWhereColumn | NameRefClass::UpdateSetColumn => {
+        NameRefClass::UpdateColumn => {
             resolve_update_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::UpdateReturningQualifiedColumnTable
-        | NameRefClass::UpdateSetQualifiedColumnTable => {
+        NameRefClass::UpdateQualifiedColumnTable => {
             resolve_update_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::UpdateReturningColumn => {
-            resolve_update_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::InsertReturningColumn => {
-            resolve_insert_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::MergeWhenColumn
-        | NameRefClass::MergeReturningColumn
-        | NameRefClass::MergeOnColumn => {
+        NameRefClass::MergeColumn => {
             resolve_merge_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::MergeQualifiedColumnTable
-        | NameRefClass::MergeReturningQualifiedColumnTable => {
+        NameRefClass::MergeQualifiedColumnTable => {
             resolve_merge_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
         }
-        NameRefClass::InsertReturningQualifiedColumnTable => {
-            resolve_insert_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
-        }
         NameRefClass::JoinUsingColumn => resolve_join_using_columns(binder, root, name_ref),
-        NameRefClass::AlterTableColumn | NameRefClass::AlterTableDropColumn => {
+        NameRefClass::AlterColumn => {
             let column_name = Name::from_node(name_ref);
             let alter_table = name_ref
                 .syntax()
                 .ancestors()
                 .find_map(ast::AlterTable::cast)?;
-            let path = alter_table.relation_name()?.path()?;
-            resolve_column_for_path(binder, root, &path, column_name).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::ReindexSchema => {
-            let path = find_containing_path(name_ref)?;
-            let schema_name = extract_table_name(&path)?;
-            resolve_schema(binder, &schema_name).map(|ptr| smallvec![ptr])
+            let table_path = alter_table.relation_name()?.path()?;
+            resolve_column_for_path(binder, root, &table_path, column_name)
+                .map(|ptr| smallvec![ptr])
         }
     }
 }

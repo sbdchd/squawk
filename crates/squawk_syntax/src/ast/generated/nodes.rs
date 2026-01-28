@@ -2670,6 +2670,18 @@ pub struct CommentOn {
 }
 impl CommentOn {
     #[inline]
+    pub fn aggregate(&self) -> Option<Aggregate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cast_sig(&self) -> Option<CastSig> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn function_sig(&self) -> Option<FunctionSig> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
@@ -2678,36 +2690,244 @@ impl CommentOn {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn op(&self) -> Option<Op> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_method(&self) -> Option<UsingMethod> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn access_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ACCESS_KW)
+    }
+    #[inline]
+    pub fn aggregate_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
+    }
+    #[inline]
+    pub fn cast_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CAST_KW)
+    }
+    #[inline]
+    pub fn class_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CLASS_KW)
+    }
+    #[inline]
+    pub fn collation_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLLATION_KW)
+    }
+    #[inline]
+    pub fn column_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMN_KW)
     }
     #[inline]
     pub fn comment_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COMMENT_KW)
     }
     #[inline]
+    pub fn configuration_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONFIGURATION_KW)
+    }
+    #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
+    }
+    #[inline]
+    pub fn conversion_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONVERSION_KW)
+    }
+    #[inline]
+    pub fn data_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DATA_KW)
+    }
+    #[inline]
+    pub fn database_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
+    }
+    #[inline]
+    pub fn dictionary_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DICTIONARY_KW)
     }
     #[inline]
     pub fn domain_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
     }
     #[inline]
+    pub fn event_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EVENT_KW)
+    }
+    #[inline]
+    pub fn extension_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXTENSION_KW)
+    }
+    #[inline]
+    pub fn family_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FAMILY_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn foreign_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
+    }
+    #[inline]
+    pub fn function_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
+    }
+    #[inline]
+    pub fn index_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INDEX_KW)
+    }
+    #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn language_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
+    }
+    #[inline]
+    pub fn large_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LARGE_KW)
+    }
+    #[inline]
+    pub fn materialized_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATERIALIZED_KW)
+    }
+    #[inline]
+    pub fn method_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::METHOD_KW)
     }
     #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NULL_KW)
     }
     #[inline]
+    pub fn object_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
+    }
+    #[inline]
     pub fn on_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ON_KW)
     }
     #[inline]
+    pub fn operator_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
+    }
+    #[inline]
+    pub fn parser_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARSER_KW)
+    }
+    #[inline]
+    pub fn policy_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POLICY_KW)
+    }
+    #[inline]
+    pub fn procedural_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROCEDURAL_KW)
+    }
+    #[inline]
+    pub fn procedure_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
+    }
+    #[inline]
+    pub fn publication_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
+    }
+    #[inline]
+    pub fn role_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROLE_KW)
+    }
+    #[inline]
+    pub fn routine_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROUTINE_KW)
+    }
+    #[inline]
+    pub fn rule_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RULE_KW)
+    }
+    #[inline]
+    pub fn schema_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
+    }
+    #[inline]
+    pub fn search_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEARCH_KW)
+    }
+    #[inline]
+    pub fn sequence_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
+    }
+    #[inline]
+    pub fn server_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SERVER_KW)
+    }
+    #[inline]
+    pub fn statistics_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STATISTICS_KW)
+    }
+    #[inline]
+    pub fn subscription_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SUBSCRIPTION_KW)
+    }
+    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+    #[inline]
+    pub fn tablespace_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
+    }
+    #[inline]
+    pub fn template_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TEMPLATE_KW)
+    }
+    #[inline]
+    pub fn text_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TEXT_KW)
+    }
+    #[inline]
+    pub fn transform_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TRANSFORM_KW)
+    }
+    #[inline]
+    pub fn trigger_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TRIGGER_KW)
+    }
+    #[inline]
+    pub fn type_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TYPE_KW)
+    }
+    #[inline]
+    pub fn view_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VIEW_KW)
+    }
+    #[inline]
+    pub fn wrapper_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WRAPPER_KW)
     }
 }
 
