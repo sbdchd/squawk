@@ -192,39 +192,21 @@ fn handle_goto_definition(
     let line_index = LineIndex::new(content);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
-    let ranges = goto_definition(file, offset);
-
-    let result = if ranges.is_empty() {
-        GotoDefinitionResponse::Array(vec![])
-    } else if ranges.len() == 1 {
-        // TODO: can we just always use the array response?
-        let target_range = ranges[0];
-        debug_assert!(
-            !target_range.contains(offset),
-            "Our target destination range must not include the source range otherwise go to def won't work in vscode."
-        );
-        GotoDefinitionResponse::Scalar(Location {
-            uri: uri.clone(),
-            range: lsp_utils::range(&line_index, target_range),
+    let ranges = goto_definition(file, offset)
+        .into_iter()
+        .map(|target_range| {
+            debug_assert!(
+                !target_range.contains(offset),
+                "Our target destination range must not include the source range otherwise go to def won't work in vscode."
+            );
+            Location {
+                uri: uri.clone(),
+                range: lsp_utils::range(&line_index, target_range),
+            }
         })
-    } else {
-        GotoDefinitionResponse::Array(
-            ranges
-                .into_iter()
-                .map(|target_range| {
-                    debug_assert!(
-                        !target_range.contains(offset),
-                        "Our target destination range must not include the source range otherwise go to def won't work in vscode."
-                    );
-                    Location {
-                        uri: uri.clone(),
-                        range: lsp_utils::range(&line_index, target_range),
-                    }
-                })
-                .collect(),
-        )
-    };
+        .collect();
 
+    let result = GotoDefinitionResponse::Array(ranges);
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&result).unwrap()),
