@@ -150,6 +150,14 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
   )
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand("squawk.reportIssue", () => {
+      vscode.commands.executeCommand("workbench.action.openIssueReporter", {
+        extensionId: "sbdchd.squawk",
+      })
+    }),
+  )
+
   context.subscriptions.push(onClientStateChange)
 
   await startServer(context)

@@ -6,6 +6,9 @@
     "type": "git",
     "url": "https://github.com/sbdchd/squawk.git"
   },
+  "bugs": {
+    "url": "https://github.com/sbdchd/squawk/issues"
+  },
   "icon": "icon.png",
   "author": "Squawk Team & Contributors",
   "license": "(Apache-2.0 OR MIT)",
@@ -69,6 +72,11 @@
       {
         "command": "squawk.restartServer",
         "title": "Restart Server",
+        "category": "Squawk"
+      },
+      {
+        "command": "squawk.reportIssue",
+        "title": "Report Issue",
         "category": "Squawk"
       }
     ],
