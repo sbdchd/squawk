@@ -4,7 +4,13 @@
 --   cargo xtask sync-builtins
 
 create schema information_schema;
+
+-- system catalog schema
 create schema pg_catalog;
+
+-- standard public schema
+create schema public;
+
 create schema pg_temp;
 
 -- size: 4, align: 4
@@ -16921,4753 +16927,5552 @@ create function pg_catalog.xpath_exists(text, xml) returns boolean
 create function pg_catalog.xpath_exists(text, xml, text[]) returns boolean
   language internal;
 
+-- NOT tsquery
 create operator pg_catalog.!! (
   rightarg = tsquery,
   function = pg_catalog.tsquery_not
 );
 
+-- does not match regular expression, case-sensitive
 create operator pg_catalog.!~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.textregexne
 );
 
+-- does not match regular expression, case-sensitive
 create operator pg_catalog.!~ (
   leftarg = character,
   rightarg = text,
   function = pg_catalog.bpcharregexne
 );
 
+-- does not match regular expression, case-sensitive
 create operator pg_catalog.!~ (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameregexne
 );
 
+-- does not match regular expression, case-insensitive
 create operator pg_catalog.!~* (
   leftarg = character,
   rightarg = text,
   function = pg_catalog.bpcharicregexne
 );
 
+-- does not match regular expression, case-insensitive
 create operator pg_catalog.!~* (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.texticregexne
 );
 
+-- does not match regular expression, case-insensitive
 create operator pg_catalog.!~* (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameicregexne
 );
 
+-- does not match LIKE expression
 create operator pg_catalog.!~~ (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.byteanlike
 );
 
+-- does not match LIKE expression
 create operator pg_catalog.!~~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.textnlike
 );
 
+-- does not match LIKE expression
 create operator pg_catalog.!~~ (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.namenlike
 );
 
+-- does not match LIKE expression
 create operator pg_catalog.!~~ (
   leftarg = character,
   rightarg = text,
   function = pg_catalog.bpcharnlike
 );
 
+-- does not match LIKE expression, case-insensitive
 create operator pg_catalog.!~~* (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameicnlike
 );
 
+-- does not match LIKE expression, case-insensitive
 create operator pg_catalog.!~~* (
   leftarg = character,
   rightarg = text,
   function = pg_catalog.bpcharicnlike
 );
 
+-- does not match LIKE expression, case-insensitive
 create operator pg_catalog.!~~* (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.texticnlike
 );
 
+-- box intersection
 create operator pg_catalog.# (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_intersect
 );
 
+-- intersection point
 create operator pg_catalog.# (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_interpt
 );
 
+-- number of points
 create operator pg_catalog.# (
   rightarg = path,
   function = pg_catalog.path_npoints
 );
 
+-- number of points
 create operator pg_catalog.# (
   rightarg = polygon,
   function = pg_catalog.poly_npoints
 );
 
+-- intersection point
 create operator pg_catalog.# (
   leftarg = line,
   rightarg = line,
   function = pg_catalog.line_interpt
 );
 
+-- bitwise exclusive or
 create operator pg_catalog.# (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitxor
 );
 
+-- bitwise exclusive or
 create operator pg_catalog.# (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2xor
 );
 
+-- bitwise exclusive or
 create operator pg_catalog.# (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4xor
 );
 
+-- bitwise exclusive or
 create operator pg_catalog.# (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8xor
 );
 
+-- closest point to A on B
 create operator pg_catalog.## (
   leftarg = point,
   rightarg = box,
   function = pg_catalog.close_pb
 );
 
+-- closest point to A on B
 create operator pg_catalog.## (
   leftarg = lseg,
   rightarg = box,
   function = pg_catalog.close_sb
 );
 
+-- closest point to A on B
 create operator pg_catalog.## (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.close_lseg
 );
 
+-- closest point to A on B
 create operator pg_catalog.## (
   leftarg = line,
   rightarg = lseg,
   function = pg_catalog.close_ls
 );
 
+-- closest point to A on B
 create operator pg_catalog.## (
   leftarg = point,
   rightarg = lseg,
   function = pg_catalog.close_ps
 );
 
+-- closest point to A on B
 create operator pg_catalog.## (
   leftarg = point,
   rightarg = line,
   function = pg_catalog.close_pl
 );
 
+-- delete path
 create operator pg_catalog.#- (
   leftarg = jsonb,
   rightarg = text[],
   function = pg_catalog.jsonb_delete_path
 );
 
+-- get value from json with path elements
 create operator pg_catalog.#> (
   leftarg = json,
   rightarg = text[],
   function = pg_catalog.json_extract_path
 );
 
+-- get value from jsonb with path elements
 create operator pg_catalog.#> (
   leftarg = jsonb,
   rightarg = text[],
   function = pg_catalog.jsonb_extract_path
 );
 
+-- get value from json as text with path elements
 create operator pg_catalog.#>> (
   leftarg = json,
   rightarg = text[],
   function = pg_catalog.json_extract_path_text
 );
 
+-- get value from jsonb as text with path elements
 create operator pg_catalog.#>> (
   leftarg = jsonb,
   rightarg = text[],
   function = pg_catalog.jsonb_extract_path_text
 );
 
+-- modulus
 create operator pg_catalog.% (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2mod
 );
 
+-- modulus
 create operator pg_catalog.% (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4mod
 );
 
+-- modulus
 create operator pg_catalog.% (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8mod
 );
 
+-- modulus
 create operator pg_catalog.% (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_mod
 );
 
+-- bitwise and
 create operator pg_catalog.& (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8and
 );
 
+-- bitwise and
 create operator pg_catalog.& (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.inetand
 );
 
+-- bitwise and
 create operator pg_catalog.& (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2and
 );
 
+-- bitwise and
 create operator pg_catalog.& (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_and
 );
 
+-- bitwise and
 create operator pg_catalog.& (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitand
 );
 
+-- bitwise and
 create operator pg_catalog.& (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_and
 );
 
+-- bitwise and
 create operator pg_catalog.& (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4and
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_overlaps_multirange
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.arrayoverlap
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_overlaps_multirange
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_overlap
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_overlap
 );
 
+-- overlaps (is subnet or supernet)
 create operator pg_catalog.&& (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_overlap
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_overlaps
 );
 
+-- AND-concatenate
 create operator pg_catalog.&& (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_and
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_overlap
 );
 
+-- overlaps
 create operator pg_catalog.&& (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_overlaps_range
 );
 
+-- overlaps or is left of
 create operator pg_catalog.&< (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_overleft
 );
 
+-- overlaps or is left of
 create operator pg_catalog.&< (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_overleft
 );
 
+-- overlaps or is left of
 create operator pg_catalog.&< (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_overleft
 );
 
+-- overlaps or is left of
 create operator pg_catalog.&< (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_overleft_multirange
 );
 
+-- overlaps or is left of
 create operator pg_catalog.&< (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_overleft_range
 );
 
+-- overlaps or is left of
 create operator pg_catalog.&< (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_overleft_multirange
 );
 
+-- overlaps or is left of
 create operator pg_catalog.&< (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_overleft
 );
 
+-- overlaps or is below
 create operator pg_catalog.&<| (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_overbelow
 );
 
+-- overlaps or is below
 create operator pg_catalog.&<| (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_overbelow
 );
 
+-- overlaps or is below
 create operator pg_catalog.&<| (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_overbelow
 );
 
+-- overlaps or is right of
 create operator pg_catalog.&> (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_overright
 );
 
+-- overlaps or is right of
 create operator pg_catalog.&> (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_overright
 );
 
+-- overlaps or is right of
 create operator pg_catalog.&> (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_overright_multirange
 );
 
+-- overlaps or is right of
 create operator pg_catalog.&> (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_overright
 );
 
+-- overlaps or is right of
 create operator pg_catalog.&> (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_overright_range
 );
 
+-- overlaps or is right of
 create operator pg_catalog.&> (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_overright_multirange
 );
 
+-- overlaps or is right of
 create operator pg_catalog.&> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_overright
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = real,
   rightarg = money,
   function = pg_catalog.flt4_mul_cash
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = money,
   rightarg = real,
   function = pg_catalog.cash_mul_flt4
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42mul
 );
 
+-- range intersection
 create operator pg_catalog.* (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_intersect
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = double precision,
   rightarg = interval,
   function = pg_catalog.mul_d_interval
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = interval,
   rightarg = double precision,
   function = pg_catalog.interval_mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84mul
 );
 
+-- multiply points (scale/rotate)
 create operator pg_catalog.* (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_mul
 );
 
+-- multiply (rotate/scale path)
 create operator pg_catalog.* (
   leftarg = path,
   rightarg = point,
   function = pg_catalog.path_mul_pt
 );
 
+-- multirange intersect
 create operator pg_catalog.* (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_intersect
 );
 
+-- multiply box by point (scale)
 create operator pg_catalog.* (
   leftarg = box,
   rightarg = point,
   function = pg_catalog.box_mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = circle,
   rightarg = point,
   function = pg_catalog.circle_mul_pt
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8mul
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = double precision,
   rightarg = money,
   function = pg_catalog.flt8_mul_cash
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = money,
   rightarg = double precision,
   function = pg_catalog.cash_mul_flt8
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = money,
   rightarg = smallint,
   function = pg_catalog.cash_mul_int2
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = money,
   rightarg = integer,
   function = pg_catalog.cash_mul_int4
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = money,
   rightarg = bigint,
   function = pg_catalog.cash_mul_int8
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = smallint,
   rightarg = money,
   function = pg_catalog.int2_mul_cash
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = integer,
   rightarg = money,
   function = pg_catalog.int4_mul_cash
 );
 
+-- multiply
 create operator pg_catalog.* (
   leftarg = bigint,
   rightarg = money,
   function = pg_catalog.int8_mul_cash
 );
 
+-- less than
 create operator pg_catalog.*< (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_image_lt
 );
 
+-- less than or equal
 create operator pg_catalog.*<= (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_image_le
 );
 
+-- not identical
 create operator pg_catalog.*<> (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_image_ne
 );
 
+-- identical
 create operator pg_catalog.*= (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_image_eq
 );
 
+-- greater than
 create operator pg_catalog.*> (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_image_gt
 );
 
+-- greater than or equal
 create operator pg_catalog.*>= (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_image_ge
 );
 
+-- convert date and time to timestamp
 create operator pg_catalog.+ (
   leftarg = date,
   rightarg = time without time zone,
   function = pg_catalog.datetime_pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = numeric,
   rightarg = pg_lsn,
   function = pg_catalog.numeric_pl_pg_lsn
 );
 
+-- convert time and date to timestamp
 create operator pg_catalog.+ (
   leftarg = time without time zone,
   rightarg = date,
   function = pg_catalog.timedate_pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48pl
 );
 
+-- convert time with time zone and date to timestamp with time zone
 create operator pg_catalog.+ (
   leftarg = time with time zone,
   rightarg = date,
   function = pg_catalog.timetzdate_pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = timestamp with time zone,
   rightarg = interval,
   function = pg_catalog.timestamptz_pl_interval
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = inet,
   rightarg = bigint,
   function = pg_catalog.inetpl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_pl
 );
 
+-- unary plus
 create operator pg_catalog.+ (
   rightarg = double precision,
   function = pg_catalog.float8up
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = interval,
   rightarg = time without time zone,
   function = pg_catalog.interval_pl_time
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = interval,
   rightarg = date,
   function = pg_catalog.interval_pl_date
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = interval,
   rightarg = time with time zone,
   function = pg_catalog.interval_pl_timetz
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = circle,
   rightarg = point,
   function = pg_catalog.circle_add_pt
 );
 
+-- unary plus
 create operator pg_catalog.+ (
   rightarg = numeric,
   function = pg_catalog.numeric_uplus
 );
 
+-- range union
 create operator pg_catalog.+ (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_union
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = pg_lsn,
   rightarg = numeric,
   function = pg_catalog.pg_lsn_pli
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = integer,
   rightarg = date,
   function = pg_catalog.integer_pl_date
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = date,
   rightarg = integer,
   function = pg_catalog.date_pli
 );
 
+-- add points (translate)
 create operator pg_catalog.+ (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_add
 );
 
+-- unary plus
 create operator pg_catalog.+ (
   rightarg = bigint,
   function = pg_catalog.int8up
 );
 
+-- add/update ACL item
 create operator pg_catalog.+ (
   leftarg = aclitem[],
   rightarg = aclitem,
   function = pg_catalog.aclinsert
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = timestamp without time zone,
   rightarg = interval,
   function = pg_catalog.timestamp_pl_interval
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = time with time zone,
   rightarg = interval,
   function = pg_catalog.timetz_pl_interval
 );
 
+-- unary plus
 create operator pg_catalog.+ (
   rightarg = smallint,
   function = pg_catalog.int2up
 );
 
+-- unary plus
 create operator pg_catalog.+ (
   rightarg = integer,
   function = pg_catalog.int4up
 );
 
+-- add (translate path)
 create operator pg_catalog.+ (
   leftarg = path,
   rightarg = point,
   function = pg_catalog.path_add_pt
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = time without time zone,
   rightarg = interval,
   function = pg_catalog.time_pl_interval
 );
 
+-- concatenate
 create operator pg_catalog.+ (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_add
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = interval,
   rightarg = timestamp without time zone,
   function = pg_catalog.interval_pl_timestamp
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = interval,
   rightarg = timestamp with time zone,
   function = pg_catalog.interval_pl_timestamptz
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82pl
 );
 
+-- add point to box (translate)
 create operator pg_catalog.+ (
   leftarg = box,
   rightarg = point,
   function = pg_catalog.box_add
 );
 
+-- convert date and time with time zone to timestamp with time zone
 create operator pg_catalog.+ (
   leftarg = date,
   rightarg = time with time zone,
   function = pg_catalog.datetimetz_pl
 );
 
+-- unary plus
 create operator pg_catalog.+ (
   rightarg = real,
   function = pg_catalog.float4up
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = bigint,
   rightarg = inet,
   function = pg_catalog.int8pl_inet
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_add
 );
 
+-- multirange union
 create operator pg_catalog.+ (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_union
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8pl
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = date,
   rightarg = interval,
   function = pg_catalog.date_pl_interval
 );
 
+-- add
 create operator pg_catalog.+ (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84pl
 );
 
+-- negate
 create operator pg_catalog.- (
   rightarg = real,
   function = pg_catalog.float4um
 );
 
+-- negate
 create operator pg_catalog.- (
   rightarg = integer,
   function = pg_catalog.int4um
 );
 
+-- negate
 create operator pg_catalog.- (
   rightarg = smallint,
   function = pg_catalog.int2um
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = date,
   rightarg = date,
   function = pg_catalog.date_mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8mi
 );
 
+-- negate
 create operator pg_catalog.- (
   rightarg = double precision,
   function = pg_catalog.float8um
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = time without time zone,
   rightarg = time without time zone,
   function = pg_catalog.time_mi_time
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.inetmi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = inet,
   rightarg = bigint,
   function = pg_catalog.inetmi_int8
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = timestamp without time zone,
   rightarg = interval,
   function = pg_catalog.timestamp_mi_interval
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = date,
   rightarg = interval,
   function = pg_catalog.date_mi_interval
 );
 
+-- minus
 create operator pg_catalog.- (
   leftarg = pg_lsn,
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = pg_lsn,
   rightarg = numeric,
   function = pg_catalog.pg_lsn_mii
 );
 
+-- remove ACL item
 create operator pg_catalog.- (
   leftarg = aclitem[],
   rightarg = aclitem,
   function = pg_catalog.aclremove
 );
 
+-- negate
 create operator pg_catalog.- (
   rightarg = bigint,
   function = pg_catalog.int8um
 );
 
+-- delete object field
 create operator pg_catalog.- (
   leftarg = jsonb,
   rightarg = text,
   function = pg_catalog.jsonb_delete
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8mi
 );
 
+-- delete array element
 create operator pg_catalog.- (
   leftarg = jsonb,
   rightarg = integer,
   function = pg_catalog.jsonb_delete
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84mi
 );
 
+-- delete object fields
 create operator pg_catalog.- (
   leftarg = jsonb,
   rightarg = text[],
   function = pg_catalog.jsonb_delete
 );
 
+-- multirange minus
 create operator pg_catalog.- (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_minus
 );
 
+-- subtract points (translate)
 create operator pg_catalog.- (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_sub
 );
 
+-- subtract (translate path)
 create operator pg_catalog.- (
   leftarg = path,
   rightarg = point,
   function = pg_catalog.path_sub_pt
 );
 
+-- subtract point from box (translate)
 create operator pg_catalog.- (
   leftarg = box,
   rightarg = point,
   function = pg_catalog.box_sub
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = timestamp with time zone,
   rightarg = interval,
   function = pg_catalog.timestamptz_mi_interval
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_mi
 );
 
+-- negate
 create operator pg_catalog.- (
   rightarg = interval,
   function = pg_catalog.interval_um
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = circle,
   rightarg = point,
   function = pg_catalog.circle_sub_pt
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = date,
   rightarg = integer,
   function = pg_catalog.date_mii
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42mi
 );
 
+-- range difference
 create operator pg_catalog.- (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_minus
 );
 
+-- negate
 create operator pg_catalog.- (
   rightarg = numeric,
   function = pg_catalog.numeric_uminus
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = time with time zone,
   rightarg = interval,
   function = pg_catalog.timetz_mi_interval
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = time without time zone,
   rightarg = interval,
   function = pg_catalog.time_mi_interval
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4mi
 );
 
+-- subtract
 create operator pg_catalog.- (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_sub
 );
 
+-- get json array element
 create operator pg_catalog.-> (
   leftarg = json,
   rightarg = integer,
   function = pg_catalog.json_array_element
 );
 
+-- get json object field
 create operator pg_catalog.-> (
   leftarg = json,
   rightarg = text,
   function = pg_catalog.json_object_field
 );
 
+-- get jsonb array element
 create operator pg_catalog.-> (
   leftarg = jsonb,
   rightarg = integer,
   function = pg_catalog.jsonb_array_element
 );
 
+-- get jsonb object field
 create operator pg_catalog.-> (
   leftarg = jsonb,
   rightarg = text,
   function = pg_catalog.jsonb_object_field
 );
 
+-- get jsonb object field as text
 create operator pg_catalog.->> (
   leftarg = jsonb,
   rightarg = text,
   function = pg_catalog.jsonb_object_field_text
 );
 
+-- get json object field as text
 create operator pg_catalog.->> (
   leftarg = json,
   rightarg = text,
   function = pg_catalog.json_object_field_text
 );
 
+-- get json array element as text
 create operator pg_catalog.->> (
   leftarg = json,
   rightarg = integer,
   function = pg_catalog.json_array_element_text
 );
 
+-- get jsonb array element as text
 create operator pg_catalog.->> (
   leftarg = jsonb,
   rightarg = integer,
   function = pg_catalog.jsonb_array_element_text
 );
 
+-- is adjacent to
 create operator pg_catalog.-|- (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_adjacent_multirange
 );
 
+-- is adjacent to
 create operator pg_catalog.-|- (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_adjacent
 );
 
+-- is adjacent to
 create operator pg_catalog.-|- (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_adjacent_range
 );
 
+-- is adjacent to
 create operator pg_catalog.-|- (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_adjacent_multirange
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = money,
   rightarg = bigint,
   function = pg_catalog.cash_div_int8
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = interval,
   rightarg = double precision,
   function = pg_catalog.interval_div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = money,
   rightarg = integer,
   function = pg_catalog.cash_div_int4
 );
 
+-- divide (rotate/scale path)
 create operator pg_catalog./ (
   leftarg = path,
   rightarg = point,
   function = pg_catalog.path_div_pt
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = money,
   rightarg = smallint,
   function = pg_catalog.cash_div_int2
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48div
 );
 
+-- divide points (scale/rotate)
 create operator pg_catalog./ (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = circle,
   rightarg = point,
   function = pg_catalog.circle_div_pt
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = money,
   rightarg = real,
   function = pg_catalog.cash_div_flt4
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28div
 );
 
+-- divide box by point (scale)
 create operator pg_catalog./ (
   leftarg = box,
   rightarg = point,
   function = pg_catalog.box_div
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = money,
   rightarg = double precision,
   function = pg_catalog.cash_div_flt8
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_div_cash
 );
 
+-- divide
 create operator pg_catalog./ (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8div
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = name,
   rightarg = name,
   function = pg_catalog.namelt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = bit varying,
   rightarg = bit varying,
   function = pg_catalog.varbitlt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = oid,
   rightarg = oid,
   function = pg_catalog.oidlt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = date,
   rightarg = timestamp without time zone,
   function = pg_catalog.date_lt_timestamp
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = text,
   rightarg = name,
   function = pg_catalog.textltname
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.bytealt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = date,
   rightarg = timestamp with time zone,
   function = pg_catalog.date_lt_timestamptz
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = timestamp without time zone,
   rightarg = date,
   function = pg_catalog.timestamp_lt_date
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitlt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = timestamp with time zone,
   rightarg = date,
   function = pg_catalog.timestamptz_lt_date
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = timestamp without time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamp_lt_timestamptz
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_n_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = "char",
   rightarg = "char",
   function = pg_catalog.charlt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = timestamp with time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamptz_lt_timestamp
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.array_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = pg_lsn,
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_lt
 );
 
+-- less than by length
 create operator pg_catalog.< (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpcharlt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.namelttext
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = time without time zone,
   rightarg = time without time zone,
   function = pg_catalog.time_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = date,
   rightarg = date,
   function = pg_catalog.date_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_lt
 );
 
+-- less than by area
 create operator pg_catalog.< (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_lt
 );
 
+-- less than by area
 create operator pg_catalog.< (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = time with time zone,
   rightarg = time with time zone,
   function = pg_catalog.timetz_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = boolean,
   rightarg = boolean,
   function = pg_catalog.boollt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = tsvector,
   rightarg = tsvector,
   function = pg_catalog.tsvector_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = xid8,
   rightarg = xid8,
   function = pg_catalog.xid8lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = tid,
   rightarg = tid,
   function = pg_catalog.tidlt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = anyenum,
   rightarg = anyenum,
   function = pg_catalog.enum_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = uuid,
   rightarg = uuid,
   function = pg_catalog.uuid_lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = oidvector,
   rightarg = oidvector,
   function = pg_catalog.oidvectorlt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24lt
 );
 
+-- less than
 create operator pg_catalog.< (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48lt
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = point,
   rightarg = lseg,
   function = pg_catalog.dist_ps
 );
 
+-- phrase-concatenate
 create operator pg_catalog.<-> (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_phrase
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = circle,
   rightarg = point,
   function = pg_catalog.dist_cpoint
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = line,
   rightarg = line,
   function = pg_catalog.line_distance
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_distance
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = point,
   rightarg = line,
   function = pg_catalog.dist_pl
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = line,
   rightarg = point,
   function = pg_catalog.dist_lp
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_distance
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = lseg,
   rightarg = line,
   function = pg_catalog.dist_sl
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = point,
   rightarg = circle,
   function = pg_catalog.dist_pc
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = line,
   rightarg = lseg,
   function = pg_catalog.dist_ls
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = circle,
   rightarg = polygon,
   function = pg_catalog.dist_cpoly
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_distance
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = polygon,
   rightarg = circle,
   function = pg_catalog.dist_polyc
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = path,
   rightarg = point,
   function = pg_catalog.dist_pathp
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = point,
   rightarg = path,
   function = pg_catalog.dist_ppath
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_distance
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_distance
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = box,
   rightarg = lseg,
   function = pg_catalog.dist_bs
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = point,
   rightarg = polygon,
   function = pg_catalog.dist_ppoly
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = polygon,
   rightarg = point,
   function = pg_catalog.dist_polyp
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = lseg,
   rightarg = box,
   function = pg_catalog.dist_sb
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = box,
   rightarg = point,
   function = pg_catalog.dist_bp
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = point,
   rightarg = box,
   function = pg_catalog.dist_pb
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = lseg,
   rightarg = point,
   function = pg_catalog.dist_sp
 );
 
+-- distance between
 create operator pg_catalog.<-> (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_distance
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_left
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_left
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_left
 );
 
+-- is subnet
 create operator pg_catalog.<< (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_sub
 );
 
+-- bitwise shift left
 create operator pg_catalog.<< (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4shl
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_before_multirange
 );
 
+-- bitwise shift left
 create operator pg_catalog.<< (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int8shl
 );
 
+-- bitwise shift left
 create operator pg_catalog.<< (
   leftarg = bit,
   rightarg = integer,
   function = pg_catalog.bitshiftleft
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_left
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_before
 );
 
+-- bitwise shift left
 create operator pg_catalog.<< (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int2shl
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_before_multirange
 );
 
+-- is left of
 create operator pg_catalog.<< (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_before_range
 );
 
+-- is subnet or equal
 create operator pg_catalog.<<= (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_subeq
 );
 
+-- is below
 create operator pg_catalog.<<| (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_below
 );
 
+-- is below
 create operator pg_catalog.<<| (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_below
 );
 
+-- is below
 create operator pg_catalog.<<| (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_below
 );
 
+-- is below
 create operator pg_catalog.<<| (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_below
 );
 
+-- less than or equal by area
 create operator pg_catalog.<= (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = boolean,
   rightarg = boolean,
   function = pg_catalog.boolle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = xid8,
   rightarg = xid8,
   function = pg_catalog.xid8le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = name,
   rightarg = name,
   function = pg_catalog.namele
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = oid,
   rightarg = oid,
   function = pg_catalog.oidle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_n_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = "char",
   rightarg = "char",
   function = pg_catalog.charle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpcharle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = date,
   rightarg = date,
   function = pg_catalog.date_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = time without time zone,
   rightarg = time without time zone,
   function = pg_catalog.time_le
 );
 
+-- less than or equal by area
 create operator pg_catalog.<= (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = tsvector,
   rightarg = tsvector,
   function = pg_catalog.tsvector_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = anyenum,
   rightarg = anyenum,
   function = pg_catalog.enum_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = tid,
   rightarg = tid,
   function = pg_catalog.tidle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = time with time zone,
   rightarg = time with time zone,
   function = pg_catalog.timetz_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = pg_lsn,
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = oidvector,
   rightarg = oidvector,
   function = pg_catalog.oidvectorle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = uuid,
   rightarg = uuid,
   function = pg_catalog.uuid_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4le
 );
 
+-- less than or equal by length
 create operator pg_catalog.<= (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = timestamp with time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamptz_le_timestamp
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = timestamp without time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamp_le_timestamptz
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = timestamp with time zone,
   rightarg = date,
   function = pg_catalog.timestamptz_le_date
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.array_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = timestamp without time zone,
   rightarg = date,
   function = pg_catalog.timestamp_le_date
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = date,
   rightarg = timestamp with time zone,
   function = pg_catalog.date_le_timestamptz
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = text,
   rightarg = name,
   function = pg_catalog.textlename
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = date,
   rightarg = timestamp without time zone,
   function = pg_catalog.date_le_timestamp
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = bit varying,
   rightarg = bit varying,
   function = pg_catalog.varbitle
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameletext
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.byteale
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24le
 );
 
+-- less than or equal
 create operator pg_catalog.<= (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42le
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = pg_lsn,
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.array_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.namenetext
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.textne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = xid,
   rightarg = integer,
   function = pg_catalog.xidneqint4
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = tid,
   rightarg = tid,
   function = pg_catalog.tidne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = oidvector,
   rightarg = oidvector,
   function = pg_catalog.oidvectorne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = time with time zone,
   rightarg = time with time zone,
   function = pg_catalog.timetz_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = anyenum,
   rightarg = anyenum,
   function = pg_catalog.enum_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = tsvector,
   rightarg = tsvector,
   function = pg_catalog.tsvector_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = uuid,
   rightarg = uuid,
   function = pg_catalog.uuid_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = bit varying,
   rightarg = bit varying,
   function = pg_catalog.varbitne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = time without time zone,
   rightarg = time without time zone,
   function = pg_catalog.time_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_ne
 );
 
+-- not equal by area
 create operator pg_catalog.<> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = date,
   rightarg = date,
   function = pg_catalog.date_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpcharne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = boolean,
   rightarg = boolean,
   function = pg_catalog.boolne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = timestamp with time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamptz_ne_timestamp
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = timestamp without time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamp_ne_timestamptz
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = text,
   rightarg = name,
   function = pg_catalog.textnename
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.byteane
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = "char",
   rightarg = "char",
   function = pg_catalog.charne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = timestamp with time zone,
   rightarg = date,
   function = pg_catalog.timestamptz_ne_date
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = name,
   rightarg = name,
   function = pg_catalog.namene
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = timestamp without time zone,
   rightarg = date,
   function = pg_catalog.timestamp_ne_date
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = date,
   rightarg = timestamp with time zone,
   function = pg_catalog.date_ne_timestamptz
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24ne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = xid,
   rightarg = xid,
   function = pg_catalog.xidneq
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = date,
   rightarg = timestamp without time zone,
   function = pg_catalog.date_ne_timestamp
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = oid,
   rightarg = oid,
   function = pg_catalog.oidne
 );
 
+-- not equal
 create operator pg_catalog.<> (
   leftarg = xid8,
   rightarg = xid8,
   function = pg_catalog.xid8ne
 );
 
+-- point within closed path, or point on open path
 create operator pg_catalog.<@ (
   leftarg = point,
   rightarg = path,
   function = pg_catalog.on_ppath
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = point,
   rightarg = polygon,
   function = pg_catalog.pt_contained_poly
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_contained
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = lseg,
   rightarg = box,
   function = pg_catalog.on_sb
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_contained_by
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = point,
   rightarg = lseg,
   function = pg_catalog.on_ps
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_contained_by_range
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_contained
 );
 
+-- lseg on line
 create operator pg_catalog.<@ (
   leftarg = lseg,
   rightarg = line,
   function = pg_catalog.on_sl
 );
 
+-- point on line
 create operator pg_catalog.<@ (
   leftarg = point,
   rightarg = line,
   function = pg_catalog.on_pl
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.arraycontained
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_contained_by_multirange
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsq_mcontained
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_contained
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = anyelement,
   rightarg = anymultirange,
   function = pg_catalog.elem_contained_by_multirange
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_contained_by_multirange
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = point,
   rightarg = circle,
   function = pg_catalog.pt_contained_circle
 );
 
+-- point inside box
 create operator pg_catalog.<@ (
   leftarg = point,
   rightarg = box,
   function = pg_catalog.on_pb
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = anyelement,
   rightarg = anyrange,
   function = pg_catalog.elem_contained_by_range
 );
 
+-- is contained by
 create operator pg_catalog.<@ (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_contained
 );
 
+-- deprecated, use <<| instead
 create operator pg_catalog.<^ (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_below
 );
 
+-- is below (allows touching)
 create operator pg_catalog.<^ (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_below_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.array_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_n_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = aclitem,
   rightarg = aclitem,
   function = pg_catalog.aclitemeq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpchareq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = date,
   rightarg = date,
   function = pg_catalog.date_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = time without time zone,
   rightarg = time without time zone,
   function = pg_catalog.time_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = tid,
   rightarg = tid,
   function = pg_catalog.tideq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = xid,
   rightarg = integer,
   function = pg_catalog.xideqint4
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = time with time zone,
   rightarg = time with time zone,
   function = pg_catalog.timetz_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4eq
 );
 
+-- equal by area
 create operator pg_catalog.= (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = line,
   rightarg = line,
   function = pg_catalog.line_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.biteq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = text,
   rightarg = name,
   function = pg_catalog.texteqname
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = bit varying,
   rightarg = bit varying,
   function = pg_catalog.varbiteq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameeqtext
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = oid,
   rightarg = oid,
   function = pg_catalog.oideq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.byteaeq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = oidvector,
   rightarg = oidvector,
   function = pg_catalog.oidvectoreq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = date,
   rightarg = timestamp without time zone,
   function = pg_catalog.date_eq_timestamp
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = date,
   rightarg = timestamp with time zone,
   function = pg_catalog.date_eq_timestamptz
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = timestamp without time zone,
   rightarg = date,
   function = pg_catalog.timestamp_eq_date
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = timestamp with time zone,
   rightarg = date,
   function = pg_catalog.timestamptz_eq_date
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = timestamp without time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamp_eq_timestamptz
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = timestamp with time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamptz_eq_timestamp
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = "char",
   rightarg = "char",
   function = pg_catalog.chareq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = boolean,
   rightarg = boolean,
   function = pg_catalog.booleq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = uuid,
   rightarg = uuid,
   function = pg_catalog.uuid_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = pg_lsn,
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = anyenum,
   rightarg = anyenum,
   function = pg_catalog.enum_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = tsvector,
   rightarg = tsvector,
   function = pg_catalog.tsvector_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_eq
 );
 
+-- equal by area
 create operator pg_catalog.= (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = cid,
   rightarg = cid,
   function = pg_catalog.cideq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = xid8,
   rightarg = xid8,
   function = pg_catalog.xid8eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = xid,
   rightarg = xid,
   function = pg_catalog.xideq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.texteq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2eq
 );
 
+-- equal
 create operator pg_catalog.= (
   leftarg = name,
   rightarg = name,
   function = pg_catalog.nameeq
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = date,
   rightarg = timestamp with time zone,
   function = pg_catalog.date_gt_timestamptz
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_n_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = text,
   rightarg = name,
   function = pg_catalog.textgtname
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitgt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.array_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = timestamp without time zone,
   rightarg = date,
   function = pg_catalog.timestamp_gt_date
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4gt
 );
 
+-- greater than by area
 create operator pg_catalog.> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_gt
 );
 
+-- greater than by length
 create operator pg_catalog.> (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = timestamp with time zone,
   rightarg = date,
   function = pg_catalog.timestamptz_gt_date
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = timestamp with time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamptz_gt_timestamp
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = timestamp without time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamp_gt_timestamptz
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = xid8,
   rightarg = xid8,
   function = pg_catalog.xid8gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = "char",
   rightarg = "char",
   function = pg_catalog.chargt
 );
 
+-- greater than by area
 create operator pg_catalog.> (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.byteagt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpchargt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = date,
   rightarg = date,
   function = pg_catalog.date_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = time without time zone,
   rightarg = time without time zone,
   function = pg_catalog.time_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = bit varying,
   rightarg = bit varying,
   function = pg_catalog.varbitgt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = name,
   rightarg = name,
   function = pg_catalog.namegt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = oid,
   rightarg = oid,
   function = pg_catalog.oidgt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.namegttext
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = boolean,
   rightarg = boolean,
   function = pg_catalog.boolgt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = tsvector,
   rightarg = tsvector,
   function = pg_catalog.tsvector_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = tid,
   rightarg = tid,
   function = pg_catalog.tidgt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = anyenum,
   rightarg = anyenum,
   function = pg_catalog.enum_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = time with time zone,
   rightarg = time with time zone,
   function = pg_catalog.timetz_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = pg_lsn,
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = oidvector,
   rightarg = oidvector,
   function = pg_catalog.oidvectorgt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = date,
   rightarg = timestamp without time zone,
   function = pg_catalog.date_gt_timestamp
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = uuid,
   rightarg = uuid,
   function = pg_catalog.uuid_gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2gt
 );
 
+-- greater than
 create operator pg_catalog.> (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_gt
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = interval,
   rightarg = interval,
   function = pg_catalog.interval_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = integer,
   rightarg = smallint,
   function = pg_catalog.int42ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int24ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.byteage
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = bit varying,
   rightarg = bit varying,
   function = pg_catalog.varbitge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = oid,
   rightarg = oid,
   function = pg_catalog.oidge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.namegetext
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = date,
   rightarg = timestamp without time zone,
   function = pg_catalog.date_ge_timestamp
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = date,
   rightarg = timestamp with time zone,
   function = pg_catalog.date_ge_timestamptz
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = text,
   rightarg = name,
   function = pg_catalog.textgename
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = xid8,
   rightarg = xid8,
   function = pg_catalog.xid8ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = timestamp without time zone,
   rightarg = date,
   function = pg_catalog.timestamp_ge_date
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = timestamp with time zone,
   rightarg = date,
   function = pg_catalog.timestamptz_ge_date
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = timestamp without time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamp_ge_timestamptz
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = name,
   rightarg = name,
   function = pg_catalog.namege
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = timestamp with time zone,
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamptz_ge_timestamp
 );
 
+-- greater than or equal by length
 create operator pg_catalog.>= (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4ge
 );
 
+-- greater than or equal by area
 create operator pg_catalog.>= (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = uuid,
   rightarg = uuid,
   function = pg_catalog.uuid_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = real,
   rightarg = real,
   function = pg_catalog.float4ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = pg_lsn,
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.float8ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = time with time zone,
   rightarg = time with time zone,
   function = pg_catalog.timetz_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = tid,
   rightarg = tid,
   function = pg_catalog.tidge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = anyenum,
   rightarg = anyenum,
   function = pg_catalog.enum_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = real,
   rightarg = double precision,
   function = pg_catalog.float48ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.array_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = tsvector,
   rightarg = tsvector,
   function = pg_catalog.tsvector_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = double precision,
   rightarg = real,
   function = pg_catalog.float84ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = time without time zone,
   rightarg = time without time zone,
   function = pg_catalog.time_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = date,
   rightarg = date,
   function = pg_catalog.date_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpcharge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = record,
   rightarg = record,
   function = pg_catalog.record_ge
 );
 
+-- greater than or equal by area
 create operator pg_catalog.>= (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = oidvector,
   rightarg = oidvector,
   function = pg_catalog.oidvectorge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = "char",
   rightarg = "char",
   function = pg_catalog.charge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_n_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = money,
   rightarg = money,
   function = pg_catalog.cash_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = boolean,
   rightarg = boolean,
   function = pg_catalog.boolge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int84ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = smallint,
   rightarg = bigint,
   function = pg_catalog.int28ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = bigint,
   rightarg = smallint,
   function = pg_catalog.int82ge
 );
 
+-- greater than or equal
 create operator pg_catalog.>= (
   leftarg = integer,
   rightarg = bigint,
   function = pg_catalog.int48ge
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_right
 );
 
+-- bitwise shift right
 create operator pg_catalog.>> (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4shr
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_right
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_after
 );
 
+-- bitwise shift right
 create operator pg_catalog.>> (
   leftarg = bit,
   rightarg = integer,
   function = pg_catalog.bitshiftright
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_after_multirange
 );
 
+-- bitwise shift right
 create operator pg_catalog.>> (
   leftarg = bigint,
   rightarg = integer,
   function = pg_catalog.int8shr
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_after_multirange
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_after_range
 );
 
+-- bitwise shift right
 create operator pg_catalog.>> (
   leftarg = smallint,
   rightarg = integer,
   function = pg_catalog.int2shr
 );
 
+-- is supernet
 create operator pg_catalog.>> (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_sup
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_right
 );
 
+-- is right of
 create operator pg_catalog.>> (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_right
 );
 
+-- is supernet or equal
 create operator pg_catalog.>>= (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.network_supeq
 );
 
+-- is above (allows touching)
 create operator pg_catalog.>^ (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_above_eq
 );
 
+-- deprecated, use |>> instead
 create operator pg_catalog.>^ (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_above
 );
 
+-- key exists
 create operator pg_catalog.? (
   leftarg = jsonb,
   rightarg = text,
   function = pg_catalog.jsonb_exists
 );
 
+-- intersect
 create operator pg_catalog.?# (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_intersect
 );
 
+-- intersect
 create operator pg_catalog.?# (
   leftarg = lseg,
   rightarg = box,
   function = pg_catalog.inter_sb
 );
 
+-- intersect
 create operator pg_catalog.?# (
   leftarg = line,
   rightarg = box,
   function = pg_catalog.inter_lb
 );
 
+-- deprecated, use && instead
 create operator pg_catalog.?# (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_overlap
 );
 
+-- intersect
 create operator pg_catalog.?# (
   leftarg = line,
   rightarg = line,
   function = pg_catalog.line_intersect
 );
 
+-- intersect
 create operator pg_catalog.?# (
   leftarg = path,
   rightarg = path,
   function = pg_catalog.path_inter
 );
 
+-- intersect
 create operator pg_catalog.?# (
   leftarg = lseg,
   rightarg = line,
   function = pg_catalog.inter_sl
 );
 
+-- all keys exist
 create operator pg_catalog.?& (
   leftarg = jsonb,
   rightarg = text[],
   function = pg_catalog.jsonb_exists_all
 );
 
+-- horizontal
 create operator pg_catalog.?- (
   rightarg = line,
   function = pg_catalog.line_horizontal
 );
 
+-- horizontally aligned
 create operator pg_catalog.?- (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_horiz
 );
 
+-- horizontal
 create operator pg_catalog.?- (
   rightarg = lseg,
   function = pg_catalog.lseg_horizontal
 );
 
+-- perpendicular
 create operator pg_catalog.?-| (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_perp
 );
 
+-- perpendicular
 create operator pg_catalog.?-| (
   leftarg = line,
   rightarg = line,
   function = pg_catalog.line_perp
 );
 
+-- vertical
 create operator pg_catalog.?| (
   rightarg = line,
   function = pg_catalog.line_vertical
 );
 
+-- vertical
 create operator pg_catalog.?| (
   rightarg = lseg,
   function = pg_catalog.lseg_vertical
 );
 
+-- any key exists
 create operator pg_catalog.?| (
   leftarg = jsonb,
   rightarg = text[],
   function = pg_catalog.jsonb_exists_any
 );
 
+-- vertically aligned
 create operator pg_catalog.?| (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_vert
 );
 
+-- parallel
 create operator pg_catalog.?|| (
   leftarg = line,
   rightarg = line,
   function = pg_catalog.line_parallel
 );
 
+-- parallel
 create operator pg_catalog.?|| (
   leftarg = lseg,
   rightarg = lseg,
   function = pg_catalog.lseg_parallel
 );
 
+-- absolute value
 create operator pg_catalog.@ (
   rightarg = double precision,
   function = pg_catalog.float8abs
 );
 
+-- absolute value
 create operator pg_catalog.@ (
   rightarg = numeric,
   function = pg_catalog.numeric_abs
 );
 
+-- absolute value
 create operator pg_catalog.@ (
   rightarg = smallint,
   function = pg_catalog.int2abs
 );
 
+-- absolute value
 create operator pg_catalog.@ (
   rightarg = bigint,
   function = pg_catalog.int8abs
 );
 
+-- absolute value
 create operator pg_catalog.@ (
   rightarg = integer,
   function = pg_catalog.int4abs
 );
 
+-- absolute value
 create operator pg_catalog.@ (
   rightarg = real,
   function = pg_catalog.float4abs
 );
 
+-- sum of path segment lengths
 create operator pg_catalog.@-@ (
   rightarg = path,
   function = pg_catalog.path_length
 );
 
+-- distance between endpoints
 create operator pg_catalog.@-@ (
   rightarg = lseg,
   function = pg_catalog.lseg_length
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = anymultirange,
   rightarg = anymultirange,
   function = pg_catalog.multirange_contains_multirange
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsq_mcontains
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = anymultirange,
   rightarg = anyrange,
   function = pg_catalog.multirange_contains_range
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = circle,
   rightarg = point,
   function = pg_catalog.circle_contain_pt
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_contain
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_contain
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = anymultirange,
   rightarg = anyelement,
   function = pg_catalog.multirange_contains_elem
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_contains
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = anyrange,
   rightarg = anymultirange,
   function = pg_catalog.range_contains_multirange
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = anyarray,
   rightarg = anyarray,
   function = pg_catalog.arraycontains
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = box,
   rightarg = point,
   function = pg_catalog.box_contain_pt
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = path,
   rightarg = point,
   function = pg_catalog.path_contain_pt
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_contain
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = aclitem[],
   rightarg = aclitem,
   function = pg_catalog.aclcontains
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = polygon,
   rightarg = point,
   function = pg_catalog.poly_contain_pt
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = anyrange,
   rightarg = anyelement,
   function = pg_catalog.range_contains_elem
 );
 
+-- contains
 create operator pg_catalog.@> (
   leftarg = anyrange,
   rightarg = anyrange,
   function = pg_catalog.range_contains
 );
 
+-- jsonpath exists
 create operator pg_catalog.@? (
   leftarg = jsonb,
   rightarg = jsonpath,
   function = pg_catalog.jsonb_path_exists_opr
 );
 
+-- center of
 create operator pg_catalog.@@ (
   rightarg = polygon,
   function = pg_catalog.poly_center
 );
 
+-- center of
 create operator pg_catalog.@@ (
   rightarg = lseg,
   function = pg_catalog.lseg_center
 );
 
+-- center of
 create operator pg_catalog.@@ (
   rightarg = box,
   function = pg_catalog.box_center
 );
 
+-- text search match
 create operator pg_catalog.@@ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.ts_match_tt
 );
 
+-- text search match
 create operator pg_catalog.@@ (
   leftarg = tsquery,
   rightarg = tsvector,
   function = pg_catalog.ts_match_qv
 );
 
+-- center of
 create operator pg_catalog.@@ (
   rightarg = circle,
   function = pg_catalog.circle_center
 );
 
+-- text search match
 create operator pg_catalog.@@ (
   leftarg = text,
   rightarg = tsquery,
   function = pg_catalog.ts_match_tq
 );
 
+-- jsonpath match
 create operator pg_catalog.@@ (
   leftarg = jsonb,
   rightarg = jsonpath,
   function = pg_catalog.jsonb_path_match_opr
 );
 
+-- text search match
 create operator pg_catalog.@@ (
   leftarg = tsvector,
   rightarg = tsquery,
   function = pg_catalog.ts_match_vq
 );
 
+-- deprecated, use @@ instead
 create operator pg_catalog.@@@ (
   leftarg = tsvector,
   rightarg = tsquery,
   function = pg_catalog.ts_match_vq
 );
 
+-- deprecated, use @@ instead
 create operator pg_catalog.@@@ (
   leftarg = tsquery,
   rightarg = tsvector,
   function = pg_catalog.ts_match_qv
 );
 
+-- exponentiation
 create operator pg_catalog.^ (
   leftarg = double precision,
   rightarg = double precision,
   function = pg_catalog.dpow
 );
 
+-- exponentiation
 create operator pg_catalog.^ (
   leftarg = numeric,
   rightarg = numeric,
   function = pg_catalog.numeric_power
 );
 
+-- starts with
 create operator pg_catalog.^@ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.starts_with
 );
 
+-- bitwise or
 create operator pg_catalog.| (
   leftarg = smallint,
   rightarg = smallint,
   function = pg_catalog.int2or
 );
 
+-- bitwise or
 create operator pg_catalog.| (
   leftarg = inet,
   rightarg = inet,
   function = pg_catalog.inetor
 );
 
+-- bitwise or
 create operator pg_catalog.| (
   leftarg = bit,
   rightarg = bit,
   function = pg_catalog.bitor
 );
 
+-- bitwise or
 create operator pg_catalog.| (
   leftarg = macaddr,
   rightarg = macaddr,
   function = pg_catalog.macaddr_or
 );
 
+-- bitwise or
 create operator pg_catalog.| (
   leftarg = integer,
   rightarg = integer,
   function = pg_catalog.int4or
 );
 
+-- bitwise or
 create operator pg_catalog.| (
   leftarg = bigint,
   rightarg = bigint,
   function = pg_catalog.int8or
 );
 
+-- bitwise or
 create operator pg_catalog.| (
   leftarg = macaddr8,
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_or
 );
 
+-- overlaps or is above
 create operator pg_catalog.|&> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_overabove
 );
 
+-- overlaps or is above
 create operator pg_catalog.|&> (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_overabove
 );
 
+-- overlaps or is above
 create operator pg_catalog.|&> (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_overabove
 );
 
+-- square root
 create operator pg_catalog.|/ (
   rightarg = double precision,
   function = pg_catalog.dsqrt
 );
 
+-- is above
 create operator pg_catalog.|>> (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_above
 );
 
+-- is above
 create operator pg_catalog.|>> (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_above
 );
 
+-- is above
 create operator pg_catalog.|>> (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_above
 );
 
+-- is above
 create operator pg_catalog.|>> (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_above
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = anycompatiblearray,
   rightarg = anycompatiblearray,
   function = pg_catalog.array_cat
 );
 
+-- OR-concatenate
 create operator pg_catalog.|| (
   leftarg = tsquery,
   rightarg = tsquery,
   function = pg_catalog.tsquery_or
 );
 
+-- prepend element onto front of array
 create operator pg_catalog.|| (
   leftarg = anycompatible,
   rightarg = anycompatiblearray,
   function = pg_catalog.array_prepend
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = tsvector,
   rightarg = tsvector,
   function = pg_catalog.tsvector_concat
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = jsonb,
   rightarg = jsonb,
   function = pg_catalog.jsonb_concat
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.textcat
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.byteacat
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = bit varying,
   rightarg = bit varying,
   function = pg_catalog.bitcat
 );
 
+-- append element onto end of array
 create operator pg_catalog.|| (
   leftarg = anycompatiblearray,
   rightarg = anycompatible,
   function = pg_catalog.array_append
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = anynonarray,
   rightarg = text,
   function = pg_catalog.anytextcat
 );
 
+-- concatenate
 create operator pg_catalog.|| (
   leftarg = text,
   rightarg = anynonarray,
   function = pg_catalog.textanycat
 );
 
+-- cube root
 create operator pg_catalog.||/ (
   rightarg = double precision,
   function = pg_catalog.dcbrt
 );
 
+-- bitwise not
 create operator pg_catalog.~ (
   rightarg = bigint,
   function = pg_catalog.int8not
 );
 
+-- matches regular expression, case-sensitive
 create operator pg_catalog.~ (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameregexeq
 );
 
+-- bitwise not
 create operator pg_catalog.~ (
   rightarg = macaddr,
   function = pg_catalog.macaddr_not
 );
 
+-- bitwise not
 create operator pg_catalog.~ (
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_not
 );
 
+-- matches regular expression, case-sensitive
 create operator pg_catalog.~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.textregexeq
 );
 
+-- bitwise not
 create operator pg_catalog.~ (
   rightarg = integer,
   function = pg_catalog.int4not
 );
 
+-- bitwise not
 create operator pg_catalog.~ (
   rightarg = smallint,
   function = pg_catalog.int2not
 );
 
+-- matches regular expression, case-sensitive
 create operator pg_catalog.~ (
   leftarg = character,
   rightarg = text,
   function = pg_catalog.bpcharregexeq
 );
 
+-- bitwise not
 create operator pg_catalog.~ (
   rightarg = inet,
   function = pg_catalog.inetnot
 );
 
+-- bitwise not
 create operator pg_catalog.~ (
   rightarg = bit,
   function = pg_catalog.bitnot
 );
 
+-- matches regular expression, case-insensitive
 create operator pg_catalog.~* (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameicregexeq
 );
 
+-- matches regular expression, case-insensitive
 create operator pg_catalog.~* (
   leftarg = character,
   rightarg = text,
   function = pg_catalog.bpcharicregexeq
 );
 
+-- matches regular expression, case-insensitive
 create operator pg_catalog.~* (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.texticregexeq
 );
 
+-- less than or equal
 create operator pg_catalog.~<=~ (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpchar_pattern_le
 );
 
+-- less than or equal
 create operator pg_catalog.~<=~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_pattern_le
 );
 
+-- less than
 create operator pg_catalog.~<~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_pattern_lt
 );
 
+-- less than
 create operator pg_catalog.~<~ (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpchar_pattern_lt
 );
 
+-- same as
 create operator pg_catalog.~= (
   leftarg = circle,
   rightarg = circle,
   function = pg_catalog.circle_same
 );
 
+-- same as
 create operator pg_catalog.~= (
   leftarg = point,
   rightarg = point,
   function = pg_catalog.point_eq
 );
 
+-- same as
 create operator pg_catalog.~= (
   leftarg = polygon,
   rightarg = polygon,
   function = pg_catalog.poly_same
 );
 
+-- same as
 create operator pg_catalog.~= (
   leftarg = box,
   rightarg = box,
   function = pg_catalog.box_same
 );
 
+-- greater than or equal
 create operator pg_catalog.~>=~ (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpchar_pattern_ge
 );
 
+-- greater than or equal
 create operator pg_catalog.~>=~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_pattern_ge
 );
 
+-- greater than
 create operator pg_catalog.~>~ (
   leftarg = character,
   rightarg = character,
   function = pg_catalog.bpchar_pattern_gt
 );
 
+-- greater than
 create operator pg_catalog.~>~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.text_pattern_gt
 );
 
+-- matches LIKE expression
 create operator pg_catalog.~~ (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.namelike
 );
 
+-- matches LIKE expression
 create operator pg_catalog.~~ (
   leftarg = character,
   rightarg = text,
   function = pg_catalog.bpcharlike
 );
 
+-- matches LIKE expression
 create operator pg_catalog.~~ (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.textlike
 );
 
+-- matches LIKE expression
 create operator pg_catalog.~~ (
   leftarg = bytea,
   rightarg = bytea,
   function = pg_catalog.bytealike
 );
 
+-- matches LIKE expression, case-insensitive
 create operator pg_catalog.~~* (
   leftarg = name,
   rightarg = text,
   function = pg_catalog.nameiclike
 );
 
+-- matches LIKE expression, case-insensitive
 create operator pg_catalog.~~* (
   leftarg = text,
   rightarg = text,
   function = pg_catalog.texticlike
 );
 
+-- matches LIKE expression, case-insensitive
 create operator pg_catalog.~~* (
   leftarg = character,
   rightarg = text,

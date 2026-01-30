@@ -5,12 +5,12 @@ use anyhow::{Context, Result, bail};
 use crate::path::project_root;
 
 const BUILTIN_SCHEMAS_QUERY: &str = r"
-select nspname
-from pg_namespace
-where nspname not like 'pg_temp%'
-  and nspname not like 'pg_toast%'
-  and nspname != 'public'
-order by nspname;
+select n.nspname, coalesce(d.description, '')
+from pg_namespace n
+  left join pg_description d on d.objoid = n.oid and d.classoid = 'pg_namespace'::regclass
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+order by n.nspname;
 ";
 
 const BUILTIN_TYPES_QUERY: &str = r"
@@ -80,11 +80,13 @@ select n.nspname, o.oprname,
   format_type(o.oprleft, null) as left_type,
   format_type(o.oprright, null) as right_type,
   pn.nspname as func_schema,
-  p.proname as func_name
+  p.proname as func_name,
+  coalesce(d.description, '')
 from pg_operator o
   join pg_namespace n on n.oid = o.oprnamespace
   join pg_proc p on p.oid = o.oprcode
   join pg_namespace pn on pn.oid = p.pronamespace
+  left join pg_description d on d.objoid = o.oid and d.classoid = 'pg_operator'::regclass
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
@@ -173,14 +175,19 @@ pub(crate) fn sync_builtins() -> Result<()> {
 "
     );
 
-    for schema in run_sql(BUILTIN_SCHEMAS_QUERY)?
+    for line in run_sql(BUILTIN_SCHEMAS_QUERY)?
         .lines()
         .filter(|line| !line.is_empty())
     {
-        sql.push_str(&format!("create schema {schema};\n"));
+        let mut parts = line.split('\t');
+        let schema = parts.next().context("expected schema name")?;
+        let description = parts.next().context("expected schema description")?;
+        if !description.is_empty() {
+            sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
+        }
+        sql.push_str(&format!("create schema {schema};\n\n"));
     }
-    sql.push_str("create schema pg_temp;\n");
-    sql.push('\n');
+    sql.push_str("create schema pg_temp;\n\n");
 
     for line in run_sql(BUILTIN_TYPES_QUERY)?
         .lines()
@@ -298,7 +305,11 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let right_type = parts.next().context("expected right type")?;
         let func_schema = parts.next().context("expected function schema")?;
         let func_name = parts.next().context("expected function name")?;
+        let description = parts.next().context("expected operator description")?;
 
+        if !description.is_empty() {
+            sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
+        }
         let args = match (left_type, right_type) {
             ("-", r) => format!("  rightarg = {r},\n"),
             (l, "-") => format!("  leftarg = {l},\n"),
