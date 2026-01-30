@@ -19,9 +19,10 @@ select n.nspname, t.typname, t.typlen, case t.typalign
     when 's' then 2
     when 'i' then 4
     when 'd' then 8
-  end as typalign
+  end as typalign, coalesce(d.description, '')
 from pg_type t
-join pg_namespace n on n.oid = t.typnamespace
+  join pg_namespace n on n.oid = t.typnamespace
+  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_type'::regclass
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
@@ -36,10 +37,11 @@ select n.nspname, t.typname, t.typlen, case t.typalign
     when 's' then 2
     when 'i' then 4
     when 'd' then 8
-  end as typalign, format_type(r.rngsubtype, null) as subtype
+  end as typalign, format_type(r.rngsubtype, null) as subtype, coalesce(d.description, '')
 from pg_type t
-join pg_namespace n on n.oid = t.typnamespace
-join pg_range r on r.rngtypid = t.oid
+  join pg_namespace n on n.oid = t.typnamespace
+  join pg_range r on r.rngtypid = t.oid
+  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_type'::regclass
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
@@ -47,10 +49,11 @@ order by n.nspname, t.typname;
 ";
 
 const BUILTIN_TABLES_QUERY: &str = r"
-select n.nspname, c.relname, c.relkind, a.attname, format_type(a.atttypid, a.atttypmod) as type
+select n.nspname, c.relname, c.relkind, a.attname, format_type(a.atttypid, a.atttypmod) as type, coalesce(d.description, '')
 from pg_class c
-join pg_namespace n on n.oid = c.relnamespace
-join pg_attribute a on a.attrelid = c.oid
+  join pg_namespace n on n.oid = c.relnamespace
+  join pg_attribute a on a.attrelid = c.oid
+  left join pg_description d on d.objoid = c.oid and d.classoid = 'pg_class'::regclass and d.objsubid = 0
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
@@ -61,14 +64,15 @@ order by n.nspname, c.relname, a.attnum;
 ";
 
 const BUILTIN_FUNCTIONS_QUERY: &str = r"
-select n.nspname, p.proname, pg_get_function_arguments(p.oid) as args, pg_get_function_result(p.oid) as result
+select n.nspname, p.proname, pg_get_function_arguments(p.oid) as args, pg_get_function_result(p.oid) as result, coalesce(d.description, '')
 from pg_proc p
-join pg_namespace n on n.oid = p.pronamespace
+  join pg_namespace n on n.oid = p.pronamespace
+  left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
   and pg_get_function_arguments(p.oid) not like '%ORDER BY%'
-order by n.nspname, p.proname;
+order by 1, 2, 3, 4;
 ";
 
 const BUILTIN_OPERATORS_QUERY: &str = r"
@@ -78,9 +82,9 @@ select n.nspname, o.oprname,
   pn.nspname as func_schema,
   p.proname as func_name
 from pg_operator o
-join pg_namespace n on n.oid = o.oprnamespace
-join pg_proc p on p.oid = o.oprcode
-join pg_namespace pn on pn.oid = p.pronamespace
+  join pg_namespace n on n.oid = o.oprnamespace
+  join pg_proc p on p.oid = o.oprcode
+  join pg_namespace pn on pn.oid = p.pronamespace
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
@@ -89,7 +93,16 @@ order by n.nspname, o.oprname;
 
 const PG_VERSION_QUERY: &str = "show server_version;";
 
-fn write_table(sql: &mut String, schema: &str, table_name: &str, columns: &[(String, String)]) {
+fn write_table(
+    sql: &mut String,
+    schema: &str,
+    table_name: &str,
+    description: &str,
+    columns: &[(String, String)],
+) {
+    if !description.is_empty() {
+        sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
+    }
     sql.push_str(&format!("create table {schema}.{table_name} (\n"));
     for (i, (col_name, col_type)) in columns.iter().enumerate() {
         let comma = if i + 1 < columns.len() { "," } else { "" };
@@ -98,7 +111,16 @@ fn write_table(sql: &mut String, schema: &str, table_name: &str, columns: &[(Str
     sql.push_str(");\n\n");
 }
 
-fn write_view(sql: &mut String, schema: &str, view_name: &str, columns: &[(String, String)]) {
+fn write_view(
+    sql: &mut String,
+    schema: &str,
+    view_name: &str,
+    description: &str,
+    columns: &[(String, String)],
+) {
+    if !description.is_empty() {
+        sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
+    }
     let col_names: Vec<_> = columns.iter().map(|(name, _)| name.as_str()).collect();
     sql.push_str(&format!(
         "create view {schema}.{view_name}({}) as\n  select\n",
@@ -169,8 +191,12 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let type_name = parts.next().context("expected type name")?;
         let type_size = parts.next().context("expected type size")?;
         let type_align = parts.next().context("expected type alignment")?;
+        let description = parts.next().context("expected type description")?;
         if type_align.is_empty() {
             bail!("unexpected type alignment for {schema}.{type_name}");
+        }
+        if !description.is_empty() {
+            sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
         }
         sql.push_str(&format!(
             "-- size: {type_size}, align: {type_align}\ncreate type {schema}.{type_name};\n\n"
@@ -187,12 +213,16 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let type_size = parts.next().context("expected type size")?;
         let type_align = parts.next().context("expected type alignment")?;
         let subtype = parts.next().context("expected subtype")?;
+        let description = parts.next().context("expected range type description")?;
+        if !description.is_empty() {
+            sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
+        }
         sql.push_str(&format!(
             "-- size: {type_size}, align: {type_align}\ncreate type {schema}.{type_name} as range (subtype = {subtype});\n\n"
         ));
     }
 
-    let mut current_relation: Option<(String, String, String)> = None;
+    let mut current_relation: Option<(String, String, String, String)> = None;
     let mut columns: Vec<(String, String)> = vec![];
 
     for line in run_sql(BUILTIN_TABLES_QUERY)?
@@ -205,17 +235,18 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let relkind = parts.next().context("expected relkind")?;
         let col_name = parts.next().context("expected column name")?;
         let col_type = parts.next().context("expected column type")?;
+        let description = parts.next().context("expected description")?;
 
         if current_relation
             .as_ref()
-            .map(|(s, t, _)| (s.as_str(), t.as_str()))
+            .map(|(s, t, _, _)| (s.as_str(), t.as_str()))
             != Some((schema, rel_name))
         {
-            if let Some((prev_schema, prev_rel, prev_kind)) = current_relation.take() {
+            if let Some((prev_schema, prev_rel, prev_kind, prev_desc)) = current_relation.take() {
                 if prev_kind == "v" {
-                    write_view(&mut sql, &prev_schema, &prev_rel, &columns);
+                    write_view(&mut sql, &prev_schema, &prev_rel, &prev_desc, &columns);
                 } else {
-                    write_table(&mut sql, &prev_schema, &prev_rel, &columns);
+                    write_table(&mut sql, &prev_schema, &prev_rel, &prev_desc, &columns);
                 }
                 columns.clear();
             }
@@ -223,17 +254,18 @@ pub(crate) fn sync_builtins() -> Result<()> {
                 schema.to_string(),
                 rel_name.to_string(),
                 relkind.to_string(),
+                description.to_string(),
             ));
         }
 
         columns.push((col_name.to_string(), col_type.to_string()));
     }
 
-    if let Some((schema, rel_name, relkind)) = current_relation {
+    if let Some((schema, rel_name, relkind, description)) = current_relation {
         if relkind == "v" {
-            write_view(&mut sql, &schema, &rel_name, &columns);
+            write_view(&mut sql, &schema, &rel_name, &description, &columns);
         } else {
-            write_table(&mut sql, &schema, &rel_name, &columns);
+            write_table(&mut sql, &schema, &rel_name, &description, &columns);
         }
     }
 
@@ -246,6 +278,10 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let func_name = parts.next().context("expected function name")?;
         let args = parts.next().context("expected function arguments")?;
         let result = parts.next().context("expected function result")?;
+        let description = parts.next().context("expected function description")?;
+        if !description.is_empty() {
+            sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
+        }
         sql.push_str(&format!(
             "create function {schema}.{func_name}({args}) returns {result}\n  language internal;\n\n"
         ));

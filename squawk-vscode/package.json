@@ -76,7 +76,7 @@
       },
       {
         "command": "squawk.reportIssue",
-        "title": "Report Issue",
+        "title": "Report Issue...",
         "category": "Squawk"
       }
     ],
