@@ -3622,6 +3622,23 @@ select a$0(t, 1) from t;
     }
 
     #[test]
+    fn goto_function_call_nested() {
+        assert_snapshot!(goto("
+create function f() returns int8
+  as 'select 1'
+  language sql;
+select format('foo%d', f$0());
+"), @r"
+          ╭▸ 
+        2 │ create function f() returns int8
+          │                 ─ 2. destination
+          ‡
+        5 │ select format('foo%d', f());
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_field_style_function_call() {
         assert_snapshot!(goto("
 create table t(a int);
