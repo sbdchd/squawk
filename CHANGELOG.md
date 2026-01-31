@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.39.0 - 2026-01-31
+
+### Added
+
+- vscode: add report issue command using the builtin issue reporter (#897)
+- ide: goto def on `comment on` stmts (#894)
+- ide: goto def with create table as (#893)
+- ide: document symbols for create policy (#892)
+- ide: goto def with policy stmts (#886, #887, #888)
+
+### Changed
+
+- linter: undo ignoring single stmts in prefer-robust-stmts (#902)
+
+### Fixed
+
+- ide: fix goto def for func call inside func (#901)
+- docs(readme): bump version of squawk in pre-commit demo v0.10.0 to v2.38.0 (#889). Thanks @dzhalaevd!
+
 ## v2.38.0 - 2026-01-24
 
 ### Added
