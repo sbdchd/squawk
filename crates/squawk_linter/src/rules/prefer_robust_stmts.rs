@@ -500,7 +500,6 @@ CREATE TABLE "core_bar" (
         );
     }
 
-
     #[test]
     fn create_index_concurrently_without_name_ok() {
         let sql = r#"
