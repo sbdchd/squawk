@@ -302,6 +302,25 @@ create table users (
                 ),
             },
             Violation {
+                code: PreferRobustStmts,
+                message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+                text_range: 14..31,
+                help: None,
+                fix: Some(
+                    Fix {
+                        title: "Insert `if not exists`",
+                        edits: [
+                            Edit {
+                                text_range: 24..24,
+                                text: Some(
+                                    " if not exists",
+                                ),
+                            },
+                        ],
+                    },
+                ),
+            },
+            Violation {
                 code: BanCharField,
                 message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
                 text_range: 27..31,
