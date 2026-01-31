@@ -91,7 +91,7 @@ fn is_special_fn(kind: SyntaxKind) -> bool {
 }
 
 pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass> {
-    let mut in_call_expr = false;
+    let mut in_function_name = false;
     let mut in_arg_list = false;
     let mut in_column_list = false;
     let mut in_where_clause = false;
@@ -546,8 +546,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             return Some(NameRefClass::Table);
         }
         if let Some(create_trigger) = ast::CreateTrigger::cast(ancestor.clone())
-            && in_call_expr
-            && !in_arg_list
+            && in_function_name
         {
             if create_trigger.procedure_token().is_some() {
                 return Some(NameRefClass::ProcedureCall);
@@ -555,8 +554,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             return Some(NameRefClass::FunctionCall);
         }
         if let Some(create_event_trigger) = ast::CreateEventTrigger::cast(ancestor.clone())
-            && in_call_expr
-            && !in_arg_list
+            && in_function_name
         {
             if create_event_trigger.procedure_token().is_some() {
                 return Some(NameRefClass::ProcedureCall);
@@ -576,9 +574,11 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_arg_list = true;
         }
         if ast::CallExpr::can_cast(ancestor.kind()) {
-            in_call_expr = true;
+            if !in_arg_list {
+                in_function_name = true;
+            }
         }
-        if ast::DefaultConstraint::can_cast(ancestor.kind()) && in_call_expr && !in_arg_list {
+        if ast::DefaultConstraint::can_cast(ancestor.kind()) && in_function_name {
             return Some(NameRefClass::FunctionCall);
         }
         if ast::OnClause::can_cast(ancestor.kind()) {
@@ -588,7 +588,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_from_clause = true;
         }
         if ast::Select::can_cast(ancestor.kind()) {
-            if in_call_expr && !in_arg_list && !in_special_sql_fn {
+            if in_function_name && !in_special_sql_fn {
                 return Some(NameRefClass::SelectFunctionCall);
             }
             if in_from_clause && !in_on_clause {
