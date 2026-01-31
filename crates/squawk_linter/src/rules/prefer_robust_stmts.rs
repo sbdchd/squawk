@@ -19,18 +19,6 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let mut inside_transaction = ctx.settings.assume_in_transaction;
     let mut constraint_names: HashMap<Identifier, Constraint> = HashMap::new();
 
-    let mut total_stmts = 0;
-    for _ in file.stmts() {
-        total_stmts += 1;
-        if total_stmts > 1 {
-            break;
-        }
-    }
-    if total_stmts <= 1 {
-        // single stmts are fine
-        return;
-    }
-
     enum ActionErrorMessage {
         IfExists,
         IfNotExists,
@@ -502,22 +490,6 @@ CREATE TABLE "core_bar" (
     "id" serial NOT NULL PRIMARY KEY,
     "bravo" text NOT NULL
 );
-        "#;
-        lint_ok_with(
-            sql,
-            LinterSettings {
-                assume_in_transaction: true,
-                ..Default::default()
-            },
-        );
-    }
-
-    #[test]
-    fn ignore_single_stmts_ok() {
-        // we don't include a placeholder stmt because we're actually checking
-        // for the single stmt behavior here
-        let sql = r#"
-CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
         "#;
         lint_ok_with(
             sql,
