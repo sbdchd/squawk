@@ -1438,6 +1438,85 @@ create table t (
     }
 
     #[test]
+    fn goto_generated_column_function_call() {
+        assert_snapshot!(goto("
+create function pg_catalog.lower(text) returns text
+  language internal;
+
+create table articles (
+  id serial primary key,
+  title text not null,
+  body text not null,
+  title_lower text generated always as (
+    lower$0(title)
+  ) stored
+);
+"), @r"
+           ╭▸ 
+         2 │ create function pg_catalog.lower(text) returns text
+           │                            ───── 2. destination
+           ‡
+        10 │     lower(title)
+           ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_index_expr_function_call() {
+        assert_snapshot!(goto("
+create function lower(text) returns text language internal;
+create table articles (
+  id serial primary key,
+  title text not null
+);
+create index on articles (lower$0(title));
+"), @r"
+          ╭▸ 
+        2 │ create function lower(text) returns text language internal;
+          │                 ───── 2. destination
+          ‡
+        7 │ create index on articles (lower(title));
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_exclude_constraint_expr_function_call() {
+        assert_snapshot!(goto("
+create function lower(text) returns text language internal;
+create table articles (
+  title text not null,
+  exclude using btree (lower$0(title) with =)
+);
+"), @r"
+          ╭▸ 
+        2 │ create function lower(text) returns text language internal;
+          │                 ───── 2. destination
+          ‡
+        5 │   exclude using btree (lower(title) with =)
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_partition_by_expr_function_call() {
+        assert_snapshot!(goto("
+create function lower(text) returns text language internal;
+create table articles (
+  id serial primary key,
+  title text not null
+) partition by range (lower$0(title));
+"), @r"
+          ╭▸ 
+        2 │ create function lower(text) returns text language internal;
+          │                 ───── 2. destination
+          ‡
+        6 │ ) partition by range (lower(title));
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_table_check_constraint_column() {
         assert_snapshot!(goto("
 create table t (
