@@ -500,6 +500,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             || ast::GeneratedConstraint::can_cast(ancestor.kind())
             || ast::NotNullConstraint::can_cast(ancestor.kind())
         {
+            if in_function_name {
+                return Some(NameRefClass::FunctionCall);
+            }
             return Some(NameRefClass::ConstraintColumn);
         }
         if in_column_list
@@ -513,6 +516,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             || in_constraint_where_clause)
             && ast::ExcludeConstraint::can_cast(ancestor.kind())
         {
+            if in_function_name {
+                return Some(NameRefClass::FunctionCall);
+            }
             return Some(NameRefClass::ConstraintColumn);
         }
         if ast::LikeClause::can_cast(ancestor.kind()) {
@@ -541,6 +547,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
             if in_partition_item {
+                if in_function_name {
+                    return Some(NameRefClass::FunctionCall);
+                }
                 return Some(NameRefClass::CreateIndexColumn);
             }
             return Some(NameRefClass::Table);
@@ -562,6 +571,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             return Some(NameRefClass::FunctionCall);
         }
         if in_partition_item && ast::CreateTableLike::can_cast(ancestor.kind()) {
+            if in_function_name {
+                return Some(NameRefClass::FunctionCall);
+            }
             return Some(NameRefClass::ConstraintColumn);
         }
         if is_special_fn(ancestor.kind()) {
