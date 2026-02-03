@@ -4123,8 +4123,9 @@ select * from nums;
           ╭▸ 
         2 │ with recursive nums as (
           │                ──── 2. destination
+          ‡
         5 │   select n + 1 from nums where n < 5
-          ╰╴                    ──── 1. source
+          ╰╴                       ─ 1. source
         ");
     }
 
