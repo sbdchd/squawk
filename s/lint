@@ -4,6 +4,7 @@ set -e
 if [ -n "$CI" ]; then
   cargo fmt -- --check
   cargo clippy --all-targets --all-features -- -D warnings
+  cargo check --locked
 else
   cargo fmt 
   cargo clippy --fix --allow-staged --allow-dirty --all-targets --all-features -- -D warnings
