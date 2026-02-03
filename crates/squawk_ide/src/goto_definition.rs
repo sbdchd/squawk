@@ -1403,6 +1403,31 @@ create table bar(
     }
 
     #[test]
+    fn goto_alter_table_foreign_key_local_column() {
+        assert_snapshot!(goto("
+create table t (
+  id bigserial primary key
+);
+
+create table u (
+  id bigserial primary key,
+  t_id bigint
+);
+
+alter table u
+  add constraint fooo_fkey
+  foreign key (t_id$0) references t (id);
+"), @r"
+           ╭▸ 
+         8 │   t_id bigint
+           │   ──── 2. destination
+           ‡
+        13 │   foreign key (t_id) references t (id);
+           ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_check_constraint_column() {
         assert_snapshot!(goto("
 create table t (
@@ -6659,6 +6684,99 @@ alter table users$0 drop column email;
     }
 
     #[test]
+    fn goto_alter_table_add_constraint_using_index() {
+        assert_snapshot!(goto("
+create table u(id int);
+create index my_index on u (id);
+alter table u add constraint uq unique using index my_in$0dex;
+"), @r"
+          ╭▸ 
+        3 │ create index my_index on u (id);
+          │              ──────── 2. destination
+        4 │ alter table u add constraint uq unique using index my_index;
+          ╰╴                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_owner_to_role() {
+        assert_snapshot!(goto("
+create role reader;
+create table t(id int);
+alter table t owner to read$0er;
+"), @r"
+          ╭▸ 
+        2 │ create role reader;
+          │             ────── 2. destination
+        3 │ create table t(id int);
+        4 │ alter table t owner to reader;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_set_tablespace() {
+        assert_snapshot!(goto("
+create tablespace ts location '/tmp/ts';
+create table t(id int);
+alter table t set tablespace t$0s;
+"), @r"
+          ╭▸ 
+        2 │ create tablespace ts location '/tmp/ts';
+          │                   ── 2. destination
+        3 │ create table t(id int);
+        4 │ alter table t set tablespace ts;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_set_schema() {
+        assert_snapshot!(goto("
+create schema foo;
+create table t(id int);
+alter table t set schema fo$0o;
+"), @r"
+          ╭▸ 
+        2 │ create schema foo;
+          │               ─── 2. destination
+        3 │ create table t(id int);
+        4 │ alter table t set schema foo;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_attach_partition() {
+        assert_snapshot!(goto("
+create table parent (id int) partition by range (id);
+create table child (id int);
+alter table parent attach partition ch$0ild for values from (1) to (10);
+"), @r"
+          ╭▸ 
+        3 │ create table child (id int);
+          │              ───── 2. destination
+        4 │ alter table parent attach partition child for values from (1) to (10);
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_detach_partition() {
+        assert_snapshot!(goto("
+create table parent (id int) partition by range (id);
+create table child partition of parent for values from (1) to (10);
+alter table parent detach partition ch$0ild;
+"), @r"
+          ╭▸ 
+        3 │ create table child partition of parent for values from (1) to (10);
+          │              ───── 2. destination
+        4 │ alter table parent detach partition child;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_comment_on_table() {
         assert_snapshot!(goto("
 create table t(id int);
@@ -7028,6 +7146,48 @@ insert into t as f values (1, 2) returning f.a$0;"
           │                ─ 2. destination
         3 │ insert into t as f values (1, 2) returning f.a;
           ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_target_column() {
+        assert_snapshot!(goto("
+create table t(c text);
+insert into t values ('c') on conflict (c$0) do nothing;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(c text);
+          │                ─ 2. destination
+        3 │ insert into t values ('c') on conflict (c) do nothing;
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_set_column() {
+        assert_snapshot!(goto("
+create table t(c text, d text);
+insert into t values ('c', 'd') on conflict (c) do update set c$0 = excluded.c;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(c text, d text);
+          │                ─ 2. destination
+        3 │ insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c;
+          ╰╴                                                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_excluded_column() {
+        assert_snapshot!(goto("
+create table t(c text, d text);
+insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c$0;"
+        ), @r"
+          ╭▸ 
+        2 │ create table t(c text, d text);
+          │                ─ 2. destination
+        3 │ insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c;
+          ╰╴                                                                           ─ 1. source
         ");
     }
 

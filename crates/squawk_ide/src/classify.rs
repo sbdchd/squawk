@@ -107,6 +107,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     let mut in_returning_clause = false;
     let mut in_when_clause = false;
     let mut in_special_sql_fn = false;
+    let mut in_conflict_target = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = name_ref.syntax().parent()
@@ -347,6 +348,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             || ast::AlterTable::can_cast(ancestor.kind())
             || ast::OnTable::can_cast(ancestor.kind())
             || ast::AttachPartition::can_cast(ancestor.kind())
+            || ast::DetachPartition::can_cast(ancestor.kind())
             || ast::Table::can_cast(ancestor.kind())
             || ast::Inherits::can_cast(ancestor.kind())
             || ast::PartitionOf::can_cast(ancestor.kind())
@@ -379,7 +381,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 return Some(NameRefClass::Database);
             }
         }
-        if ast::DropIndex::can_cast(ancestor.kind()) {
+        if ast::DropIndex::can_cast(ancestor.kind()) || ast::UsingIndex::can_cast(ancestor.kind()) {
             return Some(NameRefClass::Index);
         }
         if ast::DropType::can_cast(ancestor.kind()) || ast::DropDomain::can_cast(ancestor.kind()) {
@@ -542,7 +544,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::Call::can_cast(ancestor.kind()) {
             return Some(NameRefClass::CallProcedure);
         }
-        if ast::DropSchema::can_cast(ancestor.kind()) {
+        if ast::DropSchema::can_cast(ancestor.kind()) || ast::SetSchema::can_cast(ancestor.kind()) {
             return Some(NameRefClass::Schema);
         }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
@@ -625,8 +627,16 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::PartitionItem::can_cast(ancestor.kind()) {
             in_partition_item = true;
         }
+        if ast::ConflictIndexItem::can_cast(ancestor.kind()) {
+            in_conflict_target = true;
+        }
         if ast::Insert::can_cast(ancestor.kind()) {
-            if in_returning_clause || in_column_list {
+            if in_returning_clause
+                || in_column_list
+                || in_set_clause
+                || in_where_clause
+                || in_conflict_target
+            {
                 return Some(NameRefClass::InsertColumn);
             }
             return Some(NameRefClass::Table);
@@ -640,10 +650,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         if ast::SetClause::can_cast(ancestor.kind()) {
             in_set_clause = true;
         }
-        if ast::UsingClause::can_cast(ancestor.kind()) {
-            in_using_clause = true;
-        }
-        if ast::UsingOnClause::can_cast(ancestor.kind()) {
+        if ast::UsingClause::can_cast(ancestor.kind())
+            || ast::UsingOnClause::can_cast(ancestor.kind())
+        {
             in_using_clause = true;
         }
         if ast::ReturningClause::can_cast(ancestor.kind()) {
