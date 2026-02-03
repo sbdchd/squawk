@@ -87,10 +87,9 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_view_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::Index => {
-            let path = find_containing_path(name_ref)?;
-            let (index_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
-            resolve_index_name_ptr(binder, &index_name, &schema, position).map(|ptr| smallvec![ptr])
+            let index_name = Name::from_node(name_ref);
+            resolve_index_name_ptr(binder, &index_name, &None, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::Type => {
             let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
@@ -220,13 +219,19 @@ pub(crate) fn resolve_name_ref_ptrs(
             resolve_column_for_path(binder, root, &path, column_name).map(|ptr| smallvec![ptr])
         }
         NameRefClass::ConstraintColumn => {
-            let create_table = name_ref
-                .syntax()
-                .ancestors()
-                .find_map(ast::CreateTableLike::cast)?;
             let column_name = Name::from_node(name_ref);
-            find_column_in_create_table(binder, root, &create_table, &column_name)
-                .map(|ptr| smallvec![ptr])
+            for ancestor in name_ref.syntax().ancestors() {
+                if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
+                    return find_column_in_create_table(binder, root, &create_table, &column_name)
+                        .map(|ptr| smallvec![ptr]);
+                }
+                if let Some(alter_table) = ast::AlterTable::cast(ancestor) {
+                    let table_path = alter_table.relation_name()?.path()?;
+                    return resolve_column_for_path(binder, root, &table_path, column_name)
+                        .map(|ptr| smallvec![ptr]);
+                }
+            }
+            None
         }
         NameRefClass::PolicyColumn => {
             let on_table_path = name_ref.syntax().ancestors().find_map(|n| {
