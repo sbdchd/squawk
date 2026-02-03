@@ -4111,6 +4111,24 @@ select a from y;
     }
 
     #[test]
+    fn goto_recursive_cte_reference_inside_cte() {
+        assert_snapshot!(goto("
+with recursive nums as (
+  select 1 as n
+  union all
+  select n + 1 from nums$0 where n < 5
+)
+select * from nums;
+"), @r"
+          ╭▸ 
+        2 │ with recursive nums as (
+          │                ──── 2. destination
+        5 │   select n + 1 from nums where n < 5
+          ╰╴                    ──── 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cte_with_column_list() {
         assert_snapshot!(goto("
 with t(a) as (select 1)

@@ -1886,14 +1886,16 @@ fn find_column_in_create_table_as(
 
 fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
     let with_clause = find_parent_with_clause(name_ref.syntax())?;
+    let is_recursive = with_clause.recursive_token().is_some();
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
             && Name::from_node(&name) == *cte_name
         {
-            if with_table
-                .syntax()
-                .text_range()
-                .contains_range(name_ref.syntax().text_range())
+            if !is_recursive
+                && with_table
+                    .syntax()
+                    .text_range()
+                    .contains_range(name_ref.syntax().text_range())
             {
                 continue;
             }
@@ -1998,16 +2000,18 @@ fn resolve_cte_column(
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
     let with_clause = find_parent_with_clause(name_ref.syntax())?;
+    let is_recursive = with_clause.recursive_token().is_some();
 
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
             && Name::from_node(&name) == *cte_name
         {
             // Skip if we're inside this CTE's definition (CTE doesn't shadow itself)
-            if with_table
-                .syntax()
-                .text_range()
-                .contains_range(name_ref.syntax().text_range())
+            if !is_recursive
+                && with_table
+                    .syntax()
+                    .text_range()
+                    .contains_range(name_ref.syntax().text_range())
             {
                 continue;
             }
@@ -2746,15 +2750,17 @@ fn count_columns_for_from_item(
 
 fn count_columns_for_cte(name_ref: &ast::NameRef, cte_name: &Name) -> Option<usize> {
     let with_clause = find_parent_with_clause(name_ref.syntax())?;
+    let is_recursive = with_clause.recursive_token().is_some();
 
     for with_table in with_clause.with_tables() {
         if let Some(name) = with_table.name()
             && Name::from_node(&name) == *cte_name
         {
-            if with_table
-                .syntax()
-                .text_range()
-                .contains_range(name_ref.syntax().text_range())
+            if !is_recursive
+                && with_table
+                    .syntax()
+                    .text_range()
+                    .contains_range(name_ref.syntax().text_range())
             {
                 return None;
             }
