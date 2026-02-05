@@ -4482,6 +4482,10 @@ fn opt_where_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump(WHERE_KW);
+    // TODO: we might want to be fancier, maybe all binary only operators?
+    if p.at(AND_KW) || p.at(OR_KW) {
+        p.err_and_bump(&format!("expected expression but got {:?}", p.current()));
+    }
     expr(p);
     Some(m.complete(p, WHERE_CLAUSE))
 }

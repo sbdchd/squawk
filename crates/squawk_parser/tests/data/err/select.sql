@@ -77,6 +77,10 @@ do 'begin null; end';
 select 
 grant select on t to u;
 
+-- where with missing expr
+select from t where and c > 10;
+select from t where or c != 'b';
+
 -- select end
 select
 end;
