@@ -747,6 +747,62 @@ SOURCE_FILE
           IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- where with missing expr"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      ERROR
+        AND_KW "and"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      ERROR
+        OR_KW "or"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        NEQ "!="
+        WHITESPACE " "
+        LITERAL
+          STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- select end"
   WHITESPACE "\n"
   SELECT
@@ -957,31 +1013,39 @@ error[syntax-error]: expected SEMICOLON
    ╭▸ 
 77 │ select 
    ╰╴      ━
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: expected expression but got AND_KW
    ╭▸ 
-81 │   select
-   │ ┏━━━━━━━┛
-82 │ ┃ end;
-   ╰╴┗━┛
+81 │ select from t where and c > 10;
+   ╰╴                    ━
+error[syntax-error]: expected expression but got OR_KW
+   ╭▸ 
+82 │ select from t where or c != 'b';
+   ╰╴                    ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
 85 │   select
    │ ┏━━━━━━━┛
-86 │ ┃ analyze;
+86 │ ┃ end;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-88 │   select
+89 │   select
    │ ┏━━━━━━━┛
-89 │ ┃ analyse;
+90 │ ┃ analyze;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-93 │   select
+92 │   select
    │ ┏━━━━━━━┛
-94 │ ┃ with t as (select 1)
+93 │ ┃ analyse;
+   ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+   ╭▸ 
+97 │   select
+   │ ┏━━━━━━━┛
+98 │ ┃ with t as (select 1)
    ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
-   ╭▸ 
-98 │ select 1,
-   ╰╴        ━
+    ╭▸ 
+102 │ select 1,
+    ╰╴        ━
