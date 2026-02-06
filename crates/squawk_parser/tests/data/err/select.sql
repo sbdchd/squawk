@@ -81,6 +81,12 @@ grant select on t to u;
 select from t where and c > 10;
 select from t where or c != 'b';
 
+select having and c > 10;
+select having or c != 'b';
+
+select from t join u on and true;
+select from t join u on or true;
+
 -- select end
 select
 end;
