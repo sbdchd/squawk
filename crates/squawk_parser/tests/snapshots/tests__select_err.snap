@@ -803,6 +803,106 @@ SOURCE_FILE
           STRING "'b'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "having"
+      WHITESPACE " "
+      ERROR
+        AND_KW "and"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "having"
+      WHITESPACE " "
+      ERROR
+        OR_KW "or"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        NEQ "!="
+        WHITESPACE " "
+        LITERAL
+          STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "u"
+          WHITESPACE " "
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            ERROR
+              AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "u"
+          WHITESPACE " "
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            ERROR
+              OR_KW "or"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- select end"
   WHITESPACE "\n"
   SELECT
@@ -1021,31 +1121,47 @@ error[syntax-error]: expected expression but got OR_KW
    ╭▸ 
 82 │ select from t where or c != 'b';
    ╰╴                    ━
+error[syntax-error]: expected expression but got AND_KW
+   ╭▸ 
+84 │ select having and c > 10;
+   ╰╴              ━
+error[syntax-error]: expected expression but got OR_KW
+   ╭▸ 
+85 │ select having or c != 'b';
+   ╰╴              ━
+error[syntax-error]: expected expression but got AND_KW
+   ╭▸ 
+87 │ select from t join u on and true;
+   ╰╴                        ━
+error[syntax-error]: expected expression but got OR_KW
+   ╭▸ 
+88 │ select from t join u on or true;
+   ╰╴                        ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-85 │   select
+91 │   select
    │ ┏━━━━━━━┛
-86 │ ┃ end;
+92 │ ┃ end;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-89 │   select
+95 │   select
    │ ┏━━━━━━━┛
-90 │ ┃ analyze;
+96 │ ┃ analyze;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-92 │   select
+98 │   select
    │ ┏━━━━━━━┛
-93 │ ┃ analyse;
+99 │ ┃ analyse;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-97 │   select
-   │ ┏━━━━━━━┛
-98 │ ┃ with t as (select 1)
-   ╰╴┗━┛
+    ╭▸ 
+103 │   select
+    │ ┏━━━━━━━┛
+104 │ ┃ with t as (select 1)
+    ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-102 │ select 1,
+108 │ select 1,
     ╰╴        ━

@@ -3421,7 +3421,7 @@ fn on_clause(p: &mut Parser<'_>) {
     assert!(p.at(ON_KW));
     let m = p.start();
     p.bump(ON_KW);
-    expr(p);
+    clause_expr(p);
     m.complete(p, ON_CLAUSE);
 }
 
@@ -4476,17 +4476,20 @@ fn opt_repeatable_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, REPEATABLE_CLAUSE))
 }
 
+fn clause_expr(p: &mut Parser<'_>) {
+    if p.at(AND_KW) || p.at(OR_KW) {
+        p.err_and_bump(&format!("expected expression but got {:?}", p.current()));
+    }
+    expr(p);
+}
+
 fn opt_where_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at(WHERE_KW) {
         return None;
     }
     let m = p.start();
     p.bump(WHERE_KW);
-    // TODO: we might want to be fancier, maybe all binary only operators?
-    if p.at(AND_KW) || p.at(OR_KW) {
-        p.err_and_bump(&format!("expected expression but got {:?}", p.current()));
-    }
-    expr(p);
+    clause_expr(p);
     Some(m.complete(p, WHERE_CLAUSE))
 }
 
@@ -4580,7 +4583,7 @@ fn opt_having_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump(HAVING_KW);
-    expr(p);
+    clause_expr(p);
     Some(m.complete(p, HAVING_CLAUSE))
 }
 
