@@ -7211,6 +7211,25 @@ insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c$0;"
     }
 
     #[test]
+    fn goto_insert_on_conflict_qualified_function() {
+        assert_snapshot!(goto("
+create function foo.lower(text) returns text
+  language internal;
+create table t(c text);
+insert into t values ('c')
+  on conflict (foo.lower$0(c))
+    do nothing;"
+        ), @r"
+          ╭▸ 
+        2 │ create function foo.lower(text) returns text
+          │                     ───── 2. destination
+          ‡
+        6 │   on conflict (foo.lower(c))
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_delete_from_alias() {
         assert_snapshot!(goto("
 create table t(a int, b int);
