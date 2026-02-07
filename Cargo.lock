@@ -1895,7 +1895,7 @@ dependencies = [
 
 [[package]]
 name = "squawk"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "annotate-snippets",
  "anyhow",
@@ -1924,7 +1924,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-fmt"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "insta",
  "itertools 0.14.0",
@@ -1934,7 +1934,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-github"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "jsonwebtoken",
  "log",
@@ -1945,7 +1945,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-ide"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "annotate-snippets",
  "insta",
@@ -1963,14 +1963,14 @@ dependencies = [
 
 [[package]]
 name = "squawk-lexer"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "insta",
 ]
 
 [[package]]
 name = "squawk-linter"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "annotate-snippets",
  "enum-iterator",
@@ -1985,7 +1985,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-parser"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "annotate-snippets",
  "camino",
@@ -1999,7 +1999,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-server"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "anyhow",
  "insta",
@@ -2019,7 +2019,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-syntax"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "annotate-snippets",
  "camino",
@@ -2032,7 +2032,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-wasm"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -2885,7 +2885,7 @@ checksum = "32ac00cd3f8ec9c1d33fb3e7958a82df6989c42d747bd326c822b1d625283547"
 
 [[package]]
 name = "xtask"
-version = "2.39.0"
+version = "2.40.0"
 dependencies = [
  "anyhow",
  "camino",
