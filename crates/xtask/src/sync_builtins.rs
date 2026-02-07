@@ -64,9 +64,10 @@ order by n.nspname, c.relname, a.attnum;
 ";
 
 const BUILTIN_FUNCTIONS_QUERY: &str = r"
-select n.nspname, p.proname, pg_get_function_arguments(p.oid) as args, pg_get_function_result(p.oid) as result, coalesce(d.description, '')
+select n.nspname, p.proname, pg_get_function_arguments(p.oid) as args, pg_get_function_result(p.oid) as result, l.lanname, coalesce(d.description, '')
 from pg_proc p
   join pg_namespace n on n.oid = p.pronamespace
+  join pg_language l on l.oid = p.prolang
   left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
@@ -285,12 +286,13 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let func_name = parts.next().context("expected function name")?;
         let args = parts.next().context("expected function arguments")?;
         let result = parts.next().context("expected function result")?;
+        let language = parts.next().context("expected function language")?;
         let description = parts.next().context("expected function description")?;
         if !description.is_empty() {
             sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
         }
         sql.push_str(&format!(
-            "create function {schema}.{func_name}({args}) returns {result}\n  language internal;\n\n"
+            "create function {schema}.{func_name}({args}) returns {result}\n  language {language};\n\n"
         ));
     }
 
