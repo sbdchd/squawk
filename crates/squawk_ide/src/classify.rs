@@ -631,6 +631,9 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
             in_conflict_target = true;
         }
         if ast::Insert::can_cast(ancestor.kind()) {
+            if in_function_name && !in_special_sql_fn {
+                return Some(NameRefClass::SelectFunctionCall);
+            }
             if in_returning_clause
                 || in_column_list
                 || in_set_clause
