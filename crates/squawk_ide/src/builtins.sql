@@ -3336,37 +3336,37 @@ create view pg_catalog.pg_wait_events(type, name, description) as
 ;
 
 create function information_schema._pg_char_max_length(typid oid, typmod integer) returns integer
-  language internal;
+  language sql;
 
 create function information_schema._pg_char_octet_length(typid oid, typmod integer) returns integer
-  language internal;
+  language sql;
 
 create function information_schema._pg_datetime_precision(typid oid, typmod integer) returns integer
-  language internal;
+  language sql;
 
 create function information_schema._pg_expandarray(anyarray, OUT x anyelement, OUT n integer) returns SETOF record
-  language internal;
+  language sql;
 
 create function information_schema._pg_index_position(oid, smallint) returns integer
-  language internal;
+  language sql;
 
 create function information_schema._pg_interval_type(typid oid, mod integer) returns text
-  language internal;
+  language sql;
 
 create function information_schema._pg_numeric_precision(typid oid, typmod integer) returns integer
-  language internal;
+  language sql;
 
 create function information_schema._pg_numeric_precision_radix(typid oid, typmod integer) returns integer
-  language internal;
+  language sql;
 
 create function information_schema._pg_numeric_scale(typid oid, typmod integer) returns integer
-  language internal;
+  language sql;
 
 create function information_schema._pg_truetypid(pg_attribute, pg_type) returns oid
-  language internal;
+  language sql;
 
 create function information_schema._pg_truetypmod(pg_attribute, pg_type) returns integer
-  language internal;
+  language sql;
 
 -- referential integrity ON DELETE CASCADE
 create function pg_catalog.RI_FKey_cascade_del() returns trigger
@@ -3494,7 +3494,7 @@ create function pg_catalog.acosh(double precision) returns double precision
 
 -- date difference from today preserving months and years
 create function pg_catalog.age(timestamp with time zone) returns interval
-  language internal;
+  language sql;
 
 -- date difference preserving months and years
 create function pg_catalog.age(timestamp with time zone, timestamp with time zone) returns interval
@@ -3502,7 +3502,7 @@ create function pg_catalog.age(timestamp with time zone, timestamp with time zon
 
 -- date difference from today preserving months and years
 create function pg_catalog.age(timestamp without time zone) returns interval
-  language internal;
+  language sql;
 
 -- date difference preserving months and years
 create function pg_catalog.age(timestamp without time zone, timestamp without time zone) returns interval
@@ -3638,7 +3638,7 @@ create function pg_catalog.anyrange_out(anyrange) returns cstring
 
 -- implementation of || operator
 create function pg_catalog.anytextcat(anynonarray, text) returns text
-  language internal;
+  language sql;
 
 -- box area
 create function pg_catalog.area(box) returns double precision
@@ -3974,15 +3974,15 @@ create function pg_catalog.bernoulli(internal) returns tsm_handler
 
 -- internal conversion function for BIG5 to EUC_TW
 create function pg_catalog.big5_to_euc_tw(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for BIG5 to MULE_INTERNAL
 create function pg_catalog.big5_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for BIG5 to UTF8
 create function pg_catalog.big5_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- for use by pg_upgrade (relation for pg_subscription_rel)
 create function pg_catalog.binary_upgrade_add_sub_rel_state(text, oid, "char", pg_lsn) returns void
@@ -4102,15 +4102,15 @@ create function pg_catalog.bit_in(cstring, oid, integer) returns bit
 
 -- length in bits
 create function pg_catalog.bit_length(bit) returns integer
-  language internal;
+  language sql;
 
 -- length in bits
 create function pg_catalog.bit_length(bytea) returns integer
-  language internal;
+  language sql;
 
 -- length in bits
 create function pg_catalog.bit_length(text) returns integer
-  language internal;
+  language sql;
 
 -- bitwise-or bigint aggregate
 create function pg_catalog.bit_or(bigint) returns bigint
@@ -5454,7 +5454,7 @@ create function pg_catalog.close_sb(lseg, box) returns point
 
 -- get description for table column
 create function pg_catalog.col_description(oid, integer) returns text
-  language internal;
+  language sql;
 
 -- concatenate values
 create function pg_catalog.concat(VARIADIC "any") returns text
@@ -5746,7 +5746,7 @@ create function pg_catalog.date_out(date) returns cstring
 
 -- extract field from date
 create function pg_catalog.date_part(text, date) returns double precision
-  language internal;
+  language sql;
 
 -- extract field from interval
 create function pg_catalog.date_part(text, interval) returns double precision
@@ -6005,10 +6005,10 @@ create function pg_catalog.dsimple_lexize(internal, internal, internal, internal
   language internal;
 
 create function pg_catalog.dsnowball_init(internal) returns internal
-  language internal;
+  language c;
 
 create function pg_catalog.dsnowball_lexize(internal, internal, internal, internal) returns internal
-  language internal;
+  language c;
 
 -- implementation of |/ operator
 create function pg_catalog.dsqrt(double precision) returns double precision
@@ -6128,51 +6128,51 @@ create function pg_catalog.erfc(double precision) returns double precision
 
 -- internal conversion function for EUC_CN to MULE_INTERNAL
 create function pg_catalog.euc_cn_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_CN to UTF8
 create function pg_catalog.euc_cn_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_JIS_2004 to SHIFT_JIS_2004
 create function pg_catalog.euc_jis_2004_to_shift_jis_2004(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_JIS_2004 to UTF8
 create function pg_catalog.euc_jis_2004_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_JP to MULE_INTERNAL
 create function pg_catalog.euc_jp_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_JP to SJIS
 create function pg_catalog.euc_jp_to_sjis(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_JP to UTF8
 create function pg_catalog.euc_jp_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_KR to MULE_INTERNAL
 create function pg_catalog.euc_kr_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_KR to UTF8
 create function pg_catalog.euc_kr_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_TW to BIG5
 create function pg_catalog.euc_tw_to_big5(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_TW to MULE_INTERNAL
 create function pg_catalog.euc_tw_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for EUC_TW to UTF8
 create function pg_catalog.euc_tw_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- I/O
 create function pg_catalog.event_trigger_in(cstring) returns event_trigger
@@ -6648,11 +6648,11 @@ create function pg_catalog.gamma(double precision) returns double precision
 
 -- internal conversion function for GB18030 to UTF8
 create function pg_catalog.gb18030_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for GBK to UTF8
 create function pg_catalog.gbk_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- greatest common divisor
 create function pg_catalog.gcd(bigint, bigint) returns bigint
@@ -8628,7 +8628,7 @@ create function pg_catalog.int8pl(bigint, bigint) returns bigint
 
 -- implementation of + operator
 create function pg_catalog.int8pl_inet(bigint, inet) returns inet
-  language internal;
+  language sql;
 
 -- int8range constructor
 create function pg_catalog.int8range(bigint, bigint) returns int8range
@@ -8680,7 +8680,7 @@ create function pg_catalog.int8xor(bigint, bigint) returns bigint
 
 -- implementation of + operator
 create function pg_catalog.integer_pl_date(integer, date) returns date
-  language internal;
+  language sql;
 
 -- implementation of ?# operator
 create function pg_catalog.inter_lb(line, box) returns boolean
@@ -8800,23 +8800,23 @@ create function pg_catalog.interval_pl(interval, interval) returns interval
 
 -- implementation of + operator
 create function pg_catalog.interval_pl_date(interval, date) returns timestamp without time zone
-  language internal;
+  language sql;
 
 -- implementation of + operator
 create function pg_catalog.interval_pl_time(interval, time without time zone) returns time without time zone
-  language internal;
+  language sql;
 
 -- implementation of + operator
 create function pg_catalog.interval_pl_timestamp(interval, timestamp without time zone) returns timestamp without time zone
-  language internal;
+  language sql;
 
 -- implementation of + operator
 create function pg_catalog.interval_pl_timestamptz(interval, timestamp with time zone) returns timestamp with time zone
-  language internal;
+  language sql;
 
 -- implementation of + operator
 create function pg_catalog.interval_pl_timetz(interval, time with time zone) returns time with time zone
-  language internal;
+  language sql;
 
 -- I/O
 create function pg_catalog.interval_recv(internal, oid, integer) returns interval
@@ -8896,27 +8896,27 @@ create function pg_catalog.ishorizontal(point, point) returns boolean
 
 -- internal conversion function for LATIN1 to UTF8
 create function pg_catalog.iso8859_1_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for ISO-8859 2-16 to UTF8
 create function pg_catalog.iso8859_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for ISO-8859-5 to KOI8R
 create function pg_catalog.iso_to_koi8r(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for ISO-8859-5 to MULE_INTERNAL
 create function pg_catalog.iso_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for ISO-8859-5 to WIN1251
 create function pg_catalog.iso_to_win1251(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for ISO-8859-5 to WIN866
 create function pg_catalog.iso_to_win866(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- path open?
 create function pg_catalog.isopen(path) returns boolean
@@ -8952,7 +8952,7 @@ create function pg_catalog.isvertical(point, point) returns boolean
 
 -- internal conversion function for JOHAB to UTF8
 create function pg_catalog.johab_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- aggregate input into json
 create function pg_catalog.json_agg(anyelement) returns json
@@ -9484,27 +9484,27 @@ create function pg_catalog.justify_interval(interval) returns interval
 
 -- internal conversion function for KOI8R to ISO-8859-5
 create function pg_catalog.koi8r_to_iso(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for KOI8R to MULE_INTERNAL
 create function pg_catalog.koi8r_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for KOI8R to UTF8
 create function pg_catalog.koi8r_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for KOI8R to WIN1251
 create function pg_catalog.koi8r_to_win1251(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for KOI8R to WIN866
 create function pg_catalog.koi8r_to_win866(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for KOI8U to UTF8
 create function pg_catalog.koi8u_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- fetch the Nth preceding row value with default
 create function pg_catalog.lag(anycompatible, integer, anycompatible) returns anycompatible
@@ -9536,23 +9536,23 @@ create function pg_catalog.lastval() returns bigint
 
 -- internal conversion function for LATIN1 to MULE_INTERNAL
 create function pg_catalog.latin1_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for LATIN2 to MULE_INTERNAL
 create function pg_catalog.latin2_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for LATIN2 to WIN1250
 create function pg_catalog.latin2_to_win1250(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for LATIN3 to MULE_INTERNAL
 create function pg_catalog.latin3_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for LATIN4 to MULE_INTERNAL
 create function pg_catalog.latin4_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- least common multiple
 create function pg_catalog.lcm(bigint, bigint) returns bigint
@@ -9784,7 +9784,7 @@ create function pg_catalog.log(double precision) returns double precision
 
 -- base 10 logarithm
 create function pg_catalog.log(numeric) returns numeric
-  language internal;
+  language sql;
 
 -- logarithm base m of n
 create function pg_catalog.log(numeric, numeric) returns numeric
@@ -9796,7 +9796,7 @@ create function pg_catalog.log10(double precision) returns double precision
 
 -- base 10 logarithm
 create function pg_catalog.log10(numeric) returns numeric
-  language internal;
+  language sql;
 
 -- large object read
 create function pg_catalog.loread(integer, integer) returns bytea
@@ -9836,7 +9836,7 @@ create function pg_catalog.lowrite(integer, bytea) returns integer
 
 -- left-pad string to length
 create function pg_catalog.lpad(text, integer) returns text
-  language internal;
+  language sql;
 
 -- left-pad string to length
 create function pg_catalog.lpad(text, integer, text) returns text
@@ -10212,63 +10212,63 @@ create function pg_catalog.md5(text) returns text
 
 -- internal conversion function for MULE_INTERNAL to BIG5
 create function pg_catalog.mic_to_big5(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to EUC_CN
 create function pg_catalog.mic_to_euc_cn(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to EUC_JP
 create function pg_catalog.mic_to_euc_jp(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to EUC_KR
 create function pg_catalog.mic_to_euc_kr(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to EUC_TW
 create function pg_catalog.mic_to_euc_tw(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to ISO-8859-5
 create function pg_catalog.mic_to_iso(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to KOI8R
 create function pg_catalog.mic_to_koi8r(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to LATIN1
 create function pg_catalog.mic_to_latin1(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to LATIN2
 create function pg_catalog.mic_to_latin2(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to LATIN3
 create function pg_catalog.mic_to_latin3(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to LATIN4
 create function pg_catalog.mic_to_latin4(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to SJIS
 create function pg_catalog.mic_to_sjis(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to WIN1250
 create function pg_catalog.mic_to_win1250(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to WIN1251
 create function pg_catalog.mic_to_win1251(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for MULE_INTERNAL to WIN866
 create function pg_catalog.mic_to_win866(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- minimum value of all anyarray input values
 create function pg_catalog.min(anyarray) returns anyarray
@@ -10972,7 +10972,7 @@ create function pg_catalog.numeric_out(numeric) returns cstring
 
 -- implementation of + operator
 create function pg_catalog.numeric_pl_pg_lsn(numeric, pg_lsn) returns pg_lsn
-  language internal;
+  language sql;
 
 -- aggregate final function
 create function pg_catalog.numeric_poly_avg(internal) returns numeric
@@ -11112,11 +11112,11 @@ create function pg_catalog.numrange_subdiff(numeric, numeric) returns double pre
 
 -- deprecated, use two-argument form instead
 create function pg_catalog.obj_description(oid) returns text
-  language internal;
+  language sql;
 
 -- get description for object id and catalog name
 create function pg_catalog.obj_description(oid, name) returns text
-  language internal;
+  language sql;
 
 -- octet length
 create function pg_catalog.octet_length(bit) returns integer
@@ -11268,15 +11268,15 @@ create function pg_catalog.overlaps(time with time zone, time with time zone, ti
 
 -- intervals overlap?
 create function pg_catalog.overlaps(time without time zone, interval, time without time zone, interval) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(time without time zone, interval, time without time zone, time without time zone) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(time without time zone, time without time zone, time without time zone, interval) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(time without time zone, time without time zone, time without time zone, time without time zone) returns boolean
@@ -11284,15 +11284,15 @@ create function pg_catalog.overlaps(time without time zone, time without time zo
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp with time zone, interval, timestamp with time zone, interval) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp with time zone, interval, timestamp with time zone, timestamp with time zone) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp with time zone, timestamp with time zone, timestamp with time zone, interval) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp with time zone, timestamp with time zone, timestamp with time zone, timestamp with time zone) returns boolean
@@ -11300,15 +11300,15 @@ create function pg_catalog.overlaps(timestamp with time zone, timestamp with tim
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp without time zone, interval, timestamp without time zone, interval) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp without time zone, interval, timestamp without time zone, timestamp without time zone) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp without time zone, timestamp without time zone, timestamp without time zone, interval) returns boolean
-  language internal;
+  language sql;
 
 -- intervals overlap?
 create function pg_catalog.overlaps(timestamp without time zone, timestamp without time zone, timestamp without time zone, timestamp without time zone) returns boolean
@@ -11356,7 +11356,7 @@ create function pg_catalog.path_add_pt(path, point) returns path
 
 -- implementation of @> operator
 create function pg_catalog.path_contain_pt(path, point) returns boolean
-  language internal;
+  language sql;
 
 -- implementation of <-> operator
 create function pg_catalog.path_distance(path, path) returns double precision
@@ -12400,7 +12400,7 @@ create function pg_catalog.pg_relation_is_updatable(regclass, boolean) returns i
 
 -- disk space usage for the main fork of the specified table or index
 create function pg_catalog.pg_relation_size(regclass) returns bigint
-  language internal;
+  language sql;
 
 -- disk space usage for the specified fork of a table or index
 create function pg_catalog.pg_relation_size(regclass, text) returns bigint
@@ -12516,11 +12516,11 @@ create function pg_catalog.pg_sleep(double precision) returns void
 
 -- sleep for the specified interval
 create function pg_catalog.pg_sleep_for(interval) returns void
-  language internal;
+  language sql;
 
 -- sleep until the specified time
 create function pg_catalog.pg_sleep_until(timestamp with time zone) returns void
-  language internal;
+  language sql;
 
 -- I/O
 create function pg_catalog.pg_snapshot_in(cstring) returns pg_snapshot
@@ -13267,13 +13267,13 @@ create function pg_catalog.plainto_tsquery(text) returns tsquery
   language internal;
 
 create function pg_catalog.plpgsql_call_handler() returns language_handler
-  language internal;
+  language c;
 
 create function pg_catalog.plpgsql_inline_handler(internal) returns void
-  language internal;
+  language c;
 
 create function pg_catalog.plpgsql_validator(oid) returns void
-  language internal;
+  language c;
 
 -- center of
 create function pg_catalog.point(box) returns point
@@ -13449,7 +13449,7 @@ create function pg_catalog.polygon(box) returns polygon
 
 -- convert circle to 12-vertex polygon
 create function pg_catalog.polygon(circle) returns polygon
-  language internal;
+  language sql;
 
 -- convert vertex count and circle to polygon
 create function pg_catalog.polygon(integer, circle) returns polygon
@@ -13561,7 +13561,7 @@ create function pg_catalog.quote_ident(text) returns text
 
 -- quote a data value for usage in a querystring
 create function pg_catalog.quote_literal(anyelement) returns text
-  language internal;
+  language sql;
 
 -- quote a literal for usage in a querystring
 create function pg_catalog.quote_literal(text) returns text
@@ -13569,7 +13569,7 @@ create function pg_catalog.quote_literal(text) returns text
 
 -- quote a possibly-null data value for usage in a querystring
 create function pg_catalog.quote_nullable(anyelement) returns text
-  language internal;
+  language sql;
 
 -- quote a possibly-null literal for usage in a querystring
 create function pg_catalog.quote_nullable(text) returns text
@@ -14257,7 +14257,7 @@ create function pg_catalog.round(double precision) returns double precision
 
 -- value rounded to 'scale' of zero
 create function pg_catalog.round(numeric) returns numeric
-  language internal;
+  language sql;
 
 -- value rounded to 'scale'
 create function pg_catalog.round(numeric, integer) returns numeric
@@ -14285,7 +14285,7 @@ create function pg_catalog.row_to_json(record, boolean) returns json
 
 -- right-pad string to length
 create function pg_catalog.rpad(text, integer) returns text
-  language internal;
+  language sql;
 
 -- right-pad string to length
 create function pg_catalog.rpad(text, integer, text) returns text
@@ -14429,15 +14429,15 @@ create function pg_catalog.shell_out(void) returns cstring
 
 -- internal conversion function for SHIFT_JIS_2004 to EUC_JIS_2004
 create function pg_catalog.shift_jis_2004_to_euc_jis_2004(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for SHIFT_JIS_2004 to UTF8
 create function pg_catalog.shift_jis_2004_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- get description for object id and shared catalog name
 create function pg_catalog.shobj_description(oid, name) returns text
-  language internal;
+  language sql;
 
 -- sign of value
 create function pg_catalog.sign(double precision) returns double precision
@@ -14473,15 +14473,15 @@ create function pg_catalog.sinh(double precision) returns double precision
 
 -- internal conversion function for SJIS to EUC_JP
 create function pg_catalog.sjis_to_euc_jp(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for SJIS to MULE_INTERNAL
 create function pg_catalog.sjis_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for SJIS to UTF8
 create function pg_catalog.sjis_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- slope between points
 create function pg_catalog.slope(point, point) returns double precision
@@ -14785,7 +14785,7 @@ create function pg_catalog.substring(text, text) returns text
 
 -- extract text matching SQL regular expression
 create function pg_catalog.substring(text, text, text) returns text
-  language internal;
+  language sql;
 
 -- sum as numeric across all bigint input values
 create function pg_catalog.sum(bigint) returns numeric
@@ -14933,7 +14933,7 @@ create function pg_catalog.text_starts_with_support(internal) returns internal
 
 -- implementation of || operator
 create function pg_catalog.textanycat(text, anynonarray) returns text
-  language internal;
+  language sql;
 
 -- implementation of || operator
 create function pg_catalog.textcat(text, text) returns text
@@ -15193,7 +15193,7 @@ create function pg_catalog.time_support(internal) returns internal
 
 -- implementation of + operator
 create function pg_catalog.timedate_pl(time without time zone, date) returns timestamp without time zone
-  language internal;
+  language sql;
 
 -- current date and time - increments during transactions
 create function pg_catalog.timeofday() returns text
@@ -15373,7 +15373,7 @@ create function pg_catalog.timestamptz(date, time with time zone) returns timest
 
 -- convert date and time to timestamp with time zone
 create function pg_catalog.timestamptz(date, time without time zone) returns timestamp with time zone
-  language internal;
+  language sql;
 
 -- adjust timestamptz precision
 create function pg_catalog.timestamptz(timestamp with time zone, integer) returns timestamp with time zone
@@ -15609,7 +15609,7 @@ create function pg_catalog.timetz_smaller(time with time zone, time with time zo
 
 -- implementation of + operator
 create function pg_catalog.timetzdate_pl(time with time zone, date) returns timestamp with time zone
-  language internal;
+  language sql;
 
 -- I/O typmod
 create function pg_catalog.timetztypmodin(cstring[]) returns integer
@@ -15857,7 +15857,7 @@ create function pg_catalog.trunc(macaddr8) returns macaddr8
 
 -- value truncated to 'scale' of zero
 create function pg_catalog.trunc(numeric) returns numeric
-  language internal;
+  language sql;
 
 -- value truncated to 'scale'
 create function pg_catalog.trunc(numeric, integer) returns numeric
@@ -15865,11 +15865,11 @@ create function pg_catalog.trunc(numeric, integer) returns numeric
 
 -- debug function for text search configuration
 create function pg_catalog.ts_debug(config regconfig, document text, OUT alias text, OUT description text, OUT token text, OUT dictionaries regdictionary[], OUT dictionary regdictionary, OUT lexemes text[]) returns SETOF record
-  language internal;
+  language sql;
 
 -- debug function for current text search configuration
 create function pg_catalog.ts_debug(document text, OUT alias text, OUT description text, OUT token text, OUT dictionaries regdictionary[], OUT dictionary regdictionary, OUT lexemes text[]) returns SETOF record
-  language internal;
+  language sql;
 
 -- delete lexeme
 create function pg_catalog.ts_delete(tsvector, text) returns tsvector
@@ -16265,7 +16265,7 @@ create function pg_catalog.txid_visible_in_snapshot(bigint, txid_snapshot) retur
 
 -- internal conversion function for UHC to UTF8
 create function pg_catalog.uhc_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- check valid Unicode
 create function pg_catalog.unicode_assigned(text) returns boolean
@@ -16341,71 +16341,71 @@ create function pg_catalog.upper_inf(anyrange) returns boolean
 
 -- internal conversion function for UTF8 to BIG5
 create function pg_catalog.utf8_to_big5(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to EUC_CN
 create function pg_catalog.utf8_to_euc_cn(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to EUC_JIS_2004
 create function pg_catalog.utf8_to_euc_jis_2004(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to EUC_JP
 create function pg_catalog.utf8_to_euc_jp(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to EUC_KR
 create function pg_catalog.utf8_to_euc_kr(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to EUC_TW
 create function pg_catalog.utf8_to_euc_tw(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to GB18030
 create function pg_catalog.utf8_to_gb18030(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to GBK
 create function pg_catalog.utf8_to_gbk(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to ISO-8859 2-16
 create function pg_catalog.utf8_to_iso8859(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to LATIN1
 create function pg_catalog.utf8_to_iso8859_1(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to JOHAB
 create function pg_catalog.utf8_to_johab(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to KOI8R
 create function pg_catalog.utf8_to_koi8r(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to KOI8U
 create function pg_catalog.utf8_to_koi8u(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to SHIFT_JIS_2004
 create function pg_catalog.utf8_to_shift_jis_2004(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to SJIS
 create function pg_catalog.utf8_to_sjis(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to UHC
 create function pg_catalog.utf8_to_uhc(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for UTF8 to WIN
 create function pg_catalog.utf8_to_win(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- less-equal-greater
 create function pg_catalog.uuid_cmp(uuid, uuid) returns integer
@@ -16701,47 +16701,47 @@ create function pg_catalog.width_bucket(numeric, numeric, numeric, integer) retu
 
 -- internal conversion function for WIN1250 to LATIN2
 create function pg_catalog.win1250_to_latin2(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN1250 to MULE_INTERNAL
 create function pg_catalog.win1250_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN1251 to ISO-8859-5
 create function pg_catalog.win1251_to_iso(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN1251 to KOI8R
 create function pg_catalog.win1251_to_koi8r(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN1251 to MULE_INTERNAL
 create function pg_catalog.win1251_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN1251 to WIN866
 create function pg_catalog.win1251_to_win866(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN866 to ISO-8859-5
 create function pg_catalog.win866_to_iso(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN866 to KOI8R
 create function pg_catalog.win866_to_koi8r(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN866 to MULE_INTERNAL
 create function pg_catalog.win866_to_mic(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN866 to WIN1251
 create function pg_catalog.win866_to_win1251(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- internal conversion function for WIN to UTF8
 create function pg_catalog.win_to_utf8(integer, integer, cstring, internal, integer, boolean) returns integer
-  language internal;
+  language c;
 
 -- planner support for cume_dist
 create function pg_catalog.window_cume_dist_support(internal) returns internal
@@ -16913,7 +16913,7 @@ create function pg_catalog.xmlvalidate(xml, text) returns boolean
 
 -- evaluate XPath expression
 create function pg_catalog.xpath(text, xml) returns xml[]
-  language internal;
+  language sql;
 
 -- evaluate XPath expression, with namespaces support
 create function pg_catalog.xpath(text, xml, text[]) returns xml[]
@@ -16921,7 +16921,7 @@ create function pg_catalog.xpath(text, xml, text[]) returns xml[]
 
 -- test XML value against XPath expression
 create function pg_catalog.xpath_exists(text, xml) returns boolean
-  language internal;
+  language sql;
 
 -- test XML value against XPath expression, with namespace support
 create function pg_catalog.xpath_exists(text, xml, text[]) returns boolean
