@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.40.0 - 2026-02-06
+
+### Added
+
+- parser: improve error recovery in `where`, `having`, & `join` `on` (#911, #912)
+- ide: goto def on conflict clause (#907)
+- ide: goto def func calls inside constraints/columns/indexes/partitions (#906)
+
+### Fixed
+
+- ide: goto def with recursive CTEs (#909)
+
 ## v2.39.0 - 2026-01-31
 
 ### Added
