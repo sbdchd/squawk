@@ -43,6 +43,9 @@ select array[1, ,3];
 -- trailing comma
 select array[1,2,3,];
 
+-- group by all, order by all
+select * from t group by all order by all;
+
 -- cast with malformed type mod args
 select cast(x as varchar(100 200));
 select cast(x as varchar(100, , 200));
