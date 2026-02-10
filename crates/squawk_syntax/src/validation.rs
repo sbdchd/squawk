@@ -21,9 +21,31 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
+                ast::Select(it) => validate_select(it, errors),
                 _ => (),
             }
         }
+    }
+}
+
+fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
+    let Some(from_clause) = it.from_clause() else {
+        return;
+    };
+    if let Some(select_clause) = it.select_clause() {
+        if from_clause.syntax().text_range().end() < select_clause.syntax().text_range().start() {
+            // Postgres dialect doesn't support leading from clauses, e.g., `from t select c`
+            acc.push(SyntaxError::new(
+                "Leading from clauses are not supported in Postgres",
+                from_clause.syntax().text_range(),
+            ));
+        }
+    } else {
+        // Postgres dialect doesn't support missing select clauses, e.g., `from t`
+        acc.push(SyntaxError::new(
+            "Missing select clause",
+            TextRange::empty(from_clause.syntax().text_range().start()),
+        ));
     }
 }
 
