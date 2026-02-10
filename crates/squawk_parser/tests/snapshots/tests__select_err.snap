@@ -477,6 +477,41 @@ SOURCE_FILE
             R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- group by all, order by all"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      ALL_KW "all"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          ERROR
+            ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- cast with malformed type mod args"
   WHITESPACE "\n"
   SELECT
@@ -1067,101 +1102,105 @@ error[syntax-error]: unexpected trailing comma
    ╭▸ 
 44 │ select array[1,2,3,];
    ╰╴                  ━
+error[syntax-error]: expected expression in atom_expr
+   ╭▸ 
+47 │ select * from t group by all order by all;
+   ╰╴                                      ━
 error[syntax-error]: expected COMMA
    ╭▸ 
-47 │ select cast(x as varchar(100 200));
+50 │ select cast(x as varchar(100 200));
    ╰╴                            ━
 error[syntax-error]: unexpected comma
    ╭▸ 
-48 │ select cast(x as varchar(100, , 200));
+51 │ select cast(x as varchar(100, , 200));
    ╰╴                              ━
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
-49 │ select cast(x as t(a, b,));
+52 │ select cast(x as t(a, b,));
    ╰╴                       ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-53 │ select select;
+56 │ select select;
    ╰╴      ━
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
-56 │ select a, from t;
+59 │ select a, from t;
    ╰╴        ━
 error[syntax-error]: expected an expression, found END_KW
    ╭▸ 
-59 │ select case when 1 then end;
+62 │ select case when 1 then end;
    ╰╴                       ━
 error[syntax-error]: expected an expression, found THEN_KW
    ╭▸ 
-62 │ select case when then x end;
+65 │ select case when then x end;
    ╰╴                ━
 error[syntax-error]: expected an expression, found END_KW
    ╭▸ 
-65 │ select case when 1 then 2 else end;
+68 │ select case when 1 then 2 else end;
    ╰╴                              ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-68 │   select
+71 │   select
    │ ┏━━━━━━━┛
-69 │ ┃ create table users ();
+72 │ ┃ create table users ();
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-73 │ select 
+76 │ select 
    ╰╴      ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-77 │ select 
+80 │ select 
    ╰╴      ━
 error[syntax-error]: expected expression but got AND_KW
    ╭▸ 
-81 │ select from t where and c > 10;
+84 │ select from t where and c > 10;
    ╰╴                    ━
 error[syntax-error]: expected expression but got OR_KW
    ╭▸ 
-82 │ select from t where or c != 'b';
+85 │ select from t where or c != 'b';
    ╰╴                    ━
 error[syntax-error]: expected expression but got AND_KW
    ╭▸ 
-84 │ select having and c > 10;
+87 │ select having and c > 10;
    ╰╴              ━
 error[syntax-error]: expected expression but got OR_KW
    ╭▸ 
-85 │ select having or c != 'b';
+88 │ select having or c != 'b';
    ╰╴              ━
 error[syntax-error]: expected expression but got AND_KW
    ╭▸ 
-87 │ select from t join u on and true;
+90 │ select from t join u on and true;
    ╰╴                        ━
 error[syntax-error]: expected expression but got OR_KW
    ╭▸ 
-88 │ select from t join u on or true;
+91 │ select from t join u on or true;
    ╰╴                        ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-91 │   select
+94 │   select
    │ ┏━━━━━━━┛
-92 │ ┃ end;
-   ╰╴┗━┛
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-95 │   select
-   │ ┏━━━━━━━┛
-96 │ ┃ analyze;
+95 │ ┃ end;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
 98 │   select
    │ ┏━━━━━━━┛
-99 │ ┃ analyse;
+99 │ ┃ analyze;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
     ╭▸ 
-103 │   select
+101 │   select
     │ ┏━━━━━━━┛
-104 │ ┃ with t as (select 1)
+102 │ ┃ analyse;
+    ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+106 │   select
+    │ ┏━━━━━━━┛
+107 │ ┃ with t as (select 1)
     ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-108 │ select 1,
+111 │ select 1,
     ╰╴        ━

@@ -4837,13 +4837,20 @@ const LHS_FIRST: TokenSet = TokenSet::new(&[
     DEFAULT_KW,
     // for non-standard params, like :foo
     COLON,
+    // We special case the handling of these functions later on
+    // all()
+    ALL_KW,
+    // any()
+    ANY_KW,
+    // some()
+    SOME_KW,
 ])
 .union(OPERATOR_FIRST)
 .union(LITERAL_FIRST)
 .union(TYPE_KEYWORDS)
 .union(IDENTS);
 
-const IDENTS: TokenSet = TokenSet::new(&[ANY_KW, ALL_KW, SOME_KW, IDENT]).union(FUNC_KEYWORDS);
+const IDENTS: TokenSet = TokenSet::new(&[IDENT]).union(FUNC_KEYWORDS);
 
 const FUNC_KEYWORDS: TokenSet = TokenSet::new(&[
     CURRENT_DATE_KW,
