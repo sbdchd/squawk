@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.40.1 - 2026-02-12
+
+- parser: parse leading from clauses but warn they're not supported (#927)
+- parser: fix parsing any/all/some in exprs (#926)
+- ide: goto def func call in on conflict (#925)
+- ide: include language in sql builtins (#924)
+- build(deps): bump the npm_and_yarn group across 4 directories with 8 updates (#923)
+- build(deps): bump @isaacs/brace-expansion from 5.0.0 to 5.0.1 in /squawk-vscode in the npm_and_yarn group across 1 directory (#921)
+- build(deps): bump lodash from 4.17.15 to 4.17.23 in the npm_and_yarn group across 1 directory (#919)
+- build(deps): bump webpack from 5.101.3 to 5.105.0 in /docs in the npm_and_yarn group across 1 directory (#922)
+- build(deps): bump diff from 5.2.0 to 5.2.2 in /squawk-vscode in the npm_and_yarn group across 1 directory (#920)
+- build(deps): bump tar from 7.4.3 to 7.5.7 in /playground in the npm_and_yarn group across 1 directory (#918)
+
 ## v2.40.0 - 2026-02-06
 
 ### Added
