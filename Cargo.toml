@@ -5,7 +5,7 @@ resolver = "2"
 [workspace.package]
 version = "2.40.1"
 edition = "2024"
-rust-version = "1.90.0"
+rust-version = "1.93"
 authors = ["Squawk Team & Contributors"]
 license = "Apache-2.0 OR MIT"
 description = "Linter for Postgres migrations & SQL"
