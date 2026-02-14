@@ -1,6 +1,6 @@
 use anyhow::Result;
 // see: https://github.com/matklad/cargo-xtask
-use clap::{Args, Parser, Subcommand, arg};
+use clap::{Args, Parser, Subcommand};
 use codegen::codegen;
 use new_rule::new_lint;
 use sync_builtins::sync_builtins;
