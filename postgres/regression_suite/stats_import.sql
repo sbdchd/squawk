@@ -15,6 +15,12 @@ CREATE TABLE stats_import.test(
     tags text[]
 ) WITH (autovacuum_enabled = false);
 
+CREATE TABLE stats_import.test_mr(
+    id INTEGER PRIMARY KEY,
+    name text,
+    mrange int4multirange
+) WITH (autovacuum_enabled = false);
+
 SELECT
     pg_catalog.pg_restore_relation_stats(
         'schemaname', 'stats_import',
@@ -22,7 +28,7 @@ SELECT
         'relpages', 18::integer,
         'reltuples', 21::real,
         'relallvisible', 24::integer,
-	'relallfrozen', 27::integer);
+        'relallfrozen', 27::integer);
 
 -- CREATE INDEX on a table with autovac disabled should not overwrite
 -- stats
@@ -108,9 +114,26 @@ CREATE TABLE stats_import.part_child_1
   FOR VALUES FROM (0) TO (10)
   WITH (autovacuum_enabled = false);
 
+-- This ensures the presence of extended statistics marked with
+-- inherited = true.
+CREATE STATISTICS stats_import.part_parent_stat
+  ON i, (i % 2)
+  FROM stats_import.part_parent;
+
 CREATE INDEX part_parent_i ON stats_import.part_parent(i);
 
+INSERT INTO stats_import.part_parent
+SELECT g.g
+FROM generate_series(0,9) AS g(g);
+
+SELECT COUNT(*) FROM stats_import.part_parent;
+SELECT COUNT(*) FROM stats_import.part_child_1;
+
 ANALYZE stats_import.part_parent;
+
+SELECT COUNT(*), e.inherited FROM pg_stats_ext AS e
+  WHERE e.statistics_schemaname = 'stats_import' AND
+  e.statistics_name = 'part_parent_stat' GROUP BY e.inherited;
 
 SELECT relpages
 FROM pg_class
@@ -747,6 +770,24 @@ AND tablename = 'test'
 AND inherited = false
 AND attname = 'id';
 
+-- test for multiranges
+INSERT INTO stats_import.test_mr
+VALUES
+  (1, 'red', '{[1,3),[5,9),[20,30)}'::int4multirange),
+  (2, 'red', '{[11,13),[15,19),[20,30)}'::int4multirange),
+  (3, 'red', '{[21,23),[25,29),[120,130)}'::int4multirange);
+
+-- ensure that we set attribute stats for a multirange
+SELECT pg_catalog.pg_restore_attribute_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_mr',
+  'attname', 'mrange',
+  'inherited', false,
+  'range_length_histogram', '{19,29,109}'::text,
+  'range_empty_frac', '0'::real,
+  'range_bounds_histogram', '{"[1,30)","[11,30)","[21,130)"}'::text
+);
+
 --
 -- Test the ability to exactly copy data from one table to an identical table,
 -- correctly reconstructing the stakind order as well as the staopN and
@@ -766,6 +807,34 @@ SELECT 4, 'four', NULL, int4range(0,100), NULL;
 
 CREATE INDEX is_odd ON stats_import.test(((comp).a % 2 = 1));
 
+CREATE STATISTICS stats_import.test_stat
+  ON name, comp, lower(arange), array_length(tags,1)
+  FROM stats_import.test;
+
+CREATE STATISTICS stats_import.test_stat_ndistinct (ndistinct)
+  ON name, comp
+  FROM stats_import.test;
+
+CREATE STATISTICS stats_import.test_stat_dependencies (dependencies)
+  ON name, comp
+  FROM stats_import.test;
+
+CREATE STATISTICS stats_import.test_stat_mcv (mcv)
+  ON name, comp
+  FROM stats_import.test;
+
+CREATE STATISTICS stats_import.test_stat_ndistinct_exprs (ndistinct)
+  ON lower(name), upper(name)
+  FROM stats_import.test;
+
+CREATE STATISTICS stats_import.test_stat_dependencies_exprs (dependencies)
+  ON lower(name), upper(name)
+  FROM stats_import.test;
+
+CREATE STATISTICS stats_import.test_stat_mcv_exprs (mcv)
+  ON lower(name), upper(name)
+  FROM stats_import.test;
+
 -- Generate statistics on table with data
 ANALYZE stats_import.test;
 
@@ -773,6 +842,10 @@ CREATE TABLE stats_import.test_clone ( LIKE stats_import.test )
     WITH (autovacuum_enabled = false);
 
 CREATE INDEX is_odd_clone ON stats_import.test_clone(((comp).a % 2 = 1));
+
+CREATE STATISTICS stats_import.test_stat_clone
+  ON name, comp, lower(arange), array_length(tags,1)
+  FROM stats_import.test_clone;
 
 --
 -- Copy stats from test to test_clone, and is_odd to is_odd_clone
@@ -970,4 +1043,573 @@ AND tablename = 'stats_temp'
 AND inherited = false
 AND attname = 'i';
 DROP TABLE stats_temp;
+
+-- Tests for pg_clear_extended_stats().
+--  Invalid argument values.
+SELECT pg_clear_extended_stats(schemaname => NULL,
+  relname => 'rel_foo',
+  statistics_schemaname => 'schema_foo',
+  statistics_name => 'stat_bar',
+  inherited => false);
+SELECT pg_clear_extended_stats(schemaname => 'schema_foo',
+  relname => NULL,
+  statistics_schemaname => 'schema_foo',
+  statistics_name => 'stat_bar',
+  inherited => false);
+SELECT pg_clear_extended_stats(schemaname => 'schema_foo',
+  relname => 'rel_foo',
+  statistics_schemaname => NULL,
+  statistics_name => 'stat_bar',
+  inherited => false);
+SELECT pg_clear_extended_stats(schemaname => 'schema_foo',
+  relname => 'rel_foo',
+  statistics_schemaname => 'schema_foo',
+  statistics_name => NULL,
+  inherited => false);
+SELECT pg_clear_extended_stats(schemaname => 'schema_foo',
+  relname => 'rel_foo',
+  statistics_schemaname => 'schema_foo',
+  statistics_name => 'stat_bar',
+  inherited => NULL);
+-- Missing objects
+SELECT pg_clear_extended_stats(schemaname => 'schema_not_exist',
+  relname => 'test',
+  statistics_schemaname => 'schema_not_exist',
+  statistics_name => 'test_stat',
+  inherited => false);
+SELECT pg_clear_extended_stats(schemaname => 'stats_import',
+  relname => 'table_not_exist',
+  statistics_schemaname => 'stats_import',
+  statistics_name => 'test_stat',
+  inherited => false);
+SELECT pg_clear_extended_stats(schemaname => 'stats_import',
+  relname => 'test',
+  statistics_schemaname => 'schema_not_exist',
+  statistics_name => 'test_stat',
+  inherited => false);
+SELECT pg_clear_extended_stats(schemaname => 'stats_import',
+  relname => 'test',
+  statistics_schemaname => 'stats_import',
+  statistics_name => 'ext_stats_not_exist',
+  inherited => false);
+-- Incorrect relation/extended stats combination
+SELECT pg_clear_extended_stats(schemaname => 'stats_import',
+  relname => 'test',
+  statistics_schemaname => 'stats_import',
+  statistics_name => 'test_stat_clone',
+  inherited => false);
+
+-- Check that records are removed after a valid clear call.
+SELECT COUNT(*), e.inherited FROM pg_stats_ext AS e
+  WHERE e.statistics_schemaname = 'stats_import' AND
+  e.statistics_name = 'test_stat' GROUP BY e.inherited;
+SELECT COUNT(*), e.inherited FROM pg_stats_ext_exprs AS e
+  WHERE e.statistics_schemaname = 'stats_import' AND
+  e.statistics_name = 'test_stat' GROUP BY e.inherited;
+BEGIN;
+SELECT pg_catalog.pg_clear_extended_stats(
+  schemaname => 'stats_import',
+  relname => 'test',
+  statistics_schemaname => 'stats_import',
+  statistics_name => 'test_stat',
+  inherited => false);
+SELECT mode FROM pg_locks WHERE locktype = 'relation' AND
+  relation = 'stats_import.test'::regclass AND
+  pid = pg_backend_pid();
+COMMIT;
+SELECT COUNT(*), e.inherited FROM pg_stats_ext AS e
+  WHERE e.statistics_schemaname = 'stats_import' AND
+  e.statistics_name = 'test_stat' GROUP BY e.inherited;
+SELECT COUNT(*), e.inherited FROM pg_stats_ext_exprs AS e
+  WHERE e.statistics_schemaname = 'stats_import' AND
+  e.statistics_name = 'test_stat' GROUP BY e.inherited;
+-- And before/after on inherited stats
+SELECT COUNT(*), e.inherited FROM pg_stats_ext AS e
+  WHERE e.statistics_schemaname = 'stats_import' AND
+  e.statistics_name = 'part_parent_stat' GROUP BY e.inherited;
+SELECT pg_catalog.pg_clear_extended_stats(
+  schemaname => 'stats_import',
+  relname => 'part_parent',
+  statistics_schemaname => 'stats_import',
+  statistics_name => 'part_parent_stat',
+  inherited => true);
+SELECT COUNT(*), e.inherited FROM pg_stats_ext AS e
+  WHERE e.statistics_schemaname = 'stats_import' AND
+  e.statistics_name = 'part_parent_stat' GROUP BY e.inherited;
+
+-- Check that MAINTAIN is required when clearing statistics.
+CREATE ROLE regress_test_extstat_clear;
+GRANT ALL ON SCHEMA stats_import TO regress_test_extstat_clear;
+SET ROLE regress_test_extstat_clear;
+SELECT pg_catalog.pg_clear_extended_stats(
+  schemaname => 'stats_import',
+  relname => 'test',
+  statistics_schemaname => 'stats_import',
+  statistics_name => 'test_stat',
+  inherited => false);
+RESET ROLE;
+GRANT MAINTAIN ON stats_import.test TO regress_test_extstat_clear;
+SET ROLE regress_test_extstat_clear;
+SELECT pg_catalog.pg_clear_extended_stats(
+  schemaname => 'stats_import',
+  relname => 'test',
+  statistics_schemaname => 'stats_import',
+  statistics_name => 'test_stat',
+  inherited => false);
+RESET ROLE;
+REVOKE MAINTAIN ON stats_import.test FROM regress_test_extstat_clear;
+REVOKE ALL ON SCHEMA stats_import FROM regress_test_extstat_clear;
+DROP ROLE regress_test_extstat_clear;
+
+-- Tests for pg_restore_extended_stats().
+--  Invalid argument values.
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', NULL,
+  'relname', 'test_clone',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', NULL,
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_clone',
+  'statistics_schemaname', NULL,
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_clone',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', NULL,
+  'inherited', false);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_clone',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', NULL);
+-- Missing objects
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'schema_not_exist',
+  'relname', 'test_clone',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'table_not_exist',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_clone',
+  'statistics_schemaname', 'schema_not_exist',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_clone',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'ext_stats_not_exist',
+  'inherited', false);
+-- Incorrect relation/extended stats combination
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+
+-- Check that MAINTAIN is required when restoring statistics.
+CREATE ROLE regress_test_extstat_restore;
+GRANT ALL ON SCHEMA stats_import TO regress_test_extstat_restore;
+SET ROLE regress_test_extstat_restore;
+-- No data to restore; this fails on a permission failure.
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_clone',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false);
+RESET ROLE;
+GRANT MAINTAIN ON stats_import.test_clone TO regress_test_extstat_restore;
+SET ROLE regress_test_extstat_restore;
+-- This works, check the lock on the relation while on it.
+BEGIN;
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_clone',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_clone',
+  'inherited', false,
+  'n_distinct', '[{"attributes" : [2,3], "ndistinct" : 4}]'::pg_ndistinct);
+SELECT mode FROM pg_locks WHERE locktype = 'relation' AND
+  relation = 'stats_import.test_clone'::regclass AND
+  pid = pg_backend_pid();
+COMMIT;
+RESET ROLE;
+REVOKE MAINTAIN ON stats_import.test_clone FROM regress_test_extstat_restore;
+REVOKE ALL ON SCHEMA stats_import FROM regress_test_extstat_restore;
+DROP ROLE regress_test_extstat_restore;
+
+-- ndistinct value doesn't match object definition
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_ndistinct',
+  'inherited', false,
+  'n_distinct', '[{"attributes" : [1,3], "ndistinct" : 4}]'::pg_ndistinct);
+-- Incorrect extended stats kind, ndistinct not supported
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_dependencies',
+  'inherited', false,
+  'n_distinct', '[{"attributes" : [1,3], "ndistinct" : 4}]'::pg_ndistinct);
+-- Incorrect extended stats kind, dependencies not supported
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_ndistinct',
+  'inherited', false,
+  'dependencies', '[{"attributes": [2], "dependency": 3, "degree": 1.000000},
+                    {"attributes": [3], "dependency": 2, "degree": 1.000000}]'::pg_dependencies);
+
+-- ok: ndistinct
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_ndistinct',
+  'inherited', false,
+  'n_distinct', '[{"attributes" : [2,3], "ndistinct" : 4}]'::pg_ndistinct);
+
+-- dependencies value doesn't match definition
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_dependencies',
+  'inherited', false,
+  'dependencies', '[{"attributes": [1], "dependency": 3, "degree": 1.000000},
+                    {"attributes": [3], "dependency": 1, "degree": 1.000000}]'::pg_dependencies);
+
+-- ok: dependencies
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_dependencies',
+  'inherited', false,
+  'dependencies', '[{"attributes": [2], "dependency": 3, "degree": 1.000000},
+                    {"attributes": [3], "dependency": 2, "degree": 1.000000}]'::pg_dependencies);
+
+-- ndistinct with expressions, invalid attributes.
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_ndistinct_exprs',
+  'inherited', false,
+  'n_distinct', '[{"attributes" : [1,-1], "ndistinct" : 4}]'::pg_ndistinct);
+
+-- ok: ndistinct with expressions.
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_ndistinct_exprs',
+  'inherited', false,
+  'n_distinct', '[{"attributes" : [-1,-2], "ndistinct" : 4}]'::pg_ndistinct);
+
+-- dependencies with expressions, invalid attributes.
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_dependencies_exprs',
+  'inherited', false,
+  'dependencies', '[{"attributes": [-1], "dependency": 1, "degree": 1.000000},
+                    {"attributes": [1], "dependency": -1, "degree": 1.000000}]'::pg_dependencies);
+
+-- ok: dependencies with expressions
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_dependencies_exprs',
+  'inherited', false,
+  'dependencies', '[{"attributes": [-1], "dependency": -2, "degree": 1.000000},
+                    {"attributes": [-2], "dependency": -1, "degree": 1.000000}]'::pg_dependencies);
+
+-- ok: MCV with expressions
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv_exprs',
+  'inherited', false,
+  'most_common_vals', '{{four,FOUR},{one,NULL},{NULL,TRE},{two,TWO}}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25,0.99}'::double precision[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.023,0.087}'::double precision[]);
+
+-- Check the presence of the restored stats, for each object.
+SELECT replace(e.n_distinct,   '}, ', E'},\n') AS n_distinct
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import' AND
+    e.statistics_name = 'test_stat_ndistinct' AND
+    e.inherited = false;
+
+SELECT replace(e.dependencies, '}, ', E'},\n') AS dependencies
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import' AND
+    e.statistics_name = 'test_stat_dependencies' AND
+    e.inherited = false;
+
+SELECT replace(e.n_distinct,   '}, ', E'},\n') AS n_distinct
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import' AND
+    e.statistics_name = 'test_stat_ndistinct_exprs' AND
+    e.inherited = false;
+
+SELECT replace(e.dependencies, '}, ', E'},\n') AS dependencies
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import' AND
+    e.statistics_name = 'test_stat_dependencies_exprs' AND
+    e.inherited = false;
+
+SELECT e.most_common_vals, e.most_common_val_nulls,
+       e.most_common_freqs, e.most_common_base_freqs
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import' AND
+    e.statistics_name = 'test_stat_mcv_exprs' AND
+    e.inherited = false /* \gx */;
+
+-- Incorrect extended stats kind, mcv not supported
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_dependencies',
+  'inherited', false,
+  'most_common_vals', '{{four,NULL},
+                        {one,"(1,1.1,ONE,01-01-2001,\"{\"\"xkey\"\": \"\"xval\"\"}\")"},
+                        {tre,"(3,3.3,TRE,03-03-2003,)"},
+                        {two,"(2,2.2,TWO,02-02-2002,\"[true, 4, \"\"six\"\"]\")"}}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25,0.25}'::double precision[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.0625,0.0625}'::double precision[]);
+
+-- MCV requires all three parameters
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_freqs', '{0.25,0.25,0.25,0.25}'::double precision[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.0625,0.0625}'::double precision[]);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_vals', '{{four,NULL},
+                        {one,"(1,1.1,ONE,01-01-2001,\"{\"\"xkey\"\": \"\"xval\"\"}\")"},
+                        {tre,"(3,3.3,TRE,03-03-2003,)"},
+                        {two,"(2,2.2,TWO,02-02-2002,\"[true, 4, \"\"six\"\"]\")"}}'::text[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.0625,0.0625}'::double precision[]);
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_vals', '{{four,NULL},
+                        {one,"(1,1.1,ONE,01-01-2001,\"{\"\"xkey\"\": \"\"xval\"\"}\")"},
+                        {tre,"(3,3.3,TRE,03-03-2003,)"},
+                        {two,"(2,2.2,TWO,02-02-2002,\"[true, 4, \"\"six\"\"]\")"}}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25,0.25}'::double precision[]);
+
+-- most_common_vals that is not 2-D
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_vals', '{four,NULL}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25,0.25}'::double precision[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.0625,0.0625}'::double precision[]);
+
+-- most_common_freqs with length not matching with most_common_vals.
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_vals', '{{four,NULL},
+                        {one,"(1,1.1,ONE,01-01-2001,\"{\"\"xkey\"\": \"\"xval\"\"}\")"},
+                        {tre,"(3,3.3,TRE,03-03-2003,)"},
+                        {two,"(2,2.2,TWO,02-02-2002,\"[true, 4, \"\"six\"\"]\")"}}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25}'::double precision[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.0625,0.0625}'::double precision[]);
+
+-- most_common_base_freqs with length not matching most_common_vals.
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_vals', '{{four,NULL},
+                        {one,"(1,1.1,ONE,01-01-2001,\"{\"\"xkey\"\": \"\"xval\"\"}\")"},
+                        {tre,"(3,3.3,TRE,03-03-2003,)"},
+                        {two,"(2,2.2,TWO,02-02-2002,\"[true, 4, \"\"six\"\"]\")"}}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25,0.25}'::double precision[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.0625}'::double precision[]);
+
+-- mcv attributes not matching object definition
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_vals', '{{four,NULL,0,NULL},
+                        {one,"(1,1.1,ONE,01-01-2001,\"{\"\"xkey\"\": \"\"xval\"\"}\")",1,2},
+                        {tre,"(3,3.3,TRE,03-03-2003,)",-1,3},
+                        {two,"(2,2.2,TWO,02-02-2002,\"[true, 4, \"\"six\"\"]\")",1,2}}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25,0.25}'::double precision[],
+  'most_common_base_freqs', '{0.00390625,0.015625,0.00390625,0.015625}'::double precision[]);
+
+-- ok: mcv
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_stat_mcv',
+  'inherited', false,
+  'most_common_vals', '{{four,NULL},
+                        {one,"(1,1.1,ONE,01-01-2001,\"{\"\"xkey\"\": \"\"xval\"\"}\")"},
+                        {tre,"(3,3.3,TRE,03-03-2003,)"},
+                        {two,"(2,2.2,TWO,02-02-2002,\"[true, 4, \"\"six\"\"]\")"}}'::text[],
+  'most_common_freqs', '{0.25,0.25,0.25,0.25}'::double precision[],
+  'most_common_base_freqs', '{0.0625,0.0625,0.0625,0.0625}'::double precision[]);
+
+SELECT replace(e.most_common_vals::text, '},', E'},\n ') AS mcvs,
+       e.most_common_val_nulls,
+       e.most_common_freqs, e.most_common_base_freqs
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import' AND
+    e.statistics_name = 'test_stat_mcv' AND
+    e.inherited = false
+/* \gx */;
+
+-- Check import of all kinds for multirange.
+CREATE STATISTICS stats_import.test_mr_stat
+  ON name, mrange, ( mrange + '{[10000,10200)}'::int4multirange)
+  FROM stats_import.test_mr;
+
+-- ok: multirange stats
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_mr',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_mr_stat',
+  'inherited', false,
+  'n_distinct', '[{"attributes": [2, 3], "ndistinct": 3},
+                  {"attributes": [2, -1], "ndistinct": 3},
+                  {"attributes": [3, -1], "ndistinct": 3},
+                  {"attributes": [2, 3, -1], "ndistinct": 3}]'::pg_catalog.pg_ndistinct,
+  'dependencies', '[{"attributes": [3], "dependency": 2, "degree": 1.000000},
+                    {"attributes": [3], "dependency": -1, "degree": 1.000000},
+                    {"attributes": [-1], "dependency": 2, "degree": 1.000000},
+                    {"attributes": [-1], "dependency": 3, "degree": 1.000000},
+                    {"attributes": [2, 3], "dependency": -1, "degree": 1.000000},
+                    {"attributes": [2, -1], "dependency": 3, "degree": 1.000000},
+                    {"attributes": [3, -1], "dependency": 2, "degree": 1.000000}]'::pg_catalog.pg_dependencies,
+  'most_common_vals', '{{red,"{[1,3),[5,9),[20,30)}","{[1,3),[5,9),[20,30),[10000,10200)}"},
+                        {red,"{[11,13),[15,19),[20,30)}","{[11,13),[15,19),[20,30),[10000,10200)}"},
+                        {red,"{[21,23),[25,29),[120,130)}","{[21,23),[25,29),[120,130),[10000,10200)}"}}'::text[],
+  'most_common_freqs', '{0.3333333333333333,0.3333333333333333,0.3333333333333333}'::double precision[],
+  'most_common_base_freqs', '{0.1111111111111111,0.1111111111111111,0.1111111111111111}'::double precision[]
+);
+
+SELECT replace(e.n_distinct,   '}, ', E'},\n') AS n_distinct,
+       replace(e.dependencies, '}, ', E'},\n') AS dependencies,
+       replace(e.most_common_vals::text, '},', E'},\n ') AS mcvs,
+       e.most_common_val_nulls,
+       e.most_common_freqs, e.most_common_base_freqs
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import' AND
+    e.statistics_name = 'test_mr_stat' AND
+    e.inherited = false
+/* \gx */;
+
+-- Test the ability of pg_restore_extended_stats() to import all of the
+-- statistic values from an extended statistic object that has been
+-- populated via a regular ANALYZE.  This checks after the statistics
+-- kinds supported by pg_restore_extended_stats().
+--
+-- Note: Keep this test at the bottom of the file, so as the amount of
+-- statistics data handled is maximized.
+ANALYZE stats_import.test;
+
+-- Copy stats from test_stat to test_stat_clone
+SELECT e.statistics_name,
+  pg_catalog.pg_restore_extended_stats(
+    'schemaname', e.statistics_schemaname::text,
+    'relname', 'test_clone',
+    'statistics_schemaname', e.statistics_schemaname::text,
+    'statistics_name', 'test_stat_clone',
+    'inherited', e.inherited,
+    'n_distinct', e.n_distinct,
+    'dependencies', e.dependencies,
+    'most_common_vals', e.most_common_vals,
+    'most_common_freqs', e.most_common_freqs,
+    'most_common_base_freqs', e.most_common_base_freqs)
+FROM pg_stats_ext AS e
+WHERE e.statistics_schemaname = 'stats_import'
+AND e.statistics_name = 'test_stat';
+
+-- Set difference old MINUS new.
+SELECT o.inherited,
+       o.n_distinct, o.dependencies, o.most_common_vals,
+       o.most_common_freqs, o.most_common_base_freqs
+  FROM pg_stats_ext AS o
+  WHERE o.statistics_schemaname = 'stats_import' AND
+    o.statistics_name = 'test_stat'
+EXCEPT
+SELECT n.inherited,
+       n.n_distinct, n.dependencies, n.most_common_vals,
+       n.most_common_freqs, n.most_common_base_freqs
+  FROM pg_stats_ext AS n
+  WHERE n.statistics_schemaname = 'stats_import' AND
+    n.statistics_name = 'test_stat_clone';
+-- Set difference new MINUS old.
+SELECT n.inherited,
+       n.n_distinct, n.dependencies, n.most_common_vals,
+       n.most_common_freqs, n.most_common_base_freqs
+  FROM pg_stats_ext AS n
+  WHERE n.statistics_schemaname = 'stats_import' AND
+    n.statistics_name = 'test_stat_clone'
+EXCEPT
+SELECT o.inherited,
+       o.n_distinct, o.dependencies, o.most_common_vals,
+       o.most_common_freqs, o.most_common_base_freqs
+  FROM pg_stats_ext AS o
+  WHERE o.statistics_schemaname = 'stats_import' AND
+    o.statistics_name = 'test_stat';
+
 DROP SCHEMA stats_import CASCADE;

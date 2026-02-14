@@ -12420,6 +12420,10 @@ fn conflict_action(p: &mut Parser<'_>) {
     p.expect(DO_KW);
     if p.eat(NOTHING_KW) {
         m.complete(p, CONFLICT_DO_NOTHING);
+    } else if p.eat(SELECT_KW) {
+        opt_locking_clause(p);
+        opt_where_clause(p);
+        m.complete(p, CONFLICT_DO_SELECT);
     } else {
         p.expect(UPDATE_KW);
         set_clause(p);

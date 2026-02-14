@@ -35,7 +35,7 @@ SELECT t1.a, t1.c, t2.b, t2.c FROM prt1 t1, prt2 t2 WHERE t1.a = t2.b AND t1.b =
 SELECT t1.a, t1.c, t2.b, t2.c FROM prt1 t1, prt2 t2 WHERE t1.a = t2.b AND t1.b = 0 ORDER BY t1.a, t2.b;
 
 -- inner join with partially-redundant join clauses
--- (avoid a mergejoin, because the planner thinks that an non-partitionwise
+-- (avoid a mergejoin, because the planner thinks that a non-partitionwise
 -- merge join is the cheapest plan, and we want to test a partitionwise join)
 BEGIN;
 SET LOCAL enable_mergejoin = false;
@@ -1225,7 +1225,6 @@ ANALYZE fract_t;
 -- (avoid merge joins, because the costs of partitionwise and non-partitionwise
 -- merge joins tend to be almost equal, and we want this test to be stable)
 SET max_parallel_workers_per_gather = 0;
-SET enable_partitionwise_join = on;
 SET enable_mergejoin = off;
 
 EXPLAIN (COSTS OFF)
