@@ -1,7 +1,7 @@
 // synced from: 
-//   commit: e5f3839af685c303d8ebcc1ea0d407c124372931
-//   committed at: 2025-12-22T22:41:34Z
-//   file: https://github.com/postgres/postgres/blob/e5f3839af685c303d8ebcc1ea0d407c124372931/src/include/parser/kwlist.h
+//   commit: ef3c3cf6d021ff9884c513afd850a9fe85cad736
+//   committed at: 2026-02-14T06:50:06Z
+//   file: https://github.com/postgres/postgres/blob/ef3c3cf6d021ff9884c513afd850a9fe85cad736/src/include/parser/kwlist.h
 //
 // update via:
 //   cargo xtask sync-kwlist
@@ -15,7 +15,7 @@
  * by the PG_KEYWORD macro, which is not defined in this file; it can
  * be defined by the caller for special purposes.
  *
- * Portions Copyright (c) 1996-2025, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2026, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * IDENTIFICATION

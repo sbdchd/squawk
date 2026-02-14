@@ -568,6 +568,9 @@ INSERT INTO circles VALUES('<(20,20), 10>', '<(0,0), 4>')
 -- fail, because DO UPDATE variant requires unique index
 INSERT INTO circles VALUES('<(20,20), 10>', '<(0,0), 4>')
   ON CONFLICT ON CONSTRAINT circles_c1_c2_excl DO UPDATE SET c2 = EXCLUDED.c2;
+-- fail, because DO SELECT variant requires unique index
+INSERT INTO circles VALUES('<(20,20), 10>', '<(0,0), 4>')
+  ON CONFLICT ON CONSTRAINT circles_c1_c2_excl DO SELECT RETURNING *;
 -- succeed because c1 doesn't overlap
 INSERT INTO circles VALUES('<(20,20), 1>', '<(0,0), 5>');
 -- succeed because c2 doesn't overlap
@@ -623,7 +626,9 @@ DROP TABLE deferred_excl;
 -- verify constraints created for NOT NULL clauses
 CREATE TABLE notnull_tbl1 (a INTEGER NOT NULL NOT NULL);
 -- \d+ notnull_tbl1
--- no-op
+-- specifying an existing constraint is a no-op
+ALTER TABLE notnull_tbl1 ADD CONSTRAINT notnull_tbl1_a_not_null NOT NULL a;
+-- but using a different constraint name is not allowed
 ALTER TABLE notnull_tbl1 ADD CONSTRAINT nn NOT NULL a;
 -- \d+ notnull_tbl1
 -- duplicate name

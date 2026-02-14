@@ -282,7 +282,9 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
                 in_copy_stdin = false;
             }
             should_comment = true;
-        } else if (line.trim_start().starts_with('\\') && !line.contains("\\gset"))
+        } else if (line.trim_start().starts_with('\\')
+            && !line.contains("\\gset")
+            && !line.contains("\\gx"))
             || line.starts_with("'show_data'")
             || line.starts_with(':')
         {
@@ -318,8 +320,8 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
             line = line.replace(from, to);
         }
 
-        if line.contains("\\gset") {
-            if let Some(start) = line.find("\\gset") {
+        for pattern in ["\\gx", "\\gset"] {
+            if let Some(start) = line.find(pattern) {
                 let end = line[start..]
                     .find('\n')
                     .map(|i| start + i)
