@@ -148,6 +148,7 @@ function useWasmStatus() {
 }
 
 interface LocationRange {
+  file: "current" | "builtins"
   start_line: number
   start_column: number
   end_line: number

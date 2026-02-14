@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use etcetera::BaseStrategy;
 use line_index::LineIndex;
 use log::info;
 use lsp_server::{Connection, Message, Notification, Response};
@@ -23,15 +24,15 @@ use lsp_types::{
     },
 };
 use rowan::TextRange;
-use squawk_ide::code_actions::code_actions;
 use squawk_ide::completion::completion;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_ide::hover::hover;
 use squawk_ide::inlay_hints::inlay_hints;
+use squawk_ide::{builtins::BUILTINS_SQL, code_actions::code_actions};
 use squawk_syntax::SourceFile;
-use std::collections::HashMap;
+use std::{collections::HashMap, fs, sync::OnceLock};
 
 use diagnostic::DIAGNOSTIC_NAME;
 
@@ -40,6 +41,22 @@ mod diagnostic;
 mod ignore;
 mod lint;
 mod lsp_utils;
+
+fn builtins_url() -> Option<Url> {
+    // TODO: once we get salsa setup, we can migrate this over
+    static BUILTINS_URL: OnceLock<Option<Url>> = OnceLock::new();
+    BUILTINS_URL
+        .get_or_init(|| {
+            let strategy = etcetera::base_strategy::choose_base_strategy().ok()?;
+            let config_dir = strategy.config_dir();
+            let cache_dir = config_dir.join("squawk/stubs");
+            let path = cache_dir.join("builtins.sql");
+            fs::create_dir_all(cache_dir).ok()?;
+            fs::write(&path, BUILTINS_SQL).ok()?;
+            Url::from_file_path(&path).ok()
+        })
+        .clone()
+}
 
 struct DocumentState {
     content: String,
@@ -192,17 +209,29 @@ fn handle_goto_definition(
     let line_index = LineIndex::new(content);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
-    let ranges = goto_definition(file, offset)
+    let ranges = goto_definition(&file, offset)
         .into_iter()
-        .map(|target_range| {
+        .filter_map(|location| {
             debug_assert!(
-                !target_range.contains(offset),
+                !location.range.contains(offset),
                 "Our target destination range must not include the source range otherwise go to def won't work in vscode."
             );
-            Location {
-                uri: uri.clone(),
-                range: lsp_utils::range(&line_index, target_range),
-            }
+
+            let uri = match location.file {
+                squawk_ide::goto_definition::FileId::Current => uri.clone(),
+                squawk_ide::goto_definition::FileId::Builtins => builtins_url()?,
+            };
+
+            let line_index = match location.file {
+                squawk_ide::goto_definition::FileId::Current => &line_index,
+                squawk_ide::goto_definition::FileId::Builtins => &LineIndex::new(BUILTINS_SQL),
+            };
+            let range = lsp_utils::range(line_index, location.range);
+
+            Some(Location {
+                uri,
+                range,
+            })
         })
         .collect();
 
@@ -269,10 +298,23 @@ fn handle_inlay_hints(
 
     let lsp_hints: Vec<InlayHint> = hints
         .into_iter()
-        .map(|hint| {
+        .flat_map(|hint| {
             let line_col = line_index.line_col(hint.position);
             let position = lsp_types::Position::new(line_col.line, line_col.col);
-            let kind = match hint.kind {
+
+            let uri = match hint.file {
+                Some(squawk_ide::goto_definition::FileId::Current) | None => uri.clone(),
+                Some(squawk_ide::goto_definition::FileId::Builtins) => builtins_url()?,
+            };
+
+            let line_index = match hint.file {
+                Some(squawk_ide::goto_definition::FileId::Current) | None => &line_index,
+                Some(squawk_ide::goto_definition::FileId::Builtins) => {
+                    &LineIndex::new(BUILTINS_SQL)
+                }
+            };
+
+            let kind: InlayHintKind = match hint.kind {
                 squawk_ide::inlay_hints::InlayHintKind::Type => InlayHintKind::TYPE,
                 squawk_ide::inlay_hints::InlayHintKind::Parameter => InlayHintKind::PARAMETER,
             };
@@ -282,7 +324,7 @@ fn handle_inlay_hints(
                     value: hint.label,
                     location: Some(Location {
                         uri: uri.clone(),
-                        range: lsp_utils::range(&line_index, target_range),
+                        range: lsp_utils::range(line_index, target_range),
                     }),
                     tooltip: None,
                     command: None,
@@ -291,7 +333,7 @@ fn handle_inlay_hints(
                 InlayHintLabel::String(hint.label)
             };
 
-            InlayHint {
+            Some(InlayHint {
                 position,
                 label,
                 kind: Some(kind),
@@ -300,7 +342,7 @@ fn handle_inlay_hints(
                 padding_left: None,
                 padding_right: None,
                 data: None,
-            }
+            })
         })
         .collect();
 

@@ -2,6 +2,8 @@ use line_index::LineIndex;
 use log::info;
 use rowan::TextRange;
 use serde::{Deserialize, Serialize};
+use squawk_ide::builtins::BUILTINS_SQL;
+use squawk_ide::goto_definition::FileId;
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
 use web_sys::js_sys::Error;
@@ -191,13 +193,19 @@ fn into_error<E: std::fmt::Display>(err: E) -> Error {
 #[wasm_bindgen]
 pub fn goto_definition(content: String, line: u32, col: u32) -> Result<JsValue, Error> {
     let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let offset = position_to_offset(&line_index, line, col)?;
-    let result = squawk_ide::goto_definition::goto_definition(parse.tree(), offset);
+    let current_line_index = LineIndex::new(&content);
+    let builtins_line_index = LineIndex::new(BUILTINS_SQL);
+    let offset = position_to_offset(&current_line_index, line, col)?;
+    let result = squawk_ide::goto_definition::goto_definition(&parse.tree(), offset);
 
     let response: Vec<LocationRange> = result
         .into_iter()
-        .map(|range| {
+        .map(|location| {
+            let range = location.range;
+            let (file, line_index) = match location.file {
+                FileId::Current => ("current", &current_line_index),
+                FileId::Builtins => ("builtins", &builtins_line_index),
+            };
             let start = line_index.line_col(range.start());
             let end = line_index.line_col(range.end());
             let start_wide = line_index
@@ -208,6 +216,7 @@ pub fn goto_definition(content: String, line: u32, col: u32) -> Result<JsValue, 
                 .unwrap();
 
             LocationRange {
+                file: file.to_string(),
                 start_line: start_wide.line,
                 start_column: start_wide.col,
                 end_line: end_wide.line,
@@ -249,6 +258,7 @@ pub fn find_references(content: String, line: u32, col: u32) -> Result<JsValue, 
                 .unwrap();
 
             LocationRange {
+                file: "current".to_string(),
                 start_line: start_wide.line,
                 start_column: start_wide.col,
                 end_line: end_wide.line,
@@ -342,6 +352,7 @@ fn position_to_offset(
 
 #[derive(Serialize)]
 struct LocationRange {
+    file: String,
     start_line: u32,
     start_column: u32,
     end_line: u32,

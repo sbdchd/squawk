@@ -35,6 +35,69 @@ fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
 }
 
 #[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/../squawk_parser/tests/data/ok",
+    glob: "*.sql",
+)]
+fn parser_ok_validation(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let test_name = absolute_fixture_path
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let parse = SourceFile::parse(content);
+    let errors = parse.errors();
+
+    assert!(
+        errors.is_empty(),
+        "parser ok test `{test_name}` has syntax validation errors:\n{}",
+        render_errors(content, &errors)
+    );
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/../../postgres/regression_suite",
+    glob: "*.sql",
+)]
+fn regression_suite_validation(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let test_name = absolute_fixture_path
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    if absolute_fixture_path.to_string().contains("psql") {
+        return;
+    }
+
+    let parse = SourceFile::parse(content);
+    let errors = parse.errors();
+
+    let mut errors = errors;
+
+    if test_name == "errors" {
+        assert!(
+            !errors.is_empty(),
+            "the errors.sql regression test must have validation errors"
+        );
+        return;
+    }
+
+    // strings.sql intentionally has a comment between string continuation literals
+    if test_name == "strings" {
+        errors.retain(|e| e.message() != "Comments between string literals are not allowed.");
+    }
+
+    assert!(
+        errors.is_empty(),
+        "regression test `{test_name}` has syntax validation errors:\n{}",
+        render_errors(content, &errors)
+    );
+}
+
+#[dir_test(
     dir: "$CARGO_MANIFEST_DIR/test_data",
     glob: "**/*.sql",
 )]
