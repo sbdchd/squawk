@@ -35,6 +35,8 @@ pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeA
     remove_else_clause(&mut actions, &file, offset);
     rewrite_table_as_select(&mut actions, &file, offset);
     rewrite_select_as_table(&mut actions, &file, offset);
+    rewrite_from(&mut actions, &file, offset);
+    rewrite_leading_from(&mut actions, &file, offset);
     rewrite_values_as_select(&mut actions, &file, offset);
     rewrite_select_as_values(&mut actions, &file, offset);
     add_schema(&mut actions, &file, offset);
@@ -162,10 +164,10 @@ fn remove_else_clause(
 
     let mut edits = vec![];
     edits.push(Edit::delete(else_clause.syntax().text_range()));
-    if let Some(token) = else_token.prev_token() {
-        if token.kind() == SyntaxKind::WHITESPACE {
-            edits.push(Edit::delete(token.text_range()));
-        }
+    if let Some(token) = else_token.prev_token()
+        && token.kind() == SyntaxKind::WHITESPACE
+    {
+        edits.push(Edit::delete(token.text_range()));
     }
 
     actions.push(CodeAction {
@@ -227,6 +229,72 @@ fn rewrite_select_as_table(
         title: "Rewrite as `table`".to_owned(),
         edits: vec![Edit::replace(select.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn rewrite_from(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let select = token.parent_ancestors().find_map(ast::Select::cast)?;
+
+    if select.select_clause().is_some() {
+        return None;
+    }
+
+    select.from_clause()?;
+
+    actions.push(CodeAction {
+        title: "Insert leading `select *`".to_owned(),
+        edits: vec![Edit::insert(
+            "select * ".to_owned(),
+            select.syntax().text_range().start(),
+        )],
+        kind: ActionKind::QuickFix,
+    });
+
+    Some(())
+}
+
+fn rewrite_leading_from(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let select = token.parent_ancestors().find_map(ast::Select::cast)?;
+
+    let from_clause = select.from_clause()?;
+    let select_clause = select.select_clause()?;
+
+    if from_clause.syntax().text_range().start() >= select_clause.syntax().text_range().start() {
+        return None;
+    }
+
+    let select_text = select_clause.syntax().text().to_string();
+
+    let mut delete_start = select_clause.syntax().text_range().start();
+    if let Some(prev) = select_clause.syntax().prev_sibling_or_token()
+        && prev.kind() == SyntaxKind::WHITESPACE
+    {
+        delete_start = prev.text_range().start();
+    }
+    let select_with_ws = TextRange::new(delete_start, select_clause.syntax().text_range().end());
+
+    actions.push(CodeAction {
+        title: "Swap `from` and `select` clauses".to_owned(),
+        edits: vec![
+            Edit::delete(select_with_ws),
+            Edit::insert(
+                format!("{} ", select_text),
+                from_clause.syntax().text_range().start(),
+            ),
+        ],
+        kind: ActionKind::QuickFix,
     });
 
     Some(())
@@ -748,7 +816,6 @@ mod test {
     ) -> String {
         let (mut offset, sql) = fixture(sql);
         let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
         let file: ast::SourceFile = parse.tree();
 
         offset = offset.checked_sub(1.into()).unwrap_or_default();
@@ -762,6 +829,16 @@ mod test {
         );
 
         let action = &actions[0];
+
+        match action.kind {
+            ActionKind::QuickFix => {
+                // Quickfixes can fix syntax errors so we don't assert
+            }
+            ActionKind::RefactorRewrite => {
+                assert_eq!(parse.errors(), vec![]);
+            }
+        }
+
         let mut result = sql.clone();
 
         let mut edits = action.edits.clone();
@@ -777,11 +854,19 @@ mod test {
         }
 
         let reparse = ast::SourceFile::parse(&result);
-        assert_eq!(
-            reparse.errors(),
-            vec![],
-            "Code actions shouldn't cause syntax errors"
-        );
+
+        match action.kind {
+            ActionKind::QuickFix => {
+                // Quickfixes can fix syntax errors so we don't assert
+            }
+            ActionKind::RefactorRewrite => {
+                assert_eq!(
+                    reparse.errors(),
+                    vec![],
+                    "Code actions shouldn't cause syntax errors"
+                );
+            }
+        }
 
         result
     }
@@ -804,18 +889,35 @@ mod test {
         }
     }
 
-    fn code_action_not_applicable(
+    fn code_action_not_applicable_(
         f: impl Fn(&mut Vec<CodeAction>, &ast::SourceFile, TextSize) -> Option<()>,
         sql: &str,
+        allow_errors: bool,
     ) -> bool {
         let (offset, sql) = fixture(sql);
         let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
+        if !allow_errors {
+            assert_eq!(parse.errors(), vec![]);
+        }
         let file: ast::SourceFile = parse.tree();
 
         let mut actions = vec![];
         f(&mut actions, &file, offset);
         actions.is_empty()
+    }
+
+    fn code_action_not_applicable(
+        f: impl Fn(&mut Vec<CodeAction>, &ast::SourceFile, TextSize) -> Option<()>,
+        sql: &str,
+    ) -> bool {
+        code_action_not_applicable_(f, sql, false)
+    }
+
+    fn code_action_not_applicable_with_errors(
+        f: impl Fn(&mut Vec<CodeAction>, &ast::SourceFile, TextSize) -> Option<()>,
+        sql: &str,
+    ) -> bool {
+        code_action_not_applicable_(f, sql, true)
     }
 
     #[test]
@@ -2003,6 +2105,93 @@ select myschema.f$0();"
         assert!(code_action_not_applicable(
             rewrite_select_as_values,
             "select 1 as column1, 2 as column2 exc$0ept select 3, 4;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_from_simple() {
+        assert_snapshot!(apply_code_action(
+            rewrite_from,
+            "from$0 t;"),
+            @"select * from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_from_qualified() {
+        assert_snapshot!(apply_code_action(
+            rewrite_from,
+            "from$0 s.t;"),
+            @"select * from s.t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_from_on_name() {
+        assert_snapshot!(apply_code_action(
+            rewrite_from,
+            "from t$0;"),
+            @"select * from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_from_not_applicable_with_select() {
+        assert!(code_action_not_applicable_with_errors(
+            rewrite_from,
+            "from$0 t select c;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_from_not_applicable_on_normal_select() {
+        assert!(code_action_not_applicable(
+            rewrite_from,
+            "select * from$0 t;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_leading_from_simple() {
+        assert_snapshot!(apply_code_action(
+            rewrite_leading_from,
+            "from$0 t select c;"),
+            @"select c from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_leading_from_multiple_cols() {
+        assert_snapshot!(apply_code_action(
+            rewrite_leading_from,
+            "from$0 t select a, b;"),
+            @"select a, b from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_leading_from_with_where() {
+        assert_snapshot!(apply_code_action(
+            rewrite_leading_from,
+            "from$0 t select c where x = 1;"),
+            @"select c from t where x = 1;"
+        );
+    }
+
+    #[test]
+    fn rewrite_leading_from_on_select() {
+        assert_snapshot!(apply_code_action(
+            rewrite_leading_from,
+            "from t sel$0ect c;"),
+            @"select c from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_leading_from_not_applicable_normal() {
+        assert!(code_action_not_applicable(
+            rewrite_leading_from,
+            "sel$0ect c from t;"
         ));
     }
 }
