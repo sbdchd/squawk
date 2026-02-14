@@ -2880,23 +2880,6 @@ fn resolve_column_from_paren_expr(
     None
 }
 
-pub(crate) fn resolve_insert_create_table(
-    root: &SyntaxNode,
-    binder: &Binder,
-    insert: &ast::Insert,
-) -> Option<ast::CreateTableLike> {
-    let path = insert.path()?;
-    let (table_name, schema) = extract_table_schema_from_path(&path)?;
-    let position = insert.syntax().text_range().start();
-
-    let table_name_ptr = resolve_table_name_ptr(binder, &table_name, &schema, position)?;
-    let table_name_node = table_name_ptr.to_node(root);
-
-    table_name_node
-        .ancestors()
-        .find_map(ast::CreateTableLike::cast)
-}
-
 pub(crate) fn resolve_table_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
     resolve_symbol_info(binder, path, SymbolKind::Table)
 }

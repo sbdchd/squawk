@@ -154,6 +154,9 @@ export async function provideHover(
   }
 }
 
+const builtinsUri = monaco.Uri.parse("file:///builtins.sql")
+const currentUri = monaco.Uri.parse("file:///current.sql")
+
 export async function provideDefinition(
   model: monaco.editor.ITextModel,
   position: monaco.Position,
@@ -170,15 +173,19 @@ export async function provideDefinition(
 
     if (!results) return null
 
-    return results.map((results) => ({
-      uri: model.uri,
-      range: {
-        startLineNumber: results.start_line + 1,
-        startColumn: results.start_column + 1,
-        endLineNumber: results.end_line + 1,
-        endColumn: results.end_column + 1,
-      },
-    }))
+    return results.map((result) => {
+      const uri = result.file === "current" ? currentUri : builtinsUri
+      return {
+        uri,
+        file: result.file,
+        range: {
+          startLineNumber: result.start_line + 1,
+          startColumn: result.start_column + 1,
+          endLineNumber: result.end_line + 1,
+          endColumn: result.end_column + 1,
+        },
+      }
+    })
   } catch (e) {
     console.error("Error in provideDefinition:", e)
     return null
