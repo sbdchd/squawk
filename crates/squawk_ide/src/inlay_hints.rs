@@ -138,21 +138,12 @@ fn inlay_hint_insert(
             })
             .collect()
     } else {
-        // TODO: this doesn't work when there's `inherit`/`like` involved in the table def
         // `insert into t values (1, 2, 3)`
-        create_table?
-            .table_arg_list()?
-            .args()
-            .filter_map(|arg| {
-                if let ast::TableArg::Column(column) = arg
-                    && let Some(name) = column.name()
-                {
-                    let col_name = Name::from_node(&name);
-                    let target = Some(name.syntax().text_range());
-                    Some((col_name, target, location.as_ref().map(|x| x.file)))
-                } else {
-                    None
-                }
+        resolve::collect_columns_from_create_table(&binder, file.syntax(), &create_table?)
+            .into_iter()
+            .map(|(col_name, ptr)| {
+                let target = ptr.map(|p| p.to_node(file.syntax()).text_range());
+                (col_name, target, location.as_ref().map(|x| x.file))
             })
             .collect()
     };
@@ -445,6 +436,34 @@ insert into t values (1, 2, 3);
           ╭▸ 
         3 │ insert into t values (a: 1, b: 2, 3);
           ╰╴                      ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_table_inherits_select() {
+        assert_snapshot!(check_inlay_hints("
+create table t (a int, b int);
+create table u (c int) inherits (t);
+insert into u select 1, 2, 3;
+"), @r"
+        inlay hints:
+          ╭▸ 
+        4 │ insert into u select a: 1, b: 2, c: 3;
+          ╰╴                     ───   ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_table_like_select() {
+        assert_snapshot!(check_inlay_hints("
+create table x (a int, b int);
+create table y (c int, like x);
+insert into y select 1, 2, 3;
+"), @r"
+        inlay hints:
+          ╭▸ 
+        4 │ insert into y select c: 1, a: 2, b: 3;
+          ╰╴                     ───   ───   ───
         ");
     }
 

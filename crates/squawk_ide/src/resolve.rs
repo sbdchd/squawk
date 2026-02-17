@@ -1737,6 +1737,80 @@ pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
     Some(name)
 }
 
+pub(crate) fn collect_columns_from_create_table(
+    binder: &Binder,
+    root: &SyntaxNode,
+    create_table: &ast::CreateTableLike,
+) -> Vec<(Name, Option<SyntaxNodePtr>)> {
+    let mut columns = vec![];
+    collect_columns_from_create_table_impl(binder, root, create_table, &mut columns, 0);
+    columns
+}
+
+fn collect_columns_from_create_table_impl(
+    binder: &Binder,
+    root: &SyntaxNode,
+    create_table: &ast::CreateTableLike,
+    columns: &mut Vec<(Name, Option<SyntaxNodePtr>)>,
+    depth: usize,
+) {
+    if depth > 40 {
+        log::info!("max depth reached, probably in a cycle");
+        return;
+    }
+
+    if let Some(inherits) = create_table.inherits() {
+        for path in inherits.paths() {
+            if let Some((table_name, schema)) = extract_table_schema_from_path(&path) {
+                let position = path.syntax().text_range().start();
+                if let Some(ResolvedTableName::Table(parent_table)) =
+                    resolve_table_name(binder, root, &table_name, &schema, position)
+                {
+                    collect_columns_from_create_table_impl(
+                        binder,
+                        root,
+                        &parent_table,
+                        columns,
+                        depth + 1,
+                    );
+                }
+            }
+        }
+    }
+
+    if let Some(arg_list) = create_table.table_arg_list() {
+        for arg in arg_list.args() {
+            match &arg {
+                ast::TableArg::Column(column) => {
+                    if let Some(name) = column.name() {
+                        let col_name = Name::from_node(&name);
+                        columns.push((col_name, Some(SyntaxNodePtr::new(name.syntax()))));
+                    }
+                }
+                ast::TableArg::LikeClause(like_clause) => {
+                    if let Some(path) = like_clause.path()
+                        && let Some((table_name, schema)) = extract_table_schema_from_path(&path)
+                    {
+                        let position = path.syntax().text_range().start();
+                        if let Some(ResolvedTableName::Table(source_table)) =
+                            resolve_table_name(binder, root, &table_name, &schema, position)
+                        {
+                            collect_columns_from_create_table_impl(
+                                binder,
+                                root,
+                                &source_table,
+                                columns,
+                                depth + 1,
+                            );
+                        }
+                    }
+                }
+                ast::TableArg::TableConstraint(_) => (),
+            }
+        }
+    }
+}
+
 pub(crate) fn find_column_in_create_table(
     binder: &Binder,
     root: &SyntaxNode,
