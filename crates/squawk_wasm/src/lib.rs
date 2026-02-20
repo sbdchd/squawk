@@ -245,20 +245,21 @@ pub fn find_references(content: String, line: u32, col: u32) -> Result<JsValue, 
     let offset = position_to_offset(&line_index, line, col)?;
     let references = squawk_ide::find_references::find_references(&parse.tree(), offset);
 
+    let builtins_line_index = LineIndex::new(BUILTINS_SQL);
     let locations: Vec<LocationRange> = references
         .iter()
-        .map(|range| {
-            let start = line_index.line_col(range.start());
-            let end = line_index.line_col(range.end());
-            let start_wide = line_index
-                .to_wide(line_index::WideEncoding::Utf16, start)
-                .unwrap();
-            let end_wide = line_index
-                .to_wide(line_index::WideEncoding::Utf16, end)
-                .unwrap();
+        .map(|loc| {
+            let (li, file) = match loc.file {
+                FileId::Current => (&line_index, "current"),
+                FileId::Builtins => (&builtins_line_index, "builtin"),
+            };
+            let start = li.line_col(loc.range.start());
+            let end = li.line_col(loc.range.end());
+            let start_wide = li.to_wide(line_index::WideEncoding::Utf16, start).unwrap();
+            let end_wide = li.to_wide(line_index::WideEncoding::Utf16, end).unwrap();
 
             LocationRange {
-                file: "current".to_string(),
+                file: file.to_string(),
                 start_line: start_wide.line,
                 start_column: start_wide.col,
                 end_line: end_wide.line,
