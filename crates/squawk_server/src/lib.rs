@@ -512,15 +512,25 @@ fn handle_references(
     let line_index = LineIndex::new(content);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
-    let ranges = find_references(&file, offset);
+    let refs = find_references(&file, offset);
     let include_declaration = params.context.include_declaration;
 
-    let locations: Vec<Location> = ranges
+    let locations: Vec<Location> = refs
         .into_iter()
-        .filter(|range| include_declaration || !range.contains(offset))
-        .map(|range| Location {
-            uri: uri.clone(),
-            range: lsp_utils::range(&line_index, range),
+        .filter(|loc| include_declaration || !loc.range.contains(offset))
+        .filter_map(|loc| {
+            let uri = match loc.file {
+                squawk_ide::goto_definition::FileId::Current => uri.clone(),
+                squawk_ide::goto_definition::FileId::Builtins => builtins_url()?,
+            };
+            let line_index = match loc.file {
+                squawk_ide::goto_definition::FileId::Current => &line_index,
+                squawk_ide::goto_definition::FileId::Builtins => &LineIndex::new(BUILTINS_SQL),
+            };
+            Some(Location {
+                uri,
+                range: lsp_utils::range(line_index, loc.range),
+            })
         })
         .collect();
 

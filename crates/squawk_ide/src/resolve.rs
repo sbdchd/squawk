@@ -12,6 +12,16 @@ use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
 
+/// Resolves a name reference to its definition(s).
+///
+/// Most of the time returns one result, but can return two definitions
+/// in the case of:
+///
+/// ```sql
+/// select * from t join u using (col);
+/// ```
+///
+/// since `col` is defined in both `t` and `u`.
 pub(crate) fn resolve_name_ref_ptrs(
     binder: &Binder,
     root: &SyntaxNode,
