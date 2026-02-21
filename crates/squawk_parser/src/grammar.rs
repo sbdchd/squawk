@@ -388,7 +388,7 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
         _ if p.eat(COMMA) => {
             opt_expr_list(p);
         }
-        _ => {}
+        _ => (),
     }
     p.expect(R_PAREN);
     let m = m.complete(p, SUBSTRING_FN).precede(p);
