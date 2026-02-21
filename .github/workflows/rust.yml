@@ -134,7 +134,7 @@ jobs:
       - name: VSCode - Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - name: VSCode - Setup node
         uses: actions/setup-node@v3
@@ -247,7 +247,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
       - uses: actions/setup-node@v3
         with:
           node-version-file: "playground/package.json"
@@ -368,7 +368,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
       - name: Setup node
         uses: actions/setup-node@v3
         with:
