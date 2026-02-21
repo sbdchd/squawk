@@ -184,7 +184,7 @@ JsonQueryFn =
 XmlTable =
    'xmltable'
    '('
-     ('xmlnamespaces' XmlNamespaceList ',')
+     ('xmlnamespaces' XmlNamespaceList ',')?
      XmlRowPassingClause
      XmlTableColumnList
    ')'
@@ -237,7 +237,7 @@ SubstringFn =
   'substring' '('
     Expr 'for' Expr ('from' Expr)
   | Expr 'from' Expr ('for' Expr)
-  | Expr 'similar' Expr
+  | Expr 'similar' Expr 'escape' Expr
   | (Expr (',' Expr)*)
   ')'
 
@@ -254,9 +254,12 @@ OverlayFn =
 
 TrimFn =
   'trim' '('
-    'from' (Expr (',' Expr)*)
-   | Expr 'from' Expr
-   | (Expr (',' Expr)*)?
+    ('both' | 'leading' | 'trailing')?
+    (
+      'from' (Expr (',' Expr)*)
+     | Expr 'from' Expr
+     | (Expr (',' Expr)*)?
+    )
   ')'
 
 XmlRootFn =
@@ -276,7 +279,7 @@ XmlSerializeFn =
     Expr
     'as'
     Type
-    ('no' 'ident' | 'ident')?
+    ('no' 'indent' | 'indent')?
   ')'
 
 XmlElementFn =
@@ -289,7 +292,7 @@ XmlElementFn =
         ')'
         (',' (Expr (',' Expr)*))?
     | ',' (Expr (',' Expr)*)
-    )
+    )?
   ')'
 
 ExprAsName =
@@ -303,6 +306,7 @@ XmlForestFn =
 
 XmlExistsFn =
   'xmlexists' '('
+    Expr
     'passing'
     XmlPassingMech?
     Expr
@@ -362,7 +366,7 @@ JsonValueExpr =
   Expr JsonFormatClause?
 
 JsonKeyValue =
-  Expr ':' JsonValueExpr
+  Expr (':' | 'value') JsonValueExpr
 
 Gteq =
  '>' '='
@@ -1529,7 +1533,7 @@ JsonKeysUniqueClause =
   'with' 'unique' 'keys' | 'without' 'unique' 'keys'
 
 JsonQuotesClause =
-  'keep' 'quotes' | 'omit' 'quotes'
+  ('keep' | 'omit') 'quotes' ('on' 'scalar' 'string')?
 
 JsonBehaviorDefault =
  'default' Expr
@@ -1580,7 +1584,7 @@ JsonBehaviorClause =
   JsonBehavior
 
 JsonPassingArg =
-  Expr
+  Expr 'as' Name
 
 JsonPassingClause =
   'passing' (JsonPassingArg (',' JsonPassingArg)*)
@@ -1725,7 +1729,7 @@ FromClause =
   (JoinExpr (',' JoinExpr)*)?
 
 XmlTableColumnList =
-  (XmlTableColumn (',' XmlTableColumn)*)
+  'columns' (XmlTableColumn (',' XmlTableColumn)*)
 
 XmlTableColumn =
   Name Type XmlColumnOptionList?

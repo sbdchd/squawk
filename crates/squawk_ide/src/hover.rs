@@ -1,3 +1,4 @@
+use crate::builtins::BUILTINS_SQL;
 use crate::classify::{NameClass, NameRefClass, classify_name, classify_name_ref};
 use crate::column_name::ColumnName;
 use crate::offsets::token_from_offset;
@@ -43,109 +44,15 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        let context = classify_name_ref(&name_ref)?;
-        match context {
-            NameRefClass::CreateIndexColumn
-            | NameRefClass::InsertColumn
-            | NameRefClass::DeleteColumn
-            | NameRefClass::UpdateColumn
-            | NameRefClass::MergeColumn
-            | NameRefClass::ConstraintColumn
-            | NameRefClass::JoinUsingColumn
-            | NameRefClass::ForeignKeyColumn
-            | NameRefClass::AlterColumn
-            | NameRefClass::QualifiedColumn => {
-                return hover_column(root, &name_ref, &binder);
-            }
-            NameRefClass::Type => {
-                return hover_type(root, &name_ref, &binder);
-            }
-            NameRefClass::CompositeTypeField => {
-                return hover_composite_type_field(root, &name_ref, &binder);
-            }
-            NameRefClass::SelectColumn
-            | NameRefClass::SelectQualifiedColumn
-            | NameRefClass::PolicyColumn => {
-                // Try hover as column first
-                if let Some(result) = hover_column(root, &name_ref, &binder) {
-                    return Some(result);
-                }
-                // If no column, try as function (handles field-style function calls like `t.b`)
-                if let Some(result) = hover_function(root, &name_ref, &binder) {
-                    return Some(result);
-                }
-                // Finally try as table (handles case like `select t from t;` where t is the table)
-                return hover_table(root, &name_ref, &binder);
-            }
-            NameRefClass::DeleteQualifiedColumnTable
-            | NameRefClass::ForeignKeyTable
-            | NameRefClass::FromTable
-            | NameRefClass::InsertQualifiedColumnTable
-            | NameRefClass::LikeTable
-            | NameRefClass::MergeQualifiedColumnTable
-            | NameRefClass::PolicyQualifiedColumnTable
-            | NameRefClass::SelectQualifiedColumnTable
-            | NameRefClass::Table
-            | NameRefClass::UpdateQualifiedColumnTable
-            | NameRefClass::View => {
-                return hover_table(root, &name_ref, &binder);
-            }
-            NameRefClass::Sequence => return hover_sequence(root, &name_ref, &binder),
-            NameRefClass::Trigger => return hover_trigger(root, &name_ref, &binder),
-            NameRefClass::Policy => {
-                return hover_policy(root, &name_ref, &binder);
-            }
-            NameRefClass::EventTrigger => {
-                return hover_event_trigger(root, &name_ref, &binder);
-            }
-            NameRefClass::Database => {
-                return hover_database(root, &name_ref, &binder);
-            }
-            NameRefClass::Server => {
-                return hover_server(root, &name_ref, &binder);
-            }
-            NameRefClass::Extension => {
-                return hover_extension(root, &name_ref, &binder);
-            }
-            NameRefClass::Role => {
-                return hover_role(root, &name_ref, &binder);
-            }
-            NameRefClass::Tablespace => return hover_tablespace(root, &name_ref, &binder),
-            NameRefClass::Index => {
-                return hover_index(root, &name_ref, &binder);
-            }
-            NameRefClass::Function | NameRefClass::FunctionCall | NameRefClass::FunctionName => {
-                return hover_function(root, &name_ref, &binder);
-            }
-            NameRefClass::Aggregate => return hover_aggregate(root, &name_ref, &binder),
-            NameRefClass::Procedure | NameRefClass::CallProcedure | NameRefClass::ProcedureCall => {
-                return hover_procedure(root, &name_ref, &binder);
-            }
-            NameRefClass::Routine => return hover_routine(root, &name_ref, &binder),
-            NameRefClass::SelectFunctionCall => {
-                // Try function first, but fall back to column if no function found
-                // (handles function-call-style column access like `select a(t)`)
-                if let Some(result) = hover_function(root, &name_ref, &binder) {
-                    return Some(result);
-                }
-                return hover_column(root, &name_ref, &binder);
-            }
-            NameRefClass::Schema => {
-                return hover_schema(root, &name_ref, &binder);
-            }
-            NameRefClass::NamedArgParameter => {
-                return hover_named_arg_parameter(root, &name_ref, &binder);
-            }
-            NameRefClass::Cursor => {
-                return hover_cursor(root, &name_ref, &binder);
-            }
-            NameRefClass::PreparedStatement => {
-                return hover_prepared_statement(root, &name_ref, &binder);
-            }
-            NameRefClass::Channel => {
-                return hover_channel(root, &name_ref, &binder);
-            }
+        if let Some(result) = hover_name_ref(root, &name_ref, &binder) {
+            return Some(result);
         }
+
+        // Fall back to builtins
+        let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL).tree();
+        let builtins_binder = binder::bind(&builtins_tree);
+        let builtins_root = builtins_tree.syntax();
+        return hover_name_ref(builtins_root, &name_ref, &builtins_binder);
     }
 
     if let Some(name) = ast::Name::cast(parent) {
@@ -220,6 +127,84 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
     }
 
     None
+}
+
+fn hover_name_ref(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let context = classify_name_ref(name_ref)?;
+    match context {
+        NameRefClass::CreateIndexColumn
+        | NameRefClass::InsertColumn
+        | NameRefClass::DeleteColumn
+        | NameRefClass::UpdateColumn
+        | NameRefClass::MergeColumn
+        | NameRefClass::ConstraintColumn
+        | NameRefClass::JoinUsingColumn
+        | NameRefClass::ForeignKeyColumn
+        | NameRefClass::AlterColumn
+        | NameRefClass::QualifiedColumn => hover_column(root, name_ref, binder),
+        NameRefClass::Type => hover_type(root, name_ref, binder),
+        NameRefClass::CompositeTypeField => hover_composite_type_field(root, name_ref, binder),
+        NameRefClass::SelectColumn
+        | NameRefClass::SelectQualifiedColumn
+        | NameRefClass::PolicyColumn => {
+            // Try hover as column first
+            if let Some(result) = hover_column(root, name_ref, binder) {
+                return Some(result);
+            }
+            // If no column, try as function (handles field-style function calls like `t.b`)
+            if let Some(result) = hover_function(root, name_ref, binder) {
+                return Some(result);
+            }
+            // Finally try as table (handles case like `select t from t;` where t is the table)
+            hover_table(root, name_ref, binder)
+        }
+        NameRefClass::DeleteQualifiedColumnTable
+        | NameRefClass::ForeignKeyTable
+        | NameRefClass::FromTable
+        | NameRefClass::InsertQualifiedColumnTable
+        | NameRefClass::LikeTable
+        | NameRefClass::MergeQualifiedColumnTable
+        | NameRefClass::PolicyQualifiedColumnTable
+        | NameRefClass::SelectQualifiedColumnTable
+        | NameRefClass::Table
+        | NameRefClass::UpdateQualifiedColumnTable
+        | NameRefClass::View => hover_table(root, name_ref, binder),
+        NameRefClass::Sequence => hover_sequence(root, name_ref, binder),
+        NameRefClass::Trigger => hover_trigger(root, name_ref, binder),
+        NameRefClass::Policy => hover_policy(root, name_ref, binder),
+        NameRefClass::EventTrigger => hover_event_trigger(root, name_ref, binder),
+        NameRefClass::Database => hover_database(root, name_ref, binder),
+        NameRefClass::Server => hover_server(root, name_ref, binder),
+        NameRefClass::Extension => hover_extension(root, name_ref, binder),
+        NameRefClass::Role => hover_role(root, name_ref, binder),
+        NameRefClass::Tablespace => hover_tablespace(root, name_ref, binder),
+        NameRefClass::Index => hover_index(root, name_ref, binder),
+        NameRefClass::Function | NameRefClass::FunctionCall | NameRefClass::FunctionName => {
+            hover_function(root, name_ref, binder)
+        }
+        NameRefClass::Aggregate => hover_aggregate(root, name_ref, binder),
+        NameRefClass::Procedure | NameRefClass::CallProcedure | NameRefClass::ProcedureCall => {
+            hover_procedure(root, name_ref, binder)
+        }
+        NameRefClass::Routine => hover_routine(root, name_ref, binder),
+        NameRefClass::SelectFunctionCall => {
+            // Try function first, but fall back to column if no function found
+            // (handles function-call-style column access like `select a(t)`)
+            if let Some(result) = hover_function(root, name_ref, binder) {
+                return Some(result);
+            }
+            hover_column(root, name_ref, binder)
+        }
+        NameRefClass::Schema => hover_schema(root, name_ref, binder),
+        NameRefClass::NamedArgParameter => hover_named_arg_parameter(root, name_ref, binder),
+        NameRefClass::Cursor => hover_cursor(root, name_ref, binder),
+        NameRefClass::PreparedStatement => hover_prepared_statement(root, name_ref, binder),
+        NameRefClass::Channel => hover_channel(root, name_ref, binder),
+    }
 }
 
 struct ColumnHover {}
@@ -2190,6 +2175,18 @@ select add$0(1, 2);
         hover: function public.add(a int, b int) returns int
           ╭▸ 
         3 │ select add(1, 2);
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_builtin_function_call() {
+        assert_snapshot!(check_hover("
+select now$0();
+"), @r"
+        hover: function pg_catalog.now() returns timestamp with time zone
+          ╭▸ 
+        2 │ select now();
           ╰╴         ─ hover
         ");
     }
