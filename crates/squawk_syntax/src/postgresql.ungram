@@ -604,11 +604,11 @@ CompressionMethod =
 Column =
   'period'?
   (
-    Name WithOptions? constraint:ColumnConstraint?
+    Name WithOptions? constraints:ColumnConstraint*
       DeferrableConstraintOption? NotDeferrableConstraintOption?
       InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
       NotEnforced? Enforced?
-  | Name Type Storage? CompressionMethod? Collate? constraint:ColumnConstraint?
+  | Name Type Storage? CompressionMethod? Collate? constraints:ColumnConstraint*
       DeferrableConstraintOption? NotDeferrableConstraintOption?
       InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
       NotEnforced? Enforced?

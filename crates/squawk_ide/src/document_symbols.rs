@@ -201,7 +201,7 @@ pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
                 }
             }
 
-            _ => {}
+            _ => (),
         }
     }
 

@@ -281,7 +281,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
-        _ => {}
+        _ => (),
     }
 }
 

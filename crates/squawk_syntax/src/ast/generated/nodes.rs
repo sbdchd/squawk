@@ -2579,8 +2579,8 @@ impl Column {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn constraint(&self) -> Option<ColumnConstraint> {
-        support::child(&self.syntax)
+    pub fn constraints(&self) -> AstChildren<ColumnConstraint> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn deferrable_constraint_option(&self) -> Option<DeferrableConstraintOption> {

@@ -124,7 +124,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             .help("Make the field nullable and use a `CHECK` constraint instead."),
                         );
                     }
-                    _ => {}
+                    _ => (),
                 }
             }
         }

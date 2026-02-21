@@ -15,63 +15,103 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
     let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
     // TODO: use match_ast! like in #api_walkthrough
     for stmt in file.stmts() {
-        if let ast::Stmt::AlterTable(alter_table) = stmt {
-            if let Some(table_name) = alter_table
-                .relation_name()
-                .and_then(|x| x.path())
-                .and_then(|x| x.segment())
-                .and_then(|x| x.name_ref())
-            {
-                for action in alter_table.actions() {
-                    match action {
-                        ast::AlterTableAction::AddConstraint(add_constraint) => {
-                            if add_constraint.not_valid().is_some()
-                                || tables_created.contains(&Identifier::new(&table_name.text()))
-                            {
-                                // Adding foreign key is okay when:
-                                // - NOT VALID is specified.
-                                // - The table is created in the same transaction
-                                continue;
-                            }
-                            if let Some(constraint) = add_constraint.constraint() {
-                                if matches!(
-                                    constraint,
-                                    ast::Constraint::ForeignKeyConstraint(_)
-                                        | ast::Constraint::ReferencesConstraint(_)
-                                ) {
-                                    ctx.report(
-                                        Violation::for_node(
-                                            Rule::AddingForeignKeyConstraint,
-                                            message.into(),
-                                            constraint.syntax(),
+        match stmt {
+            ast::Stmt::AlterTable(alter_table) => {
+                if let Some(table_name) = alter_table
+                    .relation_name()
+                    .and_then(|x| x.path())
+                    .and_then(|x| x.segment())
+                    .and_then(|x| x.name_ref())
+                {
+                    for action in alter_table.actions() {
+                        match action {
+                            ast::AlterTableAction::AddConstraint(add_constraint) => {
+                                if add_constraint.not_valid().is_some()
+                                    || tables_created.contains(&Identifier::new(&table_name.text()))
+                                {
+                                    // Adding foreign key is okay when:
+                                    // - NOT VALID is specified.
+                                    // - The table is created in the same transaction
+                                    continue;
+                                }
+                                if let Some(constraint) = add_constraint.constraint() {
+                                    if matches!(
+                                        constraint,
+                                        ast::Constraint::ForeignKeyConstraint(_)
+                                            | ast::Constraint::ReferencesConstraint(_)
+                                    ) {
+                                        ctx.report(
+                                            Violation::for_node(
+                                                Rule::AddingForeignKeyConstraint,
+                                                message.into(),
+                                                constraint.syntax(),
+                                            )
+                                            .help(help),
                                         )
-                                        .help(help),
-                                    )
+                                    }
                                 }
                             }
-                        }
-                        ast::AlterTableAction::AddColumn(add_column) => {
-                            for constraint in add_column.constraints() {
-                                if matches!(
-                                    constraint,
-                                    ast::Constraint::ForeignKeyConstraint(_)
-                                        | ast::Constraint::ReferencesConstraint(_)
-                                ) {
-                                    ctx.report(
-                                        Violation::for_node(
-                                            Rule::AddingForeignKeyConstraint,
-                                            message.into(),
-                                            constraint.syntax(),
+                            ast::AlterTableAction::AddColumn(add_column) => {
+                                for constraint in add_column.constraints() {
+                                    if matches!(
+                                        constraint,
+                                        ast::Constraint::ForeignKeyConstraint(_)
+                                            | ast::Constraint::ReferencesConstraint(_)
+                                    ) {
+                                        ctx.report(
+                                            Violation::for_node(
+                                                Rule::AddingForeignKeyConstraint,
+                                                message.into(),
+                                                constraint.syntax(),
+                                            )
+                                            .help(help),
                                         )
-                                        .help(help),
-                                    )
+                                    }
                                 }
                             }
+                            _ => continue,
                         }
-                        _ => continue,
                     }
                 }
             }
+            ast::Stmt::CreateTable(create_table) => {
+                if let Some(table_arg_list) = create_table.table_arg_list() {
+                    for arg in table_arg_list.args() {
+                        match arg {
+                            ast::TableArg::TableConstraint(
+                                ast::TableConstraint::ForeignKeyConstraint(fk),
+                            ) => {
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::AddingForeignKeyConstraint,
+                                        message.into(),
+                                        fk.syntax(),
+                                    )
+                                    .help(help),
+                                );
+                            }
+                            ast::TableArg::Column(column) => {
+                                for constraint in column.constraints() {
+                                    if let ast::ColumnConstraint::ReferencesConstraint(refs) =
+                                        constraint
+                                    {
+                                        ctx.report(
+                                            Violation::for_node(
+                                                Rule::AddingForeignKeyConstraint,
+                                                message.into(),
+                                                refs.syntax(),
+                                            )
+                                            .help(help),
+                                        );
+                                    }
+                                }
+                            }
+                            _ => (),
+                        }
+                    }
+                }
+            }
+            _ => (),
         }
     }
 }
@@ -90,20 +130,32 @@ mod test {
     #[test]
     fn create_table_with_foreign_key_constraint() {
         let sql = r#"
-        BEGIN;
-        CREATE TABLE email (
-            id BIGINT GENERATED ALWAYS AS IDENTITY,
-            user_id BIGINT,
-            email TEXT,
-            PRIMARY KEY(id),
-            CONSTRAINT fk_user
-                FOREIGN KEY ("user_id")
-                REFERENCES "user" ("id")
-        );
-        COMMIT;
+BEGIN;
+CREATE TABLE email (
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    user_id BIGINT,
+    email TEXT,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_user
+        FOREIGN KEY ("user_id")
+        REFERENCES "user" ("id")
+);
+COMMIT;
         "#;
 
-        lint_ok(sql, Rule::AddingForeignKeyConstraint);
+        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint));
+    }
+
+    #[test]
+    fn create_table_with_column_references() {
+        let sql = r#"
+CREATE TABLE table_name (
+    id BIGSERIAL NOT NULL,
+    my_fk_id INTEGER NOT NULL REFERENCES other_table (id) ON DELETE CASCADE
+);
+        "#;
+
+        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint));
     }
 
     #[test]
