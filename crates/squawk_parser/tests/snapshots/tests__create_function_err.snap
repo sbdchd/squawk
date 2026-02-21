@@ -23,25 +23,28 @@ SOURCE_FILE
       WHITESPACE " "
       TABLE_KW "table"
       WHITESPACE " "
-      L_PAREN "("
-      NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              TEXT_KW "text"
-      WHITESPACE "  "
-      NAME_REF
-        IDENT "b"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              INT_KW "int"
-      R_PAREN ")"
+      TABLE_ARG_LIST
+        L_PAREN "("
+        COLUMN
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+        WHITESPACE "  "
+        COLUMN
+          NAME
+            IDENT "b"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
       AS_FUNC_OPTION

@@ -11441,6 +11441,10 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn is_not_json_object(&self) -> Option<IsNotJsonObject> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn is_not_json_scalar(&self) -> Option<IsNotJsonScalar> {
         support::child(&self.syntax)
     }
@@ -13205,12 +13209,20 @@ pub struct RetType {
 }
 impl RetType {
     #[inline]
+    pub fn table_arg_list(&self) -> Option<TableArgList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn returns_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RETURNS_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
     }
 }
 
