@@ -653,9 +653,9 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
             assert!(label.is_none());
             let manually_implemented = matches!(
                 l.as_str(),
-                "value" 
+                "value"
                 // bin expr fields
-                | "lhs" | "rhs" 
+                | "lhs" | "rhs" | "op"
                 // between expr fields
                 | "target" | "start" | "end" 
                 // index expr fields

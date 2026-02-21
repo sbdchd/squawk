@@ -261,7 +261,7 @@ fn api_walkthrough() {
     // To switch from AST to CST, call `.syntax()` method:
     let func_option_syntax = func_option.syntax();
 
-    // Note how `expr` and `bin_expr` are in fact the same node underneath:
+    // Note how `func_option_syntax` and `option` are in fact the same node underneath:
     assert!(func_option_syntax == option.syntax());
 
     // To go from CST to AST, `AstNode::cast` function is used:
@@ -479,4 +479,64 @@ fn create_table() {
         ),
     ]
     "#)
+}
+
+#[test]
+fn bin_expr() {
+    use insta::assert_debug_snapshot;
+
+    let source_code = "select 1 is not null;";
+    let parse = SourceFile::parse(source_code);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+
+    let ast::Stmt::Select(select) = file.stmts().next().unwrap() else {
+        unreachable!()
+    };
+
+    let target_list = select.select_clause().unwrap().target_list().unwrap();
+    let target = target_list.targets().next().unwrap();
+    let ast::Expr::BinExpr(bin_expr) = target.expr().unwrap() else {
+        unreachable!()
+    };
+
+    let lhs = bin_expr.lhs();
+    let op = bin_expr.op();
+    let rhs = bin_expr.rhs();
+
+    assert_debug_snapshot!(lhs, @r#"
+    Some(
+        Literal(
+            Literal {
+                syntax: LITERAL@7..8
+                  INT_NUMBER@7..8 "1"
+                ,
+            },
+        ),
+    )
+    "#);
+    assert_debug_snapshot!(op, @r#"
+    Some(
+        IsNot(
+            IsNot {
+                syntax: IS_NOT@9..15
+                  IS_KW@9..11 "is"
+                  WHITESPACE@11..12 " "
+                  NOT_KW@12..15 "not"
+                ,
+            },
+        ),
+    )
+    "#);
+    assert_debug_snapshot!(rhs, @r#"
+    Some(
+        Literal(
+            Literal {
+                syntax: LITERAL@16..20
+                  NULL_KW@16..20 "null"
+                ,
+            },
+        ),
+    )
+    "#);
 }

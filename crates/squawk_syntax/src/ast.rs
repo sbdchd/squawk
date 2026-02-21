@@ -37,14 +37,8 @@ use squawk_parser::SyntaxKind;
 
 pub use self::{
     generated::tokens::*,
+    node_ext::{BinOp, LitKind},
     nodes::*,
-    // node_ext::{
-    //     AttrKind, FieldKind, Macro, NameLike, NameOrNameRef, PathSegmentKind, SelfParamKind,
-    //     SlicePatComponents, StructKind, TraitOrAlias, TypeBoundKind, TypeOrConstParam,
-    //     VisibilityKind,
-    // },
-    // operators::{ArithOp, BinaryOp, CmpOp, LogicOp, Ordering, RangeOp, UnaryOp},
-    // token_ext::{CommentKind, CommentPlacement, CommentShape, IsString, QuoteOffsets, Radix},
     traits::{HasCreateTable, HasParamList, HasWithClause, NameLike},
 };
 
