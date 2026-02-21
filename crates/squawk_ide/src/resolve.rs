@@ -1,7 +1,7 @@
 use rowan::TextSize;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
-    SyntaxNode, SyntaxNodePtr,
+    SyntaxKind, SyntaxNode, SyntaxNodePtr,
     ast::{self, AstNode, SelectVariant},
 };
 
@@ -496,6 +496,7 @@ pub(crate) fn resolve_name_ref_ptrs(
                 .map(|ptr| smallvec![ptr])
         }
     }
+    .or_else(|| resolve_current_timestamp_as_now(binder, name_ref))
 }
 
 fn resolve_table_name_ptr(
@@ -701,6 +702,24 @@ fn resolve_for_kind_with_params(
     kind: SymbolKind,
 ) -> Option<SyntaxNodePtr> {
     binder.lookup_with_params(name, kind, position, schema, params)
+}
+
+/// `current_timestamp` is equivalent to `now()`
+fn resolve_current_timestamp_as_now(
+    binder: &Binder,
+    name_ref: &ast::NameRef,
+) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
+    if name_ref
+        .syntax()
+        .first_child_or_token()
+        .is_some_and(|t| t.kind() == SyntaxKind::CURRENT_TIMESTAMP_KW)
+    {
+        let now_name = Name::from_string("now");
+        let position = name_ref.syntax().text_range().start();
+        return resolve_function(binder, &now_name, &None, None, position)
+            .map(|ptr| smallvec![ptr]);
+    }
+    None
 }
 
 fn resolve_function(

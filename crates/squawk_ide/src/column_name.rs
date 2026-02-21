@@ -311,8 +311,15 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 ));
             }
             if let Some(trim_fn) = call_expr.trim_fn() {
+                let name = if trim_fn.leading_token().is_some() {
+                    "ltrim"
+                } else if trim_fn.trailing_token().is_some() {
+                    "rtrim"
+                } else {
+                    "btrim"
+                };
                 return Some((
-                    ColumnName::Column("trim".to_string()),
+                    ColumnName::Column(name.to_string()),
                     trim_fn.syntax().clone(),
                 ));
             }
@@ -494,7 +501,10 @@ fn examples() {
     assert_snapshot!(name("substring('hello' from 2 for 3)"), @"substring");
     assert_snapshot!(name("position('a' in 'abc')"), @"position");
     assert_snapshot!(name("overlay('hello' placing 'X' from 2)"), @"overlay");
-    assert_snapshot!(name("trim('  hi  ')"), @"trim");
+    assert_snapshot!(name("trim('  hi  ')"), @"btrim");
+    assert_snapshot!(name("trim(leading ' ' from '  hi  ')"), @"ltrim");
+    assert_snapshot!(name("trim(trailing ' ' from '  hi  ')"), @"rtrim");
+    assert_snapshot!(name("trim(both ' ' from '  hi  ')"), @"btrim");
     assert_snapshot!(name("xmlroot('<a/>', version '1.0')"), @"xml_root");
     assert_snapshot!(name("xmlserialize(document '<a/>' as text)"), @"xml_serialize");
     assert_snapshot!(name("xmlelement(name foo, 'bar')"), @"xml_element");
