@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.41.0 - 2026-02-20
+
+### Added
+
+- linter: warn about foreign key constraints in create table defs (#945)
+- parser: support on conflict do select & sync regression suite (#935)
+- parser: improve create function table return type parsing (#944)
+- ide: find ref support for builtins (#942)
+- ide: support inherits/like tables in inlay hints (#936)
+- ide: add quick fixes for leading `from` (#933)
+- ide: goto def for builtins (#932)
+
+### Fixed
+
+- linter: fix adding-not-nullable-field for pg >= 12 with validated CHECK (#910). Thanks @reteps!
+
+### Changed
+
+- linter: don't report lint errors when syntax error found (#943)
+
 ## v2.40.1 - 2026-02-12
 
 ### Fixed
