@@ -106,12 +106,12 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                     }
                                 }
                             }
-                            _ => ()
+                            _ => (),
                         }
                     }
                 }
             }
-            _ => ()
+            _ => (),
         }
     }
 }
