@@ -32,17 +32,101 @@ use rowan::{GreenNodeData, GreenTokenData, NodeOrToken};
 
 #[cfg(test)]
 use crate::SourceFile;
+use rowan::Direction;
+
 use crate::ast;
 use crate::ast::AstNode;
-use crate::{SyntaxNode, TokenText};
+use crate::{SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
 
 use super::support;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LitKind {
+    BitString(SyntaxToken),
+    ByteString(SyntaxToken),
+    DollarQuotedString(SyntaxToken),
+    EscString(SyntaxToken),
+    FloatNumber(SyntaxToken),
+    IntNumber(SyntaxToken),
+    Null(SyntaxToken),
+    PositionalParam(SyntaxToken),
+    String(SyntaxToken),
+    UnicodeEscString(SyntaxToken),
+}
+
+impl ast::Literal {
+    pub fn kind(&self) -> Option<LitKind> {
+        let token = self.syntax().first_child_or_token()?.into_token()?;
+        let kind = match token.kind() {
+            SyntaxKind::STRING => LitKind::String(token),
+            SyntaxKind::NULL_KW => LitKind::Null(token),
+            SyntaxKind::FLOAT_NUMBER => LitKind::FloatNumber(token),
+            SyntaxKind::INT_NUMBER => LitKind::IntNumber(token),
+            SyntaxKind::BYTE_STRING => LitKind::ByteString(token),
+            SyntaxKind::BIT_STRING => LitKind::BitString(token),
+            SyntaxKind::DOLLAR_QUOTED_STRING => LitKind::DollarQuotedString(token),
+            SyntaxKind::UNICODE_ESC_STRING => LitKind::UnicodeEscString(token),
+            SyntaxKind::ESC_STRING => LitKind::EscString(token),
+            SyntaxKind::POSITIONAL_PARAM => LitKind::PositionalParam(token),
+            _ => return None,
+        };
+        Some(kind)
+    }
+}
 
 impl ast::Constraint {
     #[inline]
     pub fn constraint_name(&self) -> Option<ast::ConstraintName> {
         support::child(self.syntax())
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BinOp {
+    And(SyntaxToken),
+    AtTimeZone(ast::AtTimeZone),
+    Caret(SyntaxToken),
+    Collate(SyntaxToken),
+    ColonColon(ast::ColonColon),
+    ColonEq(ast::ColonEq),
+    CustomOp(ast::CustomOp),
+    Eq(SyntaxToken),
+    FatArrow(ast::FatArrow),
+    Gteq(ast::Gteq),
+    Ilike(SyntaxToken),
+    In(SyntaxToken),
+    Is(SyntaxToken),
+    IsDistinctFrom(ast::IsDistinctFrom),
+    IsJson(ast::IsJson),
+    IsJsonArray(ast::IsJsonArray),
+    IsJsonObject(ast::IsJsonObject),
+    IsJsonScalar(ast::IsJsonScalar),
+    IsJsonValue(ast::IsJsonValue),
+    IsNot(ast::IsNot),
+    IsNotDistinctFrom(ast::IsNotDistinctFrom),
+    IsNotJson(ast::IsNotJson),
+    IsNotJsonArray(ast::IsNotJsonArray),
+    IsNotJsonScalar(ast::IsNotJsonScalar),
+    IsNotJsonValue(ast::IsNotJsonValue),
+    LAngle(SyntaxToken),
+    Like(SyntaxToken),
+    Lteq(ast::Lteq),
+    Minus(SyntaxToken),
+    Neq(ast::Neq),
+    Neqb(ast::Neqb),
+    NotIlike(ast::NotIlike),
+    NotIn(ast::NotIn),
+    NotLike(ast::NotLike),
+    NotSimilarTo(ast::NotSimilarTo),
+    OperatorCall(ast::OperatorCall),
+    Or(SyntaxToken),
+    Overlaps(SyntaxToken),
+    Percent(SyntaxToken),
+    Plus(SyntaxToken),
+    RAngle(SyntaxToken),
+    SimilarTo(ast::SimilarTo),
+    Slash(SyntaxToken),
+    Star(SyntaxToken),
 }
 
 impl ast::BinExpr {
@@ -54,6 +138,99 @@ impl ast::BinExpr {
     #[inline]
     pub fn rhs(&self) -> Option<ast::Expr> {
         support::children(self.syntax()).nth(1)
+    }
+
+    pub fn op(&self) -> Option<BinOp> {
+        let lhs = self.lhs()?;
+        for child in lhs.syntax().siblings_with_tokens(Direction::Next).skip(1) {
+            match child {
+                NodeOrToken::Token(token) => {
+                    let op = match token.kind() {
+                        SyntaxKind::AND_KW => BinOp::And(token),
+                        SyntaxKind::CARET => BinOp::Caret(token),
+                        SyntaxKind::COLLATE_KW => BinOp::Collate(token),
+                        SyntaxKind::EQ => BinOp::Eq(token),
+                        SyntaxKind::ILIKE_KW => BinOp::Ilike(token),
+                        SyntaxKind::IN_KW => BinOp::In(token),
+                        SyntaxKind::IS_KW => BinOp::Is(token),
+                        SyntaxKind::L_ANGLE => BinOp::LAngle(token),
+                        SyntaxKind::LIKE_KW => BinOp::Like(token),
+                        SyntaxKind::MINUS => BinOp::Minus(token),
+                        SyntaxKind::OR_KW => BinOp::Or(token),
+                        SyntaxKind::OVERLAPS_KW => BinOp::Overlaps(token),
+                        SyntaxKind::PERCENT => BinOp::Percent(token),
+                        SyntaxKind::PLUS => BinOp::Plus(token),
+                        SyntaxKind::R_ANGLE => BinOp::RAngle(token),
+                        SyntaxKind::SLASH => BinOp::Slash(token),
+                        SyntaxKind::STAR => BinOp::Star(token),
+                        _ => continue,
+                    };
+                    return Some(op);
+                }
+                NodeOrToken::Node(node) => {
+                    let op = match node.kind() {
+                        SyntaxKind::AT_TIME_ZONE => {
+                            BinOp::AtTimeZone(ast::AtTimeZone { syntax: node })
+                        }
+                        SyntaxKind::COLON_COLON => {
+                            BinOp::ColonColon(ast::ColonColon { syntax: node })
+                        }
+                        SyntaxKind::COLON_EQ => BinOp::ColonEq(ast::ColonEq { syntax: node }),
+                        SyntaxKind::CUSTOM_OP => BinOp::CustomOp(ast::CustomOp { syntax: node }),
+                        SyntaxKind::FAT_ARROW => BinOp::FatArrow(ast::FatArrow { syntax: node }),
+                        SyntaxKind::GTEQ => BinOp::Gteq(ast::Gteq { syntax: node }),
+                        SyntaxKind::IS_DISTINCT_FROM => {
+                            BinOp::IsDistinctFrom(ast::IsDistinctFrom { syntax: node })
+                        }
+                        SyntaxKind::IS_JSON => BinOp::IsJson(ast::IsJson { syntax: node }),
+                        SyntaxKind::IS_JSON_ARRAY => {
+                            BinOp::IsJsonArray(ast::IsJsonArray { syntax: node })
+                        }
+                        SyntaxKind::IS_JSON_OBJECT => {
+                            BinOp::IsJsonObject(ast::IsJsonObject { syntax: node })
+                        }
+                        SyntaxKind::IS_JSON_SCALAR => {
+                            BinOp::IsJsonScalar(ast::IsJsonScalar { syntax: node })
+                        }
+                        SyntaxKind::IS_JSON_VALUE => {
+                            BinOp::IsJsonValue(ast::IsJsonValue { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT => BinOp::IsNot(ast::IsNot { syntax: node }),
+                        SyntaxKind::IS_NOT_DISTINCT_FROM => {
+                            BinOp::IsNotDistinctFrom(ast::IsNotDistinctFrom { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON => {
+                            BinOp::IsNotJson(ast::IsNotJson { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_ARRAY => {
+                            BinOp::IsNotJsonArray(ast::IsNotJsonArray { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_SCALAR => {
+                            BinOp::IsNotJsonScalar(ast::IsNotJsonScalar { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_VALUE => {
+                            BinOp::IsNotJsonValue(ast::IsNotJsonValue { syntax: node })
+                        }
+                        SyntaxKind::LTEQ => BinOp::Lteq(ast::Lteq { syntax: node }),
+                        SyntaxKind::NEQ => BinOp::Neq(ast::Neq { syntax: node }),
+                        SyntaxKind::NEQB => BinOp::Neqb(ast::Neqb { syntax: node }),
+                        SyntaxKind::NOT_ILIKE => BinOp::NotIlike(ast::NotIlike { syntax: node }),
+                        SyntaxKind::NOT_IN => BinOp::NotIn(ast::NotIn { syntax: node }),
+                        SyntaxKind::NOT_LIKE => BinOp::NotLike(ast::NotLike { syntax: node }),
+                        SyntaxKind::NOT_SIMILAR_TO => {
+                            BinOp::NotSimilarTo(ast::NotSimilarTo { syntax: node })
+                        }
+                        SyntaxKind::OPERATOR_CALL => {
+                            BinOp::OperatorCall(ast::OperatorCall { syntax: node })
+                        }
+                        SyntaxKind::SIMILAR_TO => BinOp::SimilarTo(ast::SimilarTo { syntax: node }),
+                        _ => continue,
+                    };
+                    return Some(op);
+                }
+            }
+        }
+        None
     }
 }
 
