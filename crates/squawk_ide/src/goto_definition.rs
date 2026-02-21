@@ -3687,6 +3687,178 @@ select foo$0();
     }
 
     #[test]
+    fn goto_select_column_from_function_return_table() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select f1$0 from dup(42);
+"#), @r"
+          ╭▸ 
+        2 │ create function dup(int) returns table(f1 int, f2 text)
+          │                                        ── 2. destination
+          ‡
+        6 │ select f1 from dup(42);
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_with_schema() {
+        assert_snapshot!(goto(r#"
+create function myschema.dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+create function otherschema.dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select f1$0 from myschema.dup(42);
+"#), @r"
+          ╭▸ 
+        2 │ create function myschema.dup(int) returns table(f1 int, f2 text)
+          │                                                 ── 2. destination
+          ‡
+        9 │ select f1 from myschema.dup(42);
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_paren() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select (dup(42)).f2$0;
+"#), @r"
+          ╭▸ 
+        2 │ create function dup(int) returns table(f1 int, f2 text)
+          │                                                ── 2. destination
+          ‡
+        6 │ select (dup(42)).f2;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_qualified() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select dup.f1$0 from dup(42);
+"#), @r"
+          ╭▸ 
+        2 │ create function dup(int) returns table(f1 int, f2 text)
+          │                                        ── 2. destination
+          ‡
+        6 │ select dup.f1 from dup(42);
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_qualified_function_name() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select dup$0.f1 from dup(42);
+"#), @r"
+          ╭▸ 
+        2 │ create function dup(int) returns table(f1 int, f2 text)
+          │                 ─── 2. destination
+          ‡
+        6 │ select dup.f1 from dup(42);
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_qualified_function_name_with_alias() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select dup$0.f2 from dup(42) as dup;
+"#), @r"
+          ╭▸ 
+        6 │ select dup.f2 from dup(42) as dup;
+          ╰╴         ─ 1. source          ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_alias_list() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select a$0 from dup(42) t(a, b);
+"#), @r"
+          ╭▸ 
+        6 │ select a from dup(42) t(a, b);
+          ╰╴       ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_alias_list_qualified_partial() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select u.f2$0 from dup(42) as u(x);
+"#), @r"
+          ╭▸ 
+        2 │ create function dup(int) returns table(f1 int, f2 text)
+          │                                                ── 2. destination
+          ‡
+        6 │ select u.f2 from dup(42) as u(x);
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_alias_list_unqualified_partial() {
+        assert_snapshot!(goto(r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select f2$0 from dup(42) as u(x);
+"#), @r"
+          ╭▸ 
+        2 │ create function dup(int) returns table(f1 int, f2 text)
+          │                                                ── 2. destination
+          ‡
+        6 │ select f2 from dup(42) as u(x);
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_return_table_alias_list_unqualified_not_found() {
+        goto_not_found(
+            r#"
+create function dup(int) returns table(f1 int, f2 text)
+  as ''
+  language sql;
+
+select f2$0 from dup(42) as u(x, y);
+"#,
+        );
+    }
+
+    #[test]
     fn goto_select_aggregate_call() {
         assert_snapshot!(goto("
 create aggregate foo(int) (
