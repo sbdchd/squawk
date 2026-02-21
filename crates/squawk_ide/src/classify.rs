@@ -62,6 +62,7 @@ fn is_special_fn(kind: SyntaxKind) -> bool {
     matches!(
         kind,
         SyntaxKind::EXTRACT_FN
+            | SyntaxKind::COLLATION_FOR_FN
             | SyntaxKind::JSON_EXISTS_FN
             | SyntaxKind::JSON_ARRAY_FN
             | SyntaxKind::JSON_OBJECT_FN
