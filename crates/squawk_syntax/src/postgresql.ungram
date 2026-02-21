@@ -431,7 +431,7 @@ IsNot =
   'is' 'not'
 
 Op =
-'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | NotSimilarTo | AtTimeZone | IsJson | IsJsonValue | IsNotJson | IsJsonObject | IsJsonArray |IsJsonScalar | IsNotJsonValue | IsJsonObject | IsNotJsonArray | IsNotJsonScalar
+'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | NotSimilarTo | AtTimeZone | IsJson | IsJsonValue | IsNotJson | IsJsonObject | IsJsonArray |IsJsonScalar | IsNotJsonValue | IsNotJsonObject | IsNotJsonArray | IsNotJsonScalar
 
 IsJson =
   'is' 'json' JsonKeysUniqueClause?
@@ -1139,7 +1139,7 @@ OrReplace =
   'or' 'replace'
 
 RetType =
-  'returns' Type
+  'returns' ('table' TableArgList | Type)
 
 BeginFuncOptionList =
   'begin' 'atomic'

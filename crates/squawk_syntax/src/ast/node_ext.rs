@@ -106,6 +106,7 @@ pub enum BinOp {
     IsNotDistinctFrom(ast::IsNotDistinctFrom),
     IsNotJson(ast::IsNotJson),
     IsNotJsonArray(ast::IsNotJsonArray),
+    IsNotJsonObject(ast::IsNotJsonObject),
     IsNotJsonScalar(ast::IsNotJsonScalar),
     IsNotJsonValue(ast::IsNotJsonValue),
     LAngle(SyntaxToken),
@@ -204,6 +205,9 @@ impl ast::BinExpr {
                         }
                         SyntaxKind::IS_NOT_JSON_ARRAY => {
                             BinOp::IsNotJsonArray(ast::IsNotJsonArray { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_OBJECT => {
+                            BinOp::IsNotJsonObject(ast::IsNotJsonObject { syntax: node })
                         }
                         SyntaxKind::IS_NOT_JSON_SCALAR => {
                             BinOp::IsNotJsonScalar(ast::IsNotJsonScalar { syntax: node })

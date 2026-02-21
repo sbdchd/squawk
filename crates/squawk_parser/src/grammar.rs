@@ -13290,24 +13290,11 @@ fn opt_ret_type(p: &mut Parser<'_>) {
     let m = p.start();
     if p.eat(RETURNS_KW) {
         if p.eat(TABLE_KW) {
-            delimited(
-                p,
-                L_PAREN,
-                R_PAREN,
-                COMMA,
-                || "unexpected comma".to_string(),
-                NAME_REF_FIRST,
-                |p| {
-                    // TODO: should this be the column def name?
-                    // column_name
-                    if opt_name_ref(p).is_none() {
-                        return false;
-                    }
-                    // column_type
-                    type_name(p);
-                    true
-                },
-            );
+            if p.at(L_PAREN) {
+                table_arg_list(p);
+            } else {
+                p.error("expected table arg list");
+            }
         } else {
             p.eat(SETOF_KW);
             type_name(p);
