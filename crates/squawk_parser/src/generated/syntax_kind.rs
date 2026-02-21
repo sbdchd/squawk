@@ -638,6 +638,7 @@ pub enum SyntaxKind {
     CLUSTER,
     CLUSTER_ON,
     COLLATE,
+    COLLATION_FOR_FN,
     COLON_COLON,
     COLON_EQ,
     COLUMN,

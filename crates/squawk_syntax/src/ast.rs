@@ -37,7 +37,7 @@ use squawk_parser::SyntaxKind;
 
 pub use self::{
     generated::tokens::*,
-    node_ext::{BinOp, LitKind},
+    node_ext::{BinOp, LitKind, PostfixOp},
     nodes::*,
     traits::{HasCreateTable, HasParamList, HasWithClause, NameLike},
 };

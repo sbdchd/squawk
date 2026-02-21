@@ -97,18 +97,8 @@ pub enum BinOp {
     In(SyntaxToken),
     Is(SyntaxToken),
     IsDistinctFrom(ast::IsDistinctFrom),
-    IsJson(ast::IsJson),
-    IsJsonArray(ast::IsJsonArray),
-    IsJsonObject(ast::IsJsonObject),
-    IsJsonScalar(ast::IsJsonScalar),
-    IsJsonValue(ast::IsJsonValue),
     IsNot(ast::IsNot),
     IsNotDistinctFrom(ast::IsNotDistinctFrom),
-    IsNotJson(ast::IsNotJson),
-    IsNotJsonArray(ast::IsNotJsonArray),
-    IsNotJsonObject(ast::IsNotJsonObject),
-    IsNotJsonScalar(ast::IsNotJsonScalar),
-    IsNotJsonValue(ast::IsNotJsonValue),
     LAngle(SyntaxToken),
     Like(SyntaxToken),
     Lteq(ast::Lteq),
@@ -128,6 +118,25 @@ pub enum BinOp {
     SimilarTo(ast::SimilarTo),
     Slash(SyntaxToken),
     Star(SyntaxToken),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PostfixOp {
+    AtLocal(SyntaxToken),
+    IsJson(ast::IsJson),
+    IsJsonArray(ast::IsJsonArray),
+    IsJsonObject(ast::IsJsonObject),
+    IsJsonScalar(ast::IsJsonScalar),
+    IsJsonValue(ast::IsJsonValue),
+    IsNormalized(ast::IsNormalized),
+    IsNotJson(ast::IsNotJson),
+    IsNotJsonArray(ast::IsNotJsonArray),
+    IsNotJsonObject(ast::IsNotJsonObject),
+    IsNotJsonScalar(ast::IsNotJsonScalar),
+    IsNotJsonValue(ast::IsNotJsonValue),
+    IsNotNormalized(ast::IsNotNormalized),
+    IsNull(SyntaxToken),
+    NotNull(SyntaxToken),
 }
 
 impl ast::BinExpr {
@@ -183,37 +192,9 @@ impl ast::BinExpr {
                         SyntaxKind::IS_DISTINCT_FROM => {
                             BinOp::IsDistinctFrom(ast::IsDistinctFrom { syntax: node })
                         }
-                        SyntaxKind::IS_JSON => BinOp::IsJson(ast::IsJson { syntax: node }),
-                        SyntaxKind::IS_JSON_ARRAY => {
-                            BinOp::IsJsonArray(ast::IsJsonArray { syntax: node })
-                        }
-                        SyntaxKind::IS_JSON_OBJECT => {
-                            BinOp::IsJsonObject(ast::IsJsonObject { syntax: node })
-                        }
-                        SyntaxKind::IS_JSON_SCALAR => {
-                            BinOp::IsJsonScalar(ast::IsJsonScalar { syntax: node })
-                        }
-                        SyntaxKind::IS_JSON_VALUE => {
-                            BinOp::IsJsonValue(ast::IsJsonValue { syntax: node })
-                        }
                         SyntaxKind::IS_NOT => BinOp::IsNot(ast::IsNot { syntax: node }),
                         SyntaxKind::IS_NOT_DISTINCT_FROM => {
                             BinOp::IsNotDistinctFrom(ast::IsNotDistinctFrom { syntax: node })
-                        }
-                        SyntaxKind::IS_NOT_JSON => {
-                            BinOp::IsNotJson(ast::IsNotJson { syntax: node })
-                        }
-                        SyntaxKind::IS_NOT_JSON_ARRAY => {
-                            BinOp::IsNotJsonArray(ast::IsNotJsonArray { syntax: node })
-                        }
-                        SyntaxKind::IS_NOT_JSON_OBJECT => {
-                            BinOp::IsNotJsonObject(ast::IsNotJsonObject { syntax: node })
-                        }
-                        SyntaxKind::IS_NOT_JSON_SCALAR => {
-                            BinOp::IsNotJsonScalar(ast::IsNotJsonScalar { syntax: node })
-                        }
-                        SyntaxKind::IS_NOT_JSON_VALUE => {
-                            BinOp::IsNotJsonValue(ast::IsNotJsonValue { syntax: node })
                         }
                         SyntaxKind::LTEQ => BinOp::Lteq(ast::Lteq { syntax: node }),
                         SyntaxKind::NEQ => BinOp::Neq(ast::Neq { syntax: node }),
@@ -234,6 +215,69 @@ impl ast::BinExpr {
                 }
             }
         }
+        None
+    }
+}
+
+impl ast::PostfixExpr {
+    pub fn op(&self) -> Option<PostfixOp> {
+        let lhs = self.expr()?;
+
+        let siblings = lhs.syntax().siblings_with_tokens(Direction::Next).skip(1);
+        for child in siblings {
+            match child {
+                NodeOrToken::Token(token) => {
+                    let op = match token.kind() {
+                        SyntaxKind::AT_KW => PostfixOp::AtLocal(token),
+                        SyntaxKind::ISNULL_KW => PostfixOp::IsNull(token),
+                        SyntaxKind::NOTNULL_KW => PostfixOp::NotNull(token),
+                        _ => continue,
+                    };
+                    return Some(op);
+                }
+                NodeOrToken::Node(node) => {
+                    let op = match node.kind() {
+                        SyntaxKind::IS_JSON => PostfixOp::IsJson(ast::IsJson { syntax: node }),
+                        SyntaxKind::IS_JSON_ARRAY => {
+                            PostfixOp::IsJsonArray(ast::IsJsonArray { syntax: node })
+                        }
+                        SyntaxKind::IS_JSON_OBJECT => {
+                            PostfixOp::IsJsonObject(ast::IsJsonObject { syntax: node })
+                        }
+                        SyntaxKind::IS_JSON_SCALAR => {
+                            PostfixOp::IsJsonScalar(ast::IsJsonScalar { syntax: node })
+                        }
+                        SyntaxKind::IS_JSON_VALUE => {
+                            PostfixOp::IsJsonValue(ast::IsJsonValue { syntax: node })
+                        }
+                        SyntaxKind::IS_NORMALIZED => {
+                            PostfixOp::IsNormalized(ast::IsNormalized { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON => {
+                            PostfixOp::IsNotJson(ast::IsNotJson { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_ARRAY => {
+                            PostfixOp::IsNotJsonArray(ast::IsNotJsonArray { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_OBJECT => {
+                            PostfixOp::IsNotJsonObject(ast::IsNotJsonObject { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_SCALAR => {
+                            PostfixOp::IsNotJsonScalar(ast::IsNotJsonScalar { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_JSON_VALUE => {
+                            PostfixOp::IsNotJsonValue(ast::IsNotJsonValue { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_NORMALIZED => {
+                            PostfixOp::IsNotNormalized(ast::IsNotNormalized { syntax: node })
+                        }
+                        _ => continue,
+                    };
+                    return Some(op);
+                }
+            }
+        }
+
         None
     }
 }

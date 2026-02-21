@@ -809,6 +809,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         (XMLPI_KW, L_PAREN) => xmlpi_fn(p),
         (SOME_KW | ALL_KW | ANY_KW, L_PAREN) => some_any_all_fn(p),
         (EXISTS_KW, L_PAREN) => exists_fn(p),
+        (COLLATION_KW, FOR_KW) => collation_for_fn(p),
         _ if p.at_ts(NAME_REF_FIRST) => name_ref_(p)?,
         (L_PAREN, _) => tuple_expr(p),
         (ARRAY_KW, L_BRACK | L_PAREN) => {
@@ -859,6 +860,21 @@ fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.expect(R_PAREN);
     let m = m.complete(p, EXISTS_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
+}
+
+fn collation_for_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(COLLATION_KW) && p.nth_at(1, FOR_KW));
+    let m = p.start();
+    p.bump(COLLATION_KW);
+    p.bump(FOR_KW);
+    p.expect(L_PAREN);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, COLLATION_FOR_FN).precede(p);
     opt_agg_clauses(p);
     m.complete(p, CALL_EXPR)
 }
@@ -2042,11 +2058,6 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     let kind = match p.current() {
-        COLLATION_KW => {
-            p.bump(COLLATION_KW);
-            p.expect(FOR_KW);
-            NAME_REF
-        }
         TIMESTAMP_KW | TIME_KW => {
             p.bump_any();
             if p.eat(L_PAREN) {
@@ -3178,6 +3189,10 @@ fn data_source(p: &mut Parser<'_>) {
             if expr(p).is_none() {
                 p.error("expected expression");
             }
+            opt_alias(p);
+        }
+        COLLATION_KW if p.nth_at(1, FOR_KW) => {
+            collation_for_fn(p);
             opt_alias(p);
         }
         _ if p.at_ts(FROM_ITEM_KEYWORDS_FIRST) => from_item_name(p),
