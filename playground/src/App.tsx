@@ -22,9 +22,10 @@ import {
   provideSelectionRanges,
   provideCompletionItems,
 } from "./providers"
+import BUILTINS_SQL from "./builtins.sql?raw"
 
 const modes = ["Lint", "Syntax Tree", "Tokens"] as const
-const STORAGE_KEY = "playground-history-v1"
+const STORAGE_KEY = "playground-history-v3"
 
 type Mode = (typeof modes)[number]
 
@@ -39,7 +40,7 @@ alter table users
   -- squawk-ignore prefer-robust-stmts
   add column is_admin boolean default func();
 
-select * from users;
+select *, now() from users;
 `
 
 const SETTINGS = {
@@ -127,6 +128,8 @@ function initialValue(): string | null {
 export function App() {
   const [mode, setActiveMode] = useMode()
   const [text, setState] = useState(() => initialValue() ?? SETTINGS.value)
+  const [file, setFile] = useState<"current" | "builtins">("current")
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
 
   const markers = useMarkers(text)
 
@@ -163,16 +166,36 @@ export function App() {
             mode != null && "md:grid-cols-2",
           )}
         >
-          <Editor
-            onChange={(text) => {
-              setState(text)
-            }}
-            autoFocus
-            markers={markers}
-            settings={{ ...SETTINGS, value: text }}
-            onSave={handleSave}
-          />
+          <div className="flex flex-col flex-1">
+            {file == "builtins" ? (
+              <BuiltinsBanner
+                onBack={() => {
+                  // TODO: Might want to use an imperative ref so we can move this into the Editor
+                  editorRef.current?.setModel(getCurrentModel())
+                  editorRef.current?.updateOptions({ readOnly: false })
+                }}
+              />
+            ) : null}
+            <Editor
+              onChange={(text) => {
+                setState(text)
+              }}
+              autoFocus
+              markers={markers}
+              settings={{ ...SETTINGS, value: text }}
+              onSave={handleSave}
+              onModelChange={(model) => {
+                if (model?.path === builtinsUri.path) {
+                  setFile("builtins")
+                } else if (model?.path === currentUri.path) {
+                  setFile("current")
+                }
+              }}
+              ref={editorRef}
+            />
+          </div>
           {mode === "Syntax Tree" ? (
+            // TODO: it might be better to have an editor and switch the underlying monaco models
             <SyntaxTreePanel text={text} />
           ) : mode === "Tokens" ? (
             <TokenPanel text={text} />
@@ -184,6 +207,20 @@ export function App() {
         </div>
         <Controls activeMode={mode} onModeChange={setActiveMode} />
       </div>
+    </div>
+  )
+}
+
+function BuiltinsBanner({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="bg-blue-800 text-slate-100 px-3 py-2 text-sm flex items-center justify-between">
+      <div>Viewing postgres stubs (read-only)</div>
+      <button
+        className="px-2 py-1 border border-slate-300 rounded hover:bg-blue-600"
+        onClick={onBack}
+      >
+        Go Back
+      </button>
     </div>
   )
 }
@@ -243,7 +280,7 @@ function assertNever(x: never): never {
 let monacoGlobalProvidersRegistered = false
 // Only want to register these once, otherwise we'll end up with multiple
 // providers running and get dupe results for things like hover
-function registerMonacoProviders() {
+function registerMonacoProvidersOnce() {
   if (monacoGlobalProvidersRegistered) {
     return
   }
@@ -440,6 +477,33 @@ function registerMonacoProviders() {
   }
 }
 
+const builtinsUri = monaco.Uri.parse("file:///builtins.sql")
+const currentUri = monaco.Uri.parse("file:///current.sql")
+
+function getBuiltinsModel() {
+  let builtinsModel = monaco.editor.getModel(builtinsUri)
+  if (!builtinsModel) {
+    builtinsModel = monaco.editor.createModel(
+      BUILTINS_SQL,
+      "pgsql",
+      builtinsUri,
+    )
+  }
+  return builtinsModel
+}
+
+function getCurrentModel(defaultText?: string | undefined) {
+  let currentModel = monaco.editor.getModel(currentUri)
+  if (!currentModel) {
+    currentModel = monaco.editor.createModel(
+      defaultText ?? "",
+      "pgsql",
+      currentUri,
+    )
+  }
+  return currentModel
+}
+
 // TODO: this is hacky
 let fixesRef: Map<string, Fix> = new Map()
 
@@ -450,6 +514,8 @@ function Editor({
   value,
   markers,
   onSave,
+  onModelChange,
+  ref,
 }: {
   value?: string
   autoFocus?: boolean
@@ -457,12 +523,17 @@ function Editor({
   onSave?: (_: string) => void
   settings: monaco.editor.IStandaloneEditorConstructionOptions
   markers?: Marker[]
+  onModelChange?: (uri: monaco.Uri | null) => void
+  ref?: React.RefObject<monaco.editor.IStandaloneCodeEditor | null>
 }) {
   const onChangeText = useEffectEvent((text: string) => {
     onChange?.(text)
   })
   const onSaveText = useEffectEvent((text: string) => {
     onSave?.(text)
+  })
+  const onModelChange_ = useEffectEvent((uri: monaco.Uri | null) => {
+    onModelChange?.(uri)
   })
   const divRef = useRef<HTMLDivElement>(null)
   const autoFocusRef = useRef(autoFocus)
@@ -490,16 +561,58 @@ function Editor({
   }, [markers])
 
   useLayoutEffect(() => {
-    registerMonacoProviders()
+    registerMonacoProvidersOnce()
     const editor = monaco.editor.create(
       divRef.current!,
       settingsInitial.current,
     )
+    if (ref) {
+      ref.current = editor
+    }
+    if (!editor.getOption(monaco.editor.EditorOption.readOnly)) {
+      editor.setModel(getCurrentModel(settingsInitial.current?.value))
+    }
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
       onSaveText(editor.getValue()),
     )
-    editor.onDidBlurEditorText(() => {
-      onSaveText(editor.getValue())
+
+    editor.onDidChangeModel((e) => {
+      onModelChange_(e.newModelUrl)
+    })
+
+    const opener = monaco.editor.registerEditorOpener({
+      openCodeEditor: (
+        editor: monaco.editor.ICodeEditor,
+        resource: monaco.Uri,
+        selectionOrPosition?: monaco.IRange | monaco.IPosition,
+      ): boolean | Promise<boolean> => {
+        if (editor.getOption(monaco.editor.EditorOption.readOnly)) {
+          return false
+        }
+        let switched = false
+        if (resource.path === builtinsUri.path) {
+          editor.setModel(getBuiltinsModel())
+          editor.updateOptions({ readOnly: true })
+          switched = true
+        } else if (resource.path === currentUri.path) {
+          // we're already in the "current" file
+          switched = true
+        }
+
+        if (switched && selectionOrPosition) {
+          if ("startLineNumber" in selectionOrPosition) {
+            editor.setSelection(selectionOrPosition)
+            editor.revealRangeInCenter(selectionOrPosition)
+          } else {
+            editor.setPosition(selectionOrPosition)
+            editor.revealPositionInCenter(selectionOrPosition)
+          }
+          editor.focus()
+          return true
+        }
+
+        return false
+      },
     })
 
     editor.onDidChangeModelContent(() => {
@@ -513,8 +626,9 @@ function Editor({
       editorRef.current = null
 
       editor?.dispose()
+      opener.dispose()
     }
-  }, [])
+  }, [ref])
   useEffect(() => {
     if (value != null) {
       editorRef.current?.setValue(value)

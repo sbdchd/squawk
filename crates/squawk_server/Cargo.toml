@@ -28,6 +28,7 @@ squawk-linter.workspace = true
 squawk-syntax.workspace = true
 line-index.workspace = true
 insta.workspace = true
+etcetera.workspace = true
 
 [lints]
 workspace = true

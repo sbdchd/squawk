@@ -867,6 +867,33 @@ where (hundred, thousand) in (select twothousand, twothousand from onek);
 reset enable_memoize;
 
 --
+-- more antijoin recognition tests using NOT NULL constraints
+--
+
+begin;
+
+create temp table tbl_anti(a int not null, b int, c int);
+
+-- this is an antijoin, as t2.a is non-null for any matching row
+explain (costs off)
+select * from tenk1 t1 left join tbl_anti t2 on t1.unique1 = t2.b
+where t2.a is null;
+
+-- this is an antijoin, as t2.a is non-null for any matching row
+explain (costs off)
+select * from tenk1 t1 left join
+  (tbl_anti t2 left join tbl_anti t3 on t2.c = t3.c) on t1.unique1 = t2.b
+where t2.a is null;
+
+-- this is not an antijoin, as t3.a can be nulled by t2/t3 join
+explain (costs off)
+select * from tenk1 t1 left join
+  (tbl_anti t2 left join tbl_anti t3 on t2.c = t3.c) on t1.unique1 = t2.b
+where t3.a is null;
+
+rollback;
+
+--
 -- regression test for bogus RTE_GROUP entries
 --
 
@@ -3763,6 +3790,16 @@ SELECT 1 FROM group_tbl t1
 GROUP BY s.c1, s.c2;
 
 DROP TABLE group_tbl;
+
+-- Test that we ignore PlaceHolderVars when looking up statistics
+EXPLAIN (COSTS OFF)
+SELECT t1.unique1 FROM tenk1 t1 LEFT JOIN
+  (SELECT *, 42 AS phv FROM tenk1 t2) ss ON t1.unique2 = ss.unique2
+WHERE ss.unique1 = ss.phv AND t1.unique1 < 100;
+
+SELECT t1.unique1 FROM tenk1 t1 LEFT JOIN
+  (SELECT *, 42 AS phv FROM tenk1 t2) ss ON t1.unique2 = ss.unique2
+WHERE ss.unique1 = ss.phv AND t1.unique1 < 100;
 
 --
 -- Test for a nested loop join involving index scan, transforming OR-clauses

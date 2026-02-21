@@ -1305,12 +1305,16 @@ ConflictIndexItem =
 ConflictAction =
   ConflictDoNothing
 | ConflictDoUpdateSet
+| ConflictDoSelect
 
 ConflictDoUpdateSet =
   'do' 'update' SetClause WhereClause?
 
 ConflictDoNothing =
   'do' 'nothing'
+
+ConflictDoSelect =
+  'do' 'select' LockingClause? WhereClause?
 
 SetClause =
   'set' SetColumnList

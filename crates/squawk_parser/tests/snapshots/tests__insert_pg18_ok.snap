@@ -1,0 +1,77 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/insert_pg18.sql
+---
+SOURCE_FILE
+  COMMENT "-- on conflict do select"
+  WHITESPACE "\n"
+  INSERT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      R_PAREN ")"
+    WHITESPACE " "
+    VALUES
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+    WHITESPACE "\n    "
+    ON_CONFLICT_CLAUSE
+      ON_KW "ON"
+      WHITESPACE " "
+      CONFLICT_KW "CONFLICT"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          CONFLICT_INDEX_ITEM
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+      WHITESPACE " "
+      CONFLICT_DO_SELECT
+        DO_KW "DO"
+        WHITESPACE " "
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        LOCKING_CLAUSE
+          FOR_KW "FOR"
+          WHITESPACE " "
+          UPDATE_KW "UPDATE"
+        WHITESPACE " "
+        WHERE_CLAUSE
+          WHERE_KW "WHERE"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+    WHITESPACE " "
+    RETURNING_CLAUSE
+      RETURNING_KW "RETURNING"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n"

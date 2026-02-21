@@ -1,0 +1,80 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/select.sql
+---
+SOURCE_FILE@0..64
+  WHITESPACE@0..1 "\n"
+  SELECT@1..16
+    FROM_CLAUSE@1..7
+      FROM_KW@1..5 "from"
+      WHITESPACE@5..6 " "
+      FROM_ITEM@6..7
+        NAME_REF@6..7
+          IDENT@6..7 "t"
+    WHITESPACE@7..8 " "
+    SELECT_CLAUSE@8..16
+      SELECT_KW@8..14 "select"
+      WHITESPACE@14..15 " "
+      TARGET_LIST@15..16
+        TARGET@15..16
+          NAME_REF@15..16
+            IDENT@15..16 "c"
+  SEMICOLON@16..17 ";"
+  WHITESPACE@17..19 "\n\n"
+  SELECT@19..25
+    FROM_CLAUSE@19..25
+      FROM_KW@19..23 "from"
+      WHITESPACE@23..24 " "
+      FROM_ITEM@24..25
+        NAME_REF@24..25
+          IDENT@24..25 "t"
+  SEMICOLON@25..26 ";"
+  WHITESPACE@26..28 "\n\n"
+  SELECT@28..62
+    WITH_CLAUSE@28..46
+      WITH_KW@28..32 "with"
+      WHITESPACE@32..33 " "
+      WITH_TABLE@33..46
+        NAME@33..34
+          IDENT@33..34 "t"
+        WHITESPACE@34..35 " "
+        AS_KW@35..37 "as"
+        WHITESPACE@37..38 " "
+        L_PAREN@38..39 "("
+        SELECT@39..45
+          FROM_CLAUSE@39..45
+            FROM_KW@39..43 "from"
+            WHITESPACE@43..44 " "
+            FROM_ITEM@44..45
+              NAME_REF@44..45
+                IDENT@44..45 "k"
+        R_PAREN@45..46 ")"
+    WHITESPACE@46..47 "\n"
+    SELECT_CLAUSE@47..55
+      SELECT_KW@47..53 "select"
+      WHITESPACE@53..54 " "
+      TARGET_LIST@54..55
+        TARGET@54..55
+          STAR@54..55 "*"
+    WHITESPACE@55..56 " "
+    FROM_CLAUSE@56..62
+      FROM_KW@56..60 "from"
+      WHITESPACE@60..61 " "
+      FROM_ITEM@61..62
+        NAME_REF@61..62
+          IDENT@61..62 "t"
+  SEMICOLON@62..63 ";"
+  WHITESPACE@63..64 "\n"
+
+error[syntax-error]: Leading from clauses are not supported in Postgres
+  ╭▸ 
+2 │ from t select c;
+  ╰╴━━━━━━
+error[syntax-error]: Missing select clause
+  ╭▸ 
+4 │ from t;
+  ╰╴━
+error[syntax-error]: Missing select clause
+  ╭▸ 
+6 │ with t as (from k)
+  ╰╴           ━

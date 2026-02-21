@@ -1,6 +1,6 @@
-use crate::binder;
 use crate::offsets::token_from_offset;
 use crate::resolve;
+use crate::{binder, builtins::BUILTINS_SQL};
 use rowan::{TextRange, TextSize};
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
@@ -8,8 +8,8 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> SmallVec<[TextRange; 1]> {
-    let Some(token) = token_from_offset(&file, offset) else {
+pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Location; 1]> {
+    let Some(token) = token_from_offset(file, offset) else {
         return smallvec![];
     };
     let Some(parent) = token.parent() else {
@@ -25,45 +25,55 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> SmallVec<[Tex
             if let Some(case_expr) = ast::CaseExpr::cast(parent)
                 && let Some(case_token) = case_expr.case_token()
             {
-                return smallvec![case_token.text_range()];
+                return smallvec![Location::range(case_token.text_range())];
             }
         }
     }
 
     // goto def on COMMIT -> BEGIN/START TRANSACTION
-    if ast::Commit::can_cast(parent.kind()) {
-        if let Some(begin_range) = find_preceding_begin(&file, token.text_range().start()) {
-            return smallvec![begin_range];
-        }
+    if ast::Commit::can_cast(parent.kind())
+        && let Some(begin_range) = find_preceding_begin(file, token.text_range().start())
+    {
+        return smallvec![Location::range(begin_range)];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
-    if ast::Rollback::can_cast(parent.kind()) {
-        if let Some(begin_range) = find_preceding_begin(&file, token.text_range().start()) {
-            return smallvec![begin_range];
-        }
+    if ast::Rollback::can_cast(parent.kind())
+        && let Some(begin_range) = find_preceding_begin(file, token.text_range().start())
+    {
+        return smallvec![Location::range(begin_range)];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
-    if ast::Begin::can_cast(parent.kind()) {
-        if let Some(end_range) = find_following_commit_or_rollback(&file, token.text_range().end())
-        {
-            return smallvec![end_range];
-        }
+    if ast::Begin::can_cast(parent.kind())
+        && let Some(end_range) = find_following_commit_or_rollback(file, token.text_range().end())
+    {
+        return smallvec![Location::range(end_range)];
     }
 
     if let Some(name) = ast::Name::cast(parent.clone()) {
-        return smallvec![name.syntax().text_range()];
+        return smallvec![Location::range(name.syntax().text_range())];
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        let binder_output = binder::bind(&file);
-        let root = file.syntax();
-        if let Some(ptrs) = resolve::resolve_name_ref_ptrs(&binder_output, root, &name_ref) {
-            return ptrs
-                .iter()
-                .map(|ptr| ptr.to_node(file.syntax()).text_range())
-                .collect();
+        for file_id in [FileId::Current, FileId::Builtins] {
+            let file = match file_id {
+                FileId::Current => file,
+                FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+            };
+            let binder_output = binder::bind(file);
+            let root = file.syntax();
+            if let Some(ptrs) = resolve::resolve_name_ref_ptrs(&binder_output, root, &name_ref) {
+                let ranges = ptrs
+                    .iter()
+                    .map(|ptr| ptr.to_node(file.syntax()).text_range())
+                    .map(|range| Location {
+                        file: file_id,
+                        range,
+                    })
+                    .collect();
+                return ranges;
+            }
         }
     }
 
@@ -76,14 +86,44 @@ pub fn goto_definition(file: ast::SourceFile, offset: TextSize) -> SmallVec<[Tex
         }
     });
     if let Some(ty) = type_node {
-        let binder_output = binder::bind(&file);
-        let position = token.text_range().start();
-        if let Some(ptr) = resolve::resolve_type_ptr_from_type(&binder_output, &ty, position) {
-            return smallvec![ptr.to_node(file.syntax()).text_range()];
+        for file_id in [FileId::Current, FileId::Builtins] {
+            let file = match file_id {
+                FileId::Current => file,
+                FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+            };
+            let binder_output = binder::bind(file);
+            let position = token.text_range().start();
+            if let Some(ptr) = resolve::resolve_type_ptr_from_type(&binder_output, &ty, position) {
+                return smallvec![Location {
+                    file: file_id,
+                    range: ptr.to_node(file.syntax()).text_range(),
+                }];
+            }
         }
     }
 
     smallvec![]
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord)]
+pub enum FileId {
+    Current,
+    Builtins,
+}
+
+#[derive(Debug)]
+pub struct Location {
+    pub file: FileId,
+    pub range: TextRange,
+}
+
+impl Location {
+    fn range(range: TextRange) -> Location {
+        Location {
+            file: FileId::Current,
+            range,
+        }
+    }
 }
 
 fn find_preceding_begin(file: &ast::SourceFile, before: TextSize) -> Option<TextRange> {
@@ -115,11 +155,14 @@ fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) ->
 
 #[cfg(test)]
 mod test {
-    use crate::goto_definition::goto_definition;
+    use crate::builtins::BUILTINS_SQL;
+    use crate::goto_definition::{FileId, goto_definition};
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use log::info;
+    use rowan::TextRange;
+
     use squawk_syntax::ast;
 
     #[track_caller]
@@ -137,30 +180,50 @@ mod test {
         let parse = ast::SourceFile::parse(&sql);
         assert_eq!(parse.errors(), vec![]);
         let file: ast::SourceFile = parse.tree();
-        let results = goto_definition(file, offset);
+        let results = goto_definition(&file, offset);
         if !results.is_empty() {
             let offset: usize = offset.into();
-            let mut snippet = Snippet::source(&sql).fold(true);
-
-            for (i, result) in results.iter().enumerate() {
-                snippet = snippet.annotation(
-                    AnnotationKind::Context
-                        .span((*result).into())
-                        .label(format!("{}. destination", i + 2)),
-                );
+            let mut current_dests = vec![];
+            let mut builtin_dests = vec![];
+            for (i, location) in results.iter().enumerate() {
+                let label_index = i + 2;
+                match location.file {
+                    FileId::Current => current_dests.push((label_index, location.range)),
+                    FileId::Builtins => builtin_dests.push((label_index, location.range)),
+                }
             }
 
+            let has_builtins = !builtin_dests.is_empty();
+
+            let mut snippet = Snippet::source(&sql).fold(true);
+            if has_builtins {
+                // only show the current file when we have two file types, aka current and builtins
+                snippet = snippet.path("current.sql");
+            } else {
+                snippet = annotate_destinations(snippet, current_dests);
+            }
             snippet = snippet.annotation(
                 AnnotationKind::Context
                     .span(offset..offset + 1)
                     .label("1. source"),
             );
 
-            let group = Level::INFO.primary_title("definition").element(snippet);
+            let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
+
+            if has_builtins {
+                let builtins_snippet = Snippet::source(BUILTINS_SQL).path("builtin.sql").fold(true);
+                let builtins_snippet = annotate_destinations(builtins_snippet, builtin_dests);
+                groups.push(
+                    Level::INFO
+                        .primary_title("definition")
+                        .element(builtins_snippet),
+                );
+            }
+
             let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
             return Some(
                 renderer
-                    .render(&[group])
+                    .render(&groups)
                     .to_string()
                     // hacky cleanup to make the text shorter
                     .replace("info: definition", ""),
@@ -171,6 +234,21 @@ mod test {
 
     fn goto_not_found(sql: &str) {
         assert!(goto_(sql).is_none(), "Should not find a definition");
+    }
+
+    fn annotate_destinations<'a>(
+        mut snippet: Snippet<'a, annotate_snippets::Annotation<'a>>,
+        destinations: Vec<(usize, TextRange)>,
+    ) -> Snippet<'a, annotate_snippets::Annotation<'a>> {
+        for (label_index, range) in destinations {
+            snippet = snippet.annotation(
+                AnnotationKind::Context
+                    .span(range.into())
+                    .label(format!("{}. destination", label_index)),
+            );
+        }
+
+        snippet
     }
 
     #[test]
@@ -663,6 +741,24 @@ alter policy p on t
         3 │ alter policy p on t
         4 │   with check (t.c > d);
           ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_builtin_now() {
+        assert_snapshot!(goto("
+select now$0();
+"), @r"
+              ╭▸ current.sql:2:10
+              │
+            2 │ select now();
+              │          ─ 1. source
+              ╰╴
+
+              ╭▸ builtin.sql:10798:28
+              │
+        10798 │ create function pg_catalog.now() returns timestamp with time zone
+              ╰╴                           ─── 2. destination
         ");
     }
 
@@ -7207,6 +7303,25 @@ insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c$0;"
           │                ─ 2. destination
         3 │ insert into t values ('c', 'd') on conflict (c) do update set c = excluded.c;
           ╰╴                                                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_qualified_function() {
+        assert_snapshot!(goto("
+create function foo.lower(text) returns text
+  language internal;
+create table t(c text);
+insert into t values ('c')
+  on conflict (foo.lower$0(c))
+    do nothing;"
+        ), @r"
+          ╭▸ 
+        2 │ create function foo.lower(text) returns text
+          │                     ───── 2. destination
+          ‡
+        6 │   on conflict (foo.lower(c))
+          ╰╴                       ─ 1. source
         ");
     }
 

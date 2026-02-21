@@ -477,6 +477,41 @@ SOURCE_FILE
             R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- group by all, order by all"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      ALL_KW "all"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          ERROR
+            ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- cast with malformed type mod args"
   WHITESPACE "\n"
   SELECT
@@ -747,6 +782,162 @@ SOURCE_FILE
           IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- where with missing expr"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      ERROR
+        AND_KW "and"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      ERROR
+        OR_KW "or"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        NEQ "!="
+        WHITESPACE " "
+        LITERAL
+          STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "having"
+      WHITESPACE " "
+      ERROR
+        AND_KW "and"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "having"
+      WHITESPACE " "
+      ERROR
+        OR_KW "or"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        NEQ "!="
+        WHITESPACE " "
+        LITERAL
+          STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "u"
+          WHITESPACE " "
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            ERROR
+              AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "u"
+          WHITESPACE " "
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            ERROR
+              OR_KW "or"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- select end"
   WHITESPACE "\n"
   SELECT
@@ -911,77 +1102,105 @@ error[syntax-error]: unexpected trailing comma
    ╭▸ 
 44 │ select array[1,2,3,];
    ╰╴                  ━
+error[syntax-error]: expected expression in atom_expr
+   ╭▸ 
+47 │ select * from t group by all order by all;
+   ╰╴                                      ━
 error[syntax-error]: expected COMMA
    ╭▸ 
-47 │ select cast(x as varchar(100 200));
+50 │ select cast(x as varchar(100 200));
    ╰╴                            ━
 error[syntax-error]: unexpected comma
    ╭▸ 
-48 │ select cast(x as varchar(100, , 200));
+51 │ select cast(x as varchar(100, , 200));
    ╰╴                              ━
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
-49 │ select cast(x as t(a, b,));
+52 │ select cast(x as t(a, b,));
    ╰╴                       ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-53 │ select select;
+56 │ select select;
    ╰╴      ━
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
-56 │ select a, from t;
+59 │ select a, from t;
    ╰╴        ━
 error[syntax-error]: expected an expression, found END_KW
    ╭▸ 
-59 │ select case when 1 then end;
+62 │ select case when 1 then end;
    ╰╴                       ━
 error[syntax-error]: expected an expression, found THEN_KW
    ╭▸ 
-62 │ select case when then x end;
+65 │ select case when then x end;
    ╰╴                ━
 error[syntax-error]: expected an expression, found END_KW
    ╭▸ 
-65 │ select case when 1 then 2 else end;
+68 │ select case when 1 then 2 else end;
    ╰╴                              ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-68 │   select
+71 │   select
    │ ┏━━━━━━━┛
-69 │ ┃ create table users ();
+72 │ ┃ create table users ();
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-73 │ select 
+76 │ select 
    ╰╴      ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-77 │ select 
+80 │ select 
    ╰╴      ━
+error[syntax-error]: expected expression but got AND_KW
+   ╭▸ 
+84 │ select from t where and c > 10;
+   ╰╴                    ━
+error[syntax-error]: expected expression but got OR_KW
+   ╭▸ 
+85 │ select from t where or c != 'b';
+   ╰╴                    ━
+error[syntax-error]: expected expression but got AND_KW
+   ╭▸ 
+87 │ select having and c > 10;
+   ╰╴              ━
+error[syntax-error]: expected expression but got OR_KW
+   ╭▸ 
+88 │ select having or c != 'b';
+   ╰╴              ━
+error[syntax-error]: expected expression but got AND_KW
+   ╭▸ 
+90 │ select from t join u on and true;
+   ╰╴                        ━
+error[syntax-error]: expected expression but got OR_KW
+   ╭▸ 
+91 │ select from t join u on or true;
+   ╰╴                        ━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-81 │   select
+94 │   select
    │ ┏━━━━━━━┛
-82 │ ┃ end;
+95 │ ┃ end;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-85 │   select
+98 │   select
    │ ┏━━━━━━━┛
-86 │ ┃ analyze;
+99 │ ┃ analyze;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-88 │   select
-   │ ┏━━━━━━━┛
-89 │ ┃ analyse;
-   ╰╴┗━┛
+    ╭▸ 
+101 │   select
+    │ ┏━━━━━━━┛
+102 │ ┃ analyse;
+    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-93 │   select
-   │ ┏━━━━━━━┛
-94 │ ┃ with t as (select 1)
-   ╰╴┗━┛
+    ╭▸ 
+106 │   select
+    │ ┏━━━━━━━┛
+107 │ ┃ with t as (select 1)
+    ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
-   ╭▸ 
-98 │ select 1,
-   ╰╴        ━
+    ╭▸ 
+111 │ select 1,
+    ╰╴        ━

@@ -93,7 +93,7 @@ jobs:
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2 # stable
         with:
-          toolchain: 1.90.0
+          toolchain: 1.93
           targets: ${{ matrix.target }}
 
       - name: Cache
@@ -291,7 +291,7 @@ jobs:
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2 # stable
         with:
-          toolchain: 1.90.0
+          toolchain: 1.93
           components: clippy, rustfmt
 
       - name: Cache
@@ -316,7 +316,7 @@ jobs:
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2 # stable
         with:
-          toolchain: 1.90.0
+          toolchain: 1.93
 
       - name: Cache
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
@@ -348,7 +348,7 @@ jobs:
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2 # stable
         with:
-          toolchain: 1.90.0
+          toolchain: 1.93
 
       - name: Cache
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2

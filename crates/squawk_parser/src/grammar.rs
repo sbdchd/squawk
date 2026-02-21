@@ -123,7 +123,7 @@ fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMa
     }
 }
 
-const SELECT_FIRST: TokenSet = TokenSet::new(&[SELECT_KW, TABLE_KW, WITH_KW, VALUES_KW]);
+const SELECT_FIRST: TokenSet = TokenSet::new(&[SELECT_KW, TABLE_KW, WITH_KW, VALUES_KW, FROM_KW]);
 const PAREN_SELECT_FIRST: TokenSet = TokenSet::new(&[L_PAREN]).union(SELECT_FIRST);
 
 fn tuple_expr(p: &mut Parser<'_>) -> CompletedMarker {
@@ -2697,6 +2697,12 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
     m.complete(p, COMPOUND_SELECT)
 }
 
+fn opt_select_clause(p: &mut Parser<'_>) {
+    if p.at(SELECT_KW) {
+        select_clause(p);
+    }
+}
+
 // error recovery:
 // - <https://youtu.be/0HlrqwLjCxA?feature=shared&t=2172>
 /// <https://www.postgresql.org/docs/17/sql-select.html>
@@ -2724,7 +2730,11 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
         relation_name(p);
         out_kind = TABLE;
     } else {
-        select_clause(p);
+        if opt_from_clause(p).is_some() {
+            opt_select_clause(p)
+        } else {
+            select_clause(p);
+        }
     }
     if opt_into_clause(p).is_some() {
         out_kind = SELECT_INTO;
@@ -3421,7 +3431,7 @@ fn on_clause(p: &mut Parser<'_>) {
     assert!(p.at(ON_KW));
     let m = p.start();
     p.bump(ON_KW);
-    expr(p);
+    clause_expr(p);
     m.complete(p, ON_CLAUSE);
 }
 
@@ -4476,13 +4486,20 @@ fn opt_repeatable_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, REPEATABLE_CLAUSE))
 }
 
+fn clause_expr(p: &mut Parser<'_>) {
+    if p.at(AND_KW) || p.at(OR_KW) {
+        p.err_and_bump(&format!("expected expression but got {:?}", p.current()));
+    }
+    expr(p);
+}
+
 fn opt_where_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at(WHERE_KW) {
         return None;
     }
     let m = p.start();
     p.bump(WHERE_KW);
-    expr(p);
+    clause_expr(p);
     Some(m.complete(p, WHERE_CLAUSE))
 }
 
@@ -4576,7 +4593,7 @@ fn opt_having_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump(HAVING_KW);
-    expr(p);
+    clause_expr(p);
     Some(m.complete(p, HAVING_CLAUSE))
 }
 
@@ -4830,13 +4847,20 @@ const LHS_FIRST: TokenSet = TokenSet::new(&[
     DEFAULT_KW,
     // for non-standard params, like :foo
     COLON,
+    // We special case the handling of these functions later on
+    // all()
+    ALL_KW,
+    // any()
+    ANY_KW,
+    // some()
+    SOME_KW,
 ])
 .union(OPERATOR_FIRST)
 .union(LITERAL_FIRST)
 .union(TYPE_KEYWORDS)
 .union(IDENTS);
 
-const IDENTS: TokenSet = TokenSet::new(&[ANY_KW, ALL_KW, SOME_KW, IDENT]).union(FUNC_KEYWORDS);
+const IDENTS: TokenSet = TokenSet::new(&[IDENT]).union(FUNC_KEYWORDS);
 
 const FUNC_KEYWORDS: TokenSet = TokenSet::new(&[
     CURRENT_DATE_KW,
@@ -5830,7 +5854,9 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (ROLLBACK_KW, _) => Some(rollback(p)),
         (SAVEPOINT_KW, _) => Some(savepoint(p)),
         (SECURITY_KW, LABEL_KW) => Some(security_label(p)),
-        (SELECT_KW | TABLE_KW | VALUES_KW, _) => select(p, None, &SelectRestrictions::default()),
+        (SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW, _) => {
+            select(p, None, &SelectRestrictions::default())
+        }
         (SET_KW, CONSTRAINTS_KW) => Some(set_constraints(p)),
         (SET_KW, LOCAL_KW) => match p.nth(2) {
             ROLE_KW => Some(set_role(p)),
@@ -12394,6 +12420,10 @@ fn conflict_action(p: &mut Parser<'_>) {
     p.expect(DO_KW);
     if p.eat(NOTHING_KW) {
         m.complete(p, CONFLICT_DO_NOTHING);
+    } else if p.eat(SELECT_KW) {
+        opt_locking_clause(p);
+        opt_where_clause(p);
+        m.complete(p, CONFLICT_DO_SELECT);
     } else {
         p.expect(UPDATE_KW);
         set_clause(p);
@@ -12608,7 +12638,9 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
     with_query_clause(p);
     match p.current() {
         DELETE_KW => Some(delete(p, Some(m))),
-        SELECT_KW | TABLE_KW | VALUES_KW => select(p, Some(m), &SelectRestrictions::default()),
+        SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW => {
+            select(p, Some(m), &SelectRestrictions::default())
+        }
         INSERT_KW => Some(insert(p, Some(m))),
         UPDATE_KW => Some(update(p, Some(m))),
         MERGE_KW => Some(merge(p, Some(m))),

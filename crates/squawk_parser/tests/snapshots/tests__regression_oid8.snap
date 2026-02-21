@@ -1,0 +1,5 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: postgres/regression_suite/oid8.sql
+---
+

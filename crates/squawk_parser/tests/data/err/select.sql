@@ -43,6 +43,9 @@ select array[1, ,3];
 -- trailing comma
 select array[1,2,3,];
 
+-- group by all, order by all
+select * from t group by all order by all;
+
 -- cast with malformed type mod args
 select cast(x as varchar(100 200));
 select cast(x as varchar(100, , 200));
@@ -76,6 +79,16 @@ do 'begin null; end';
 -- select grant
 select 
 grant select on t to u;
+
+-- where with missing expr
+select from t where and c > 10;
+select from t where or c != 'b';
+
+select having and c > 10;
+select having or c != 'b';
+
+select from t join u on and true;
+select from t join u on or true;
 
 -- select end
 select

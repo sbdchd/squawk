@@ -1,4 +1,5 @@
 mod binder;
+pub mod builtins;
 mod classify;
 pub mod code_actions;
 pub mod column_name;

@@ -3023,6 +3023,29 @@ impl ConflictDoNothing {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConflictDoSelect {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConflictDoSelect {
+    #[inline]
+    pub fn locking_clause(&self) -> Option<LockingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn do_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DO_KW)
+    }
+    #[inline]
+    pub fn select_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SELECT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ConflictDoUpdateSet {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16952,6 +16975,7 @@ pub enum ConfigValue {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConflictAction {
     ConflictDoNothing(ConflictDoNothing),
+    ConflictDoSelect(ConflictDoSelect),
     ConflictDoUpdateSet(ConflictDoUpdateSet),
 }
 
@@ -19110,6 +19134,24 @@ impl AstNode for ConflictDoNothing {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::CONFLICT_DO_NOTHING
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConflictDoSelect {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFLICT_DO_SELECT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -30000,7 +30042,9 @@ impl AstNode for ConflictAction {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            SyntaxKind::CONFLICT_DO_NOTHING | SyntaxKind::CONFLICT_DO_UPDATE_SET
+            SyntaxKind::CONFLICT_DO_NOTHING
+                | SyntaxKind::CONFLICT_DO_SELECT
+                | SyntaxKind::CONFLICT_DO_UPDATE_SET
         )
     }
     #[inline]
@@ -30008,6 +30052,9 @@ impl AstNode for ConflictAction {
         let res = match syntax.kind() {
             SyntaxKind::CONFLICT_DO_NOTHING => {
                 ConflictAction::ConflictDoNothing(ConflictDoNothing { syntax })
+            }
+            SyntaxKind::CONFLICT_DO_SELECT => {
+                ConflictAction::ConflictDoSelect(ConflictDoSelect { syntax })
             }
             SyntaxKind::CONFLICT_DO_UPDATE_SET => {
                 ConflictAction::ConflictDoUpdateSet(ConflictDoUpdateSet { syntax })
@@ -30022,6 +30069,7 @@ impl AstNode for ConflictAction {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             ConflictAction::ConflictDoNothing(it) => &it.syntax,
+            ConflictAction::ConflictDoSelect(it) => &it.syntax,
             ConflictAction::ConflictDoUpdateSet(it) => &it.syntax,
         }
     }
@@ -30030,6 +30078,12 @@ impl From<ConflictDoNothing> for ConflictAction {
     #[inline]
     fn from(node: ConflictDoNothing) -> ConflictAction {
         ConflictAction::ConflictDoNothing(node)
+    }
+}
+impl From<ConflictDoSelect> for ConflictAction {
+    #[inline]
+    fn from(node: ConflictDoSelect) -> ConflictAction {
+        ConflictAction::ConflictDoSelect(node)
     }
 }
 impl From<ConflictDoUpdateSet> for ConflictAction {

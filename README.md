@@ -252,7 +252,7 @@ to your project's `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/sbdchd/squawk
-    rev: 2.39.0
+    rev: 2.40.1
     hooks:
       - id: squawk
         files: path/to/postgres/migrations/written/in/sql

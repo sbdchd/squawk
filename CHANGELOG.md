@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.40.1 - 2026-02-12
+
+### Fixed
+
+- github: fix commenting via rust_crypto features in jsonwebtoken (#929). Thanks @lokiwins!
+
+### Added
+
+- parser: parse leading from clauses but warn they're not supported (#927)
+
+  ```sql
+  from t select c;
+  ```
+
+  now gives:
+
+  ```
+     error[syntax-error]: Leading from clauses are not supported in Postgres
+    ╭▸ stdin:1:1
+    │
+  1 │ from t select c;
+    ╰╴━━━━━━
+  ```
+
+  We also check for solo from clauses:
+
+  ```sql
+  from t;
+  ```
+
+  gives:
+
+  ```
+    error[syntax-error]: Missing select clause
+    ╭▸ stdin:1:1
+    │
+  1 │ from t
+    ╰╴━
+  ```
+
+- parser: fix parsing any/all/some in exprs (#926)
+
+  ```sql
+  select * from t order by all
+  ```
+
+  now properly errors:
+
+  ```sql
+     error[syntax-error]: expected expression in atom_expr
+    ╭▸ stdin:1:26
+    │
+  1 │ select * from t order by all
+    ╰╴                         ━
+  ```
+
+  Before it parsed `all` as a name reference.
+
+- ide: goto def func call in on conflict (#925)
+
+## v2.40.0 - 2026-02-06
+
+### Added
+
+- parser: improve error recovery in `where`, `having`, & `join` `on` (#911, #912)
+- ide: goto def on conflict clause (#907)
+- ide: goto def func calls inside constraints/columns/indexes/partitions (#906)
+
+### Fixed
+
+- ide: goto def with recursive CTEs (#909)
+
 ## v2.39.0 - 2026-01-31
 
 ### Added

@@ -240,3 +240,211 @@ SELECT * FROM pred_tab WHERE a < 3 AND b IS NOT NULL AND c IS NOT NULL;
 SELECT * FROM pred_tab WHERE a < 3 AND b IS NOT NULL AND c IS NOT NULL;
 
 DROP TABLE pred_tab;
+
+--
+-- Test that COALESCE expressions in predicates are simplified using
+-- non-nullable arguments.
+--
+CREATE TABLE pred_tab (a int NOT NULL, b int, c int);
+
+-- Ensure that constant NULL arguments are dropped
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE COALESCE(NULL, b, NULL, a) > 1;
+
+-- Ensure that argument "b*a" is dropped
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE COALESCE(b, a, b*a) > 1;
+
+-- Ensure that the entire COALESCE expression is replaced by "a"
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE COALESCE(a, b) > 1;
+
+--
+-- Test detection of non-nullable expressions in predicates
+--
+
+-- CoalesceExpr
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE COALESCE(b, a) IS NULL;
+
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE COALESCE(b, c) IS NULL;
+
+-- MinMaxExpr
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE GREATEST(b, a) IS NULL;
+
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE GREATEST(b, c) IS NULL;
+
+-- CaseExpr
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE (CASE WHEN c > 0 THEN a ELSE a END) IS NULL;
+
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE (CASE WHEN c > 0 THEN b ELSE a END) IS NULL;
+
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE (CASE WHEN c > 0 THEN a END) IS NULL;
+
+-- ArrayExpr
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE ARRAY[b] IS NULL;
+
+-- NullTest
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE (b IS NULL) IS NULL;
+
+-- BooleanTest
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE ((a > 1) IS TRUE) IS NULL;
+
+-- DistinctExpr
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE (a IS DISTINCT FROM b) IS NULL;
+
+-- RelabelType
+EXPLAIN (COSTS OFF)
+SELECT * FROM pred_tab WHERE (a::oid) IS NULL;
+
+DROP TABLE pred_tab;
+
+--
+-- Test optimization of IS [NOT] DISTINCT FROM
+--
+
+CREATE TYPE dist_row_t AS (a int, b int);
+CREATE TABLE dist_tab (id int, val_nn int NOT NULL, val_null int, row_nn dist_row_t NOT NULL);
+
+INSERT INTO dist_tab VALUES (1, 10, 10, ROW(1, 1));
+INSERT INTO dist_tab VALUES (2, 20, NULL, ROW(2, 2));
+INSERT INTO dist_tab VALUES (3, 30, 30, ROW(1, NULL));
+
+CREATE INDEX dist_tab_nn_idx ON dist_tab (val_nn);
+
+ANALYZE dist_tab;
+
+-- Ensure that the predicate folds to constant TRUE
+EXPLAIN(COSTS OFF)
+SELECT id FROM dist_tab WHERE val_nn IS DISTINCT FROM NULL::INT;
+SELECT id FROM dist_tab WHERE val_nn IS DISTINCT FROM NULL::INT;
+
+-- Ensure that the predicate folds to constant FALSE
+EXPLAIN(COSTS OFF)
+SELECT id FROM dist_tab WHERE val_nn IS NOT DISTINCT FROM NULL::INT;
+SELECT id FROM dist_tab WHERE val_nn IS NOT DISTINCT FROM NULL::INT;
+
+-- Ensure that the predicate is converted to an inequality operator
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE val_nn IS DISTINCT FROM 10;
+SELECT id FROM dist_tab WHERE val_nn IS DISTINCT FROM 10;
+
+-- Ensure that the predicate is converted to an equality operator, and thus can
+-- use index scan
+SET enable_seqscan TO off;
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE val_nn IS NOT DISTINCT FROM 10;
+SELECT id FROM dist_tab WHERE val_nn IS NOT DISTINCT FROM 10;
+RESET enable_seqscan;
+
+-- Ensure that the predicate is preserved as "IS DISTINCT FROM"
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE val_null IS DISTINCT FROM 20;
+SELECT id FROM dist_tab WHERE val_null IS DISTINCT FROM 20;
+
+-- Safety check for rowtypes
+-- Ensure that the predicate is converted to an inequality operator
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE row_nn IS DISTINCT FROM ROW(1, 5)::dist_row_t;
+-- ... and that all 3 rows are returned
+SELECT id FROM dist_tab WHERE row_nn IS DISTINCT FROM ROW(1, 5)::dist_row_t;
+
+-- Ensure that the predicate is converted to an equality operator, and thus
+-- mergejoinable or hashjoinable
+SET enable_nestloop TO off;
+EXPLAIN (COSTS OFF)
+SELECT * FROM dist_tab t1 JOIN dist_tab t2 ON t1.val_nn IS NOT DISTINCT FROM t2.val_nn;
+SELECT * FROM dist_tab t1 JOIN dist_tab t2 ON t1.val_nn IS NOT DISTINCT FROM t2.val_nn;
+RESET enable_nestloop;
+
+-- Ensure that the predicate is converted to IS NOT NULL
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE val_null IS DISTINCT FROM NULL::INT;
+SELECT id FROM dist_tab WHERE val_null IS DISTINCT FROM NULL::INT;
+
+-- Ensure that the predicate is converted to IS NULL
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE val_null IS NOT DISTINCT FROM NULL::INT;
+SELECT id FROM dist_tab WHERE val_null IS NOT DISTINCT FROM NULL::INT;
+
+-- Safety check for rowtypes
+-- The predicate is converted to IS NOT NULL, and get_rule_expr prints it as IS
+-- DISTINCT FROM because argisrow is false, indicating that we're applying a
+-- scalar test
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE (val_null, val_null) IS DISTINCT FROM NULL::RECORD;
+SELECT id FROM dist_tab WHERE (val_null, val_null) IS DISTINCT FROM NULL::RECORD;
+
+-- The predicate is converted to IS NULL, and get_rule_expr prints it as IS NOT
+-- DISTINCT FROM because argisrow is false, indicating that we're applying a
+-- scalar test
+EXPLAIN (COSTS OFF)
+SELECT id FROM dist_tab WHERE (val_null, val_null) IS NOT DISTINCT FROM NULL::RECORD;
+SELECT id FROM dist_tab WHERE (val_null, val_null) IS NOT DISTINCT FROM NULL::RECORD;
+
+DROP TABLE dist_tab;
+DROP TYPE dist_row_t;
+
+--
+-- Test optimization of BooleanTest (IS [NOT] TRUE/FALSE/UNKNOWN) on
+-- non-nullable input
+--
+CREATE TABLE bool_tab (id int, flag_nn boolean NOT NULL, flag_null boolean);
+
+INSERT INTO bool_tab VALUES (1, true,  true);
+INSERT INTO bool_tab VALUES (2, false, NULL);
+
+CREATE INDEX bool_tab_nn_idx ON bool_tab (flag_nn);
+
+ANALYZE bool_tab;
+
+-- Ensure that the predicate folds to constant FALSE
+EXPLAIN (COSTS OFF)
+SELECT id FROM bool_tab WHERE flag_nn IS UNKNOWN;
+SELECT id FROM bool_tab WHERE flag_nn IS UNKNOWN;
+
+-- Ensure that the predicate folds to constant TRUE
+EXPLAIN (COSTS OFF)
+SELECT id FROM bool_tab WHERE flag_nn IS NOT UNKNOWN;
+SELECT id FROM bool_tab WHERE flag_nn IS NOT UNKNOWN;
+
+-- Ensure that the predicate folds to flag_nn
+EXPLAIN (COSTS OFF)
+SELECT id FROM bool_tab WHERE flag_nn IS TRUE;
+SELECT id FROM bool_tab WHERE flag_nn IS TRUE;
+
+-- Ensure that the predicate folds to flag_nn, and thus can use index scan
+SET enable_seqscan TO off;
+EXPLAIN (COSTS OFF)
+SELECT id FROM bool_tab WHERE flag_nn IS NOT FALSE;
+SELECT id FROM bool_tab WHERE flag_nn IS NOT FALSE;
+RESET enable_seqscan;
+
+-- Ensure that the predicate folds to not flag_nn
+EXPLAIN (COSTS OFF)
+SELECT id FROM bool_tab WHERE flag_nn IS FALSE;
+SELECT id FROM bool_tab WHERE flag_nn IS FALSE;
+
+-- Ensure that the predicate folds to not flag_nn, and thus can use index scan
+SET enable_seqscan TO off;
+EXPLAIN (COSTS OFF)
+SELECT id FROM bool_tab WHERE flag_nn IS NOT TRUE;
+SELECT id FROM bool_tab WHERE flag_nn IS NOT TRUE;
+RESET enable_seqscan;
+
+-- Ensure that the predicate is preserved as a BooleanTest
+EXPLAIN (COSTS OFF)
+SELECT id FROM bool_tab WHERE flag_null IS UNKNOWN;
+SELECT id FROM bool_tab WHERE flag_null IS UNKNOWN;
+
+DROP TABLE bool_tab;
