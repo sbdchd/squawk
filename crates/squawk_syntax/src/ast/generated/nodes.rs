@@ -2185,6 +2185,10 @@ impl CallExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn collation_for_fn(&self) -> Option<CollationForFn> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn exists_fn(&self) -> Option<ExistsFn> {
         support::child(&self.syntax)
     }
@@ -2536,6 +2540,33 @@ impl Collate {
     #[inline]
     pub fn collate_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLLATE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CollationForFn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CollationForFn {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn collation_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLLATION_KW)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
     }
 }
 
@@ -19028,6 +19059,24 @@ impl AstNode for Collate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::COLLATE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CollationForFn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COLLATION_FOR_FN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

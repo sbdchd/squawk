@@ -5918,12 +5918,11 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CALL_EXPR
-            NAME_REF
+            COLLATION_FOR_FN
               COLLATION_KW "collation"
               WHITESPACE " "
               FOR_KW "for"
-            WHITESPACE " "
-            ARG_LIST
+              WHITESPACE " "
               L_PAREN "("
               WHITESPACE " "
               BIN_EXPR
@@ -5936,6 +5935,39 @@ SOURCE_FILE
                   IDENT "c"
               WHITESPACE " "
               R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        CALL_EXPR
+          COLLATION_FOR_FN
+            COLLATION_KW "collation"
+            WHITESPACE " "
+            FOR_KW "for"
+            WHITESPACE " "
+            L_PAREN "("
+            CAST_EXPR
+              LITERAL
+                STRING "'x'"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_role"

@@ -216,9 +216,18 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
         ast::Expr::ArrayExpr(_) => {
             return Some((ColumnName::Column("array".to_string()), node));
         }
-        ast::Expr::BetweenExpr(_) | ast::Expr::BinExpr(_) => {
+        ast::Expr::BetweenExpr(_) => {
             return Some((ColumnName::UnknownColumn(None), node));
         }
+        ast::Expr::BinExpr(bin_expr) => match bin_expr.op() {
+            Some(ast::BinOp::AtTimeZone(_)) => {
+                return Some((ColumnName::Column("timezone".to_string()), node));
+            }
+            Some(ast::BinOp::Overlaps(_)) => {
+                return Some((ColumnName::Column("overlaps".to_string()), node));
+            }
+            _ => return Some((ColumnName::UnknownColumn(None), node)),
+        },
         ast::Expr::CallExpr(call_expr) => {
             if let Some(exists_fn) = call_expr.exists_fn() {
                 return Some((
@@ -365,6 +374,12 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     xml_pi_fn.syntax().clone(),
                 ));
             }
+            if let Some(collation_for_fn) = call_expr.collation_for_fn() {
+                return Some((
+                    ColumnName::Column("pg_collation_for".to_string()),
+                    collation_for_fn.syntax().clone(),
+                ));
+            }
             if let Some(func_name) = call_expr.expr() {
                 match func_name {
                     ast::Expr::ArrayExpr(_)
@@ -432,9 +447,18 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 return name_from_expr(base, in_type);
             }
         }
-        ast::Expr::Literal(_) | ast::Expr::PrefixExpr(_) | ast::Expr::PostfixExpr(_) => {
+        ast::Expr::Literal(_) | ast::Expr::PrefixExpr(_) => {
             return Some((ColumnName::UnknownColumn(None), node));
         }
+        ast::Expr::PostfixExpr(postfix_expr) => match postfix_expr.op() {
+            Some(ast::PostfixOp::AtLocal(_)) => {
+                return Some((ColumnName::Column("timezone".to_string()), node));
+            }
+            Some(ast::PostfixOp::IsNormalized(_)) => {
+                return Some((ColumnName::Column("is_normalized".to_string()), node));
+            }
+            _ => return Some((ColumnName::UnknownColumn(None), node)),
+        },
         ast::Expr::NameRef(name_ref) => {
             return name_from_name_ref(name_ref, in_type);
         }
@@ -477,6 +501,15 @@ fn examples() {
     // postfix
     assert_snapshot!(name("x is null"), @"?column?");
     assert_snapshot!(name("x is not null"), @"?column?");
+    assert_snapshot!(name("'foo' is normalized"), @"is_normalized");
+    assert_snapshot!(name("'foo' is not normalized"), @"?column?");
+    assert_snapshot!(name("now() at local"), @"timezone");
+    // bin expr
+    assert_snapshot!(name("now() at time zone 'America/Chicago'"), @"timezone");
+    assert_snapshot!(
+        name("(DATE '2001-02-16', DATE '2001-12-21') OVERLAPS (DATE '2001-10-30', DATE '2002-10-30')"),
+        @"overlaps"
+    );
     // paren expr
     assert_snapshot!(name("(1 * 2)"), @"?column?");
     assert_snapshot!(name("(select 1 as a)"), @"a");
@@ -486,6 +519,7 @@ fn examples() {
     assert_snapshot!(name("schema.func_name(1)"), @"func_name");
 
     // special funcs
+    assert_snapshot!(name("collation for ('bar')"), @"pg_collation_for");
     assert_snapshot!(name("extract(year from now())"), @"extract");
     assert_snapshot!(name("exists(select 1)"), @"exists");
     assert_snapshot!(name(r#"json_exists('{"a":1}', '$.a')"#), @"json_exists");

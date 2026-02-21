@@ -472,6 +472,7 @@ select c null;
 -- select_special_funcs
 -- collation
 select collation for ( b + c );
+select * from collation for ('x'::text);
 
 -- current_role
 select current_role;

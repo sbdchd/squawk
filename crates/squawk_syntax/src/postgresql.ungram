@@ -89,6 +89,7 @@ CallExpr =
 | SomeFn
 | AnyFn
 | AllFn
+| CollationForFn
 | ExistsFn
 
 JsonArrayFn =
@@ -329,6 +330,9 @@ XmlPiFn =
     Name
     (',' Expr)?
   ')'
+
+CollationForFn =
+  'collation' 'for' '(' Expr ')'
 
 ExistsFn =
   'exists' '(' SelectVariant ')'
