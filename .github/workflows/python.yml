@@ -33,10 +33,12 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-            before-script: export CC=gcc CXX=g++ && yum install clang llvm llvm-devel perl-IPC-Cmd -y && python3 -m ensurepip
+            sccache: "false"
+            before-script: yum install clang llvm llvm-devel perl-IPC-Cmd -y && python3 -m ensurepip
             manylinux: manylinux_2_28
           - runner: ubuntu-latest
             target: aarch64-unknown-linux-gnu
+            sccache: "true"
             maturin-options: --zig
             # Use zig 0.11.0 because this version contains generic-glibc < 2.38
             # after glibc >= 2.38 strchrnul available in glibc by default
@@ -53,7 +55,7 @@ jobs:
           working-directory: crates/squawk
           args: --release --out dist ${{ matrix.platform.maturin-options }}
           manylinux: ${{ matrix.platform.manylinux }}
-          sccache: "true"
+          sccache: ${{ matrix.platform.sccache }}
           before-script-linux: ${{ matrix.platform.before-script }}
       - name: Upload wheels
         uses: actions/upload-artifact@v4
