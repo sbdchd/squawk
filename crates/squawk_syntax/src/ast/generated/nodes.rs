@@ -2127,12 +2127,7 @@ impl BetweenExpr {
 pub struct BinExpr {
     pub(crate) syntax: SyntaxNode,
 }
-impl BinExpr {
-    #[inline]
-    pub fn op(&self) -> Option<Op> {
-        support::child(&self.syntax)
-    }
-}
+impl BinExpr {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BitType {

@@ -464,7 +464,7 @@ IsJsonScalar =
   'is' 'json' 'scalar' JsonKeysUniqueClause?
 
 BinExpr =
-  lhs:Expr Op rhs:Expr
+  lhs:Expr op:Op rhs:Expr
 
 WhenClauseList =
   WhenClause WhenClause*

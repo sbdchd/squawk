@@ -1,66 +1,40 @@
 use std::collections::{HashMap, HashSet};
 
 use squawk_syntax::{
-    Parse, SourceFile, SyntaxKind,
+    Parse, SourceFile,
     ast::{self, AstNode},
     identifier::Identifier,
 };
 
 use crate::{Linter, Rule, Version, Violation};
 
-/// A table/column pair identifying a NOT NULL check constraint.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct TableColumn {
     table: Identifier,
     column: Identifier,
 }
 
-/// Checks if a Literal expression is NULL.
-fn is_null_literal(lit: &ast::Literal) -> bool {
-    lit.syntax()
-        .first_child_or_token()
-        .is_some_and(|child| child.kind() == SyntaxKind::NULL_KW)
-}
-
-/// Checks if a `BinExpr` has an IS NOT operator.
-fn has_is_not_operator(bin_expr: &ast::BinExpr) -> bool {
-    // First try the Op accessor (in case the parser wraps the operator)
-    if let Some(op) = bin_expr.op() {
-        if op.is_not().is_some() {
-            return true;
-        }
-    }
-    // Fall back to checking for IS_NOT directly as a child
-    bin_expr
-        .syntax()
-        .children()
-        .any(|child| child.kind() == SyntaxKind::IS_NOT)
-}
-
-/// Checks if a CHECK constraint expression is of the form `column IS NOT NULL`.
-/// Returns the column name if so.
 fn is_not_null_check(expr: &ast::Expr) -> Option<Identifier> {
     let ast::Expr::BinExpr(bin_expr) = expr else {
         return None;
     };
-    // Check if this is an `IS NOT` operation
-    if !has_is_not_operator(bin_expr) {
+    let ast::BinOp::IsNot(_) = bin_expr.op()? else {
+        return None;
+    };
+
+    let ast::Expr::Literal(lit) = bin_expr.rhs()? else {
+        return None;
+    };
+    if !matches!(lit.kind(), Some(ast::LitKind::Null(_))) {
         return None;
     }
-    // Check if the RHS is NULL
-    let rhs = bin_expr.rhs()?;
-    if !matches!(rhs, ast::Expr::Literal(ref lit) if is_null_literal(lit)) {
-        return None;
-    }
-    // Get the column name from the LHS
-    let lhs = bin_expr.lhs()?;
-    match lhs {
+
+    match bin_expr.lhs()? {
         ast::Expr::NameRef(name_ref) => Some(Identifier::new(&name_ref.text())),
         _ => None,
     }
 }
 
-/// Extracts the table name from an ALTER TABLE statement.
 fn get_table_name(alter_table: &ast::AlterTable) -> Option<Identifier> {
     alter_table
         .relation_name()?
@@ -73,92 +47,82 @@ fn get_table_name(alter_table: &ast::AlterTable) -> Option<Identifier> {
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
 
-    // For PostgreSQL 12+, track CHECK constraints that ensure a column IS NOT NULL
-    let pg12_plus = ctx.settings.pg_version >= Version::new(12, None, None);
+    let is_pg12_plus = ctx.settings.pg_version >= Version::new(12, None, None);
 
-    // Map from constraint name to the table/column it covers
     let mut not_null_constraints: HashMap<Identifier, TableColumn> = HashMap::new();
-    // Set of table/column pairs with validated NOT NULL check constraints
     let mut validated_not_null_columns: HashSet<TableColumn> = HashSet::new();
 
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
-            let Some(table_name) = get_table_name(&alter_table) else {
+            let Some(table) = get_table_name(&alter_table) else {
                 continue;
             };
 
             for action in alter_table.actions() {
                 match action {
-                    // Track CHECK constraints with NOT VALID that check column IS NOT NULL
-                    ast::AlterTableAction::AddConstraint(add_constraint) if pg12_plus => {
-                        if add_constraint.not_valid().is_some() {
-                            if let Some(ast::Constraint::CheckConstraint(check)) =
-                                add_constraint.constraint()
-                            {
-                                if let Some(constraint_name) =
-                                    check.constraint_name().and_then(|c| c.name())
-                                {
-                                    if let Some(expr) = check.expr() {
-                                        if let Some(column) = is_not_null_check(&expr) {
-                                            not_null_constraints.insert(
-                                                Identifier::new(&constraint_name.text()),
-                                                TableColumn {
-                                                    table: table_name.clone(),
-                                                    column,
-                                                },
-                                            );
-                                        }
-                                    }
-                                }
-                            }
+                    // Step 1: Add constraint
+                    ast::AlterTableAction::AddConstraint(add_constraint)
+                        if is_pg12_plus && add_constraint.not_valid().is_some() =>
+                    {
+                        if let Some(ast::Constraint::CheckConstraint(check)) =
+                            add_constraint.constraint()
+                            && let Some(constraint_name) =
+                                check.constraint_name().and_then(|c| c.name())
+                            && let Some(expr) = check.expr()
+                            && let Some(column) = is_not_null_check(&expr)
+                        {
+                            not_null_constraints.insert(
+                                Identifier::new(&constraint_name.text()),
+                                TableColumn {
+                                    table: table.clone(),
+                                    column,
+                                },
+                            );
                         }
                     }
-                    // Track VALIDATE CONSTRAINT for our tracked constraints
-                    ast::AlterTableAction::ValidateConstraint(validate_constraint) if pg12_plus => {
+                    // Step 2: Validate constraint
+                    ast::AlterTableAction::ValidateConstraint(validate_constraint)
+                        if is_pg12_plus =>
+                    {
                         if let Some(constraint_name) = validate_constraint
                             .name_ref()
                             .map(|x| Identifier::new(&x.text()))
+                            && let Some(table_column) = not_null_constraints.get(&constraint_name)
+                            && table_column.table == table
                         {
-                            if let Some(table_column) = not_null_constraints.get(&constraint_name) {
-                                // Only mark as validated if it's for the same table
-                                if table_column.table == table_name {
-                                    validated_not_null_columns.insert(table_column.clone());
-                                }
-                            }
+                            validated_not_null_columns.insert(table_column.clone());
                         }
                     }
-                    // Check SET NOT NULL
+                    // Step 3: Check that we're altering a validated constraint
                     ast::AlterTableAction::AlterColumn(alter_column) => {
-                        let Some(option) = alter_column.option() else {
+                        let Some(ast::AlterColumnOption::SetNotNull(option)) =
+                            alter_column.option()
+                        else {
                             continue;
                         };
 
-                        if matches!(option, ast::AlterColumnOption::SetNotNull(_)) {
-                            // For PostgreSQL 12+, skip if there's a validated CHECK constraint
-                            if pg12_plus {
-                                if let Some(column_name) =
-                                    alter_column.name_ref().map(|x| Identifier::new(&x.text()))
-                                {
-                                    let table_column = TableColumn {
-                                        table: table_name.clone(),
-                                        column: column_name,
-                                    };
-                                    if validated_not_null_columns.contains(&table_column) {
-                                        continue;
-                                    }
-                                }
+                        if is_pg12_plus
+                            && let Some(column) =
+                                alter_column.name_ref().map(|x| Identifier::new(&x.text()))
+                        {
+                            let table_column = TableColumn {
+                                table: table.clone(),
+                                column,
+                            };
+                            if validated_not_null_columns.contains(&table_column) {
+                                continue;
                             }
-
-                            ctx.report(
-                                Violation::for_node(
-                                    Rule::AddingNotNullableField,
-                                    "Setting a column `NOT NULL` blocks reads while the table is scanned."
-                                        .into(),
-                                    option.syntax(),
-                                )
-                                .help("Make the field nullable and use a `CHECK` constraint instead."),
-                            );
                         }
+
+                        ctx.report(
+                            Violation::for_node(
+                                Rule::AddingNotNullableField,
+                                "Setting a column `NOT NULL` blocks reads while the table is scanned."
+                                    .into(),
+                                option.syntax(),
+                            )
+                            .help("Make the field nullable and use a `CHECK` constraint instead."),
+                        );
                     }
                     _ => {}
                 }
@@ -235,21 +199,14 @@ COMMIT;
     fn regression_gh_issue_628_pg16_with_validated_check_ok() {
         let sql = r#"
 BEGIN;
-
 ALTER TABLE foo ADD COLUMN bar BIGINT;
-
 ALTER TABLE foo ADD CONSTRAINT bar_not_null CHECK (bar IS NOT NULL) NOT VALID;
-
 COMMIT;
 
 BEGIN;
-
 ALTER TABLE foo VALIDATE CONSTRAINT bar_not_null;
-
 ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
-
 ALTER TABLE foo DROP CONSTRAINT bar_not_null;
-
 COMMIT;
         "#;
 
