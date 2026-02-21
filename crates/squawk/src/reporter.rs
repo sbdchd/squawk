@@ -33,49 +33,61 @@ fn check_sql(
     linter.settings.assume_in_transaction = assume_in_transaction;
     let parse = SourceFile::parse(sql);
     let parse_errors = parse.errors();
-    let errors = linter.lint(&parse, sql);
     let line_index = LineIndex::new(sql);
 
-    let mut violations = Vec::with_capacity(parse_errors.len() + errors.len());
+    if !parse_errors.is_empty() {
+        let violations = parse_errors
+            .into_iter()
+            .map(|e| {
+                let range_start = e.range().start();
+                let line_col = line_index.line_col(range_start);
+                let range_end = e.range().end();
+                let line_end = line_index.line_col(range_end);
+                ReportViolation {
+                    file: path.to_string(),
+                    line: line_col.line as usize,
+                    line_end: line_end.line as usize,
+                    column: line_col.col as usize,
+                    column_end: line_end.col as usize,
+                    level: ViolationLevel::Error,
+                    help: None,
+                    range: e.range(),
+                    message: e.message().to_string(),
+                    rule_name: "syntax-error".to_string(),
+                    fix: None,
+                }
+            })
+            .collect();
+        return CheckReport {
+            filename: path.into(),
+            sql: sql.into(),
+            violations,
+        };
+    }
 
-    for e in parse_errors {
-        let range_start = e.range().start();
-        let line_col = line_index.line_col(range_start);
-        let range_end = e.range().end();
-        let line_end = line_index.line_col(range_end);
-        violations.push(ReportViolation {
-            file: path.to_string(),
-            line: line_col.line as usize,
-            line_end: line_end.line as usize,
-            column: line_col.col as usize,
-            column_end: line_end.col as usize,
-            level: ViolationLevel::Error,
-            help: None,
-            range: e.range(),
-            message: e.message().to_string(),
-            rule_name: "syntax-error".to_string(),
-            fix: None,
+    let errors = linter.lint(&parse, sql);
+    let violations = errors
+        .into_iter()
+        .map(|e| {
+            let range_start = e.text_range.start();
+            let line_col = line_index.line_col(range_start);
+            let range_end = e.text_range.end();
+            let line_end = line_index.line_col(range_end);
+            ReportViolation {
+                file: path.to_string(),
+                line: line_col.line as usize,
+                line_end: line_end.line as usize,
+                column: line_col.col as usize,
+                column_end: line_end.col as usize,
+                range: e.text_range,
+                help: e.help,
+                level: ViolationLevel::Warning,
+                message: e.message,
+                rule_name: e.code.to_string(),
+                fix: e.fix,
+            }
         })
-    }
-    for e in errors {
-        let range_start = e.text_range.start();
-        let line_col = line_index.line_col(range_start);
-        let range_end = e.text_range.end();
-        let line_end = line_index.line_col(range_end);
-        violations.push(ReportViolation {
-            file: path.to_string(),
-            line: line_col.line as usize,
-            line_end: line_end.line as usize,
-            column: line_col.col as usize,
-            column_end: line_end.col as usize,
-            range: e.text_range,
-            help: e.help,
-            level: ViolationLevel::Warning,
-            message: e.message,
-            rule_name: e.code.to_string(),
-            fix: e.fix,
-        })
-    }
+        .collect();
 
     CheckReport {
         filename: path.into(),
@@ -484,6 +496,15 @@ select \;
 
         let val: Value = serde_json::from_slice(&buff).unwrap();
         assert_snapshot!(val);
+    }
+
+    #[test]
+    fn skip_lint_on_syntax_error() {
+        let error_sql = "ALTER TABLE foo ALTER CONSTRAINT bar RENAME TO quux;";
+        let mut buff = vec![];
+        let res = check_sql(error_sql, "test.sql", &[], None, false);
+        fmt_json(&mut buff, vec![res]).unwrap();
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"test.sql","line":0,"column":36,"level":"Error","message":"missing comma","help":null,"rule_name":"syntax-error","column_end":36,"line_end":0}]"#);
     }
 }
 
