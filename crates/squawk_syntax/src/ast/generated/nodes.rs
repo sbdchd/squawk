@@ -2121,6 +2121,14 @@ impl BetweenExpr {
     pub fn between_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BETWEEN_KW)
     }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn symmetric_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SYMMETRIC_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
