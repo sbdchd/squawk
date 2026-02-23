@@ -46,6 +46,7 @@ pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeA
     remove_redundant_alias(&mut actions, &file, offset);
     rewrite_cast_to_double_colon(&mut actions, &file, offset);
     rewrite_double_colon_to_cast(&mut actions, &file, offset);
+    rewrite_between_as_binary_expression(&mut actions, &file, offset);
     Some(actions)
 }
 
@@ -612,6 +613,52 @@ fn rewrite_double_colon_to_cast(
     actions.push(CodeAction {
         title: "Rewrite as cast function `cast()`".to_owned(),
         edits: vec![Edit::replace(cast_expr.syntax().text_range(), replacement)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn rewrite_between_as_binary_expression(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let between_expr = token.parent_ancestors().find_map(ast::BetweenExpr::cast)?;
+
+    let target = between_expr.target()?;
+    let start = between_expr.start()?;
+    let end = between_expr.end()?;
+
+    let is_not = between_expr.not_token().is_some();
+    let is_symmetric = between_expr.symmetric_token().is_some();
+
+    let target_text = target.syntax().text();
+    let start_text = start.syntax().text();
+    let end_text = end.syntax().text();
+
+    let replacement = match (is_not, is_symmetric) {
+        (false, false) => {
+            format!("{target_text} >= {start_text} and {target_text} <= {end_text}")
+        }
+        (true, false) => {
+            format!("({target_text} < {start_text} or {target_text} > {end_text})")
+        }
+        (false, true) => format!(
+            "{target_text} >= least({start_text}, {end_text}) and {target_text} <= greatest({start_text}, {end_text})"
+        ),
+        (true, true) => format!(
+            "({target_text} < least({start_text}, {end_text}) or {target_text} > greatest({start_text}, {end_text}))"
+        ),
+    };
+
+    actions.push(CodeAction {
+        title: "Rewrite as binary expression".to_owned(),
+        edits: vec![Edit::replace(
+            between_expr.syntax().text_range(),
+            replacement,
+        )],
         kind: ActionKind::RefactorRewrite,
     });
 
@@ -1854,6 +1901,54 @@ select myschema.f$0();"
         assert!(code_action_not_applicable(
             rewrite_double_colon_to_cast,
             "select fo$0o from t;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_between_as_binary_expression_simple() {
+        assert_snapshot!(apply_code_action(
+            rewrite_between_as_binary_expression,
+            "select 2 betw$0een 1 and 3;"
+        ),
+        @"select 2 >= 1 and 2 <= 3;"
+        );
+    }
+
+    #[test]
+    fn rewrite_not_between_as_binary_expression() {
+        assert_snapshot!(apply_code_action(
+            rewrite_between_as_binary_expression,
+            "select 2 no$0t between 1 and 3;"
+        ),
+        @"select (2 < 1 or 2 > 3);"
+        );
+    }
+
+    #[test]
+    fn rewrite_between_symmetric_as_binary_expression() {
+        assert_snapshot!(apply_code_action(
+            rewrite_between_as_binary_expression,
+            "select 2 between symme$0tric 3 and 1;"
+        ),
+        @"select 2 >= least(3, 1) and 2 <= greatest(3, 1);"
+        );
+    }
+
+    #[test]
+    fn rewrite_not_between_symmetric_as_binary_expression() {
+        assert_snapshot!(apply_code_action(
+            rewrite_between_as_binary_expression,
+            "select 2 not between symme$0tric 3 and 1;"
+        ),
+        @"select (2 < least(3, 1) or 2 > greatest(3, 1));"
+        );
+    }
+
+    #[test]
+    fn rewrite_between_as_binary_expression_not_applicable() {
+        assert!(code_action_not_applicable(
+            rewrite_between_as_binary_expression,
+            "select 1 +$0 2;"
         ));
     }
 

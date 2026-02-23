@@ -1505,7 +1505,7 @@ SliceExpr =
   base:Expr '[' start:Expr? ':' end:Expr? ']'
 
 BetweenExpr =
-  target:Expr 'between' start:Expr 'and' end:Expr
+  target:Expr 'not'? 'between' 'symmetric'? start:Expr 'and' end:Expr
 
 JsonTableColumn =
   Name 'for' 'ordinality'
