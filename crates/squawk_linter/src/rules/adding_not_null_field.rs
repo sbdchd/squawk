@@ -91,8 +91,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             .name_ref()
                             .map(|x| Identifier::new(&x.text()))
                         {
-                            if let Some(table_column) =
-                                not_null_constraints.get(&constraint_name)
+                            if let Some(table_column) = not_null_constraints.get(&constraint_name)
                                 && table_column.table == table
                             {
                                 validated_not_null_columns.insert(table_column.clone());
@@ -100,8 +99,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                                 // Cross-migration pattern: the ADD CONSTRAINT ... NOT VALID
                                 // was in a previous migration file. Track the table so that
                                 // a subsequent SET NOT NULL is considered safe.
-                                tables_with_external_validated_constraints
-                                    .insert(table.clone());
+                                tables_with_external_validated_constraints.insert(table.clone());
                             }
                         }
                     }
@@ -122,8 +120,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                                 column,
                             };
                             if validated_not_null_columns.contains(&table_column)
-                                || tables_with_external_validated_constraints
-                                    .contains(&table)
+                                || tables_with_external_validated_constraints.contains(&table)
                             {
                                 continue;
                             }
