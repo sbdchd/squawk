@@ -551,6 +551,48 @@ select t$0.* from t;
     }
 
     #[test]
+    fn goto_cross_join_func_column() {
+        assert_snapshot!(goto(r#"
+with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+select * from t, json_to_recordset(x$0) as r(a int, b int);
+"#), @r#"
+          ╭▸ 
+        2 │ with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+          │        ─ 2. destination
+        3 │ select * from t, json_to_recordset(x) as r(a int, b int);
+          ╰╴                                   ─ 1. source
+        "#);
+    }
+
+    #[test]
+    fn goto_cross_join_func_qualified_column_table() {
+        assert_snapshot!(goto(r#"
+with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+select * from t, json_to_recordset(t$0.x) as r(a int, b int);
+"#), @r#"
+          ╭▸ 
+        2 │ with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+          │      ─ 2. destination
+        3 │ select * from t, json_to_recordset(t.x) as r(a int, b int);
+          ╰╴                                   ─ 1. source
+        "#);
+    }
+
+    #[test]
+    fn goto_cross_join_func_qualified_column_field() {
+        assert_snapshot!(goto(r#"
+with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+select * from t, json_to_recordset(t.x$0) as r(a int, b int);
+"#), @r#"
+          ╭▸ 
+        2 │ with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+          │        ─ 2. destination
+        3 │ select * from t, json_to_recordset(t.x) as r(a int, b int);
+          ╰╴                                     ─ 1. source
+        "#);
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;
