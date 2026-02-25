@@ -1,5 +1,0 @@
----
-source: crates/squawk_linter/src/rules/adding_field_with_default.rs
-expression: errors
----
-[]
