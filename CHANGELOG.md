@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - linter: undo foreign key constraint check in create table (#962)
-  
+
   This was an incorrect change to add and isn't necessary since the new table
   doesn't have any rows.
 
