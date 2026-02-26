@@ -2729,11 +2729,12 @@ fn collect_tables_from_item(
 }
 
 pub(crate) enum TableSource {
-    WithTable(ast::WithTable),
-    CreateView(ast::CreateView),
+    Alias(ast::Alias),
     CreateMaterializedView(ast::CreateMaterializedView),
     CreateTable(ast::CreateTableLike),
+    CreateView(ast::CreateView),
     ParenSelect(ast::ParenSelect),
+    WithTable(ast::WithTable),
 }
 
 pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
@@ -2742,6 +2743,12 @@ pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
     }
 
     for ancestor in node.ancestors() {
+        if let Some(alias) = ast::Alias::cast(ancestor.clone())
+            && alias.column_list().is_some()
+        {
+            return Some(TableSource::Alias(alias));
+        }
+
         if let Some(with_table) = ast::WithTable::cast(ancestor.clone()) {
             return Some(TableSource::WithTable(with_table));
         }
