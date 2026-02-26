@@ -1,12 +1,12 @@
 use crate::builtins::BUILTINS_SQL;
-use crate::classify::{NameClass, NameRefClass, classify_name, classify_name_ref};
+use crate::classify::{NameClass, NameRefClass, classify_def_node, classify_name};
 use crate::column_name::ColumnName;
 use crate::offsets::token_from_offset;
-use crate::resolve;
 use crate::{
     binder,
     symbols::{Name, Schema},
 };
+use crate::{goto_definition, resolve};
 use rowan::TextSize;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::{
@@ -19,6 +19,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
     let parent = token.parent()?;
 
     let root = file.syntax();
+    // TODO: we should salsa this
     let binder = binder::bind(file);
 
     if token.kind() == SyntaxKind::STAR {
@@ -44,15 +45,29 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        if let Some(result) = hover_name_ref(root, &name_ref, &binder) {
-            return Some(result);
-        }
+        let definition = goto_definition::goto_definition(file, offset);
+        let def = definition.first()?;
 
-        // Fall back to builtins
-        let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL).tree();
-        let builtins_binder = binder::bind(&builtins_tree);
-        let builtins_root = builtins_tree.syntax();
-        return hover_name_ref(builtins_root, &name_ref, &builtins_binder);
+        let (binder, root) = match def.file {
+            goto_definition::FileId::Current => (binder, root.clone()),
+            goto_definition::FileId::Builtins => {
+                let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL);
+                let builtins_tree = builtins_tree.tree();
+                // TODO: we should salsa this
+                let binder = binder::bind(&builtins_tree);
+                let tree = builtins_tree.syntax().clone();
+                (binder, tree)
+            }
+        };
+
+        let def_node = match root.covering_element(def.range) {
+            rowan::NodeOrToken::Token(token) => token.parent()?,
+            rowan::NodeOrToken::Node(node) => node,
+        };
+
+        let context = classify_def_node(&def_node)?;
+
+        return hover_name_ref(&root, &name_ref, &binder, context, &def_node);
     }
 
     if let Some(name) = ast::Name::cast(parent) {
@@ -132,9 +147,12 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 fn hover_name_ref(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
+    // TODO: we should pass in the file id along with the def_node and then use
+    // salsa to lookup the the correct binder.
     binder: &binder::Binder,
+    context: NameRefClass,
+    def_node: &SyntaxNode,
 ) -> Option<String> {
-    let context = classify_name_ref(name_ref)?;
     match context {
         NameRefClass::CreateIndexColumn
         | NameRefClass::InsertColumn
@@ -160,7 +178,7 @@ fn hover_name_ref(
                 return Some(result);
             }
             // Finally try as table (handles case like `select t from t;` where t is the table)
-            hover_table(root, name_ref, binder)
+            hover_table(binder, def_node)
         }
         NameRefClass::DeleteQualifiedColumnTable
         | NameRefClass::ForeignKeyTable
@@ -172,7 +190,7 @@ fn hover_name_ref(
         | NameRefClass::SelectQualifiedColumnTable
         | NameRefClass::Table
         | NameRefClass::UpdateQualifiedColumnTable
-        | NameRefClass::View => hover_table(root, name_ref, binder),
+        | NameRefClass::View => hover_table(binder, def_node),
         NameRefClass::Sequence => hover_sequence(root, name_ref, binder),
         NameRefClass::Trigger => hover_trigger(root, name_ref, binder),
         NameRefClass::Policy => hover_policy(root, name_ref, binder),
@@ -406,40 +424,32 @@ fn hover_column_definition(
     ))
 }
 
-fn hover_table(
-    root: &SyntaxNode,
-    name_ref: &ast::NameRef,
-    binder: &binder::Binder,
-) -> Option<String> {
-    if let Some(result) = hover_subquery_table(name_ref) {
-        return Some(result);
-    }
-
-    let table_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
-        .into_iter()
-        .next()?;
-
-    hover_table_from_ptr(root, &table_ptr, binder)
-}
-
-fn hover_table_from_ptr(
-    root: &SyntaxNode,
-    table_ptr: &squawk_syntax::SyntaxNodePtr,
-    binder: &binder::Binder,
-) -> Option<String> {
-    let table_name_node = table_ptr.to_node(root);
-
-    match resolve::find_table_source(&table_name_node)? {
+// TODO: we should pass in the file id along with the def_node and then use
+// salsa to lookup the the correct binder.
+fn format_table_source(source: resolve::TableSource, binder: &binder::Binder) -> Option<String> {
+    match source {
         resolve::TableSource::WithTable(with_table) => format_with_table(&with_table),
         resolve::TableSource::CreateView(create_view) => format_create_view(&create_view, binder),
-        resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
-            format_create_materialized_view(&create_materialized_view, binder)
+        resolve::TableSource::CreateMaterializedView(mv) => {
+            format_create_materialized_view(&mv, binder)
         }
         resolve::TableSource::CreateTable(create_table) => {
             format_create_table(&create_table, binder)
         }
         resolve::TableSource::ParenSelect(paren_select) => format_paren_select(&paren_select),
     }
+}
+
+fn hover_table(binder: &binder::Binder, def_node: &SyntaxNode) -> Option<String> {
+    if let Some(result) = hover_subquery_table(def_node) {
+        return Some(result);
+    }
+
+    if let Some(source) = resolve::find_table_source(def_node) {
+        return format_table_source(source, binder);
+    }
+
+    None
 }
 
 fn hover_qualified_star(
@@ -491,20 +501,16 @@ fn hover_unqualified_star_in_arg_list(
     Some(results.join("\n"))
 }
 
-fn hover_subquery_table(name_ref: &ast::NameRef) -> Option<String> {
-    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
-    let from_clause = select.from_clause()?;
-    let qualifier = Name::from_node(name_ref);
-    let from_item = resolve::find_from_item_in_from_clause(&from_clause, &qualifier)?;
+fn hover_subquery_table(def_node: &SyntaxNode) -> Option<String> {
+    let alias = def_node.ancestors().find_map(ast::Alias::cast)?;
+    let name = Name::from_node(&alias.name()?);
+    let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let paren_select = from_item.paren_select()?;
-    format_subquery_table(name_ref, &paren_select)
+    format_subquery_table(&name, &paren_select)
 }
 
-fn format_subquery_table(
-    name_ref: &ast::NameRef,
-    paren_select: &ast::ParenSelect,
-) -> Option<String> {
-    let name = name_ref.syntax().text().to_string();
+fn format_subquery_table(name: &Name, paren_select: &ast::ParenSelect) -> Option<String> {
+    let name = name.to_string();
     let query = paren_select.syntax().text().to_string();
     Some(format!("subquery {} as {}", name, query))
 }
@@ -968,6 +974,8 @@ fn format_create_table(
 
 fn format_create_view(create_view: &ast::CreateView, binder: &binder::Binder) -> Option<String> {
     let path = create_view.path()?;
+    // TODO: we use this to infer the schema, we should either rename this or
+    // create a different function
     let (schema, view_name) = resolve::resolve_view_info(binder, &path)?;
     let schema = schema.to_string();
 

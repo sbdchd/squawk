@@ -27,12 +27,11 @@ pub(crate) fn resolve_name_ref_ptrs(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
 ) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
-    let context = classify_name_ref(name_ref)?;
+    let context = classify_name_ref(name_ref.syntax())?;
 
     match context {
         NameRefClass::Table => {
-            let path = find_containing_path(name_ref)?;
-            let (table_name, schema) = extract_table_schema_from_path(&path)?;
+            let (table_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
         }
@@ -118,22 +117,18 @@ pub(crate) fn resolve_name_ref_ptrs(
                 };
                 (type_name, schema)
             } else {
-                let path = find_containing_path(name_ref)?;
-                let (type_name, schema) = extract_table_schema_from_path(&path)?;
-                (type_name, schema)
+                extract_table_schema_from_name_ref(name_ref)?
             };
             let position = name_ref.syntax().text_range().start();
             resolve_type_name_ptr(binder, &type_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::View => {
-            let path = find_containing_path(name_ref)?;
-            let (view_name, schema) = extract_table_schema_from_path(&path)?;
+            let (view_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             resolve_view_name_ptr(binder, &view_name, &schema, position).map(|ptr| smallvec![ptr])
         }
         NameRefClass::Sequence => {
-            let path = find_containing_path(name_ref)?;
-            let (sequence_name, schema) = extract_table_schema_from_path(&path)?;
+            let (sequence_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             resolve_sequence_name_ptr(binder, &sequence_name, &schema, position)
                 .map(|ptr| smallvec![ptr])
@@ -962,6 +957,11 @@ fn extract_table_schema_from_path(path: &ast::Path) -> Option<(Name, Option<Sche
     Some((extract_table_name(path)?, extract_schema_name(path)))
 }
 
+fn extract_table_schema_from_name_ref(name_ref: &ast::NameRef) -> Option<(Name, Option<Schema>)> {
+    let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
+    extract_table_schema_from_path(&path)
+}
+
 fn resolve_select_qualified_column_ptr(
     binder: &Binder,
     root: &SyntaxNode,
@@ -1777,15 +1777,6 @@ pub(crate) fn find_from_item_in_from_clause(
         }
     }
 
-    None
-}
-
-fn find_containing_path(name_ref: &ast::NameRef) -> Option<ast::Path> {
-    for ancestor in name_ref.syntax().ancestors() {
-        if let Some(path) = ast::Path::cast(ancestor) {
-            return Some(path);
-        }
-    }
     None
 }
 
