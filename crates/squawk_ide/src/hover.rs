@@ -430,8 +430,8 @@ fn format_table_source(source: resolve::TableSource, binder: &binder::Binder) ->
     match source {
         resolve::TableSource::WithTable(with_table) => format_with_table(&with_table),
         resolve::TableSource::CreateView(create_view) => format_create_view(&create_view, binder),
-        resolve::TableSource::CreateMaterializedView(mv) => {
-            format_create_materialized_view(&mv, binder)
+        resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
+            format_create_materialized_view(&create_materialized_view, binder)
         }
         resolve::TableSource::CreateTable(create_table) => {
             format_create_table(&create_table, binder)
