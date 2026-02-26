@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.42.0 - 2026-02-25
+
+### Changed
+
+- linter: undo foreign key constraint check in create table (#962)
+
+  This was an incorrect change to add and isn't necessary since the new table
+  doesn't have any rows.
+
+### Added
+
+- ci: build for alpine arm (#960)
+- ide: code action - rewrite between as binary expression (#953)
+- ide: goto def & hover for now() + current_timestamp (#950)
+- ide: goto def for column names in table function returns (#949)
+- ide: goto def with function in from item & cross join (#961)
+
+### Fixed
+
+- ide: fix col names for collation for, at time zone, overlaps (#951)
+
 ## v2.41.0 - 2026-02-20
 
 ### Added
