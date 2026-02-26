@@ -428,6 +428,7 @@ fn hover_column_definition(
 // salsa to lookup the the correct binder.
 fn format_table_source(source: resolve::TableSource, binder: &binder::Binder) -> Option<String> {
     match source {
+        resolve::TableSource::Alias(alias) => format_alias_with_column_list(&alias),
         resolve::TableSource::WithTable(with_table) => format_with_table(&with_table),
         resolve::TableSource::CreateView(create_view) => format_create_view(&create_view, binder),
         resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
@@ -450,6 +451,14 @@ fn hover_table(binder: &binder::Binder, def_node: &SyntaxNode) -> Option<String>
     }
 
     None
+}
+
+fn format_alias_with_column_list(alias: &ast::Alias) -> Option<String> {
+    let alias_name = alias.name()?;
+    let column_list = alias.column_list()?;
+    let name = Name::from_node(&alias_name).to_string();
+    let columns = column_list.syntax().text().to_string();
+    Some(format!("table {}{}", name, columns))
 }
 
 fn hover_qualified_star(
@@ -527,6 +536,7 @@ fn hover_qualified_star_columns(
     }
 
     match resolve::find_table_source(&table_name_node)? {
+        resolve::TableSource::Alias(alias) => hover_qualified_star_columns_from_alias(&alias),
         resolve::TableSource::WithTable(with_table) => {
             hover_qualified_star_columns_from_cte(&with_table)
         }
@@ -545,6 +555,25 @@ fn hover_qualified_star_columns(
     }
 }
 
+fn hover_qualified_star_columns_from_alias(alias: &ast::Alias) -> Option<String> {
+    let alias_name = Name::from_node(&alias.name()?);
+    let columns = alias.column_list()?.columns();
+    let results: Vec<String> = columns
+        .filter_map(|column| {
+            let column_name = Name::from_node(&column.name()?);
+            Some(ColumnHover::table_column(
+                &alias_name.to_string(),
+                &column_name.to_string(),
+            ))
+        })
+        .collect();
+
+    if results.is_empty() {
+        return None;
+    }
+
+    Some(results.join("\n"))
+}
 fn hover_qualified_star_columns_from_table(
     root: &SyntaxNode,
     create_table: &impl ast::HasCreateTable,
@@ -3003,6 +3032,19 @@ select t.*$0 from t;
           ╭▸ 
         3 │ select t.* from t;
           ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_table_alias_with_column_list() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b)
+select u$0.x, u.y from t as u(x, y);
+"), @"
+        hover: table u(x, y)
+          ╭▸ 
+        3 │ select u.x, u.y from t as u(x, y);
+          ╰╴       ─ hover
         ");
     }
 

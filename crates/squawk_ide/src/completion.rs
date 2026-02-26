@@ -393,6 +393,22 @@ fn column_completions_from_clause(
                     sort_text: None,
                 }));
             }
+            Some(resolve::TableSource::Alias(alias)) => {
+                if let Some(column_list) = alias.column_list() {
+                    completions.extend(column_list.columns().filter_map(|column| {
+                        let name = column.name()?;
+                        Some(CompletionItem {
+                            label: Name::from_node(&name).to_string(),
+                            kind: CompletionItemKind::Column,
+                            detail: None,
+                            insert_text: None,
+                            insert_text_format: None,
+                            trigger_completion_after_insert: false,
+                            sort_text: None,
+                        })
+                    }));
+                }
+            }
             Some(resolve::TableSource::ParenSelect(paren_select)) => {
                 let columns = resolve::collect_paren_select_columns_with_types(
                     binder,
