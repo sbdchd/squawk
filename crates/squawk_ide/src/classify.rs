@@ -1,10 +1,10 @@
 use crate::symbols::Name;
 use squawk_syntax::{
-    SyntaxKind,
+    SyntaxKind, SyntaxNode,
     ast::{self, AstNode},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) enum NameRefClass {
     Aggregate,
     AlterColumn,
@@ -91,7 +91,7 @@ fn is_special_fn(kind: SyntaxKind) -> bool {
     )
 }
 
-pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass> {
+pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
     let mut in_function_name = false;
     let mut in_arg_list = false;
     let mut in_column_list = false;
@@ -111,13 +111,13 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     let mut in_conflict_target = false;
 
     // TODO: can we combine this if and the one that follows?
-    if let Some(parent) = name_ref.syntax().parent()
+    if let Some(parent) = node.parent()
         && let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
         && let Some(base) = field_expr.base()
         && let ast::Expr::NameRef(base_name_ref) = base
         // check that the name_ref we're looking at in the field expr is the
         // base name_ref, i.e., the schema, rather than the item
-        && base_name_ref.syntax() == name_ref.syntax()
+        && base_name_ref.syntax() == node
     {
         let is_function_call = field_expr
             .syntax()
@@ -217,13 +217,13 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         return Some(NameRefClass::Schema);
     }
 
-    if let Some(parent) = name_ref.syntax().parent()
+    if let Some(parent) = node.parent()
         && let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
         && field_expr
             .field()
             // we're at the field in a FieldExpr, i.e., foo.bar
             //                                              ^^^
-            .is_some_and(|field_name_ref| field_name_ref.syntax() == name_ref.syntax())
+            .is_some_and(|field_name_ref| field_name_ref.syntax() == node)
             // we're not inside a call expr
         && field_expr.star_token().is_none()
         && field_expr
@@ -296,7 +296,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
         }
     }
 
-    if let Some(parent) = name_ref.syntax().parent()
+    if let Some(parent) = node.parent()
         && let Some(inner_path) = ast::PathSegment::cast(parent)
             .and_then(|p| p.syntax().parent().and_then(ast::Path::cast))
         && let Some(outer_path) = inner_path
@@ -309,7 +309,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     }
 
     // Check for function/procedure reference in CREATE OPERATOR before the type check
-    for ancestor in name_ref.syntax().ancestors() {
+    for ancestor in node.ancestors() {
         if let Some(attr_option) = ast::AttributeOption::cast(ancestor.clone())
             && let Some(name) = attr_option.name()
         {
@@ -327,7 +327,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
     }
 
     let mut in_type = false;
-    for ancestor in name_ref.syntax().ancestors() {
+    for ancestor in node.ancestors() {
         if ast::PathType::can_cast(ancestor.kind()) || ast::ExprType::can_cast(ancestor.kind()) {
             in_type = true;
         }
@@ -462,7 +462,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                     && to_columns
                         .syntax()
                         .text_range()
-                        .contains_range(name_ref.syntax().text_range())
+                        .contains_range(node.text_range())
                 {
                     return Some(NameRefClass::ForeignKeyColumn);
                 }
@@ -470,7 +470,7 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                     && from_columns
                         .syntax()
                         .text_range()
-                        .contains_range(name_ref.syntax().text_range())
+                        .contains_range(node.text_range())
                 {
                     return Some(NameRefClass::ConstraintColumn);
                 }
@@ -487,15 +487,12 @@ pub(crate) fn classify_name_ref(name_ref: &ast::NameRef) -> Option<NameRefClass>
                 && column_ref
                     .syntax()
                     .text_range()
-                    .contains_range(name_ref.syntax().text_range())
+                    .contains_range(node.text_range())
             {
                 return Some(NameRefClass::ForeignKeyColumn);
             }
             if let Some(path) = references_constraint.table()
-                && path
-                    .syntax()
-                    .text_range()
-                    .contains_range(name_ref.syntax().text_range())
+                && path.syntax().text_range().contains_range(node.text_range())
             {
                 return Some(NameRefClass::ForeignKeyTable);
             }
@@ -823,6 +820,113 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
         return Some(NameClass::WithTable(with_table));
     }
 
+    None
+}
+
+pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<NameRefClass> {
+    let mut in_column = false;
+    let mut in_column_list = false;
+    for ancestor in def_node.ancestors() {
+        if ast::Column::can_cast(ancestor.kind()) {
+            in_column = true;
+        }
+        if ast::ColumnList::can_cast(ancestor.kind()) {
+            in_column_list = true;
+        }
+        if ast::Param::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::NamedArgParameter);
+        }
+        if ast::CreateTableLike::can_cast(ancestor.kind()) {
+            if in_column {
+                return Some(NameRefClass::SelectColumn);
+            }
+            return Some(NameRefClass::Table);
+        }
+        if ast::CreateType::can_cast(ancestor.kind()) {
+            if in_column {
+                return Some(NameRefClass::CompositeTypeField);
+            }
+            return Some(NameRefClass::Type);
+        }
+        if ast::CreateFunction::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Function);
+        }
+        if ast::CreateProcedure::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Procedure);
+        }
+        if ast::WithTable::can_cast(ancestor.kind()) {
+            if in_column_list {
+                return Some(NameRefClass::SelectColumn);
+            }
+            return Some(NameRefClass::Table);
+        }
+        if ast::CreateTableAs::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Table);
+        }
+        if ast::CreateIndex::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Index);
+        }
+        if ast::CreateSequence::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Sequence);
+        }
+        if ast::CreateTrigger::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Trigger);
+        }
+        if ast::CreateEventTrigger::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::EventTrigger);
+        }
+        if ast::CreateTablespace::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Tablespace);
+        }
+        if ast::CreateDatabase::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Database);
+        }
+        if ast::CreateServer::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Server);
+        }
+        if ast::CreateExtension::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Extension);
+        }
+        if ast::CreateRole::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Role);
+        }
+        if ast::CreateAggregate::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Aggregate);
+        }
+        if ast::CreateSchema::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Schema);
+        }
+        if ast::CreateView::can_cast(ancestor.kind())
+            || ast::CreateMaterializedView::can_cast(ancestor.kind())
+        {
+            if in_column_list {
+                return Some(NameRefClass::SelectColumn);
+            }
+            return Some(NameRefClass::View);
+        }
+        if ast::CreatePolicy::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Policy);
+        }
+        if ast::Declare::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Cursor);
+        }
+        if ast::Prepare::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::PreparedStatement);
+        }
+        if ast::Listen::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Channel);
+        }
+        if ast::Alias::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::FromTable);
+        }
+        if ast::AsName::can_cast(ancestor.kind())
+            || ast::ParenSelect::can_cast(ancestor.kind())
+            || ast::Values::can_cast(ancestor.kind())
+            || ast::Select::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::SelectColumn);
+        }
+    }
     None
 }
 

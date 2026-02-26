@@ -50,6 +50,7 @@ pub struct DocumentSymbol {
 }
 
 pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut symbols = vec![];
 

@@ -12,9 +12,12 @@ use squawk_syntax::{
 };
 
 pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<Location> {
+    // TODO: we should salsa this
     let current_binder = binder::bind(file);
 
+    // TODO: we should salsa this
     let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL).tree();
+    // TODO: we should salsa this
     let builtins_binder = binder::bind(&builtins_tree);
 
     let Some((target_file, target_defs)) = find_target_defs(

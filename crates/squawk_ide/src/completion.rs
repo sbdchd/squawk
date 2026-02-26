@@ -45,6 +45,7 @@ fn select_completions(
     select_clause: ast::SelectClause,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
     let schema = schema_qualifier_at_token(token);
@@ -246,6 +247,7 @@ fn select_clauses_completions(select: &ast::Select) -> Vec<CompletionItem> {
 }
 
 fn limit_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
@@ -265,6 +267,7 @@ fn limit_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<Complet
 }
 
 fn offset_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
@@ -277,6 +280,7 @@ fn select_expr_completions(
     select: &ast::Select,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
     let schema = schema_qualifier_at_token(token);
@@ -449,6 +453,7 @@ fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
 }
 
 fn table_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
@@ -528,6 +533,7 @@ fn delete_expr_completions(
     delete: &ast::Delete,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
 
@@ -738,6 +744,7 @@ fn file_with_completion_marker(file: &ast::SourceFile, offset: TextSize) -> ast:
     let offset = u32::from(offset) as usize;
     let offset = offset.min(sql.len());
     sql.insert_str(offset, COMPLETION_MARKER);
+    // TODO: should this be cached
     ast::SourceFile::parse(&sql).tree()
 }
 

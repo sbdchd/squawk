@@ -59,8 +59,10 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
                 FileId::Current => file,
+                // TODO: we should salsa this
                 FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
             };
+            // TODO: we should salsa this
             let binder_output = binder::bind(file);
             let root = file.syntax();
             if let Some(ptrs) = resolve::resolve_name_ref_ptrs(&binder_output, root, &name_ref) {
@@ -89,8 +91,10 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
                 FileId::Current => file,
+                // TODO: we should salsa this
                 FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
             };
+            // TODO: we should salsa this
             let binder_output = binder::bind(file);
             let position = token.text_range().start();
             if let Some(ptr) = resolve::resolve_type_ptr_from_type(&binder_output, &ty, position) {
