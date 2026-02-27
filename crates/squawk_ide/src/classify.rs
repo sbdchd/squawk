@@ -308,19 +308,31 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         return Some(NameRefClass::Schema);
     }
 
-    // Check for function/procedure reference in CREATE OPERATOR before the type check
+    // Check for function/procedure reference in CREATE OPERATOR / CREATE AGGREGATE
+    // before the type check
     for ancestor in node.ancestors() {
         if let Some(attr_option) = ast::AttributeOption::cast(ancestor.clone())
             && let Some(name) = attr_option.name()
         {
             let attr_name = Name::from_node(&name);
-            if attr_name == Name::from_string("function")
-                || attr_name == Name::from_string("procedure")
-            {
-                for outer in attr_option.syntax().ancestors() {
-                    if ast::CreateOperator::can_cast(outer.kind()) {
-                        return Some(NameRefClass::FunctionName);
-                    }
+            for outer in attr_option.syntax().ancestors() {
+                if ast::CreateOperator::can_cast(outer.kind())
+                    && (attr_name == Name::from_string("function")
+                        || attr_name == Name::from_string("procedure"))
+                {
+                    return Some(NameRefClass::FunctionName);
+                }
+                if ast::CreateAggregate::can_cast(outer.kind())
+                    && (attr_name == Name::from_string("sfunc")
+                        || attr_name == Name::from_string("finalfunc")
+                        || attr_name == Name::from_string("combinefunc")
+                        || attr_name == Name::from_string("serialfunc")
+                        || attr_name == Name::from_string("deserialfunc")
+                        || attr_name == Name::from_string("msfunc")
+                        || attr_name == Name::from_string("minvfunc")
+                        || attr_name == Name::from_string("mfinalfunc"))
+                {
+                    return Some(NameRefClass::FunctionName);
                 }
             }
         }
