@@ -1,5 +1,5 @@
 -- squawk-ignore-file
--- pg version: 18.1
+-- pg version: 18.2
 -- update via:
 --   cargo xtask sync-builtins
 
@@ -3525,8 +3525,11 @@ create function pg_catalog.any_out("any") returns cstring
   language internal;
 
 -- arbitrary value from among input values
-create function pg_catalog.any_value(anyelement) returns anyelement
-  language internal;
+create aggregate pg_catalog.any_value(anyelement) (
+  sfunc = any_value_transfn,
+  stype = anyelement,
+  combinefunc = any_value_transfn
+);
 
 -- aggregate transition function
 create function pg_catalog.any_value_transfn(anyelement, anyelement) returns anyelement
@@ -3661,12 +3664,20 @@ create function pg_catalog.areasel(internal, oid, internal, integer) returns dou
   language internal;
 
 -- concatenate aggregate input into an array
-create function pg_catalog.array_agg(anyarray) returns anyarray
-  language internal;
+create aggregate pg_catalog.array_agg(anyarray) (
+  sfunc = array_agg_array_transfn,
+  stype = internal,
+  finalfunc = array_agg_array_finalfn,
+  combinefunc = array_agg_array_combine
+);
 
 -- concatenate aggregate input into an array
-create function pg_catalog.array_agg(anynonarray) returns anyarray
-  language internal;
+create aggregate pg_catalog.array_agg(anynonarray) (
+  sfunc = array_agg_transfn,
+  stype = internal,
+  finalfunc = array_agg_finalfn,
+  combinefunc = array_agg_combine
+);
 
 -- aggregate combine function
 create function pg_catalog.array_agg_array_combine(internal, internal) returns internal
@@ -3941,32 +3952,64 @@ create function pg_catalog.atanh(double precision) returns double precision
   language internal;
 
 -- the average (arithmetic mean) as numeric of all bigint values
-create function pg_catalog.avg(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.avg(bigint) (
+  sfunc = int8_avg_accum,
+  stype = internal,
+  finalfunc = numeric_poly_avg,
+  combinefunc = int8_avg_combine
+);
 
 -- the average (arithmetic mean) as float8 of all float8 values
-create function pg_catalog.avg(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.avg(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_avg,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- the average (arithmetic mean) as numeric of all integer values
-create function pg_catalog.avg(integer) returns numeric
-  language internal;
+create aggregate pg_catalog.avg(integer) (
+  sfunc = int4_avg_accum,
+  stype = bigint[],
+  finalfunc = int8_avg,
+  combinefunc = int4_avg_combine,
+  initcond = '{0,0}'
+);
 
 -- the average (arithmetic mean) as interval of all interval values
-create function pg_catalog.avg(interval) returns interval
-  language internal;
+create aggregate pg_catalog.avg(interval) (
+  sfunc = interval_avg_accum,
+  stype = internal,
+  finalfunc = interval_avg,
+  combinefunc = interval_avg_combine
+);
 
 -- the average (arithmetic mean) as numeric of all numeric values
-create function pg_catalog.avg(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.avg(numeric) (
+  sfunc = numeric_avg_accum,
+  stype = internal,
+  finalfunc = numeric_avg,
+  combinefunc = numeric_avg_combine
+);
 
 -- the average (arithmetic mean) as float8 of all float4 values
-create function pg_catalog.avg(real) returns double precision
-  language internal;
+create aggregate pg_catalog.avg(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_avg,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- the average (arithmetic mean) as numeric of all smallint values
-create function pg_catalog.avg(smallint) returns numeric
-  language internal;
+create aggregate pg_catalog.avg(smallint) (
+  sfunc = int2_avg_accum,
+  stype = bigint[],
+  finalfunc = int8_avg,
+  combinefunc = int4_avg_combine,
+  initcond = '{0,0}'
+);
 
 -- BERNOULLI tablesample method handler
 create function pg_catalog.bernoulli(internal) returns tsm_handler
@@ -4073,20 +4116,32 @@ create function pg_catalog.bit(integer, integer) returns bit
   language internal;
 
 -- bitwise-and bigint aggregate
-create function pg_catalog.bit_and(bigint) returns bigint
-  language internal;
+create aggregate pg_catalog.bit_and(bigint) (
+  sfunc = int8and,
+  stype = bigint,
+  combinefunc = int8and
+);
 
 -- bitwise-and bit aggregate
-create function pg_catalog.bit_and(bit) returns bit
-  language internal;
+create aggregate pg_catalog.bit_and(bit) (
+  sfunc = bitand,
+  stype = bit,
+  combinefunc = bitand
+);
 
 -- bitwise-and integer aggregate
-create function pg_catalog.bit_and(integer) returns integer
-  language internal;
+create aggregate pg_catalog.bit_and(integer) (
+  sfunc = int4and,
+  stype = integer,
+  combinefunc = int4and
+);
 
 -- bitwise-and smallint aggregate
-create function pg_catalog.bit_and(smallint) returns smallint
-  language internal;
+create aggregate pg_catalog.bit_and(smallint) (
+  sfunc = int2and,
+  stype = smallint,
+  combinefunc = int2and
+);
 
 -- number of set bits
 create function pg_catalog.bit_count(bit) returns bigint
@@ -4113,20 +4168,32 @@ create function pg_catalog.bit_length(text) returns integer
   language sql;
 
 -- bitwise-or bigint aggregate
-create function pg_catalog.bit_or(bigint) returns bigint
-  language internal;
+create aggregate pg_catalog.bit_or(bigint) (
+  sfunc = int8or,
+  stype = bigint,
+  combinefunc = int8or
+);
 
 -- bitwise-or bit aggregate
-create function pg_catalog.bit_or(bit) returns bit
-  language internal;
+create aggregate pg_catalog.bit_or(bit) (
+  sfunc = bitor,
+  stype = bit,
+  combinefunc = bitor
+);
 
 -- bitwise-or integer aggregate
-create function pg_catalog.bit_or(integer) returns integer
-  language internal;
+create aggregate pg_catalog.bit_or(integer) (
+  sfunc = int4or,
+  stype = integer,
+  combinefunc = int4or
+);
 
 -- bitwise-or smallint aggregate
-create function pg_catalog.bit_or(smallint) returns smallint
-  language internal;
+create aggregate pg_catalog.bit_or(smallint) (
+  sfunc = int2or,
+  stype = smallint,
+  combinefunc = int2or
+);
 
 -- I/O
 create function pg_catalog.bit_out(bit) returns cstring
@@ -4141,20 +4208,32 @@ create function pg_catalog.bit_send(bit) returns bytea
   language internal;
 
 -- bitwise-xor bigint aggregate
-create function pg_catalog.bit_xor(bigint) returns bigint
-  language internal;
+create aggregate pg_catalog.bit_xor(bigint) (
+  sfunc = int8xor,
+  stype = bigint,
+  combinefunc = int8xor
+);
 
 -- bitwise-xor bit aggregate
-create function pg_catalog.bit_xor(bit) returns bit
-  language internal;
+create aggregate pg_catalog.bit_xor(bit) (
+  sfunc = bitxor,
+  stype = bit,
+  combinefunc = bitxor
+);
 
 -- bitwise-xor integer aggregate
-create function pg_catalog.bit_xor(integer) returns integer
-  language internal;
+create aggregate pg_catalog.bit_xor(integer) (
+  sfunc = int4xor,
+  stype = integer,
+  combinefunc = int4xor
+);
 
 -- bitwise-xor smallint aggregate
-create function pg_catalog.bit_xor(smallint) returns smallint
-  language internal;
+create aggregate pg_catalog.bit_xor(smallint) (
+  sfunc = int2xor,
+  stype = smallint,
+  combinefunc = int2xor
+);
 
 -- implementation of & operator
 create function pg_catalog.bitand(bit, bit) returns bit
@@ -4241,16 +4320,22 @@ create function pg_catalog.bool_alltrue(internal) returns boolean
   language internal;
 
 -- boolean-and aggregate
-create function pg_catalog.bool_and(boolean) returns boolean
-  language internal;
+create aggregate pg_catalog.bool_and(boolean) (
+  sfunc = booland_statefunc,
+  stype = boolean,
+  combinefunc = booland_statefunc
+);
 
 -- aggregate final function
 create function pg_catalog.bool_anytrue(internal) returns boolean
   language internal;
 
 -- boolean-or aggregate
-create function pg_catalog.bool_or(boolean) returns boolean
-  language internal;
+create aggregate pg_catalog.bool_or(boolean) (
+  sfunc = boolor_statefunc,
+  stype = boolean,
+  combinefunc = boolor_statefunc
+);
 
 -- aggregate transition function
 create function pg_catalog.booland_statefunc(boolean, boolean) returns boolean
@@ -5485,8 +5570,13 @@ create function pg_catalog.convert_to(text, name) returns bytea
   language internal;
 
 -- correlation coefficient
-create function pg_catalog.corr(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.corr(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_corr,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- cosine
 create function pg_catalog.cos(double precision) returns double precision
@@ -5509,20 +5599,38 @@ create function pg_catalog.cotd(double precision) returns double precision
   language internal;
 
 -- number of input rows
-create function pg_catalog.count() returns bigint
-  language internal;
+create aggregate pg_catalog.count(*) (
+  sfunc = int8inc,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
 
 -- number of input rows for which the input expression is not null
-create function pg_catalog.count("any") returns bigint
-  language internal;
+create aggregate pg_catalog.count("any") (
+  sfunc = int8inc_any,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
 
 -- population covariance
-create function pg_catalog.covar_pop(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.covar_pop(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_covar_pop,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- sample covariance
-create function pg_catalog.covar_samp(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.covar_samp(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_covar_samp,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- CRC-32 value
 create function pg_catalog.crc32(bytea) returns bigint
@@ -6183,8 +6291,11 @@ create function pg_catalog.event_trigger_out(event_trigger) returns cstring
   language internal;
 
 -- boolean-and aggregate
-create function pg_catalog.every(boolean) returns boolean
-  language internal;
+create aggregate pg_catalog.every(boolean) (
+  sfunc = booland_statefunc,
+  stype = boolean,
+  combinefunc = booland_statefunc
+);
 
 -- natural exponential (e^x)
 create function pg_catalog.exp(double precision) returns double precision
@@ -8955,16 +9066,22 @@ create function pg_catalog.johab_to_utf8(integer, integer, cstring, internal, in
   language c;
 
 -- aggregate input into json
-create function pg_catalog.json_agg(anyelement) returns json
-  language internal;
+create aggregate pg_catalog.json_agg(anyelement) (
+  sfunc = json_agg_transfn,
+  stype = internal,
+  finalfunc = json_agg_finalfn
+);
 
 -- json aggregate final function
 create function pg_catalog.json_agg_finalfn(internal) returns json
   language internal;
 
 -- aggregate input into json
-create function pg_catalog.json_agg_strict(anyelement) returns json
-  language internal;
+create aggregate pg_catalog.json_agg_strict(anyelement) (
+  sfunc = json_agg_strict_transfn,
+  stype = internal,
+  finalfunc = json_agg_finalfn
+);
 
 -- json aggregate transition function
 create function pg_catalog.json_agg_strict_transfn(internal, anyelement) returns internal
@@ -9039,16 +9156,22 @@ create function pg_catalog.json_object(text[], text[]) returns json
   language internal;
 
 -- aggregate input into a json object
-create function pg_catalog.json_object_agg(key "any", value "any") returns json
-  language internal;
+create aggregate pg_catalog.json_object_agg(key "any", value "any") (
+  sfunc = json_object_agg_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
 
 -- json object aggregate final function
 create function pg_catalog.json_object_agg_finalfn(internal) returns json
   language internal;
 
 -- aggregate non-NULL input into a json object
-create function pg_catalog.json_object_agg_strict(key "any", value "any") returns json
-  language internal;
+create aggregate pg_catalog.json_object_agg_strict(key "any", value "any") (
+  sfunc = json_object_agg_strict_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
 
 -- json object aggregate transition function
 create function pg_catalog.json_object_agg_strict_transfn(internal, "any", "any") returns internal
@@ -9059,12 +9182,18 @@ create function pg_catalog.json_object_agg_transfn(internal, "any", "any") retur
   language internal;
 
 -- aggregate input into a json object with unique keys
-create function pg_catalog.json_object_agg_unique(key "any", value "any") returns json
-  language internal;
+create aggregate pg_catalog.json_object_agg_unique(key "any", value "any") (
+  sfunc = json_object_agg_unique_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
 
 -- aggregate non-NULL input into a json object with unique keys
-create function pg_catalog.json_object_agg_unique_strict(key "any", value "any") returns json
-  language internal;
+create aggregate pg_catalog.json_object_agg_unique_strict(key "any", value "any") (
+  sfunc = json_object_agg_unique_strict_transfn,
+  stype = internal,
+  finalfunc = json_object_agg_finalfn
+);
 
 -- json object aggregate transition function
 create function pg_catalog.json_object_agg_unique_strict_transfn(internal, "any", "any") returns internal
@@ -9131,16 +9260,22 @@ create function pg_catalog.json_typeof(json) returns text
   language internal;
 
 -- aggregate input into jsonb
-create function pg_catalog.jsonb_agg(anyelement) returns jsonb
-  language internal;
+create aggregate pg_catalog.jsonb_agg(anyelement) (
+  sfunc = jsonb_agg_transfn,
+  stype = internal,
+  finalfunc = jsonb_agg_finalfn
+);
 
 -- jsonb aggregate final function
 create function pg_catalog.jsonb_agg_finalfn(internal) returns jsonb
   language internal;
 
 -- aggregate input into jsonb skipping nulls
-create function pg_catalog.jsonb_agg_strict(anyelement) returns jsonb
-  language internal;
+create aggregate pg_catalog.jsonb_agg_strict(anyelement) (
+  sfunc = jsonb_agg_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_agg_finalfn
+);
 
 -- jsonb aggregate transition function
 create function pg_catalog.jsonb_agg_strict_transfn(internal, anyelement) returns internal
@@ -9295,16 +9430,22 @@ create function pg_catalog.jsonb_object(text[], text[]) returns jsonb
   language internal;
 
 -- aggregate inputs into jsonb object
-create function pg_catalog.jsonb_object_agg(key "any", value "any") returns jsonb
-  language internal;
+create aggregate pg_catalog.jsonb_object_agg(key "any", value "any") (
+  sfunc = jsonb_object_agg_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
 
 -- jsonb object aggregate final function
 create function pg_catalog.jsonb_object_agg_finalfn(internal) returns jsonb
   language internal;
 
 -- aggregate non-NULL inputs into jsonb object
-create function pg_catalog.jsonb_object_agg_strict(key "any", value "any") returns jsonb
-  language internal;
+create aggregate pg_catalog.jsonb_object_agg_strict(key "any", value "any") (
+  sfunc = jsonb_object_agg_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
 
 -- jsonb object aggregate transition function
 create function pg_catalog.jsonb_object_agg_strict_transfn(internal, "any", "any") returns internal
@@ -9315,12 +9456,18 @@ create function pg_catalog.jsonb_object_agg_transfn(internal, "any", "any") retu
   language internal;
 
 -- aggregate inputs into jsonb object checking key uniqueness
-create function pg_catalog.jsonb_object_agg_unique(key "any", value "any") returns jsonb
-  language internal;
+create aggregate pg_catalog.jsonb_object_agg_unique(key "any", value "any") (
+  sfunc = jsonb_object_agg_unique_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
 
 -- aggregate non-NULL inputs into jsonb object checking key uniqueness
-create function pg_catalog.jsonb_object_agg_unique_strict(key "any", value "any") returns jsonb
-  language internal;
+create aggregate pg_catalog.jsonb_object_agg_unique_strict(key "any", value "any") (
+  sfunc = jsonb_object_agg_unique_strict_transfn,
+  stype = internal,
+  finalfunc = jsonb_object_agg_finalfn
+);
 
 -- jsonb object aggregate transition function
 create function pg_catalog.jsonb_object_agg_unique_strict_transfn(internal, "any", "any") returns internal
@@ -10107,100 +10254,172 @@ create function pg_catalog.matchingsel(internal, oid, internal, integer) returns
   language internal;
 
 -- maximum value of all anyarray input values
-create function pg_catalog.max(anyarray) returns anyarray
-  language internal;
+create aggregate pg_catalog.max(anyarray) (
+  sfunc = array_larger,
+  stype = anyarray,
+  combinefunc = array_larger
+);
 
 -- maximum value of all enum input values
-create function pg_catalog.max(anyenum) returns anyenum
-  language internal;
+create aggregate pg_catalog.max(anyenum) (
+  sfunc = enum_larger,
+  stype = anyenum,
+  combinefunc = enum_larger
+);
 
 -- maximum value of all bigint input values
-create function pg_catalog.max(bigint) returns bigint
-  language internal;
+create aggregate pg_catalog.max(bigint) (
+  sfunc = int8larger,
+  stype = bigint,
+  combinefunc = int8larger
+);
 
 -- maximum value of all bytea input values
-create function pg_catalog.max(bytea) returns bytea
-  language internal;
+create aggregate pg_catalog.max(bytea) (
+  sfunc = bytea_larger,
+  stype = bytea,
+  combinefunc = bytea_larger
+);
 
 -- maximum value of all bpchar input values
-create function pg_catalog.max(character) returns character
-  language internal;
+create aggregate pg_catalog.max(character) (
+  sfunc = bpchar_larger,
+  stype = character,
+  combinefunc = bpchar_larger
+);
 
 -- maximum value of all date input values
-create function pg_catalog.max(date) returns date
-  language internal;
+create aggregate pg_catalog.max(date) (
+  sfunc = date_larger,
+  stype = date,
+  combinefunc = date_larger
+);
 
 -- maximum value of all float8 input values
-create function pg_catalog.max(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.max(double precision) (
+  sfunc = float8larger,
+  stype = double precision,
+  combinefunc = float8larger
+);
 
 -- maximum value of all inet input values
-create function pg_catalog.max(inet) returns inet
-  language internal;
+create aggregate pg_catalog.max(inet) (
+  sfunc = network_larger,
+  stype = inet,
+  combinefunc = network_larger
+);
 
 -- maximum value of all integer input values
-create function pg_catalog.max(integer) returns integer
-  language internal;
+create aggregate pg_catalog.max(integer) (
+  sfunc = int4larger,
+  stype = integer,
+  combinefunc = int4larger
+);
 
 -- maximum value of all interval input values
-create function pg_catalog.max(interval) returns interval
-  language internal;
+create aggregate pg_catalog.max(interval) (
+  sfunc = interval_larger,
+  stype = interval,
+  combinefunc = interval_larger
+);
 
 -- maximum value of all money input values
-create function pg_catalog.max(money) returns money
-  language internal;
+create aggregate pg_catalog.max(money) (
+  sfunc = cashlarger,
+  stype = money,
+  combinefunc = cashlarger
+);
 
 -- maximum value of all numeric input values
-create function pg_catalog.max(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.max(numeric) (
+  sfunc = numeric_larger,
+  stype = numeric,
+  combinefunc = numeric_larger
+);
 
 -- maximum value of all oid input values
-create function pg_catalog.max(oid) returns oid
-  language internal;
+create aggregate pg_catalog.max(oid) (
+  sfunc = oidlarger,
+  stype = oid,
+  combinefunc = oidlarger
+);
 
 -- maximum value of all pg_lsn input values
-create function pg_catalog.max(pg_lsn) returns pg_lsn
-  language internal;
+create aggregate pg_catalog.max(pg_lsn) (
+  sfunc = pg_lsn_larger,
+  stype = pg_lsn,
+  combinefunc = pg_lsn_larger
+);
 
 -- maximum value of all float4 input values
-create function pg_catalog.max(real) returns real
-  language internal;
+create aggregate pg_catalog.max(real) (
+  sfunc = float4larger,
+  stype = real,
+  combinefunc = float4larger
+);
 
 -- maximum value of all record input values
-create function pg_catalog.max(record) returns record
-  language internal;
+create aggregate pg_catalog.max(record) (
+  sfunc = record_larger,
+  stype = record,
+  combinefunc = record_larger
+);
 
 -- maximum value of all smallint input values
-create function pg_catalog.max(smallint) returns smallint
-  language internal;
+create aggregate pg_catalog.max(smallint) (
+  sfunc = int2larger,
+  stype = smallint,
+  combinefunc = int2larger
+);
 
 -- maximum value of all text input values
-create function pg_catalog.max(text) returns text
-  language internal;
+create aggregate pg_catalog.max(text) (
+  sfunc = text_larger,
+  stype = text,
+  combinefunc = text_larger
+);
 
 -- maximum value of all tid input values
-create function pg_catalog.max(tid) returns tid
-  language internal;
+create aggregate pg_catalog.max(tid) (
+  sfunc = tidlarger,
+  stype = tid,
+  combinefunc = tidlarger
+);
 
 -- maximum value of all time with time zone input values
-create function pg_catalog.max(time with time zone) returns time with time zone
-  language internal;
+create aggregate pg_catalog.max(time with time zone) (
+  sfunc = timetz_larger,
+  stype = time with time zone,
+  combinefunc = timetz_larger
+);
 
 -- maximum value of all time input values
-create function pg_catalog.max(time without time zone) returns time without time zone
-  language internal;
+create aggregate pg_catalog.max(time without time zone) (
+  sfunc = time_larger,
+  stype = time without time zone,
+  combinefunc = time_larger
+);
 
 -- maximum value of all timestamp with time zone input values
-create function pg_catalog.max(timestamp with time zone) returns timestamp with time zone
-  language internal;
+create aggregate pg_catalog.max(timestamp with time zone) (
+  sfunc = timestamptz_larger,
+  stype = timestamp with time zone,
+  combinefunc = timestamptz_larger
+);
 
 -- maximum value of all timestamp input values
-create function pg_catalog.max(timestamp without time zone) returns timestamp without time zone
-  language internal;
+create aggregate pg_catalog.max(timestamp without time zone) (
+  sfunc = timestamp_larger,
+  stype = timestamp without time zone,
+  combinefunc = timestamp_larger
+);
 
 -- maximum value of all xid8 input values
-create function pg_catalog.max(xid8) returns xid8
-  language internal;
+create aggregate pg_catalog.max(xid8) (
+  sfunc = xid8_larger,
+  stype = xid8,
+  combinefunc = xid8_larger
+);
 
 -- MD5 hash
 create function pg_catalog.md5(bytea) returns text
@@ -10271,100 +10490,172 @@ create function pg_catalog.mic_to_win866(integer, integer, cstring, internal, in
   language c;
 
 -- minimum value of all anyarray input values
-create function pg_catalog.min(anyarray) returns anyarray
-  language internal;
+create aggregate pg_catalog.min(anyarray) (
+  sfunc = array_smaller,
+  stype = anyarray,
+  combinefunc = array_smaller
+);
 
 -- minimum value of all enum input values
-create function pg_catalog.min(anyenum) returns anyenum
-  language internal;
+create aggregate pg_catalog.min(anyenum) (
+  sfunc = enum_smaller,
+  stype = anyenum,
+  combinefunc = enum_smaller
+);
 
 -- minimum value of all bigint input values
-create function pg_catalog.min(bigint) returns bigint
-  language internal;
+create aggregate pg_catalog.min(bigint) (
+  sfunc = int8smaller,
+  stype = bigint,
+  combinefunc = int8smaller
+);
 
 -- minimum value of all bytea input values
-create function pg_catalog.min(bytea) returns bytea
-  language internal;
+create aggregate pg_catalog.min(bytea) (
+  sfunc = bytea_smaller,
+  stype = bytea,
+  combinefunc = bytea_smaller
+);
 
 -- minimum value of all bpchar input values
-create function pg_catalog.min(character) returns character
-  language internal;
+create aggregate pg_catalog.min(character) (
+  sfunc = bpchar_smaller,
+  stype = character,
+  combinefunc = bpchar_smaller
+);
 
 -- minimum value of all date input values
-create function pg_catalog.min(date) returns date
-  language internal;
+create aggregate pg_catalog.min(date) (
+  sfunc = date_smaller,
+  stype = date,
+  combinefunc = date_smaller
+);
 
 -- minimum value of all float8 input values
-create function pg_catalog.min(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.min(double precision) (
+  sfunc = float8smaller,
+  stype = double precision,
+  combinefunc = float8smaller
+);
 
 -- minimum value of all inet input values
-create function pg_catalog.min(inet) returns inet
-  language internal;
+create aggregate pg_catalog.min(inet) (
+  sfunc = network_smaller,
+  stype = inet,
+  combinefunc = network_smaller
+);
 
 -- minimum value of all integer input values
-create function pg_catalog.min(integer) returns integer
-  language internal;
+create aggregate pg_catalog.min(integer) (
+  sfunc = int4smaller,
+  stype = integer,
+  combinefunc = int4smaller
+);
 
 -- minimum value of all interval input values
-create function pg_catalog.min(interval) returns interval
-  language internal;
+create aggregate pg_catalog.min(interval) (
+  sfunc = interval_smaller,
+  stype = interval,
+  combinefunc = interval_smaller
+);
 
 -- minimum value of all money input values
-create function pg_catalog.min(money) returns money
-  language internal;
+create aggregate pg_catalog.min(money) (
+  sfunc = cashsmaller,
+  stype = money,
+  combinefunc = cashsmaller
+);
 
 -- minimum value of all numeric input values
-create function pg_catalog.min(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.min(numeric) (
+  sfunc = numeric_smaller,
+  stype = numeric,
+  combinefunc = numeric_smaller
+);
 
 -- minimum value of all oid input values
-create function pg_catalog.min(oid) returns oid
-  language internal;
+create aggregate pg_catalog.min(oid) (
+  sfunc = oidsmaller,
+  stype = oid,
+  combinefunc = oidsmaller
+);
 
 -- minimum value of all pg_lsn input values
-create function pg_catalog.min(pg_lsn) returns pg_lsn
-  language internal;
+create aggregate pg_catalog.min(pg_lsn) (
+  sfunc = pg_lsn_smaller,
+  stype = pg_lsn,
+  combinefunc = pg_lsn_smaller
+);
 
 -- minimum value of all float4 input values
-create function pg_catalog.min(real) returns real
-  language internal;
+create aggregate pg_catalog.min(real) (
+  sfunc = float4smaller,
+  stype = real,
+  combinefunc = float4smaller
+);
 
 -- minimum value of all record input values
-create function pg_catalog.min(record) returns record
-  language internal;
+create aggregate pg_catalog.min(record) (
+  sfunc = record_smaller,
+  stype = record,
+  combinefunc = record_smaller
+);
 
 -- minimum value of all smallint input values
-create function pg_catalog.min(smallint) returns smallint
-  language internal;
+create aggregate pg_catalog.min(smallint) (
+  sfunc = int2smaller,
+  stype = smallint,
+  combinefunc = int2smaller
+);
 
 -- minimum value of all text values
-create function pg_catalog.min(text) returns text
-  language internal;
+create aggregate pg_catalog.min(text) (
+  sfunc = text_smaller,
+  stype = text,
+  combinefunc = text_smaller
+);
 
 -- minimum value of all tid input values
-create function pg_catalog.min(tid) returns tid
-  language internal;
+create aggregate pg_catalog.min(tid) (
+  sfunc = tidsmaller,
+  stype = tid,
+  combinefunc = tidsmaller
+);
 
 -- minimum value of all time with time zone input values
-create function pg_catalog.min(time with time zone) returns time with time zone
-  language internal;
+create aggregate pg_catalog.min(time with time zone) (
+  sfunc = timetz_smaller,
+  stype = time with time zone,
+  combinefunc = timetz_smaller
+);
 
 -- minimum value of all time input values
-create function pg_catalog.min(time without time zone) returns time without time zone
-  language internal;
+create aggregate pg_catalog.min(time without time zone) (
+  sfunc = time_smaller,
+  stype = time without time zone,
+  combinefunc = time_smaller
+);
 
 -- minimum value of all timestamp with time zone input values
-create function pg_catalog.min(timestamp with time zone) returns timestamp with time zone
-  language internal;
+create aggregate pg_catalog.min(timestamp with time zone) (
+  sfunc = timestamptz_smaller,
+  stype = timestamp with time zone,
+  combinefunc = timestamptz_smaller
+);
 
 -- minimum value of all timestamp input values
-create function pg_catalog.min(timestamp without time zone) returns timestamp without time zone
-  language internal;
+create aggregate pg_catalog.min(timestamp without time zone) (
+  sfunc = timestamp_smaller,
+  stype = timestamp without time zone,
+  combinefunc = timestamp_smaller
+);
 
 -- minimum value of all xid8 input values
-create function pg_catalog.min(xid8) returns xid8
-  language internal;
+create aggregate pg_catalog.min(xid8) (
+  sfunc = xid8_smaller,
+  stype = xid8,
+  combinefunc = xid8_smaller
+);
 
 -- minimum scale needed to represent the value
 create function pg_catalog.min_scale(numeric) returns integer
@@ -13620,12 +13911,18 @@ create function pg_catalog.range_after_multirange(anyrange, anymultirange) retur
   language internal;
 
 -- combine aggregate input into a multirange
-create function pg_catalog.range_agg(anymultirange) returns anymultirange
-  language internal;
+create aggregate pg_catalog.range_agg(anymultirange) (
+  sfunc = multirange_agg_transfn,
+  stype = internal,
+  finalfunc = multirange_agg_finalfn
+);
 
 -- combine aggregate input into a multirange
-create function pg_catalog.range_agg(anyrange) returns anymultirange
-  language internal;
+create aggregate pg_catalog.range_agg(anyrange) (
+  sfunc = range_agg_transfn,
+  stype = internal,
+  finalfunc = range_agg_finalfn
+);
 
 -- aggregate final function
 create function pg_catalog.range_agg_finalfn(internal, anyrange) returns anymultirange
@@ -13712,12 +14009,18 @@ create function pg_catalog.range_intersect(anyrange, anyrange) returns anyrange
   language internal;
 
 -- range aggregate by intersecting
-create function pg_catalog.range_intersect_agg(anymultirange) returns anymultirange
-  language internal;
+create aggregate pg_catalog.range_intersect_agg(anymultirange) (
+  sfunc = multirange_intersect_agg_transfn,
+  stype = anymultirange,
+  combinefunc = multirange_intersect_agg_transfn
+);
 
 -- range aggregate by intersecting
-create function pg_catalog.range_intersect_agg(anyrange) returns anyrange
-  language internal;
+create aggregate pg_catalog.range_intersect_agg(anyrange) (
+  sfunc = range_intersect_agg_transfn,
+  stype = anyrange,
+  combinefunc = range_intersect_agg_transfn
+);
 
 -- range aggregate by intersecting
 create function pg_catalog.range_intersect_agg_transfn(anyrange, anyrange) returns anyrange
@@ -14164,40 +14467,84 @@ create function pg_catalog.regprocsend(regproc) returns bytea
   language internal;
 
 -- average of the independent variable (sum(X)/N)
-create function pg_catalog.regr_avgx(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_avgx(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_avgx,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- average of the dependent variable (sum(Y)/N)
-create function pg_catalog.regr_avgy(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_avgy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_avgy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- number of input rows in which both expressions are not null
-create function pg_catalog.regr_count(double precision, double precision) returns bigint
-  language internal;
+create aggregate pg_catalog.regr_count(double precision, double precision) (
+  sfunc = int8inc_float8_float8,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
 
 -- y-intercept of the least-squares-fit linear equation determined by the (X, Y) pairs
-create function pg_catalog.regr_intercept(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_intercept(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_intercept,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- square of the correlation coefficient
-create function pg_catalog.regr_r2(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_r2(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_r2,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- slope of the least-squares-fit linear equation determined by the (X, Y) pairs
-create function pg_catalog.regr_slope(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_slope(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_slope,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- sum of squares of the independent variable (sum(X^2) - sum(X)^2/N)
-create function pg_catalog.regr_sxx(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_sxx(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_sxx,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- sum of products of independent times dependent variable (sum(X*Y) - sum(X) * sum(Y)/N)
-create function pg_catalog.regr_sxy(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_sxy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_sxy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- sum of squares of the dependent variable (sum(Y^2) - sum(Y)^2/N)
-create function pg_catalog.regr_syy(double precision, double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.regr_syy(double precision, double precision) (
+  sfunc = float8_regr_accum,
+  stype = double precision[],
+  finalfunc = float8_regr_syy,
+  combinefunc = float8_regr_combine,
+  initcond = '{0,0,0,0,0,0}'
+);
 
 -- I/O
 create function pg_catalog.regrolein(cstring) returns regrole
@@ -14616,84 +14963,170 @@ create function pg_catalog.statement_timestamp() returns timestamp with time zon
   language internal;
 
 -- historical alias for stddev_samp
-create function pg_catalog.stddev(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
 
 -- historical alias for stddev_samp
-create function pg_catalog.stddev(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.stddev(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- historical alias for stddev_samp
-create function pg_catalog.stddev(integer) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- historical alias for stddev_samp
-create function pg_catalog.stddev(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
 
 -- historical alias for stddev_samp
-create function pg_catalog.stddev(real) returns double precision
-  language internal;
+create aggregate pg_catalog.stddev(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- historical alias for stddev_samp
-create function pg_catalog.stddev(smallint) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- population standard deviation of bigint input values
-create function pg_catalog.stddev_pop(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_pop(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_pop,
+  combinefunc = numeric_combine
+);
 
 -- population standard deviation of float8 input values
-create function pg_catalog.stddev_pop(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.stddev_pop(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- population standard deviation of integer input values
-create function pg_catalog.stddev_pop(integer) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_pop(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_pop,
+  combinefunc = numeric_poly_combine
+);
 
 -- population standard deviation of numeric input values
-create function pg_catalog.stddev_pop(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_pop(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_pop,
+  combinefunc = numeric_combine
+);
 
 -- population standard deviation of float4 input values
-create function pg_catalog.stddev_pop(real) returns double precision
-  language internal;
+create aggregate pg_catalog.stddev_pop(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- population standard deviation of smallint input values
-create function pg_catalog.stddev_pop(smallint) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_pop(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_pop,
+  combinefunc = numeric_poly_combine
+);
 
 -- sample standard deviation of bigint input values
-create function pg_catalog.stddev_samp(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_samp(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
 
 -- sample standard deviation of float8 input values
-create function pg_catalog.stddev_samp(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.stddev_samp(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- sample standard deviation of integer input values
-create function pg_catalog.stddev_samp(integer) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_samp(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- sample standard deviation of numeric input values
-create function pg_catalog.stddev_samp(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_samp(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_stddev_samp,
+  combinefunc = numeric_combine
+);
 
 -- sample standard deviation of float4 input values
-create function pg_catalog.stddev_samp(real) returns double precision
-  language internal;
+create aggregate pg_catalog.stddev_samp(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_stddev_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- sample standard deviation of smallint input values
-create function pg_catalog.stddev_samp(smallint) returns numeric
-  language internal;
+create aggregate pg_catalog.stddev_samp(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_stddev_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- concatenate aggregate input into a bytea
-create function pg_catalog.string_agg(value bytea, delimiter bytea) returns bytea
-  language internal;
+create aggregate pg_catalog.string_agg(value bytea, delimiter bytea) (
+  sfunc = bytea_string_agg_transfn,
+  stype = internal,
+  finalfunc = bytea_string_agg_finalfn,
+  combinefunc = string_agg_combine
+);
 
 -- concatenate aggregate input into a string
-create function pg_catalog.string_agg(value text, delimiter text) returns text
-  language internal;
+create aggregate pg_catalog.string_agg(value text, delimiter text) (
+  sfunc = string_agg_transfn,
+  stype = internal,
+  finalfunc = string_agg_finalfn,
+  combinefunc = string_agg_combine
+);
 
 -- aggregate combine function
 create function pg_catalog.string_agg_combine(internal, internal) returns internal
@@ -14788,36 +15221,63 @@ create function pg_catalog.substring(text, text, text) returns text
   language sql;
 
 -- sum as numeric across all bigint input values
-create function pg_catalog.sum(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.sum(bigint) (
+  sfunc = int8_avg_accum,
+  stype = internal,
+  finalfunc = numeric_poly_sum,
+  combinefunc = int8_avg_combine
+);
 
 -- sum as float8 across all float8 input values
-create function pg_catalog.sum(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.sum(double precision) (
+  sfunc = float8pl,
+  stype = double precision,
+  combinefunc = float8pl
+);
 
 -- sum as bigint across all integer input values
-create function pg_catalog.sum(integer) returns bigint
-  language internal;
+create aggregate pg_catalog.sum(integer) (
+  sfunc = int4_sum,
+  stype = bigint,
+  combinefunc = int8pl
+);
 
 -- sum as interval across all interval input values
-create function pg_catalog.sum(interval) returns interval
-  language internal;
+create aggregate pg_catalog.sum(interval) (
+  sfunc = interval_avg_accum,
+  stype = internal,
+  finalfunc = interval_sum,
+  combinefunc = interval_avg_combine
+);
 
 -- sum as money across all money input values
-create function pg_catalog.sum(money) returns money
-  language internal;
+create aggregate pg_catalog.sum(money) (
+  sfunc = cash_pl,
+  stype = money,
+  combinefunc = cash_pl
+);
 
 -- sum as numeric across all numeric input values
-create function pg_catalog.sum(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.sum(numeric) (
+  sfunc = numeric_avg_accum,
+  stype = internal,
+  finalfunc = numeric_sum,
+  combinefunc = numeric_avg_combine
+);
 
 -- sum as float4 across all float4 input values
-create function pg_catalog.sum(real) returns real
-  language internal;
+create aggregate pg_catalog.sum(real) (
+  sfunc = float4pl,
+  stype = real,
+  combinefunc = float4pl
+);
 
 -- sum as bigint across all smallint input values
-create function pg_catalog.sum(smallint) returns bigint
-  language internal;
+create aggregate pg_catalog.sum(smallint) (
+  sfunc = int2_sum,
+  stype = bigint,
+  combinefunc = int8pl
+);
 
 -- trigger to suppress updates when new and old records match
 create function pg_catalog.suppress_redundant_updates_trigger() returns trigger
@@ -16488,52 +16948,104 @@ create function pg_catalog.uuidv7(shift interval) returns uuid
   language internal;
 
 -- population variance of bigint input values (square of the population standard deviation)
-create function pg_catalog.var_pop(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.var_pop(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_pop,
+  combinefunc = numeric_combine
+);
 
 -- population variance of float8 input values (square of the population standard deviation)
-create function pg_catalog.var_pop(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.var_pop(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- population variance of integer input values (square of the population standard deviation)
-create function pg_catalog.var_pop(integer) returns numeric
-  language internal;
+create aggregate pg_catalog.var_pop(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_pop,
+  combinefunc = numeric_poly_combine
+);
 
 -- population variance of numeric input values (square of the population standard deviation)
-create function pg_catalog.var_pop(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.var_pop(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_pop,
+  combinefunc = numeric_combine
+);
 
 -- population variance of float4 input values (square of the population standard deviation)
-create function pg_catalog.var_pop(real) returns double precision
-  language internal;
+create aggregate pg_catalog.var_pop(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_pop,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- population variance of smallint input values (square of the population standard deviation)
-create function pg_catalog.var_pop(smallint) returns numeric
-  language internal;
+create aggregate pg_catalog.var_pop(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_pop,
+  combinefunc = numeric_poly_combine
+);
 
 -- sample variance of bigint input values (square of the sample standard deviation)
-create function pg_catalog.var_samp(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.var_samp(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
 
 -- sample variance of float8 input values (square of the sample standard deviation)
-create function pg_catalog.var_samp(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.var_samp(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- sample variance of integer input values (square of the sample standard deviation)
-create function pg_catalog.var_samp(integer) returns numeric
-  language internal;
+create aggregate pg_catalog.var_samp(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- sample variance of numeric input values (square of the sample standard deviation)
-create function pg_catalog.var_samp(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.var_samp(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
 
 -- sample variance of float4 input values (square of the sample standard deviation)
-create function pg_catalog.var_samp(real) returns double precision
-  language internal;
+create aggregate pg_catalog.var_samp(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- sample variance of smallint input values (square of the sample standard deviation)
-create function pg_catalog.var_samp(smallint) returns numeric
-  language internal;
+create aggregate pg_catalog.var_samp(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- adjust varbit() to typmod length
 create function pg_catalog.varbit(bit varying, integer, boolean) returns bit varying
@@ -16632,28 +17144,54 @@ create function pg_catalog.varchartypmodout(integer) returns cstring
   language internal;
 
 -- historical alias for var_samp
-create function pg_catalog.variance(bigint) returns numeric
-  language internal;
+create aggregate pg_catalog.variance(bigint) (
+  sfunc = int8_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
 
 -- historical alias for var_samp
-create function pg_catalog.variance(double precision) returns double precision
-  language internal;
+create aggregate pg_catalog.variance(double precision) (
+  sfunc = float8_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- historical alias for var_samp
-create function pg_catalog.variance(integer) returns numeric
-  language internal;
+create aggregate pg_catalog.variance(integer) (
+  sfunc = int4_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- historical alias for var_samp
-create function pg_catalog.variance(numeric) returns numeric
-  language internal;
+create aggregate pg_catalog.variance(numeric) (
+  sfunc = numeric_accum,
+  stype = internal,
+  finalfunc = numeric_var_samp,
+  combinefunc = numeric_combine
+);
 
 -- historical alias for var_samp
-create function pg_catalog.variance(real) returns double precision
-  language internal;
+create aggregate pg_catalog.variance(real) (
+  sfunc = float4_accum,
+  stype = double precision[],
+  finalfunc = float8_var_samp,
+  combinefunc = float8_combine,
+  initcond = '{0,0,0}'
+);
 
 -- historical alias for var_samp
-create function pg_catalog.variance(smallint) returns numeric
-  language internal;
+create aggregate pg_catalog.variance(smallint) (
+  sfunc = int2_accum,
+  stype = internal,
+  finalfunc = numeric_poly_var_samp,
+  combinefunc = numeric_poly_combine
+);
 
 -- PostgreSQL version string
 create function pg_catalog.version() returns text
@@ -16888,8 +17426,10 @@ create function pg_catalog.xml_send(xml) returns bytea
   language internal;
 
 -- concatenate XML values
-create function pg_catalog.xmlagg(xml) returns xml
-  language internal;
+create aggregate pg_catalog.xmlagg(xml) (
+  sfunc = xmlconcat2,
+  stype = xml
+);
 
 -- generate XML comment
 create function pg_catalog.xmlcomment(text) returns xml

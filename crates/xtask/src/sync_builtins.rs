@@ -64,11 +64,24 @@ order by n.nspname, c.relname, a.attnum;
 ";
 
 const BUILTIN_FUNCTIONS_QUERY: &str = r"
-select n.nspname, p.proname, pg_get_function_arguments(p.oid) as args, pg_get_function_result(p.oid) as result, l.lanname, coalesce(d.description, '')
+select
+  n.nspname,
+  p.proname,
+  pg_get_function_arguments(p.oid) as args,
+  pg_get_function_result(p.oid) as result,
+  l.lanname,
+  coalesce(d.description, ''),
+  p.prokind,
+  a.aggtransfn::regproc::text as trans_fn,
+  format_type(a.aggtranstype, null) as trans_type,
+  a.aggfinalfn::regproc::text as final_fn,
+  a.aggcombinefn::regproc::text as combine_fn,
+  coalesce(quote_literal(a.agginitval), '') as init_val
 from pg_proc p
   join pg_namespace n on n.oid = p.pronamespace
   join pg_language l on l.oid = p.prolang
   left join pg_description d on d.objoid = p.oid and d.classoid = 'pg_proc'::regclass
+  left join pg_aggregate a on a.aggfnoid = p.oid
 where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
   and n.nspname != 'public'
@@ -134,6 +147,51 @@ fn write_view(
         sql.push_str(&format!("    null::{col_type}{comma}\n"));
     }
     sql.push_str(";\n\n");
+}
+
+fn write_function(
+    sql: &mut String,
+    schema: &str,
+    func_name: &str,
+    args: &str,
+    result: &str,
+    language: &str,
+) {
+    sql.push_str(&format!(
+        "create function {schema}.{func_name}({args}) returns {result}\n  language {language};\n\n"
+    ));
+}
+
+fn write_aggregate(
+    sql: &mut String,
+    schema: &str,
+    aggregate_name: &str,
+    args: &str,
+    trans_fn: &str,
+    trans_type: &str,
+    final_fn: &str,
+    combine_fn: &str,
+    init_val: &str,
+) {
+    let args = if args.is_empty() { "*" } else { args };
+
+    sql.push_str(&format!(
+        "create aggregate {schema}.{aggregate_name}({args}) (\n  sfunc = {trans_fn},\n  stype = {trans_type}"
+    ));
+
+    if final_fn != "-" {
+        sql.push_str(&format!(",\n  finalfunc = {final_fn}"));
+    }
+
+    if combine_fn != "-" {
+        sql.push_str(&format!(",\n  combinefunc = {combine_fn}"));
+    }
+
+    if !init_val.is_empty() {
+        sql.push_str(&format!(",\n  initcond = {init_val}"));
+    }
+
+    sql.push_str("\n);\n\n");
 }
 
 fn run_sql(query: &str) -> Result<String> {
@@ -288,12 +346,25 @@ pub(crate) fn sync_builtins() -> Result<()> {
         let result = parts.next().context("expected function result")?;
         let language = parts.next().context("expected function language")?;
         let description = parts.next().context("expected function description")?;
+        let prokind = parts.next().context("expected function kind")?;
+        let trans_fn = parts.next().context("expected aggregate trans fn")?;
+        let trans_type = parts.next().context("expected aggregate trans type")?;
+        let final_fn = parts.next().context("expected aggregate final fn")?;
+        let combine_fn = parts.next().context("expected aggregate combine fn")?;
+        let init_val = parts.next().context("expected aggregate init value")?;
+
         if !description.is_empty() {
             sql.push_str(&format!("-- {}\n", description.replace('\n', "\n-- ")));
         }
-        sql.push_str(&format!(
-            "create function {schema}.{func_name}({args}) returns {result}\n  language {language};\n\n"
-        ));
+
+        if prokind == "a" {
+            write_aggregate(
+                &mut sql, schema, func_name, args, trans_fn, trans_type, final_fn, combine_fn,
+                init_val,
+            );
+        } else {
+            write_function(&mut sql, schema, func_name, args, result, language);
+        }
     }
 
     for line in run_sql(BUILTIN_OPERATORS_QUERY)?
