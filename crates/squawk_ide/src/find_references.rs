@@ -452,7 +452,7 @@ drop table foo_bar;
         assert_snapshot!(find_refs("
 select now$0();
 select now();
-"), @r"
+"), @"
               ╭▸ current.sql:2:8
               │
             2 │ select now();
@@ -464,9 +464,9 @@ select now();
               │        ─── 2. reference
               ╰╴
 
-              ╭▸ builtin.sql:10798:28
+              ╭▸ builtin.sql:11089:28
               │
-        10798 │ create function pg_catalog.now() returns timestamp with time zone
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 3. reference
         ");
     }

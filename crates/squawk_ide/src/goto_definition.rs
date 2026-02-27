@@ -872,16 +872,16 @@ alter policy p on t
     fn goto_builtin_now() {
         assert_snapshot!(goto("
 select now$0();
-"), @r"
+"), @"
               ╭▸ current.sql:2:10
               │
             2 │ select now();
               │          ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:10798:28
+              ╭▸ builtin.sql:11089:28
               │
-        10798 │ create function pg_catalog.now() returns timestamp with time zone
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -890,16 +890,16 @@ select now$0();
     fn goto_current_timestamp() {
         assert_snapshot!(goto("
 select current_timestamp$0;
-"), @r"
+"), @"
               ╭▸ current.sql:2:24
               │
             2 │ select current_timestamp;
               │                        ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:10798:28
+              ╭▸ builtin.sql:11089:28
               │
-        10798 │ create function pg_catalog.now() returns timestamp with time zone
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -923,16 +923,16 @@ select current_timestamp$0 from t;
         assert_snapshot!(goto("
 create table t(created_at timestamptz);
 select * from t where current_timestamp$0 > t.created_at;
-"), @r"
+"), @"
               ╭▸ current.sql:3:39
               │
             3 │ select * from t where current_timestamp > t.created_at;
               │                                       ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:10798:28
+              ╭▸ builtin.sql:11089:28
               │
-        10798 │ create function pg_catalog.now() returns timestamp with time zone
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
