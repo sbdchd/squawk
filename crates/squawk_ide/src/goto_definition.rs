@@ -4982,6 +4982,42 @@ select x, b$0 from (select 1 a, 2 b) t(x);
     }
 
     #[test]
+    fn goto_subquery_alias_with_column_list_table_ref() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select z$0 from (select * from t) as z(x, y);
+"), @"
+          ╭▸ 
+        3 │ select z from (select * from t) as z(x, y);
+          ╰╴       ─ 1. source                 ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_alias_with_column_list_table_ref_shadows_column() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select z$0 from (select a as z, b from t) as z(x, y);
+"), @"
+          ╭▸ 
+        3 │ select z from (select a as z, b from t) as z(x, y);
+          ╰╴       ─ 1. source                         ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_nested_paren_alias_with_column_list_table_ref() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b, 3 c)
+select z$0 from ((select * from t)) as z(x, y);
+"), @"
+          ╭▸ 
+        3 │ select z from ((select * from t)) as z(x, y);
+          ╰╴       ─ 1. source                   ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_table_expr_values_cte_partial_alias() {
         assert_snapshot!(goto("
 with t as (values (1, 2), (3, 4))

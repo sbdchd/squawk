@@ -338,6 +338,18 @@ fn format_hover_for_column_node(
             return format_view_column(&create_view, column_name, binder);
         }
 
+        if let Some(alias) = ast::Alias::cast(a.clone())
+            && let Some(alias_name) = alias.name()
+            && alias.column_list().is_some()
+        {
+            let table_name = Name::from_node(&alias_name);
+            let column_name = Name::from_string(column_name_node.text().to_string());
+            return Some(ColumnHover::table_column(
+                &table_name.to_string(),
+                &column_name.to_string(),
+            ));
+        }
+
         if let Some(create_table_as) = ast::CreateTableAs::cast(a.clone()) {
             let column_name = if let Some(name) = ast::Name::cast(column_name_node.clone()) {
                 Name::from_node(&name)
@@ -581,6 +593,9 @@ fn hover_unqualified_star_in_arg_list(
 
 fn hover_subquery_table(def_node: &SyntaxNode) -> Option<String> {
     let alias = def_node.ancestors().find_map(ast::Alias::cast)?;
+    if alias.column_list().is_some() {
+        return None;
+    }
     let name = Name::from_node(&alias.name()?);
     let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let paren_select = from_item.paren_select()?;
@@ -671,10 +686,15 @@ fn collect_star_column_names(
     let table_name_node = table_ptr.to_node(root);
 
     if let Some(paren_select) = ast::ParenSelect::cast(table_name_node.clone()) {
-        return resolve::collect_paren_select_columns_with_types(binder, root, &paren_select)
-            .into_iter()
-            .map(|(name, _ty)| name)
-            .collect();
+        let columns: Vec<Name> =
+            resolve::collect_paren_select_columns_with_types(binder, root, &paren_select)
+                .into_iter()
+                .map(|(name, _ty)| name)
+                .collect();
+        if !columns.is_empty() {
+            return columns;
+        }
+        return collect_star_column_names_from_paren_select(root, &paren_select, binder);
     }
 
     match resolve::find_table_source(&table_name_node) {
@@ -718,6 +738,29 @@ fn collect_star_column_names(
         }
         None => vec![],
     }
+}
+
+fn collect_star_column_names_from_paren_select(
+    root: &SyntaxNode,
+    paren_select: &ast::ParenSelect,
+    binder: &binder::Binder,
+) -> Vec<Name> {
+    let Some(select_variant) = paren_select.select() else {
+        return vec![];
+    };
+    let ast::SelectVariant::Select(select) = select_variant else {
+        return vec![];
+    };
+    let Some(from_clause) = select.from_clause() else {
+        return vec![];
+    };
+    let mut columns = vec![];
+    for from_item in from_clause.from_items() {
+        if let Some(table_ptr) = resolve::table_ptr_from_from_item(binder, &from_item) {
+            columns.extend(collect_star_column_names(root, &table_ptr, binder));
+        }
+    }
+    columns
 }
 
 fn hover_qualified_star_columns_from_table(
@@ -3236,6 +3279,19 @@ select u$0.x, u.y from t as u(x, y);
     }
 
     #[test]
+    fn hover_on_cte_table_alias_with_column_list_column_ref() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select u.x$0 from t as u(x, y);
+"), @"
+        hover: column u.x
+          ╭▸ 
+        3 │ select u.x from t as u(x, y);
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
     fn hover_on_cte_table_alias_with_column_list_table_ref() {
         assert_snapshot!(check_hover("
 with t as (select 1 a, 2 b, 3 c)
@@ -3244,6 +3300,32 @@ select u$0 from t as u(x, y);
         hover: table u(x, y, c)
           ╭▸ 
         3 │ select u from t as u(x, y);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_subquery_alias_with_column_list_table_ref() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select z$0 from (select * from t) as z(x, y);
+"), @"
+        hover: table z(x, y, c)
+          ╭▸ 
+        3 │ select z from (select * from t) as z(x, y);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_subquery_nested_paren_alias_with_column_list_table_ref() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select z$0 from ((select * from t)) as z(x, y);
+"), @"
+        hover: table z(x, y, c)
+          ╭▸ 
+        3 │ select z from ((select * from t)) as z(x, y);
           ╰╴       ─ hover
         ");
     }

@@ -1285,14 +1285,23 @@ fn resolve_from_item_column_ptr(
     let column_name = Name::from_node(column_name_ref);
     if let Some(paren_select) = from_item.paren_select() {
         let alias = from_item.alias();
-        return resolve_subquery_column_ptr(
+        if let Some(ptr) = resolve_subquery_column_ptr(
             binder,
             root,
             &paren_select,
             column_name_ref,
             &column_name,
             alias.as_ref(),
-        );
+        ) {
+            return Some(ptr);
+        }
+        if let Some(alias) = alias
+            && let Some(alias_name) = alias.name()
+            && Name::from_node(&alias_name) == column_name
+        {
+            return Some(SyntaxNodePtr::new(alias_name.syntax()));
+        }
+        return None;
     }
 
     if let Some(paren_expr) = from_item.paren_expr() {
@@ -1308,13 +1317,18 @@ fn resolve_from_item_column_ptr(
             }
         }
 
-        return resolve_column_from_paren_expr(
-            binder,
-            root,
-            &paren_expr,
-            column_name_ref,
-            &column_name,
-        );
+        if let Some(ptr) =
+            resolve_column_from_paren_expr(binder, root, &paren_expr, column_name_ref, &column_name)
+        {
+            return Some(ptr);
+        }
+        if let Some(alias) = from_item.alias()
+            && let Some(alias_name) = alias.name()
+            && Name::from_node(&alias_name) == column_name
+        {
+            return Some(SyntaxNodePtr::new(alias_name.syntax()));
+        }
+        return None;
     }
 
     let alias_len = if let Some(alias) = from_item.alias()
@@ -2425,7 +2439,7 @@ fn resolve_subquery_column_ptr(
 ) -> Option<SyntaxNodePtr> {
     let select_variant = paren_select.select()?;
 
-    if let Some(alias) = alias
+    let column_list_len = if let Some(alias) = alias
         && let Some(column_list) = alias.column_list()
     {
         for col in column_list.columns() {
@@ -2438,7 +2452,10 @@ fn resolve_subquery_column_ptr(
         if matches!(select_variant, ast::SelectVariant::Values(_)) {
             return None;
         }
-    }
+        column_list.columns().count()
+    } else {
+        0
+    };
 
     // TODO: this should just be a match stmt
     if let ast::SelectVariant::Table(table) = select_variant {
@@ -2482,8 +2499,16 @@ fn resolve_subquery_column_ptr(
     let select_clause = subquery_select.select_clause()?;
     let target_list = select_clause.target_list()?;
 
-    for target in target_list.targets() {
+    for (i, target) in target_list.targets().enumerate() {
         if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
+            // skip targets that have been renamed by the column list
+            if i < column_list_len {
+                if matches!(col_name, ColumnName::Star) {
+                    // star expands to multiple columns, handled below
+                } else {
+                    continue;
+                }
+            }
             if let Some(col_name_str) = col_name.to_string()
                 && Name::from_string(col_name_str) == *column_name
             {
@@ -2759,6 +2784,10 @@ pub(crate) fn table_ptr_from_from_item(
         return Some(SyntaxNodePtr::new(paren_select.syntax()));
     }
 
+    if let Some(paren_expr) = from_item.paren_expr() {
+        return table_ptr_from_paren_expr(binder, &paren_expr);
+    }
+
     let (table_name, schema) = table_and_schema_from_from_item(from_item)?;
     let position = from_item.syntax().text_range().start();
 
@@ -2777,6 +2806,19 @@ pub(crate) fn table_ptr_from_from_item(
         return Some(cte_ptr);
     }
 
+    None
+}
+
+fn table_ptr_from_paren_expr(
+    binder: &Binder,
+    paren_expr: &ast::ParenExpr,
+) -> Option<SyntaxNodePtr> {
+    if let Some(from_item) = paren_expr.from_item() {
+        return table_ptr_from_from_item(binder, &from_item);
+    }
+    if let Some(ast::Expr::ParenExpr(inner)) = paren_expr.expr() {
+        return table_ptr_from_paren_expr(binder, &inner);
+    }
     None
 }
 
