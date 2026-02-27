@@ -97,6 +97,12 @@ jobs:
         if: matrix.target == 'x86_64-unknown-linux-musl'
         run: sudo apt-get install musl-tools
 
+      - name: Install Zig
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        run: |
+          python3 -m pip install --user ziglang==0.11.0
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2 # stable
         with:
@@ -109,8 +115,9 @@ jobs:
       - name: Build
         run: |
           if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
-            export CC_aarch64_unknown_linux_musl=aarch64-linux-gnu-gcc
-            export AR_aarch64_unknown_linux_musl=aarch64-linux-gnu-ar
+            export CC_aarch64_unknown_linux_musl="zig cc -target aarch64-linux-musl"
+            export AR_aarch64_unknown_linux_musl="zig ar"
+            export RANLIB_aarch64_unknown_linux_musl="zig ranlib"
           fi
 
           RUSTFLAGS="${{ matrix.rustflags }}" cargo build --target ${{ matrix.target }} --release
