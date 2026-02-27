@@ -917,6 +917,9 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<NameRefClass> {
             return Some(NameRefClass::Channel);
         }
         if ast::Alias::can_cast(ancestor.kind()) {
+            if in_column {
+                return Some(NameRefClass::SelectColumn);
+            }
             return Some(NameRefClass::FromTable);
         }
         if ast::AsName::can_cast(ancestor.kind())
