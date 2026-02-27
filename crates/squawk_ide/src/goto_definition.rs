@@ -597,6 +597,84 @@ select * from t, json_to_recordset(t.x$0) as r(a int, b int);
     }
 
     #[test]
+    fn goto_lateral_values_alias_in_subquery() {
+        assert_snapshot!(goto("
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join lateral (select u$0.n * 10 as val) x;
+"), @r"
+          ╭▸ 
+        3 │ from (values (1), (2)) u(n)
+          │                        ─ 2. destination
+        4 │ cross join lateral (select u.n * 10 as val) x;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_lateral_missing_not_found() {
+        // Query 1 ERROR at Line 3: : ERROR:  invalid reference to FROM-clause entry for table "u"
+        // LINE 3: cross join (select u.n * 10 as val) x;
+        //                            ^
+        // DETAIL:  There is an entry for table "u", but it cannot be referenced from this part of the query.
+        // HINT:  To reference that table, you must mark this subquery with LATERAL.
+        goto_not_found(
+            "
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join (select u$0.n * 10 as val) x;
+",
+        );
+    }
+
+    #[test]
+    fn goto_lateral_deeply_nested_paren_expr_values_alias_in_subquery() {
+        assert_snapshot!(goto("
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join lateral ((((select u$0.n * 10 as val)))) x;
+"), @r"
+          ╭▸ 
+        3 │ from (values (1), (2)) u(n)
+          │                        ─ 2. destination
+        4 │ cross join lateral ((((select u.n * 10 as val)))) x;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_lateral_deeply_nested_paren_expr_values_alias_column() {
+        assert_snapshot!(goto("
+select u.n, x.val$0
+from (values (1), (2)) u(n)
+cross join lateral ((((select u.n * 10 as val)))) x;
+"), @r"
+          ╭▸ 
+        2 │ select u.n, x.val
+          │                 ─ 1. source
+        3 │ from (values (1), (2)) u(n)
+        4 │ cross join lateral ((((select u.n * 10 as val)))) x;
+          ╰╴                                          ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_lateral_deeply_nested_paren_expr_missing_not_found() {
+        // Query 1 ERROR at Line 3: : ERROR:  invalid reference to FROM-clause entry for table "u"
+        // LINE 3: cross join ((((select u.n * 10 as val)))) x;
+        //                               ^
+        // DETAIL:  There is an entry for table "u", but it cannot be referenced from this part of the query.
+        // HINT:  To reference that table, you must mark this subquery with LATERAL.
+        goto_not_found(
+            "
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join ((((select u$0.n * 10 as val)))) x;
+",
+        );
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;
@@ -4823,6 +4901,20 @@ select b$0 from (values (1, 2)) t(a, b);
     }
 
     #[test]
+    fn goto_values_column_alias_list_nested_parens() {
+        assert_snapshot!(goto("
+select n$0
+from ((values (1), (2))) u(n);
+"), @r"
+          ╭▸ 
+        2 │ select n
+          │        ─ 1. source
+        3 │ from ((values (1), (2))) u(n);
+          ╰╴                           ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_table_expr_column() {
         assert_snapshot!(goto("
 create table t(a int, b int);
@@ -4847,6 +4939,20 @@ select a$0 from (table x);
           │                     ─ 2. destination
         3 │ select a from (table x);
           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_table_expr_cte_table() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select * from (table t$0);
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b)
+          │      ─ 2. destination
+        3 │ select * from (table t);
+          ╰╴                     ─ 1. source
         ");
     }
 
