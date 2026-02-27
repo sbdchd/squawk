@@ -115,10 +115,29 @@ jobs:
       - name: Build
         run: |
           if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
-            export CC_aarch64_unknown_linux_musl=zig
-            export CFLAGS_aarch64_unknown_linux_musl=--target=aarch64-linux-musl
-            export AR_aarch64_unknown_linux_musl="zig ar"
-            export RANLIB_aarch64_unknown_linux_musl="zig ranlib"
+            mkdir -p "$RUNNER_TEMP/bin"
+
+            cat > "$RUNNER_TEMP/bin/aarch64-linux-musl-gcc" << 'EOF'
+            #!/usr/bin/env bash
+            exec zig cc --target=aarch64-linux-musl "$@"
+            EOF
+
+            cat > "$RUNNER_TEMP/bin/aarch64-linux-musl-ar" << 'EOF'
+            #!/usr/bin/env bash
+            exec zig ar "$@"
+            EOF
+
+            cat > "$RUNNER_TEMP/bin/aarch64-linux-musl-ranlib" << 'EOF'
+            #!/usr/bin/env bash
+            exec zig ranlib "$@"
+            EOF
+
+            chmod +x "$RUNNER_TEMP/bin/aarch64-linux-musl-gcc" "$RUNNER_TEMP/bin/aarch64-linux-musl-ar" "$RUNNER_TEMP/bin/aarch64-linux-musl-ranlib"
+
+            export PATH="$RUNNER_TEMP/bin:$PATH"
+            export CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc
+            export AR_aarch64_unknown_linux_musl=aarch64-linux-musl-ar
+            export RANLIB_aarch64_unknown_linux_musl=aarch64-linux-musl-ranlib
           fi
 
           RUSTFLAGS="${{ matrix.rustflags }}" cargo build --target ${{ matrix.target }} --release
