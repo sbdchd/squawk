@@ -117,20 +117,9 @@ jobs:
           if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
             mkdir -p "$RUNNER_TEMP/bin"
 
-            cat > "$RUNNER_TEMP/bin/aarch64-linux-musl-gcc" << 'EOF'
-            #!/usr/bin/env bash
-            exec zig cc --target=aarch64-linux-musl "$@"
-            EOF
-
-            cat > "$RUNNER_TEMP/bin/aarch64-linux-musl-ar" << 'EOF'
-            #!/usr/bin/env bash
-            exec zig ar "$@"
-            EOF
-
-            cat > "$RUNNER_TEMP/bin/aarch64-linux-musl-ranlib" << 'EOF'
-            #!/usr/bin/env bash
-            exec zig ranlib "$@"
-            EOF
+            printf '%s\n' '#!/usr/bin/env bash' 'exec zig cc --target=aarch64-linux-musl "$@"' > "$RUNNER_TEMP/bin/aarch64-linux-musl-gcc"
+            printf '%s\n' '#!/usr/bin/env bash' 'exec zig ar "$@"' > "$RUNNER_TEMP/bin/aarch64-linux-musl-ar"
+            printf '%s\n' '#!/usr/bin/env bash' 'exec zig ranlib "$@"' > "$RUNNER_TEMP/bin/aarch64-linux-musl-ranlib"
 
             chmod +x "$RUNNER_TEMP/bin/aarch64-linux-musl-gcc" "$RUNNER_TEMP/bin/aarch64-linux-musl-ar" "$RUNNER_TEMP/bin/aarch64-linux-musl-ranlib"
 
