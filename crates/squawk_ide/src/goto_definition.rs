@@ -4054,6 +4054,52 @@ select foo$0(1);
     }
 
     #[test]
+    fn goto_create_aggregate_sfunc() {
+        assert_snapshot!(goto("
+create function pg_catalog.int8inc(bigint) returns bigint
+  language internal;
+
+create aggregate pg_catalog.count(*) (
+  sfunc = int8inc$0,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
+"), @r"
+          ╭▸ 
+        2 │ create function pg_catalog.int8inc(bigint) returns bigint
+          │                            ─────── 2. destination
+          ‡
+        6 │   sfunc = int8inc,
+          ╰╴                ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_create_aggregate_combinefunc() {
+        assert_snapshot!(goto("
+create function pg_catalog.int8pl(bigint, bigint) returns bigint
+  language internal;
+
+create aggregate pg_catalog.count(*) (
+  sfunc = int8inc,
+  stype = bigint,
+  combinefunc = int8pl$0,
+  initcond = '0'
+);
+"), @r"
+          ╭▸ 
+        2 │ create function pg_catalog.int8pl(bigint, bigint) returns bigint
+          │                            ────── 2. destination
+          ‡
+        8 │   combinefunc = int8pl,
+          ╰╴                     ─ 1. source
+        "
+        );
+    }
+
+    #[test]
     fn goto_default_constraint_function_call() {
         assert_snapshot!(goto("
 create function f() returns int as 'select 1' language sql;
