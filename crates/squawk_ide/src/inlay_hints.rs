@@ -58,6 +58,7 @@ fn inlay_hint_call_expr(
 
     let file = match location.file {
         goto_definition::FileId::Current => file,
+        // TODO: we should salsa this
         goto_definition::FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
     };
 
@@ -106,6 +107,7 @@ fn inlay_hint_insert(
 
     let file = match location.as_ref().map(|x| x.file) {
         Some(goto_definition::FileId::Current) | None => file,
+        // TODO: we should salsa this
         Some(goto_definition::FileId::Builtins) => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
     };
 
@@ -120,6 +122,7 @@ fn inlay_hint_insert(
         })
     };
 
+    // TODO: we should salsa this
     let binder = binder::bind(file);
 
     let columns = if let Some(column_list) = insert.column_list() {

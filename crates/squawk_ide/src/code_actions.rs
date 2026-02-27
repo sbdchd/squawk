@@ -548,6 +548,7 @@ fn add_schema(
     }
 
     let position = token.text_range().start();
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = binder.search_path_at(position).first()?.to_string();
     let replacement = format!("{}.", schema);

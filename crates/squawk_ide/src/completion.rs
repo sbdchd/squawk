@@ -45,6 +45,7 @@ fn select_completions(
     select_clause: ast::SelectClause,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
     let schema = schema_qualifier_at_token(token);
@@ -246,6 +247,7 @@ fn select_clauses_completions(select: &ast::Select) -> Vec<CompletionItem> {
 }
 
 fn limit_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
@@ -265,6 +267,7 @@ fn limit_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<Complet
 }
 
 fn offset_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
@@ -277,6 +280,7 @@ fn select_expr_completions(
     select: &ast::Select,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
     let schema = schema_qualifier_at_token(token);
@@ -352,7 +356,11 @@ fn column_completions_from_clause(
                 }));
             }
             Some(resolve::TableSource::WithTable(with_table)) => {
-                let columns = resolve::collect_with_table_columns_with_types(&with_table);
+                let columns = resolve::collect_with_table_columns_with_types(
+                    binder,
+                    file.syntax(),
+                    &with_table,
+                );
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
                     kind: CompletionItemKind::Column,
@@ -389,6 +397,44 @@ fn column_completions_from_clause(
                     sort_text: None,
                 }));
             }
+            Some(resolve::TableSource::Alias(alias)) => {
+                let alias_columns: Vec<Name> = alias
+                    .column_list()
+                    .into_iter()
+                    .flat_map(|column_list| column_list.columns())
+                    .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
+                    .collect();
+
+                let base_columns = alias_base_columns_with_types(binder, file, &alias);
+
+                for (idx, alias_column) in alias_columns.iter().enumerate() {
+                    completions.push(CompletionItem {
+                        label: alias_column.to_string(),
+                        kind: CompletionItemKind::Column,
+                        detail: base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
+                        insert_text: None,
+                        insert_text_format: None,
+                        trigger_completion_after_insert: false,
+                        sort_text: Some(format!("{idx:04}")),
+                    });
+                }
+
+                completions.extend(
+                    base_columns
+                        .into_iter()
+                        .skip(alias_columns.len())
+                        .enumerate()
+                        .map(|(idx, (name, ty))| CompletionItem {
+                            label: name.to_string(),
+                            kind: CompletionItemKind::Column,
+                            detail: ty,
+                            insert_text: None,
+                            insert_text_format: None,
+                            trigger_completion_after_insert: false,
+                            sort_text: Some(format!("{:04}", idx + alias_columns.len())),
+                        }),
+                );
+            }
             Some(resolve::TableSource::ParenSelect(paren_select)) => {
                 let columns = resolve::collect_paren_select_columns_with_types(
                     binder,
@@ -409,6 +455,59 @@ fn column_completions_from_clause(
         }
     }
     completions
+}
+
+fn alias_base_columns_with_types(
+    binder: &binder::Binder,
+    file: &ast::SourceFile,
+    alias: &ast::Alias,
+) -> Vec<(Name, Option<String>)> {
+    let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
+        return vec![];
+    };
+    let Some(table_ptr) = resolve::table_ptr_from_from_item(binder, &from_item) else {
+        return vec![];
+    };
+
+    let table_node = table_ptr.to_node(file.syntax());
+
+    match resolve::find_table_source(&table_node) {
+        Some(resolve::TableSource::CreateTable(create_table)) => {
+            resolve::collect_table_columns(binder, file.syntax(), &create_table)
+                .into_iter()
+                .filter_map(|column| {
+                    let name = column.name()?;
+                    let detail = column.ty().map(|t| t.syntax().text().to_string());
+                    Some((Name::from_node(&name), detail))
+                })
+                .collect()
+        }
+        Some(resolve::TableSource::WithTable(with_table)) => {
+            resolve::collect_with_table_columns_with_types(binder, file.syntax(), &with_table)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::CreateView(create_view)) => {
+            resolve::collect_view_columns_with_types(&create_view)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::CreateMaterializedView(create_materialized_view)) => {
+            resolve::collect_materialized_view_columns_with_types(&create_materialized_view)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::ParenSelect(paren_select)) => {
+            resolve::collect_paren_select_columns_with_types(binder, file.syntax(), &paren_select)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::Alias(_)) | None => vec![],
+    }
 }
 
 fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
@@ -449,6 +548,7 @@ fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
 }
 
 fn table_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
@@ -528,6 +628,7 @@ fn delete_expr_completions(
     delete: &ast::Delete,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
 
@@ -738,6 +839,7 @@ fn file_with_completion_marker(file: &ast::SourceFile, offset: TextSize) -> ast:
     let offset = u32::from(offset) as usize;
     let offset = offset.min(sql.len());
     sql.insert_str(offset, COMPLETION_MARKER);
+    // TODO: should this be cached
     ast::SourceFile::parse(&sql).tree()
 }
 
@@ -1066,6 +1168,26 @@ select $0 from t;
          label              | kind     | detail  
         --------------------+----------+---------
          a                  | Column   | integer 
+         *                  | Operator |         
+         public             | Schema   |         
+         pg_catalog         | Schema   |         
+         pg_temp            | Schema   |         
+         pg_toast           | Schema   |         
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_with_cte_alias_column_list() {
+        assert_snapshot!(completions("
+with t as (select 1 a, 2 b, 3 c)
+select $0 from t as u(x, y);
+"), @r"
+         label              | kind     | detail  
+        --------------------+----------+---------
+         x                  | Column   | integer 
+         y                  | Column   | integer 
+         c                  | Column   | integer 
          *                  | Operator |         
          public             | Schema   |         
          pg_catalog         | Schema   |         
