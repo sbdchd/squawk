@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Update apt repositories
-        if: matrix.target == 'aarch64-unknown-linux-gnu' || matrix.target == 'x86_64-unknown-linux-musl'
+        if: matrix.target == 'aarch64-unknown-linux-gnu' || matrix.target == 'aarch64-unknown-linux-musl' || matrix.target == 'x86_64-unknown-linux-musl'
         run: sudo apt-get update
 
       - name: Install AArch64 target toolchain
@@ -96,6 +96,12 @@ jobs:
       - name: Install x86_64-musl target toolchain
         if: matrix.target == 'x86_64-unknown-linux-musl'
         run: sudo apt-get install musl-tools
+
+      - name: Install Zig
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.11.0
 
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2 # stable
@@ -107,7 +113,23 @@ jobs:
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
       - name: Build
-        run: RUSTFLAGS="${{ matrix.rustflags }}" cargo build --target ${{ matrix.target }} --release
+        run: |
+          if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
+            mkdir -p "$RUNNER_TEMP/bin"
+
+            printf '%s\n' '#!/usr/bin/env bash' 'args=()' 'skip_next=0' 'for arg in "$@"; do' '  if [ "$skip_next" = "1" ]; then' '    skip_next=0' '    continue' '  fi' '  case "$arg" in' '    --target=*|-target=*) continue ;;' '    --target|-target) skip_next=1; continue ;;' '  esac' '  args+=("$arg")' 'done' 'exec zig cc -target aarch64-linux-musl "${args[@]}"' > "$RUNNER_TEMP/bin/aarch64-linux-musl-gcc"
+            printf '%s\n' '#!/usr/bin/env bash' 'exec zig ar "$@"' > "$RUNNER_TEMP/bin/aarch64-linux-musl-ar"
+            printf '%s\n' '#!/usr/bin/env bash' 'exec zig ranlib "$@"' > "$RUNNER_TEMP/bin/aarch64-linux-musl-ranlib"
+
+            chmod +x "$RUNNER_TEMP/bin/aarch64-linux-musl-gcc" "$RUNNER_TEMP/bin/aarch64-linux-musl-ar" "$RUNNER_TEMP/bin/aarch64-linux-musl-ranlib"
+
+            export PATH="$RUNNER_TEMP/bin:$PATH"
+            export CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc
+            export AR_aarch64_unknown_linux_musl=aarch64-linux-musl-ar
+            export RANLIB_aarch64_unknown_linux_musl=aarch64-linux-musl-ranlib
+          fi
+
+          RUSTFLAGS="${{ matrix.rustflags }}" cargo build --target ${{ matrix.target }} --release
         shell: bash
 
       - name: Rename artifact (windows)
