@@ -15,6 +15,7 @@ pub enum IgnoreKind {
 pub struct Ignore {
     pub range: TextRange,
     pub violation_names: HashSet<Rule>,
+    pub ignore_all: bool,
     pub kind: IgnoreKind,
 }
 
@@ -48,18 +49,22 @@ pub fn ignore_rule_info(token: &SyntaxToken) -> Option<(&str, TextRange, IgnoreK
     if let Some((comment_body, range)) = comment_body(token) {
         let without_start = comment_body.trim_start();
         let trim_start_size = comment_body.len() - without_start.len();
-        let trimmed_comment = without_start.trim_end();
-        let trim_end_size = without_start.len() - trimmed_comment.len();
+
+        let without_end = without_start
+            .find("--")
+            .map_or(without_start, |idx| &without_start[..idx])
+            .trim_end();
+        let trim_end_size = without_start.len() - without_end.len();
 
         for (prefix, kind) in [
             (IGNORE_FILE_TEXT, IgnoreKind::File),
             (IGNORE_LINE_TEXT, IgnoreKind::Line),
         ] {
-            if let Some(without_prefix) = trimmed_comment.strip_prefix(prefix) {
-                let range = TextRange::new(
-                    range.start() + TextSize::new((trim_start_size + prefix.len()) as u32),
-                    range.end() - TextSize::new(trim_end_size as u32),
-                );
+            if let Some(without_prefix) = without_end.strip_prefix(prefix) {
+                let start = range.start() + TextSize::new((trim_start_size + prefix.len()) as u32);
+                let end = range.end() - TextSize::new(trim_end_size as u32);
+
+                let range = TextRange::new(start, end);
                 return Some((without_prefix, range, kind));
             }
         }
@@ -76,6 +81,10 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                 if let Some((rule_names, range, kind)) = ignore_rule_info(&token) {
                     let mut set = HashSet::new();
                     let mut offset = 0usize;
+                    // We have a specific check instead of going off of empty
+                    // rules in case we have invalid rule names specified in the
+                    // ignore.
+                    let ignore_all = rule_names.trim().is_empty();
 
                     // we need to keep track of our offset and report specific
                     // ranges for any unknown names we encounter, which makes
@@ -109,6 +118,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                     ctx.ignore(Ignore {
                         range,
                         violation_names: set,
+                        ignore_all,
                         kind,
                     });
                 }
@@ -503,6 +513,102 @@ alter table t2 drop column c2 cascade;
             RequireTimeoutSettings,
             PreferRobustStmts,
             PreferRobustStmts,
+        ]
+        ");
+    }
+
+    #[test]
+    fn file_ignore_with_invalid_rules() {
+        let mut linter = Linter::with_all_rules();
+        let sql = r#"
+-- squawk-ignore-file ban-ban-ban-drop-column ignore-something hmm
+alter table t drop column c cascade;
+alter table t2 drop column c2 cascade;
+        "#;
+
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        let errors = linter.lint(&parse, sql);
+        let errors: Vec<_> = errors.iter().map(|x| (&x.code, &x.message)).collect();
+
+        assert_debug_snapshot!(errors, @r#"
+        [
+            (
+                UnusedIgnore,
+                "unknown name ban-ban-ban-drop-column ignore-something hmm",
+            ),
+            (
+                RequireTimeoutSettings,
+                "Missing `set lock_timeout` before potentially slow operations",
+            ),
+            (
+                RequireTimeoutSettings,
+                "Missing `set statement_timeout` before potentially slow operations",
+            ),
+            (
+                BanDropColumn,
+                "Dropping a column may break existing clients.",
+            ),
+            (
+                PreferRobustStmts,
+                "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
+            ),
+            (
+                BanDropColumn,
+                "Dropping a column may break existing clients.",
+            ),
+            (
+                PreferRobustStmts,
+                "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
+            ),
+        ]
+        "#);
+    }
+
+    #[test]
+    fn file_ignore_with_trailing_comment() {
+        let mut linter = Linter::with_all_rules();
+        let sql = r#"
+-- squawk-ignore-file ban-drop-column -- some comment here
+alter table t drop column c cascade;
+alter table t2 drop column c2 cascade;
+        "#;
+
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        let errors: Vec<_> = linter
+            .lint(&parse, sql)
+            .into_iter()
+            .map(|x| x.code)
+            .collect();
+
+        assert_debug_snapshot!(errors, @"
+        [
+            RequireTimeoutSettings,
+            RequireTimeoutSettings,
+            PreferRobustStmts,
+            PreferRobustStmts,
+        ]
+        ");
+    }
+
+    #[test]
+    fn line_ignore_with_trailing_comment() {
+        let mut linter = Linter::with_all_rules();
+        let sql = r#"
+-- squawk-ignore ban-drop-column,prefer-robust-stmts -- drop is intentional
+alter table t drop column c cascade;
+        "#;
+
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        let errors: Vec<_> = linter
+            .lint(&parse, sql)
+            .into_iter()
+            .map(|x| x.code)
+            .collect();
+
+        assert_debug_snapshot!(errors, @"
+        [
+            RequireTimeoutSettings,
+            RequireTimeoutSettings,
         ]
         ");
     }

@@ -38,8 +38,7 @@ impl IgnoreIndex {
         for ignore in ignores {
             match ignore.kind {
                 IgnoreKind::File => {
-                    if ignore.violation_names.is_empty() {
-                        // When a squawk-ignore-file comment has no rules, it means we should disable all the rules
+                    if ignore.ignore_all {
                         ignore_all = true;
                     } else {
                         file_ignored.extend(ignore.violation_names.clone());
