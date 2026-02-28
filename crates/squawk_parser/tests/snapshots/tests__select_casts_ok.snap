@@ -953,11 +953,12 @@ SOURCE_FILE
             TIME_TYPE
               TIMESTAMP_KW "timestamp"
               WHITESPACE " "
-              WITH_KW "with"
-              WHITESPACE " "
-              TIME_KW "time"
-              WHITESPACE " "
-              ZONE_KW "zone"
+              WITH_TIMEZONE
+                WITH_KW "with"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
             WHITESPACE " "
             LITERAL
               STRING "'2005-04-02 12:00:00-07'"
@@ -976,11 +977,12 @@ SOURCE_FILE
               TIME_TYPE
                 TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
-                WITH_KW "with"
-                WHITESPACE " "
-                TIME_KW "time"
-                WHITESPACE " "
-                ZONE_KW "zone"
+                WITH_TIMEZONE
+                  WITH_KW "with"
+                  WHITESPACE " "
+                  TIME_KW "time"
+                  WHITESPACE " "
+                  ZONE_KW "zone"
               WHITESPACE " "
               LITERAL
                 STRING "'2001-02-16 20:38:40-05'"
@@ -1074,11 +1076,12 @@ SOURCE_FILE
               TIME_TYPE
                 TIME_KW "time"
                 WHITESPACE " "
-                WITH_KW "with"
-                WHITESPACE " "
-                TIME_KW "time"
-                WHITESPACE " "
-                ZONE_KW "zone"
+                WITH_TIMEZONE
+                  WITH_KW "with"
+                  WHITESPACE " "
+                  TIME_KW "time"
+                  WHITESPACE " "
+                  ZONE_KW "zone"
               WHITESPACE " "
               LITERAL
                 STRING "'20:38:40-05'"
@@ -1114,11 +1117,12 @@ SOURCE_FILE
               TIME_TYPE
                 TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
-                WITH_KW "with"
-                WHITESPACE " "
-                TIME_KW "time"
-                WHITESPACE " "
-                ZONE_KW "zone"
+                WITH_TIMEZONE
+                  WITH_KW "with"
+                  WHITESPACE " "
+                  TIME_KW "time"
+                  WHITESPACE " "
+                  ZONE_KW "zone"
               WHITESPACE " "
               LITERAL
                 STRING "'2001-02-16 20:38:40-05'"

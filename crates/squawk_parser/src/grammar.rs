@@ -2066,10 +2066,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 }
                 p.expect(R_PAREN);
             }
-            if p.eat(WITH_KW) || p.eat(WITHOUT_KW) {
-                p.expect(TIME_KW);
-                p.expect(ZONE_KW);
-            }
+            opt_with_timezone(p);
             TIME_TYPE
         }
         BIT_KW => {
