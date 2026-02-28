@@ -2970,6 +2970,8 @@ ClusterOn =
 
 DetachPartition =
   'detach' 'partition'
+  Path
+  ('concurrently' | 'finalize')?
 
 MergePartitions =
   'merge' 'partitions'

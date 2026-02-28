@@ -5598,8 +5598,20 @@ pub struct DetachPartition {
 }
 impl DetachPartition {
     #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn concurrently_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
+    }
+    #[inline]
     pub fn detach_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DETACH_KW)
+    }
+    #[inline]
+    pub fn finalize_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FINALIZE_KW)
     }
     #[inline]
     pub fn partition_token(&self) -> Option<SyntaxToken> {
