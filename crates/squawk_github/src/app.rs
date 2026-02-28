@@ -11,7 +11,7 @@ use serde_json::Value;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub(crate) const SQUAWK_USER_AGENT: &str = "squawk/2.42.0";
+pub(crate) const SQUAWK_USER_AGENT: &str = "squawk/2.43.0";
 
 #[derive(Debug, Serialize)]
 struct CommentBody {
