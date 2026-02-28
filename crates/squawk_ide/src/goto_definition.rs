@@ -2883,6 +2883,48 @@ select '{[1.234, 5.678]}'::floatmultirangerange$0;
     }
 
     #[test]
+    fn goto_cast_boolean_falls_back_to_bool() {
+        assert_snapshot!(goto("
+create type pg_catalog.bool;
+select '1'::boolean$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.bool;
+          │                        ──── 2. destination
+        3 │ select '1'::boolean;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_decimal_falls_back_to_numeric() {
+        assert_snapshot!(goto("
+create type pg_catalog.numeric;
+select 1::decimal$0(10, 2);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.numeric;
+          │                        ─────── 2. destination
+        3 │ select 1::decimal(10, 2);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_float_falls_back_to_float8() {
+        assert_snapshot!(goto("
+create type pg_catalog.float8;
+select 1::float$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float8;
+          │                        ────── 2. destination
+        3 │ select 1::float;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cast_bigint_falls_back_to_int8() {
         assert_snapshot!(goto("
 create type pg_catalog.int8;
@@ -2893,6 +2935,20 @@ select 1::bigint$0;
           │                        ──── 2. destination
         3 │ select 1::bigint;
           ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_real_falls_back_to_float4() {
+        assert_snapshot!(goto("
+create type pg_catalog.float4;
+select 1::real$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float4;
+          │                        ────── 2. destination
+        3 │ select 1::real;
+          ╰╴             ─ 1. source
         ");
     }
 
