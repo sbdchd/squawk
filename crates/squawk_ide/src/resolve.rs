@@ -607,7 +607,11 @@ fn type_name_and_schema_from_type(ty: &ast::Type) -> Option<(Name, Option<Schema
 fn fallback_type_alias(type_name: &Name) -> Option<Name> {
     match type_name.0.as_str() {
         "bigint" | "bigserial" | "serial8" => Some(Name::from_string("int8")),
+        "boolean" => Some(Name::from_string("bool")),
+        "decimal" => Some(Name::from_string("numeric")),
+        "float" => Some(Name::from_string("float8")),
         "int" | "integer" | "serial" | "serial4" => Some(Name::from_string("int4")),
+        "real" => Some(Name::from_string("float4")),
         "smallint" | "smallserial" | "serial2" => Some(Name::from_string("int2")),
         _ => None,
     }
