@@ -15,10 +15,11 @@ export async function provideInlayHints(
   model: monaco.editor.ITextModel,
 ): Promise<monaco.languages.InlayHintList> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return { hints: [], dispose: () => {} }
 
   try {
-    const wasmHints = inlay_hints(content)
+    const wasmHints = inlay_hints(content, version)
 
     const hints = wasmHints.map((hint) => ({
       label: hint.label,
@@ -43,10 +44,11 @@ export async function provideDocumentSymbols(
   model: monaco.editor.ITextModel,
 ): Promise<monaco.languages.DocumentSymbol[]> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return []
 
   try {
-    const symbols = document_symbols(content)
+    const symbols = document_symbols(content, version)
 
     return symbols.map((symbol) => convertDocumentSymbol(symbol))
   } catch (e) {
@@ -97,11 +99,13 @@ export async function provideCodeActions(
   position: monaco.Position,
 ): Promise<monaco.languages.CodeAction[]> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return []
 
   try {
     const actions = code_actions(
       content,
+      version,
       position.lineNumber - 1,
       position.column - 1,
     )
@@ -138,10 +142,16 @@ export async function provideHover(
   position: monaco.Position,
 ): Promise<monaco.languages.Hover | null> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return null
 
   try {
-    const result = hover(content, position.lineNumber - 1, position.column - 1)
+    const result = hover(
+      content,
+      version,
+      position.lineNumber - 1,
+      position.column - 1,
+    )
 
     if (!result) return null
 
@@ -162,11 +172,13 @@ export async function provideDefinition(
   position: monaco.Position,
 ): Promise<Array<monaco.languages.Location> | null> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return null
 
   try {
     const results = goto_definition(
       content,
+      version,
       position.lineNumber - 1,
       position.column - 1,
     )
@@ -197,11 +209,13 @@ export async function provideReferences(
   position: monaco.Position,
 ): Promise<monaco.languages.Location[]> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return []
 
   try {
     const results = find_references(
       content,
+      version,
       position.lineNumber - 1,
       position.column - 1,
     )
@@ -226,6 +240,7 @@ export async function provideSelectionRanges(
   positions: monaco.Position[],
 ): Promise<monaco.languages.SelectionRange[][]> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return []
 
   try {
@@ -234,7 +249,7 @@ export async function provideSelectionRanges(
       column: pos.column - 1,
     }))
 
-    const results = selection_ranges(content, wasmPositions)
+    const results = selection_ranges(content, version, wasmPositions)
 
     return results.map((ranges) =>
       ranges.map((range) => ({
@@ -280,11 +295,13 @@ export async function provideCompletionItems(
   position: monaco.Position,
 ): Promise<monaco.languages.CompletionList> {
   const content = model.getValue()
+  const version = model.getVersionId()
   if (!content) return { suggestions: [] }
 
   try {
     const items = completion(
       content,
+      version,
       position.lineNumber - 1,
       position.column - 1,
     )

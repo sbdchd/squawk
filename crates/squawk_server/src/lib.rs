@@ -1,6 +1,5 @@
 use ::line_index::LineIndex;
 use anyhow::{Context, Result};
-use etcetera::BaseStrategy;
 use log::info;
 use lsp_server::{Connection, Message, Notification, Response};
 use lsp_types::{
@@ -25,40 +24,24 @@ use lsp_types::{
 };
 use rowan::TextRange;
 use salsa::Setter;
+use squawk_ide::builtins::{builtins_line_index, builtins_url};
+use squawk_ide::code_actions::code_actions;
 use squawk_ide::completion::completion;
+use squawk_ide::db::{Database, File, line_index, parse};
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 use squawk_ide::find_references::find_references;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_ide::hover::hover;
 use squawk_ide::inlay_hints::inlay_hints;
-use squawk_ide::{builtins::BUILTINS_SQL, code_actions::code_actions};
-use std::{collections::HashMap, fs, sync::OnceLock};
+use std::collections::HashMap;
 
 use diagnostic::DIAGNOSTIC_NAME;
 
-use crate::db::{Database, File, line_index, parse};
 use crate::diagnostic::AssociatedDiagnosticData;
-mod db;
 mod diagnostic;
 mod ignore;
 mod lint;
 mod lsp_utils;
-
-fn builtins_url() -> Option<Url> {
-    // TODO: once we get salsa setup, we can migrate this over
-    static BUILTINS_URL: OnceLock<Option<Url>> = OnceLock::new();
-    BUILTINS_URL
-        .get_or_init(|| {
-            let strategy = etcetera::base_strategy::choose_base_strategy().ok()?;
-            let config_dir = strategy.config_dir();
-            let cache_dir = config_dir.join("squawk/stubs");
-            let path = cache_dir.join("builtins.sql");
-            fs::create_dir_all(cache_dir).ok()?;
-            fs::write(&path, BUILTINS_SQL).ok()?;
-            Url::from_file_path(&path).ok()
-        })
-        .clone()
-}
 
 struct DocumentState {
     content: String,
@@ -253,11 +236,10 @@ fn handle_goto_definition(
 
     let db = file_system.db();
     let file = file_system.file(&uri).unwrap();
-    let parse = parse(db, file);
     let line_index = line_index(db, file);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
-    let ranges = goto_definition(&parse.tree(), offset)
+    let ranges = goto_definition(db, file, offset)
         .into_iter()
         .filter_map(|location| {
             debug_assert!(
@@ -267,12 +249,12 @@ fn handle_goto_definition(
 
             let uri = match location.file {
                 squawk_ide::goto_definition::FileId::Current => uri.clone(),
-                squawk_ide::goto_definition::FileId::Builtins => builtins_url()?,
+                squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,
             };
 
             let line_index = match location.file {
                 squawk_ide::goto_definition::FileId::Current => &line_index,
-                squawk_ide::goto_definition::FileId::Builtins => &LineIndex::new(BUILTINS_SQL),
+                squawk_ide::goto_definition::FileId::Builtins => &builtins_line_index(db),
             };
             let range = lsp_utils::range(line_index, location.range);
 
@@ -305,11 +287,10 @@ fn handle_hover(
 
     let db = file_system.db();
     let file = file_system.file(&uri).unwrap();
-    let parse = parse(db, file);
     let line_index = line_index(db, file);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
-    let type_info = hover(&parse.tree(), offset);
+    let type_info = hover(db, file, offset);
 
     let result = type_info.map(|type_str| Hover {
         contents: HoverContents::Scalar(MarkedString::LanguageString(LanguageString {
@@ -339,11 +320,9 @@ fn handle_inlay_hints(
 
     let db = file_system.db();
     let file = file_system.file(&uri).unwrap();
-    let parse = parse(db, file);
     let line_index = line_index(db, file);
 
-    // TODO: move this to a tracked function
-    let hints = inlay_hints(&parse.tree());
+    let hints = inlay_hints(db, file);
 
     let lsp_hints: Vec<InlayHint> = hints
         .into_iter()
@@ -353,14 +332,12 @@ fn handle_inlay_hints(
 
             let uri = match hint.file {
                 Some(squawk_ide::goto_definition::FileId::Current) | None => uri.clone(),
-                Some(squawk_ide::goto_definition::FileId::Builtins) => builtins_url()?,
+                Some(squawk_ide::goto_definition::FileId::Builtins) => builtins_url(db)?,
             };
 
             let line_index = match hint.file {
                 Some(squawk_ide::goto_definition::FileId::Current) | None => &line_index,
-                Some(squawk_ide::goto_definition::FileId::Builtins) => {
-                    &LineIndex::new(BUILTINS_SQL)
-                }
+                Some(squawk_ide::goto_definition::FileId::Builtins) => &builtins_line_index(db),
             };
 
             let kind: InlayHintKind = match hint.kind {
@@ -415,10 +392,9 @@ fn handle_document_symbol(
 
     let db = file_system.db();
     let file = file_system.file(&uri).unwrap();
-    let parse = parse(db, file);
     let line_index = line_index(db, file);
 
-    let symbols = document_symbols(&parse.tree());
+    let symbols = document_symbols(db, file);
 
     fn convert_symbol(
         sym: squawk_ide::document_symbols::DocumentSymbol,
@@ -558,11 +534,10 @@ fn handle_references(
 
     let db = file_system.db();
     let file = file_system.file(&uri).unwrap();
-    let parse = parse(db, file);
     let line_index = line_index(db, file);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
-    let refs = find_references(&parse.tree(), offset);
+    let refs = find_references(db, file, offset);
     let include_declaration = params.context.include_declaration;
 
     let locations: Vec<Location> = refs
@@ -571,11 +546,11 @@ fn handle_references(
         .filter_map(|loc| {
             let uri = match loc.file {
                 squawk_ide::goto_definition::FileId::Current => uri.clone(),
-                squawk_ide::goto_definition::FileId::Builtins => builtins_url()?,
+                squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,
             };
             let line_index = match loc.file {
                 squawk_ide::goto_definition::FileId::Current => &line_index,
-                squawk_ide::goto_definition::FileId::Builtins => &LineIndex::new(BUILTINS_SQL),
+                squawk_ide::goto_definition::FileId::Builtins => &builtins_line_index(db),
             };
             Some(Location {
                 uri,
@@ -605,7 +580,6 @@ fn handle_completion(
 
     let db = file_system.db();
     let file = file_system.file(&uri).unwrap();
-    let parse = parse(db, file);
     let line_index = line_index(db, file);
 
     let Some(offset) = lsp_utils::offset(&line_index, position) else {
@@ -618,8 +592,7 @@ fn handle_completion(
         return Ok(());
     };
 
-    // TODO: move this to a tracked function
-    let completion_items = completion(&parse.tree(), offset)
+    let completion_items = completion(db, file, offset)
         .into_iter()
         .map(lsp_utils::completion_item)
         .collect();
@@ -648,12 +621,10 @@ fn handle_code_action(
 
     let db = file_system.db();
     let file = file_system.file(&uri).unwrap();
-    let parse = parse(db, file);
     let line_index = line_index(db, file);
     let offset = lsp_utils::offset(&line_index, params.range.start).unwrap();
 
-    // TODO: move this to a tracked function
-    let ide_actions = code_actions(parse.tree(), offset).unwrap_or_default();
+    let ide_actions = code_actions(db, file, offset).unwrap_or_default();
 
     for action in ide_actions {
         let lsp_action = lsp_utils::code_action(&line_index, uri.clone(), action);
@@ -805,10 +776,10 @@ fn handle_did_open(
     let content = params.text_document.text;
     let version = params.text_document.version;
 
-    // TODO: move this to a tracked function
-    let diagnostics = lint::lint(&content);
-
     file_system.set(uri.clone(), DocumentState { content, version });
+    let db = file_system.db();
+    let file = file_system.file(&uri).unwrap();
+    let diagnostics = lint::lint(db, file);
 
     // TODO: we need a better setup for "run func when input changed"
     publish_diagnostics(connection, uri, version, diagnostics)?;
@@ -831,17 +802,17 @@ fn handle_did_change(
 
     let updated_content = lsp_utils::apply_incremental_changes(content, params.content_changes);
 
-    // TODO: move this to a tracked function
-    let diagnostics = lint::lint(&updated_content);
-    publish_diagnostics(connection, uri.clone(), version, diagnostics)?;
-
     file_system.set(
-        uri,
+        uri.clone(),
         DocumentState {
             content: updated_content,
             version,
         },
     );
+    let db = file_system.db();
+    let file = file_system.file(&uri).unwrap();
+    let diagnostics = lint::lint(db, file);
+    publish_diagnostics(connection, uri, version, diagnostics)?;
 
     Ok(())
 }

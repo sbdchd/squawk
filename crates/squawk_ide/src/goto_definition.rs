@@ -1,15 +1,21 @@
+use crate::binder;
+use crate::builtins::parse_builtins;
+use crate::db::{File, parse};
 use crate::offsets::token_from_offset;
 use crate::resolve;
-use crate::{binder, builtins::BUILTINS_SQL};
 use rowan::{TextRange, TextSize};
+use salsa::Database as Db;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
 
-pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Location; 1]> {
-    let Some(token) = token_from_offset(file, offset) else {
+#[salsa::tracked]
+pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[Location; 1]> {
+    let parse = parse(db, file);
+    let source_file = &parse.tree();
+    let Some(token) = token_from_offset(source_file, offset) else {
         return smallvec![];
     };
     let Some(parent) = token.parent() else {
@@ -32,21 +38,22 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
 
     // goto def on COMMIT -> BEGIN/START TRANSACTION
     if ast::Commit::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
     {
         return smallvec![Location::range(begin_range)];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
     {
         return smallvec![Location::range(begin_range)];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
     if ast::Begin::can_cast(parent.kind())
-        && let Some(end_range) = find_following_commit_or_rollback(file, token.text_range().end())
+        && let Some(end_range) =
+            find_following_commit_or_rollback(source_file, token.text_range().end())
     {
         return smallvec![Location::range(end_range)];
     }
@@ -58,9 +65,9 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
-                FileId::Current => file,
+                FileId::Current => source_file,
                 // TODO: we should salsa this
-                FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+                FileId::Builtins => &parse_builtins(db).tree(),
             };
             // TODO: we should salsa this
             let binder_output = binder::bind(file);
@@ -90,9 +97,9 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
     if let Some(ty) = type_node {
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
-                FileId::Current => file,
+                FileId::Current => source_file,
                 // TODO: we should salsa this
-                FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+                FileId::Builtins => &parse_builtins(db).tree(),
             };
             // TODO: we should salsa this
             let binder_output = binder::bind(file);
@@ -115,7 +122,7 @@ pub enum FileId {
     Builtins,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Location {
     pub file: FileId,
     pub range: TextRange,
@@ -160,14 +167,13 @@ fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) ->
 #[cfg(test)]
 mod test {
     use crate::builtins::BUILTINS_SQL;
+    use crate::db::{Database, File};
     use crate::goto_definition::{FileId, goto_definition};
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use log::info;
     use rowan::TextRange;
-
-    use squawk_syntax::ast;
 
     #[track_caller]
     fn goto(sql: &str) -> String {
@@ -181,10 +187,10 @@ mod test {
         // For go to def we want the previous character since we usually put the
         // marker after the item we're trying to go to def on.
         offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
-        let file: ast::SourceFile = parse.tree();
-        let results = goto_definition(&file, offset);
+        let db = Database::default();
+        let file = File::new(&db, sql.clone(), 0);
+        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
+        let results = goto_definition(&db, file, offset);
         if !results.is_empty() {
             let offset: usize = offset.into();
             let mut current_dests = vec![];

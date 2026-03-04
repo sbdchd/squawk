@@ -4,6 +4,7 @@ mod classify;
 pub mod code_actions;
 pub mod column_name;
 pub mod completion;
+pub mod db;
 pub mod document_symbols;
 pub mod expand_selection;
 pub mod find_references;
