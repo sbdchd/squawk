@@ -1,8 +1,10 @@
 use line_index::LineIndex;
 use log::info;
 use rowan::TextRange;
+use salsa::Setter;
 use serde::{Deserialize, Serialize};
-use squawk_ide::builtins::BUILTINS_SQL;
+use squawk_ide::builtins::builtins_line_index;
+use squawk_ide::db::{self, Database, File};
 use squawk_ide::goto_definition::FileId;
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
@@ -25,278 +27,110 @@ pub fn run() {
 }
 
 #[wasm_bindgen]
-pub fn dump_cst(text: String) -> String {
-    let parse = squawk_syntax::SourceFile::parse(&text);
-    format!("{:#?}", parse.syntax_node())
+pub struct SquawkDatabase {
+    db: Database,
+    file: Option<File>,
 }
 
 #[wasm_bindgen]
-pub fn dump_tokens(text: String) -> String {
-    let tokens = squawk_lexer::tokenize(&text);
-    let mut start = 0;
-    let mut out = String::new();
-    for token in tokens {
-        let end = start + token.len;
-        let content = &text[start as usize..(end) as usize];
-        out += &format!("{:?}@{start}..{end} {:?}\n", token.kind, content);
-        start += token.len;
-    }
-    out
-}
-
-#[expect(unused)]
-#[derive(Serialize)]
-enum Severity {
-    Hint,
-    Info,
-    Warning,
-    Error,
-}
-
-#[derive(Serialize)]
-struct LintError {
-    severity: Severity,
-    code: String,
-    message: String,
-    start_line_number: u32,
-    start_column: u32,
-    end_line_number: u32,
-    end_column: u32,
-    // used for the linter tab
-    range_start: usize,
-    // used for the linter tab
-    range_end: usize,
-    // used for the linter tab
-    messages: Vec<String>,
-    fix: Option<Fix>,
-}
-
-#[derive(Serialize)]
-struct Fix {
-    title: String,
-    edits: Vec<TextEdit>,
-}
-
-#[derive(Serialize)]
-struct TextEdit {
-    start_line_number: u32,
-    start_column: u32,
-    end_line_number: u32,
-    end_column: u32,
-    text: String,
-}
-
-#[wasm_bindgen]
-pub fn lint(text: String) -> Result<JsValue, Error> {
-    let mut linter = squawk_linter::Linter::with_all_rules();
-    let parse = squawk_syntax::SourceFile::parse(&text);
-    let parse_errors = parse.errors();
-
-    let line_index = LineIndex::new(&text);
-
-    // TODO: chain these with other stuff
-    let parse_errors = parse_errors.iter().map(|x| {
-        let range_start = x.range().start();
-        let range_end = x.range().end();
-        let start = line_index.line_col(range_start);
-        let end = line_index.line_col(range_end);
-        let start = line_index
-            .to_wide(line_index::WideEncoding::Utf16, start)
-            .unwrap();
-        let end = line_index
-            .to_wide(line_index::WideEncoding::Utf16, end)
-            .unwrap();
-        LintError {
-            severity: Severity::Error,
-            code: "syntax-error".to_string(),
-            message: x.message().to_string(),
-            start_line_number: start.line,
-            start_column: start.col,
-            end_line_number: end.line,
-            end_column: end.col,
-            range_start: range_start.into(),
-            range_end: range_end.into(),
-            messages: vec![],
-            fix: None,
+#[allow(clippy::new_without_default)]
+impl SquawkDatabase {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> SquawkDatabase {
+        SquawkDatabase {
+            db: Database::default(),
+            file: None,
         }
-    });
+    }
 
-    let lint_errors = linter.lint(&parse, &text);
-    let errors = lint_errors.into_iter().map(|x| {
-        let start = line_index.line_col(x.text_range.start());
-        let end = line_index.line_col(x.text_range.end());
-        let start = line_index
-            .to_wide(line_index::WideEncoding::Utf16, start)
-            .unwrap();
-        let end = line_index
-            .to_wide(line_index::WideEncoding::Utf16, end)
-            .unwrap();
+    pub fn open_file(&mut self, content: String) {
+        let file = File::new(&self.db, content, 0);
+        self.file = Some(file);
+    }
 
-        let messages = x.help.into_iter().collect();
+    pub fn update_file(&mut self, content: String, version: i32) {
+        if let Some(file) = self.file {
+            file.set_content(&mut self.db).to(content);
+            file.set_version(&mut self.db).to(version);
+        }
+    }
 
-        let fix = x.fix.map(|fix| {
-            let edits = fix
-                .edits
-                .into_iter()
-                .map(|edit| {
-                    let start_pos = line_index.line_col(edit.text_range.start());
-                    let end_pos = line_index.line_col(edit.text_range.end());
-                    let start_wide = line_index
-                        .to_wide(line_index::WideEncoding::Utf16, start_pos)
-                        .unwrap();
-                    let end_wide = line_index
-                        .to_wide(line_index::WideEncoding::Utf16, end_pos)
-                        .unwrap();
+    fn file(&self) -> Result<File, Error> {
+        self.file
+            .ok_or_else(|| Error::new("No file open. Call open_file first."))
+    }
 
-                    TextEdit {
-                        start_line_number: start_wide.line,
-                        start_column: start_wide.col,
-                        end_line_number: end_wide.line,
-                        end_column: end_wide.col,
-                        text: edit.text.unwrap_or_default(),
-                    }
-                })
-                .collect();
+    pub fn dump_cst(&self) -> Result<String, Error> {
+        let file = self.file()?;
+        let parse = db::parse(&self.db, file);
+        Ok(format!("{:#?}", parse.syntax_node()))
+    }
 
-            Fix {
-                title: fix.title,
-                edits,
+    pub fn dump_tokens(&self) -> Result<String, Error> {
+        let file = self.file()?;
+        let content = file.content(&self.db);
+        let tokens = squawk_lexer::tokenize(content);
+        let mut start = 0;
+        let mut out = String::new();
+        for token in tokens {
+            let end = start + token.len;
+            let text = &content[start as usize..(end) as usize];
+            out += &format!("{:?}@{start}..{end} {:?}\n", token.kind, text);
+            start += token.len;
+        }
+        Ok(out)
+    }
+
+    pub fn lint(&self) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let content = file.content(&self.db);
+        let mut linter = squawk_linter::Linter::with_all_rules();
+        let parse = db::parse(&self.db, file);
+        let parse_errors = parse.errors();
+
+        let line_index = db::line_index(&self.db, file);
+
+        let parse_errors = parse_errors.iter().map(|x| {
+            let range_start = x.range().start();
+            let range_end = x.range().end();
+            let start = line_index.line_col(range_start);
+            let end = line_index.line_col(range_end);
+            let start = line_index
+                .to_wide(line_index::WideEncoding::Utf16, start)
+                .unwrap();
+            let end = line_index
+                .to_wide(line_index::WideEncoding::Utf16, end)
+                .unwrap();
+            LintError {
+                severity: Severity::Error,
+                code: "syntax-error".to_string(),
+                message: x.message().to_string(),
+                start_line_number: start.line,
+                start_column: start.col,
+                end_line_number: end.line,
+                end_column: end.col,
+                range_start: range_start.into(),
+                range_end: range_end.into(),
+                messages: vec![],
+                fix: None,
             }
         });
 
-        LintError {
-            code: x.code.to_string(),
-            range_start: x.text_range.start().into(),
-            range_end: x.text_range.end().into(),
-            message: x.message.clone(),
-            messages,
-            // parser errors should be error
-            severity: Severity::Warning,
-            start_line_number: start.line,
-            start_column: start.col,
-            end_line_number: end.line,
-            end_column: end.col,
-            fix,
-        }
-    });
-
-    let mut errors_to_dump = errors.chain(parse_errors).collect::<Vec<_>>();
-    errors_to_dump.sort_by_key(|k| (k.start_line_number, k.start_column));
-
-    serde_wasm_bindgen::to_value(&errors_to_dump).map_err(into_error)
-}
-
-fn into_error<E: std::fmt::Display>(err: E) -> Error {
-    Error::new(&err.to_string())
-}
-
-#[wasm_bindgen]
-pub fn goto_definition(content: String, line: u32, col: u32) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let current_line_index = LineIndex::new(&content);
-    let builtins_line_index = LineIndex::new(BUILTINS_SQL);
-    let offset = position_to_offset(&current_line_index, line, col)?;
-    let result = squawk_ide::goto_definition::goto_definition(&parse.tree(), offset);
-
-    let response: Vec<LocationRange> = result
-        .into_iter()
-        .map(|location| {
-            let range = location.range;
-            let (file, line_index) = match location.file {
-                FileId::Current => ("current", &current_line_index),
-                FileId::Builtins => ("builtins", &builtins_line_index),
-            };
-            let start = line_index.line_col(range.start());
-            let end = line_index.line_col(range.end());
-            let start_wide = line_index
+        let lint_errors = linter.lint(&parse, content);
+        let errors = lint_errors.into_iter().map(|x| {
+            let start = line_index.line_col(x.text_range.start());
+            let end = line_index.line_col(x.text_range.end());
+            let start = line_index
                 .to_wide(line_index::WideEncoding::Utf16, start)
                 .unwrap();
-            let end_wide = line_index
+            let end = line_index
                 .to_wide(line_index::WideEncoding::Utf16, end)
                 .unwrap();
 
-            LocationRange {
-                file: file.to_string(),
-                start_line: start_wide.line,
-                start_column: start_wide.col,
-                end_line: end_wide.line,
-                end_column: end_wide.col,
-            }
-        })
-        .collect();
+            let messages = x.help.into_iter().collect();
 
-    serde_wasm_bindgen::to_value(&response).map_err(into_error)
-}
-
-#[wasm_bindgen]
-pub fn hover(content: String, line: u32, col: u32) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let offset = position_to_offset(&line_index, line, col)?;
-    let result = squawk_ide::hover::hover(&parse.tree(), offset);
-
-    serde_wasm_bindgen::to_value(&result).map_err(into_error)
-}
-
-#[wasm_bindgen]
-pub fn find_references(content: String, line: u32, col: u32) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let offset = position_to_offset(&line_index, line, col)?;
-    let references = squawk_ide::find_references::find_references(&parse.tree(), offset);
-
-    let builtins_line_index = LineIndex::new(BUILTINS_SQL);
-    let locations: Vec<LocationRange> = references
-        .iter()
-        .map(|loc| {
-            let (li, file) = match loc.file {
-                FileId::Current => (&line_index, "current"),
-                FileId::Builtins => (&builtins_line_index, "builtin"),
-            };
-            let start = li.line_col(loc.range.start());
-            let end = li.line_col(loc.range.end());
-            let start_wide = li.to_wide(line_index::WideEncoding::Utf16, start).unwrap();
-            let end_wide = li.to_wide(line_index::WideEncoding::Utf16, end).unwrap();
-
-            LocationRange {
-                file: file.to_string(),
-                start_line: start_wide.line,
-                start_column: start_wide.col,
-                end_line: end_wide.line,
-                end_column: end_wide.col,
-            }
-        })
-        .collect();
-
-    serde_wasm_bindgen::to_value(&locations).map_err(into_error)
-}
-
-#[wasm_bindgen]
-pub fn document_symbols(content: String) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let symbols = squawk_ide::document_symbols::document_symbols(&parse.tree());
-
-    let converted: Vec<WasmDocumentSymbol> = symbols
-        .into_iter()
-        .map(|s| convert_document_symbol(&line_index, s))
-        .collect();
-
-    serde_wasm_bindgen::to_value(&converted).map_err(into_error)
-}
-
-#[wasm_bindgen]
-pub fn code_actions(content: String, line: u32, col: u32) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let offset = position_to_offset(&line_index, line, col)?;
-    let actions = squawk_ide::code_actions::code_actions(parse.tree(), offset);
-
-    let converted = actions.map(|actions| {
-        actions
-            .into_iter()
-            .map(|action| {
-                let edits = action
+            let fix = x.fix.map(|fix| {
+                let edits = fix
                     .edits
                     .into_iter()
                     .map(|edit| {
@@ -319,20 +153,292 @@ pub fn code_actions(content: String, line: u32, col: u32) -> Result<JsValue, Err
                     })
                     .collect();
 
-                WasmCodeAction {
-                    title: action.title,
+                Fix {
+                    title: fix.title,
                     edits,
-                    kind: match action.kind {
-                        squawk_ide::code_actions::ActionKind::QuickFix => "quickfix",
-                        squawk_ide::code_actions::ActionKind::RefactorRewrite => "refactor.rewrite",
+                }
+            });
+
+            LintError {
+                code: x.code.to_string(),
+                range_start: x.text_range.start().into(),
+                range_end: x.text_range.end().into(),
+                message: x.message.clone(),
+                messages,
+                severity: Severity::Warning,
+                start_line_number: start.line,
+                start_column: start.col,
+                end_line_number: end.line,
+                end_column: end.col,
+                fix,
+            }
+        });
+
+        let mut errors_to_dump = errors.chain(parse_errors).collect::<Vec<_>>();
+        errors_to_dump.sort_by_key(|k| (k.start_line_number, k.start_column));
+
+        serde_wasm_bindgen::to_value(&errors_to_dump).map_err(into_error)
+    }
+
+    pub fn goto_definition(&self, line: u32, col: u32) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let current_line_index = db::line_index(&self.db, file);
+        let offset = position_to_offset(&current_line_index, line, col)?;
+        let builtins_li = builtins_line_index(&self.db);
+        let result = squawk_ide::goto_definition::goto_definition(&self.db, file, offset);
+
+        let response: Vec<LocationRange> = result
+            .into_iter()
+            .map(|location| {
+                let range = location.range;
+                let (file, line_index) = match location.file {
+                    FileId::Current => ("current", &current_line_index),
+                    FileId::Builtins => ("builtins", &builtins_li),
+                };
+                let start = line_index.line_col(range.start());
+                let end = line_index.line_col(range.end());
+                let start_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .unwrap();
+                let end_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .unwrap();
+
+                LocationRange {
+                    file: file.to_string(),
+                    start_line: start_wide.line,
+                    start_column: start_wide.col,
+                    end_line: end_wide.line,
+                    end_column: end_wide.col,
+                }
+            })
+            .collect();
+
+        serde_wasm_bindgen::to_value(&response).map_err(into_error)
+    }
+
+    pub fn hover(&self, line: u32, col: u32) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let offset = position_to_offset(&line_index, line, col)?;
+        let result = squawk_ide::hover::hover(&self.db, file, offset);
+
+        serde_wasm_bindgen::to_value(&result).map_err(into_error)
+    }
+
+    pub fn find_references(&self, line: u32, col: u32) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let offset = position_to_offset(&line_index, line, col)?;
+        let references = squawk_ide::find_references::find_references(&self.db, file, offset);
+        let builtins_li = builtins_line_index(&self.db);
+        let locations: Vec<LocationRange> = references
+            .iter()
+            .map(|loc| {
+                let (li, file) = match loc.file {
+                    FileId::Current => (&line_index, "current"),
+                    FileId::Builtins => (&builtins_li, "builtins"),
+                };
+                let start = li.line_col(loc.range.start());
+                let end = li.line_col(loc.range.end());
+                let start_wide = li.to_wide(line_index::WideEncoding::Utf16, start).unwrap();
+                let end_wide = li.to_wide(line_index::WideEncoding::Utf16, end).unwrap();
+
+                LocationRange {
+                    file: file.to_string(),
+                    start_line: start_wide.line,
+                    start_column: start_wide.col,
+                    end_line: end_wide.line,
+                    end_column: end_wide.col,
+                }
+            })
+            .collect();
+
+        serde_wasm_bindgen::to_value(&locations).map_err(into_error)
+    }
+
+    pub fn document_symbols(&self) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let symbols = squawk_ide::document_symbols::document_symbols(&self.db, file);
+
+        let converted: Vec<WasmDocumentSymbol> = symbols
+            .into_iter()
+            .map(|s| convert_document_symbol(&line_index, s))
+            .collect();
+
+        serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+    }
+
+    pub fn code_actions(&self, line: u32, col: u32) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let offset = position_to_offset(&line_index, line, col)?;
+        let actions = squawk_ide::code_actions::code_actions(&self.db, file, offset);
+
+        let converted = actions.map(|actions| {
+            actions
+                .into_iter()
+                .map(|action| {
+                    let edits = action
+                        .edits
+                        .into_iter()
+                        .map(|edit| {
+                            let start_pos = line_index.line_col(edit.text_range.start());
+                            let end_pos = line_index.line_col(edit.text_range.end());
+                            let start_wide = line_index
+                                .to_wide(line_index::WideEncoding::Utf16, start_pos)
+                                .unwrap();
+                            let end_wide = line_index
+                                .to_wide(line_index::WideEncoding::Utf16, end_pos)
+                                .unwrap();
+
+                            TextEdit {
+                                start_line_number: start_wide.line,
+                                start_column: start_wide.col,
+                                end_line_number: end_wide.line,
+                                end_column: end_wide.col,
+                                text: edit.text.unwrap_or_default(),
+                            }
+                        })
+                        .collect();
+
+                    WasmCodeAction {
+                        title: action.title,
+                        edits,
+                        kind: match action.kind {
+                            squawk_ide::code_actions::ActionKind::QuickFix => "quickfix",
+                            squawk_ide::code_actions::ActionKind::RefactorRewrite => {
+                                "refactor.rewrite"
+                            }
+                        }
+                        .to_string(),
+                    }
+                })
+                .collect::<Vec<_>>()
+        });
+
+        serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+    }
+
+    pub fn inlay_hints(&self) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let hints = squawk_ide::inlay_hints::inlay_hints(&self.db, file);
+
+        let converted: Vec<WasmInlayHint> = hints
+            .into_iter()
+            .map(|hint| {
+                let position = line_index.line_col(hint.position);
+                let position_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, position)
+                    .unwrap();
+
+                WasmInlayHint {
+                    line: position_wide.line,
+                    column: position_wide.col,
+                    label: hint.label,
+                    kind: match hint.kind {
+                        squawk_ide::inlay_hints::InlayHintKind::Type => "type",
+                        squawk_ide::inlay_hints::InlayHintKind::Parameter => "parameter",
                     }
                     .to_string(),
                 }
             })
-            .collect::<Vec<_>>()
-    });
+            .collect();
 
-    serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+        serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+    }
+
+    pub fn selection_ranges(&self, positions: Vec<JsValue>) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let parse = db::parse(&self.db, file);
+        let line_index = db::line_index(&self.db, file);
+        let tree = parse.tree();
+        let root = tree.syntax();
+
+        let mut results: Vec<Vec<WasmSelectionRange>> = vec![];
+
+        for pos in positions {
+            let pos: Position = serde_wasm_bindgen::from_value(pos).map_err(into_error)?;
+            let offset = position_to_offset(&line_index, pos.line, pos.column)?;
+
+            let mut ranges = vec![];
+            let mut range = TextRange::new(offset, offset);
+
+            for _ in 0..20 {
+                let next = squawk_ide::expand_selection::extend_selection(root, range);
+                if next == range {
+                    break;
+                }
+
+                let start = line_index.line_col(next.start());
+                let end = line_index.line_col(next.end());
+                let start_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .unwrap();
+                let end_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .unwrap();
+
+                ranges.push(WasmSelectionRange {
+                    start_line: start_wide.line,
+                    start_column: start_wide.col,
+                    end_line: end_wide.line,
+                    end_column: end_wide.col,
+                });
+
+                range = next;
+            }
+
+            results.push(ranges);
+        }
+
+        serde_wasm_bindgen::to_value(&results).map_err(into_error)
+    }
+
+    pub fn completion(&self, line: u32, col: u32) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let offset = position_to_offset(&line_index, line, col)?;
+        let items = squawk_ide::completion::completion(&self.db, file, offset);
+
+        let converted: Vec<WasmCompletionItem> = items
+            .into_iter()
+            .map(|item| WasmCompletionItem {
+                label: item.label,
+                kind: match item.kind {
+                    squawk_ide::completion::CompletionItemKind::Keyword => "keyword",
+                    squawk_ide::completion::CompletionItemKind::Table => "table",
+                    squawk_ide::completion::CompletionItemKind::Column => "column",
+                    squawk_ide::completion::CompletionItemKind::Function => "function",
+                    squawk_ide::completion::CompletionItemKind::Schema => "schema",
+                    squawk_ide::completion::CompletionItemKind::Type => "type",
+                    squawk_ide::completion::CompletionItemKind::Snippet => "snippet",
+                    squawk_ide::completion::CompletionItemKind::Operator => "operator",
+                }
+                .to_string(),
+                detail: item.detail,
+                insert_text: item.insert_text,
+                insert_text_format: item.insert_text_format.map(|fmt| {
+                    match fmt {
+                        squawk_ide::completion::CompletionInsertTextFormat::PlainText => {
+                            "plainText"
+                        }
+                        squawk_ide::completion::CompletionInsertTextFormat::Snippet => "snippet",
+                    }
+                    .to_string()
+                }),
+                trigger_completion_after_insert: item.trigger_completion_after_insert,
+            })
+            .collect();
+
+        serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+    }
+}
+
+fn into_error<E: std::fmt::Display>(err: E) -> Error {
+    Error::new(&err.to_string())
 }
 
 fn position_to_offset(
@@ -349,38 +455,6 @@ fn position_to_offset(
     line_index
         .offset(pos)
         .ok_or_else(|| Error::new("Invalid position offset"))
-}
-
-#[derive(Serialize)]
-struct LocationRange {
-    file: String,
-    start_line: u32,
-    start_column: u32,
-    end_line: u32,
-    end_column: u32,
-}
-
-#[derive(Serialize)]
-struct WasmCodeAction {
-    title: String,
-    edits: Vec<TextEdit>,
-    kind: String,
-}
-
-#[derive(Serialize)]
-struct WasmDocumentSymbol {
-    name: String,
-    detail: Option<String>,
-    kind: String,
-    start_line: u32,
-    start_column: u32,
-    end_line: u32,
-    end_column: u32,
-    selection_start_line: u32,
-    selection_start_column: u32,
-    selection_end_line: u32,
-    selection_end_column: u32,
-    children: Vec<WasmDocumentSymbol>,
 }
 
 fn convert_document_symbol(
@@ -456,87 +530,75 @@ fn convert_document_symbol(
     }
 }
 
-#[wasm_bindgen]
-pub fn inlay_hints(content: String) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let hints = squawk_ide::inlay_hints::inlay_hints(&parse.tree());
-
-    let converted: Vec<WasmInlayHint> = hints
-        .into_iter()
-        .map(|hint| {
-            let position = line_index.line_col(hint.position);
-            let position_wide = line_index
-                .to_wide(line_index::WideEncoding::Utf16, position)
-                .unwrap();
-
-            WasmInlayHint {
-                line: position_wide.line,
-                column: position_wide.col,
-                label: hint.label,
-                kind: match hint.kind {
-                    squawk_ide::inlay_hints::InlayHintKind::Type => "type",
-                    squawk_ide::inlay_hints::InlayHintKind::Parameter => "parameter",
-                }
-                .to_string(),
-            }
-        })
-        .collect();
-
-    serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+#[expect(unused)]
+#[derive(Serialize)]
+enum Severity {
+    Hint,
+    Info,
+    Warning,
+    Error,
 }
 
-#[derive(Deserialize)]
-struct Position {
-    line: u32,
-    column: u32,
+#[derive(Serialize)]
+struct LintError {
+    severity: Severity,
+    code: String,
+    message: String,
+    start_line_number: u32,
+    start_column: u32,
+    end_line_number: u32,
+    end_column: u32,
+    range_start: usize,
+    range_end: usize,
+    messages: Vec<String>,
+    fix: Option<Fix>,
 }
 
-#[wasm_bindgen]
-pub fn selection_ranges(content: String, positions: Vec<JsValue>) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let tree = parse.tree();
-    let root = tree.syntax();
+#[derive(Serialize)]
+struct Fix {
+    title: String,
+    edits: Vec<TextEdit>,
+}
 
-    let mut results: Vec<Vec<WasmSelectionRange>> = vec![];
+#[derive(Serialize)]
+struct TextEdit {
+    start_line_number: u32,
+    start_column: u32,
+    end_line_number: u32,
+    end_column: u32,
+    text: String,
+}
 
-    for pos in positions {
-        let pos: Position = serde_wasm_bindgen::from_value(pos).map_err(into_error)?;
-        let offset = position_to_offset(&line_index, pos.line, pos.column)?;
+#[derive(Serialize)]
+struct LocationRange {
+    file: String,
+    start_line: u32,
+    start_column: u32,
+    end_line: u32,
+    end_column: u32,
+}
 
-        let mut ranges = vec![];
-        let mut range = TextRange::new(offset, offset);
+#[derive(Serialize)]
+struct WasmCodeAction {
+    title: String,
+    edits: Vec<TextEdit>,
+    kind: String,
+}
 
-        for _ in 0..20 {
-            let next = squawk_ide::expand_selection::extend_selection(root, range);
-            if next == range {
-                break;
-            }
-
-            let start = line_index.line_col(next.start());
-            let end = line_index.line_col(next.end());
-            let start_wide = line_index
-                .to_wide(line_index::WideEncoding::Utf16, start)
-                .unwrap();
-            let end_wide = line_index
-                .to_wide(line_index::WideEncoding::Utf16, end)
-                .unwrap();
-
-            ranges.push(WasmSelectionRange {
-                start_line: start_wide.line,
-                start_column: start_wide.col,
-                end_line: end_wide.line,
-                end_column: end_wide.col,
-            });
-
-            range = next;
-        }
-
-        results.push(ranges);
-    }
-
-    serde_wasm_bindgen::to_value(&results).map_err(into_error)
+#[derive(Serialize)]
+struct WasmDocumentSymbol {
+    name: String,
+    detail: Option<String>,
+    kind: String,
+    start_line: u32,
+    start_column: u32,
+    end_line: u32,
+    end_column: u32,
+    selection_start_line: u32,
+    selection_start_column: u32,
+    selection_end_line: u32,
+    selection_end_column: u32,
+    children: Vec<WasmDocumentSymbol>,
 }
 
 #[derive(Serialize)]
@@ -555,44 +617,6 @@ struct WasmSelectionRange {
     end_column: u32,
 }
 
-#[wasm_bindgen]
-pub fn completion(content: String, line: u32, col: u32) -> Result<JsValue, Error> {
-    let parse = squawk_syntax::SourceFile::parse(&content);
-    let line_index = LineIndex::new(&content);
-    let offset = position_to_offset(&line_index, line, col)?;
-    let items = squawk_ide::completion::completion(&parse.tree(), offset);
-
-    let converted: Vec<WasmCompletionItem> = items
-        .into_iter()
-        .map(|item| WasmCompletionItem {
-            label: item.label,
-            kind: match item.kind {
-                squawk_ide::completion::CompletionItemKind::Keyword => "keyword",
-                squawk_ide::completion::CompletionItemKind::Table => "table",
-                squawk_ide::completion::CompletionItemKind::Column => "column",
-                squawk_ide::completion::CompletionItemKind::Function => "function",
-                squawk_ide::completion::CompletionItemKind::Schema => "schema",
-                squawk_ide::completion::CompletionItemKind::Type => "type",
-                squawk_ide::completion::CompletionItemKind::Snippet => "snippet",
-                squawk_ide::completion::CompletionItemKind::Operator => "operator",
-            }
-            .to_string(),
-            detail: item.detail,
-            insert_text: item.insert_text,
-            insert_text_format: item.insert_text_format.map(|fmt| {
-                match fmt {
-                    squawk_ide::completion::CompletionInsertTextFormat::PlainText => "plainText",
-                    squawk_ide::completion::CompletionInsertTextFormat::Snippet => "snippet",
-                }
-                .to_string()
-            }),
-            trigger_completion_after_insert: item.trigger_completion_after_insert,
-        })
-        .collect();
-
-    serde_wasm_bindgen::to_value(&converted).map_err(into_error)
-}
-
 #[derive(Serialize)]
 struct WasmCompletionItem {
     label: String,
@@ -601,4 +625,10 @@ struct WasmCompletionItem {
     insert_text: Option<String>,
     insert_text_format: Option<String>,
     trigger_completion_after_insert: bool,
+}
+
+#[derive(Deserialize)]
+struct Position {
+    line: u32,
+    column: u32,
 }

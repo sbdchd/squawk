@@ -1,6 +1,7 @@
-use crate::builtins::BUILTINS_SQL;
+use crate::builtins::parse_builtins;
 use crate::classify::{NameClass, NameRefClass, classify_def_node, classify_name};
 use crate::column_name::ColumnName;
+use crate::db::{File, parse};
 use crate::offsets::token_from_offset;
 use crate::{
     binder,
@@ -8,52 +9,55 @@ use crate::{
 };
 use crate::{goto_definition, resolve};
 use rowan::TextSize;
+use salsa::Database as Db;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
 
-pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
-    let token = token_from_offset(file, offset)?;
+#[salsa::tracked]
+pub fn hover(db: &dyn Db, file: File, offset: TextSize) -> Option<String> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
+    let token = token_from_offset(&source_file, offset)?;
     let parent = token.parent()?;
 
-    let root = file.syntax();
+    let root = source_file.syntax();
     // TODO: we should salsa this
-    let binder = binder::bind(file);
+    let binder = binder::bind(&source_file);
 
     if token.kind() == SyntaxKind::STAR {
         if let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
             && field_expr.star_token().is_some()
-            && let Some(result) = hover_qualified_star(root, &field_expr, &binder)
+            && let Some(result) = hover_qualified_star(db, root, &field_expr, &binder)
         {
             return Some(result);
         }
 
         if let Some(arg_list) = ast::ArgList::cast(parent.clone())
-            && let Some(result) = hover_unqualified_star_in_arg_list(root, &arg_list, &binder)
+            && let Some(result) = hover_unqualified_star_in_arg_list(db, root, &arg_list, &binder)
         {
             return Some(result);
         }
 
         if let Some(target) = ast::Target::cast(parent.clone())
             && target.star_token().is_some()
-            && let Some(result) = hover_unqualified_star(root, &target, &binder)
+            && let Some(result) = hover_unqualified_star(db, root, &target, &binder)
         {
             return Some(result);
         }
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        let definition = goto_definition::goto_definition(file, offset);
+        let definition = goto_definition::goto_definition(db, file, offset);
         let def = definition.first()?;
 
         let (binder, root) = match def.file {
             goto_definition::FileId::Current => (binder, root.clone()),
             goto_definition::FileId::Builtins => {
-                let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL);
-                let builtins_tree = builtins_tree.tree();
-                // TODO: we should salsa this
+                let builtins_tree = parse_builtins(db).tree();
                 let binder = binder::bind(&builtins_tree);
                 let tree = builtins_tree.syntax().clone();
                 (binder, tree)
@@ -67,7 +71,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 
         let context = classify_def_node(&def_node)?;
 
-        return hover_name_ref(&root, &name_ref, &binder, context, &def_node);
+        return hover_name_ref(db, &root, &name_ref, &binder, context, &def_node);
     }
 
     if let Some(name) = ast::Name::cast(parent) {
@@ -145,6 +149,7 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 }
 
 fn hover_name_ref(
+    db: &dyn Db,
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
     // TODO: we should pass in the file id along with the def_node and then use
@@ -178,7 +183,7 @@ fn hover_name_ref(
                 return Some(result);
             }
             // Finally try as table (handles case like `select t from t;` where t is the table)
-            hover_table(binder, def_node)
+            hover_table(db, binder, def_node)
         }
         NameRefClass::DeleteQualifiedColumnTable
         | NameRefClass::ForeignKeyTable
@@ -190,7 +195,7 @@ fn hover_name_ref(
         | NameRefClass::SelectQualifiedColumnTable
         | NameRefClass::Table
         | NameRefClass::UpdateQualifiedColumnTable
-        | NameRefClass::View => hover_table(binder, def_node),
+        | NameRefClass::View => hover_table(db, binder, def_node),
         NameRefClass::Sequence => hover_sequence(root, name_ref, binder),
         NameRefClass::Trigger => hover_trigger(root, name_ref, binder),
         NameRefClass::Policy => hover_policy(root, name_ref, binder),
@@ -439,12 +444,15 @@ fn hover_column_definition(
 // TODO: we should pass in the file id along with the def_node and then use
 // salsa to lookup the the correct binder.
 fn format_table_source(
+    db: &dyn Db,
     root: &SyntaxNode,
     source: resolve::TableSource,
     binder: &binder::Binder,
 ) -> Option<String> {
     match source {
-        resolve::TableSource::Alias(alias) => format_alias_with_column_list(root, &alias, binder),
+        resolve::TableSource::Alias(alias) => {
+            format_alias_with_column_list(db, root, &alias, binder)
+        }
         resolve::TableSource::WithTable(with_table) => format_with_table(&with_table),
         resolve::TableSource::CreateView(create_view) => format_create_view(&create_view, binder),
         resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
@@ -457,7 +465,7 @@ fn format_table_source(
     }
 }
 
-fn hover_table(binder: &binder::Binder, def_node: &SyntaxNode) -> Option<String> {
+fn hover_table(db: &dyn Db, binder: &binder::Binder, def_node: &SyntaxNode) -> Option<String> {
     if let Some(result) = hover_subquery_table(def_node) {
         return Some(result);
     }
@@ -465,13 +473,14 @@ fn hover_table(binder: &binder::Binder, def_node: &SyntaxNode) -> Option<String>
     if let Some(source) = resolve::find_table_source(def_node)
         && let Some(root) = def_node.ancestors().last()
     {
-        return format_table_source(&root, source, binder);
+        return format_table_source(db, &root, source, binder);
     }
 
     None
 }
 
 fn format_alias_with_column_list(
+    db: &dyn Db,
     root: &SyntaxNode,
     alias: &ast::Alias,
     binder: &binder::Binder,
@@ -492,7 +501,7 @@ fn format_alias_with_column_list(
     if let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast)
         && let Some(table_ptr) = resolve::table_ptr_from_from_item(binder, &from_item)
     {
-        let base_columns = collect_star_column_names(root, &table_ptr, binder);
+        let base_columns = collect_star_column_names(db, root, &table_ptr, binder);
         for column in base_columns.iter().skip(columns.len()) {
             columns.push(column.clone());
         }
@@ -507,26 +516,32 @@ fn format_alias_with_column_list(
 }
 
 fn hover_qualified_star(
+    db: &dyn Db,
     root: &SyntaxNode,
     field_expr: &ast::FieldExpr,
     binder: &binder::Binder,
 ) -> Option<String> {
     let table_ptr = resolve::resolve_qualified_star_table_ptr(binder, field_expr)?;
-    hover_qualified_star_columns(root, &table_ptr, binder)
+    hover_qualified_star_columns(db, root, &table_ptr, binder)
 }
 
 fn hover_unqualified_star(
+    db: &dyn Db,
     root: &SyntaxNode,
     target: &ast::Target,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let mut results = hover_unqualified_star_with_binder(root, target, binder);
+    let mut results = hover_unqualified_star_with_binder(db, root, target, binder);
 
     if results.is_empty() && target_has_schema_qualified_from_item(target) {
-        let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL).tree();
+        let builtins_tree = parse_builtins(db).tree();
         let builtins_binder = binder::bind(&builtins_tree);
-        results =
-            hover_unqualified_star_with_binder(builtins_tree.syntax(), target, &builtins_binder);
+        results = hover_unqualified_star_with_binder(
+            db,
+            builtins_tree.syntax(),
+            target,
+            &builtins_binder,
+        );
     }
 
     if results.is_empty() {
@@ -537,6 +552,7 @@ fn hover_unqualified_star(
 }
 
 fn hover_unqualified_star_with_binder(
+    db: &dyn Db,
     root: &SyntaxNode,
     target: &ast::Target,
     binder: &binder::Binder,
@@ -545,7 +561,7 @@ fn hover_unqualified_star_with_binder(
 
     if let Some(table_ptrs) = resolve::resolve_unqualified_star_table_ptrs(binder, target) {
         for table_ptr in table_ptrs {
-            if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
+            if let Some(columns) = hover_qualified_star_columns(db, root, &table_ptr, binder) {
                 results.push(columns);
             }
         }
@@ -572,6 +588,7 @@ fn target_has_schema_qualified_from_item(target: &ast::Target) -> bool {
 }
 
 fn hover_unqualified_star_in_arg_list(
+    db: &dyn Db,
     root: &SyntaxNode,
     arg_list: &ast::ArgList,
     binder: &binder::Binder,
@@ -579,7 +596,7 @@ fn hover_unqualified_star_in_arg_list(
     let table_ptrs = resolve::resolve_unqualified_star_in_arg_list_ptrs(binder, arg_list)?;
     let mut results = vec![];
     for table_ptr in table_ptrs {
-        if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
+        if let Some(columns) = hover_qualified_star_columns(db, root, &table_ptr, binder) {
             results.push(columns);
         }
     }
@@ -609,6 +626,7 @@ fn format_subquery_table(name: &Name, paren_select: &ast::ParenSelect) -> Option
 }
 
 fn hover_qualified_star_columns(
+    db: &dyn Db,
     root: &SyntaxNode,
     table_ptr: &squawk_syntax::SyntaxNodePtr,
     binder: &binder::Binder,
@@ -616,12 +634,12 @@ fn hover_qualified_star_columns(
     let table_name_node = table_ptr.to_node(root);
 
     if let Some(paren_select) = ast::ParenSelect::cast(table_name_node.clone()) {
-        return hover_qualified_star_columns_from_subquery(root, &paren_select, binder);
+        return hover_qualified_star_columns_from_subquery(db, root, &paren_select, binder);
     }
 
     match resolve::find_table_source(&table_name_node)? {
         resolve::TableSource::Alias(alias) => {
-            hover_qualified_star_columns_from_alias(root, &alias, binder)
+            hover_qualified_star_columns_from_alias(db, root, &alias, binder)
         }
         resolve::TableSource::WithTable(with_table) => {
             hover_qualified_star_columns_from_cte(root, &with_table, binder)
@@ -636,12 +654,13 @@ fn hover_qualified_star_columns(
             hover_qualified_star_columns_from_materialized_view(&create_materialized_view, binder)
         }
         resolve::TableSource::ParenSelect(paren_select) => {
-            hover_qualified_star_columns_from_subquery(root, &paren_select, binder)
+            hover_qualified_star_columns_from_subquery(db, root, &paren_select, binder)
         }
     }
 }
 
 fn hover_qualified_star_columns_from_alias(
+    db: &dyn Db,
     root: &SyntaxNode,
     alias: &ast::Alias,
     binder: &binder::Binder,
@@ -666,7 +685,7 @@ fn hover_qualified_star_columns_from_alias(
 
     let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let table_ptr = resolve::table_ptr_from_from_item(binder, &from_item)?;
-    let base_column_names = collect_star_column_names(root, &table_ptr, binder);
+    let base_column_names = collect_star_column_names(db, root, &table_ptr, binder);
 
     for column_name in base_column_names.iter().skip(alias_columns.len()) {
         results.push(ColumnHover::table_column(
@@ -679,6 +698,7 @@ fn hover_qualified_star_columns_from_alias(
 }
 
 fn collect_star_column_names(
+    db: &dyn Db,
     root: &SyntaxNode,
     table_ptr: &squawk_syntax::SyntaxNodePtr,
     binder: &binder::Binder,
@@ -694,7 +714,7 @@ fn collect_star_column_names(
         if !columns.is_empty() {
             return columns;
         }
-        return collect_star_column_names_from_paren_select(root, &paren_select, binder);
+        return collect_star_column_names_from_paren_select(db, root, &paren_select, binder);
     }
 
     match resolve::find_table_source(&table_name_node) {
@@ -710,7 +730,7 @@ fn collect_star_column_names(
                 return columns;
             }
 
-            let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL).tree();
+            let builtins_tree = parse_builtins(db).tree();
             let builtins_binder = binder::bind(&builtins_tree);
             resolve::collect_with_table_column_names(
                 &builtins_binder,
@@ -741,6 +761,7 @@ fn collect_star_column_names(
 }
 
 fn collect_star_column_names_from_paren_select(
+    db: &dyn Db,
     root: &SyntaxNode,
     paren_select: &ast::ParenSelect,
     binder: &binder::Binder,
@@ -757,7 +778,7 @@ fn collect_star_column_names_from_paren_select(
     let mut columns = vec![];
     for from_item in from_clause.from_items() {
         if let Some(table_ptr) = resolve::table_ptr_from_from_item(binder, &from_item) {
-            columns.extend(collect_star_column_names(root, &table_ptr, binder));
+            columns.extend(collect_star_column_names(db, root, &table_ptr, binder));
         }
     }
     columns
@@ -861,6 +882,7 @@ fn hover_qualified_star_columns_from_materialized_view(
 }
 
 fn hover_qualified_star_columns_from_subquery(
+    db: &dyn Db,
     root: &SyntaxNode,
     paren_select: &ast::ParenSelect,
     binder: &binder::Binder,
@@ -878,7 +900,9 @@ fn hover_qualified_star_columns_from_subquery(
             if target.star_token().is_some() {
                 let table_ptrs = resolve::resolve_unqualified_star_table_ptrs(binder, &target)?;
                 for table_ptr in table_ptrs {
-                    if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
+                    if let Some(columns) =
+                        hover_qualified_star_columns(db, root, &table_ptr, binder)
+                    {
                         results.push(columns)
                     }
                 }
@@ -1630,11 +1654,11 @@ fn hover_routine(
 
 #[cfg(test)]
 mod test {
+    use crate::db::{Database, File};
     use crate::hover::hover;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
-    use squawk_syntax::ast;
 
     #[track_caller]
     fn check_hover(sql: &str) -> String {
@@ -1643,13 +1667,13 @@ mod test {
 
     #[track_caller]
     fn check_hover_(sql: &str) -> Option<String> {
+        let db = Database::default();
         let (mut offset, sql) = fixture(sql);
         offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
-        let file: ast::SourceFile = parse.tree();
+        let file = File::new(&db, sql.clone(), 0);
+        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
-        if let Some(type_info) = hover(&file, offset) {
+        if let Some(type_info) = hover(&db, file, offset) {
             let offset_usize: usize = offset.into();
             let title = format!("hover: {}", type_info);
             let group = Level::INFO.primary_title(&title).element(

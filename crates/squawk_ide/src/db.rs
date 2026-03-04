@@ -3,6 +3,9 @@ use salsa::Database as Db;
 use salsa::Storage;
 use squawk_syntax::{Parse, SourceFile};
 
+use crate::binder;
+use crate::binder::Binder;
+
 #[salsa::input]
 pub struct File {
     #[returns(ref)]
@@ -18,6 +21,13 @@ pub fn parse(db: &dyn Db, file: File) -> Parse<SourceFile> {
 #[salsa::tracked]
 pub fn line_index(db: &dyn Db, file: File) -> LineIndex {
     LineIndex::new(file.content(db))
+}
+
+#[salsa::tracked]
+pub fn bind(db: &dyn Db, file: File) -> Binder {
+    let result = parse(db, file);
+    let source_file = result.tree();
+    binder::bind(&source_file)
 }
 
 #[salsa::db]

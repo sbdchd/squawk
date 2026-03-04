@@ -1,17 +1,23 @@
 use rowan::TextSize;
+use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 use squawk_syntax::{SyntaxKind, SyntaxToken};
 
 use crate::binder;
+use crate::db::{File, parse};
 use crate::resolve;
 use crate::symbols::{Name, Schema, SymbolKind};
 use crate::tokens::is_string_or_comment;
 
 const COMPLETION_MARKER: &str = "squawkCompletionMarker";
 
-pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionItem> {
-    let file = file_with_completion_marker(file, offset);
-    let Some(token) = token_at_offset(&file, offset) else {
+#[salsa::tracked]
+pub fn completion(db: &dyn Db, file: File, offset: TextSize) -> Vec<CompletionItem> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
+    let marker_file = file_with_completion_marker(&source_file, offset);
+    let Some(token) = token_at_offset(&marker_file, offset) else {
         // empty file
         return default_completions();
     };
@@ -24,19 +30,23 @@ pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionIte
     }
 
     match completion_context(&token) {
-        CompletionContext::TableOnly => table_completions(&file, &token),
+        CompletionContext::TableOnly => table_completions(&marker_file, &token),
         CompletionContext::Default => default_completions(),
         CompletionContext::SelectClause(select_clause) => {
-            select_completions(&file, select_clause, &token)
+            select_completions(&marker_file, select_clause, &token)
         }
         CompletionContext::SelectClauses(select) => select_clauses_completions(&select),
-        CompletionContext::SelectExpr(select) => select_expr_completions(&file, &select, &token),
-        CompletionContext::LimitClause => limit_completions(&file, &token),
-        CompletionContext::OffsetClause => offset_completions(&file, &token),
-        CompletionContext::DeleteClauses(delete) => {
-            delete_clauses_completions(&file, &delete, &token)
+        CompletionContext::SelectExpr(select) => {
+            select_expr_completions(&marker_file, &select, &token)
         }
-        CompletionContext::DeleteExpr(delete) => delete_expr_completions(&file, &delete, &token),
+        CompletionContext::LimitClause => limit_completions(&marker_file, &token),
+        CompletionContext::OffsetClause => offset_completions(&marker_file, &token),
+        CompletionContext::DeleteClauses(delete) => {
+            delete_clauses_completions(&marker_file, &delete, &token)
+        }
+        CompletionContext::DeleteExpr(delete) => {
+            delete_expr_completions(&marker_file, &delete, &token)
+        }
     }
 }
 
@@ -944,17 +954,17 @@ pub struct CompletionItem {
 #[cfg(test)]
 mod tests {
     use super::completion;
+    use crate::db::{Database, File};
     use crate::test_utils::fixture;
     use insta::assert_snapshot;
-    use squawk_syntax::ast;
     use tabled::builder::Builder;
     use tabled::settings::Style;
 
     fn completions(sql: &str) -> String {
         let (offset, sql) = fixture(sql);
-        let parse = ast::SourceFile::parse(&sql);
-        let file = parse.tree();
-        let items = completion(&file, offset);
+        let db = Database::default();
+        let file = File::new(&db, sql, 0);
+        let items = completion(&db, file, offset);
         assert!(
             !items.is_empty(),
             "No completions found. If this was intended, use `completions_not_found` instead."
@@ -964,9 +974,9 @@ mod tests {
 
     fn completions_not_found(sql: &str) {
         let (offset, sql) = fixture(sql);
-        let parse = ast::SourceFile::parse(&sql);
-        let file = parse.tree();
-        let items = completion(&file, offset);
+        let db = Database::default();
+        let file = File::new(&db, sql, 0);
+        let items = completion(&db, file, offset);
         assert_eq!(
             items,
             vec![],

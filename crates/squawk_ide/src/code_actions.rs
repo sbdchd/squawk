@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use rowan::{TextRange, TextSize};
+use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::{
     SyntaxKind, SyntaxToken,
@@ -10,44 +11,49 @@ use std::iter;
 use crate::{
     binder,
     column_name::ColumnName,
+    db::{File, parse},
     offsets::token_from_offset,
     quote::{quote_column_alias, unquote_ident},
     symbols::Name,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ActionKind {
     QuickFix,
     RefactorRewrite,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CodeAction {
     pub title: String,
     pub edits: Vec<Edit>,
     pub kind: ActionKind,
 }
 
-pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeAction>> {
+#[salsa::tracked]
+pub fn code_actions(db: &dyn Db, file: File, offset: TextSize) -> Option<Vec<CodeAction>> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
     let mut actions = vec![];
-    rewrite_as_regular_string(&mut actions, &file, offset);
-    rewrite_as_dollar_quoted_string(&mut actions, &file, offset);
-    remove_else_clause(&mut actions, &file, offset);
-    rewrite_table_as_select(&mut actions, &file, offset);
-    rewrite_select_as_table(&mut actions, &file, offset);
-    rewrite_from(&mut actions, &file, offset);
-    rewrite_leading_from(&mut actions, &file, offset);
-    rewrite_values_as_select(&mut actions, &file, offset);
-    rewrite_select_as_values(&mut actions, &file, offset);
-    add_schema(&mut actions, &file, offset);
-    quote_identifier(&mut actions, &file, offset);
-    unquote_identifier(&mut actions, &file, offset);
-    add_explicit_alias(&mut actions, &file, offset);
-    remove_redundant_alias(&mut actions, &file, offset);
-    rewrite_cast_to_double_colon(&mut actions, &file, offset);
-    rewrite_double_colon_to_cast(&mut actions, &file, offset);
-    rewrite_between_as_binary_expression(&mut actions, &file, offset);
-    rewrite_timestamp_type(&mut actions, &file, offset);
+    rewrite_as_regular_string(&mut actions, &source_file, offset);
+    rewrite_as_dollar_quoted_string(&mut actions, &source_file, offset);
+    remove_else_clause(&mut actions, &source_file, offset);
+    rewrite_table_as_select(&mut actions, &source_file, offset);
+    rewrite_select_as_table(&mut actions, &source_file, offset);
+    rewrite_from(&mut actions, &source_file, offset);
+    rewrite_leading_from(&mut actions, &source_file, offset);
+    rewrite_values_as_select(&mut actions, &source_file, offset);
+    rewrite_select_as_values(&mut actions, &source_file, offset);
+    add_schema(&mut actions, &source_file, offset);
+    quote_identifier(&mut actions, &source_file, offset);
+    unquote_identifier(&mut actions, &source_file, offset);
+    add_explicit_alias(&mut actions, &source_file, offset);
+    remove_redundant_alias(&mut actions, &source_file, offset);
+    rewrite_cast_to_double_colon(&mut actions, &source_file, offset);
+    rewrite_double_colon_to_cast(&mut actions, &source_file, offset);
+    rewrite_between_as_binary_expression(&mut actions, &source_file, offset);
+    rewrite_timestamp_type(&mut actions, &source_file, offset);
     Some(actions)
 }
 

@@ -1,9 +1,11 @@
-use crate::binder::{self, Binder};
-use crate::builtins::BUILTINS_SQL;
+use crate::binder::Binder;
+use crate::builtins::{builtins_binder, parse_builtins};
+use crate::db::{File, bind, parse};
 use crate::goto_definition::{FileId, Location};
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::TextSize;
+use salsa::Database as Db;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxNodePtr,
@@ -11,17 +13,18 @@ use squawk_syntax::{
     match_ast,
 };
 
-pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<Location> {
-    // TODO: we should salsa this
-    let current_binder = binder::bind(file);
+#[salsa::tracked]
+pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Location> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
 
-    // TODO: we should salsa this
-    let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL).tree();
-    // TODO: we should salsa this
-    let builtins_binder = binder::bind(&builtins_tree);
+    let current_binder = bind(db, file);
+
+    let builtins_tree = parse_builtins(db).tree();
+    let builtins_binder = builtins_binder(db);
 
     let Some((target_file, target_defs)) = find_target_defs(
-        file,
+        &source_file,
         offset,
         &current_binder,
         &builtins_tree,
@@ -31,7 +34,7 @@ pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<Location
     };
 
     let (binder, root) = match target_file {
-        FileId::Current => (&current_binder, file.syntax()),
+        FileId::Current => (&current_binder, source_file.syntax()),
         FileId::Builtins => (&builtins_binder, builtins_tree.syntax()),
     };
 
@@ -46,7 +49,7 @@ pub fn find_references(file: &ast::SourceFile, offset: TextSize) -> Vec<Location
         }
     }
 
-    for node in file.syntax().descendants() {
+    for node in source_file.syntax().descendants() {
         match_ast! {
             match node {
                 ast::NameRef(name_ref) => {
@@ -114,23 +117,23 @@ fn find_target_defs(
 #[cfg(test)]
 mod test {
     use crate::builtins::BUILTINS_SQL;
+    use crate::db::{Database, File};
     use crate::find_references::find_references;
     use crate::goto_definition::FileId;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use rowan::TextRange;
-    use squawk_syntax::ast;
 
     #[track_caller]
     fn find_refs(sql: &str) -> String {
         let (mut offset, sql) = fixture(sql);
         offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
-        let file: ast::SourceFile = parse.tree();
+        let db = Database::default();
+        let file = File::new(&db, sql.clone(), 0);
+        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
-        let references = find_references(&file, offset);
+        let references = find_references(&db, file, offset);
 
         let offset_usize: usize = offset.into();
 

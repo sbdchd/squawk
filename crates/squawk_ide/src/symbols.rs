@@ -66,7 +66,7 @@ pub(crate) enum SymbolKind {
     Policy,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) struct Symbol {
     pub(crate) kind: SymbolKind,
     pub(crate) ptr: SyntaxNodePtr,

@@ -5,7 +5,7 @@ use crate::symbols::{Name, SymbolId};
 
 pub(crate) type ScopeId = Idx<Scope>;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone, PartialEq)]
 pub(crate) struct Scope {
     #[allow(dead_code)]
     pub(crate) parent: Option<ScopeId>,

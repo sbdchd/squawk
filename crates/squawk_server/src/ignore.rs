@@ -67,6 +67,7 @@ fn is_ignore_comment(token: &SyntaxToken) -> bool {
 #[cfg(test)]
 mod test {
     use crate::{diagnostic::AssociatedDiagnosticData, lint::lint};
+    use squawk_ide::db::{Database, File};
 
     #[test]
     fn ignore_line() {
@@ -85,7 +86,7 @@ create table c (
   b int
 );
 ";
-        let ignore_line_edits = lint(sql)
+        let ignore_line_edits = lint_sql(sql)
             .into_iter()
             .flat_map(|x| {
                 let data = x.data?;
@@ -132,7 +133,7 @@ create table c (
   b int
 );
 ";
-        let ignore_line_edits = lint(sql)
+        let ignore_line_edits = lint_sql(sql)
             .into_iter()
             .flat_map(|x| {
                 let data = x.data?;
@@ -197,5 +198,11 @@ create table c (
         }
 
         result
+    }
+
+    fn lint_sql(sql: &str) -> Vec<lsp_types::Diagnostic> {
+        let db = Database::default();
+        let file = File::new(&db, sql.to_owned(), 0);
+        lint(&db, file)
     }
 }
