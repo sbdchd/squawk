@@ -20,11 +20,14 @@ squawk-linter.workspace = true
 rowan.workspace = true
 line-index.workspace = true
 annotate-snippets.workspace = true
+url.workspace = true
+salsa.workspace = true
 log.workspace = true
 smol_str.workspace = true
 la-arena.workspace = true
 smallvec.workspace = true
 itertools.workspace = true
+etcetera.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

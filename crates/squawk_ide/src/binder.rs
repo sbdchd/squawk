@@ -7,11 +7,13 @@ use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 use crate::scope::{Scope, ScopeId};
 use crate::symbols::{Name, Schema, Symbol, SymbolKind};
 
+#[derive(Clone, PartialEq)]
 struct SearchPathChange {
     position: TextSize,
     search_path: Vec<Schema>,
 }
 
+#[derive(Clone, PartialEq)]
 pub(crate) struct Binder {
     // TODO: doesn't seem like we need this with our resolve setup
     scopes: Arena<Scope>,
