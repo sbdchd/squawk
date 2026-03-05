@@ -246,22 +246,7 @@ fn handle_goto_definition(
                 !location.range.contains(offset),
                 "Our target destination range must not include the source range otherwise go to def won't work in vscode."
             );
-
-            let uri = match location.file {
-                squawk_ide::goto_definition::FileId::Current => uri.clone(),
-                squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,
-            };
-
-            let line_index = match location.file {
-                squawk_ide::goto_definition::FileId::Current => &line_index,
-                squawk_ide::goto_definition::FileId::Builtins => &builtins_line_index(db),
-            };
-            let range = lsp_utils::range(line_index, location.range);
-
-            Some(Location {
-                uri,
-                range,
-            })
+            to_location(db, file_system, &uri, location)
         })
         .collect();
 
@@ -523,6 +508,25 @@ fn handle_selection_range(
     Ok(())
 }
 
+fn to_location(
+    db: &dyn salsa::Database,
+    file_system: &impl FileSystem,
+    uri: &Url,
+    loc: squawk_ide::goto_definition::Location,
+) -> Option<Location> {
+    let file = file_system.file(uri).unwrap();
+    let uri = match loc.file {
+        squawk_ide::goto_definition::FileId::Current => uri.clone(),
+        squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,
+    };
+    let line_index = match loc.file {
+        squawk_ide::goto_definition::FileId::Current => &line_index(db, file),
+        squawk_ide::goto_definition::FileId::Builtins => &builtins_line_index(db),
+    };
+    let range = lsp_utils::range(line_index, loc.range);
+    Some(Location { uri, range })
+}
+
 fn handle_references(
     connection: &Connection,
     req: lsp_server::Request,
@@ -543,20 +547,7 @@ fn handle_references(
     let locations: Vec<Location> = refs
         .into_iter()
         .filter(|loc| include_declaration || !loc.range.contains(offset))
-        .filter_map(|loc| {
-            let uri = match loc.file {
-                squawk_ide::goto_definition::FileId::Current => uri.clone(),
-                squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,
-            };
-            let line_index = match loc.file {
-                squawk_ide::goto_definition::FileId::Current => &line_index,
-                squawk_ide::goto_definition::FileId::Builtins => &builtins_line_index(db),
-            };
-            Some(Location {
-                uri,
-                range: lsp_utils::range(line_index, loc.range),
-            })
-        })
+        .filter_map(|loc| to_location(db, file_system, &uri, loc))
         .collect();
 
     let resp = Response {
