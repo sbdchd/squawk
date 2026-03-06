@@ -440,3 +440,151 @@ SOURCE_FILE
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  PAREN_SELECT
+    L_PAREN "("
+    PAREN_SELECT
+      L_PAREN "("
+      COMPOUND_SELECT
+        PAREN_SELECT
+          L_PAREN "("
+          PAREN_SELECT
+            L_PAREN "("
+            PAREN_SELECT
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "1"
+              R_PAREN ")"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        UNION_KW "union"
+        WHITESPACE " "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+      R_PAREN ")"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        PAREN_EXPR
+          L_PAREN "("
+          FROM_ITEM
+            PAREN_SELECT
+              COMPOUND_SELECT
+                PAREN_SELECT
+                  L_PAREN "("
+                  FROM_ITEM
+                    PAREN_EXPR
+                      L_PAREN "("
+                      FROM_ITEM
+                        PAREN_EXPR
+                          L_PAREN "("
+                          FROM_ITEM
+                            PAREN_SELECT
+                              L_PAREN "("
+                              SELECT
+                                SELECT_CLAUSE
+                                  SELECT_KW "select"
+                                  WHITESPACE " "
+                                  TARGET_LIST
+                                    TARGET
+                                      LITERAL
+                                        INT_NUMBER "1"
+                              R_PAREN ")"
+                          R_PAREN ")"
+                      R_PAREN ")"
+                WHITESPACE " "
+                UNION_KW "union"
+                WHITESPACE " "
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+              R_PAREN ")"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        PAREN_SELECT
+          L_PAREN "("
+          FROM_ITEM
+            PAREN_EXPR
+              L_PAREN "("
+              FROM_ITEM
+                COMPOUND_SELECT
+                  PAREN_SELECT
+                    L_PAREN "("
+                    SELECT
+                      SELECT_CLAUSE
+                        SELECT_KW "select"
+                        WHITESPACE " "
+                        TARGET_LIST
+                          TARGET
+                            LITERAL
+                              INT_NUMBER "1"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  UNION_KW "union"
+                  WHITESPACE " "
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "select"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "2"
+              R_PAREN ")"
+          WHITESPACE " "
+          LIMIT_CLAUSE
+            LIMIT_KW "limit"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
