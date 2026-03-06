@@ -8,7 +8,7 @@ use url::Url;
 
 use crate::binder::{self, Binder};
 
-pub(crate) const BUILTINS_SQL: &str = include_str!("builtins.sql");
+pub(crate) const BUILTINS_SQL: &str = include_str!("generated/builtins.sql");
 
 #[salsa::tracked]
 pub fn parse_builtins(_db: &dyn Db) -> Parse<SourceFile> {
