@@ -2210,14 +2210,30 @@ fn count_columns_for_table_name(
 }
 
 fn resolve_select_clause(query: SelectVariant) -> Option<ast::Select> {
-    match query {
-        ast::SelectVariant::Select(s) => Some(s),
-        ast::SelectVariant::ParenSelect(ps) => match ps.select()? {
-            ast::SelectVariant::Select(s) => Some(s),
-            _ => return None,
-        },
-        _ => return None,
+    leftmost_select_from_variant(query)
+}
+
+fn leftmost_select_from_variant(select_variant: ast::SelectVariant) -> Option<ast::Select> {
+    let mut current = select_variant;
+
+    for _ in 0..10_000 {
+        match current {
+            ast::SelectVariant::Select(select) => return Some(select),
+            ast::SelectVariant::CompoundSelect(compound) => {
+                current = compound.lhs()?;
+            }
+            ast::SelectVariant::ParenSelect(paren_select) => {
+                current = paren_select.select()?;
+            }
+            ast::SelectVariant::SelectInto(_)
+            | ast::SelectVariant::Table(_)
+            | ast::SelectVariant::Values(_) => {
+                return None;
+            }
+        }
     }
+
+    None
 }
 
 fn resolve_cte_column(
@@ -2496,46 +2512,57 @@ fn resolve_subquery_column_ptr(
         return None;
     }
 
-    let ast::SelectVariant::Select(subquery_select) = select_variant else {
-        return None;
-    };
+    let subquery_select = leftmost_select_from_variant(select_variant)?;
+    resolve_column_from_select_targets(
+        binder,
+        root,
+        &subquery_select,
+        name_ref,
+        column_name,
+        column_list_len,
+    )
+}
 
-    let select_clause = subquery_select.select_clause()?;
+fn resolve_column_from_select_targets(
+    binder: &Binder,
+    root: &SyntaxNode,
+    select: &ast::Select,
+    name_ref: &ast::NameRef,
+    column_name: &Name,
+    skip_target_count: usize,
+) -> Option<SyntaxNodePtr> {
+    let select_clause = select.select_clause()?;
     let target_list = select_clause.target_list()?;
+    let from_clause = select.from_clause();
 
     for (i, target) in target_list.targets().enumerate() {
         if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
-            // skip targets that have been renamed by the column list
-            if i < column_list_len {
-                if matches!(col_name, ColumnName::Star) {
-                    // star expands to multiple columns, handled below
-                } else {
-                    continue;
-                }
+            if i < skip_target_count && !matches!(col_name, ColumnName::Star) {
+                continue;
             }
             if let Some(col_name_str) = col_name.to_string()
                 && Name::from_string(col_name_str) == *column_name
             {
                 return Some(SyntaxNodePtr::new(&node));
             }
-            if matches!(col_name, ColumnName::Star) {
-                if let Some(from_clause) = subquery_select.from_clause() {
-                    for from_item in from_clause.from_items() {
-                        if let Some(result) =
-                            resolve_from_item_column_ptr(binder, root, &from_item, name_ref)
-                        {
-                            return Some(result);
-                        }
+            if matches!(col_name, ColumnName::Star)
+                && let Some(from_clause) = &from_clause
+            {
+                for from_item in from_clause.from_items() {
+                    if let Some(result) =
+                        resolve_from_item_column_ptr(binder, root, &from_item, name_ref)
+                    {
+                        return Some(result);
                     }
+                }
 
-                    for join_expr in from_clause.join_exprs() {
-                        if let Some(result) =
-                            resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
-                                resolve_from_item_column_ptr(binder, root, from_item, name_ref)
-                            })
-                        {
-                            return Some(result);
-                        }
+                for join_expr in from_clause.join_exprs() {
+                    if let Some(result) =
+                        resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
+                            resolve_from_item_column_ptr(binder, root, from_item, name_ref)
+                        })
+                    {
+                        return Some(result);
                     }
                 }
             }
@@ -2544,8 +2571,8 @@ fn resolve_subquery_column_ptr(
         if let Some(expr) = target.expr()
             && let ast::Expr::FieldExpr(field_expr) = expr
             && let Some(table_name) = qualified_star_table_name(&field_expr)
-            && let Some(from_clause) = subquery_select.from_clause()
-            && let Some(from_item) = find_from_item_in_from_clause(&from_clause, &table_name)
+            && let Some(from_clause) = &from_clause
+            && let Some(from_item) = find_from_item_in_from_clause(from_clause, &table_name)
             && let Some(result) = resolve_from_item_column_ptr(binder, root, &from_item, name_ref)
         {
             return Some(result);
@@ -2933,20 +2960,15 @@ pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
 
 pub(crate) fn select_from_with_query(query: ast::WithQuery) -> Option<ast::Select> {
     let select_variant = match query {
-        ast::WithQuery::Select(s) => ast::SelectVariant::Select(s),
-        ast::WithQuery::ParenSelect(ps) => ps.select()?,
-        ast::WithQuery::CompoundSelect(compound) => compound.lhs()?,
+        ast::WithQuery::Select(select) => ast::SelectVariant::Select(select),
+        ast::WithQuery::ParenSelect(paren_select) => paren_select.select()?,
+        ast::WithQuery::CompoundSelect(compound_select) => {
+            ast::SelectVariant::CompoundSelect(compound_select)
+        }
         _ => return None,
     };
 
-    match select_variant {
-        ast::SelectVariant::Select(s) => Some(s),
-        ast::SelectVariant::CompoundSelect(compound) => match compound.lhs()? {
-            ast::SelectVariant::Select(s) => Some(s),
-            _ => None,
-        },
-        _ => None,
-    }
+    leftmost_select_from_variant(select_variant)
 }
 
 fn count_columns_for_target(
@@ -3150,19 +3172,7 @@ fn resolve_column_from_paren_expr(
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
     if let Some(select) = paren_expr.select() {
-        if let Some(select_clause) = select.select_clause()
-            && let Some(target_list) = select_clause.target_list()
-        {
-            for target in target_list.targets() {
-                if let Some((col_name, node)) = ColumnName::from_target(target.clone())
-                    && let Some(col_name_str) = col_name.to_string()
-                    && Name::from_string(col_name_str) == *column_name
-                {
-                    return Some(SyntaxNodePtr::new(&node));
-                }
-            }
-        }
-        return None;
+        return resolve_column_from_select_targets(binder, root, &select, name_ref, column_name, 0);
     }
 
     if let Some(ast::Expr::CallExpr(call_expr)) = paren_expr.expr()
@@ -3192,6 +3202,22 @@ fn resolve_column_from_paren_expr(
                 name_ref,
                 column_name,
                 alias.as_ref(),
+            );
+        }
+
+        if let Some(select_variant) = from_item
+            .syntax()
+            .children()
+            .find_map(ast::SelectVariant::cast)
+        {
+            let select = leftmost_select_from_variant(select_variant)?;
+            return resolve_column_from_select_targets(
+                binder,
+                root,
+                &select,
+                name_ref,
+                column_name,
+                0,
             );
         }
 
