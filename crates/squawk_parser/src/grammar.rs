@@ -118,7 +118,7 @@ fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMa
         let cm = m.complete(p, PAREN_SELECT);
         Some(compound_select(p, cm))
     } else {
-        select_trailing_clauses(p);
+        opt_select_trailing_clauses(p);
         Some(m.complete(p, PAREN_SELECT))
     }
 }
@@ -2701,7 +2701,7 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
             p.error("expected start of a select statement")
         }
     }
-    select_trailing_clauses(p);
+    opt_select_trailing_clauses(p);
     m.complete(p, COMPOUND_SELECT)
 }
 
@@ -2757,12 +2757,19 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
         return Some(compound_select(p, cm));
     }
     if r.trailing_clauses {
-        select_trailing_clauses(p);
+        opt_select_trailing_clauses(p);
     }
     Some(m.complete(p, out_kind))
 }
 
-fn select_trailing_clauses(p: &mut Parser<'_>) {
+const SELECT_TRAILING_CLAUSES_FIRST: TokenSet =
+    TokenSet::new(&[ORDER_KW, FOR_KW, LIMIT_KW, OFFSET_KW, FETCH_KW]);
+
+fn opt_select_trailing_clauses(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(SELECT_TRAILING_CLAUSES_FIRST) {
+        return false;
+    }
+
     opt_order_by_clause(p);
     let mut has_locking_clause = false;
     while p.at(FOR_KW) {
@@ -2780,6 +2787,7 @@ fn select_trailing_clauses(p: &mut Parser<'_>) {
             opt_locking_clause(p);
         }
     }
+    true
 }
 
 // INTO [ TEMPORARY | TEMP | UNLOGGED ] [ TABLE ] new_table
@@ -3337,6 +3345,16 @@ fn paren_data_source(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     p.bump(L_PAREN);
     // Then try to parse as a FROM_ITEM (which includes table references and joins)
     if opt_from_item(p) {
+        if p.at_ts(COMPOUND_SELECT_FIRST) {
+            let cm = m.complete(p, PAREN_SELECT);
+            let cm = compound_select(p, cm);
+            p.expect(R_PAREN);
+            return Some(cm.precede(p).complete(p, PAREN_SELECT));
+        }
+        if opt_select_trailing_clauses(p) {
+            p.expect(R_PAREN);
+            return Some(m.complete(p, PAREN_SELECT));
+        }
         p.expect(R_PAREN);
         return Some(m.complete(p, PAREN_EXPR));
     } else {
