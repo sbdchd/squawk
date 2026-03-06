@@ -1384,6 +1384,27 @@ SELECT loread(lo_open(1005, x'40000'::int), 32);
 SELECT lo_truncate(lo_open(1005, x'20000'::int), 10);	-- to be denied
 SELECT lo_truncate(lo_open(2001, x'20000'::int), 10);
 
+-- \c -
+-- confirm role with privileges of pg_read_all_data can read large objects
+SET SESSION AUTHORIZATION regress_priv_user6;
+
+SELECT loread(lo_open(1002, x'40000'::int), 32);
+SELECT lo_get(1002);
+SELECT lowrite(lo_open(1002, x'20000'::int), 'abcd');	-- to be denied
+SELECT lo_put(1002, 1, 'abcd');							-- to be denied
+SELECT lo_truncate(lo_open(1002, x'20000'::int), 0);	-- to be denied
+SELECT lo_unlink(1002);									-- to be denied
+
+-- \c -
+-- confirm role with privileges of pg_write_all_data can write large objects
+GRANT SELECT ON LARGE OBJECT 1002 TO regress_priv_user7;
+SET SESSION AUTHORIZATION regress_priv_user7;
+
+SELECT lowrite(lo_open(1002, x'20000'::int), 'abcd');
+SELECT lo_put(1002, 1, 'abcd');
+SELECT lo_truncate(lo_open(1002, x'20000'::int), 0);
+SELECT lo_unlink(1002);									-- to be denied
+
 -- has_largeobject_privilege function
 
 -- superuser
@@ -1619,7 +1640,7 @@ ALTER DEFAULT PRIVILEGES GRANT SELECT ON LARGE OBJECTS TO regress_priv_user2;
 
 SELECT lo_create(1008);
 SELECT has_largeobject_privilege('regress_priv_user2', 1008, 'SELECT'); -- yes
-SELECT has_largeobject_privilege('regress_priv_user6', 1008, 'SELECT'); -- no
+SELECT has_largeobject_privilege('regress_priv_user3', 1008, 'SELECT'); -- no
 SELECT has_largeobject_privilege('regress_priv_user2', 1008, 'UPDATE'); -- no
 
 ALTER DEFAULT PRIVILEGES GRANT ALL ON LARGE OBJECTS TO regress_priv_user2;
