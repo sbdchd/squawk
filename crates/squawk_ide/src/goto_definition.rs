@@ -4841,6 +4841,34 @@ select a$0 from (select 1 as a);
     }
 
     #[test]
+    fn goto_subquery_compound_select_column() {
+        assert_snapshot!(goto("
+select c$0 from (select 1 c union select 2 c);
+"), @r"
+          ╭▸ 
+        2 │ select c from (select 1 c union select 2 c);
+          ╰╴       ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_compound_select_column_with_nested_parens() {
+        assert_snapshot!(goto("
+with t as (
+  select 1 as c
+)
+select c$0 from ((select * from t) union all (select * from t));
+"), @r"
+          ╭▸ 
+        3 │   select 1 as c
+          │               ─ 2. destination
+        4 │ )
+        5 │ select c from ((select * from t) union all (select * from t));
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_subquery_column_multiple_columns() {
         assert_snapshot!(goto("
 select b$0 from (select 1 a, 2 b);
