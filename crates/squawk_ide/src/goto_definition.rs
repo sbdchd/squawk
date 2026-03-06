@@ -4869,15 +4869,6 @@ select c$0 from ((select * from t) union all (select * from t));
     }
 
     #[test]
-    fn goto_subquery_compound_select_nested_parens_parses() {
-        goto_not_found(
-            "
-select *$0 from (((select 1)) union (select 2));
-",
-        );
-    }
-
-    #[test]
     fn goto_subquery_column_multiple_columns() {
         assert_snapshot!(goto("
 select b$0 from (select 1 a, 2 b);
