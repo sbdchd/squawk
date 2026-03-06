@@ -2300,8 +2300,11 @@ CreateProcedure =
 
 CreatePublication =
   'create' 'publication' Name
-  ('for' 'all' 'tables' | 'for' (PublicationObject (',' PublicationObject)*))
+  ('for' 'all' 'tables' ExceptTableClause? | 'for' (PublicationObject (',' PublicationObject)*))
   WithParams?
+
+ExceptTableClause =
+  'except' 'table' '(' (RelationName (',' RelationName)*) ')'
 
 PublicationObject  =
   'table' 'only'? (Path | '(' Path ')') '*'? ColumnList?  WhereConditionClause?

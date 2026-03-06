@@ -9173,7 +9173,7 @@ fn publication_object(p: &mut Parser<'_>) {
 }
 
 // CREATE PUBLICATION name
-//     [ FOR ALL TABLES
+//     [ FOR ALL TABLES [ EXCEPT TABLE ( relation_name [, ...] ) ]
 //       | FOR publication_object [, ... ] ]
 //     [ WITH ( publication_parameter [= value] [, ... ] ) ]
 //
@@ -9192,6 +9192,7 @@ fn create_publication(p: &mut Parser<'_>) -> CompletedMarker {
             while !p.at(EOF) && p.eat(COMMA) {
                 publication_all_object(p);
             }
+            opt_except_table_clause(p);
         } else {
             publication_object(p);
             while !p.at(EOF) && p.eat(COMMA) {
@@ -9211,6 +9212,26 @@ fn publication_all_object(p: &mut Parser<'_>) {
             p.current()
         ));
     }
+}
+
+fn opt_except_table_clause(p: &mut Parser<'_>) {
+    if !p.at(EXCEPT_KW) {
+        return;
+    }
+
+    let m = p.start();
+    p.bump(EXCEPT_KW);
+    p.expect(TABLE_KW);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        RELATION_NAME_FIRST,
+        |p| opt_relation_name(p).is_some(),
+    );
+    m.complete(p, EXCEPT_TABLE_CLAUSE);
 }
 
 // CREATE ROLE name [ [ WITH ] option [ ... ] ]
@@ -13656,6 +13677,8 @@ const NON_RESERVED_WORD: TokenSet = TokenSet::new(&[IDENT])
     .union(COLUMN_NAME_KEYWORDS)
     .union(TYPE_FUNC_NAME_KEYWORDS);
 
+const RELATION_NAME_FIRST: TokenSet = TokenSet::new(&[ONLY_KW]).union(PATH_FIRST);
+
 fn relation_name(p: &mut Parser<'_>) {
     if opt_relation_name(p).is_none() {
         p.error("expected relation name");
@@ -13663,6 +13686,10 @@ fn relation_name(p: &mut Parser<'_>) {
 }
 
 fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(RELATION_NAME_FIRST) {
+        return None;
+    }
+
     let m = p.start();
     if p.eat(ONLY_KW) {
         let trailing_paren = p.eat(L_PAREN);
@@ -13672,10 +13699,7 @@ fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             p.expect(R_PAREN);
         }
     } else {
-        if opt_path_name_ref(p).is_none() {
-            m.abandon(p);
-            return None;
-        };
+        path_name_ref(p);
         p.eat(STAR);
     }
     Some(m.complete(p, RELATION_NAME))
