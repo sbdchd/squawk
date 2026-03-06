@@ -726,8 +726,8 @@ pub(crate) fn sync_builtins() -> Result<()> {
     query_functions(&mut modules)?;
     query_operators(&mut modules)?;
 
-    let extensions_root = project_root().join("crates/squawk_ide/src/extensions");
-    let builtins_path = project_root().join("crates/squawk_ide/src/builtins.sql");
+    let extensions_root = project_root().join("crates/squawk_ide/src/generated/extensions");
+    let builtins_path = project_root().join("crates/squawk_ide/src/generated/builtins.sql");
 
     std::fs::create_dir_all(&extensions_root).context("Failed to create builtins directory")?;
     if extensions_root.exists() {
