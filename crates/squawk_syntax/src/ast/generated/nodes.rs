@@ -4629,6 +4629,10 @@ impl CreateSubscription {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_refs(&self) -> AstChildren<NameRef> {
         support::children(&self.syntax)
     }
@@ -4647,6 +4651,10 @@ impl CreateSubscription {
     #[inline]
     pub fn publication_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
+    }
+    #[inline]
+    pub fn server_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
     #[inline]
     pub fn subscription_token(&self) -> Option<SyntaxToken> {
@@ -7814,6 +7822,10 @@ impl FdwOption {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn connection_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONNECTION_KW)
     }
     #[inline]
     pub fn handler_token(&self) -> Option<SyntaxToken> {

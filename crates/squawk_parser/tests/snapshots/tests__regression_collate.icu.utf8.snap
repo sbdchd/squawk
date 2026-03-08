@@ -1,5 +1,5 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/regression_suite/collate.icu.utf8.sql
+input_file: postgres/regression_suite/collate.icu.utf8.sql
 ---
 
