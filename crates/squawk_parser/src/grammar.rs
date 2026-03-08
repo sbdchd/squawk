@@ -7588,6 +7588,10 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
             p.bump(CONNECTION_KW);
             string_literal(p);
         }
+        SERVER_KW => {
+            p.bump(SERVER_KW);
+            name_ref(p);
+        }
         SET_KW if p.nth_at(1, L_PAREN) => {
             set_options(p);
         }
@@ -7623,7 +7627,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => {
             p.error(
-            "expected CONNECTION, SET, ADD, DROP, REFRESH, ENABLE, DISABLE, SKIP, OWNER or RENAME",
+            "expected CONNECTION, SERVER, SET, ADD, DROP, REFRESH, ENABLE, DISABLE, SKIP, OWNER or RENAME",
         );
         }
     }
@@ -8851,15 +8855,15 @@ fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
             }
             true
         }
-        HANDLER_KW | VALIDATOR_KW => {
+        CONNECTION_KW | HANDLER_KW | VALIDATOR_KW => {
             p.bump_any();
             path_name_ref(p);
             true
         }
         NO_KW => {
             p.bump(NO_KW);
-            if !p.eat(HANDLER_KW) && !p.eat(VALIDATOR_KW) {
-                p.error("expected HANDLER or VALIDATOR")
+            if !p.eat(CONNECTION_KW) && !p.eat(HANDLER_KW) && !p.eat(VALIDATOR_KW) {
+                p.error("expected CONNECTION, HANDLER or VALIDATOR")
             }
             true
         }
@@ -9433,8 +9437,13 @@ fn create_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(SUBSCRIPTION_KW);
     name(p);
-    p.expect(CONNECTION_KW);
-    string_literal(p);
+    if p.at(SERVER_KW) {
+        p.bump(SERVER_KW);
+        name_ref(p);
+    } else {
+        p.expect(CONNECTION_KW);
+        string_literal(p);
+    }
     p.expect(PUBLICATION_KW);
     name_ref_list(p);
     opt_with_params(p);

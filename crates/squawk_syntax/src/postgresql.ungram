@@ -1968,8 +1968,10 @@ FdwOptionList =
 
 FdwOption =
   'options' AlterOptionList
+| 'connection' Path
 | 'handler' Path
 | 'validator' Path
+| 'no' 'connection'
 | 'no' 'handler'
 | 'no' 'validator'
 
@@ -2336,7 +2338,7 @@ CreateStatistics =
 
 CreateSubscription =
   'create' 'subscription' Name
-  'connection' Literal
+  ('connection' Literal | 'server' NameRef)
   'publication' (NameRef (',' NameRef)*)
   WithParams?
 
