@@ -28,6 +28,7 @@ pub(crate) mod require_concurrent_index_creation;
 pub(crate) mod require_concurrent_index_deletion;
 pub(crate) mod require_timeout_settings;
 pub(crate) mod transaction_nesting;
+pub(crate) mod require_enum_value_ordering;
 // xtask:new-rule:mod-decl
 
 pub(crate) use adding_field_with_default::adding_field_with_default;
@@ -60,4 +61,5 @@ pub(crate) use require_concurrent_index_creation::require_concurrent_index_creat
 pub(crate) use require_concurrent_index_deletion::require_concurrent_index_deletion;
 pub(crate) use require_timeout_settings::require_timeout_settings;
 pub(crate) use transaction_nesting::transaction_nesting;
+pub(crate) use require_enum_value_ordering::require_enum_value_ordering;
 // xtask:new-rule:export

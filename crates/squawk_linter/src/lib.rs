@@ -55,6 +55,7 @@ use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
+use rules::require_enum_value_ordering;
 // xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, Sequence)]
@@ -90,6 +91,7 @@ pub enum Rule {
     BanTruncateCascade,
     RequireTimeoutSettings,
     BanUncommittedTransaction,
+    RequireEnumValueOrdering,
     // xtask:new-rule:error-name
 }
 
@@ -132,6 +134,7 @@ impl TryFrom<&str> for Rule {
             "ban-truncate-cascade" => Ok(Rule::BanTruncateCascade),
             "require-timeout-settings" => Ok(Rule::RequireTimeoutSettings),
             "ban-uncommitted-transaction" => Ok(Rule::BanUncommittedTransaction),
+            "require-enum-value-ordering" => Ok(Rule::RequireEnumValueOrdering),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -194,6 +197,7 @@ impl fmt::Display for Rule {
             Rule::BanTruncateCascade => "ban-truncate-cascade",
             Rule::RequireTimeoutSettings => "require-timeout-settings",
             Rule::BanUncommittedTransaction => "ban-uncommitted-transaction",
+            Rule::RequireEnumValueOrdering => "require-enum-value-ordering",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -420,6 +424,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::BanUncommittedTransaction) {
             ban_uncommitted_transaction(self, file);
+        }
+        if self.rules.contains(&Rule::RequireEnumValueOrdering) {
+            require_enum_value_ordering(self, &file);
         }
         // xtask:new-rule:rule-call
 

@@ -202,6 +202,11 @@ const rules = [
     tags: ["schema"],
     description: "Ensure all transactions are committed",
   },
+  {
+    name: "require-enum-value-ordering",
+    tags: ["schema"],
+    description: "Require BEFORE or AFTER when adding enum values",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
