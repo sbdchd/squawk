@@ -6,7 +6,8 @@ use std::fs::{File, create_dir_all, remove_dir_all};
 use std::io::{BufRead, Write};
 use std::process::Command;
 
-const PROCESSED_OUTPUT_DIR: &str = "postgres/regression_suite";
+const SQL_REGRESSION_SUITE_DIR: &str = "postgres/regression_suite";
+const PLPGSQL_REGRESSION_SUITE_DIR: &str = "postgres/plpgsql";
 
 const START_END_MARKERS: &[(&str, &str)] = &[
     (
@@ -104,22 +105,31 @@ const GSET_REPLACEMENTS: &[(&str, &str)] = &[
 ];
 
 pub(crate) fn sync_regression_suite() -> Result<()> {
-    let temp_dir = download_regression_suite()?;
-    transform_regression_suite(&temp_dir)?;
-    Ok(())
-}
-
-fn download_regression_suite() -> Result<Utf8PathBuf> {
-    let target_dir = Utf8PathBuf::try_from(std::env::temp_dir())
+    let sql_target_dir = Utf8PathBuf::try_from(std::env::temp_dir())
         .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
         .join("squawk_raw_regression_suite");
 
-    if target_dir.exists() {
-        println!("Cleaning temp directory: {target_dir:?}");
-        remove_dir_all(&target_dir)?;
-    }
+    let plpgsql_target_dir = Utf8PathBuf::try_from(std::env::temp_dir())
+        .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
+        .join("squawk_raw_plpgsql_suite");
 
-    create_dir_all(&target_dir)?;
+    download_regression_suite(&sql_target_dir, &plpgsql_target_dir)?;
+    transform_regression_suite(&sql_target_dir)?;
+    copy_plpgsql_suite(&plpgsql_target_dir)?;
+    Ok(())
+}
+
+fn download_regression_suite(
+    sql_target_dir: &Utf8PathBuf,
+    plpgsql_target_dir: &Utf8PathBuf,
+) -> Result<()> {
+    for dir in [sql_target_dir, plpgsql_target_dir] {
+        if dir.exists() {
+            println!("Cleaning temp directory: {dir:?}");
+            remove_dir_all(dir)?;
+        }
+        create_dir_all(dir)?;
+    }
 
     let clone_dir = Utf8PathBuf::try_from(std::env::temp_dir())
         .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
@@ -146,10 +156,15 @@ fn download_regression_suite() -> Result<Utf8PathBuf> {
         bail!("Failed to clone postgres repository");
     }
 
-    println!("Setting up sparse checkout for src/test/regress/sql...");
+    println!("Setting up sparse checkout...");
 
     let status = Command::new("git")
-        .args(["sparse-checkout", "set", "src/test/regress/sql"])
+        .args([
+            "sparse-checkout",
+            "set",
+            "src/test/regress/sql",
+            "src/pl/plpgsql/src/sql",
+        ])
         .current_dir(&clone_dir)
         .status()?;
 
@@ -157,7 +172,7 @@ fn download_regression_suite() -> Result<Utf8PathBuf> {
         bail!("Failed to set sparse checkout");
     }
 
-    println!("Copying SQL files...");
+    println!("Copying regression SQL files...");
     let source_dir = clone_dir.join("src/test/regress/sql");
 
     let mut file_count = 0;
@@ -166,23 +181,38 @@ fn download_regression_suite() -> Result<Utf8PathBuf> {
         let path = Utf8PathBuf::try_from(entry.path())?;
         if path.extension() == Some("sql") {
             let filename = path.file_name().unwrap();
-            if !filename.contains("psql") {
-                std::fs::copy(&path, target_dir.join(filename))?;
+            if !filename.contains("psql") || filename == "plpgsql.sql" {
+                std::fs::copy(&path, sql_target_dir.join(filename))?;
                 file_count += 1;
             }
         }
     }
 
-    println!("Copied {file_count} SQL files");
+    println!("Copied {file_count} regression SQL files");
+
+    println!("Copying PL/pgSQL SQL files...");
+    let plpgsql_source_dir = clone_dir.join("src/pl/plpgsql/src/sql");
+    let mut plpgsql_count = 0;
+    for entry in std::fs::read_dir(&plpgsql_source_dir)? {
+        let entry = entry?;
+        let path = Utf8PathBuf::try_from(entry.path())?;
+        if path.extension() == Some("sql") {
+            let filename = path.file_name().unwrap();
+            std::fs::copy(&path, plpgsql_target_dir.join(filename))?;
+            plpgsql_count += 1;
+        }
+    }
+
+    println!("Copied {plpgsql_count} PL/pgSQL SQL files");
 
     println!("Cleaning up clone directory...");
     remove_dir_all(&clone_dir)?;
 
-    Ok(target_dir)
+    Ok(())
 }
 
 fn transform_regression_suite(input_dir: &Utf8PathBuf) -> Result<()> {
-    let output_dir = project_root().join(PROCESSED_OUTPUT_DIR);
+    let output_dir = project_root().join(SQL_REGRESSION_SUITE_DIR);
 
     if output_dir.exists() {
         println!("Cleaning target directory: {output_dir:?}");
@@ -221,6 +251,32 @@ fn transform_regression_suite(input_dir: &Utf8PathBuf) -> Result<()> {
         let mut dest = File::create(&output_path)?;
         dest.write_all(&processed_content)?;
     }
+
+    Ok(())
+}
+
+fn copy_plpgsql_suite(input_dir: &Utf8PathBuf) -> Result<()> {
+    let output_dir = project_root().join(PLPGSQL_REGRESSION_SUITE_DIR);
+
+    if output_dir.exists() {
+        println!("Cleaning target directory: {output_dir:?}");
+        remove_dir_all(&output_dir)?;
+    }
+
+    create_dir_all(&output_dir)?;
+
+    let mut file_count = 0;
+    for entry in std::fs::read_dir(input_dir)? {
+        let entry = entry?;
+        let path = Utf8PathBuf::try_from(entry.path())?;
+        if path.extension() == Some("sql") {
+            let filename = path.file_name().unwrap();
+            std::fs::copy(&path, output_dir.join(filename))?;
+            file_count += 1;
+        }
+    }
+
+    println!("Copied {file_count} PL/pgSQL files to {output_dir}");
 
     Ok(())
 }
