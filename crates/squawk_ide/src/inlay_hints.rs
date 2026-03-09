@@ -1,9 +1,11 @@
-use crate::builtins::BUILTINS_SQL;
+use crate::builtins::parse_builtins;
+use crate::db::{File, parse};
 use crate::goto_definition::FileId;
 use crate::resolve;
 use crate::symbols::Name;
 use crate::{binder, goto_definition};
 use rowan::{TextRange, TextSize};
+use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 
 /// `VSCode` has some theming options based on these types.
@@ -26,20 +28,26 @@ pub struct InlayHint {
     pub file: Option<FileId>,
 }
 
-pub fn inlay_hints(file: &ast::SourceFile) -> Vec<InlayHint> {
+#[salsa::tracked]
+pub fn inlay_hints(db: &dyn Db, file: File) -> Vec<InlayHint> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
     let mut hints = vec![];
-    for node in file.syntax().descendants() {
+    for node in source_file.syntax().descendants() {
         if let Some(call_expr) = ast::CallExpr::cast(node.clone()) {
-            inlay_hint_call_expr(&mut hints, file, call_expr);
+            inlay_hint_call_expr(db, &mut hints, file, &source_file, call_expr);
         } else if let Some(insert) = ast::Insert::cast(node) {
-            inlay_hint_insert(&mut hints, file, insert);
+            inlay_hint_insert(db, &mut hints, file, &source_file, insert);
         }
     }
     hints
 }
 
 fn inlay_hint_call_expr(
+    db: &dyn Db,
     hints: &mut Vec<InlayHint>,
+    file_id: File,
     file: &ast::SourceFile,
     call_expr: ast::CallExpr,
 ) -> Option<()> {
@@ -52,13 +60,14 @@ fn inlay_hint_call_expr(
         ast::FieldExpr::cast(expr.syntax().clone())?.field()?
     };
 
-    let location = goto_definition::goto_definition(file, name_ref.syntax().text_range().start())
-        .into_iter()
-        .next()?;
+    let location =
+        goto_definition::goto_definition(db, file_id, name_ref.syntax().text_range().start())
+            .into_iter()
+            .next()?;
 
     let file = match location.file {
         goto_definition::FileId::Current => file,
-        goto_definition::FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+        goto_definition::FileId::Builtins => &parse_builtins(db).tree(),
     };
 
     let function_name_node = file.syntax().covering_element(location.range);
@@ -87,7 +96,9 @@ fn inlay_hint_call_expr(
 }
 
 fn inlay_hint_insert(
+    db: &dyn Db,
     hints: &mut Vec<InlayHint>,
+    file_id: File,
     file: &ast::SourceFile,
     insert: ast::Insert,
 ) -> Option<()> {
@@ -100,13 +111,13 @@ fn inlay_hint_insert(
         .start();
     // We need to support the table definition not being found since we can
     // still provide inlay hints when a column list is provided
-    let location = goto_definition::goto_definition(file, name_start)
+    let location = goto_definition::goto_definition(db, file_id, name_start)
         .into_iter()
         .next();
 
     let file = match location.as_ref().map(|x| x.file) {
         Some(goto_definition::FileId::Current) | None => file,
-        Some(goto_definition::FileId::Builtins) => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+        Some(goto_definition::FileId::Builtins) => &parse_builtins(db).tree(),
     };
 
     let create_table = {
@@ -120,6 +131,7 @@ fn inlay_hint_insert(
         })
     };
 
+    // TODO: we should salsa this
     let binder = binder::bind(file);
 
     let columns = if let Some(column_list) = insert.column_list() {
@@ -219,18 +231,19 @@ fn target_list_from_select_variant(select: ast::SelectVariant) -> Option<ast::Ta
 
 #[cfg(test)]
 mod test {
+    use crate::db::{Database, File};
     use crate::inlay_hints::inlay_hints;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
-    use squawk_syntax::ast;
 
     #[track_caller]
     fn check_inlay_hints(sql: &str) -> String {
-        let parse = ast::SourceFile::parse(sql);
-        assert_eq!(parse.errors(), vec![]);
-        let file: ast::SourceFile = parse.tree();
+        let db = Database::default();
+        let file = File::new(&db, sql.to_string(), 0);
 
-        let hints = inlay_hints(&file);
+        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
+
+        let hints = inlay_hints(&db, file);
 
         if hints.is_empty() {
             return String::new();

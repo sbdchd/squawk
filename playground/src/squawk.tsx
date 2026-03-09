@@ -1,17 +1,5 @@
 import { useEffect, useState } from "react"
-import initWasm, {
-  dump_cst,
-  dump_tokens,
-  lint as lint_,
-  goto_definition as goto_definition_,
-  hover as hover_,
-  find_references as find_references_,
-  document_symbols as document_symbols_,
-  code_actions as code_actions_,
-  inlay_hints as inlay_hints_,
-  selection_ranges as selection_ranges_,
-  completion as completion_,
-} from "./pkg/squawk_wasm"
+import initWasm, { SquawkDatabase } from "./pkg/squawk_wasm"
 
 export type TextEdit = {
   start_line_number: number
@@ -40,78 +28,113 @@ export type LintError = {
   fix?: Fix
 }
 
-function lint(text: string): Array<LintError> {
-  return lint_(text)
+let db: SquawkDatabase | null = null
+
+// We pass in content and version here so that we:
+// 1. update the database
+// 2. so the react compiler doesn't just cache the functions at their initial
+//    results. We need them to be dependent on their input.
+//
+// We can probably do better than this.
+function getDb(content: string, version: number): SquawkDatabase {
+  if (db == null) {
+    db = new SquawkDatabase()
+    db.open_file(content)
+  }
+  db.update_file(content, version)
+
+  return db
 }
 
-export function inlay_hints(content: string): InlayHint[] {
-  return inlay_hints_(content)
+function lint(content: string, version: number): Array<LintError> {
+  return getDb(content, version).lint()
+}
+
+export function inlay_hints(content: string, version: number): InlayHint[] {
+  return getDb(content, version).inlay_hints()
 }
 
 export function code_actions(
   content: string,
+  version: number,
   line: number,
   column: number,
 ): CodeAction[] | null {
-  return code_actions_(content, line, column)
+  return getDb(content, version).code_actions(line, column)
 }
 
-export function document_symbols(content: string): DocumentSymbol[] {
-  return document_symbols_(content)
+export function document_symbols(
+  content: string,
+  version: number,
+): DocumentSymbol[] {
+  return getDb(content, version).document_symbols()
 }
 
 export function hover(
   content: string,
+  version: number,
   line: number,
   column: number,
 ): string | null {
-  return hover_(content, line, column)
+  return getDb(content, version).hover(line, column)
 }
 
 export function goto_definition(
   content: string,
+  version: number,
   line: number,
   column: number,
 ): Array<LocationRange> {
-  return goto_definition_(content, line, column)
+  return getDb(content, version).goto_definition(line, column)
 }
 
 export function find_references(
   content: string,
+  version: number,
   line: number,
   column: number,
 ): LocationRange[] {
-  return find_references_(content, line, column)
+  return getDb(content, version).find_references(line, column)
 }
 
 export function selection_ranges(
   content: string,
+  version: number,
   positions: Array<{ line: number; column: number }>,
 ): SelectionRange[][] {
-  return selection_ranges_(content, positions)
+  return getDb(content, version).selection_ranges(positions)
 }
 
 export function completion(
   content: string,
+  version: number,
   line: number,
   column: number,
 ): CompletionItem[] {
-  return completion_(content, line, column)
+  return getDb(content, version).completion(line, column)
 }
 
-export function useErrors(text: string) {
-  const isReady = useWasmStatus()
-  return isReady ? lint(text) : []
+export function dump_cst(content: string, version: number): string {
+  return getDb(content, version).dump_cst()
 }
 
-export function useDumpCst(text: string): string {
-  const isReady = useWasmStatus()
-  return isReady ? dump_cst(text) : ""
+export function dump_tokens(content: string, version: number): string {
+  return getDb(content, version).dump_tokens()
 }
 
-export function useDumpTokens(text: string): string {
+export function useErrors(text: string, version: number) {
   const isReady = useWasmStatus()
-  return isReady ? dump_tokens(text) : ""
+  return isReady ? lint(text, version) : []
+}
+
+export function useDumpCst(text: string, version: number): string {
+  const isReady = useWasmStatus()
+  return isReady ? dump_cst(text, version) : ""
+}
+
+export function useDumpTokens(text: string, version: number): string {
+  const isReady = useWasmStatus()
+  return isReady ? dump_tokens(text, version) : ""
 }
 
 let isStartingAlready: { promise: Promise<unknown>; start: number } | null =

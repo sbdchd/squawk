@@ -430,6 +430,10 @@ ALTER MATERIALIZED VIEW ALL IN TABLESPACE regress_tblspace_renamed SET TABLESPAC
 ALTER TABLE ALL IN TABLESPACE regress_tblspace_renamed SET TABLESPACE pg_default;
 ALTER MATERIALIZED VIEW ALL IN TABLESPACE regress_tblspace_renamed SET TABLESPACE pg_default;
 
+-- Should fail, contains \n in name
+ALTER TABLESPACE regress_tblspace_renamed RENAME TO "invalid
+name";
+
 -- Should succeed
 DROP TABLESPACE regress_tblspace_renamed;
 

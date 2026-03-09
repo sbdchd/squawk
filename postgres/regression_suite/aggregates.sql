@@ -246,6 +246,16 @@ select array(select sum(x+y) s
             from generate_series(1,3) y group by y order by s)
   from generate_series(1,3) x;
 
+-- Test handling of grouping-expression references within sublinks
+
+select two + four as g, (select f1 from int4_tbl where f1 = (two + four))
+from tenk1 t1
+group by two + four order by 1;
+
+select q1, (select q1) as ss  -- q1 is actually a COALESCE expression here
+from int8_tbl i81 full outer join int8_tbl i82 using (q1)
+group by q1 order by q1;
+
 --
 -- test for bitwise integer aggregates
 --
@@ -649,6 +659,12 @@ select f2, count(*) from
 t1 x(x0,x1) left join (t1 left join t2 using(f2)) on (x0 = 0)
 group by f2;
 
+-- check that we preserve join alias in GROUP BY expressions
+create temp view v1 as
+select f1::int from t1 left join t2 using (f1) group by f1;
+select pg_get_viewdef('v1'::regclass);
+
+drop view v1;
 drop table t1, t2;
 
 --

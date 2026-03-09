@@ -1968,8 +1968,10 @@ FdwOptionList =
 
 FdwOption =
   'options' AlterOptionList
+| 'connection' Path
 | 'handler' Path
 | 'validator' Path
+| 'no' 'connection'
 | 'no' 'handler'
 | 'no' 'validator'
 
@@ -2300,8 +2302,11 @@ CreateProcedure =
 
 CreatePublication =
   'create' 'publication' Name
-  ('for' 'all' 'tables' | 'for' (PublicationObject (',' PublicationObject)*))
+  ('for' 'all' 'tables' ExceptTableClause? | 'for' (PublicationObject (',' PublicationObject)*))
   WithParams?
+
+ExceptTableClause =
+  'except' 'table' '(' (RelationName (',' RelationName)*) ')'
 
 PublicationObject  =
   'table' 'only'? (Path | '(' Path ')') '*'? ColumnList?  WhereConditionClause?
@@ -2333,7 +2338,7 @@ CreateStatistics =
 
 CreateSubscription =
   'create' 'subscription' Name
-  'connection' Literal
+  ('connection' Literal | 'server' NameRef)
   'publication' (NameRef (',' NameRef)*)
   WithParams?
 
@@ -2970,6 +2975,8 @@ ClusterOn =
 
 DetachPartition =
   'detach' 'partition'
+  Path
+  ('concurrently' | 'finalize')?
 
 MergePartitions =
   'merge' 'partitions'

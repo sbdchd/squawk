@@ -168,6 +168,18 @@ fn name_from_name_ref(name_ref: ast::NameRef, in_type: bool) -> Option<(ColumnNa
                         name_ref.syntax().clone(),
                     ));
                 }
+                SyntaxKind::BOOLEAN_KW => {
+                    return Some((
+                        ColumnName::Column("bool".to_owned()),
+                        name_ref.syntax().clone(),
+                    ));
+                }
+                SyntaxKind::DECIMAL_KW => {
+                    return Some((
+                        ColumnName::Column("numeric".to_owned()),
+                        name_ref.syntax().clone(),
+                    ));
+                }
                 SyntaxKind::INT_KW | SyntaxKind::INTEGER_KW => {
                     return Some((
                         ColumnName::Column("int4".to_owned()),
@@ -569,6 +581,8 @@ fn examples() {
     assert_snapshot!(name("col_name::text"), @"col_name");
     assert_snapshot!(name("col_name::int::text"), @"col_name");
     assert_snapshot!(name("'1'::bigint"), @"int8");
+    assert_snapshot!(name("'1'::decimal"), @"numeric");
+    assert_snapshot!(name("'1'::boolean"), @"bool");
     assert_snapshot!(name("'1'::int"), @"int4");
     assert_snapshot!(name("'1'::smallint"), @"int2");
     assert_snapshot!(name("'{{1, 2}, {3, 4}}'::bigint[][]"), @"int8");

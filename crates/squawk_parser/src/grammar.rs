@@ -118,7 +118,7 @@ fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMa
         let cm = m.complete(p, PAREN_SELECT);
         Some(compound_select(p, cm))
     } else {
-        select_trailing_clauses(p);
+        opt_select_trailing_clauses(p);
         Some(m.complete(p, PAREN_SELECT))
     }
 }
@@ -2066,10 +2066,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 }
                 p.expect(R_PAREN);
             }
-            if p.eat(WITH_KW) || p.eat(WITHOUT_KW) {
-                p.expect(TIME_KW);
-                p.expect(ZONE_KW);
-            }
+            opt_with_timezone(p);
             TIME_TYPE
         }
         BIT_KW => {
@@ -2704,7 +2701,7 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
             p.error("expected start of a select statement")
         }
     }
-    select_trailing_clauses(p);
+    opt_select_trailing_clauses(p);
     m.complete(p, COMPOUND_SELECT)
 }
 
@@ -2760,12 +2757,19 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
         return Some(compound_select(p, cm));
     }
     if r.trailing_clauses {
-        select_trailing_clauses(p);
+        opt_select_trailing_clauses(p);
     }
     Some(m.complete(p, out_kind))
 }
 
-fn select_trailing_clauses(p: &mut Parser<'_>) {
+const SELECT_TRAILING_CLAUSES_FIRST: TokenSet =
+    TokenSet::new(&[ORDER_KW, FOR_KW, LIMIT_KW, OFFSET_KW, FETCH_KW]);
+
+fn opt_select_trailing_clauses(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(SELECT_TRAILING_CLAUSES_FIRST) {
+        return false;
+    }
+
     opt_order_by_clause(p);
     let mut has_locking_clause = false;
     while p.at(FOR_KW) {
@@ -2783,6 +2787,7 @@ fn select_trailing_clauses(p: &mut Parser<'_>) {
             opt_locking_clause(p);
         }
     }
+    true
 }
 
 // INTO [ TEMPORARY | TEMP | UNLOGGED ] [ TABLE ] new_table
@@ -3340,6 +3345,16 @@ fn paren_data_source(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     p.bump(L_PAREN);
     // Then try to parse as a FROM_ITEM (which includes table references and joins)
     if opt_from_item(p) {
+        if p.at_ts(COMPOUND_SELECT_FIRST) {
+            let cm = m.complete(p, PAREN_SELECT);
+            let cm = compound_select(p, cm);
+            p.expect(R_PAREN);
+            return Some(cm.precede(p).complete(p, PAREN_SELECT));
+        }
+        if opt_select_trailing_clauses(p) {
+            p.expect(R_PAREN);
+            return Some(m.complete(p, PAREN_SELECT));
+        }
         p.expect(R_PAREN);
         return Some(m.complete(p, PAREN_EXPR));
     } else {
@@ -7573,6 +7588,10 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
             p.bump(CONNECTION_KW);
             string_literal(p);
         }
+        SERVER_KW => {
+            p.bump(SERVER_KW);
+            name_ref(p);
+        }
         SET_KW if p.nth_at(1, L_PAREN) => {
             set_options(p);
         }
@@ -7608,7 +7627,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => {
             p.error(
-            "expected CONNECTION, SET, ADD, DROP, REFRESH, ENABLE, DISABLE, SKIP, OWNER or RENAME",
+            "expected CONNECTION, SERVER, SET, ADD, DROP, REFRESH, ENABLE, DISABLE, SKIP, OWNER or RENAME",
         );
         }
     }
@@ -8836,15 +8855,15 @@ fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
             }
             true
         }
-        HANDLER_KW | VALIDATOR_KW => {
+        CONNECTION_KW | HANDLER_KW | VALIDATOR_KW => {
             p.bump_any();
             path_name_ref(p);
             true
         }
         NO_KW => {
             p.bump(NO_KW);
-            if !p.eat(HANDLER_KW) && !p.eat(VALIDATOR_KW) {
-                p.error("expected HANDLER or VALIDATOR")
+            if !p.eat(CONNECTION_KW) && !p.eat(HANDLER_KW) && !p.eat(VALIDATOR_KW) {
+                p.error("expected CONNECTION, HANDLER or VALIDATOR")
             }
             true
         }
@@ -9176,7 +9195,7 @@ fn publication_object(p: &mut Parser<'_>) {
 }
 
 // CREATE PUBLICATION name
-//     [ FOR ALL TABLES
+//     [ FOR ALL TABLES [ EXCEPT TABLE ( relation_name [, ...] ) ]
 //       | FOR publication_object [, ... ] ]
 //     [ WITH ( publication_parameter [= value] [, ... ] ) ]
 //
@@ -9195,6 +9214,7 @@ fn create_publication(p: &mut Parser<'_>) -> CompletedMarker {
             while !p.at(EOF) && p.eat(COMMA) {
                 publication_all_object(p);
             }
+            opt_except_table_clause(p);
         } else {
             publication_object(p);
             while !p.at(EOF) && p.eat(COMMA) {
@@ -9214,6 +9234,26 @@ fn publication_all_object(p: &mut Parser<'_>) {
             p.current()
         ));
     }
+}
+
+fn opt_except_table_clause(p: &mut Parser<'_>) {
+    if !p.at(EXCEPT_KW) {
+        return;
+    }
+
+    let m = p.start();
+    p.bump(EXCEPT_KW);
+    p.expect(TABLE_KW);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        RELATION_NAME_FIRST,
+        |p| opt_relation_name(p).is_some(),
+    );
+    m.complete(p, EXCEPT_TABLE_CLAUSE);
 }
 
 // CREATE ROLE name [ [ WITH ] option [ ... ] ]
@@ -9397,8 +9437,13 @@ fn create_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(SUBSCRIPTION_KW);
     name(p);
-    p.expect(CONNECTION_KW);
-    string_literal(p);
+    if p.at(SERVER_KW) {
+        p.bump(SERVER_KW);
+        name_ref(p);
+    } else {
+        p.expect(CONNECTION_KW);
+        string_literal(p);
+    }
     p.expect(PUBLICATION_KW);
     name_ref_list(p);
     opt_with_params(p);
@@ -13659,6 +13704,8 @@ const NON_RESERVED_WORD: TokenSet = TokenSet::new(&[IDENT])
     .union(COLUMN_NAME_KEYWORDS)
     .union(TYPE_FUNC_NAME_KEYWORDS);
 
+const RELATION_NAME_FIRST: TokenSet = TokenSet::new(&[ONLY_KW]).union(PATH_FIRST);
+
 fn relation_name(p: &mut Parser<'_>) {
     if opt_relation_name(p).is_none() {
         p.error("expected relation name");
@@ -13666,6 +13713,10 @@ fn relation_name(p: &mut Parser<'_>) {
 }
 
 fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(RELATION_NAME_FIRST) {
+        return None;
+    }
+
     let m = p.start();
     if p.eat(ONLY_KW) {
         let trailing_paren = p.eat(L_PAREN);
@@ -13675,10 +13726,7 @@ fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             p.expect(R_PAREN);
         }
     } else {
-        if opt_path_name_ref(p).is_none() {
-            m.abandon(p);
-            return None;
-        };
+        path_name_ref(p);
         p.eat(STAR);
     }
     Some(m.complete(p, RELATION_NAME))

@@ -19,3 +19,9 @@ table t union table t;
 
 values (1), (2) union values (3), (4);
 
+(((((select 1))) union select 1));
+
+select * from (((((select 1))) union select 1));
+
+select * from (((select 1) union select 2) limit 1) as t;
+

@@ -1,58 +1,77 @@
-use crate::builtins::BUILTINS_SQL;
-use crate::classify::{NameClass, NameRefClass, classify_name, classify_name_ref};
+use crate::builtins::parse_builtins;
+use crate::classify::{NameClass, NameRefClass, classify_def_node, classify_name};
 use crate::column_name::ColumnName;
+use crate::db::{File, parse};
 use crate::offsets::token_from_offset;
-use crate::resolve;
 use crate::{
     binder,
     symbols::{Name, Schema},
 };
+use crate::{goto_definition, resolve};
 use rowan::TextSize;
+use salsa::Database as Db;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
 
-pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
-    let token = token_from_offset(file, offset)?;
+#[salsa::tracked]
+pub fn hover(db: &dyn Db, file: File, offset: TextSize) -> Option<String> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
+    let token = token_from_offset(&source_file, offset)?;
     let parent = token.parent()?;
 
-    let root = file.syntax();
-    let binder = binder::bind(file);
+    let root = source_file.syntax();
+    // TODO: we should salsa this
+    let binder = binder::bind(&source_file);
 
     if token.kind() == SyntaxKind::STAR {
         if let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
             && field_expr.star_token().is_some()
-            && let Some(result) = hover_qualified_star(root, &field_expr, &binder)
+            && let Some(result) = hover_qualified_star(db, root, &field_expr, &binder)
         {
             return Some(result);
         }
 
         if let Some(arg_list) = ast::ArgList::cast(parent.clone())
-            && let Some(result) = hover_unqualified_star_in_arg_list(root, &arg_list, &binder)
+            && let Some(result) = hover_unqualified_star_in_arg_list(db, root, &arg_list, &binder)
         {
             return Some(result);
         }
 
         if let Some(target) = ast::Target::cast(parent.clone())
             && target.star_token().is_some()
-            && let Some(result) = hover_unqualified_star(root, &target, &binder)
+            && let Some(result) = hover_unqualified_star(db, root, &target, &binder)
         {
             return Some(result);
         }
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        if let Some(result) = hover_name_ref(root, &name_ref, &binder) {
-            return Some(result);
-        }
+        let definition = goto_definition::goto_definition(db, file, offset);
+        let def = definition.first()?;
 
-        // Fall back to builtins
-        let builtins_tree = ast::SourceFile::parse(BUILTINS_SQL).tree();
-        let builtins_binder = binder::bind(&builtins_tree);
-        let builtins_root = builtins_tree.syntax();
-        return hover_name_ref(builtins_root, &name_ref, &builtins_binder);
+        let (binder, root) = match def.file {
+            goto_definition::FileId::Current => (binder, root.clone()),
+            goto_definition::FileId::Builtins => {
+                let builtins_tree = parse_builtins(db).tree();
+                let binder = binder::bind(&builtins_tree);
+                let tree = builtins_tree.syntax().clone();
+                (binder, tree)
+            }
+        };
+
+        let def_node = match root.covering_element(def.range) {
+            rowan::NodeOrToken::Token(token) => token.parent()?,
+            rowan::NodeOrToken::Node(node) => node,
+        };
+
+        let context = classify_def_node(&def_node)?;
+
+        return hover_name_ref(db, &root, &name_ref, &binder, context, &def_node);
     }
 
     if let Some(name) = ast::Name::cast(parent) {
@@ -130,11 +149,15 @@ pub fn hover(file: &ast::SourceFile, offset: TextSize) -> Option<String> {
 }
 
 fn hover_name_ref(
+    db: &dyn Db,
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
+    // TODO: we should pass in the file id along with the def_node and then use
+    // salsa to lookup the the correct binder.
     binder: &binder::Binder,
+    context: NameRefClass,
+    def_node: &SyntaxNode,
 ) -> Option<String> {
-    let context = classify_name_ref(name_ref)?;
     match context {
         NameRefClass::CreateIndexColumn
         | NameRefClass::InsertColumn
@@ -160,7 +183,7 @@ fn hover_name_ref(
                 return Some(result);
             }
             // Finally try as table (handles case like `select t from t;` where t is the table)
-            hover_table(root, name_ref, binder)
+            hover_table(db, binder, def_node)
         }
         NameRefClass::DeleteQualifiedColumnTable
         | NameRefClass::ForeignKeyTable
@@ -172,7 +195,7 @@ fn hover_name_ref(
         | NameRefClass::SelectQualifiedColumnTable
         | NameRefClass::Table
         | NameRefClass::UpdateQualifiedColumnTable
-        | NameRefClass::View => hover_table(root, name_ref, binder),
+        | NameRefClass::View => hover_table(db, binder, def_node),
         NameRefClass::Sequence => hover_sequence(root, name_ref, binder),
         NameRefClass::Trigger => hover_trigger(root, name_ref, binder),
         NameRefClass::Policy => hover_policy(root, name_ref, binder),
@@ -320,6 +343,18 @@ fn format_hover_for_column_node(
             return format_view_column(&create_view, column_name, binder);
         }
 
+        if let Some(alias) = ast::Alias::cast(a.clone())
+            && let Some(alias_name) = alias.name()
+            && alias.column_list().is_some()
+        {
+            let table_name = Name::from_node(&alias_name);
+            let column_name = Name::from_string(column_name_node.text().to_string());
+            return Some(ColumnHover::table_column(
+                &table_name.to_string(),
+                &column_name.to_string(),
+            ));
+        }
+
         if let Some(create_table_as) = ast::CreateTableAs::cast(a.clone()) {
             let column_name = if let Some(name) = ast::Name::cast(column_name_node.clone()) {
                 Name::from_node(&name)
@@ -406,30 +441,18 @@ fn hover_column_definition(
     ))
 }
 
-fn hover_table(
+// TODO: we should pass in the file id along with the def_node and then use
+// salsa to lookup the the correct binder.
+fn format_table_source(
+    db: &dyn Db,
     root: &SyntaxNode,
-    name_ref: &ast::NameRef,
+    source: resolve::TableSource,
     binder: &binder::Binder,
 ) -> Option<String> {
-    if let Some(result) = hover_subquery_table(name_ref) {
-        return Some(result);
-    }
-
-    let table_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
-        .into_iter()
-        .next()?;
-
-    hover_table_from_ptr(root, &table_ptr, binder)
-}
-
-fn hover_table_from_ptr(
-    root: &SyntaxNode,
-    table_ptr: &squawk_syntax::SyntaxNodePtr,
-    binder: &binder::Binder,
-) -> Option<String> {
-    let table_name_node = table_ptr.to_node(root);
-
-    match resolve::find_table_source(&table_name_node)? {
+    match source {
+        resolve::TableSource::Alias(alias) => {
+            format_alias_with_column_list(db, root, &alias, binder)
+        }
         resolve::TableSource::WithTable(with_table) => format_with_table(&with_table),
         resolve::TableSource::CreateView(create_view) => format_create_view(&create_view, binder),
         resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
@@ -442,26 +465,83 @@ fn hover_table_from_ptr(
     }
 }
 
+fn hover_table(db: &dyn Db, binder: &binder::Binder, def_node: &SyntaxNode) -> Option<String> {
+    if let Some(result) = hover_subquery_table(def_node) {
+        return Some(result);
+    }
+
+    if let Some(source) = resolve::find_table_source(def_node)
+        && let Some(root) = def_node.ancestors().last()
+    {
+        return format_table_source(db, &root, source, binder);
+    }
+
+    None
+}
+
+fn format_alias_with_column_list(
+    db: &dyn Db,
+    root: &SyntaxNode,
+    alias: &ast::Alias,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let alias_name = alias.name()?;
+    let name = Name::from_node(&alias_name);
+
+    let mut columns: Vec<Name> = alias
+        .column_list()?
+        .columns()
+        .filter_map(|column| {
+            column
+                .name()
+                .map(|column_name| Name::from_node(&column_name))
+        })
+        .collect();
+
+    if let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast)
+        && let Some(table_ptr) = resolve::table_ptr_from_from_item(binder, &from_item)
+    {
+        let base_columns = collect_star_column_names(db, root, &table_ptr, binder);
+        for column in base_columns.iter().skip(columns.len()) {
+            columns.push(column.clone());
+        }
+    }
+
+    let columns = columns
+        .iter()
+        .map(|column| column.to_string())
+        .collect::<Vec<_>>()
+        .join(", ");
+    Some(format!("table {}({})", name, columns))
+}
+
 fn hover_qualified_star(
+    db: &dyn Db,
     root: &SyntaxNode,
     field_expr: &ast::FieldExpr,
     binder: &binder::Binder,
 ) -> Option<String> {
     let table_ptr = resolve::resolve_qualified_star_table_ptr(binder, field_expr)?;
-    hover_qualified_star_columns(root, &table_ptr, binder)
+    hover_qualified_star_columns(db, root, &table_ptr, binder)
 }
 
 fn hover_unqualified_star(
+    db: &dyn Db,
     root: &SyntaxNode,
     target: &ast::Target,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let table_ptrs = resolve::resolve_unqualified_star_table_ptrs(binder, target)?;
-    let mut results = vec![];
-    for table_ptr in table_ptrs {
-        if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
-            results.push(columns);
-        }
+    let mut results = hover_unqualified_star_with_binder(db, root, target, binder);
+
+    if results.is_empty() && target_has_schema_qualified_from_item(target) {
+        let builtins_tree = parse_builtins(db).tree();
+        let builtins_binder = binder::bind(&builtins_tree);
+        results = hover_unqualified_star_with_binder(
+            db,
+            builtins_tree.syntax(),
+            target,
+            &builtins_binder,
+        );
     }
 
     if results.is_empty() {
@@ -471,7 +551,44 @@ fn hover_unqualified_star(
     Some(results.join("\n"))
 }
 
+fn hover_unqualified_star_with_binder(
+    db: &dyn Db,
+    root: &SyntaxNode,
+    target: &ast::Target,
+    binder: &binder::Binder,
+) -> Vec<String> {
+    let mut results = vec![];
+
+    if let Some(table_ptrs) = resolve::resolve_unqualified_star_table_ptrs(binder, target) {
+        for table_ptr in table_ptrs {
+            if let Some(columns) = hover_qualified_star_columns(db, root, &table_ptr, binder) {
+                results.push(columns);
+            }
+        }
+    }
+
+    results
+}
+
+fn target_has_schema_qualified_from_item(target: &ast::Target) -> bool {
+    let Some(select) = target.syntax().ancestors().find_map(ast::Select::cast) else {
+        return false;
+    };
+    let Some(from_clause) = select.from_clause() else {
+        return false;
+    };
+
+    for from_item in from_clause.from_items() {
+        if from_item.field_expr().is_some() {
+            return true;
+        }
+    }
+
+    false
+}
+
 fn hover_unqualified_star_in_arg_list(
+    db: &dyn Db,
     root: &SyntaxNode,
     arg_list: &ast::ArgList,
     binder: &binder::Binder,
@@ -479,7 +596,7 @@ fn hover_unqualified_star_in_arg_list(
     let table_ptrs = resolve::resolve_unqualified_star_in_arg_list_ptrs(binder, arg_list)?;
     let mut results = vec![];
     for table_ptr in table_ptrs {
-        if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
+        if let Some(columns) = hover_qualified_star_columns(db, root, &table_ptr, binder) {
             results.push(columns);
         }
     }
@@ -491,25 +608,25 @@ fn hover_unqualified_star_in_arg_list(
     Some(results.join("\n"))
 }
 
-fn hover_subquery_table(name_ref: &ast::NameRef) -> Option<String> {
-    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
-    let from_clause = select.from_clause()?;
-    let qualifier = Name::from_node(name_ref);
-    let from_item = resolve::find_from_item_in_from_clause(&from_clause, &qualifier)?;
+fn hover_subquery_table(def_node: &SyntaxNode) -> Option<String> {
+    let alias = def_node.ancestors().find_map(ast::Alias::cast)?;
+    if alias.column_list().is_some() {
+        return None;
+    }
+    let name = Name::from_node(&alias.name()?);
+    let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let paren_select = from_item.paren_select()?;
-    format_subquery_table(name_ref, &paren_select)
+    format_subquery_table(&name, &paren_select)
 }
 
-fn format_subquery_table(
-    name_ref: &ast::NameRef,
-    paren_select: &ast::ParenSelect,
-) -> Option<String> {
-    let name = name_ref.syntax().text().to_string();
+fn format_subquery_table(name: &Name, paren_select: &ast::ParenSelect) -> Option<String> {
+    let name = name.to_string();
     let query = paren_select.syntax().text().to_string();
     Some(format!("subquery {} as {}", name, query))
 }
 
 fn hover_qualified_star_columns(
+    db: &dyn Db,
     root: &SyntaxNode,
     table_ptr: &squawk_syntax::SyntaxNodePtr,
     binder: &binder::Binder,
@@ -517,12 +634,15 @@ fn hover_qualified_star_columns(
     let table_name_node = table_ptr.to_node(root);
 
     if let Some(paren_select) = ast::ParenSelect::cast(table_name_node.clone()) {
-        return hover_qualified_star_columns_from_subquery(root, &paren_select, binder);
+        return hover_qualified_star_columns_from_subquery(db, root, &paren_select, binder);
     }
 
     match resolve::find_table_source(&table_name_node)? {
+        resolve::TableSource::Alias(alias) => {
+            hover_qualified_star_columns_from_alias(db, root, &alias, binder)
+        }
         resolve::TableSource::WithTable(with_table) => {
-            hover_qualified_star_columns_from_cte(&with_table)
+            hover_qualified_star_columns_from_cte(root, &with_table, binder)
         }
         resolve::TableSource::CreateTable(create_table) => {
             hover_qualified_star_columns_from_table(root, &create_table, binder)
@@ -534,9 +654,134 @@ fn hover_qualified_star_columns(
             hover_qualified_star_columns_from_materialized_view(&create_materialized_view, binder)
         }
         resolve::TableSource::ParenSelect(paren_select) => {
-            hover_qualified_star_columns_from_subquery(root, &paren_select, binder)
+            hover_qualified_star_columns_from_subquery(db, root, &paren_select, binder)
         }
     }
+}
+
+fn hover_qualified_star_columns_from_alias(
+    db: &dyn Db,
+    root: &SyntaxNode,
+    alias: &ast::Alias,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let alias_name = Name::from_node(&alias.name()?);
+    let alias_columns: Vec<Name> = alias
+        .column_list()?
+        .columns()
+        .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
+        .collect();
+
+    if alias_columns.is_empty() {
+        return None;
+    }
+
+    let mut results: Vec<String> = alias_columns
+        .iter()
+        .map(|column_name| {
+            ColumnHover::table_column(&alias_name.to_string(), &column_name.to_string())
+        })
+        .collect();
+
+    let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
+    let table_ptr = resolve::table_ptr_from_from_item(binder, &from_item)?;
+    let base_column_names = collect_star_column_names(db, root, &table_ptr, binder);
+
+    for column_name in base_column_names.iter().skip(alias_columns.len()) {
+        results.push(ColumnHover::table_column(
+            &alias_name.to_string(),
+            &column_name.to_string(),
+        ));
+    }
+
+    Some(results.join("\n"))
+}
+
+fn collect_star_column_names(
+    db: &dyn Db,
+    root: &SyntaxNode,
+    table_ptr: &squawk_syntax::SyntaxNodePtr,
+    binder: &binder::Binder,
+) -> Vec<Name> {
+    let table_name_node = table_ptr.to_node(root);
+
+    if let Some(paren_select) = ast::ParenSelect::cast(table_name_node.clone()) {
+        let columns: Vec<Name> =
+            resolve::collect_paren_select_columns_with_types(binder, root, &paren_select)
+                .into_iter()
+                .map(|(name, _ty)| name)
+                .collect();
+        if !columns.is_empty() {
+            return columns;
+        }
+        return collect_star_column_names_from_paren_select(db, root, &paren_select, binder);
+    }
+
+    match resolve::find_table_source(&table_name_node) {
+        Some(resolve::TableSource::Alias(alias)) => alias
+            .column_list()
+            .into_iter()
+            .flat_map(|column_list| column_list.columns())
+            .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
+            .collect(),
+        Some(resolve::TableSource::WithTable(with_table)) => {
+            let columns = resolve::collect_with_table_column_names(binder, root, &with_table);
+            if !columns.is_empty() {
+                return columns;
+            }
+
+            let builtins_tree = parse_builtins(db).tree();
+            let builtins_binder = binder::bind(&builtins_tree);
+            resolve::collect_with_table_column_names(
+                &builtins_binder,
+                builtins_tree.syntax(),
+                &with_table,
+            )
+        }
+        Some(resolve::TableSource::CreateTable(create_table)) => {
+            resolve::collect_table_columns(binder, root, &create_table)
+                .into_iter()
+                .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
+                .collect()
+        }
+        Some(resolve::TableSource::CreateView(create_view)) => {
+            resolve::collect_view_column_names(&create_view)
+        }
+        Some(resolve::TableSource::CreateMaterializedView(create_materialized_view)) => {
+            resolve::collect_materialized_view_column_names(&create_materialized_view)
+        }
+        Some(resolve::TableSource::ParenSelect(paren_select)) => {
+            resolve::collect_paren_select_columns_with_types(binder, root, &paren_select)
+                .into_iter()
+                .map(|(name, _ty)| name)
+                .collect()
+        }
+        None => vec![],
+    }
+}
+
+fn collect_star_column_names_from_paren_select(
+    db: &dyn Db,
+    root: &SyntaxNode,
+    paren_select: &ast::ParenSelect,
+    binder: &binder::Binder,
+) -> Vec<Name> {
+    let Some(select_variant) = paren_select.select() else {
+        return vec![];
+    };
+    let ast::SelectVariant::Select(select) = select_variant else {
+        return vec![];
+    };
+    let Some(from_clause) = select.from_clause() else {
+        return vec![];
+    };
+    let mut columns = vec![];
+    for from_item in from_clause.from_items() {
+        if let Some(table_ptr) = resolve::table_ptr_from_from_item(binder, &from_item) {
+            columns.extend(collect_star_column_names(db, root, &table_ptr, binder));
+        }
+    }
+    columns
 }
 
 fn hover_qualified_star_columns_from_table(
@@ -569,9 +814,13 @@ fn hover_qualified_star_columns_from_table(
     Some(results.join("\n"))
 }
 
-fn hover_qualified_star_columns_from_cte(with_table: &ast::WithTable) -> Option<String> {
+fn hover_qualified_star_columns_from_cte(
+    root: &SyntaxNode,
+    with_table: &ast::WithTable,
+    binder: &binder::Binder,
+) -> Option<String> {
     let cte_name = Name::from_node(&with_table.name()?);
-    let column_names = resolve::collect_with_table_column_names(with_table);
+    let column_names = resolve::collect_with_table_column_names(binder, root, with_table);
     let results: Vec<String> = column_names
         .iter()
         .map(|column_name| {
@@ -633,37 +882,64 @@ fn hover_qualified_star_columns_from_materialized_view(
 }
 
 fn hover_qualified_star_columns_from_subquery(
+    db: &dyn Db,
     root: &SyntaxNode,
     paren_select: &ast::ParenSelect,
     binder: &binder::Binder,
 ) -> Option<String> {
-    let ast::SelectVariant::Select(select) = paren_select.select()? else {
-        return None;
-    };
+    let select_variant = paren_select.select()?;
 
-    let select_clause = select.select_clause()?;
-    let target_list = select_clause.target_list()?;
+    if let ast::SelectVariant::Select(select) = select_variant {
+        let select_clause = select.select_clause()?;
+        let target_list = select_clause.target_list()?;
 
-    let mut results = vec![];
-    let subquery_alias = subquery_alias_name(paren_select);
+        let mut results = vec![];
+        let subquery_alias = subquery_alias_name(paren_select);
 
-    for target in target_list.targets() {
-        if target.star_token().is_some() {
-            let table_ptrs = resolve::resolve_unqualified_star_table_ptrs(binder, &target)?;
-            for table_ptr in table_ptrs {
-                if let Some(columns) = hover_qualified_star_columns(root, &table_ptr, binder) {
-                    results.push(columns)
+        for target in target_list.targets() {
+            if target.star_token().is_some() {
+                let table_ptrs = resolve::resolve_unqualified_star_table_ptrs(binder, &target)?;
+                for table_ptr in table_ptrs {
+                    if let Some(columns) =
+                        hover_qualified_star_columns(db, root, &table_ptr, binder)
+                    {
+                        results.push(columns)
+                    }
                 }
+                continue;
             }
-            continue;
+
+            if let Some(result) =
+                hover_subquery_target_column(root, &target, subquery_alias.as_ref(), binder)
+            {
+                results.push(result);
+            }
         }
 
-        if let Some(result) =
-            hover_subquery_target_column(root, &target, subquery_alias.as_ref(), binder)
-        {
-            results.push(result);
+        if results.is_empty() {
+            return None;
         }
+
+        return Some(results.join("\n"));
     }
+
+    let subquery_alias = subquery_alias_name(paren_select);
+    let results: Vec<String> =
+        resolve::collect_paren_select_columns_with_types(binder, root, paren_select)
+            .into_iter()
+            .map(|(column_name, ty)| {
+                if let Some(alias) = &subquery_alias {
+                    return ColumnHover::table_column(&alias.to_string(), &column_name.to_string());
+                }
+                if let Some(ty) = ty {
+                    return ColumnHover::anon_column_type(
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    );
+                }
+                ColumnHover::anon_column(&column_name.to_string())
+            })
+            .collect();
 
     if results.is_empty() {
         return None;
@@ -968,6 +1244,8 @@ fn format_create_table(
 
 fn format_create_view(create_view: &ast::CreateView, binder: &binder::Binder) -> Option<String> {
     let path = create_view.path()?;
+    // TODO: we use this to infer the schema, we should either rename this or
+    // create a different function
     let (schema, view_name) = resolve::resolve_view_info(binder, &path)?;
     let schema = schema.to_string();
 
@@ -1376,11 +1654,11 @@ fn hover_routine(
 
 #[cfg(test)]
 mod test {
+    use crate::db::{Database, File};
     use crate::hover::hover;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
-    use squawk_syntax::ast;
 
     #[track_caller]
     fn check_hover(sql: &str) -> String {
@@ -1389,13 +1667,13 @@ mod test {
 
     #[track_caller]
     fn check_hover_(sql: &str) -> Option<String> {
+        let db = Database::default();
         let (mut offset, sql) = fixture(sql);
         offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
-        let file: ast::SourceFile = parse.tree();
+        let file = File::new(&db, sql.clone(), 0);
+        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
-        if let Some(type_info) = hover(&file, offset) {
+        if let Some(type_info) = hover(&db, file, offset) {
             let offset_usize: usize = offset.into();
             let title = format!("hover: {}", type_info);
             let group = Level::INFO.primary_title(&title).element(
@@ -2807,6 +3085,19 @@ select a from t$0;
     }
 
     #[test]
+    fn hover_on_select_cte_table_as_column() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select t$0 from t;
+"), @r"
+        hover: with t as (select 1 a, 2 b, 3 c)
+          ╭▸ 
+        3 │ select t from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
     fn hover_on_cte_column() {
         assert_snapshot!(check_hover("
 with t as (select 1 a)
@@ -2999,6 +3290,133 @@ select t.*$0 from t;
     }
 
     #[test]
+    fn hover_on_cte_table_alias_with_column_list() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select u$0.x, u.y from t as u(x, y);
+"), @"
+        hover: table u(x, y, c)
+          ╭▸ 
+        3 │ select u.x, u.y from t as u(x, y);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_table_alias_with_column_list_column_ref() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select u.x$0 from t as u(x, y);
+"), @"
+        hover: column u.x
+          ╭▸ 
+        3 │ select u.x from t as u(x, y);
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_table_alias_with_column_list_table_ref() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select u$0 from t as u(x, y);
+"), @"
+        hover: table u(x, y, c)
+          ╭▸ 
+        3 │ select u from t as u(x, y);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_subquery_alias_with_column_list_table_ref() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select z$0 from (select * from t) as z(x, y);
+"), @"
+        hover: table z(x, y, c)
+          ╭▸ 
+        3 │ select z from (select * from t) as z(x, y);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_subquery_nested_paren_alias_with_column_list_table_ref() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select z$0 from ((select * from t)) as z(x, y);
+"), @"
+        hover: table z(x, y, c)
+          ╭▸ 
+        3 │ select z from ((select * from t)) as z(x, y);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_table_alias_with_partial_column_list_star() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select *$0 from t u(x, y);
+"), @"
+        hover: column u.x
+              column u.y
+              column u.c
+          ╭▸ 
+        3 │ select * from t u(x, y);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_table_alias_with_partial_column_list_star_from_information_schema() {
+        assert_snapshot!(check_hover("
+with t as (select * from information_schema.sql_features)
+select *$0 from t u(x);
+"), @"
+        hover: column u.x
+              column u.feature_name
+              column u.sub_feature_id
+              column u.sub_feature_name
+              column u.is_supported
+              column u.is_verified_by
+              column u.comments
+          ╭▸ 
+        3 │ select * from t u(x);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_cte_table_alias_with_partial_column_list_qualified_star() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b, 3 c)
+select u.*$0 from t u(x, y);
+"), @"
+        hover: column u.x
+              column u.y
+              column u.c
+          ╭▸ 
+        3 │ select u.* from t u(x, y);
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_star_from_cte_empty_select() {
+        assert!(
+            check_hover_(
+                "
+with t as (select)
+select *$0 from t;
+",
+            )
+            .is_none()
+        );
+    }
+
+    #[test]
     fn hover_on_star_with_subquery_from_cte() {
         assert_snapshot!(check_hover("
 with u as (select 1 id, 2 b)
@@ -3025,6 +3443,38 @@ select *$0 from (select a from t);
         hover: column public.t.a int
           ╭▸ 
         3 │ select * from (select a from t);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_star_with_subquery_from_table_statement() {
+        assert_snapshot!(check_hover("
+with t as (select 1 a, 2 b)
+select *$0 from (table t);
+"), @r"
+        hover: column a
+              column b
+          ╭▸ 
+        3 │ select * from (table t);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_star_from_information_schema_table() {
+        assert_snapshot!(check_hover("
+select *$0 from information_schema.sql_features;
+"), @"
+        hover: column information_schema.sql_features.feature_id information_schema.character_data
+              column information_schema.sql_features.feature_name information_schema.character_data
+              column information_schema.sql_features.sub_feature_id information_schema.character_data
+              column information_schema.sql_features.sub_feature_name information_schema.character_data
+              column information_schema.sql_features.is_supported information_schema.yes_or_no
+              column information_schema.sql_features.is_verified_by information_schema.character_data
+              column information_schema.sql_features.comments information_schema.character_data
+          ╭▸ 
+        2 │ select * from information_schema.sql_features;
           ╰╴       ─ hover
         ");
     }

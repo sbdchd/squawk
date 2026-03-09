@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use rowan::{TextRange, TextSize};
+use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::{
     SyntaxKind, SyntaxToken,
@@ -10,43 +11,49 @@ use std::iter;
 use crate::{
     binder,
     column_name::ColumnName,
+    db::{File, parse},
     offsets::token_from_offset,
     quote::{quote_column_alias, unquote_ident},
     symbols::Name,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ActionKind {
     QuickFix,
     RefactorRewrite,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CodeAction {
     pub title: String,
     pub edits: Vec<Edit>,
     pub kind: ActionKind,
 }
 
-pub fn code_actions(file: ast::SourceFile, offset: TextSize) -> Option<Vec<CodeAction>> {
+#[salsa::tracked]
+pub fn code_actions(db: &dyn Db, file: File, offset: TextSize) -> Option<Vec<CodeAction>> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
     let mut actions = vec![];
-    rewrite_as_regular_string(&mut actions, &file, offset);
-    rewrite_as_dollar_quoted_string(&mut actions, &file, offset);
-    remove_else_clause(&mut actions, &file, offset);
-    rewrite_table_as_select(&mut actions, &file, offset);
-    rewrite_select_as_table(&mut actions, &file, offset);
-    rewrite_from(&mut actions, &file, offset);
-    rewrite_leading_from(&mut actions, &file, offset);
-    rewrite_values_as_select(&mut actions, &file, offset);
-    rewrite_select_as_values(&mut actions, &file, offset);
-    add_schema(&mut actions, &file, offset);
-    quote_identifier(&mut actions, &file, offset);
-    unquote_identifier(&mut actions, &file, offset);
-    add_explicit_alias(&mut actions, &file, offset);
-    remove_redundant_alias(&mut actions, &file, offset);
-    rewrite_cast_to_double_colon(&mut actions, &file, offset);
-    rewrite_double_colon_to_cast(&mut actions, &file, offset);
-    rewrite_between_as_binary_expression(&mut actions, &file, offset);
+    rewrite_as_regular_string(&mut actions, &source_file, offset);
+    rewrite_as_dollar_quoted_string(&mut actions, &source_file, offset);
+    remove_else_clause(&mut actions, &source_file, offset);
+    rewrite_table_as_select(&mut actions, &source_file, offset);
+    rewrite_select_as_table(&mut actions, &source_file, offset);
+    rewrite_from(&mut actions, &source_file, offset);
+    rewrite_leading_from(&mut actions, &source_file, offset);
+    rewrite_values_as_select(&mut actions, &source_file, offset);
+    rewrite_select_as_values(&mut actions, &source_file, offset);
+    add_schema(&mut actions, &source_file, offset);
+    quote_identifier(&mut actions, &source_file, offset);
+    unquote_identifier(&mut actions, &source_file, offset);
+    add_explicit_alias(&mut actions, &source_file, offset);
+    remove_redundant_alias(&mut actions, &source_file, offset);
+    rewrite_cast_to_double_colon(&mut actions, &source_file, offset);
+    rewrite_double_colon_to_cast(&mut actions, &source_file, offset);
+    rewrite_between_as_binary_expression(&mut actions, &source_file, offset);
+    rewrite_timestamp_type(&mut actions, &source_file, offset);
     Some(actions)
 }
 
@@ -548,7 +555,17 @@ fn add_schema(
     }
 
     let position = token.text_range().start();
+    // TODO: we should salsa this
     let binder = binder::bind(file);
+    // TODO: we don't need the search path at the current position, we need to
+    // lookup the definition of the item and see what the definition's search
+    // path is.
+    //
+    // It tries to rewrite:
+    // `select now()::timestamptz;` as
+    // `select now()::public.timestamptz;`
+    // instead of
+    // `select now()::pg_catalog.timestamptz;`
     let schema = binder.search_path_at(position).first()?.to_string();
     let replacement = format!("{}.", schema);
 
@@ -659,6 +676,40 @@ fn rewrite_between_as_binary_expression(
             between_expr.syntax().text_range(),
             replacement,
         )],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn rewrite_timestamp_type(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let time_type = token.parent_ancestors().find_map(ast::TimeType::cast)?;
+
+    let replacement = match time_type.timezone()? {
+        ast::Timezone::WithoutTimezone(_) => {
+            if time_type.timestamp_token().is_some() {
+                "timestamp"
+            } else {
+                "time"
+            }
+        }
+        ast::Timezone::WithTimezone(_) => {
+            if time_type.timestamp_token().is_some() {
+                "timestamptz"
+            } else {
+                "timetz"
+            }
+        }
+    };
+
+    actions.push(CodeAction {
+        title: format!("Rewrite as `{replacement}`"),
+        edits: vec![Edit::replace(time_type.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 
@@ -2288,5 +2339,67 @@ select myschema.f$0();"
             rewrite_leading_from,
             "sel$0ect c from t;"
         ));
+    }
+
+    #[test]
+    fn rewrite_timestamp_without_tz_column() {
+        assert_snapshot!(apply_code_action(
+            rewrite_timestamp_type,
+            "create table t(a time$0stamp without time zone);"),
+            @"create table t(a timestamp);"
+        );
+    }
+
+    #[test]
+    fn rewrite_timestamp_without_tz_cast() {
+        assert_snapshot!(apply_code_action(
+            rewrite_timestamp_type,
+            "select timestamp$0 without time zone '2021-01-01';"),
+            @"select timestamp '2021-01-01';"
+        );
+    }
+
+    #[test]
+    fn rewrite_time_without_tz() {
+        assert_snapshot!(apply_code_action(
+            rewrite_timestamp_type,
+            "create table t(a ti$0me without time zone);"),
+            @"create table t(a time);"
+        );
+    }
+
+    #[test]
+    fn rewrite_timestamp_without_tz_not_applicable_plain() {
+        assert!(code_action_not_applicable(
+            rewrite_timestamp_type,
+            "create table t(a time$0stamp);"
+        ));
+    }
+
+    #[test]
+    fn rewrite_timestamp_with_tz_column() {
+        assert_snapshot!(apply_code_action(
+            rewrite_timestamp_type,
+            "create table t(a time$0stamp with time zone);"),
+            @"create table t(a timestamptz);"
+        );
+    }
+
+    #[test]
+    fn rewrite_timestamp_with_tz_cast() {
+        assert_snapshot!(apply_code_action(
+            rewrite_timestamp_type,
+            "select timestamp$0 with time zone '2021-01-01';"),
+            @"select timestamptz '2021-01-01';"
+        );
+    }
+
+    #[test]
+    fn rewrite_time_with_tz() {
+        assert_snapshot!(apply_code_action(
+            rewrite_timestamp_type,
+            "create table t(a ti$0me with time zone);"),
+            @"create table t(a timetz);"
+        );
     }
 }

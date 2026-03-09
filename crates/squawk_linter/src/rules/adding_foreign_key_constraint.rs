@@ -74,42 +74,9 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                     }
                 }
             }
-            ast::Stmt::CreateTable(create_table) => {
-                if let Some(table_arg_list) = create_table.table_arg_list() {
-                    for arg in table_arg_list.args() {
-                        match arg {
-                            ast::TableArg::TableConstraint(
-                                ast::TableConstraint::ForeignKeyConstraint(fk),
-                            ) => {
-                                ctx.report(
-                                    Violation::for_node(
-                                        Rule::AddingForeignKeyConstraint,
-                                        message.into(),
-                                        fk.syntax(),
-                                    )
-                                    .help(help),
-                                );
-                            }
-                            ast::TableArg::Column(column) => {
-                                for constraint in column.constraints() {
-                                    if let ast::ColumnConstraint::ReferencesConstraint(refs) =
-                                        constraint
-                                    {
-                                        ctx.report(
-                                            Violation::for_node(
-                                                Rule::AddingForeignKeyConstraint,
-                                                message.into(),
-                                                refs.syntax(),
-                                            )
-                                            .help(help),
-                                        );
-                                    }
-                                }
-                            }
-                            _ => (),
-                        }
-                    }
-                }
+            ast::Stmt::CreateTable(_) => {
+                // NOTE: we don't consider foreign key constraints in create
+                // table stmts as there are no rows in the current table.
             }
             _ => (),
         }
@@ -129,6 +96,8 @@ mod test {
 
     #[test]
     fn create_table_with_foreign_key_constraint() {
+        // Okay as there are no rows in the current table. We'll take a share
+        // row exclusive lock on the related table but won't hold it for long.
         let sql = r#"
 BEGIN;
 CREATE TABLE email (
@@ -143,11 +112,13 @@ CREATE TABLE email (
 COMMIT;
         "#;
 
-        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint));
+        lint_ok(sql, Rule::AddingForeignKeyConstraint);
     }
 
     #[test]
     fn create_table_with_column_references() {
+        // Okay as there are no rows in the current table. We'll take a share
+        // row exclusive lock on the related table but won't hold it for long.
         let sql = r#"
 CREATE TABLE table_name (
     id BIGSERIAL NOT NULL,
@@ -155,7 +126,7 @@ CREATE TABLE table_name (
 );
         "#;
 
-        assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint));
+        lint_ok(sql, Rule::AddingForeignKeyConstraint);
     }
 
     #[test]

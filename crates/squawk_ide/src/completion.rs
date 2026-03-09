@@ -1,17 +1,23 @@
 use rowan::TextSize;
+use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 use squawk_syntax::{SyntaxKind, SyntaxToken};
 
 use crate::binder;
+use crate::db::{File, parse};
 use crate::resolve;
 use crate::symbols::{Name, Schema, SymbolKind};
 use crate::tokens::is_string_or_comment;
 
 const COMPLETION_MARKER: &str = "squawkCompletionMarker";
 
-pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionItem> {
-    let file = file_with_completion_marker(file, offset);
-    let Some(token) = token_at_offset(&file, offset) else {
+#[salsa::tracked]
+pub fn completion(db: &dyn Db, file: File, offset: TextSize) -> Vec<CompletionItem> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
+    let marker_file = file_with_completion_marker(&source_file, offset);
+    let Some(token) = token_at_offset(&marker_file, offset) else {
         // empty file
         return default_completions();
     };
@@ -24,19 +30,23 @@ pub fn completion(file: &ast::SourceFile, offset: TextSize) -> Vec<CompletionIte
     }
 
     match completion_context(&token) {
-        CompletionContext::TableOnly => table_completions(&file, &token),
+        CompletionContext::TableOnly => table_completions(&marker_file, &token),
         CompletionContext::Default => default_completions(),
         CompletionContext::SelectClause(select_clause) => {
-            select_completions(&file, select_clause, &token)
+            select_completions(&marker_file, select_clause, &token)
         }
         CompletionContext::SelectClauses(select) => select_clauses_completions(&select),
-        CompletionContext::SelectExpr(select) => select_expr_completions(&file, &select, &token),
-        CompletionContext::LimitClause => limit_completions(&file, &token),
-        CompletionContext::OffsetClause => offset_completions(&file, &token),
-        CompletionContext::DeleteClauses(delete) => {
-            delete_clauses_completions(&file, &delete, &token)
+        CompletionContext::SelectExpr(select) => {
+            select_expr_completions(&marker_file, &select, &token)
         }
-        CompletionContext::DeleteExpr(delete) => delete_expr_completions(&file, &delete, &token),
+        CompletionContext::LimitClause => limit_completions(&marker_file, &token),
+        CompletionContext::OffsetClause => offset_completions(&marker_file, &token),
+        CompletionContext::DeleteClauses(delete) => {
+            delete_clauses_completions(&marker_file, &delete, &token)
+        }
+        CompletionContext::DeleteExpr(delete) => {
+            delete_expr_completions(&marker_file, &delete, &token)
+        }
     }
 }
 
@@ -45,6 +55,7 @@ fn select_completions(
     select_clause: ast::SelectClause,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
     let schema = schema_qualifier_at_token(token);
@@ -246,6 +257,7 @@ fn select_clauses_completions(select: &ast::Select) -> Vec<CompletionItem> {
 }
 
 fn limit_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
@@ -265,6 +277,7 @@ fn limit_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<Complet
 }
 
 fn offset_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
@@ -277,6 +290,7 @@ fn select_expr_completions(
     select: &ast::Select,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
     let schema = schema_qualifier_at_token(token);
@@ -352,7 +366,11 @@ fn column_completions_from_clause(
                 }));
             }
             Some(resolve::TableSource::WithTable(with_table)) => {
-                let columns = resolve::collect_with_table_columns_with_types(&with_table);
+                let columns = resolve::collect_with_table_columns_with_types(
+                    binder,
+                    file.syntax(),
+                    &with_table,
+                );
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
                     kind: CompletionItemKind::Column,
@@ -389,6 +407,44 @@ fn column_completions_from_clause(
                     sort_text: None,
                 }));
             }
+            Some(resolve::TableSource::Alias(alias)) => {
+                let alias_columns: Vec<Name> = alias
+                    .column_list()
+                    .into_iter()
+                    .flat_map(|column_list| column_list.columns())
+                    .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
+                    .collect();
+
+                let base_columns = alias_base_columns_with_types(binder, file, &alias);
+
+                for (idx, alias_column) in alias_columns.iter().enumerate() {
+                    completions.push(CompletionItem {
+                        label: alias_column.to_string(),
+                        kind: CompletionItemKind::Column,
+                        detail: base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
+                        insert_text: None,
+                        insert_text_format: None,
+                        trigger_completion_after_insert: false,
+                        sort_text: Some(format!("{idx:04}")),
+                    });
+                }
+
+                completions.extend(
+                    base_columns
+                        .into_iter()
+                        .skip(alias_columns.len())
+                        .enumerate()
+                        .map(|(idx, (name, ty))| CompletionItem {
+                            label: name.to_string(),
+                            kind: CompletionItemKind::Column,
+                            detail: ty,
+                            insert_text: None,
+                            insert_text_format: None,
+                            trigger_completion_after_insert: false,
+                            sort_text: Some(format!("{:04}", idx + alias_columns.len())),
+                        }),
+                );
+            }
             Some(resolve::TableSource::ParenSelect(paren_select)) => {
                 let columns = resolve::collect_paren_select_columns_with_types(
                     binder,
@@ -409,6 +465,59 @@ fn column_completions_from_clause(
         }
     }
     completions
+}
+
+fn alias_base_columns_with_types(
+    binder: &binder::Binder,
+    file: &ast::SourceFile,
+    alias: &ast::Alias,
+) -> Vec<(Name, Option<String>)> {
+    let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
+        return vec![];
+    };
+    let Some(table_ptr) = resolve::table_ptr_from_from_item(binder, &from_item) else {
+        return vec![];
+    };
+
+    let table_node = table_ptr.to_node(file.syntax());
+
+    match resolve::find_table_source(&table_node) {
+        Some(resolve::TableSource::CreateTable(create_table)) => {
+            resolve::collect_table_columns(binder, file.syntax(), &create_table)
+                .into_iter()
+                .filter_map(|column| {
+                    let name = column.name()?;
+                    let detail = column.ty().map(|t| t.syntax().text().to_string());
+                    Some((Name::from_node(&name), detail))
+                })
+                .collect()
+        }
+        Some(resolve::TableSource::WithTable(with_table)) => {
+            resolve::collect_with_table_columns_with_types(binder, file.syntax(), &with_table)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::CreateView(create_view)) => {
+            resolve::collect_view_columns_with_types(&create_view)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::CreateMaterializedView(create_materialized_view)) => {
+            resolve::collect_materialized_view_columns_with_types(&create_materialized_view)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::ParenSelect(paren_select)) => {
+            resolve::collect_paren_select_columns_with_types(binder, file.syntax(), &paren_select)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(resolve::TableSource::Alias(_)) | None => vec![],
+    }
 }
 
 fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
@@ -449,6 +558,7 @@ fn schema_completions(binder: &binder::Binder) -> Vec<CompletionItem> {
 }
 
 fn table_completions(file: &ast::SourceFile, token: &SyntaxToken) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let schema = schema_qualifier_at_token(token);
     let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
@@ -528,6 +638,7 @@ fn delete_expr_completions(
     delete: &ast::Delete,
     token: &SyntaxToken,
 ) -> Vec<CompletionItem> {
+    // TODO: we should salsa this
     let binder = binder::bind(file);
     let mut completions = vec![];
 
@@ -738,6 +849,7 @@ fn file_with_completion_marker(file: &ast::SourceFile, offset: TextSize) -> ast:
     let offset = u32::from(offset) as usize;
     let offset = offset.min(sql.len());
     sql.insert_str(offset, COMPLETION_MARKER);
+    // TODO: should this be cached
     ast::SourceFile::parse(&sql).tree()
 }
 
@@ -842,17 +954,17 @@ pub struct CompletionItem {
 #[cfg(test)]
 mod tests {
     use super::completion;
+    use crate::db::{Database, File};
     use crate::test_utils::fixture;
     use insta::assert_snapshot;
-    use squawk_syntax::ast;
     use tabled::builder::Builder;
     use tabled::settings::Style;
 
     fn completions(sql: &str) -> String {
         let (offset, sql) = fixture(sql);
-        let parse = ast::SourceFile::parse(&sql);
-        let file = parse.tree();
-        let items = completion(&file, offset);
+        let db = Database::default();
+        let file = File::new(&db, sql, 0);
+        let items = completion(&db, file, offset);
         assert!(
             !items.is_empty(),
             "No completions found. If this was intended, use `completions_not_found` instead."
@@ -862,9 +974,9 @@ mod tests {
 
     fn completions_not_found(sql: &str) {
         let (offset, sql) = fixture(sql);
-        let parse = ast::SourceFile::parse(&sql);
-        let file = parse.tree();
-        let items = completion(&file, offset);
+        let db = Database::default();
+        let file = File::new(&db, sql, 0);
+        let items = completion(&db, file, offset);
         assert_eq!(
             items,
             vec![],
@@ -1066,6 +1178,26 @@ select $0 from t;
          label              | kind     | detail  
         --------------------+----------+---------
          a                  | Column   | integer 
+         *                  | Operator |         
+         public             | Schema   |         
+         pg_catalog         | Schema   |         
+         pg_temp            | Schema   |         
+         pg_toast           | Schema   |         
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_with_cte_alias_column_list() {
+        assert_snapshot!(completions("
+with t as (select 1 a, 2 b, 3 c)
+select $0 from t as u(x, y);
+"), @r"
+         label              | kind     | detail  
+        --------------------+----------+---------
+         x                  | Column   | integer 
+         y                  | Column   | integer 
+         c                  | Column   | integer 
          *                  | Operator |         
          public             | Schema   |         
          pg_catalog         | Schema   |         

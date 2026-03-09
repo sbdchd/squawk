@@ -3,7 +3,7 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
-version = "2.41.0"
+version = "2.43.0"
 edition = "2024"
 rust-version = "1.93"
 authors = ["Squawk Team & Contributors"]
@@ -46,9 +46,9 @@ line-index = "0.1.2"
 lsp-server = "0.7.8"
 lsp-types = "0.95"
 serde-wasm-bindgen = "0.6.5"
-wasm-bindgen = "0.2.100"
-wasm-bindgen-test = "0.3.34"
-web-sys = "0.3.77"
+wasm-bindgen = "0.2.114"
+wasm-bindgen-test = "0.3.50"
+web-sys = "0.3.91"
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 annotate-snippets = "0.12.4"
@@ -63,16 +63,17 @@ snapbox = { version = "0.6.0", features = ["diff", "term-svg", "cmd"] }
 smallvec = "1.13.2"
 tabled = "0.17.0"
 etcetera = "0.11.0"
+url = "2.5.4"
 
 # local
 # we have to make the versions explicit otherwise `cargo publish` won't work
-squawk-github = { path = "./crates/squawk_github", version = "2.41.0" }
-squawk-ide = { path = "./crates/squawk_ide", version = "2.41.0" }
-squawk-lexer = { path = "./crates/squawk_lexer", version = "2.41.0" }
-squawk-parser = { path = "./crates/squawk_parser", version = "2.41.0" }
-squawk-syntax = { path = "./crates/squawk_syntax", version = "2.41.0" }
-squawk-linter = { path = "./crates/squawk_linter", version = "2.41.0" }
-squawk-server = { path = "./crates/squawk_server", version = "2.41.0" }
+squawk-github = { path = "./crates/squawk_github", version = "2.43.0" }
+squawk-ide = { path = "./crates/squawk_ide", version = "2.43.0" }
+squawk-lexer = { path = "./crates/squawk_lexer", version = "2.43.0" }
+squawk-parser = { path = "./crates/squawk_parser", version = "2.43.0" }
+squawk-syntax = { path = "./crates/squawk_syntax", version = "2.43.0" }
+squawk-linter = { path = "./crates/squawk_linter", version = "2.43.0" }
+squawk-server = { path = "./crates/squawk_server", version = "2.43.0" }
 
 [workspace.lints.clippy]
 collapsible_else_if = "allow"

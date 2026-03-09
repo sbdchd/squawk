@@ -1,15 +1,21 @@
+use crate::binder;
+use crate::builtins::parse_builtins;
+use crate::db::{File, parse};
 use crate::offsets::token_from_offset;
 use crate::resolve;
-use crate::{binder, builtins::BUILTINS_SQL};
 use rowan::{TextRange, TextSize};
+use salsa::Database as Db;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
 
-pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Location; 1]> {
-    let Some(token) = token_from_offset(file, offset) else {
+#[salsa::tracked]
+pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[Location; 1]> {
+    let parse = parse(db, file);
+    let source_file = &parse.tree();
+    let Some(token) = token_from_offset(source_file, offset) else {
         return smallvec![];
     };
     let Some(parent) = token.parent() else {
@@ -32,21 +38,22 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
 
     // goto def on COMMIT -> BEGIN/START TRANSACTION
     if ast::Commit::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
     {
         return smallvec![Location::range(begin_range)];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
     {
         return smallvec![Location::range(begin_range)];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
     if ast::Begin::can_cast(parent.kind())
-        && let Some(end_range) = find_following_commit_or_rollback(file, token.text_range().end())
+        && let Some(end_range) =
+            find_following_commit_or_rollback(source_file, token.text_range().end())
     {
         return smallvec![Location::range(end_range)];
     }
@@ -58,9 +65,11 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
-                FileId::Current => file,
-                FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+                FileId::Current => source_file,
+                // TODO: we should salsa this
+                FileId::Builtins => &parse_builtins(db).tree(),
             };
+            // TODO: we should salsa this
             let binder_output = binder::bind(file);
             let root = file.syntax();
             if let Some(ptrs) = resolve::resolve_name_ref_ptrs(&binder_output, root, &name_ref) {
@@ -88,9 +97,11 @@ pub fn goto_definition(file: &ast::SourceFile, offset: TextSize) -> SmallVec<[Lo
     if let Some(ty) = type_node {
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
-                FileId::Current => file,
-                FileId::Builtins => &ast::SourceFile::parse(BUILTINS_SQL).tree(),
+                FileId::Current => source_file,
+                // TODO: we should salsa this
+                FileId::Builtins => &parse_builtins(db).tree(),
             };
+            // TODO: we should salsa this
             let binder_output = binder::bind(file);
             let position = token.text_range().start();
             if let Some(ptr) = resolve::resolve_type_ptr_from_type(&binder_output, &ty, position) {
@@ -111,7 +122,7 @@ pub enum FileId {
     Builtins,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Location {
     pub file: FileId,
     pub range: TextRange,
@@ -156,14 +167,13 @@ fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) ->
 #[cfg(test)]
 mod test {
     use crate::builtins::BUILTINS_SQL;
+    use crate::db::{Database, File};
     use crate::goto_definition::{FileId, goto_definition};
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use log::info;
     use rowan::TextRange;
-
-    use squawk_syntax::ast;
 
     #[track_caller]
     fn goto(sql: &str) -> String {
@@ -177,10 +187,10 @@ mod test {
         // For go to def we want the previous character since we usually put the
         // marker after the item we're trying to go to def on.
         offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let parse = ast::SourceFile::parse(&sql);
-        assert_eq!(parse.errors(), vec![]);
-        let file: ast::SourceFile = parse.tree();
-        let results = goto_definition(&file, offset);
+        let db = Database::default();
+        let file = File::new(&db, sql.clone(), 0);
+        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
+        let results = goto_definition(&db, file, offset);
         if !results.is_empty() {
             let offset: usize = offset.into();
             let mut current_dests = vec![];
@@ -551,6 +561,126 @@ select t$0.* from t;
     }
 
     #[test]
+    fn goto_cross_join_func_column() {
+        assert_snapshot!(goto(r#"
+with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+select * from t, json_to_recordset(x$0) as r(a int, b int);
+"#), @r#"
+          ╭▸ 
+        2 │ with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+          │        ─ 2. destination
+        3 │ select * from t, json_to_recordset(x) as r(a int, b int);
+          ╰╴                                   ─ 1. source
+        "#);
+    }
+
+    #[test]
+    fn goto_cross_join_func_qualified_column_table() {
+        assert_snapshot!(goto(r#"
+with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+select * from t, json_to_recordset(t$0.x) as r(a int, b int);
+"#), @r#"
+          ╭▸ 
+        2 │ with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+          │      ─ 2. destination
+        3 │ select * from t, json_to_recordset(t.x) as r(a int, b int);
+          ╰╴                                   ─ 1. source
+        "#);
+    }
+
+    #[test]
+    fn goto_cross_join_func_qualified_column_field() {
+        assert_snapshot!(goto(r#"
+with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+select * from t, json_to_recordset(t.x$0) as r(a int, b int);
+"#), @r#"
+          ╭▸ 
+        2 │ with t(x) as (select $$[{"a":1,"b":2}]$$::json)
+          │        ─ 2. destination
+        3 │ select * from t, json_to_recordset(t.x) as r(a int, b int);
+          ╰╴                                     ─ 1. source
+        "#);
+    }
+
+    #[test]
+    fn goto_lateral_values_alias_in_subquery() {
+        assert_snapshot!(goto("
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join lateral (select u$0.n * 10 as val) x;
+"), @r"
+          ╭▸ 
+        3 │ from (values (1), (2)) u(n)
+          │                        ─ 2. destination
+        4 │ cross join lateral (select u.n * 10 as val) x;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_lateral_missing_not_found() {
+        // Query 1 ERROR at Line 3: : ERROR:  invalid reference to FROM-clause entry for table "u"
+        // LINE 3: cross join (select u.n * 10 as val) x;
+        //                            ^
+        // DETAIL:  There is an entry for table "u", but it cannot be referenced from this part of the query.
+        // HINT:  To reference that table, you must mark this subquery with LATERAL.
+        goto_not_found(
+            "
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join (select u$0.n * 10 as val) x;
+",
+        );
+    }
+
+    #[test]
+    fn goto_lateral_deeply_nested_paren_expr_values_alias_in_subquery() {
+        assert_snapshot!(goto("
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join lateral ((((select u$0.n * 10 as val)))) x;
+"), @r"
+          ╭▸ 
+        3 │ from (values (1), (2)) u(n)
+          │                        ─ 2. destination
+        4 │ cross join lateral ((((select u.n * 10 as val)))) x;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_lateral_deeply_nested_paren_expr_values_alias_column() {
+        assert_snapshot!(goto("
+select u.n, x.val$0
+from (values (1), (2)) u(n)
+cross join lateral ((((select u.n * 10 as val)))) x;
+"), @r"
+          ╭▸ 
+        2 │ select u.n, x.val
+          │                 ─ 1. source
+        3 │ from (values (1), (2)) u(n)
+        4 │ cross join lateral ((((select u.n * 10 as val)))) x;
+          ╰╴                                          ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_lateral_deeply_nested_paren_expr_missing_not_found() {
+        // Query 1 ERROR at Line 3: : ERROR:  invalid reference to FROM-clause entry for table "u"
+        // LINE 3: cross join ((((select u.n * 10 as val)))) x;
+        //                               ^
+        // DETAIL:  There is an entry for table "u", but it cannot be referenced from this part of the query.
+        // HINT:  To reference that table, you must mark this subquery with LATERAL.
+        goto_not_found(
+            "
+select u.n, x.val
+from (values (1), (2)) u(n)
+cross join ((((select u$0.n * 10 as val)))) x;
+",
+        );
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;
@@ -748,16 +878,16 @@ alter policy p on t
     fn goto_builtin_now() {
         assert_snapshot!(goto("
 select now$0();
-"), @r"
+"), @"
               ╭▸ current.sql:2:10
               │
             2 │ select now();
               │          ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:10798:28
+              ╭▸ builtin.sql:11089:28
               │
-        10798 │ create function pg_catalog.now() returns timestamp with time zone
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -766,16 +896,16 @@ select now$0();
     fn goto_current_timestamp() {
         assert_snapshot!(goto("
 select current_timestamp$0;
-"), @r"
+"), @"
               ╭▸ current.sql:2:24
               │
             2 │ select current_timestamp;
               │                        ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:10798:28
+              ╭▸ builtin.sql:11089:28
               │
-        10798 │ create function pg_catalog.now() returns timestamp with time zone
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -799,16 +929,16 @@ select current_timestamp$0 from t;
         assert_snapshot!(goto("
 create table t(created_at timestamptz);
 select * from t where current_timestamp$0 > t.created_at;
-"), @r"
+"), @"
               ╭▸ current.sql:3:39
               │
             3 │ select * from t where current_timestamp > t.created_at;
               │                                       ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:10798:28
+              ╭▸ builtin.sql:11089:28
               │
-        10798 │ create function pg_catalog.now() returns timestamp with time zone
+        11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
     }
@@ -2759,6 +2889,48 @@ select '{[1.234, 5.678]}'::floatmultirangerange$0;
     }
 
     #[test]
+    fn goto_cast_boolean_falls_back_to_bool() {
+        assert_snapshot!(goto("
+create type pg_catalog.bool;
+select '1'::boolean$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.bool;
+          │                        ──── 2. destination
+        3 │ select '1'::boolean;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_decimal_falls_back_to_numeric() {
+        assert_snapshot!(goto("
+create type pg_catalog.numeric;
+select 1::decimal$0(10, 2);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.numeric;
+          │                        ─────── 2. destination
+        3 │ select 1::decimal(10, 2);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_float_falls_back_to_float8() {
+        assert_snapshot!(goto("
+create type pg_catalog.float8;
+select 1::float$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float8;
+          │                        ────── 2. destination
+        3 │ select 1::float;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cast_bigint_falls_back_to_int8() {
         assert_snapshot!(goto("
 create type pg_catalog.int8;
@@ -2769,6 +2941,20 @@ select 1::bigint$0;
           │                        ──── 2. destination
         3 │ select 1::bigint;
           ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_real_falls_back_to_float4() {
+        assert_snapshot!(goto("
+create type pg_catalog.float4;
+select 1::real$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float4;
+          │                        ────── 2. destination
+        3 │ select 1::real;
+          ╰╴             ─ 1. source
         ");
     }
 
@@ -3930,6 +4116,52 @@ select foo$0(1);
     }
 
     #[test]
+    fn goto_create_aggregate_sfunc() {
+        assert_snapshot!(goto("
+create function pg_catalog.int8inc(bigint) returns bigint
+  language internal;
+
+create aggregate pg_catalog.count(*) (
+  sfunc = int8inc$0,
+  stype = bigint,
+  combinefunc = int8pl,
+  initcond = '0'
+);
+"), @r"
+          ╭▸ 
+        2 │ create function pg_catalog.int8inc(bigint) returns bigint
+          │                            ─────── 2. destination
+          ‡
+        6 │   sfunc = int8inc,
+          ╰╴                ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_create_aggregate_combinefunc() {
+        assert_snapshot!(goto("
+create function pg_catalog.int8pl(bigint, bigint) returns bigint
+  language internal;
+
+create aggregate pg_catalog.count(*) (
+  sfunc = int8inc,
+  stype = bigint,
+  combinefunc = int8pl$0,
+  initcond = '0'
+);
+"), @r"
+          ╭▸ 
+        2 │ create function pg_catalog.int8pl(bigint, bigint) returns bigint
+          │                            ────── 2. destination
+          ‡
+        8 │   combinefunc = int8pl,
+          ╰╴                     ─ 1. source
+        "
+        );
+    }
+
+    #[test]
     fn goto_default_constraint_function_call() {
         assert_snapshot!(goto("
 create function f() returns int as 'select 1' language sql;
@@ -4609,6 +4841,34 @@ select a$0 from (select 1 as a);
     }
 
     #[test]
+    fn goto_subquery_compound_select_column() {
+        assert_snapshot!(goto("
+select c$0 from (select 1 c union select 2 c);
+"), @r"
+          ╭▸ 
+        2 │ select c from (select 1 c union select 2 c);
+          ╰╴       ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_compound_select_column_with_nested_parens() {
+        assert_snapshot!(goto("
+with t as (
+  select 1 as c
+)
+select c$0 from ((select * from t) union all (select * from t));
+"), @r"
+          ╭▸ 
+        3 │   select 1 as c
+          │               ─ 2. destination
+        4 │ )
+        5 │ select c from ((select * from t) union all (select * from t));
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_subquery_column_multiple_columns() {
         assert_snapshot!(goto("
 select b$0 from (select 1 a, 2 b);
@@ -4777,6 +5037,20 @@ select b$0 from (values (1, 2)) t(a, b);
     }
 
     #[test]
+    fn goto_values_column_alias_list_nested_parens() {
+        assert_snapshot!(goto("
+select n$0
+from ((values (1), (2))) u(n);
+"), @r"
+          ╭▸ 
+        2 │ select n
+          │        ─ 1. source
+        3 │ from ((values (1), (2))) u(n);
+          ╰╴                           ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_table_expr_column() {
         assert_snapshot!(goto("
 create table t(a int, b int);
@@ -4805,6 +5079,20 @@ select a$0 from (table x);
     }
 
     #[test]
+    fn goto_table_expr_cte_table() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select * from (table t$0);
+"), @r"
+          ╭▸ 
+        2 │ with t as (select 1 a, 2 b)
+          │      ─ 2. destination
+        3 │ select * from (table t);
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_table_expr_partial_column_alias_list() {
         assert_snapshot!(goto("
 with t as (select 1 a, 2 b)
@@ -4826,6 +5114,42 @@ select x, b$0 from (select 1 a, 2 b) t(x);
           ╭▸ 
         2 │ select x, b from (select 1 a, 2 b) t(x);
           ╰╴          ─ 1. source           ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_alias_with_column_list_table_ref() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select z$0 from (select * from t) as z(x, y);
+"), @"
+          ╭▸ 
+        3 │ select z from (select * from t) as z(x, y);
+          ╰╴       ─ 1. source                 ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_alias_with_column_list_table_ref_shadows_column() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b)
+select z$0 from (select a as z, b from t) as z(x, y);
+"), @"
+          ╭▸ 
+        3 │ select z from (select a as z, b from t) as z(x, y);
+          ╰╴       ─ 1. source                         ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_nested_paren_alias_with_column_list_table_ref() {
+        assert_snapshot!(goto("
+with t as (select 1 a, 2 b, 3 c)
+select z$0 from ((select * from t)) as z(x, y);
+"), @"
+          ╭▸ 
+        3 │ select z from ((select * from t)) as z(x, y);
+          ╰╴       ─ 1. source                   ─ 2. destination
         ");
     }
 

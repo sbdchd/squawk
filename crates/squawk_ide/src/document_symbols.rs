@@ -1,13 +1,15 @@
 use rowan::TextRange;
+use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder::{self, extract_string_literal};
+use crate::db::{File, parse};
 use crate::resolve::{
     resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_sequence_info,
     resolve_table_info, resolve_type_info, resolve_view_info,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DocumentSymbolKind {
     Schema,
     Table,
@@ -36,7 +38,7 @@ pub enum DocumentSymbolKind {
     Channel,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DocumentSymbol {
     pub name: String,
     pub detail: Option<String>,
@@ -49,11 +51,16 @@ pub struct DocumentSymbol {
     pub children: Vec<DocumentSymbol>,
 }
 
-pub fn document_symbols(file: &ast::SourceFile) -> Vec<DocumentSymbol> {
-    let binder = binder::bind(file);
+#[salsa::tracked]
+pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
+    let parse = parse(db, file);
+    let source_file = parse.tree();
+
+    // TODO: we should salsa this
+    let binder = binder::bind(&source_file);
     let mut symbols = vec![];
 
-    for stmt in file.stmts() {
+    for stmt in source_file.stmts() {
         match stmt {
             ast::Stmt::CreateSchema(create_schema) => {
                 if let Some(symbol) = create_schema_symbol(create_schema) {
@@ -839,24 +846,25 @@ fn create_unlisten_symbol(unlisten: ast::Unlisten) -> Option<DocumentSymbol> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::db::{Database, File};
     use annotate_snippets::{
         AnnotationKind, Group, Level, Renderer, Snippet, renderer::DecorStyle,
     };
     use insta::assert_snapshot;
 
     fn symbols_not_found(sql: &str) {
-        let parse = ast::SourceFile::parse(sql);
-        let file = parse.tree();
-        let symbols = document_symbols(&file);
+        let db = Database::default();
+        let file = File::new(&db, sql.to_string(), 0);
+        let symbols = document_symbols(&db, file);
         if !symbols.is_empty() {
             panic!("Symbols found. If this is expected, use `symbols` instead.")
         }
     }
 
     fn symbols(sql: &str) -> String {
-        let parse = ast::SourceFile::parse(sql);
-        let file = parse.tree();
-        let symbols = document_symbols(&file);
+        let db = Database::default();
+        let file = File::new(&db, sql.to_string(), 0);
+        let symbols = document_symbols(&db, file);
         if symbols.is_empty() {
             panic!("No symbols found. If this is expected, use `symbols_not_found` instead.")
         }

@@ -128,10 +128,11 @@ function initialValue(): string | null {
 export function App() {
   const [mode, setActiveMode] = useMode()
   const [text, setState] = useState(() => initialValue() ?? SETTINGS.value)
+  const [version, setVersion] = useState(0)
   const [file, setFile] = useState<"current" | "builtins">("current")
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
 
-  const markers = useMarkers(text)
+  const markers = useMarkers(text, version)
 
   return (
     <div className="flex flex-col h-screen">
@@ -177,8 +178,9 @@ export function App() {
               />
             ) : null}
             <Editor
-              onChange={(text) => {
+              onChange={(text, version) => {
                 setState(text)
+                setVersion(version)
               }}
               autoFocus
               markers={markers}
@@ -196,9 +198,9 @@ export function App() {
           </div>
           {mode === "Syntax Tree" ? (
             // TODO: it might be better to have an editor and switch the underlying monaco models
-            <SyntaxTreePanel text={text} />
+            <SyntaxTreePanel text={text} version={version} />
           ) : mode === "Tokens" ? (
-            <TokenPanel text={text} />
+            <TokenPanel text={text} version={version} />
           ) : mode === "Lint" ? (
             <ErrorPanel errors={markers} />
           ) : mode == null ? null : (
@@ -225,8 +227,8 @@ function BuiltinsBanner({ onBack }: { onBack: () => void }) {
   )
 }
 
-function TokenPanel({ text }: { text: string }) {
-  const value = useDumpTokens(text)
+function TokenPanel({ text, version }: { text: string; version: number }) {
+  const value = useDumpTokens(text, version)
   return (
     <Editor
       value={value}
@@ -519,15 +521,15 @@ function Editor({
 }: {
   value?: string
   autoFocus?: boolean
-  onChange?: (_: string) => void
+  onChange?: (_: string, version: number) => void
   onSave?: (_: string) => void
   settings: monaco.editor.IStandaloneEditorConstructionOptions
   markers?: Marker[]
   onModelChange?: (uri: monaco.Uri | null) => void
   ref?: React.RefObject<monaco.editor.IStandaloneCodeEditor | null>
 }) {
-  const onChangeText = useEffectEvent((text: string) => {
-    onChange?.(text)
+  const onChangeText = useEffectEvent((text: string, version: number) => {
+    onChange?.(text, version)
   })
   const onSaveText = useEffectEvent((text: string) => {
     onSave?.(text)
@@ -616,7 +618,7 @@ function Editor({
     })
 
     editor.onDidChangeModelContent(() => {
-      onChangeText(editor.getValue())
+      onChangeText(editor.getValue(), editor.getModel()?.getVersionId() ?? 0)
     })
     if (autoFocusRef.current) {
       editor.focus()
@@ -677,8 +679,8 @@ function createMarkerKey(marker: {
   return `${marker.startLineNumber}:${marker.startColumn}:${marker.endLineNumber}:${marker.endColumn}:${marker.message}`
 }
 
-function SyntaxTreePanel({ text }: { text: string }) {
-  const value = useDumpCst(text)
+function SyntaxTreePanel({ text, version }: { text: string; version: number }) {
+  const value = useDumpCst(text, version)
   return (
     <Editor
       value={value}
@@ -694,8 +696,8 @@ function SyntaxTreePanel({ text }: { text: string }) {
   )
 }
 
-function useMarkers(text: string): Array<Marker> {
-  const errors = useErrors(text)
+function useMarkers(text: string, version: number): Array<Marker> {
+  const errors = useErrors(text, version)
   return errors.map((x): Marker => {
     const startLineNumber = x.start_line_number + 1
     const startColumn = x.start_column + 1

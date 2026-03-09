@@ -835,6 +835,25 @@ ORDER BY 1;
 reset enable_nestloop;
 
 --
+-- test that estimate_hash_bucket_stats estimates correctly with skewed data
+-- (we should choose to hash the filtered table)
+--
+
+create temp table skewedtable (val int not null, filt int not null);
+insert into skewedtable
+select
+    case when g <= 100 then 0 else (g % 100) + 1 end,
+    g % 10
+from generate_series(1, 1000) g;
+analyze skewedtable;
+
+explain (costs off)
+select * from skewedtable t1 join skewedtable t2 on t1.val = t2.val
+where t1.filt = 5;
+
+drop table skewedtable;
+
+--
 -- basic semijoin and antijoin recognition tests
 --
 
@@ -1507,6 +1526,30 @@ select * from int4_tbl left join (
   select text 'foo' union all select text 'bar'
 ) ss(x) on true
 where ss.x is null;
+
+-- Test computation of varnullingrels when translating appendrel Var
+begin;
+
+create temp table t_append (a int not null, b int);
+insert into t_append values (1, 1);
+insert into t_append values (2, 3);
+
+explain (verbose, costs off)
+select t1.a, s.a from t_append t1
+  left join t_append t2 on t1.a = t2.b
+  join lateral (
+    select t1.a as a union all select t2.a as a
+  ) s on true
+where s.a is not null;
+
+select t1.a, s.a from t_append t1
+  left join t_append t2 on t1.a = t2.b
+  join lateral (
+    select t1.a as a union all select t2.a as a
+  ) s on true
+where s.a is not null;
+
+rollback;
 
 --
 -- test inlining of immutable functions

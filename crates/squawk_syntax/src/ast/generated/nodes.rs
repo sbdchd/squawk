@@ -4296,6 +4296,10 @@ pub struct CreatePublication {
 }
 impl CreatePublication {
     #[inline]
+    pub fn except_table_clause(&self) -> Option<ExceptTableClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
     }
@@ -4625,6 +4629,10 @@ impl CreateSubscription {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_refs(&self) -> AstChildren<NameRef> {
         support::children(&self.syntax)
     }
@@ -4643,6 +4651,10 @@ impl CreateSubscription {
     #[inline]
     pub fn publication_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
+    }
+    #[inline]
+    pub fn server_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
     #[inline]
     pub fn subscription_token(&self) -> Option<SyntaxToken> {
@@ -5598,8 +5610,20 @@ pub struct DetachPartition {
 }
 impl DetachPartition {
     #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn concurrently_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
+    }
+    #[inline]
     pub fn detach_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DETACH_KW)
+    }
+    #[inline]
+    pub fn finalize_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FINALIZE_KW)
     }
     #[inline]
     pub fn partition_token(&self) -> Option<SyntaxToken> {
@@ -7549,6 +7573,33 @@ impl EventTriggerWhenClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExceptTableClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExceptTableClause {
+    #[inline]
+    pub fn relation_names(&self) -> AstChildren<RelationName> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn except_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXCEPT_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExceptTables {
     pub(crate) syntax: SyntaxNode,
 }
@@ -7771,6 +7822,10 @@ impl FdwOption {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn connection_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONNECTION_KW)
     }
     #[inline]
     pub fn handler_token(&self) -> Option<SyntaxToken> {
@@ -21785,6 +21840,24 @@ impl AstNode for EventTriggerWhenClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::EVENT_TRIGGER_WHEN_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExceptTableClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXCEPT_TABLE_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

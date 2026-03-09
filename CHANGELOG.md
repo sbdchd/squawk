@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.43.0 - 2026-02-28
+
+### Added
+
+- ide: quick action for `timestamp with out timezone` to `timestamptz` (#976)
+- ide: goto def for create aggregate params (#972)
+- ide: hover/goto def for subquery w/ alias (#970)
+- ide: lateral joins, subqueries with table, hover aliases (#969)
+- ide: support table alias with column list (#968)
+
+### Fixed
+
+- linter: fix ignore comment not working with trailing content (#975)
+- ide: fix column name infer & related goto def (#977)
+- syntax: update ast with missing `detach partition` fields (#978)
+- ide: fix builtin aggregates being defined as functions (#971)
+- ci: fix arm musl build (#966)
+
+### Internal
+
+- ide: refactor hover to use goto def (#967)
+
+## v2.42.0 - 2026-02-25
+
+### Changed
+
+- linter: undo foreign key constraint check in create table (#962)
+
+  This was an incorrect change to add and isn't necessary since the new table
+  doesn't have any rows.
+
+### Added
+
+- ci: build for alpine arm (#960)
+- ide: code action - rewrite between as binary expression (#953)
+- ide: goto def & hover for now() + current_timestamp (#950)
+- ide: goto def for column names in table function returns (#949)
+- ide: goto def with function in from item & cross join (#961)
+
+### Fixed
+
+- ide: fix col names for collation for, at time zone, overlaps (#951)
+
 ## v2.41.0 - 2026-02-20
 
 ### Added
