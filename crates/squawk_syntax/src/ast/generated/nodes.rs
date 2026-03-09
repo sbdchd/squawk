@@ -8,6 +8,41 @@ use crate::syntax_node::SyntaxNode;
 use crate::syntax_node::SyntaxToken;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AddAttribute {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AddAttribute {
+    #[inline]
+    pub fn cascade(&self) -> Option<Cascade> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn restrict(&self) -> Option<Restrict> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn add_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ADD_KW)
+    }
+    #[inline]
+    pub fn attribute_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ATTRIBUTE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AddColumn {
     pub(crate) syntax: SyntaxNode,
 }
@@ -120,6 +155,37 @@ impl AddOpClassOptions {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AddValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AddValue {
+    #[inline]
+    pub fn if_not_exists(&self) -> Option<IfNotExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn add_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ADD_KW)
+    }
+    #[inline]
+    pub fn after_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AFTER_KW)
+    }
+    #[inline]
+    pub fn before_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BEFORE_KW)
+    }
+    #[inline]
+    pub fn value_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Aggregate {
     pub(crate) syntax: SyntaxNode,
 }
@@ -196,6 +262,29 @@ impl AlterAggregate {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterAttribute {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterAttribute {
+    #[inline]
+    pub fn cascade(&self) -> Option<Cascade> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn restrict(&self) -> Option<Restrict> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn attribute_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ATTRIBUTE_KW)
     }
 }
 
@@ -1607,7 +1696,39 @@ pub struct AlterType {
 }
 impl AlterType {
     #[inline]
+    pub fn add_value(&self) -> Option<AddValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn alter_type_actions(&self) -> AstChildren<AlterTypeAction> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn owner_to(&self) -> Option<OwnerTo> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_attribute(&self) -> Option<RenameAttribute> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_to(&self) -> Option<RenameTo> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_value(&self) -> Option<RenameValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_options(&self) -> Option<SetOptions> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5842,6 +5963,33 @@ impl DropAggregate {
     #[inline]
     pub fn restrict_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DropAttribute {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DropAttribute {
+    #[inline]
+    pub fn cascade(&self) -> Option<Cascade> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn if_exists(&self) -> Option<IfExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn restrict(&self) -> Option<Restrict> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn attribute_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ATTRIBUTE_KW)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
 }
 
@@ -13079,6 +13227,33 @@ impl ReleaseSavepoint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RenameAttribute {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RenameAttribute {
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn attribute_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ATTRIBUTE_KW)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RenameColumn {
     pub(crate) syntax: SyntaxNode,
 }
@@ -13140,6 +13315,29 @@ impl RenameTo {
     #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RenameValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RenameValue {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn value_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUE_KW)
     }
 }
 
@@ -17106,6 +17304,13 @@ pub enum AlterTableAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AlterTypeAction {
+    AddAttribute(AddAttribute),
+    AlterAttribute(AlterAttribute),
+    DropAttribute(DropAttribute),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ColumnConstraint {
     CheckConstraint(CheckConstraint),
     DefaultConstraint(DefaultConstraint),
@@ -17570,6 +17775,24 @@ pub enum WithQuery {
     Update(Update),
     Values(Values),
 }
+impl AstNode for AddAttribute {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ADD_ATTRIBUTE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for AddColumn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -17642,6 +17865,24 @@ impl AstNode for AddOpClassOptions {
         &self.syntax
     }
 }
+impl AstNode for AddValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ADD_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Aggregate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -17700,6 +17941,24 @@ impl AstNode for AlterAggregate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ALTER_AGGREGATE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterAttribute {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_ATTRIBUTE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -20742,6 +21001,24 @@ impl AstNode for DropAggregate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::DROP_AGGREGATE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for DropAttribute {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DROP_ATTRIBUTE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -26120,6 +26397,24 @@ impl AstNode for ReleaseSavepoint {
         &self.syntax
     }
 }
+impl AstNode for RenameAttribute {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RENAME_ATTRIBUTE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for RenameColumn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -26160,6 +26455,24 @@ impl AstNode for RenameTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RenameValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RENAME_VALUE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -30086,6 +30399,55 @@ impl From<ValidateConstraint> for AlterTableAction {
     #[inline]
     fn from(node: ValidateConstraint) -> AlterTableAction {
         AlterTableAction::ValidateConstraint(node)
+    }
+}
+impl AstNode for AlterTypeAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::ADD_ATTRIBUTE | SyntaxKind::ALTER_ATTRIBUTE | SyntaxKind::DROP_ATTRIBUTE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::ADD_ATTRIBUTE => AlterTypeAction::AddAttribute(AddAttribute { syntax }),
+            SyntaxKind::ALTER_ATTRIBUTE => {
+                AlterTypeAction::AlterAttribute(AlterAttribute { syntax })
+            }
+            SyntaxKind::DROP_ATTRIBUTE => AlterTypeAction::DropAttribute(DropAttribute { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            AlterTypeAction::AddAttribute(it) => &it.syntax,
+            AlterTypeAction::AlterAttribute(it) => &it.syntax,
+            AlterTypeAction::DropAttribute(it) => &it.syntax,
+        }
+    }
+}
+impl From<AddAttribute> for AlterTypeAction {
+    #[inline]
+    fn from(node: AddAttribute) -> AlterTypeAction {
+        AlterTypeAction::AddAttribute(node)
+    }
+}
+impl From<AlterAttribute> for AlterTypeAction {
+    #[inline]
+    fn from(node: AlterAttribute) -> AlterTypeAction {
+        AlterTypeAction::AlterAttribute(node)
+    }
+}
+impl From<DropAttribute> for AlterTypeAction {
+    #[inline]
+    fn from(node: DropAttribute) -> AlterTypeAction {
+        AlterTypeAction::DropAttribute(node)
     }
 }
 impl AstNode for ColumnConstraint {

@@ -2116,6 +2116,39 @@ AlterTrigger =
 
 AlterType =
   'alter' 'type' Path
+  (
+    AlterTypeAction (',' AlterTypeAction)*
+  | OwnerTo
+  | SetSchema
+  | SetOptions
+  | RenameTo
+  | RenameAttribute
+  | RenameValue
+  | AddValue
+  )
+
+RenameAttribute =
+  'rename' 'attribute' NameRef 'to' Name
+
+RenameValue =
+  'rename' 'value' Literal 'to' Literal
+
+AlterTypeAction =
+  AddAttribute
+| DropAttribute
+| AlterAttribute
+
+AddAttribute =
+  'add' 'attribute' Name Type Collate? (Cascade | Restrict)?
+
+DropAttribute =
+  'drop' 'attribute' IfExists? (Cascade | Restrict)?
+
+AlterAttribute =
+  'alter' 'attribute' (Cascade | Restrict)?
+
+AddValue =
+  'add' 'value' IfNotExists? Literal (('before' | 'after') Literal)?
 
 AlterUser =
   'alter' 'user' RoleRef
