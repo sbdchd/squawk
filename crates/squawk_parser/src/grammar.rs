@@ -7910,17 +7910,20 @@ fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn alter_type_action(p: &mut Parser<'_>) {
-    if p.eat(ADD_KW) {
+    let m = p.start();
+    let kind = if p.eat(ADD_KW) {
         p.expect(ATTRIBUTE_KW);
         name(p);
         type_name(p);
         opt_collate(p);
         opt_cascade_or_restrict(p);
+        ADD_ATTRIBUTE
     } else if p.eat(DROP_KW) {
         p.expect(ATTRIBUTE_KW);
         opt_if_exists(p);
         name_ref(p);
         opt_cascade_or_restrict(p);
+        DROP_ATTRIBUTE
     } else {
         p.expect(ALTER_KW);
         p.expect(ATTRIBUTE_KW);
@@ -7932,7 +7935,9 @@ fn alter_type_action(p: &mut Parser<'_>) {
         type_name(p);
         opt_collate(p);
         opt_cascade_or_restrict(p);
-    }
+        ALTER_ATTRIBUTE
+    };
+    m.complete(p, kind);
 }
 
 // ALTER TYPE name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
@@ -7974,36 +7979,34 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             rename_to(p);
         }
         RENAME_KW => {
+            let m = p.start();
             p.bump(RENAME_KW);
             if p.eat(ATTRIBUTE_KW) {
                 name_ref(p);
                 p.expect(TO_KW);
                 name(p);
                 opt_cascade_or_restrict(p);
+                m.complete(p, RENAME_ATTRIBUTE);
             } else if p.eat(VALUE_KW) {
                 string_literal(p);
                 p.expect(TO_KW);
                 string_literal(p);
+                m.complete(p, RENAME_VALUE);
             } else {
                 p.error("expected TO, ATTRIBUTE, or VALUE");
+                m.abandon(p);
             }
         }
         ADD_KW => {
+            let m = p.start();
             p.bump(ADD_KW);
-            if p.eat(VALUE_KW) {
-                opt_if_not_exists(p);
+            p.expect(VALUE_KW);
+            opt_if_not_exists(p);
+            string_literal(p);
+            if p.eat(BEFORE_KW) || p.eat(AFTER_KW) {
                 string_literal(p);
-                if p.eat(BEFORE_KW) || p.eat(AFTER_KW) {
-                    string_literal(p);
-                }
-            } else if p.eat(ATTRIBUTE_KW) {
-                name(p);
-                type_name(p);
-                opt_collate(p);
-                opt_cascade_or_restrict(p);
-            } else {
-                p.error("expected VALUE or ATTRIBUTE");
             }
+            m.complete(p, ADD_VALUE);
         }
         _ => p.error("expected ALTER TYPE option"),
     }
