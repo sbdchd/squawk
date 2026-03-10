@@ -51,6 +51,9 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
     let mut not_null_constraints: HashMap<Identifier, TableColumn> = HashMap::new();
     let mut validated_not_null_columns: HashSet<TableColumn> = HashSet::new();
+    // Tables where VALIDATE CONSTRAINT was seen without a matching ADD CONSTRAINT
+    // in the same file (cross-migration pattern).
+    let mut tables_with_external_validated_constraints: HashSet<Identifier> = HashSet::new();
 
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
@@ -87,10 +90,17 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         if let Some(constraint_name) = validate_constraint
                             .name_ref()
                             .map(|x| Identifier::new(&x.text()))
-                            && let Some(table_column) = not_null_constraints.get(&constraint_name)
-                            && table_column.table == table
                         {
-                            validated_not_null_columns.insert(table_column.clone());
+                            if let Some(table_column) = not_null_constraints.get(&constraint_name)
+                                && table_column.table == table
+                            {
+                                validated_not_null_columns.insert(table_column.clone());
+                            } else {
+                                // Cross-migration pattern: the ADD CONSTRAINT ... NOT VALID
+                                // was in a previous migration file. Track the table so that
+                                // a subsequent SET NOT NULL is considered safe.
+                                tables_with_external_validated_constraints.insert(table.clone());
+                            }
                         }
                     }
                     // Step 3: Check that we're altering a validated constraint
@@ -109,7 +119,9 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                                 table: table.clone(),
                                 column,
                             };
-                            if validated_not_null_columns.contains(&table_column) {
+                            if validated_not_null_columns.contains(&table_column)
+                                || tables_with_external_validated_constraints.contains(&table)
+                            {
                                 continue;
                             }
                         }
@@ -295,6 +307,65 @@ ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
             sql,
             LinterSettings {
                 pg_version: "12".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField
+        ));
+    }
+
+    // Cross-migration pattern: ADD CONSTRAINT was in a previous migration file,
+    // so only VALIDATE CONSTRAINT + SET NOT NULL appear in this file.
+    #[test]
+    fn pg16_cross_migration_validate_then_set_not_null_ok() {
+        let sql = r#"
+ALTER TABLE foo VALIDATE CONSTRAINT foo_bar_not_null;
+
+ALTER TABLE foo
+ALTER COLUMN bar
+SET NOT NULL;
+
+ALTER TABLE foo
+DROP CONSTRAINT foo_bar_not_null;
+        "#;
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                pg_version: "16".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField,
+        );
+    }
+
+    #[test]
+    fn pg12_cross_migration_validate_then_set_not_null_ok() {
+        let sql = r#"
+ALTER TABLE foo VALIDATE CONSTRAINT foo_bar_not_null;
+ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
+ALTER TABLE foo DROP CONSTRAINT foo_bar_not_null;
+        "#;
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                pg_version: "12".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField,
+        );
+    }
+
+    #[test]
+    fn pg11_cross_migration_validate_then_set_not_null_err() {
+        // PostgreSQL 11 doesn't support using CHECK constraint to skip table scan
+        let sql = r#"
+ALTER TABLE foo VALIDATE CONSTRAINT foo_bar_not_null;
+ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
+ALTER TABLE foo DROP CONSTRAINT foo_bar_not_null;
+        "#;
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                pg_version: "11".parse().expect("Invalid PostgreSQL version"),
                 ..Default::default()
             },
             Rule::AddingNotNullableField
