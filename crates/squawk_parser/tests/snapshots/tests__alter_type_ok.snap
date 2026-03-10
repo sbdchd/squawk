@@ -229,10 +229,11 @@ SOURCE_FILE
       LITERAL
         STRING "'v'"
       WHITESPACE " "
-      BEFORE_KW "before"
-      WHITESPACE " "
-      LITERAL
-        STRING "'w'"
+      BEFORE_VALUE
+        BEFORE_KW "before"
+        WHITESPACE " "
+        LITERAL
+          STRING "'w'"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -265,10 +266,11 @@ SOURCE_FILE
       LITERAL
         STRING "'v'"
       WHITESPACE " "
-      AFTER_KW "after"
-      WHITESPACE " "
-      LITERAL
-        STRING "'w'"
+      AFTER_VALUE
+        AFTER_KW "after"
+        WHITESPACE " "
+        LITERAL
+          STRING "'w'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_value"

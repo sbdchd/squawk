@@ -34,6 +34,7 @@ module.exports = {
       "syntax-error",
       "require-timeout-settings",
       "ban-uncommitted-transaction",
+      "require-enum-value-ordering",
       // xtask:new-rule:error-name
     ],
   },

@@ -168,20 +168,31 @@ impl AddValue {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn value_position(&self) -> Option<ValuePosition> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn add_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ADD_KW)
     }
     #[inline]
-    pub fn after_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AFTER_KW)
-    }
-    #[inline]
-    pub fn before_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::BEFORE_KW)
-    }
-    #[inline]
     pub fn value_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VALUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AfterValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AfterValue {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn after_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AFTER_KW)
     }
 }
 
@@ -2157,6 +2168,21 @@ impl AttributeValue {
     #[inline]
     pub fn operator_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BeforeValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl BeforeValue {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn before_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BEFORE_KW)
     }
 }
 
@@ -17764,6 +17790,12 @@ pub enum Type {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ValuePosition {
+    AfterValue(AfterValue),
+    BeforeValue(BeforeValue),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WithQuery {
     CompoundSelect(CompoundSelect),
     Delete(Delete),
@@ -17869,6 +17901,24 @@ impl AstNode for AddValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ADD_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AfterValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::AFTER_VALUE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -19039,6 +19089,24 @@ impl AstNode for AttributeValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ATTRIBUTE_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for BeforeValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::BEFORE_VALUE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -34295,6 +34363,42 @@ impl From<TimeType> for Type {
     #[inline]
     fn from(node: TimeType) -> Type {
         Type::TimeType(node)
+    }
+}
+impl AstNode for ValuePosition {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::AFTER_VALUE | SyntaxKind::BEFORE_VALUE)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::AFTER_VALUE => ValuePosition::AfterValue(AfterValue { syntax }),
+            SyntaxKind::BEFORE_VALUE => ValuePosition::BeforeValue(BeforeValue { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ValuePosition::AfterValue(it) => &it.syntax,
+            ValuePosition::BeforeValue(it) => &it.syntax,
+        }
+    }
+}
+impl From<AfterValue> for ValuePosition {
+    #[inline]
+    fn from(node: AfterValue) -> ValuePosition {
+        ValuePosition::AfterValue(node)
+    }
+}
+impl From<BeforeValue> for ValuePosition {
+    #[inline]
+    fn from(node: BeforeValue) -> ValuePosition {
+        ValuePosition::BeforeValue(node)
     }
 }
 impl AstNode for WithQuery {
