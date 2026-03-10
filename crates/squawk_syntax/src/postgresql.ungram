@@ -2148,7 +2148,17 @@ AlterAttribute =
   'alter' 'attribute' (Cascade | Restrict)?
 
 AddValue =
-  'add' 'value' IfNotExists? Literal (('before' | 'after') Literal)?
+  'add' 'value' IfNotExists? Literal ValuePosition?
+
+ValuePosition =
+  BeforeValue
+| AfterValue
+
+BeforeValue =
+  'before' Literal
+
+AfterValue =
+  'after' Literal
 
 AlterUser =
   'alter' 'user' RoleRef

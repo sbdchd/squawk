@@ -8003,14 +8003,26 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             p.expect(VALUE_KW);
             opt_if_not_exists(p);
             string_literal(p);
-            if p.eat(BEFORE_KW) || p.eat(AFTER_KW) {
-                string_literal(p);
-            }
+            opt_value_position(p);
             m.complete(p, ADD_VALUE);
         }
         _ => p.error("expected ALTER TYPE option"),
     }
     m.complete(p, ALTER_TYPE)
+}
+
+fn opt_value_position(p: &mut Parser<'_>) {
+    let m = p.start();
+    let kind = if p.eat(BEFORE_KW) {
+        BEFORE_VALUE
+    } else if p.eat(AFTER_KW) {
+        AFTER_VALUE
+    } else {
+        m.abandon(p);
+        return;
+    };
+    string_literal(p);
+    m.complete(p, kind);
 }
 
 // ALTER USER role_specification [ WITH ] option [ ... ]
