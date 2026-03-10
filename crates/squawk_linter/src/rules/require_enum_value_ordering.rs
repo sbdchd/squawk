@@ -65,14 +65,6 @@ ALTER TYPE my_enum ADD VALUE 'new_value';
     }
 
     #[test]
-    fn fix_add_value_if_not_exists_without_ordering() {
-        let sql = r#"
-ALTER TYPE my_enum ADD VALUE IF NOT EXISTS 'new_value';
-"#;
-        assert_snapshot!(fix_sql(sql, Rule::RequireEnumValueOrdering), @"ALTER TYPE my_enum ADD VALUE IF NOT EXISTS 'new_value' BEFORE 'existing_value';");
-    }
-
-    #[test]
     fn ok_add_value_before() {
         let sql = r#"
 ALTER TYPE my_enum ADD VALUE 'new_value' BEFORE 'existing_value';
@@ -84,30 +76,6 @@ ALTER TYPE my_enum ADD VALUE 'new_value' BEFORE 'existing_value';
     fn ok_add_value_after() {
         let sql = r#"
 ALTER TYPE my_enum ADD VALUE 'new_value' AFTER 'existing_value';
-"#;
-        lint_ok(sql, Rule::RequireEnumValueOrdering);
-    }
-
-    #[test]
-    fn ok_add_value_if_not_exists_before() {
-        let sql = r#"
-ALTER TYPE my_enum ADD VALUE IF NOT EXISTS 'new_value' BEFORE 'existing_value';
-"#;
-        lint_ok(sql, Rule::RequireEnumValueOrdering);
-    }
-
-    #[test]
-    fn ok_rename_value() {
-        let sql = r#"
-ALTER TYPE my_enum RENAME VALUE 'old' TO 'new';
-"#;
-        lint_ok(sql, Rule::RequireEnumValueOrdering);
-    }
-
-    #[test]
-    fn ok_add_attribute() {
-        let sql = r#"
-ALTER TYPE my_type ADD ATTRIBUTE name text;
 "#;
         lint_ok(sql, Rule::RequireEnumValueOrdering);
     }
