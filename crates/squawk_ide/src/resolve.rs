@@ -134,6 +134,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let position = name_ref.syntax().text_range().start();
             resolve_view_name_ptr(binder, &view_name, &schema, position).map(|ptr| smallvec![ptr])
         }
+        NameRefClass::Window => resolve_window_name_ptr(name_ref).map(|ptr| smallvec![ptr]),
         NameRefClass::Sequence => {
             let (sequence_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
             let position = name_ref.syntax().text_range().start();
@@ -1588,6 +1589,22 @@ fn resolve_select_column_ptr(
             })
         {
             return Some(column_ptr);
+        }
+    }
+
+    None
+}
+
+fn resolve_window_name_ptr(name_ref: &ast::NameRef) -> Option<SyntaxNodePtr> {
+    let window_name = Name::from_node(name_ref);
+    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
+    let window_clause = select.window_clause()?;
+
+    for window_def in window_clause.window_defs() {
+        if let Some(name) = window_def.name()
+            && Name::from_node(&name) == window_name
+        {
+            return Some(SyntaxNodePtr::new(name.syntax()));
         }
     }
 

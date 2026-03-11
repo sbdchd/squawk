@@ -9001,4 +9001,122 @@ create operator ||| (leftarg = int, rightarg = int, procedure = f$0);
           ╰╴                                                                ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_cte_window_partition_column_from_create_table_if_not_exists() {
+        assert_snapshot!(goto("
+create table t (
+    id bigint primary key,
+    group_col text not null,
+    update_date date not null
+);
+
+with row_number_added as (
+  select
+    *,
+    row_number() over (
+      partition by group_col$0
+      order by update_date desc
+    ) as rn
+  from t
+)
+select * from row_number_added
+"), @"
+           ╭▸ 
+         4 │     group_col text not null,
+           │     ───────── 2. destination
+           ‡
+        12 │       partition by group_col
+           ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_window_order_column_from_create_table_if_not_exists() {
+        assert_snapshot!(goto("
+create table t (
+    id bigint primary key,
+    group_col text not null,
+    update_date date not null
+);
+
+with row_number_added as (
+  select
+    *,
+    row_number() over (
+      partition by group_col
+      order by update_date$0 desc
+    ) as rn
+  from t
+)
+select * from row_number_added
+"), @"
+           ╭▸ 
+         5 │     update_date date not null
+           │     ─────────── 2. destination
+           ‡
+        13 │       order by update_date desc
+           ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_window_partition_function_call_from_create_table() {
+        assert_snapshot!(goto("
+create function length(text) returns int language internal;
+
+create table t (
+    id bigint primary key,
+    group_col text not null,
+    update_date date not null
+);
+
+with row_number_added as (
+  select
+    *,
+    row_number() over (
+      partition by length$0(group_col)
+      order by update_date$0 desc
+    ) as rn
+  from t
+)
+select * from row_number_added
+"), @"
+           ╭▸ 
+         2 │ create function length(text) returns int language internal;
+           │                 ────── 2. destination
+           ‡
+        14 │       partition by length(group_col)
+           ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_window_def_reuse() {
+        assert_snapshot!(goto("
+create table tbl (
+  id bigint primary key,
+  group_col text not null,
+  update_date date not null,
+  value text
+);
+select
+  id,
+  group_col,
+  row_number() over w as rn,
+  lag(value) over w$0 as prev_value
+from tbl
+window w as (
+  partition by group_col
+  order by update_date desc
+);
+"), @r"
+          ╭▸ 
+       12 │   lag(value) over w as prev_value
+          │                   ─ 1. source
+       13 │ from tbl
+       14 │ window w as (
+          ╰╴       ─ 2. destination
+        ");
+    }
 }
