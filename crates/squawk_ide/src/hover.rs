@@ -1193,7 +1193,9 @@ fn hover_window(
         .into_iter()
         .next()?;
     let window_name_node = window_ptr.to_node(root);
-    let window_def = window_name_node.ancestors().find_map(ast::WindowDef::cast)?;
+    let window_def = window_name_node
+        .ancestors()
+        .find_map(ast::WindowDef::cast)?;
 
     Some(format!("window {}", window_def.syntax().text()))
 }
