@@ -56,6 +56,7 @@ pub(crate) enum NameRefClass {
     UpdateColumn,
     UpdateQualifiedColumnTable,
     View,
+    Window,
 }
 
 fn is_special_fn(kind: SyntaxKind) -> bool {
@@ -603,6 +604,16 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         if ast::ArgList::can_cast(ancestor.kind()) {
             in_arg_list = true;
         }
+        if ast::OverClause::can_cast(ancestor.kind()) && !in_function_name {
+            if node
+                .parent()
+                .is_some_and(|parent| ast::OverClause::can_cast(parent.kind()))
+            {
+                return Some(NameRefClass::Window);
+            }
+
+            return Some(NameRefClass::SelectColumn);
+        }
         if ast::CallExpr::can_cast(ancestor.kind()) {
             if !in_arg_list {
                 in_function_name = true;
@@ -933,6 +944,9 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<NameRefClass> {
                 return Some(NameRefClass::SelectColumn);
             }
             return Some(NameRefClass::FromTable);
+        }
+        if ast::WindowDef::can_cast(ancestor.kind()) {
+            return Some(NameRefClass::Window);
         }
         if ast::AsName::can_cast(ancestor.kind())
             || ast::ParenSelect::can_cast(ancestor.kind())

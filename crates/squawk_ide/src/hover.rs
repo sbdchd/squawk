@@ -227,6 +227,7 @@ fn hover_name_ref(
         NameRefClass::Cursor => hover_cursor(root, name_ref, binder),
         NameRefClass::PreparedStatement => hover_prepared_statement(root, name_ref, binder),
         NameRefClass::Channel => hover_channel(root, name_ref, binder),
+        NameRefClass::Window => hover_window(root, name_ref, binder),
     }
 }
 
@@ -1181,6 +1182,22 @@ fn hover_channel(
     let channel_name_node = channel_ptr.to_node(root);
     let listen = channel_name_node.ancestors().find_map(ast::Listen::cast)?;
     format_listen(&listen)
+}
+
+fn hover_window(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<String> {
+    let window_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+    let window_name_node = window_ptr.to_node(root);
+    let window_def = window_name_node
+        .ancestors()
+        .find_map(ast::WindowDef::cast)?;
+
+    Some(format!("window {}", window_def.syntax().text()))
 }
 
 fn hover_type(
@@ -4488,6 +4505,36 @@ select a$0 from part_2026_01_02;
           ╭▸ 
         8 │ select a from part_2026_01_02;
           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_window_def_reuse() {
+        assert_snapshot!(check_hover("
+create table tbl (
+  id bigint primary key,
+  group_col text not null,
+  update_date date not null,
+  value text
+);
+select
+  id,
+  group_col,
+  row_number() over w as rn,
+  lag(value) over w$0 as prev_value
+from tbl
+window w as (
+  partition by group_col
+  order by update_date desc
+);
+"), @r"
+hover: window w as (
+        partition by group_col
+        order by update_date desc
+      )
+   ╭▸ 
+12 │   lag(value) over w as prev_value
+   ╰╴                  ─ hover
         ");
     }
 
