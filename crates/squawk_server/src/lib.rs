@@ -6,7 +6,8 @@ use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
     CodeActionProviderCapability, CodeActionResponse, Command, CompletionOptions, CompletionParams,
     CompletionResponse, Diagnostic, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
-    DidOpenTextDocumentParams, DocumentSymbol, DocumentSymbolParams, GotoDefinitionParams,
+    DidOpenTextDocumentParams, DocumentSymbol, DocumentSymbolParams, FoldingRange,
+    FoldingRangeKind as LspFoldingRangeKind, FoldingRangeProviderCapability, GotoDefinitionParams,
     GotoDefinitionResponse, Hover, HoverContents, HoverParams, HoverProviderCapability,
     InitializeParams, InlayHint, InlayHintKind, InlayHintLabel, InlayHintLabelPart,
     InlayHintParams, LanguageString, Location, MarkedString, OneOf, PublishDiagnosticsParams,
@@ -18,8 +19,8 @@ use lsp_types::{
         PublishDiagnostics,
     },
     request::{
-        CodeActionRequest, Completion, DocumentSymbolRequest, GotoDefinition, HoverRequest,
-        InlayHintRequest, References, Request, SelectionRangeRequest,
+        CodeActionRequest, Completion, DocumentSymbolRequest, FoldingRangeRequest, GotoDefinition,
+        HoverRequest, InlayHintRequest, References, Request, SelectionRangeRequest,
     },
 };
 use rowan::TextRange;
@@ -30,6 +31,7 @@ use squawk_ide::completion::completion;
 use squawk_ide::db::{Database, File, line_index, parse};
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 use squawk_ide::find_references::find_references;
+use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
 use squawk_ide::goto_definition::goto_definition;
 use squawk_ide::hover::hover;
 use squawk_ide::inlay_hints::inlay_hints;
@@ -119,6 +121,7 @@ pub fn run() -> Result<()> {
         hover_provider: Some(HoverProviderCapability::Simple(true)),
         inlay_hint_provider: Some(OneOf::Left(true)),
         document_symbol_provider: Some(OneOf::Left(true)),
+        folding_range_provider: Some(FoldingRangeProviderCapability::Simple(true)),
         completion_provider: Some(CompletionOptions {
             resolve_provider: Some(false),
             trigger_characters: Some(vec![".".to_owned()]),
@@ -182,6 +185,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     }
                     DocumentSymbolRequest::METHOD => {
                         handle_document_symbol(&connection, req, &file_system)?;
+                    }
+                    FoldingRangeRequest::METHOD => {
+                        handle_folding_range(&connection, req, &file_system)?;
                     }
                     Completion::METHOD => {
                         handle_completion(&connection, req, &file_system)?;
@@ -443,6 +449,48 @@ fn handle_document_symbol(
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&lsp_symbols).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
+fn handle_folding_range(
+    connection: &Connection,
+    req: lsp_server::Request,
+    file_system: &impl FileSystem,
+) -> Result<()> {
+    let params: lsp_types::FoldingRangeParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document.uri;
+
+    let db = file_system.db();
+    let file = file_system.file(&uri).unwrap();
+    let line_idx = line_index(db, file);
+
+    let lsp_folds: Vec<FoldingRange> = folding_ranges(db, file)
+        .into_iter()
+        .map(|fold| {
+            let start = line_idx.line_col(fold.range.start());
+            let end = line_idx.line_col(fold.range.end());
+            let kind = match fold.kind {
+                FoldKind::Comment => Some(LspFoldingRangeKind::Comment),
+                _ => Some(LspFoldingRangeKind::Region),
+            };
+            FoldingRange {
+                start_line: start.line,
+                start_character: Some(start.col),
+                end_line: end.line,
+                end_character: Some(end.col),
+                kind,
+                collapsed_text: None,
+            }
+        })
+        .collect();
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&lsp_folds).unwrap()),
         error: None,
     };
 

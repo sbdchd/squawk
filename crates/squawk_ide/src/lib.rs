@@ -8,6 +8,7 @@ pub mod db;
 pub mod document_symbols;
 pub mod expand_selection;
 pub mod find_references;
+pub mod folding_ranges;
 mod generated;
 pub mod goto_definition;
 pub mod hover;

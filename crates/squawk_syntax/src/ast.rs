@@ -28,6 +28,7 @@ mod generated;
 mod node_ext;
 mod nodes;
 mod support;
+mod token_ext;
 mod traits;
 
 use std::marker::PhantomData;
