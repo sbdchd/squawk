@@ -7,13 +7,12 @@ use lsp_types::{
     CodeActionProviderCapability, CodeActionResponse, Command, CompletionOptions, CompletionParams,
     CompletionResponse, Diagnostic, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
     DidOpenTextDocumentParams, DocumentSymbol, DocumentSymbolParams, FoldingRange,
-    FoldingRangeKind as LspFoldingRangeKind, FoldingRangeProviderCapability, GotoDefinitionParams,
-    GotoDefinitionResponse, Hover, HoverContents, HoverParams, HoverProviderCapability,
-    InitializeParams, InlayHint, InlayHintKind, InlayHintLabel, InlayHintLabelPart,
-    InlayHintParams, LanguageString, Location, MarkedString, OneOf, PublishDiagnosticsParams,
-    ReferenceParams, SelectionRangeParams, SelectionRangeProviderCapability, ServerCapabilities,
-    SymbolKind, TextDocumentSyncCapability, TextDocumentSyncKind, Url, WorkDoneProgressOptions,
-    WorkspaceEdit,
+    FoldingRangeProviderCapability, GotoDefinitionParams, GotoDefinitionResponse, Hover,
+    HoverContents, HoverParams, HoverProviderCapability, InitializeParams, InlayHint,
+    InlayHintKind, InlayHintLabel, InlayHintLabelPart, InlayHintParams, LanguageString, Location,
+    MarkedString, OneOf, PublishDiagnosticsParams, ReferenceParams, SelectionRangeParams,
+    SelectionRangeProviderCapability, ServerCapabilities, SymbolKind, TextDocumentSyncCapability,
+    TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
@@ -31,7 +30,7 @@ use squawk_ide::completion::completion;
 use squawk_ide::db::{Database, File, line_index, parse};
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 use squawk_ide::find_references::find_references;
-use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
+use squawk_ide::folding_ranges::folding_ranges;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_ide::hover::hover;
 use squawk_ide::inlay_hints::inlay_hints;
@@ -470,22 +469,7 @@ fn handle_folding_range(
 
     let lsp_folds: Vec<FoldingRange> = folding_ranges(db, file)
         .into_iter()
-        .map(|fold| {
-            let start = line_idx.line_col(fold.range.start());
-            let end = line_idx.line_col(fold.range.end());
-            let kind = match fold.kind {
-                FoldKind::Comment => Some(LspFoldingRangeKind::Comment),
-                _ => Some(LspFoldingRangeKind::Region),
-            };
-            FoldingRange {
-                start_line: start.line,
-                start_character: Some(start.col),
-                end_line: end.line,
-                end_character: Some(end.col),
-                kind,
-                collapsed_text: None,
-            }
-        })
+        .map(|fold| lsp_utils::folding_range(&line_idx, fold))
         .collect();
 
     let resp = Response {
