@@ -533,6 +533,7 @@ fn lower(grammar: &Grammar) -> AstSrc {
         ("Null", "NULL_KW"),
         ("String", "STRING"),
         ("Comment", "COMMENT"),
+        ("Whitespace", "WHITESPACE"),
     ];
     let mut res = AstSrc {
         tokens,

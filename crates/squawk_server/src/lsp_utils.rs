@@ -2,8 +2,12 @@ use std::{collections::HashMap, ops::Range};
 
 use line_index::{LineIndex, TextRange, TextSize};
 use log::warn;
-use lsp_types::{CodeAction, CodeActionKind, Url, WorkspaceEdit};
+use lsp_types::{
+    CodeAction, CodeActionKind, FoldingRange, FoldingRangeKind as LspFoldingRangeKind, Url,
+    WorkspaceEdit,
+};
 use squawk_ide::code_actions::ActionKind;
+use squawk_ide::folding_ranges::{Fold, FoldKind};
 
 fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
     let start = offset(index, range.start)?;
@@ -141,6 +145,23 @@ pub(crate) fn range(line_index: &LineIndex, range: TextRange) -> lsp_types::Rang
         lsp_types::Position::new(start.line, start.col),
         lsp_types::Position::new(end.line, end.col),
     )
+}
+
+pub(crate) fn folding_range(line_index: &LineIndex, fold: Fold) -> FoldingRange {
+    let start = line_index.line_col(fold.range.start());
+    let end = line_index.line_col(fold.range.end());
+    let kind = match fold.kind {
+        FoldKind::Comment => Some(LspFoldingRangeKind::Comment),
+        _ => Some(LspFoldingRangeKind::Region),
+    };
+    FoldingRange {
+        start_line: start.line,
+        start_character: Some(start.col),
+        end_line: end.line,
+        end_character: Some(end.col),
+        kind,
+        collapsed_text: None,
+    }
 }
 
 // base on rust-analyzer's
