@@ -4,8 +4,8 @@ use lsp_types::{GotoDefinitionParams, GotoDefinitionResponse};
 use squawk_ide::db::line_index;
 use squawk_ide::goto_definition::goto_definition;
 
-use crate::system::System;
 use crate::lsp_utils::{self, to_location};
+use crate::system::System;
 
 pub(crate) fn handle_goto_definition(
     connection: &Connection,

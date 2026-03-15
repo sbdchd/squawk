@@ -8,9 +8,9 @@ use squawk_ide::code_actions::code_actions;
 use squawk_ide::db::line_index;
 use std::collections::HashMap;
 
-use crate::system::System;
 use crate::diagnostic::{AssociatedDiagnosticData, DIAGNOSTIC_NAME};
 use crate::lsp_utils;
+use crate::system::System;
 
 pub(crate) fn handle_code_action(
     connection: &Connection,

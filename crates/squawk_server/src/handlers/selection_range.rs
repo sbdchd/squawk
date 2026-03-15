@@ -4,8 +4,8 @@ use lsp_types::SelectionRangeParams;
 use rowan::TextRange;
 use squawk_ide::db::{line_index, parse};
 
-use crate::system::System;
 use crate::lsp_utils;
+use crate::system::System;
 
 pub(crate) fn handle_selection_range(
     connection: &Connection,

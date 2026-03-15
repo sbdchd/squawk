@@ -4,8 +4,8 @@ use lsp_types::{Location, ReferenceParams};
 use squawk_ide::db::line_index;
 use squawk_ide::find_references::find_references;
 
-use crate::system::System;
 use crate::lsp_utils::{self, to_location};
+use crate::system::System;
 
 pub(crate) fn handle_references(
     connection: &Connection,

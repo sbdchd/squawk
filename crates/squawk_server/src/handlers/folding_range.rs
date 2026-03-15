@@ -4,8 +4,8 @@ use lsp_types::FoldingRange;
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::folding_ranges;
 
-use crate::system::System;
 use crate::lsp_utils;
+use crate::system::System;
 
 pub(crate) fn handle_folding_range(
     connection: &Connection,

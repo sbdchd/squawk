@@ -4,8 +4,8 @@ use lsp_types::{CompletionParams, CompletionResponse};
 use squawk_ide::completion::completion;
 use squawk_ide::db::line_index;
 
-use crate::system::System;
 use crate::lsp_utils;
+use crate::system::System;
 
 pub(crate) fn handle_completion(
     connection: &Connection,

@@ -4,8 +4,8 @@ use lsp_types::{Hover, HoverContents, HoverParams, LanguageString, MarkedString}
 use squawk_ide::db::line_index;
 use squawk_ide::hover::hover;
 
-use crate::system::System;
 use crate::lsp_utils;
+use crate::system::System;
 
 pub(crate) fn handle_hover(
     connection: &Connection,
