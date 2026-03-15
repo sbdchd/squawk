@@ -64,6 +64,11 @@ smallvec = "1.13.2"
 tabled = "0.17.0"
 etcetera = "0.11.0"
 url = "2.5.4"
+crossbeam-channel = "0.5.15"
+crossbeam-utils = "0.8.21"
+jod-thread = "0.1.2"
+libc = "0.2.171"
+tracing = "0.1.40"
 
 # local
 # we have to make the versions explicit otherwise `cargo publish` won't work
@@ -74,6 +79,7 @@ squawk-parser = { path = "./crates/squawk_parser", version = "2.43.0" }
 squawk-syntax = { path = "./crates/squawk_syntax", version = "2.43.0" }
 squawk-linter = { path = "./crates/squawk_linter", version = "2.43.0" }
 squawk-server = { path = "./crates/squawk_server", version = "2.43.0" }
+squawk-thread = { path = "./crates/squawk_thread", version = "2.43.0" }
 
 [workspace.lints.clippy]
 collapsible_else_if = "allow"
