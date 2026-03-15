@@ -5,6 +5,7 @@ use salsa::Setter;
 use serde::{Deserialize, Serialize};
 use squawk_ide::builtins::builtins_line_index;
 use squawk_ide::db::{self, Database, File};
+use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
 use squawk_ide::goto_definition::FileId;
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
@@ -350,6 +351,38 @@ impl SquawkDatabase {
         serde_wasm_bindgen::to_value(&converted).map_err(into_error)
     }
 
+    pub fn folding_ranges(&self) -> Result<JsValue, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let folds = folding_ranges(&self.db, file);
+
+        let converted: Vec<WasmFoldingRange> = folds
+            .into_iter()
+            .map(|fold| {
+                let start = line_index.line_col(fold.range.start());
+                let end = line_index.line_col(fold.range.end());
+                let start_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .unwrap();
+                let end_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .unwrap();
+
+                WasmFoldingRange {
+                    start_line: start_wide.line,
+                    end_line: end_wide.line,
+                    kind: match fold.kind {
+                        FoldKind::Comment => "comment",
+                        _ => "region",
+                    }
+                    .to_string(),
+                }
+            })
+            .collect();
+
+        serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+    }
+
     pub fn selection_ranges(&self, positions: Vec<JsValue>) -> Result<JsValue, Error> {
         let file = self.file()?;
         let parse = db::parse(&self.db, file);
@@ -606,6 +639,13 @@ struct WasmInlayHint {
     line: u32,
     column: u32,
     label: String,
+    kind: String,
+}
+
+#[derive(Serialize)]
+struct WasmFoldingRange {
+    start_line: u32,
+    end_line: u32,
     kind: String,
 }
 
