@@ -1,0 +1,147 @@
+use anyhow::{Context, Result};
+use lsp_server::{Connection, Message, Response};
+use lsp_types::{
+    CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, CodeActionResponse, Command,
+    WorkspaceEdit,
+};
+use squawk_ide::code_actions::code_actions;
+use squawk_ide::db::line_index;
+use std::collections::HashMap;
+
+use crate::system::System;
+use crate::diagnostic::{AssociatedDiagnosticData, DIAGNOSTIC_NAME};
+use crate::lsp_utils;
+
+pub(crate) fn handle_code_action(
+    connection: &Connection,
+    req: lsp_server::Request,
+    system: &impl System,
+) -> Result<()> {
+    let params: CodeActionParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document.uri;
+
+    let mut actions: CodeActionResponse = vec![];
+
+    let db = system.db();
+    let file = system.file(&uri).unwrap();
+    let line_index = line_index(db, file);
+    let offset = lsp_utils::offset(&line_index, params.range.start).unwrap();
+
+    let ide_actions = code_actions(db, file, offset).unwrap_or_default();
+
+    for action in ide_actions {
+        let lsp_action = lsp_utils::code_action(&line_index, uri.clone(), action);
+        actions.push(CodeActionOrCommand::CodeAction(lsp_action));
+    }
+
+    for mut diagnostic in params
+        .context
+        .diagnostics
+        .into_iter()
+        .filter(|diagnostic| diagnostic.source.as_deref() == Some(DIAGNOSTIC_NAME))
+    {
+        let Some(rule_name) = diagnostic.code.as_ref().map(|x| match x {
+            lsp_types::NumberOrString::String(s) => s.clone(),
+            lsp_types::NumberOrString::Number(n) => n.to_string(),
+        }) else {
+            continue;
+        };
+        let Some(data) = diagnostic.data.take() else {
+            continue;
+        };
+
+        let associated_data: AssociatedDiagnosticData =
+            serde_json::from_value(data).context("deserializing diagnostic data")?;
+
+        if let Some(ignore_line_edit) = associated_data.ignore_line_edit {
+            let disable_line_action = CodeAction {
+                title: format!("Disable {rule_name} for this line"),
+                kind: Some(CodeActionKind::QUICKFIX),
+                diagnostics: Some(vec![diagnostic.clone()]),
+                edit: Some(WorkspaceEdit {
+                    changes: Some({
+                        let mut changes = HashMap::new();
+                        changes.insert(uri.clone(), vec![ignore_line_edit]);
+                        changes
+                    }),
+                    ..Default::default()
+                }),
+                command: None,
+                is_preferred: Some(false),
+                disabled: None,
+                data: None,
+            };
+            actions.push(CodeActionOrCommand::CodeAction(disable_line_action));
+        }
+        if let Some(ignore_file_edit) = associated_data.ignore_file_edit {
+            let disable_file_action = CodeAction {
+                title: format!("Disable {rule_name} for the entire file"),
+                kind: Some(CodeActionKind::QUICKFIX),
+                diagnostics: Some(vec![diagnostic.clone()]),
+                edit: Some(WorkspaceEdit {
+                    changes: Some({
+                        let mut changes = HashMap::new();
+                        changes.insert(uri.clone(), vec![ignore_file_edit]);
+                        changes
+                    }),
+                    ..Default::default()
+                }),
+                command: None,
+                is_preferred: Some(false),
+                disabled: None,
+                data: None,
+            };
+            actions.push(CodeActionOrCommand::CodeAction(disable_file_action));
+        }
+
+        let title = format!("Show documentation for {rule_name}");
+        let documentation_action = CodeAction {
+            title: title.clone(),
+            kind: Some(CodeActionKind::QUICKFIX),
+            diagnostics: Some(vec![diagnostic.clone()]),
+            edit: None,
+            command: Some(Command {
+                title,
+                command: "vscode.open".to_string(),
+                arguments: Some(vec![serde_json::to_value(format!(
+                    "https://squawkhq.com/docs/{rule_name}"
+                ))?]),
+            }),
+            is_preferred: Some(false),
+            disabled: None,
+            data: None,
+        };
+        actions.push(CodeActionOrCommand::CodeAction(documentation_action));
+
+        if !associated_data.title.is_empty() && !associated_data.edits.is_empty() {
+            let fix_action = CodeAction {
+                title: associated_data.title,
+                kind: Some(CodeActionKind::QUICKFIX),
+                diagnostics: Some(vec![diagnostic.clone()]),
+                edit: Some(WorkspaceEdit {
+                    changes: Some({
+                        let mut changes = HashMap::new();
+                        changes.insert(uri.clone(), associated_data.edits);
+                        changes
+                    }),
+                    ..Default::default()
+                }),
+                command: None,
+                is_preferred: Some(true),
+                disabled: None,
+                data: None,
+            };
+            actions.push(CodeActionOrCommand::CodeAction(fix_action));
+        }
+    }
+
+    let result: CodeActionResponse = actions;
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&result).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}

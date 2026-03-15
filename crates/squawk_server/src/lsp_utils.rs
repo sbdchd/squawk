@@ -1,13 +1,17 @@
 use std::{collections::HashMap, ops::Range};
 
-use line_index::{LineIndex, TextRange, TextSize};
+use ::line_index::{LineIndex, TextRange, TextSize};
 use log::warn;
 use lsp_types::{
-    CodeAction, CodeActionKind, FoldingRange, FoldingRangeKind as LspFoldingRangeKind, Url,
-    WorkspaceEdit,
+    CodeAction, CodeActionKind, FoldingRange, FoldingRangeKind as LspFoldingRangeKind, Location,
+    Url, WorkspaceEdit,
 };
+use squawk_ide::builtins::{builtins_line_index, builtins_url};
 use squawk_ide::code_actions::ActionKind;
+use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::{Fold, FoldKind};
+
+use crate::system::System;
 
 fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
     let start = offset(index, range.start)?;
@@ -208,6 +212,25 @@ pub(crate) fn apply_incremental_changes(
     }
 
     text
+}
+
+pub(crate) fn to_location(
+    db: &dyn salsa::Database,
+    system: &impl System,
+    uri: &Url,
+    loc: squawk_ide::goto_definition::Location,
+) -> Option<Location> {
+    let file = system.file(uri).unwrap();
+    let uri = match loc.file {
+        squawk_ide::goto_definition::FileId::Current => uri.clone(),
+        squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,
+    };
+    let line_index = match loc.file {
+        squawk_ide::goto_definition::FileId::Current => &line_index(db, file),
+        squawk_ide::goto_definition::FileId::Builtins => &builtins_line_index(db),
+    };
+    let range = range(line_index, loc.range);
+    Some(Location { uri, range })
 }
 
 #[cfg(test)]

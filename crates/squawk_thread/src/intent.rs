@@ -50,6 +50,7 @@ fn thread_intent_to_qos_class(intent: ThreadIntent) -> QoSClass {
 // All Apple platforms use XNU as their kernel
 // and thus have the concept of QoS.
 #[cfg(target_vendor = "apple")]
+#[allow(clippy::doc_markdown)]
 mod imp {
     use super::ThreadIntent;
 
