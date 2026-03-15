@@ -19,6 +19,7 @@ import {
   provideDefinition,
   provideReferences,
   provideDocumentSymbols,
+  provideFoldingRanges,
   provideSelectionRanges,
   provideCompletionItems,
 } from "./providers"
@@ -51,8 +52,8 @@ const SETTINGS = {
   minimap: { enabled: false },
   automaticLayout: true,
   scrollBeyondLastLine: false,
-  folding: false,
-  showFoldingControls: "never",
+  folding: true,
+  showFoldingControls: "mouseover",
   occurrencesHighlight: "off",
   stickyScroll: { enabled: false },
   fontSize: 16,
@@ -452,6 +453,13 @@ function registerMonacoProvidersOnce() {
     },
   )
 
+  const foldingRangeProvider = monaco.languages.registerFoldingRangeProvider(
+    "pgsql",
+    {
+      provideFoldingRanges,
+    },
+  )
+
   const selectionRangeProvider =
     monaco.languages.registerSelectionRangeProvider("pgsql", {
       provideSelectionRanges,
@@ -472,6 +480,7 @@ function registerMonacoProvidersOnce() {
     definitionProvider.dispose()
     referencesProvider.dispose()
     documentSymbolProvider.dispose()
+    foldingRangeProvider.dispose()
     inlayHintsProvider.dispose()
     selectionRangeProvider.dispose()
     completionProvider.dispose()

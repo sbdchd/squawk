@@ -105,6 +105,13 @@ export function selection_ranges(
   return getDb(content, version).selection_ranges(positions)
 }
 
+export function folding_ranges(
+  content: string,
+  version: number,
+): FoldingRange[] {
+  return getDb(content, version).folding_ranges()
+}
+
 export function completion(
   content: string,
   version: number,
@@ -203,6 +210,12 @@ interface InlayHint {
   line: number
   column: number
   label: string
+  kind: string
+}
+
+export interface FoldingRange {
+  start_line: number
+  end_line: number
   kind: string
 }
 
