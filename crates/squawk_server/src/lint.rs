@@ -5,8 +5,7 @@ use squawk_ide::db::{File, line_index as file_line_index, parse};
 use squawk_linter::{Edit, Linter};
 
 use crate::{
-    DIAGNOSTIC_NAME,
-    diagnostic::AssociatedDiagnosticData,
+    diagnostic::{AssociatedDiagnosticData, DIAGNOSTIC_NAME},
     ignore::{ignore_file_edit, ignore_line_edit},
 };
 
