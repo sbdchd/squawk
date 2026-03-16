@@ -36,9 +36,9 @@ impl<'a> RequestDispatcher<'a> {
         match req.extract(R::METHOD) {
             Ok((id, params)) => Some((id, params)),
             Err(err) => {
-                let response = lsp_server::Response::new_err(
+                let response = Response::new_err(
                     id,
-                    lsp_server::ErrorCode::InvalidParams as i32,
+                    lsp_server::ErrorCode::ParseError as i32,
                     err.to_string(),
                 );
                 if let Err(err) = self.connection.sender.send(Message::Response(response)) {
@@ -57,12 +57,16 @@ impl<'a> RequestDispatcher<'a> {
         R: LspRequest,
     {
         if let Some((id, params)) = self.parse::<R>() {
-            // TODO: we probably need to send an error here
-            let result = handler(self.system, params)?;
-            let resp = Response {
-                id,
-                result: Some(serde_json::to_value(result)?),
-                error: None,
+            let resp = match handler(self.system, params) {
+                Ok(result) => Response::new_ok(id, result),
+                Err(err) => {
+                    error!("Request handler failed: {err}");
+                    Response::new_err(
+                        id,
+                        lsp_server::ErrorCode::InternalError as i32,
+                        err.to_string(),
+                    )
+                }
             };
             self.connection.sender.send(Message::Response(resp))?;
         }
