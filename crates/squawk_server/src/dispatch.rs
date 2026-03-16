@@ -3,7 +3,7 @@
 use anyhow::Result;
 use log::{error, info};
 use lsp_server::{Connection, Message, Response};
-use lsp_types::request::Request as LspRequest;
+use lsp_types::{notification::Notification as LspNotification, request::Request as LspRequest};
 
 use crate::system::System;
 
@@ -73,6 +73,63 @@ impl<'a> RequestDispatcher<'a> {
     pub(crate) fn finish(self) {
         if let Some(req) = self.req {
             info!("Ignoring unhandled request: {}", req.method);
+        }
+    }
+}
+
+pub(crate) struct NotificationDispatcher<'a> {
+    connection: &'a Connection,
+    notif: Option<lsp_server::Notification>,
+    system: &'a mut dyn System,
+}
+
+impl<'a> NotificationDispatcher<'a> {
+    pub(crate) fn new(
+        connection: &'a Connection,
+        notif: lsp_server::Notification,
+        system: &'a mut dyn System,
+    ) -> Self {
+        Self {
+            connection,
+            notif: Some(notif),
+            system,
+        }
+    }
+
+    fn parse<N>(&mut self) -> Option<N::Params>
+    where
+        N: LspNotification,
+    {
+        let notif = self
+            .notif
+            .take_if(|notif| notif.method.as_str() == N::METHOD)?;
+
+        match notif.extract(N::METHOD) {
+            Ok(params) => Some(params),
+            Err(err) => {
+                error!("Failed to parse notification params: {err}");
+                None
+            }
+        }
+    }
+
+    pub(crate) fn on<N>(
+        mut self,
+        handler: fn(&Connection, N::Params, &mut dyn System) -> Result<()>,
+    ) -> Result<Self>
+    where
+        N: LspNotification,
+    {
+        if let Some(params) = self.parse::<N>() {
+            handler(self.connection, params, self.system)?;
+        }
+
+        Ok(self)
+    }
+
+    pub(crate) fn finish(self) {
+        if let Some(notif) = self.notif {
+            info!("Ignoring unhandled notification: {}", notif.method);
         }
     }
 }

@@ -34,10 +34,9 @@ fn publish_diagnostics(
 
 pub(crate) fn handle_did_open(
     connection: &Connection,
-    notif: lsp_server::Notification,
-    system: &mut impl System,
+    params: DidOpenTextDocumentParams,
+    system: &mut dyn System,
 ) -> Result<()> {
-    let params: DidOpenTextDocumentParams = serde_json::from_value(notif.params)?;
     let uri = params.text_document.uri;
     let content = params.text_document.text;
     let version = params.text_document.version;
@@ -55,10 +54,9 @@ pub(crate) fn handle_did_open(
 
 pub(crate) fn handle_did_change(
     connection: &Connection,
-    notif: lsp_server::Notification,
-    system: &mut impl System,
+    params: DidChangeTextDocumentParams,
+    system: &mut dyn System,
 ) -> Result<()> {
-    let params: DidChangeTextDocumentParams = serde_json::from_value(notif.params)?;
     let uri = params.text_document.uri;
     let version = params.text_document.version;
 
@@ -85,10 +83,9 @@ pub(crate) fn handle_did_change(
 
 pub(crate) fn handle_did_close(
     connection: &Connection,
-    notif: lsp_server::Notification,
-    system: &mut impl System,
+    params: DidCloseTextDocumentParams,
+    system: &mut dyn System,
 ) -> Result<()> {
-    let params: DidCloseTextDocumentParams = serde_json::from_value(notif.params)?;
     let uri = params.text_document.uri;
 
     system.remove(&uri);
