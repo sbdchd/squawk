@@ -1,5 +1,4 @@
 use anyhow::Result;
-use lsp_server::{Connection, Message, Response};
 use lsp_types::SelectionRangeParams;
 use rowan::TextRange;
 use squawk_ide::db::{line_index, parse};
@@ -8,11 +7,9 @@ use crate::lsp_utils;
 use crate::system::System;
 
 pub(crate) fn handle_selection_range(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: SelectionRangeParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: SelectionRangeParams,
+) -> Result<Option<Vec<lsp_types::SelectionRange>>> {
     let uri = params.text_document.uri;
 
     let db = system.db();
@@ -55,12 +52,5 @@ pub(crate) fn handle_selection_range(
         selection_ranges.push(range);
     }
 
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&selection_ranges).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(selection_ranges))
 }

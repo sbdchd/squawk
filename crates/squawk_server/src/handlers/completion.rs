@@ -1,5 +1,4 @@
 use anyhow::Result;
-use lsp_server::{Connection, Message, Response};
 use lsp_types::{CompletionParams, CompletionResponse};
 use squawk_ide::completion::completion;
 use squawk_ide::db::line_index;
@@ -8,11 +7,9 @@ use crate::lsp_utils;
 use crate::system::System;
 
 pub(crate) fn handle_completion(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: CompletionParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: CompletionParams,
+) -> Result<Option<CompletionResponse>> {
     let uri = params.text_document_position.text_document.uri;
     let position = params.text_document_position.position;
 
@@ -21,13 +18,7 @@ pub(crate) fn handle_completion(
     let line_index = line_index(db, file);
 
     let Some(offset) = lsp_utils::offset(&line_index, position) else {
-        let resp = Response {
-            id: req.id,
-            result: Some(serde_json::to_value(CompletionResponse::Array(vec![])).unwrap()),
-            error: None,
-        };
-        connection.sender.send(Message::Response(resp))?;
-        return Ok(());
+        return Ok(Some(CompletionResponse::Array(vec![])));
     };
 
     let completion_items = completion(db, file, offset)
@@ -35,14 +26,5 @@ pub(crate) fn handle_completion(
         .map(lsp_utils::completion_item)
         .collect();
 
-    let result = CompletionResponse::Array(completion_items);
-
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&result).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(CompletionResponse::Array(completion_items)))
 }

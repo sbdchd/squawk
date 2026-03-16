@@ -1,5 +1,4 @@
 use anyhow::{Context, Result};
-use lsp_server::{Connection, Message, Response};
 use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, CodeActionResponse, Command,
     WorkspaceEdit,
@@ -13,11 +12,9 @@ use crate::lsp_utils;
 use crate::system::System;
 
 pub(crate) fn handle_code_action(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: CodeActionParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: CodeActionParams,
+) -> Result<Option<CodeActionResponse>> {
     let uri = params.text_document.uri;
 
     let mut actions: CodeActionResponse = vec![];
@@ -135,13 +132,5 @@ pub(crate) fn handle_code_action(
         }
     }
 
-    let result: CodeActionResponse = actions;
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&result).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(actions))
 }

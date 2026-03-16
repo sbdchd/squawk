@@ -1,4 +1,5 @@
 mod diagnostic;
+mod dispatch;
 mod handlers;
 mod ignore;
 mod lint;

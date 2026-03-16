@@ -1,6 +1,5 @@
 use anyhow::Result;
-use lsp_server::{Connection, Message, Response};
-use lsp_types::FoldingRange;
+use lsp_types::{FoldingRange, FoldingRangeParams};
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::folding_ranges;
 
@@ -8,11 +7,9 @@ use crate::lsp_utils;
 use crate::system::System;
 
 pub(crate) fn handle_folding_range(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: lsp_types::FoldingRangeParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: FoldingRangeParams,
+) -> Result<Option<Vec<FoldingRange>>> {
     let uri = params.text_document.uri;
 
     let db = system.db();
@@ -24,12 +21,5 @@ pub(crate) fn handle_folding_range(
         .map(|fold| lsp_utils::folding_range(&line_idx, fold))
         .collect();
 
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&lsp_folds).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(lsp_folds))
 }

@@ -11,15 +11,16 @@ use lsp_types::{
     },
     request::{
         CodeActionRequest, Completion, DocumentSymbolRequest, FoldingRangeRequest, GotoDefinition,
-        HoverRequest, InlayHintRequest, References, Request, SelectionRangeRequest,
+        HoverRequest, InlayHintRequest, References, SelectionRangeRequest,
     },
 };
 
+use crate::dispatch::RequestDispatcher;
 use crate::handlers::{
-    handle_code_action, handle_completion, handle_did_change, handle_did_close, handle_did_open,
-    handle_document_symbol, handle_folding_range, handle_goto_definition, handle_hover,
-    handle_inlay_hints, handle_references, handle_selection_range, handle_syntax_tree,
-    handle_tokens,
+    SyntaxTreeRequest, TokensRequest, handle_code_action, handle_completion, handle_did_change,
+    handle_did_close, handle_did_open, handle_document_symbol, handle_folding_range,
+    handle_goto_definition, handle_hover, handle_inlay_hints, handle_references,
+    handle_selection_range, handle_syntax_tree, handle_tokens,
 };
 use crate::system::GlobalState;
 
@@ -94,44 +95,19 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     return Ok(());
                 }
 
-                match req.method.as_ref() {
-                    GotoDefinition::METHOD => {
-                        handle_goto_definition(&connection, req, &system)?;
-                    }
-                    HoverRequest::METHOD => {
-                        handle_hover(&connection, req, &system)?;
-                    }
-                    CodeActionRequest::METHOD => {
-                        handle_code_action(&connection, req, &system)?;
-                    }
-                    SelectionRangeRequest::METHOD => {
-                        handle_selection_range(&connection, req, &system)?;
-                    }
-                    InlayHintRequest::METHOD => {
-                        handle_inlay_hints(&connection, req, &system)?;
-                    }
-                    DocumentSymbolRequest::METHOD => {
-                        handle_document_symbol(&connection, req, &system)?;
-                    }
-                    FoldingRangeRequest::METHOD => {
-                        handle_folding_range(&connection, req, &system)?;
-                    }
-                    Completion::METHOD => {
-                        handle_completion(&connection, req, &system)?;
-                    }
-                    "squawk/syntaxTree" => {
-                        handle_syntax_tree(&connection, req, &system)?;
-                    }
-                    "squawk/tokens" => {
-                        handle_tokens(&connection, req, &system)?;
-                    }
-                    References::METHOD => {
-                        handle_references(&connection, req, &system)?;
-                    }
-                    _ => {
-                        info!("Ignoring unhandled request: {}", req.method);
-                    }
-                }
+                RequestDispatcher::new(&connection, req, &system)
+                    .on::<GotoDefinition>(handle_goto_definition)?
+                    .on::<HoverRequest>(handle_hover)?
+                    .on::<CodeActionRequest>(handle_code_action)?
+                    .on::<SelectionRangeRequest>(handle_selection_range)?
+                    .on::<InlayHintRequest>(handle_inlay_hints)?
+                    .on::<DocumentSymbolRequest>(handle_document_symbol)?
+                    .on::<FoldingRangeRequest>(handle_folding_range)?
+                    .on::<Completion>(handle_completion)?
+                    .on::<SyntaxTreeRequest>(handle_syntax_tree)?
+                    .on::<TokensRequest>(handle_tokens)?
+                    .on::<References>(handle_references)?
+                    .finish();
             }
             Message::Response(resp) => {
                 info!("Received response: id={:?}", resp.id);

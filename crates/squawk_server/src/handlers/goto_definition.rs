@@ -1,5 +1,4 @@
 use anyhow::Result;
-use lsp_server::{Connection, Message, Response};
 use lsp_types::{GotoDefinitionParams, GotoDefinitionResponse};
 use squawk_ide::db::line_index;
 use squawk_ide::goto_definition::goto_definition;
@@ -8,11 +7,9 @@ use crate::lsp_utils::{self, to_location};
 use crate::system::System;
 
 pub(crate) fn handle_goto_definition(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: GotoDefinitionParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: GotoDefinitionParams,
+) -> Result<Option<GotoDefinitionResponse>> {
     let uri = params.text_document_position_params.text_document.uri;
     let position = params.text_document_position_params.position;
 
@@ -32,13 +29,5 @@ pub(crate) fn handle_goto_definition(
         })
         .collect();
 
-    let result = GotoDefinitionResponse::Array(ranges);
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&result).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(GotoDefinitionResponse::Array(ranges)))
 }

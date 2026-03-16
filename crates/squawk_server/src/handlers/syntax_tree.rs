@@ -1,22 +1,25 @@
 use anyhow::Result;
 use log::info;
-use lsp_server::{Connection, Message, Response};
+use lsp_types::request::Request;
 use squawk_ide::db::parse;
 
 use crate::system::System;
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, serde::Serialize)]
 pub(crate) struct SyntaxTreeParams {
     #[serde(rename = "textDocument")]
     text_document: lsp_types::TextDocumentIdentifier,
 }
 
-pub(crate) fn handle_syntax_tree(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: SyntaxTreeParams = serde_json::from_value(req.params)?;
+pub(crate) enum SyntaxTreeRequest {}
+
+impl Request for SyntaxTreeRequest {
+    type Params = SyntaxTreeParams;
+    type Result = String;
+    const METHOD: &'static str = "squawk/syntaxTree";
+}
+
+pub(crate) fn handle_syntax_tree(system: &dyn System, params: SyntaxTreeParams) -> Result<String> {
     let uri = params.text_document.uri;
 
     info!("Generating syntax tree for: {uri}");
@@ -26,12 +29,5 @@ pub(crate) fn handle_syntax_tree(
     let parse = parse(db, file);
     let syntax_tree = format!("{:#?}", parse.syntax_node());
 
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&syntax_tree).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(syntax_tree)
 }

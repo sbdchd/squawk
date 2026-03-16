@@ -1,5 +1,4 @@
 use anyhow::Result;
-use lsp_server::{Connection, Message, Response};
 use lsp_types::{Location, ReferenceParams};
 use squawk_ide::db::line_index;
 use squawk_ide::find_references::find_references;
@@ -8,11 +7,9 @@ use crate::lsp_utils::{self, to_location};
 use crate::system::System;
 
 pub(crate) fn handle_references(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: ReferenceParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: ReferenceParams,
+) -> Result<Option<Vec<Location>>> {
     let uri = params.text_document_position.text_document.uri;
     let position = params.text_document_position.position;
 
@@ -30,12 +27,5 @@ pub(crate) fn handle_references(
         .filter_map(|loc| to_location(db, system, &uri, loc))
         .collect();
 
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&locations).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(locations))
 }
