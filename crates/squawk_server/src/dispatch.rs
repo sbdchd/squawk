@@ -36,7 +36,7 @@ impl<'a> RequestDispatcher<'a> {
         match req.extract(R::METHOD) {
             Ok((id, params)) => Some((id, params)),
             Err(err) => {
-                let response = lsp_server::Response::new_err(
+                let response = Response::new_err(
                     id,
                     lsp_server::ErrorCode::InvalidParams as i32,
                     err.to_string(),
@@ -58,14 +58,10 @@ impl<'a> RequestDispatcher<'a> {
     {
         if let Some((id, params)) = self.parse::<R>() {
             let resp = match handler(self.system, params) {
-                Ok(result) => Response {
-                    id,
-                    result: Some(serde_json::to_value(result)?),
-                    error: None,
-                },
+                Ok(result) => Response::new_ok(id, result),
                 Err(err) => {
                     error!("Request handler failed: {err}");
-                    lsp_server::Response::new_err(
+                    Response::new_err(
                         id,
                         lsp_server::ErrorCode::InternalError as i32,
                         err.to_string(),
