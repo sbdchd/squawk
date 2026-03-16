@@ -57,12 +57,20 @@ impl<'a> RequestDispatcher<'a> {
         R: LspRequest,
     {
         if let Some((id, params)) = self.parse::<R>() {
-            // TODO: we probably need to send an error here
-            let result = handler(self.system, params)?;
-            let resp = Response {
-                id,
-                result: Some(serde_json::to_value(result)?),
-                error: None,
+            let resp = match handler(self.system, params) {
+                Ok(result) => Response {
+                    id,
+                    result: Some(serde_json::to_value(result)?),
+                    error: None,
+                },
+                Err(err) => {
+                    error!("Request handler failed: {err}");
+                    lsp_server::Response::new_err(
+                        id,
+                        lsp_server::ErrorCode::InternalError as i32,
+                        err.to_string(),
+                    )
+                }
             };
             self.connection.sender.send(Message::Response(resp))?;
         }
