@@ -38,7 +38,7 @@ impl<'a> RequestDispatcher<'a> {
             Err(err) => {
                 let response = Response::new_err(
                     id,
-                    lsp_server::ErrorCode::InvalidParams as i32,
+                    lsp_server::ErrorCode::ParseError as i32,
                     err.to_string(),
                 );
                 if let Err(err) = self.connection.sender.send(Message::Response(response)) {
