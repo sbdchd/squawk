@@ -6,16 +6,14 @@ use lsp_types::{
     FoldingRangeProviderCapability, HoverProviderCapability, InitializeParams, OneOf,
     SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
     TextDocumentSyncKind, WorkDoneProgressOptions,
-    notification::{
-        DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
-    },
+    notification::{DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument},
     request::{
         CodeActionRequest, Completion, DocumentSymbolRequest, FoldingRangeRequest, GotoDefinition,
         HoverRequest, InlayHintRequest, References, SelectionRangeRequest,
     },
 };
 
-use crate::dispatch::RequestDispatcher;
+use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
 use crate::handlers::{
     SyntaxTreeRequest, TokensRequest, handle_code_action, handle_completion, handle_did_change,
     handle_did_close, handle_did_open, handle_document_symbol, handle_folding_range,
@@ -114,20 +112,12 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
             }
             Message::Notification(notif) => {
                 info!("Received notification: method={}", notif.method);
-                match notif.method.as_ref() {
-                    DidOpenTextDocument::METHOD => {
-                        handle_did_open(&connection, notif, &mut system)?;
-                    }
-                    DidChangeTextDocument::METHOD => {
-                        handle_did_change(&connection, notif, &mut system)?;
-                    }
-                    DidCloseTextDocument::METHOD => {
-                        handle_did_close(&connection, notif, &mut system)?;
-                    }
-                    _ => {
-                        info!("Ignoring unhandled notification: {}", notif.method);
-                    }
-                }
+
+                NotificationDispatcher::new(&connection, notif, &mut system)
+                    .on::<DidOpenTextDocument>(handle_did_open)?
+                    .on::<DidChangeTextDocument>(handle_did_change)?
+                    .on::<DidCloseTextDocument>(handle_did_close)?
+                    .finish();
             }
         }
     }
