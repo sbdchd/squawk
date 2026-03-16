@@ -1,21 +1,24 @@
 use anyhow::Result;
 use log::info;
-use lsp_server::{Connection, Message, Response};
+use lsp_types::request::Request;
 
 use crate::system::System;
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, serde::Serialize)]
 pub(crate) struct TokensParams {
     #[serde(rename = "textDocument")]
     text_document: lsp_types::TextDocumentIdentifier,
 }
 
-pub(crate) fn handle_tokens(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: TokensParams = serde_json::from_value(req.params)?;
+pub(crate) enum TokensRequest {}
+
+impl Request for TokensRequest {
+    type Params = TokensParams;
+    type Result = String;
+    const METHOD: &'static str = "squawk/tokens";
+}
+
+pub(crate) fn handle_tokens(system: &dyn System, params: TokensParams) -> Result<String> {
     let uri = params.text_document.uri;
 
     info!("Generating tokens for: {uri}");
@@ -40,14 +43,5 @@ pub(crate) fn handle_tokens(
         char_pos = token_end;
     }
 
-    let tokens_output = output.join("\n");
-
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&tokens_output).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(output.join("\n"))
 }

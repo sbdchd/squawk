@@ -21,5 +21,5 @@ pub(crate) use inlay_hints::handle_inlay_hints;
 pub(crate) use notifications::{handle_did_change, handle_did_close, handle_did_open};
 pub(crate) use references::handle_references;
 pub(crate) use selection_range::handle_selection_range;
-pub(crate) use syntax_tree::handle_syntax_tree;
-pub(crate) use tokens::handle_tokens;
+pub(crate) use syntax_tree::{SyntaxTreeRequest, handle_syntax_tree};
+pub(crate) use tokens::{TokensRequest, handle_tokens};

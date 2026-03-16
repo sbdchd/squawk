@@ -1,7 +1,6 @@
 use ::line_index::LineIndex;
 use anyhow::Result;
-use lsp_server::{Connection, Message, Response};
-use lsp_types::{DocumentSymbol, DocumentSymbolParams, SymbolKind};
+use lsp_types::{DocumentSymbol, DocumentSymbolParams, DocumentSymbolResponse, SymbolKind};
 use squawk_ide::db::line_index;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 
@@ -9,11 +8,9 @@ use crate::lsp_utils;
 use crate::system::System;
 
 pub(crate) fn handle_document_symbol(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: DocumentSymbolParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: DocumentSymbolParams,
+) -> Result<Option<DocumentSymbolResponse>> {
     let uri = params.text_document.uri;
 
     let db = system.db();
@@ -81,12 +78,5 @@ pub(crate) fn handle_document_symbol(
         .map(|sym| convert_symbol(sym, &line_index))
         .collect();
 
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&lsp_symbols).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(DocumentSymbolResponse::Nested(lsp_symbols)))
 }

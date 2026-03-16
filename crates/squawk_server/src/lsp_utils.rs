@@ -216,7 +216,7 @@ pub(crate) fn apply_incremental_changes(
 
 pub(crate) fn to_location(
     db: &dyn salsa::Database,
-    system: &impl System,
+    system: &dyn System,
     uri: &Url,
     loc: squawk_ide::goto_definition::Location,
 ) -> Option<Location> {

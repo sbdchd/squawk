@@ -1,5 +1,4 @@
 use anyhow::Result;
-use lsp_server::{Connection, Message, Response};
 use lsp_types::{
     InlayHint, InlayHintKind, InlayHintLabel, InlayHintLabelPart, InlayHintParams, Location,
 };
@@ -11,11 +10,9 @@ use crate::lsp_utils;
 use crate::system::System;
 
 pub(crate) fn handle_inlay_hints(
-    connection: &Connection,
-    req: lsp_server::Request,
-    system: &impl System,
-) -> Result<()> {
-    let params: InlayHintParams = serde_json::from_value(req.params)?;
+    system: &dyn System,
+    params: InlayHintParams,
+) -> Result<Option<Vec<InlayHint>>> {
     let uri = params.text_document.uri;
 
     let db = system.db();
@@ -41,8 +38,8 @@ pub(crate) fn handle_inlay_hints(
             };
 
             let kind: InlayHintKind = match hint.kind {
-                squawk_ide::inlay_hints::InlayHintKind::Type => InlayHintKind::TYPE,
                 squawk_ide::inlay_hints::InlayHintKind::Parameter => InlayHintKind::PARAMETER,
+                squawk_ide::inlay_hints::InlayHintKind::Type => InlayHintKind::TYPE,
             };
 
             let label = if let Some(target_range) = hint.target {
@@ -72,12 +69,5 @@ pub(crate) fn handle_inlay_hints(
         })
         .collect();
 
-    let resp = Response {
-        id: req.id,
-        result: Some(serde_json::to_value(&lsp_hints).unwrap()),
-        error: None,
-    };
-
-    connection.sender.send(Message::Response(resp))?;
-    Ok(())
+    Ok(Some(lsp_hints))
 }
