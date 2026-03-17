@@ -8,17 +8,18 @@ use crate::{Edit, Fix, Linter, Rule, Violation};
 use crate::visitors::check_not_allowed_types;
 use crate::visitors::is_not_valid_int_type;
 
-use lazy_static::lazy_static;
+use std::sync::OnceLock;
 
-lazy_static! {
-    static ref SMALL_INT_TYPES: FxHashSet<Identifier> = [
-        Identifier::new("smallint"),
-        Identifier::new("int2"),
-        Identifier::new("smallserial"),
-        Identifier::new("serial2"),
-    ]
-    .into_iter()
-    .collect();
+fn small_int_types() -> &'static FxHashSet<Identifier> {
+    static SMALL_INT_TYPES: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
+    SMALL_INT_TYPES.get_or_init(|| {
+        FxHashSet::from_iter([
+            Identifier::new("smallint"),
+            Identifier::new("int2"),
+            Identifier::new("smallserial"),
+            Identifier::new("serial2"),
+        ])
+    })
 }
 
 fn smallint_to_bigint(smallint_type: &str) -> &'static str {
@@ -43,7 +44,7 @@ fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
 
 fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
-        if is_not_valid_int_type(&ty, &SMALL_INT_TYPES) {
+        if is_not_valid_int_type(&ty, small_int_types()) {
             let fix = create_bigint_fix(&ty);
 
             ctx.report(
