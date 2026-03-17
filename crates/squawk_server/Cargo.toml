@@ -30,6 +30,7 @@ squawk-syntax.workspace = true
 line-index.workspace = true
 insta.workspace = true
 etcetera.workspace = true
+rustc-hash.workspace = true
 
 [lints]
 workspace = true

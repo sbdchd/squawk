@@ -7,7 +7,7 @@ use lsp_types::{
 };
 
 use crate::lsp_utils;
-use crate::system::{Document, System};
+use crate::system::System;
 
 pub(crate) fn handle_did_open(
     _connection: &Connection,
@@ -17,7 +17,7 @@ pub(crate) fn handle_did_open(
     let uri = params.text_document.uri;
     let content = params.text_document.text;
 
-    system.set(uri, Document { content });
+    system.set(uri, content);
 
     Ok(())
 }
@@ -35,12 +35,7 @@ pub(crate) fn handle_did_change(
 
     let updated_content = lsp_utils::apply_incremental_changes(content, params.content_changes);
 
-    system.set(
-        uri,
-        Document {
-            content: updated_content,
-        },
-    );
+    system.set(uri, updated_content);
 
     Ok(())
 }

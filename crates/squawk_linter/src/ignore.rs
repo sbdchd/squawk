@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use rowan::{NodeOrToken, TextRange, TextSize};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
@@ -14,7 +14,7 @@ pub enum IgnoreKind {
 #[derive(Debug)]
 pub struct Ignore {
     pub range: TextRange,
-    pub violation_names: HashSet<Rule>,
+    pub violation_names: FxHashSet<Rule>,
     pub ignore_all: bool,
     pub kind: IgnoreKind,
 }
@@ -79,7 +79,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                 if token.kind() == SyntaxKind::COMMENT =>
             {
                 if let Some((rule_names, range, kind)) = ignore_rule_info(&token) {
-                    let mut set = HashSet::new();
+                    let mut set = FxHashSet::default();
                     let mut offset = 0usize;
                     // We have a specific check instead of going off of empty
                     // rules in case we have invalid rule names specified in the

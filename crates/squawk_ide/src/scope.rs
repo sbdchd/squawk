@@ -1,5 +1,5 @@
 use la_arena::Idx;
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 
 use crate::symbols::{Name, SymbolId};
 
@@ -9,14 +9,14 @@ pub(crate) type ScopeId = Idx<Scope>;
 pub(crate) struct Scope {
     #[allow(dead_code)]
     pub(crate) parent: Option<ScopeId>,
-    pub(crate) entries: HashMap<Name, Vec<SymbolId>>,
+    pub(crate) entries: FxHashMap<Name, Vec<SymbolId>>,
 }
 
 impl Scope {
     pub(crate) fn with_parent(parent: Option<ScopeId>) -> Self {
         Scope {
             parent,
-            entries: HashMap::new(),
+            entries: FxHashMap::default(),
         }
     }
 

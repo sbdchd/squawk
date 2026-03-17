@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::{FxBuildHasher, FxHashSet};
 use std::fmt;
 
 use enum_iterator::Sequence;
@@ -317,7 +317,7 @@ pub struct LinterSettings {
 pub struct Linter {
     errors: Vec<Violation>,
     ignores: Vec<Ignore>,
-    pub rules: HashSet<Rule>,
+    pub rules: FxHashSet<Rule>,
     pub settings: LinterSettings,
 }
 
@@ -452,13 +452,13 @@ impl Linter {
     }
 
     pub fn with_all_rules() -> Self {
-        let rules = all::<Rule>().collect::<HashSet<_>>();
+        let rules = all::<Rule>().collect::<FxHashSet<_>>();
         Linter::from(rules)
     }
 
     pub fn without_rules(exclude: &[Rule]) -> Self {
-        let all_rules = all::<Rule>().collect::<HashSet<_>>();
-        let mut exclude_set = HashSet::with_capacity(exclude.len());
+        let all_rules = all::<Rule>().collect::<FxHashSet<_>>();
+        let mut exclude_set = FxHashSet::with_capacity_and_hasher(exclude.len(), FxBuildHasher);
         for e in exclude {
             exclude_set.insert(e);
         }
@@ -466,16 +466,16 @@ impl Linter {
         let rules = all_rules
             .into_iter()
             .filter(|x| !exclude_set.contains(x))
-            .collect::<HashSet<_>>();
+            .collect::<FxHashSet<_>>();
 
         Linter::from(rules)
     }
 
-    pub fn from(rules: impl Into<HashSet<Rule>>) -> Self {
+    pub fn from(rules: impl IntoIterator<Item = Rule>) -> Self {
         Self {
             errors: vec![],
             ignores: vec![],
-            rules: rules.into(),
+            rules: rules.into_iter().collect(),
             settings: Default::default(),
         }
     }

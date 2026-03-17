@@ -23,7 +23,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use anyhow::{Context, Result};
 use convert_case::{Case, Casing};
@@ -801,7 +801,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
         })
         .unzip();
 
-    let enum_nodes = enums.iter().map(|x| &x.name).collect::<HashSet<_>>();
+    let enum_nodes = enums.iter().map(|x| &x.name).collect::<FxHashSet<_>>();
 
     let (enums, enums_boilierplate_impls): (Vec<_>, Vec<_>) = enums
         .iter()

@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::{
     Parse, SourceFile,
@@ -11,8 +11,8 @@ use crate::{Linter, Rule, Violation};
 pub fn tables_created_in_transaction(
     assume_in_transaction: bool,
     file: &ast::SourceFile,
-) -> HashSet<Identifier> {
-    let mut created_table_names = HashSet::new();
+) -> FxHashSet<Identifier> {
+    let mut created_table_names = FxHashSet::default();
     let mut inside_transaction = assume_in_transaction;
     for stmt in file.stmts() {
         match stmt {
@@ -44,7 +44,7 @@ fn not_valid_validate_in_transaction(
     file: &ast::SourceFile,
 ) {
     let mut inside_transaction = assume_in_transaction;
-    let mut not_valid_names: HashSet<Identifier> = HashSet::new();
+    let mut not_valid_names: FxHashSet<Identifier> = FxHashSet::default();
     for stmt in file.stmts() {
         match stmt {
             ast::Stmt::AlterTable(alter_table) => {

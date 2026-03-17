@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast, identifier::Identifier};
@@ -11,13 +11,15 @@ use crate::visitors::is_not_valid_int_type;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref INT_TYPES: HashSet<Identifier> = HashSet::from([
+    static ref INT_TYPES: FxHashSet<Identifier> = [
         Identifier::new("int"),
         Identifier::new("integer"),
         Identifier::new("int4"),
         Identifier::new("serial"),
         Identifier::new("serial4"),
-    ]);
+    ]
+    .into_iter()
+    .collect();
 }
 
 fn int_to_bigint_replacement(int_type: &str) -> &'static str {

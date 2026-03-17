@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, SyntaxKind};
@@ -8,7 +8,7 @@ use squawk_syntax::{ast, identifier::Identifier};
 use crate::{Linter, Rule, Version, Violation};
 
 lazy_static! {
-    static ref NON_VOLATILE_FUNCS: HashSet<Identifier> = {
+    static ref NON_VOLATILE_FUNCS: FxHashSet<Identifier> = {
         NON_VOLATILE_BUILT_IN_FUNCTIONS
             .split('\n')
             .map(|x| x.trim())

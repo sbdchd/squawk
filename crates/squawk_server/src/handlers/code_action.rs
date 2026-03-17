@@ -3,9 +3,9 @@ use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, CodeActionResponse, Command,
     WorkspaceEdit,
 };
+use rustc_hash::FxHashMap;
 use squawk_ide::code_actions::code_actions;
 use squawk_ide::db::line_index;
-use std::collections::HashMap;
 
 use crate::diagnostic::{AssociatedDiagnosticData, DIAGNOSTIC_NAME};
 use crate::lsp_utils;
@@ -57,9 +57,9 @@ pub(crate) fn handle_code_action(
                 diagnostics: Some(vec![diagnostic.clone()]),
                 edit: Some(WorkspaceEdit {
                     changes: Some({
-                        let mut changes = HashMap::new();
+                        let mut changes = FxHashMap::default();
                         changes.insert(uri.clone(), vec![ignore_line_edit]);
-                        changes
+                        changes.into_iter().collect()
                     }),
                     ..Default::default()
                 }),
@@ -77,9 +77,9 @@ pub(crate) fn handle_code_action(
                 diagnostics: Some(vec![diagnostic.clone()]),
                 edit: Some(WorkspaceEdit {
                     changes: Some({
-                        let mut changes = HashMap::new();
+                        let mut changes = FxHashMap::default();
                         changes.insert(uri.clone(), vec![ignore_file_edit]);
-                        changes
+                        changes.into_iter().collect()
                     }),
                     ..Default::default()
                 }),
@@ -117,9 +117,9 @@ pub(crate) fn handle_code_action(
                 diagnostics: Some(vec![diagnostic.clone()]),
                 edit: Some(WorkspaceEdit {
                     changes: Some({
-                        let mut changes = HashMap::new();
+                        let mut changes = FxHashMap::default();
                         changes.insert(uri.clone(), associated_data.edits);
-                        changes
+                        changes.into_iter().collect()
                     }),
                     ..Default::default()
                 }),

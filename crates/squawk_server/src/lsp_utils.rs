@@ -1,4 +1,6 @@
-use std::{collections::HashMap, ops::Range};
+use std::ops::Range;
+
+use rustc_hash::FxHashMap;
 
 use ::line_index::{LineIndex, TextRange, TextSize};
 use log::warn;
@@ -62,7 +64,7 @@ pub(crate) fn code_action(
         diagnostics: None,
         edit: Some(WorkspaceEdit {
             changes: Some({
-                let mut changes = HashMap::new();
+                let mut changes = FxHashMap::default();
                 let edits = action
                     .edits
                     .into_iter()
@@ -72,7 +74,7 @@ pub(crate) fn code_action(
                     })
                     .collect();
                 changes.insert(uri, edits);
-                changes
+                changes.into_iter().collect()
             }),
             ..Default::default()
         }),

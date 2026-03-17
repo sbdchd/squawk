@@ -27,7 +27,7 @@
 // NOTE: pretty much copied as is but simplfied a fair bit. I don't use folding
 // much so not sure if this is optimal.
 
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use rowan::{Direction, NodeOrToken, TextRange};
 use salsa::Database as Db;
@@ -60,7 +60,7 @@ pub fn folding_ranges(db: &dyn Db, file: File) -> Vec<Fold> {
     let parse = parse(db, file);
 
     let mut folds = vec![];
-    let mut visited_comments = HashSet::default();
+    let mut visited_comments = FxHashSet::default();
 
     for element in parse.tree().syntax().descendants_with_tokens() {
         match &element {
@@ -166,7 +166,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
 
 fn contiguous_range_for_comment(
     first: ast::Comment,
-    visited: &mut HashSet<ast::Comment>,
+    visited: &mut FxHashSet<ast::Comment>,
 ) -> Option<TextRange> {
     visited.insert(first.clone());
 
