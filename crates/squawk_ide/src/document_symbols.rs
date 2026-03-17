@@ -854,7 +854,7 @@ mod tests {
 
     fn symbols_not_found(sql: &str) {
         let db = Database::default();
-        let file = File::new(&db, sql.to_string(), 0);
+        let file = File::new(&db, sql.to_string().into());
         let symbols = document_symbols(&db, file);
         if !symbols.is_empty() {
             panic!("Symbols found. If this is expected, use `symbols` instead.")
@@ -863,7 +863,7 @@ mod tests {
 
     fn symbols(sql: &str) -> String {
         let db = Database::default();
-        let file = File::new(&db, sql.to_string(), 0);
+        let file = File::new(&db, sql.to_string().into());
         let symbols = document_symbols(&db, file);
         if symbols.is_empty() {
             panic!("No symbols found. If this is expected, use `symbols_not_found` instead.")

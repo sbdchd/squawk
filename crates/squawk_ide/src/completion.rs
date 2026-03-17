@@ -963,7 +963,7 @@ mod tests {
     fn completions(sql: &str) -> String {
         let (offset, sql) = fixture(sql);
         let db = Database::default();
-        let file = File::new(&db, sql, 0);
+        let file = File::new(&db, sql.into());
         let items = completion(&db, file, offset);
         assert!(
             !items.is_empty(),
@@ -975,7 +975,7 @@ mod tests {
     fn completions_not_found(sql: &str) {
         let (offset, sql) = fixture(sql);
         let db = Database::default();
-        let file = File::new(&db, sql, 0);
+        let file = File::new(&db, sql.into());
         let items = completion(&db, file, offset);
         assert_eq!(
             items,

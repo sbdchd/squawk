@@ -3,22 +3,23 @@ use log::info;
 use lsp_server::{Connection, Message};
 use lsp_types::{
     CodeActionKind, CodeActionOptions, CodeActionProviderCapability, CompletionOptions,
-    FoldingRangeProviderCapability, HoverProviderCapability, InitializeParams, OneOf,
-    SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
-    TextDocumentSyncKind, WorkDoneProgressOptions,
+    DiagnosticOptions, DiagnosticServerCapabilities, FoldingRangeProviderCapability,
+    HoverProviderCapability, InitializeParams, OneOf, SelectionRangeProviderCapability,
+    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions,
     notification::{DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument},
     request::{
-        CodeActionRequest, Completion, DocumentSymbolRequest, FoldingRangeRequest, GotoDefinition,
-        HoverRequest, InlayHintRequest, References, SelectionRangeRequest,
+        CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
+        FoldingRangeRequest, GotoDefinition, HoverRequest, InlayHintRequest, References,
+        SelectionRangeRequest,
     },
 };
 
 use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
 use crate::handlers::{
     SyntaxTreeRequest, TokensRequest, handle_code_action, handle_completion, handle_did_change,
-    handle_did_close, handle_did_open, handle_document_symbol, handle_folding_range,
-    handle_goto_definition, handle_hover, handle_inlay_hints, handle_references,
-    handle_selection_range, handle_syntax_tree, handle_tokens,
+    handle_did_close, handle_did_open, handle_document_diagnostic, handle_document_symbol,
+    handle_folding_range, handle_goto_definition, handle_hover, handle_inlay_hints,
+    handle_references, handle_selection_range, handle_syntax_tree, handle_tokens,
 };
 use crate::system::GlobalState;
 
@@ -46,6 +47,14 @@ pub fn run() -> Result<()> {
         definition_provider: Some(OneOf::Left(true)),
         hover_provider: Some(HoverProviderCapability::Simple(true)),
         inlay_hint_provider: Some(OneOf::Left(true)),
+        diagnostic_provider: Some(DiagnosticServerCapabilities::Options(DiagnosticOptions {
+            identifier: None,
+            inter_file_dependencies: false,
+            workspace_diagnostics: false,
+            work_done_progress_options: WorkDoneProgressOptions {
+                work_done_progress: None,
+            },
+        })),
         document_symbol_provider: Some(OneOf::Left(true)),
         folding_range_provider: Some(FoldingRangeProviderCapability::Simple(true)),
         completion_provider: Some(CompletionOptions {
@@ -102,6 +111,7 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     .on::<DocumentSymbolRequest>(handle_document_symbol)?
                     .on::<FoldingRangeRequest>(handle_folding_range)?
                     .on::<Completion>(handle_completion)?
+                    .on::<DocumentDiagnosticRequest>(handle_document_diagnostic)?
                     .on::<SyntaxTreeRequest>(handle_syntax_tree)?
                     .on::<TokensRequest>(handle_tokens)?
                     .on::<References>(handle_references)?

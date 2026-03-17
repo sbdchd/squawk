@@ -188,7 +188,7 @@ mod test {
         // marker after the item we're trying to go to def on.
         offset = offset.checked_sub(1.into()).unwrap_or_default();
         let db = Database::default();
-        let file = File::new(&db, sql.clone(), 0);
+        let file = File::new(&db, sql.clone().into());
         assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
         let results = goto_definition(&db, file, offset);
         if !results.is_empty() {

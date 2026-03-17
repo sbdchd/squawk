@@ -45,14 +45,13 @@ impl SquawkDatabase {
     }
 
     pub fn open_file(&mut self, content: String) {
-        let file = File::new(&self.db, content, 0);
+        let file = File::new(&self.db, content.into());
         self.file = Some(file);
     }
 
-    pub fn update_file(&mut self, content: String, version: i32) {
+    pub fn update_file(&mut self, content: String) {
         if let Some(file) = self.file {
-            file.set_content(&mut self.db).to(content);
-            file.set_version(&mut self.db).to(version);
+            file.set_content(&mut self.db).to(content.into());
         }
     }
 

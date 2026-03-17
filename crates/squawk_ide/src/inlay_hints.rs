@@ -239,7 +239,7 @@ mod test {
     #[track_caller]
     fn check_inlay_hints(sql: &str) -> String {
         let db = Database::default();
-        let file = File::new(&db, sql.to_string(), 0);
+        let file = File::new(&db, sql.to_string().into());
 
         assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 

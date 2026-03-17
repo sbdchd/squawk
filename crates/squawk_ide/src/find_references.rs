@@ -130,7 +130,7 @@ mod test {
         let (mut offset, sql) = fixture(sql);
         offset = offset.checked_sub(1.into()).unwrap_or_default();
         let db = Database::default();
-        let file = File::new(&db, sql.clone(), 0);
+        let file = File::new(&db, sql.clone().into());
         assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
         let references = find_references(&db, file, offset);
