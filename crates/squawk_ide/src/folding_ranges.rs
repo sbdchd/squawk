@@ -235,7 +235,7 @@ mod tests {
 
     fn check(sql: &str) -> String {
         let db = Database::default();
-        let file = File::new(&db, sql.to_string(), 0);
+        let file = File::new(&db, sql.to_string().into());
         let folds = folding_ranges(&db, file);
 
         if folds.is_empty() {

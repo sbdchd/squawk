@@ -1687,7 +1687,7 @@ mod test {
         let db = Database::default();
         let (mut offset, sql) = fixture(sql);
         offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let file = File::new(&db, sql.clone(), 0);
+        let file = File::new(&db, sql.clone().into());
         assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
         if let Some(type_info) = hover(&db, file, offset) {

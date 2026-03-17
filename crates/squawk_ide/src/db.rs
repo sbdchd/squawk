@@ -2,6 +2,7 @@ use ::line_index::LineIndex;
 use salsa::Database as Db;
 use salsa::Storage;
 use squawk_syntax::{Parse, SourceFile};
+use std::sync::Arc;
 
 use crate::binder;
 use crate::binder::Binder;
@@ -9,8 +10,7 @@ use crate::binder::Binder;
 #[salsa::input]
 pub struct File {
     #[returns(ref)]
-    pub content: String,
-    pub version: i32,
+    pub content: Arc<str>,
 }
 
 #[salsa::tracked]

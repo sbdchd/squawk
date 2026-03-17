@@ -1,5 +1,6 @@
 mod code_action;
 mod completion;
+mod diagnostic;
 mod document_symbol;
 mod folding_range;
 mod goto_definition;
@@ -13,6 +14,7 @@ mod tokens;
 
 pub(crate) use code_action::handle_code_action;
 pub(crate) use completion::handle_completion;
+pub(crate) use diagnostic::handle_document_diagnostic;
 pub(crate) use document_symbol::handle_document_symbol;
 pub(crate) use folding_range::handle_folding_range;
 pub(crate) use goto_definition::handle_goto_definition;

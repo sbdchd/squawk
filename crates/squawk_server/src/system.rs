@@ -5,8 +5,6 @@ use std::collections::HashMap;
 
 pub(crate) struct Document {
     pub(crate) content: String,
-    #[allow(dead_code)]
-    pub(crate) version: i32,
 }
 
 pub(crate) trait System {
@@ -41,10 +39,9 @@ impl System for GlobalState {
 
     fn set(&mut self, uri: Url, doc: Document) {
         if let Some(file) = self.files.get(&uri).copied() {
-            file.set_content(&mut self.db).to(doc.content);
-            file.set_version(&mut self.db).to(doc.version);
+            file.set_content(&mut self.db).to(doc.content.into());
         } else {
-            let file = File::new(&self.db, doc.content, doc.version);
+            let file = File::new(&self.db, doc.content.into());
             self.files.insert(uri, file);
         }
     }
