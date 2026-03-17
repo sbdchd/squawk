@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use rowan::TextRange;
 use squawk_syntax::{
@@ -13,11 +13,13 @@ use crate::{Edit, Fix, Linter, Rule, Violation};
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref CHAR_TYPES: HashSet<Identifier> = HashSet::from([
+    static ref CHAR_TYPES: FxHashSet<Identifier> = [
         Identifier::new("char"),
         Identifier::new("character"),
         Identifier::new("bpchar"),
-    ]);
+    ]
+    .into_iter()
+    .collect();
 }
 
 fn is_char_type(x: TokenText<'_>) -> bool {

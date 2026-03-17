@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::{
     Parse, SourceFile,
@@ -13,14 +13,16 @@ use lazy_static::lazy_static;
 use crate::visitors::{check_not_allowed_types, is_not_valid_int_type};
 
 lazy_static! {
-    static ref SERIAL_TYPES: HashSet<Identifier> = HashSet::from([
+    static ref SERIAL_TYPES: FxHashSet<Identifier> = [
         Identifier::new("serial"),
         Identifier::new("serial2"),
         Identifier::new("serial4"),
         Identifier::new("serial8"),
         Identifier::new("smallserial"),
         Identifier::new("bigserial"),
-    ]);
+    ]
+    .into_iter()
+    .collect();
 }
 
 fn replace_serial(serial_type: &str) -> &'static str {

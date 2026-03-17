@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::{ast, identifier::Identifier};
 
@@ -6,7 +6,7 @@ use crate::Linter;
 
 pub(crate) fn is_not_valid_int_type(
     ty: &ast::Type,
-    invalid_type_names: &HashSet<Identifier>,
+    invalid_type_names: &FxHashSet<Identifier>,
 ) -> bool {
     match ty {
         ast::Type::ArrayType(array_type) => {

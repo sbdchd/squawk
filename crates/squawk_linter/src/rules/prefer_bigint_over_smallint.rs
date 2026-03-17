@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast, identifier::Identifier};
@@ -11,12 +11,14 @@ use crate::visitors::is_not_valid_int_type;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref SMALL_INT_TYPES: HashSet<Identifier> = HashSet::from([
+    static ref SMALL_INT_TYPES: FxHashSet<Identifier> = [
         Identifier::new("smallint"),
         Identifier::new("int2"),
         Identifier::new("smallserial"),
         Identifier::new("serial2"),
-    ]);
+    ]
+    .into_iter()
+    .collect();
 }
 
 fn smallint_to_bigint(smallint_type: &str) -> &'static str {

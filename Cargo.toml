@@ -69,6 +69,7 @@ crossbeam-utils = "0.8.21"
 jod-thread = "0.1.2"
 libc = "0.2.171"
 tracing = "0.1.40"
+rustc-hash = "2.1.1"
 
 # local
 # we have to make the versions explicit otherwise `cargo publish` won't work
@@ -89,6 +90,7 @@ doc_markdown = "deny"
 manual_let_else = "deny"
 explicit_iter_loop = "deny"
 too_many_arguments = "allow"
+disallowed_types = "deny"
 
 [profile.dev]
 debug = 0

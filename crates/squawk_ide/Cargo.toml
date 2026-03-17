@@ -28,6 +28,7 @@ la-arena.workspace = true
 smallvec.workspace = true
 itertools.workspace = true
 etcetera.workspace = true
+rustc-hash.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

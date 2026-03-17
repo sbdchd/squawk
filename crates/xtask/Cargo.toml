@@ -22,6 +22,7 @@ quote.workspace = true
 xshell.workspace = true
 proc-macro2.workspace = true
 regex.workspace = true
+rustc-hash.workspace = true
 
 [lints]
 workspace = true

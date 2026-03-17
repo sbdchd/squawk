@@ -24,7 +24,7 @@ enum-iterator.workspace = true
 line-index.workspace = true
 serde_plain.workspace = true
 annotate-snippets.workspace = true
-
+rustc-hash.workspace = true
 
 [lints]
 workspace = true

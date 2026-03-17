@@ -1,7 +1,7 @@
 use crate::path::project_root;
 use anyhow::{Context, Ok, Result};
 use enum_iterator::{Sequence, all};
-use std::collections::{HashMap, HashSet};
+use rustc_hash::{FxHashMap, FxHashSet};
 
 struct KeywordMeta {
     pub(crate) category: KeywordCategory,
@@ -74,11 +74,11 @@ fn keyword_allowed(cat: KeywordCategory, kw_type: KWType) -> bool {
     }
 }
 
-fn parse_header() -> Result<HashMap<String, KeywordMeta>> {
+fn parse_header() -> Result<FxHashMap<String, KeywordMeta>> {
     let kwlist_file = project_root().join("postgres/kwlist.h");
     let data = std::fs::read_to_string(kwlist_file).context("Failed to read kwlist.h")?;
 
-    let mut keywords = HashMap::new();
+    let mut keywords = FxHashMap::default();
 
     for line in data.lines() {
         if line.starts_with("PG_KEYWORD") {
@@ -158,8 +158,8 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
         .collect::<Vec<String>>();
     all_keywords.sort();
 
-    let mut col_table_tokens = HashSet::new();
-    let mut type_tokens = HashSet::new();
+    let mut col_table_tokens = FxHashSet::default();
+    let mut type_tokens = FxHashSet::default();
     for (key, meta) in &keywords {
         for variant in all::<KWType>() {
             match variant {
