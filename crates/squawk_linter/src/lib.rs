@@ -458,8 +458,7 @@ impl Linter {
 
     pub fn without_rules(exclude: &[Rule]) -> Self {
         let all_rules = all::<Rule>().collect::<FxHashSet<_>>();
-        let mut exclude_set =
-            FxHashSet::with_capacity_and_hasher(exclude.len(), FxBuildHasher);
+        let mut exclude_set = FxHashSet::with_capacity_and_hasher(exclude.len(), FxBuildHasher);
         for e in exclude {
             exclude_set.insert(e);
         }
