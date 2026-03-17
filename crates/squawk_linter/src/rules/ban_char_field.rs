@@ -10,20 +10,21 @@ use squawk_syntax::{
 use crate::visitors::check_not_allowed_types;
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
-use lazy_static::lazy_static;
+use std::sync::OnceLock;
 
-lazy_static! {
-    static ref CHAR_TYPES: FxHashSet<Identifier> = [
-        Identifier::new("char"),
-        Identifier::new("character"),
-        Identifier::new("bpchar"),
-    ]
-    .into_iter()
-    .collect();
+fn char_types() -> &'static FxHashSet<Identifier> {
+    static CHAR_TYPES: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
+    CHAR_TYPES.get_or_init(|| {
+        FxHashSet::from_iter([
+            Identifier::new("char"),
+            Identifier::new("character"),
+            Identifier::new("bpchar"),
+        ])
+    })
 }
 
 fn is_char_type(x: TokenText<'_>) -> bool {
-    CHAR_TYPES.contains(&Identifier::new(x.as_ref()))
+    char_types().contains(&Identifier::new(x.as_ref()))
 }
 
 fn create_fix(range: TextRange, args: Option<ast::ArgList>) -> Fix {
