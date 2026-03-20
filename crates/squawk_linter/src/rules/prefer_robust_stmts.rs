@@ -277,10 +277,10 @@ DROP TABLE users;
     #[test]
     fn fix_create_index_if_not_exists() {
         assert_snapshot!(fix("
-create index idx on table (col);
+create index idx on items (col);
 CREATE INDEX CONCURRENTLY idx2 ON users (email);
 "), @r"
-        create index if not exists idx on table (col);
+        create index if not exists idx on items (col);
         CREATE INDEX CONCURRENTLY if not exists idx2 ON users (email);
         ");
     }
