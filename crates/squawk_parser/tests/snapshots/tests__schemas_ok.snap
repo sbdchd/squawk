@@ -725,4 +725,13 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "4"
   SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    CATALOG_KW "catalog"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
