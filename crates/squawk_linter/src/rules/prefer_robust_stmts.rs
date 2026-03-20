@@ -147,8 +147,9 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::CreateTable(create_table)
                 if create_table.if_not_exists().is_none() && !inside_transaction =>
             {
-                let is_temp =
-                    create_table.temp_token().is_some() || create_table.temporary_token().is_some();
+                let is_temp = create_table
+                    .persistence()
+                    .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
                 let on_commit_drop = create_table
                     .on_commit()
                     .and_then(|oc| oc.on_commit_action())

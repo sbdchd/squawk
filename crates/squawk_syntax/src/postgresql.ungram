@@ -1122,7 +1122,7 @@ PartitionBy =
 
 CreateTable =
   'create'
-  (('global' | 'local')? ('temporary' | 'temp' | 'unlogged' ))?
+  Persistence?
   'table' IfNotExists? Path
   PartitionOf?
   OfType?
@@ -1454,7 +1454,7 @@ WithNoData =
 
 CreateTableAs =
   'create'
-  (('global' | 'local')? ('temporary' | 'temp' | 'unlogged' ))?
+  Persistence?
   'table'
   IfNotExists?
   Path
@@ -1684,7 +1684,7 @@ SelectInto =
   FilterClause?
 
 IntoClause =
-  'into' Path
+  'into' Persistence? 'table'? Path
 
 LockingClause =
   'for'
@@ -2240,7 +2240,10 @@ Repack =
      'using' 'index' NameRef?
   )?
 
-// TODO: use this everywhere
+Persistence =
+  Temp
+| Unlogged
+
 Temp =
   'temporary'
 | 'temp'
@@ -2248,10 +2251,12 @@ Temp =
 | 'local' 'temp'
 | 'global' 'temporary'
 | 'global' 'temp'
-| 'unlogged'
+
+Unlogged =
+  'unlogged'
 
 CreatePropertyGraph =
-  'create' Temp?  'property' 'graph' Path
+  'create' Persistence? 'property' 'graph' Path
   VertexTables?
   EdgeTables?
 
@@ -2546,7 +2551,7 @@ CreateRule =
   'do' ('also' | 'instead')? ('nothing' | '(' (Stmt (',' Stmt)*) ')' | Stmt)
 
 CreateSequence =
-  'create' ('temporary' | 'temp' | 'unlogged')? 'sequence' IfNotExists? Path
+  'create' Persistence? 'sequence' IfNotExists? Path
   SequenceOption*
 
 CreateServer =
@@ -2888,7 +2893,7 @@ Reindex =
   'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? Path?
 
 CreateView =
-  'create' OrReplace? ('temp' | 'temporary')? 'recursive'? 'view' Path ColumnList?
+  'create' OrReplace? Persistence? 'recursive'? 'view' Path ColumnList?
   WithParams?
   'as' query:SelectVariant
   ('with' ('cascaded' | 'local')? 'check' 'option')?

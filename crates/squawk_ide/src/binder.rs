@@ -295,7 +295,9 @@ fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
         return;
     };
     let name_ptr = path_to_ptr(&path);
-    let is_temp = create_table.temp_token().is_some() || create_table.temporary_token().is_some();
+    let is_temp = create_table
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
     };
@@ -329,8 +331,9 @@ fn bind_create_table_as(b: &mut Binder, create_table_as: ast::CreateTableAs) {
         return;
     };
     let name_ptr = path_to_ptr(&path);
-    let is_temp =
-        create_table_as.temp_token().is_some() || create_table_as.temporary_token().is_some();
+    let is_temp = create_table_as
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
     };
@@ -628,7 +631,9 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
     };
 
     let name_ptr = path_to_ptr(&path);
-    let is_temp = create_view.temp_token().is_some() || create_view.temporary_token().is_some();
+    let is_temp = create_view
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
 
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
@@ -684,8 +689,9 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
     };
 
     let name_ptr = path_to_ptr(&path);
-    let is_temp =
-        create_sequence.temp_token().is_some() || create_sequence.temporary_token().is_some();
+    let is_temp = create_sequence
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
 
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
