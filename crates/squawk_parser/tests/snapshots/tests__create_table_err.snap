@@ -264,7 +264,8 @@ SOURCE_FILE
     WHITESPACE "\n"
     CREATE_KW "create"
     WHITESPACE " "
-    UNLOGGED_KW "unlogged"
+    UNLOGGED
+      UNLOGGED_KW "unlogged"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "

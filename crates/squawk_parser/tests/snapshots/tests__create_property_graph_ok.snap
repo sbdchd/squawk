@@ -8,7 +8,8 @@ SOURCE_FILE
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
     WHITESPACE " "
-    TEMPORARY_KW "temporary"
+    TEMP
+      TEMPORARY_KW "temporary"
     WHITESPACE " "
     PROPERTY_KW "property"
     WHITESPACE " "
@@ -23,7 +24,8 @@ SOURCE_FILE
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
     WHITESPACE " "
-    TEMP_KW "temp"
+    TEMP
+      TEMP_KW "temp"
     WHITESPACE " "
     PROPERTY_KW "property"
     WHITESPACE " "
@@ -38,26 +40,10 @@ SOURCE_FILE
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
     WHITESPACE " "
-    LOCAL_KW "local"
-    WHITESPACE " "
-    TEMPORARY_KW "temporary"
-    WHITESPACE " "
-    PROPERTY_KW "property"
-    WHITESPACE " "
-    GRAPH_KW "graph"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "f"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  CREATE_PROPERTY_GRAPH
-    CREATE_KW "create"
-    WHITESPACE " "
-    LOCAL_KW "local"
-    WHITESPACE " "
-    TEMP_KW "temp"
+    TEMP
+      LOCAL_KW "local"
+      WHITESPACE " "
+      TEMPORARY_KW "temporary"
     WHITESPACE " "
     PROPERTY_KW "property"
     WHITESPACE " "
@@ -72,26 +58,10 @@ SOURCE_FILE
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
     WHITESPACE " "
-    GLOBAL_KW "global"
-    WHITESPACE " "
-    TEMPORARY_KW "temporary"
-    WHITESPACE " "
-    PROPERTY_KW "property"
-    WHITESPACE " "
-    GRAPH_KW "graph"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "f"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  CREATE_PROPERTY_GRAPH
-    CREATE_KW "create"
-    WHITESPACE " "
-    GLOBAL_KW "global"
-    WHITESPACE " "
-    TEMP_KW "temp"
+    TEMP
+      LOCAL_KW "local"
+      WHITESPACE " "
+      TEMP_KW "temp"
     WHITESPACE " "
     PROPERTY_KW "property"
     WHITESPACE " "
@@ -106,7 +76,44 @@ SOURCE_FILE
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
     WHITESPACE " "
-    UNLOGGED_KW "unlogged"
+    TEMP
+      GLOBAL_KW "global"
+      WHITESPACE " "
+      TEMPORARY_KW "temporary"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP
+      GLOBAL_KW "global"
+      WHITESPACE " "
+      TEMP_KW "temp"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "create"
+    WHITESPACE " "
+    UNLOGGED
+      UNLOGGED_KW "unlogged"
     WHITESPACE " "
     PROPERTY_KW "property"
     WHITESPACE " "
@@ -121,7 +128,8 @@ SOURCE_FILE
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
     WHITESPACE " "
-    TEMP_KW "temp"
+    TEMP
+      TEMP_KW "temp"
     WHITESPACE " "
     PROPERTY_KW "property"
     WHITESPACE " "

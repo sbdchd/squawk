@@ -416,7 +416,8 @@ SOURCE_FILE
       WHITESPACE " "
       REPLACE_KW "replace"
     WHITESPACE " "
-    TEMP_KW "temp"
+    TEMP
+      TEMP_KW "temp"
     WHITESPACE " "
     RECURSIVE_KW "recursive"
     WHITESPACE " "
@@ -493,7 +494,8 @@ SOURCE_FILE
   CREATE_VIEW
     CREATE_KW "create"
     WHITESPACE " "
-    TEMPORARY_KW "temporary"
+    TEMP
+      TEMPORARY_KW "temporary"
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "

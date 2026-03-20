@@ -2795,7 +2795,7 @@ fn opt_into_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(INTO_KW) {
         let m = p.start();
         p.bump(INTO_KW);
-        let _ = opt_temp(p) || p.eat(UNLOGGED_KW);
+        opt_persistence(p);
         p.eat(TABLE_KW);
         path_name(p);
         Some(m.complete(p, INTO_CLAUSE))
@@ -5241,7 +5241,7 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.expect(CREATE_KW);
-    opt_temp_or_unlogged(p);
+    opt_persistence(p);
     p.expect(TABLE_KW);
     opt_if_not_exists(p);
     path_name(p);
@@ -5290,18 +5290,27 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, CREATE_TABLE)
 }
 
-fn opt_temp_or_unlogged(p: &mut Parser<'_>) {
-    // [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ]
-    if !p.eat(UNLOGGED_KW) {
-        // [ GLOBAL | LOCAL ] { TEMPORARY | TEMP }
-        let require_temp = p.eat(GLOBAL_KW) || p.eat(LOCAL_KW);
-        if require_temp {
-            if !opt_temp(p) {
-                p.error("expected temp or temporary");
-            }
-        } else {
-            opt_temp(p);
+// [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ]
+fn opt_persistence(p: &mut Parser<'_>) -> bool {
+    let m = p.start();
+    if p.eat(UNLOGGED_KW) {
+        m.complete(p, UNLOGGED);
+        return true;
+    }
+    // [ GLOBAL | LOCAL ] { TEMPORARY | TEMP }
+    let require_temp = p.eat(GLOBAL_KW) || p.eat(LOCAL_KW);
+    if require_temp {
+        if !opt_temp(p) {
+            p.error("expected temp or temporary");
         }
+        m.complete(p, TEMP);
+        true
+    } else if opt_temp(p) {
+        m.complete(p, TEMP);
+        true
+    } else {
+        m.abandon(p);
+        false
     }
 }
 
@@ -8454,7 +8463,7 @@ fn create_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
-    opt_temp_or_unlogged(p);
+    opt_persistence(p);
     p.expect(PROPERTY_KW);
     p.expect(GRAPH_KW);
     path_name(p);
@@ -9901,7 +9910,7 @@ fn create_sequence(p: &mut Parser<'_>) -> CompletedMarker {
     );
     let m = p.start();
     p.bump(CREATE_KW);
-    let _ = opt_temp(p) || p.eat(UNLOGGED_KW);
+    opt_persistence(p);
     p.expect(SEQUENCE_KW);
     opt_if_not_exists(p);
     path_name(p);
@@ -11953,7 +11962,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(CREATE_KW);
     opt_or_replace(p);
-    opt_temp(p);
+    opt_persistence(p);
     p.eat(RECURSIVE_KW);
     p.expect(VIEW_KW);
     path_name(p);

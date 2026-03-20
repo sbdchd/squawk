@@ -4657,7 +4657,7 @@ impl CreatePropertyGraph {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn temp(&self) -> Option<Temp> {
+    pub fn persistence(&self) -> Option<Persistence> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4892,6 +4892,10 @@ impl CreateSequence {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn persistence(&self) -> Option<Persistence> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn sequence_options(&self) -> AstChildren<SequenceOption> {
         support::children(&self.syntax)
     }
@@ -4902,18 +4906,6 @@ impl CreateSequence {
     #[inline]
     pub fn sequence_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
-    }
-    #[inline]
-    pub fn temp_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMP_KW)
-    }
-    #[inline]
-    pub fn temporary_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMPORARY_KW)
-    }
-    #[inline]
-    pub fn unlogged_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UNLOGGED_KW)
     }
 }
 
@@ -5084,6 +5076,10 @@ impl CreateTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn persistence(&self) -> Option<Persistence> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn table_arg_list(&self) -> Option<TableArgList> {
         support::child(&self.syntax)
     }
@@ -5108,28 +5104,8 @@ impl CreateTable {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
     #[inline]
-    pub fn global_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::GLOBAL_KW)
-    }
-    #[inline]
-    pub fn local_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LOCAL_KW)
-    }
-    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn temp_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMP_KW)
-    }
-    #[inline]
-    pub fn temporary_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMPORARY_KW)
-    }
-    #[inline]
-    pub fn unlogged_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UNLOGGED_KW)
     }
 }
 
@@ -5148,6 +5124,10 @@ impl CreateTableAs {
     }
     #[inline]
     pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn persistence(&self) -> Option<Persistence> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5187,28 +5167,8 @@ impl CreateTableAs {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
     #[inline]
-    pub fn global_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::GLOBAL_KW)
-    }
-    #[inline]
-    pub fn local_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LOCAL_KW)
-    }
-    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn temp_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMP_KW)
-    }
-    #[inline]
-    pub fn temporary_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMPORARY_KW)
-    }
-    #[inline]
-    pub fn unlogged_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UNLOGGED_KW)
     }
 }
 
@@ -5656,6 +5616,10 @@ impl CreateView {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn persistence(&self) -> Option<Persistence> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn query(&self) -> Option<SelectVariant> {
         support::child(&self.syntax)
     }
@@ -5690,14 +5654,6 @@ impl CreateView {
     #[inline]
     pub fn recursive_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RECURSIVE_KW)
-    }
-    #[inline]
-    pub fn temp_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMP_KW)
-    }
-    #[inline]
-    pub fn temporary_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMPORARY_KW)
     }
     #[inline]
     pub fn view_token(&self) -> Option<SyntaxToken> {
@@ -5999,10 +5955,6 @@ pub struct DestVertexTable {
 impl DestVertexTable {
     #[inline]
     pub fn column_list(&self) -> Option<ColumnList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9806,8 +9758,16 @@ impl IntoClause {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn persistence(&self) -> Option<Persistence> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn into_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INTO_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
     }
 }
 
@@ -11283,14 +11243,6 @@ impl LabelAndPropertiesList {
     #[inline]
     pub fn label_and_propertiess(&self) -> AstChildren<LabelAndProperties> {
         support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -16368,10 +16320,6 @@ impl SourceVertexTable {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
@@ -16687,10 +16635,6 @@ impl Temp {
     #[inline]
     pub fn temporary_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TEMPORARY_KW)
-    }
-    #[inline]
-    pub fn unlogged_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UNLOGGED_KW)
     }
 }
 
@@ -17048,6 +16992,17 @@ impl Unlisten {
     #[inline]
     pub fn unlisten_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::UNLISTEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Unlogged {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Unlogged {
+    #[inline]
+    pub fn unlogged_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UNLOGGED_KW)
     }
 }
 
@@ -18661,6 +18616,12 @@ pub enum PathPrimary {
     EdgeRight(EdgeRight),
     ParenGraphPattern(ParenGraphPattern),
     VertexPattern(VertexPattern),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Persistence {
+    Temp(Temp),
+    Unlogged(Unlogged),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -30304,6 +30265,24 @@ impl AstNode for Unlisten {
         &self.syntax
     }
 }
+impl AstNode for Unlogged {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::UNLOGGED
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Update {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -34006,6 +33985,42 @@ impl From<VertexPattern> for PathPrimary {
     #[inline]
     fn from(node: VertexPattern) -> PathPrimary {
         PathPrimary::VertexPattern(node)
+    }
+}
+impl AstNode for Persistence {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::TEMP | SyntaxKind::UNLOGGED)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::TEMP => Persistence::Temp(Temp { syntax }),
+            SyntaxKind::UNLOGGED => Persistence::Unlogged(Unlogged { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Persistence::Temp(it) => &it.syntax,
+            Persistence::Unlogged(it) => &it.syntax,
+        }
+    }
+}
+impl From<Temp> for Persistence {
+    #[inline]
+    fn from(node: Temp) -> Persistence {
+        Persistence::Temp(node)
+    }
+}
+impl From<Unlogged> for Persistence {
+    #[inline]
+    fn from(node: Unlogged) -> Persistence {
+        Persistence::Unlogged(node)
     }
 }
 impl AstNode for PreparableStmt {

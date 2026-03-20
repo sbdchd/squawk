@@ -21,7 +21,8 @@ SOURCE_FILE
   CREATE_SEQUENCE
     CREATE_KW "create"
     WHITESPACE " "
-    TEMPORARY_KW "temporary"
+    TEMP
+      TEMPORARY_KW "temporary"
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
@@ -119,7 +120,8 @@ SOURCE_FILE
   CREATE_SEQUENCE
     CREATE_KW "create"
     WHITESPACE " "
-    UNLOGGED_KW "unlogged"
+    UNLOGGED
+      UNLOGGED_KW "unlogged"
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
