@@ -848,7 +848,7 @@ SOURCE_FILE
               WHITESPACE " "
               XMLATTRIBUTES_KW "xmlattributes"
               L_PAREN "("
-              XML_ATTRIBUTE_LIST
+              EXPR_AS_NAME_LIST
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "foo"
@@ -913,7 +913,7 @@ SOURCE_FILE
               WHITESPACE " "
               XMLATTRIBUTES_KW "xmlattributes"
               L_PAREN "("
-              XML_ATTRIBUTE_LIST
+              EXPR_AS_NAME_LIST
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "buzz"
@@ -1057,7 +1057,7 @@ SOURCE_FILE
             XML_FOREST_FN
               XMLFOREST_KW "xmlforest"
               L_PAREN "("
-              XML_ATTRIBUTE_LIST
+              EXPR_AS_NAME_LIST
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "foo"

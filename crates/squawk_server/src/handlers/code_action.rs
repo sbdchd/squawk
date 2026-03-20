@@ -55,18 +55,12 @@ pub(crate) fn handle_code_action(
                 title: format!("Disable {rule_name} for this line"),
                 kind: Some(CodeActionKind::QUICKFIX),
                 diagnostics: Some(vec![diagnostic.clone()]),
-                edit: Some(WorkspaceEdit {
-                    changes: Some({
-                        let mut changes = FxHashMap::default();
-                        changes.insert(uri.clone(), vec![ignore_line_edit]);
-                        changes.into_iter().collect()
-                    }),
-                    ..Default::default()
-                }),
-                command: None,
-                is_preferred: Some(false),
-                disabled: None,
-                data: None,
+                edit: Some(WorkspaceEdit::new({
+                    let mut changes = FxHashMap::default();
+                    changes.insert(uri.clone(), vec![ignore_line_edit]);
+                    changes.into_iter().collect()
+                })),
+                ..Default::default()
             };
             actions.push(CodeActionOrCommand::CodeAction(disable_line_action));
         }
@@ -75,18 +69,12 @@ pub(crate) fn handle_code_action(
                 title: format!("Disable {rule_name} for the entire file"),
                 kind: Some(CodeActionKind::QUICKFIX),
                 diagnostics: Some(vec![diagnostic.clone()]),
-                edit: Some(WorkspaceEdit {
-                    changes: Some({
-                        let mut changes = FxHashMap::default();
-                        changes.insert(uri.clone(), vec![ignore_file_edit]);
-                        changes.into_iter().collect()
-                    }),
-                    ..Default::default()
-                }),
-                command: None,
-                is_preferred: Some(false),
-                disabled: None,
-                data: None,
+                edit: Some(WorkspaceEdit::new({
+                    let mut changes = FxHashMap::default();
+                    changes.insert(uri.clone(), vec![ignore_file_edit]);
+                    changes.into_iter().collect()
+                })),
+                ..Default::default()
             };
             actions.push(CodeActionOrCommand::CodeAction(disable_file_action));
         }
@@ -96,7 +84,6 @@ pub(crate) fn handle_code_action(
             title: title.clone(),
             kind: Some(CodeActionKind::QUICKFIX),
             diagnostics: Some(vec![diagnostic.clone()]),
-            edit: None,
             command: Some(Command {
                 title,
                 command: "vscode.open".to_string(),
@@ -104,9 +91,7 @@ pub(crate) fn handle_code_action(
                     "https://squawkhq.com/docs/{rule_name}"
                 ))?]),
             }),
-            is_preferred: Some(false),
-            disabled: None,
-            data: None,
+            ..Default::default()
         };
         actions.push(CodeActionOrCommand::CodeAction(documentation_action));
 
@@ -115,18 +100,13 @@ pub(crate) fn handle_code_action(
                 title: associated_data.title,
                 kind: Some(CodeActionKind::QUICKFIX),
                 diagnostics: Some(vec![diagnostic.clone()]),
-                edit: Some(WorkspaceEdit {
-                    changes: Some({
-                        let mut changes = FxHashMap::default();
-                        changes.insert(uri.clone(), associated_data.edits);
-                        changes.into_iter().collect()
-                    }),
-                    ..Default::default()
-                }),
-                command: None,
+                edit: Some(WorkspaceEdit::new({
+                    let mut changes = FxHashMap::default();
+                    changes.insert(uri.clone(), associated_data.edits);
+                    changes.into_iter().collect()
+                })),
                 is_preferred: Some(true),
-                disabled: None,
-                data: None,
+                ..Default::default()
             };
             actions.push(CodeActionOrCommand::CodeAction(fix_action));
         }

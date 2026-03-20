@@ -159,7 +159,10 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::XML_ATTRIBUTE_LIST
         | SyntaxKind::XML_COLUMN_OPTION_LIST
         | SyntaxKind::XML_NAMESPACE_LIST
-        | SyntaxKind::XML_TABLE_COLUMN_LIST => Some(FoldKind::List),
+        | SyntaxKind::XML_TABLE_COLUMN_LIST
+        | SyntaxKind::LABEL_AND_PROPERTIES_LIST
+        | SyntaxKind::PATH_PATTERN_LIST
+        | SyntaxKind::PROPERTIES_LIST => Some(FoldKind::List),
         _ => None,
     }
 }

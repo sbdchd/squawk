@@ -119,6 +119,8 @@ const PUNCT: &[(&str, &str)] = &[
     (")", "R_PAREN"),
     ("[", "L_BRACK"),
     ("]", "R_BRACK"),
+    ("{", "L_CURLY"),
+    ("}", "R_CURLY"),
     ("<", "L_ANGLE"),
     (">", "R_ANGLE"),
     ("@", "AT"),
