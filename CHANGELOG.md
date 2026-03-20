@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.44.0 - 2026-03-19
+
+### Added
+
+- linter: add require-enum-value-ordering rule (#992). Thanks @cabello!
+- linter: add cross-file validation for `NOT NULL` constraint pattern (#957). Thanks @reteps!
+- parser: support postgres 18 graph language (#1010)
+- parser: support new except table clause (#986)
+- parser: alter type ast improvements (#993)
+- playground: add code folding support (#1000)
+- ide: folding range support (#999)
+- ide: goto def window defs & over clauses (#994)
+- ide: goto def subquery compound selects (#988)
+
+### Fixed
+
+- server: handle errors from handlers by converting to a lsp err response (#1005)
+- parser: we weren't handling compound selects with extra parens (#989)
+
+### Changed
+
+- server: pull based diagnostics (#1006)
+
+### Internal
+
+- internal: replace lazy_static with std::sync::OnceLock (#1009)
+- internal: HashMap -> FxHashMap, FxHashSet (#1007)
+- server: refactor notification handling to embrace types (#1004)
+- server: refactor request handling to embrace types (#1003)
+- server: refactor lib.rs into separate files (#1002)
+- ide: add thread module from rust-analyzer (#1001)
+- parser: sync plpgsql test suite from postgres (#991)
+- ide/playground: salsa most of the server functions (#981)
+- ide: update sql stub codegen to include some extensions (#984)
+
 ## v2.43.0 - 2026-02-28
 
 ### Added
