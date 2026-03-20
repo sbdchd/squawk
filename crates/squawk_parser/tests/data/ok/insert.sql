@@ -119,3 +119,7 @@ select * from u join i
 on conflict = conflict
 on conflict
   on constraint temporal_rng_pk do nothing;
+
+-- on conflict do select
+INSERT INTO t (a) VALUES (1)
+    ON CONFLICT (a) DO SELECT FOR UPDATE WHERE a > 0 RETURNING *;

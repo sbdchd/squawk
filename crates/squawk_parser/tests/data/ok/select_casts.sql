@@ -278,3 +278,5 @@ select boolean 'false';
 select foo.bar '100';
 select foo.bar(10, 2) '100';
 select pg_catalog.varchar(100) '{123}';
+
+select foo[10].bar(10, 2) '100';
