@@ -100,6 +100,8 @@ impl Cursor<'_> {
             ')' => TokenKind::CloseParen,
             '[' => TokenKind::OpenBracket,
             ']' => TokenKind::CloseBracket,
+            '{' => TokenKind::OpenCurly,
+            '}' => TokenKind::CloseCurly,
             '@' => TokenKind::At,
             '#' => TokenKind::Pound,
             '~' => TokenKind::Tilde,

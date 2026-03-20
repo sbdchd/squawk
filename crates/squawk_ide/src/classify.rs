@@ -89,6 +89,7 @@ fn is_special_fn(kind: SyntaxKind) -> bool {
             | SyntaxKind::ANY_FN
             | SyntaxKind::ALL_FN
             | SyntaxKind::EXISTS_FN
+            | SyntaxKind::GRAPH_TABLE_FN
     )
 }
 

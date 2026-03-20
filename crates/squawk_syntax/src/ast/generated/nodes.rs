@@ -140,6 +140,29 @@ impl AddGenerated {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AddLabel {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AddLabel {
+    #[inline]
+    pub fn element_table_properties(&self) -> Option<ElementTableProperties> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn add_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ADD_KW)
+    }
+    #[inline]
+    pub fn label_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LABEL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AddOpClassOptions {
     pub(crate) syntax: SyntaxNode,
 }
@@ -178,6 +201,84 @@ impl AddValue {
     #[inline]
     pub fn value_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VALUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AddVertexEdgeLabelProperties {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AddVertexEdgeLabelProperties {
+    #[inline]
+    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn add_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ADD_KW)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn edge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EDGE_KW)
+    }
+    #[inline]
+    pub fn label_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LABEL_KW)
+    }
+    #[inline]
+    pub fn node_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NODE_KW)
+    }
+    #[inline]
+    pub fn properties_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTIES_KW)
+    }
+    #[inline]
+    pub fn relationship_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+    #[inline]
+    pub fn vertex_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AddVertexEdgeTables {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AddVertexEdgeTables {
+    #[inline]
+    pub fn edge_tables(&self) -> Option<EdgeTables> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn vertex_tables(&self) -> Option<VertexTables> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn add_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ADD_KW)
     }
 }
 
@@ -254,6 +355,25 @@ impl AllFn {
     #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AllProperties {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AllProperties {
+    #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
+    #[inline]
+    pub fn columns_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMNS_KW)
+    }
+    #[inline]
+    pub fn properties_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTIES_KW)
     }
 }
 
@@ -1184,6 +1304,37 @@ impl AlterProcedure {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterPropertyGraph {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterPropertyGraph {
+    #[inline]
+    pub fn alter_property_graph_action(&self) -> Option<AlterPropertyGraphAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn if_exists(&self) -> Option<IfExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn graph_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
+    }
+    #[inline]
+    pub fn property_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AlterPublication {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1807,6 +1958,49 @@ impl AlterUserMapping {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterVertexEdgeLabels {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterVertexEdgeLabels {
+    #[inline]
+    pub fn add_label(&self) -> Option<AddLabel> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn add_labels(&self) -> AstChildren<AddLabel> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn edge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EDGE_KW)
+    }
+    #[inline]
+    pub fn node_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NODE_KW)
+    }
+    #[inline]
+    pub fn relationship_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+    #[inline]
+    pub fn vertex_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AlterView {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2357,6 +2551,10 @@ impl CallExpr {
     }
     #[inline]
     pub fn filter_clause(&self) -> Option<FilterClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn graph_table_fn(&self) -> Option<GraphTableFn> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2979,6 +3177,10 @@ impl CommentOn {
         support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
     }
     #[inline]
+    pub fn graph_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
+    }
+    #[inline]
     pub fn index_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INDEX_KW)
     }
@@ -3033,6 +3235,10 @@ impl CommentOn {
     #[inline]
     pub fn procedure_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
+    }
+    #[inline]
+    pub fn property_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
     }
     #[inline]
     pub fn publication_token(&self) -> Option<SyntaxToken> {
@@ -4438,6 +4644,41 @@ impl CreateProcedure {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CreatePropertyGraph {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CreatePropertyGraph {
+    #[inline]
+    pub fn edge_tables(&self) -> Option<EdgeTables> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn temp(&self) -> Option<Temp> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn vertex_tables(&self) -> Option<VertexTables> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn create_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CREATE_KW)
+    }
+    #[inline]
+    pub fn graph_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
+    }
+    #[inline]
+    pub fn property_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CreatePublication {
     pub(crate) syntax: SyntaxNode,
 }
@@ -5752,6 +5993,45 @@ impl DependsOnExtension {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DestVertexTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DestVertexTable {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn destination_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DESTINATION_KW)
+    }
+    #[inline]
+    pub fn key_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::KEY_KW)
+    }
+    #[inline]
+    pub fn references_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::REFERENCES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DetachPartition {
     pub(crate) syntax: SyntaxNode,
 }
@@ -6240,6 +6520,49 @@ impl DropDomain {
     #[inline]
     pub fn restrict_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DropEdgeTables {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DropEdgeTables {
+    #[inline]
+    pub fn names(&self) -> AstChildren<Name> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn edge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EDGE_KW)
+    }
+    #[inline]
+    pub fn relationship_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+    #[inline]
+    pub fn tables_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLES_KW)
     }
 }
 
@@ -6855,6 +7178,41 @@ impl DropProcedure {
     #[inline]
     pub fn procedure_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DropPropertyGraph {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DropPropertyGraph {
+    #[inline]
+    pub fn if_exists(&self) -> Option<IfExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn graph_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
+    }
+    #[inline]
+    pub fn property_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
     }
     #[inline]
     pub fn restrict_token(&self) -> Option<SyntaxToken> {
@@ -7519,6 +7877,167 @@ impl DropUserMapping {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DropVertexEdgeLabel {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DropVertexEdgeLabel {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn edge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EDGE_KW)
+    }
+    #[inline]
+    pub fn label_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LABEL_KW)
+    }
+    #[inline]
+    pub fn node_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NODE_KW)
+    }
+    #[inline]
+    pub fn relationship_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+    #[inline]
+    pub fn vertex_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DropVertexEdgeLabelProperties {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DropVertexEdgeLabelProperties {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn names(&self) -> AstChildren<Name> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn edge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EDGE_KW)
+    }
+    #[inline]
+    pub fn label_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LABEL_KW)
+    }
+    #[inline]
+    pub fn node_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NODE_KW)
+    }
+    #[inline]
+    pub fn properties_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTIES_KW)
+    }
+    #[inline]
+    pub fn relationship_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+    #[inline]
+    pub fn vertex_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DropVertexTables {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DropVertexTables {
+    #[inline]
+    pub fn names(&self) -> AstChildren<Name> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn node_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NODE_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+    #[inline]
+    pub fn tables_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLES_KW)
+    }
+    #[inline]
+    pub fn vertex_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DropView {
     pub(crate) syntax: SyntaxNode,
 }
@@ -7546,6 +8065,185 @@ impl DropView {
     #[inline]
     pub fn view_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VIEW_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EdgeAny {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EdgeAny {
+    #[inline]
+    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+    #[inline]
+    pub fn minus_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MINUS)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EdgeLeft {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EdgeLeft {
+    #[inline]
+    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+    #[inline]
+    pub fn minus_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MINUS)
+    }
+    #[inline]
+    pub fn l_angle_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_ANGLE)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EdgeRight {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EdgeRight {
+    #[inline]
+    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+    #[inline]
+    pub fn minus_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MINUS)
+    }
+    #[inline]
+    pub fn r_angle_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_ANGLE)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EdgeTableDef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EdgeTableDef {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn dest_vertex_table(&self) -> Option<DestVertexTable> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn element_table_label_and_properties(&self) -> Option<ElementTableLabelAndProperties> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn source_vertex_table(&self) -> Option<SourceVertexTable> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+    #[inline]
+    pub fn key_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::KEY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EdgeTables {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EdgeTables {
+    #[inline]
+    pub fn edge_table_defs(&self) -> AstChildren<EdgeTableDef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn edge_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EDGE_KW)
+    }
+    #[inline]
+    pub fn relationship_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RELATIONSHIP_KW)
+    }
+    #[inline]
+    pub fn tables_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLES_KW)
     }
 }
 
@@ -7896,6 +8594,17 @@ impl ExprAsName {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprAsNameList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprAsNameList {
+    #[inline]
+    pub fn expr_as_names(&self) -> AstChildren<ExprAsName> {
+        support::children(&self.syntax)
     }
 }
 
@@ -8570,6 +9279,72 @@ impl GrantDefaultPrivileges {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GraphPatternQualifier {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GraphPatternQualifier {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_curly_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_CURLY)
+    }
+    #[inline]
+    pub fn r_curly_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_CURLY)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GraphTableFn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GraphTableFn {
+    #[inline]
+    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path_pattern_list(&self) -> Option<PathPatternList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn columns_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMNS_KW)
+    }
+    #[inline]
+    pub fn graph_table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GRAPH_TABLE_KW)
+    }
+    #[inline]
+    pub fn match_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATCH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GroupByClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -9178,6 +9953,21 @@ impl IsJsonValue {
     #[inline]
     pub fn value_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VALUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsLabelExpression {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsLabelExpression {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
     }
 }
 
@@ -10463,6 +11253,48 @@ impl JsonWrapperBehaviorClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct LabelAndProperties {
+    pub(crate) syntax: SyntaxNode,
+}
+impl LabelAndProperties {
+    #[inline]
+    pub fn element_table_properties(&self) -> Option<ElementTableProperties> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+    #[inline]
+    pub fn label_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LABEL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct LabelAndPropertiesList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl LabelAndPropertiesList {
+    #[inline]
+    pub fn label_and_propertiess(&self) -> AstChildren<LabelAndProperties> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LanguageFuncOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11210,6 +12042,21 @@ impl NoInheritTable {
     #[inline]
     pub fn no_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NoProperties {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NoProperties {
+    #[inline]
+    pub fn no_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+    #[inline]
+    pub fn properties_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTIES_KW)
     }
 }
 
@@ -12317,6 +13164,29 @@ impl ParenExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ParenGraphPattern {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ParenGraphPattern {
+    #[inline]
+    pub fn path_pattern(&self) -> Option<PathPattern> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ParenSelect {
     pub(crate) syntax: SyntaxNode,
 }
@@ -12593,6 +13463,47 @@ impl Path {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PathFactor {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PathFactor {
+    #[inline]
+    pub fn graph_pattern_qualifier(&self) -> Option<GraphPatternQualifier> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path_primary(&self) -> Option<PathPrimary> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PathPattern {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PathPattern {
+    #[inline]
+    pub fn path_factor(&self) -> Option<PathFactor> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path_factors(&self) -> AstChildren<PathFactor> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PathPatternList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PathPatternList {
+    #[inline]
+    pub fn path_patterns(&self) -> AstChildren<PathPattern> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathSegment {
     pub(crate) syntax: SyntaxNode,
 }
@@ -12848,6 +13759,29 @@ impl Privileges {
     #[inline]
     pub fn privileges_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PRIVILEGES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PropertiesList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PropertiesList {
+    #[inline]
+    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn properties_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTIES_KW)
     }
 }
 
@@ -13364,6 +14298,37 @@ impl RenameValue {
     #[inline]
     pub fn value_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VALUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Repack {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Repack {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn option_item_list(&self) -> Option<OptionItemList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn table_and_columns_list(&self) -> Option<TableAndColumnsList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn index_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INDEX_KW)
+    }
+    #[inline]
+    pub fn repack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::REPACK_KW)
+    }
+    #[inline]
+    pub fn using_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USING_KW)
     }
 }
 
@@ -15394,6 +16359,45 @@ impl SourceFile {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SourceVertexTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SourceVertexTable {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn key_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::KEY_KW)
+    }
+    #[inline]
+    pub fn references_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::REFERENCES_KW)
+    }
+    #[inline]
+    pub fn source_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SOURCE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SplitPartition {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15660,6 +16664,33 @@ impl TargetList {
     #[inline]
     pub fn targets(&self) -> AstChildren<Target> {
         support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Temp {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Temp {
+    #[inline]
+    pub fn global_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GLOBAL_KW)
+    }
+    #[inline]
+    pub fn local_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOCAL_KW)
+    }
+    #[inline]
+    pub fn temp_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TEMP_KW)
+    }
+    #[inline]
+    pub fn temporary_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TEMPORARY_KW)
+    }
+    #[inline]
+    pub fn unlogged_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UNLOGGED_KW)
     }
 }
 
@@ -16288,6 +17319,103 @@ impl VariantList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VertexPattern {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VertexPattern {
+    #[inline]
+    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VertexTableDef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VertexTableDef {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn element_table_label_and_properties(&self) -> Option<ElementTableLabelAndProperties> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+    #[inline]
+    pub fn key_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::KEY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VertexTables {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VertexTables {
+    #[inline]
+    pub fn vertex_table_defs(&self) -> AstChildren<VertexTableDef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn node_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NODE_KW)
+    }
+    #[inline]
+    pub fn tables_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLES_KW)
+    }
+    #[inline]
+    pub fn vertex_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERTEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct VolatilityFuncOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16734,17 +17862,6 @@ impl WithoutTimezone {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct XmlAttributeList {
-    pub(crate) syntax: SyntaxNode,
-}
-impl XmlAttributeList {
-    #[inline]
-    pub fn expr_as_names(&self) -> AstChildren<ExprAsName> {
-        support::children(&self.syntax)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct XmlColumnOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16796,15 +17913,15 @@ pub struct XmlElementFn {
 }
 impl XmlElementFn {
     #[inline]
+    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn exprs(&self) -> AstChildren<Expr> {
         support::children(&self.syntax)
     }
     #[inline]
     pub fn name(&self) -> Option<Name> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn xml_attribute_list(&self) -> Option<XmlAttributeList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16870,7 +17987,7 @@ pub struct XmlForestFn {
 }
 impl XmlForestFn {
     #[inline]
-    pub fn xml_attribute_list(&self) -> Option<XmlAttributeList> {
+    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17283,6 +18400,20 @@ pub enum AlterMaterializedViewAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AlterPropertyGraphAction {
+    AddVertexEdgeLabelProperties(AddVertexEdgeLabelProperties),
+    AddVertexEdgeTables(AddVertexEdgeTables),
+    AlterVertexEdgeLabels(AlterVertexEdgeLabels),
+    DropEdgeTables(DropEdgeTables),
+    DropVertexEdgeLabel(DropVertexEdgeLabel),
+    DropVertexEdgeLabelProperties(DropVertexEdgeLabelProperties),
+    DropVertexTables(DropVertexTables),
+    OwnerTo(OwnerTo),
+    RenameTo(RenameTo),
+    SetSchema(SetSchema),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AlterTableAction {
     AddColumn(AddColumn),
     AddConstraint(AddConstraint),
@@ -17377,6 +18508,19 @@ pub enum Constraint {
     PrimaryKeyConstraint(PrimaryKeyConstraint),
     ReferencesConstraint(ReferencesConstraint),
     UniqueConstraint(UniqueConstraint),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ElementTableLabelAndProperties {
+    LabelAndPropertiesList(LabelAndPropertiesList),
+    ElementTableProperties(ElementTableProperties),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ElementTableProperties {
+    AllProperties(AllProperties),
+    NoProperties(NoProperties),
+    PropertiesList(PropertiesList),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -17511,6 +18655,15 @@ pub enum PartitionType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PathPrimary {
+    EdgeAny(EdgeAny),
+    EdgeLeft(EdgeLeft),
+    EdgeRight(EdgeRight),
+    ParenGraphPattern(ParenGraphPattern),
+    VertexPattern(VertexPattern),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PreparableStmt {
     CompoundSelect(CompoundSelect),
     Delete(Delete),
@@ -17581,6 +18734,7 @@ pub enum Stmt {
     AlterOperatorFamily(AlterOperatorFamily),
     AlterPolicy(AlterPolicy),
     AlterProcedure(AlterProcedure),
+    AlterPropertyGraph(AlterPropertyGraph),
     AlterPublication(AlterPublication),
     AlterRole(AlterRole),
     AlterRoutine(AlterRoutine),
@@ -17632,6 +18786,7 @@ pub enum Stmt {
     CreateOperatorFamily(CreateOperatorFamily),
     CreatePolicy(CreatePolicy),
     CreateProcedure(CreateProcedure),
+    CreatePropertyGraph(CreatePropertyGraph),
     CreatePublication(CreatePublication),
     CreateRole(CreateRole),
     CreateRule(CreateRule),
@@ -17680,6 +18835,7 @@ pub enum Stmt {
     DropOwned(DropOwned),
     DropPolicy(DropPolicy),
     DropProcedure(DropProcedure),
+    DropPropertyGraph(DropPropertyGraph),
     DropPublication(DropPublication),
     DropRole(DropRole),
     DropRoutine(DropRoutine),
@@ -17720,6 +18876,7 @@ pub enum Stmt {
     Refresh(Refresh),
     Reindex(Reindex),
     ReleaseSavepoint(ReleaseSavepoint),
+    Repack(Repack),
     Reset(Reset),
     ResetSessionAuth(ResetSessionAuth),
     Revoke(Revoke),
@@ -17879,6 +19036,24 @@ impl AstNode for AddGenerated {
         &self.syntax
     }
 }
+impl AstNode for AddLabel {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ADD_LABEL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for AddOpClassOptions {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -17901,6 +19076,42 @@ impl AstNode for AddValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ADD_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AddVertexEdgeLabelProperties {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ADD_VERTEX_EDGE_LABEL_PROPERTIES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AddVertexEdgeTables {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ADD_VERTEX_EDGE_TABLES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -17973,6 +19184,24 @@ impl AstNode for AllFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ALL_FN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AllProperties {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALL_PROPERTIES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -18455,6 +19684,24 @@ impl AstNode for AlterProcedure {
         &self.syntax
     }
 }
+impl AstNode for AlterPropertyGraph {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_PROPERTY_GRAPH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for AlterPublication {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -18819,6 +20066,24 @@ impl AstNode for AlterUserMapping {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ALTER_USER_MAPPING
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterVertexEdgeLabels {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_VERTEX_EDGE_LABELS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -20345,6 +21610,24 @@ impl AstNode for CreateProcedure {
         &self.syntax
     }
 }
+impl AstNode for CreatePropertyGraph {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CREATE_PROPERTY_GRAPH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for CreatePublication {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -20885,6 +22168,24 @@ impl AstNode for DependsOnExtension {
         &self.syntax
     }
 }
+impl AstNode for DestVertexTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DEST_VERTEX_TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for DetachPartition {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -21231,6 +22532,24 @@ impl AstNode for DropDomain {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::DROP_DOMAIN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for DropEdgeTables {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DROP_EDGE_TABLES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -21623,6 +22942,24 @@ impl AstNode for DropProcedure {
         &self.syntax
     }
 }
+impl AstNode for DropPropertyGraph {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DROP_PROPERTY_GRAPH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for DropPublication {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -21983,10 +23320,154 @@ impl AstNode for DropUserMapping {
         &self.syntax
     }
 }
+impl AstNode for DropVertexEdgeLabel {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DROP_VERTEX_EDGE_LABEL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for DropVertexEdgeLabelProperties {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DROP_VERTEX_EDGE_LABEL_PROPERTIES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for DropVertexTables {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DROP_VERTEX_TABLES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for DropView {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::DROP_VIEW
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EdgeAny {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EDGE_ANY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EdgeLeft {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EDGE_LEFT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EdgeRight {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EDGE_RIGHT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EdgeTableDef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EDGE_TABLE_DEF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EdgeTables {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EDGE_TABLES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -22311,6 +23792,24 @@ impl AstNode for ExprAsName {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::EXPR_AS_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprAsNameList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_AS_NAME_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -22707,6 +24206,42 @@ impl AstNode for GrantDefaultPrivileges {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::GRANT_DEFAULT_PRIVILEGES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for GraphPatternQualifier {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GRAPH_PATTERN_QUALIFIER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for GraphTableFn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GRAPH_TABLE_FN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -23211,6 +24746,24 @@ impl AstNode for IsJsonValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::IS_JSON_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsLabelExpression {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_LABEL_EXPRESSION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -24215,6 +25768,42 @@ impl AstNode for JsonWrapperBehaviorClause {
         &self.syntax
     }
 }
+impl AstNode for LabelAndProperties {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::LABEL_AND_PROPERTIES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for LabelAndPropertiesList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::LABEL_AND_PROPERTIES_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for LanguageFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -24849,6 +26438,24 @@ impl AstNode for NoInheritTable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NO_INHERIT_TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NoProperties {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NO_PROPERTIES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -25745,6 +27352,24 @@ impl AstNode for ParenExpr {
         &self.syntax
     }
 }
+impl AstNode for ParenGraphPattern {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PAREN_GRAPH_PATTERN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ParenSelect {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -25947,6 +27572,60 @@ impl AstNode for Path {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PATH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PathFactor {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PATH_FACTOR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PathPattern {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PATH_PATTERN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PathPatternList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PATH_PATTERN_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -26181,6 +27860,24 @@ impl AstNode for Privileges {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PRIVILEGES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PropertiesList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PROPERTIES_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -26541,6 +28238,24 @@ impl AstNode for RenameValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::RENAME_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Repack {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::REPACK
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -28031,6 +29746,24 @@ impl AstNode for SourceFile {
         &self.syntax
     }
 }
+impl AstNode for SourceVertexTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SOURCE_VERTEX_TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SplitPartition {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -28269,6 +30002,24 @@ impl AstNode for TargetList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TARGET_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Temp {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TEMP
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -28787,6 +30538,60 @@ impl AstNode for VariantList {
         &self.syntax
     }
 }
+impl AstNode for VertexPattern {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VERTEX_PATTERN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for VertexTableDef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VERTEX_TABLE_DEF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for VertexTables {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VERTEX_TABLES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for VolatilityFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -29169,24 +30974,6 @@ impl AstNode for WithoutTimezone {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::WITHOUT_TIMEZONE
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for XmlAttributeList {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::XML_ATTRIBUTE_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -30020,6 +31807,136 @@ impl From<SetSchema> for AlterMaterializedViewAction {
     #[inline]
     fn from(node: SetSchema) -> AlterMaterializedViewAction {
         AlterMaterializedViewAction::SetSchema(node)
+    }
+}
+impl AstNode for AlterPropertyGraphAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::ADD_VERTEX_EDGE_LABEL_PROPERTIES
+                | SyntaxKind::ADD_VERTEX_EDGE_TABLES
+                | SyntaxKind::ALTER_VERTEX_EDGE_LABELS
+                | SyntaxKind::DROP_EDGE_TABLES
+                | SyntaxKind::DROP_VERTEX_EDGE_LABEL
+                | SyntaxKind::DROP_VERTEX_EDGE_LABEL_PROPERTIES
+                | SyntaxKind::DROP_VERTEX_TABLES
+                | SyntaxKind::OWNER_TO
+                | SyntaxKind::RENAME_TO
+                | SyntaxKind::SET_SCHEMA
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::ADD_VERTEX_EDGE_LABEL_PROPERTIES => {
+                AlterPropertyGraphAction::AddVertexEdgeLabelProperties(
+                    AddVertexEdgeLabelProperties { syntax },
+                )
+            }
+            SyntaxKind::ADD_VERTEX_EDGE_TABLES => {
+                AlterPropertyGraphAction::AddVertexEdgeTables(AddVertexEdgeTables { syntax })
+            }
+            SyntaxKind::ALTER_VERTEX_EDGE_LABELS => {
+                AlterPropertyGraphAction::AlterVertexEdgeLabels(AlterVertexEdgeLabels { syntax })
+            }
+            SyntaxKind::DROP_EDGE_TABLES => {
+                AlterPropertyGraphAction::DropEdgeTables(DropEdgeTables { syntax })
+            }
+            SyntaxKind::DROP_VERTEX_EDGE_LABEL => {
+                AlterPropertyGraphAction::DropVertexEdgeLabel(DropVertexEdgeLabel { syntax })
+            }
+            SyntaxKind::DROP_VERTEX_EDGE_LABEL_PROPERTIES => {
+                AlterPropertyGraphAction::DropVertexEdgeLabelProperties(
+                    DropVertexEdgeLabelProperties { syntax },
+                )
+            }
+            SyntaxKind::DROP_VERTEX_TABLES => {
+                AlterPropertyGraphAction::DropVertexTables(DropVertexTables { syntax })
+            }
+            SyntaxKind::OWNER_TO => AlterPropertyGraphAction::OwnerTo(OwnerTo { syntax }),
+            SyntaxKind::RENAME_TO => AlterPropertyGraphAction::RenameTo(RenameTo { syntax }),
+            SyntaxKind::SET_SCHEMA => AlterPropertyGraphAction::SetSchema(SetSchema { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            AlterPropertyGraphAction::AddVertexEdgeLabelProperties(it) => &it.syntax,
+            AlterPropertyGraphAction::AddVertexEdgeTables(it) => &it.syntax,
+            AlterPropertyGraphAction::AlterVertexEdgeLabels(it) => &it.syntax,
+            AlterPropertyGraphAction::DropEdgeTables(it) => &it.syntax,
+            AlterPropertyGraphAction::DropVertexEdgeLabel(it) => &it.syntax,
+            AlterPropertyGraphAction::DropVertexEdgeLabelProperties(it) => &it.syntax,
+            AlterPropertyGraphAction::DropVertexTables(it) => &it.syntax,
+            AlterPropertyGraphAction::OwnerTo(it) => &it.syntax,
+            AlterPropertyGraphAction::RenameTo(it) => &it.syntax,
+            AlterPropertyGraphAction::SetSchema(it) => &it.syntax,
+        }
+    }
+}
+impl From<AddVertexEdgeLabelProperties> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: AddVertexEdgeLabelProperties) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::AddVertexEdgeLabelProperties(node)
+    }
+}
+impl From<AddVertexEdgeTables> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: AddVertexEdgeTables) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::AddVertexEdgeTables(node)
+    }
+}
+impl From<AlterVertexEdgeLabels> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: AlterVertexEdgeLabels) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::AlterVertexEdgeLabels(node)
+    }
+}
+impl From<DropEdgeTables> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: DropEdgeTables) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::DropEdgeTables(node)
+    }
+}
+impl From<DropVertexEdgeLabel> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: DropVertexEdgeLabel) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::DropVertexEdgeLabel(node)
+    }
+}
+impl From<DropVertexEdgeLabelProperties> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: DropVertexEdgeLabelProperties) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::DropVertexEdgeLabelProperties(node)
+    }
+}
+impl From<DropVertexTables> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: DropVertexTables) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::DropVertexTables(node)
+    }
+}
+impl From<OwnerTo> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: OwnerTo) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::OwnerTo(node)
+    }
+}
+impl From<RenameTo> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: RenameTo) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::RenameTo(node)
+    }
+}
+impl From<SetSchema> for AlterPropertyGraphAction {
+    #[inline]
+    fn from(node: SetSchema) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::SetSchema(node)
     }
 }
 impl AstNode for AlterTableAction {
@@ -30866,6 +32783,97 @@ impl From<UniqueConstraint> for Constraint {
     #[inline]
     fn from(node: UniqueConstraint) -> Constraint {
         Constraint::UniqueConstraint(node)
+    }
+}
+impl AstNode for ElementTableLabelAndProperties {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::LABEL_AND_PROPERTIES_LIST)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::LABEL_AND_PROPERTIES_LIST => {
+                ElementTableLabelAndProperties::LabelAndPropertiesList(LabelAndPropertiesList {
+                    syntax,
+                })
+            }
+            _ => {
+                if let Some(result) = ElementTableProperties::cast(syntax) {
+                    return Some(ElementTableLabelAndProperties::ElementTableProperties(
+                        result,
+                    ));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ElementTableLabelAndProperties::LabelAndPropertiesList(it) => &it.syntax,
+            ElementTableLabelAndProperties::ElementTableProperties(it) => it.syntax(),
+        }
+    }
+}
+impl From<LabelAndPropertiesList> for ElementTableLabelAndProperties {
+    #[inline]
+    fn from(node: LabelAndPropertiesList) -> ElementTableLabelAndProperties {
+        ElementTableLabelAndProperties::LabelAndPropertiesList(node)
+    }
+}
+impl AstNode for ElementTableProperties {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::ALL_PROPERTIES | SyntaxKind::NO_PROPERTIES | SyntaxKind::PROPERTIES_LIST
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::ALL_PROPERTIES => {
+                ElementTableProperties::AllProperties(AllProperties { syntax })
+            }
+            SyntaxKind::NO_PROPERTIES => {
+                ElementTableProperties::NoProperties(NoProperties { syntax })
+            }
+            SyntaxKind::PROPERTIES_LIST => {
+                ElementTableProperties::PropertiesList(PropertiesList { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ElementTableProperties::AllProperties(it) => &it.syntax,
+            ElementTableProperties::NoProperties(it) => &it.syntax,
+            ElementTableProperties::PropertiesList(it) => &it.syntax,
+        }
+    }
+}
+impl From<AllProperties> for ElementTableProperties {
+    #[inline]
+    fn from(node: AllProperties) -> ElementTableProperties {
+        ElementTableProperties::AllProperties(node)
+    }
+}
+impl From<NoProperties> for ElementTableProperties {
+    #[inline]
+    fn from(node: NoProperties) -> ElementTableProperties {
+        ElementTableProperties::NoProperties(node)
+    }
+}
+impl From<PropertiesList> for ElementTableProperties {
+    #[inline]
+    fn from(node: PropertiesList) -> ElementTableProperties {
+        ElementTableProperties::PropertiesList(node)
     }
 }
 impl AstNode for ExplainStmt {
@@ -31931,6 +33939,75 @@ impl From<PartitionForValuesWith> for PartitionType {
         PartitionType::PartitionForValuesWith(node)
     }
 }
+impl AstNode for PathPrimary {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::EDGE_ANY
+                | SyntaxKind::EDGE_LEFT
+                | SyntaxKind::EDGE_RIGHT
+                | SyntaxKind::PAREN_GRAPH_PATTERN
+                | SyntaxKind::VERTEX_PATTERN
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::EDGE_ANY => PathPrimary::EdgeAny(EdgeAny { syntax }),
+            SyntaxKind::EDGE_LEFT => PathPrimary::EdgeLeft(EdgeLeft { syntax }),
+            SyntaxKind::EDGE_RIGHT => PathPrimary::EdgeRight(EdgeRight { syntax }),
+            SyntaxKind::PAREN_GRAPH_PATTERN => {
+                PathPrimary::ParenGraphPattern(ParenGraphPattern { syntax })
+            }
+            SyntaxKind::VERTEX_PATTERN => PathPrimary::VertexPattern(VertexPattern { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PathPrimary::EdgeAny(it) => &it.syntax,
+            PathPrimary::EdgeLeft(it) => &it.syntax,
+            PathPrimary::EdgeRight(it) => &it.syntax,
+            PathPrimary::ParenGraphPattern(it) => &it.syntax,
+            PathPrimary::VertexPattern(it) => &it.syntax,
+        }
+    }
+}
+impl From<EdgeAny> for PathPrimary {
+    #[inline]
+    fn from(node: EdgeAny) -> PathPrimary {
+        PathPrimary::EdgeAny(node)
+    }
+}
+impl From<EdgeLeft> for PathPrimary {
+    #[inline]
+    fn from(node: EdgeLeft) -> PathPrimary {
+        PathPrimary::EdgeLeft(node)
+    }
+}
+impl From<EdgeRight> for PathPrimary {
+    #[inline]
+    fn from(node: EdgeRight) -> PathPrimary {
+        PathPrimary::EdgeRight(node)
+    }
+}
+impl From<ParenGraphPattern> for PathPrimary {
+    #[inline]
+    fn from(node: ParenGraphPattern) -> PathPrimary {
+        PathPrimary::ParenGraphPattern(node)
+    }
+}
+impl From<VertexPattern> for PathPrimary {
+    #[inline]
+    fn from(node: VertexPattern) -> PathPrimary {
+        PathPrimary::VertexPattern(node)
+    }
+}
 impl AstNode for PreparableStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -32324,6 +34401,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::ALTER_OPERATOR_FAMILY
                 | SyntaxKind::ALTER_POLICY
                 | SyntaxKind::ALTER_PROCEDURE
+                | SyntaxKind::ALTER_PROPERTY_GRAPH
                 | SyntaxKind::ALTER_PUBLICATION
                 | SyntaxKind::ALTER_ROLE
                 | SyntaxKind::ALTER_ROUTINE
@@ -32375,6 +34453,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::CREATE_OPERATOR_FAMILY
                 | SyntaxKind::CREATE_POLICY
                 | SyntaxKind::CREATE_PROCEDURE
+                | SyntaxKind::CREATE_PROPERTY_GRAPH
                 | SyntaxKind::CREATE_PUBLICATION
                 | SyntaxKind::CREATE_ROLE
                 | SyntaxKind::CREATE_RULE
@@ -32423,6 +34502,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::DROP_OWNED
                 | SyntaxKind::DROP_POLICY
                 | SyntaxKind::DROP_PROCEDURE
+                | SyntaxKind::DROP_PROPERTY_GRAPH
                 | SyntaxKind::DROP_PUBLICATION
                 | SyntaxKind::DROP_ROLE
                 | SyntaxKind::DROP_ROUTINE
@@ -32463,6 +34543,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::REFRESH
                 | SyntaxKind::REINDEX
                 | SyntaxKind::RELEASE_SAVEPOINT
+                | SyntaxKind::REPACK
                 | SyntaxKind::RESET
                 | SyntaxKind::RESET_SESSION_AUTH
                 | SyntaxKind::REVOKE
@@ -32523,6 +34604,9 @@ impl AstNode for Stmt {
             }
             SyntaxKind::ALTER_POLICY => Stmt::AlterPolicy(AlterPolicy { syntax }),
             SyntaxKind::ALTER_PROCEDURE => Stmt::AlterProcedure(AlterProcedure { syntax }),
+            SyntaxKind::ALTER_PROPERTY_GRAPH => {
+                Stmt::AlterPropertyGraph(AlterPropertyGraph { syntax })
+            }
             SyntaxKind::ALTER_PUBLICATION => Stmt::AlterPublication(AlterPublication { syntax }),
             SyntaxKind::ALTER_ROLE => Stmt::AlterRole(AlterRole { syntax }),
             SyntaxKind::ALTER_ROUTINE => Stmt::AlterRoutine(AlterRoutine { syntax }),
@@ -32596,6 +34680,9 @@ impl AstNode for Stmt {
             }
             SyntaxKind::CREATE_POLICY => Stmt::CreatePolicy(CreatePolicy { syntax }),
             SyntaxKind::CREATE_PROCEDURE => Stmt::CreateProcedure(CreateProcedure { syntax }),
+            SyntaxKind::CREATE_PROPERTY_GRAPH => {
+                Stmt::CreatePropertyGraph(CreatePropertyGraph { syntax })
+            }
             SyntaxKind::CREATE_PUBLICATION => Stmt::CreatePublication(CreatePublication { syntax }),
             SyntaxKind::CREATE_ROLE => Stmt::CreateRole(CreateRole { syntax }),
             SyntaxKind::CREATE_RULE => Stmt::CreateRule(CreateRule { syntax }),
@@ -32664,6 +34751,9 @@ impl AstNode for Stmt {
             SyntaxKind::DROP_OWNED => Stmt::DropOwned(DropOwned { syntax }),
             SyntaxKind::DROP_POLICY => Stmt::DropPolicy(DropPolicy { syntax }),
             SyntaxKind::DROP_PROCEDURE => Stmt::DropProcedure(DropProcedure { syntax }),
+            SyntaxKind::DROP_PROPERTY_GRAPH => {
+                Stmt::DropPropertyGraph(DropPropertyGraph { syntax })
+            }
             SyntaxKind::DROP_PUBLICATION => Stmt::DropPublication(DropPublication { syntax }),
             SyntaxKind::DROP_ROLE => Stmt::DropRole(DropRole { syntax }),
             SyntaxKind::DROP_ROUTINE => Stmt::DropRoutine(DropRoutine { syntax }),
@@ -32716,6 +34806,7 @@ impl AstNode for Stmt {
             SyntaxKind::REFRESH => Stmt::Refresh(Refresh { syntax }),
             SyntaxKind::REINDEX => Stmt::Reindex(Reindex { syntax }),
             SyntaxKind::RELEASE_SAVEPOINT => Stmt::ReleaseSavepoint(ReleaseSavepoint { syntax }),
+            SyntaxKind::REPACK => Stmt::Repack(Repack { syntax }),
             SyntaxKind::RESET => Stmt::Reset(Reset { syntax }),
             SyntaxKind::RESET_SESSION_AUTH => Stmt::ResetSessionAuth(ResetSessionAuth { syntax }),
             SyntaxKind::REVOKE => Stmt::Revoke(Revoke { syntax }),
@@ -32766,6 +34857,7 @@ impl AstNode for Stmt {
             Stmt::AlterOperatorFamily(it) => &it.syntax,
             Stmt::AlterPolicy(it) => &it.syntax,
             Stmt::AlterProcedure(it) => &it.syntax,
+            Stmt::AlterPropertyGraph(it) => &it.syntax,
             Stmt::AlterPublication(it) => &it.syntax,
             Stmt::AlterRole(it) => &it.syntax,
             Stmt::AlterRoutine(it) => &it.syntax,
@@ -32817,6 +34909,7 @@ impl AstNode for Stmt {
             Stmt::CreateOperatorFamily(it) => &it.syntax,
             Stmt::CreatePolicy(it) => &it.syntax,
             Stmt::CreateProcedure(it) => &it.syntax,
+            Stmt::CreatePropertyGraph(it) => &it.syntax,
             Stmt::CreatePublication(it) => &it.syntax,
             Stmt::CreateRole(it) => &it.syntax,
             Stmt::CreateRule(it) => &it.syntax,
@@ -32865,6 +34958,7 @@ impl AstNode for Stmt {
             Stmt::DropOwned(it) => &it.syntax,
             Stmt::DropPolicy(it) => &it.syntax,
             Stmt::DropProcedure(it) => &it.syntax,
+            Stmt::DropPropertyGraph(it) => &it.syntax,
             Stmt::DropPublication(it) => &it.syntax,
             Stmt::DropRole(it) => &it.syntax,
             Stmt::DropRoutine(it) => &it.syntax,
@@ -32905,6 +34999,7 @@ impl AstNode for Stmt {
             Stmt::Refresh(it) => &it.syntax,
             Stmt::Reindex(it) => &it.syntax,
             Stmt::ReleaseSavepoint(it) => &it.syntax,
+            Stmt::Repack(it) => &it.syntax,
             Stmt::Reset(it) => &it.syntax,
             Stmt::ResetSessionAuth(it) => &it.syntax,
             Stmt::Revoke(it) => &it.syntax,
@@ -33052,6 +35147,12 @@ impl From<AlterProcedure> for Stmt {
     #[inline]
     fn from(node: AlterProcedure) -> Stmt {
         Stmt::AlterProcedure(node)
+    }
+}
+impl From<AlterPropertyGraph> for Stmt {
+    #[inline]
+    fn from(node: AlterPropertyGraph) -> Stmt {
+        Stmt::AlterPropertyGraph(node)
     }
 }
 impl From<AlterPublication> for Stmt {
@@ -33360,6 +35461,12 @@ impl From<CreateProcedure> for Stmt {
         Stmt::CreateProcedure(node)
     }
 }
+impl From<CreatePropertyGraph> for Stmt {
+    #[inline]
+    fn from(node: CreatePropertyGraph) -> Stmt {
+        Stmt::CreatePropertyGraph(node)
+    }
+}
 impl From<CreatePublication> for Stmt {
     #[inline]
     fn from(node: CreatePublication) -> Stmt {
@@ -33648,6 +35755,12 @@ impl From<DropProcedure> for Stmt {
         Stmt::DropProcedure(node)
     }
 }
+impl From<DropPropertyGraph> for Stmt {
+    #[inline]
+    fn from(node: DropPropertyGraph) -> Stmt {
+        Stmt::DropPropertyGraph(node)
+    }
+}
 impl From<DropPublication> for Stmt {
     #[inline]
     fn from(node: DropPublication) -> Stmt {
@@ -33886,6 +35999,12 @@ impl From<ReleaseSavepoint> for Stmt {
     #[inline]
     fn from(node: ReleaseSavepoint) -> Stmt {
         Stmt::ReleaseSavepoint(node)
+    }
+}
+impl From<Repack> for Stmt {
+    #[inline]
+    fn from(node: Repack) -> Stmt {
+        Stmt::Repack(node)
     }
 }
 impl From<Reset> for Stmt {

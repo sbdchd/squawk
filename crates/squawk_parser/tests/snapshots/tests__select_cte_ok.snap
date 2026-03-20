@@ -834,7 +834,7 @@ SOURCE_FILE
               WHITESPACE " "
               FROM_ITEM
                 NAME_REF
-                  IDENT "graph"
+                  GRAPH_KW "graph"
                 WHITESPACE " "
                 ALIAS
                   NAME
@@ -895,7 +895,7 @@ SOURCE_FILE
               WHITESPACE " "
               FROM_ITEM
                 NAME_REF
-                  IDENT "graph"
+                  GRAPH_KW "graph"
                 WHITESPACE " "
                 ALIAS
                   NAME

@@ -2318,13 +2318,13 @@ drop type person$0;
     fn goto_create_table_type_reference() {
         assert_snapshot!(goto("
 create type person_info as (name text, email text);
-create table user(id int, member person_info$0);
-"), @r"
+create table users(id int, member person_info$0);
+"), @"
           ╭▸ 
         2 │ create type person_info as (name text, email text);
           │             ─────────── 2. destination
-        3 │ create table user(id int, member person_info);
-          ╰╴                                           ─ 1. source
+        3 │ create table users(id int, member person_info);
+          ╰╴                                            ─ 1. source
         ");
     }
 
@@ -2416,14 +2416,14 @@ create table data(id int, value myint$0);
     fn goto_composite_type_field() {
         assert_snapshot!(goto("
 create type person_info as (name text, email text);
-create table user(id int, member person_info);
-select (member).name$0 from user;
-"), @r"
+create table users(id int, member person_info);
+select (member).name$0 from users;
+"), @"
           ╭▸ 
         2 │ create type person_info as (name text, email text);
           │                             ──── 2. destination
-        3 │ create table user(id int, member person_info);
-        4 │ select (member).name from user;
+        3 │ create table users(id int, member person_info);
+        4 │ select (member).name from users;
           ╰╴                   ─ 1. source
         ");
     }

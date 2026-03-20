@@ -65,6 +65,7 @@ ArgList =
 CallExpr =
   Expr ArgList WithinClause? FilterClause? OverClause?
 | ExtractFn
+| GraphTableFn
 | JsonExistsFn
 | JsonArrayFn
 | JsonObjectFn
@@ -289,7 +290,7 @@ XmlElementFn =
     Name
     (
       ',' 'xmlattributes' '('
-           XmlAttributeList
+           ExprAsNameList
         ')'
         (',' (Expr (',' Expr)*))?
     | ',' (Expr (',' Expr)*)
@@ -299,11 +300,11 @@ XmlElementFn =
 ExprAsName =
   Expr AsName?
 
-XmlAttributeList =
+ExprAsNameList =
   (ExprAsName (',' ExprAsName)*)
 
 XmlForestFn =
-  'xmlforest' '(' XmlAttributeList ')'
+  'xmlforest' '(' ExprAsNameList ')'
 
 XmlExistsFn =
   'xmlexists' '('
@@ -2199,6 +2200,7 @@ CommentOn =
   | 'operator' 'class' Path UsingMethod
   | 'operator' 'family' Path UsingMethod
   | 'policy' NameRef 'on' Path
+  | 'property' 'graph' Path
   | 'procedural'? 'language' Path
   | 'procedure' FunctionSig
   | 'publication' Path
@@ -2229,6 +2231,185 @@ Cluster =
   ('verbose' | OptionItemList)?
   Path?
   UsingMethod?
+
+Repack =
+  'repack'
+  OptionItemList?
+  TableAndColumnsList?
+  (
+     'using' 'index' NameRef?
+  )?
+
+// TODO: use this everywhere
+Temp =
+  'temporary'
+| 'temp'
+| 'local' 'temporary'
+| 'local' 'temp'
+| 'global' 'temporary'
+| 'global' 'temp'
+| 'unlogged'
+
+CreatePropertyGraph =
+  'create' Temp?  'property' 'graph' Path
+  VertexTables?
+  EdgeTables?
+
+VertexTables =
+  ('vertex' | 'node') 'tables' '(' (VertexTableDef (',' VertexTableDef)*)  ')'
+
+VertexTableDef =
+  Path
+  ('as' Name)?
+  ('key' '(' ColumnList ')')?
+  ElementTableLabelAndProperties?
+
+ElementTableLabelAndProperties =
+  ElementTableProperties
+| LabelAndPropertiesList
+
+ElementTableProperties =
+  NoProperties
+| AllProperties
+| PropertiesList
+
+NoProperties =
+  'no' 'properties'
+
+AllProperties =
+  'properties' 'all' 'columns'
+
+PropertiesList = 
+  'properties' '(' ExprAsNameList ')'
+
+LabelAndPropertiesList =
+  (LabelAndProperties (',' LabelAndProperties)*)
+
+LabelAndProperties = 
+  (
+    'label' Name
+  | 'default' 'label'
+  )
+  ElementTableProperties?
+
+EdgeTables =
+  ('edge' | 'relationship') 'tables' '(' (EdgeTableDef (',' EdgeTableDef)*)  ')'
+
+EdgeTableDef =
+  Path
+  ('as' Name)?
+  ('key' '(' ColumnList ')')?
+  SourceVertexTable
+  DestVertexTable
+  ElementTableLabelAndProperties?
+
+SourceVertexTable =
+  'source' NameRef
+| 'source' 'key' '(' ColumnList ')' 'references' NameRef '(' ColumnList ')'
+
+DestVertexTable =
+  'destination' NameRef
+| 'destination' 'key' '(' ColumnList ')' 'references' NameRef '(' ColumnList ')'
+
+AlterPropertyGraph =
+  'alter' 'property' 'graph' IfExists? Path
+  AlterPropertyGraphAction
+
+AlterPropertyGraphAction =
+  RenameTo
+| SetSchema
+| OwnerTo
+| AddVertexEdgeTables
+| DropVertexTables
+| DropEdgeTables
+| AlterVertexEdgeLabels
+| DropVertexEdgeLabel
+| AddVertexEdgeLabelProperties
+| DropVertexEdgeLabelProperties
+
+AddVertexEdgeTables =
+  ('add' VertexTables)? ('add' EdgeTables)?
+
+DropVertexTables =
+  'drop' ('vertex' | 'node')
+  'tables' '(' (Name (',' Name)*) ')'
+  ('cascade' | 'restrict')?
+
+DropEdgeTables =
+  'drop' ('edge' | 'relationship')
+  'tables' '(' (Name (',' Name)*) ')'
+  ('cascade' | 'restrict')?
+
+AlterVertexEdgeLabels =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' Name
+    AddLabel AddLabel*
+
+AddLabel =
+  'add' 'label' Name ElementTableProperties
+
+DropVertexEdgeLabel =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' NameRef
+    'drop' 'label' NameRef ('cascade' | 'restrict')?
+
+AddVertexEdgeLabelProperties =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' NameRef
+    'alter' 'label' NameRef
+    'add' 'properties' '(' ExprAsNameList ')'
+
+DropVertexEdgeLabelProperties =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' NameRef
+    'alter' 'label' NameRef
+    'drop' 'properties' '(' (Name (',' Name)*) ')' ('cascade' | 'restrict')?
+
+DropPropertyGraph =
+  'drop' 'property' 'graph' IfExists? Path ('cascade' | 'restrict')?
+
+GraphTableFn =
+  'graph_table' '(' Path 'match' PathPatternList WhereClause? 'columns' '(' ExprAsNameList ')' ')'
+
+PathPatternList =
+  (PathPattern (',' PathPattern)*)
+
+PathPattern =
+  PathFactor PathFactor*
+
+PathFactor =
+  PathPrimary
+  GraphPatternQualifier?
+
+PathPrimary =
+  VertexPattern
+| EdgeLeft
+| EdgeRight
+| EdgeAny
+| ParenGraphPattern
+
+VertexPattern =
+  '(' Name? IsLabelExpression? WhereClause? ')'
+
+EdgeLeft =
+  '<' '-' '[' Name? IsLabelExpression? WhereClause? ']' '-'
+| '<' '-'
+
+EdgeRight =
+  '-' '[' Name? IsLabelExpression? WhereClause? ']' '-' '>'
+| '-' '>'
+
+EdgeAny =
+  '-' '[' Name? IsLabelExpression? WhereClause? ']' '-'
+| '-'
+
+ParenGraphPattern =
+  '(' PathPattern WhereClause? ')'
+
+IsLabelExpression =
+  'is' Expr
+
+GraphPatternQualifier =
+// TODO: these should be integers, not Literals
+  '{' Literal '}'
+| '{' ',' Literal '}'
+| '{' Literal ',' Literal '}'
 
 CreateAccessMethod =
   'create' 'access' 'method' name:Path
@@ -3191,6 +3372,7 @@ Stmt =
 | AlterOperator
 | AlterOperatorClass
 | AlterOperatorFamily
+| AlterPropertyGraph
 | AlterPolicy
 | AlterProcedure
 | AlterPublication
@@ -3244,6 +3426,7 @@ Stmt =
 | CreateOperator
 | CreateOperatorClass
 | CreateOperatorFamily
+| CreatePropertyGraph
 | CreatePolicy
 | CreateProcedure
 | CreatePublication
@@ -3292,6 +3475,7 @@ Stmt =
 | DropOperatorClass
 | DropOperatorFamily
 | DropOwned
+| DropPropertyGraph
 | DropPolicy
 | DropProcedure
 | DropPublication
@@ -3331,6 +3515,7 @@ Stmt =
 | Notify
 | Prepare
 | PrepareTransaction
+| Repack
 | Reassign
 | Refresh
 | Reindex

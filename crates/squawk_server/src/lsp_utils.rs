@@ -61,27 +61,21 @@ pub(crate) fn code_action(
     CodeAction {
         title: action.title,
         kind: Some(kind),
-        diagnostics: None,
-        edit: Some(WorkspaceEdit {
-            changes: Some({
-                let mut changes = FxHashMap::default();
-                let edits = action
-                    .edits
-                    .into_iter()
-                    .map(|edit| lsp_types::TextEdit {
-                        range: range(line_index, edit.text_range),
-                        new_text: edit.text.unwrap_or_default(),
-                    })
-                    .collect();
-                changes.insert(uri, edits);
-                changes.into_iter().collect()
-            }),
-            ..Default::default()
-        }),
-        command: None,
+        edit: Some(WorkspaceEdit::new({
+            let mut changes = FxHashMap::default();
+            let edits = action
+                .edits
+                .into_iter()
+                .map(|edit| lsp_types::TextEdit {
+                    range: range(line_index, edit.text_range),
+                    new_text: edit.text.unwrap_or_default(),
+                })
+                .collect();
+            changes.insert(uri, edits);
+            changes.into_iter().collect()
+        })),
         is_preferred: Some(true),
-        disabled: None,
-        data: None,
+        ..Default::default()
     }
 }
 

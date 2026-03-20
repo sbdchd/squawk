@@ -523,13 +523,33 @@ SELECT stats_reset > 'wal_reset_ts'::timestamptz FROM pg_stat_wal;
 -- Test error case for reset_shared with unknown stats type
 SELECT pg_stat_reset_shared('unknown');
 
--- Test that reset works for pg_stat_database
+-- Test that reset works for pg_stat_database and pg_stat_database_conflicts
 
--- Since pg_stat_database stats_reset starts out as NULL, reset it once first so we have something to compare it to
+-- Since pg_stat_database stats_reset starts out as NULL, reset it once first so that we
+-- have a baseline for comparison. The same for pg_stat_database_conflicts as it shares
+-- the same stats_reset as pg_stat_database.
 SELECT pg_stat_reset();
 SELECT stats_reset AS db_reset_ts FROM pg_stat_database WHERE datname = (SELECT current_database()) /* \gset */;
+SELECT stats_reset AS dbc_reset_ts FROM pg_stat_database_conflicts WHERE datname = (SELECT current_database()) /* \gset */;
+SELECT 'db_reset_ts'::timestamptz = 'dbc_reset_ts'::timestamptz;
 SELECT pg_stat_reset();
 SELECT stats_reset > 'db_reset_ts'::timestamptz FROM pg_stat_database WHERE datname = (SELECT current_database());
+SELECT stats_reset > 'dbc_reset_ts'::timestamptz FROM pg_stat_database_conflicts WHERE datname = (SELECT current_database());
+
+-- Test that reset works for pg_statio_all_sequences
+
+-- Use the sequence to accumulate its stats, and reset them once first
+-- so that we have a baseline for comparison, similar to the previous test.
+-- stats_reset to compare to.
+CREATE SEQUENCE test_seq1;
+SELECT nextval('test_seq1');
+SELECT pg_stat_reset_single_table_counters('test_seq1'::regclass);
+SELECT stats_reset AS seq_reset_ts
+  FROM pg_statio_all_sequences WHERE relname ='test_seq1' /* \gset */;
+SELECT pg_stat_reset_single_table_counters('test_seq1'::regclass);
+SELECT stats_reset > 'seq_reset_ts'::timestamptz
+  FROM pg_statio_all_sequences WHERE relname ='test_seq1';
+DROP SEQUENCE test_seq1;
 
 
 ----

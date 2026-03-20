@@ -193,6 +193,8 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::CloseParen => SyntaxKind::R_PAREN,
                 squawk_lexer::TokenKind::OpenBracket => SyntaxKind::L_BRACK,
                 squawk_lexer::TokenKind::CloseBracket => SyntaxKind::R_BRACK,
+                squawk_lexer::TokenKind::OpenCurly => SyntaxKind::L_CURLY,
+                squawk_lexer::TokenKind::CloseCurly => SyntaxKind::R_CURLY,
                 squawk_lexer::TokenKind::At => SyntaxKind::AT,
                 squawk_lexer::TokenKind::Pound => SyntaxKind::POUND,
                 squawk_lexer::TokenKind::Tilde => SyntaxKind::TILDE,

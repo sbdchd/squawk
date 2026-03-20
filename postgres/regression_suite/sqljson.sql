@@ -386,6 +386,95 @@ SELECT JSON_ARRAY(SELECT i FROM (VALUES (1), (2), (NULL), (4)) foo(i) RETURNING 
 
 DROP VIEW json_array_subquery_view;
 
+-- Test mutability of JSON_OBJECTAGG, JSON_ARRAYAGG, JSON_ARRAY, JSON_OBJECT
+create type comp1 as (a int, b date);
+create domain d_comp1 as comp1;
+create domain mydomain as timestamptz;
+create type mydomainrange as range(subtype=mydomain);
+create type comp3 as (a int, b mydomainrange);
+create table test_mutability(
+	a text[], b timestamp, c timestamptz,
+	d date, f1 comp1[], f2 timestamp[],
+	f3 d_comp1[],
+	f4 mydomainrange[],
+	f5 comp3,
+	f6 mydomainmultirange);
+
+-- JSON_OBJECTAGG, JSON_ARRAYAGG are aggregate functions, cannot be used in index
+create index xx on test_mutability(json_objectagg(a: b absent on null with unique keys returning jsonb));
+create index xx on test_mutability(json_objectagg(a: b absent on null with unique keys returning json));
+create index xx on test_mutability(json_arrayagg(a returning jsonb));
+create index xx on test_mutability(json_arrayagg(a returning json));
+
+-- jsonb: create expression index via json_array
+create index on test_mutability(json_array(a returning jsonb)); -- ok
+create index on test_mutability(json_array(b returning jsonb)); -- error
+create index on test_mutability(json_array(c returning jsonb)); -- error
+create index on test_mutability(json_array(d returning jsonb)); -- error
+create index on test_mutability(json_array(f1 returning jsonb)); -- error
+create index on test_mutability(json_array(f2 returning jsonb)); -- error
+create index on test_mutability(json_array(f3 returning jsonb)); -- error
+create index on test_mutability(json_array(f4 returning jsonb)); -- error
+create index on test_mutability(json_array(f5 returning jsonb)); -- error
+create index on test_mutability(json_array(f6 returning jsonb)); -- error
+
+-- jsonb: create expression index via json_object
+create index on test_mutability(json_object('hello' value a returning jsonb)); -- ok
+create index on test_mutability(json_object('hello' value b returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value c returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value d returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value f1 returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value f2 returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value f3 returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value f4 returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value f5 returning jsonb)); -- error
+create index on test_mutability(json_object('hello' value f6 returning jsonb)); -- error
+
+-- data type json doesn't have a default operator class for access method "btree" so
+-- we use a generated column to test whether the JSON_ARRAY expression is
+-- immutable
+alter table test_mutability add column f10 json generated always as (json_array(a returning json)); -- ok
+alter table test_mutability add column f11 json generated always as (json_array(b returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(c returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(d returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(f1 returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(f2 returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(f3 returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(f4 returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(f5 returning json)); -- error
+alter table test_mutability add column f11 json generated always as (json_array(f6 returning json)); -- error
+
+-- data type json doesn't have a default operator class for access method "btree" so
+-- we use a generated column to test whether the JSON_OBJECT expression is
+-- immutable
+alter table test_mutability add column f11 json generated always as (json_object('hello' value a returning json)); -- ok
+alter table test_mutability add column f12 json generated always as (json_object('hello' value b returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value c returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value d returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value f1 returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value f2 returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value f3 returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value f4 returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value f5 returning json)); -- error
+alter table test_mutability add column f12 json generated always as (json_object('hello' value f6 returning json)); -- error
+
+drop table test_mutability;
+drop domain d_comp1;
+drop type comp3;
+drop type mydomainrange;
+drop domain mydomain;
+drop type comp1;
+
+-- Range/multirange with immutable subtype should be considered immutable
+create type range_int as range(subtype=int);
+create table test_range_immutable(r range_int, m multirange_int);
+create index on test_range_immutable(json_array(r returning jsonb)); -- ok
+create index on test_range_immutable(json_array(m returning jsonb)); -- ok
+create index on test_range_immutable(json_object('key' value r returning jsonb)); -- ok
+create index on test_range_immutable(json_object('key' value m returning jsonb)); -- ok
+drop table test_range_immutable;
+drop type range_int;
+
 -- IS JSON predicate
 SELECT NULL IS JSON;
 SELECT NULL IS NOT JSON;
@@ -394,6 +483,37 @@ SELECT NULL::jsonb IS JSON;
 SELECT NULL::text IS JSON;
 SELECT NULL::bytea IS JSON;
 SELECT NULL::int IS JSON;
+
+-- IS JSON with domain types
+CREATE DOMAIN jd1 AS json CHECK ((VALUE ->'a')::text <> '3');
+CREATE DOMAIN jd2 AS jsonb CHECK ((VALUE ->'a') = '1'::jsonb);
+CREATE DOMAIN jd3 AS text CHECK (VALUE <> 'a');
+CREATE DOMAIN jd4 AS bytea CHECK (VALUE <> '\x61');
+CREATE DOMAIN jd5 AS date CHECK (VALUE <> NULL);
+
+-- NULLs through domains should return NULL (not error)
+SELECT NULL::jd1 IS JSON, NULL::jd2 IS JSON, NULL::jd3 IS JSON, NULL::jd4 IS JSON;
+SELECT NULL::jd1 IS NOT JSON;
+
+-- domain over unsupported base type should error
+SELECT NULL::jd5 IS JSON; -- error
+SELECT NULL::jd5 IS JSON WITH UNIQUE KEYS; -- error
+
+-- domain constraint violation during cast
+SELECT a::jd2 IS JSON WITH UNIQUE KEYS as col1 FROM (VALUES('{"a": 1, "a": 2}')) s(a); -- error
+
+-- view creation and deparsing with domain IS JSON
+CREATE VIEW domain_isjson AS
+WITH cte(a) AS (VALUES('{"a": 1, "a": 2}'))
+SELECT	a::jd1 IS JSON WITH UNIQUE KEYS as jd1,
+		a::jd3 IS JSON WITH UNIQUE KEYS as jd3,
+		a::jd4 IS JSON WITH UNIQUE KEYS as jd4
+FROM cte;
+-- \sv domain_isjson
+SELECT * FROM domain_isjson;
+
+DROP VIEW domain_isjson;
+DROP DOMAIN jd5, jd4, jd3, jd2, jd1;
 
 SELECT '' IS JSON;
 
