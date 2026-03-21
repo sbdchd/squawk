@@ -134,4 +134,20 @@ mod test {
             },
         );
     }
+
+    #[test]
+    fn squawk_disable_assume_in_transaction_overrides() {
+        let sql = r#"
+-- squawk-disable-assume-in-transaction
+CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
+    "#;
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: true,
+                ..Default::default()
+            },
+        );
+    }
 }

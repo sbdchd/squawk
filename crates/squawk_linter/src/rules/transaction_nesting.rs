@@ -168,4 +168,36 @@ SELECT 1;
         };
         lint_ok_with(sql, settings);
     }
+
+    #[test]
+    fn squawk_disable_assume_in_transaction_allows_begin_commit() {
+        let sql = r#"
+-- squawk-disable-assume-in-transaction
+BEGIN;
+SELECT 1;
+COMMIT;
+        "#;
+        let settings = LinterSettings {
+            assume_in_transaction: true,
+            ..Default::default()
+        };
+        lint_ok_with(sql, settings);
+    }
+
+    #[test]
+    fn squawk_enable_assume_in_transaction_flags_begin() {
+        let sql = r#"
+-- squawk-enable-assume-in-transaction
+BEGIN;
+SELECT 1;
+COMMIT;
+        "#;
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                assume_in_transaction: false,
+                ..Default::default()
+            },
+        ));
+    }
 }
