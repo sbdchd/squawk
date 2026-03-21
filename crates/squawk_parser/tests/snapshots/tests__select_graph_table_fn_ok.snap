@@ -83,7 +83,7 @@ SOURCE_FILE
                   NAME
                     IDENT "foo"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -217,7 +217,7 @@ SOURCE_FILE
                   NAME
                     IDENT "foo"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -352,7 +352,7 @@ SOURCE_FILE
                   NAME
                     IDENT "foo"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -469,7 +469,7 @@ SOURCE_FILE
                   NAME
                     IDENT "o"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -539,7 +539,7 @@ SOURCE_FILE
                               NAME
                                 IDENT "o"
                               WHITESPACE " "
-                              IS_LABEL_EXPRESSION
+                              IS_LABEL
                                 IS_KW "is"
                                 WHITESPACE " "
                                 NAME_REF
@@ -802,7 +802,7 @@ SOURCE_FILE
                   NAME
                     IDENT "foo"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -866,7 +866,7 @@ SOURCE_FILE
                   NAME
                     IDENT "c"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -879,7 +879,7 @@ SOURCE_FILE
                   NAME
                     IDENT "co"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -893,7 +893,7 @@ SOURCE_FILE
                   NAME
                     IDENT "o"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -981,7 +981,7 @@ SOURCE_FILE
                   NAME
                     IDENT "a"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1011,7 +1011,7 @@ SOURCE_FILE
                   NAME
                     IDENT "e1"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1026,7 +1026,7 @@ SOURCE_FILE
                   NAME
                     IDENT "b"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1063,7 +1063,7 @@ SOURCE_FILE
                   NAME
                     IDENT "e2"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1077,7 +1077,7 @@ SOURCE_FILE
                   NAME
                     IDENT "c"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1108,7 +1108,7 @@ SOURCE_FILE
                   NAME
                     IDENT "e3"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1122,7 +1122,7 @@ SOURCE_FILE
                   NAME
                     IDENT "d"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1203,7 +1203,7 @@ SOURCE_FILE
                   NAME
                     IDENT "a"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1213,7 +1213,7 @@ SOURCE_FILE
                 EDGE_RIGHT
                   MINUS "-"
                   L_BRACK "["
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1227,7 +1227,7 @@ SOURCE_FILE
                   NAME
                     IDENT "b"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1242,7 +1242,7 @@ SOURCE_FILE
                   NAME
                     IDENT "b"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1252,7 +1252,7 @@ SOURCE_FILE
                 EDGE_RIGHT
                   MINUS "-"
                   L_BRACK "["
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1266,7 +1266,7 @@ SOURCE_FILE
                   NAME
                     IDENT "c"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1281,7 +1281,7 @@ SOURCE_FILE
                   NAME
                     IDENT "a"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1291,7 +1291,7 @@ SOURCE_FILE
                 EDGE_RIGHT
                   MINUS "-"
                   L_BRACK "["
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1305,7 +1305,7 @@ SOURCE_FILE
                   NAME
                     IDENT "w"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1386,7 +1386,7 @@ SOURCE_FILE
                   NAME
                     IDENT "a"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1424,7 +1424,7 @@ SOURCE_FILE
                         NAME
                           IDENT "b"
                         WHITESPACE " "
-                        IS_LABEL_EXPRESSION
+                        IS_LABEL
                           IS_KW "is"
                           WHITESPACE " "
                           NAME_REF
@@ -1461,7 +1461,7 @@ SOURCE_FILE
                         NAME
                           IDENT "e"
                         WHITESPACE " "
-                        IS_LABEL_EXPRESSION
+                        IS_LABEL
                           IS_KW "is"
                           WHITESPACE " "
                           NAME_REF
@@ -1476,7 +1476,7 @@ SOURCE_FILE
                         NAME
                           IDENT "c"
                         WHITESPACE " "
-                        IS_LABEL_EXPRESSION
+                        IS_LABEL
                           IS_KW "is"
                           WHITESPACE " "
                           NAME_REF
@@ -1573,7 +1573,7 @@ SOURCE_FILE
                   NAME
                     IDENT "a"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1598,7 +1598,7 @@ SOURCE_FILE
                   NAME
                     IDENT "b"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1609,7 +1609,7 @@ SOURCE_FILE
                 EDGE_ANY
                   MINUS "-"
                   L_BRACK "["
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1623,7 +1623,7 @@ SOURCE_FILE
                   NAME
                     IDENT "c"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1639,7 +1639,7 @@ SOURCE_FILE
                         L_ANGLE "<"
                         MINUS "-"
                         L_BRACK "["
-                        IS_LABEL_EXPRESSION
+                        IS_LABEL
                           IS_KW "is"
                           WHITESPACE " "
                           NAME_REF
@@ -1652,7 +1652,7 @@ SOURCE_FILE
                         NAME
                           IDENT "d"
                         WHITESPACE " "
-                        IS_LABEL_EXPRESSION
+                        IS_LABEL
                           IS_KW "is"
                           WHITESPACE " "
                           NAME_REF
@@ -1671,7 +1671,7 @@ SOURCE_FILE
                   NAME
                     IDENT "e"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1781,7 +1781,7 @@ SOURCE_FILE
                         NAME
                           IDENT "a"
                         WHITESPACE " "
-                        IS_LABEL_EXPRESSION
+                        IS_LABEL
                           IS_KW "is"
                           WHITESPACE " "
                           NAME_REF
@@ -1795,7 +1795,7 @@ SOURCE_FILE
                         NAME
                           IDENT "e1"
                         WHITESPACE " "
-                        IS_LABEL_EXPRESSION
+                        IS_LABEL
                           IS_KW "is"
                           WHITESPACE " "
                           NAME_REF
@@ -1814,7 +1814,7 @@ SOURCE_FILE
                               NAME
                                 IDENT "b"
                               WHITESPACE " "
-                              IS_LABEL_EXPRESSION
+                              IS_LABEL
                                 IS_KW "is"
                                 WHITESPACE " "
                                 NAME_REF
@@ -1828,7 +1828,7 @@ SOURCE_FILE
                               NAME
                                 IDENT "e2"
                               WHITESPACE " "
-                              IS_LABEL_EXPRESSION
+                              IS_LABEL
                                 IS_KW "is"
                                 WHITESPACE " "
                                 NAME_REF
@@ -1843,7 +1843,7 @@ SOURCE_FILE
                               NAME
                                 IDENT "c"
                               WHITESPACE " "
-                              IS_LABEL_EXPRESSION
+                              IS_LABEL
                                 IS_KW "is"
                                 WHITESPACE " "
                                 NAME_REF
@@ -1949,7 +1949,7 @@ SOURCE_FILE
                   NAME
                     IDENT "a"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1967,7 +1967,7 @@ SOURCE_FILE
                   NAME
                     IDENT "b"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -1985,7 +1985,7 @@ SOURCE_FILE
                   NAME
                     IDENT "c"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -2002,7 +2002,7 @@ SOURCE_FILE
                   NAME
                     IDENT "d"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -2016,7 +2016,7 @@ SOURCE_FILE
                   NAME
                     IDENT "e"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -2031,7 +2031,7 @@ SOURCE_FILE
                   NAME
                     IDENT "f"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -2046,7 +2046,7 @@ SOURCE_FILE
                   NAME
                     IDENT "g"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF
@@ -2060,7 +2060,7 @@ SOURCE_FILE
                   NAME
                     IDENT "h"
                   WHITESPACE " "
-                  IS_LABEL_EXPRESSION
+                  IS_LABEL
                     IS_KW "is"
                     WHITESPACE " "
                     NAME_REF

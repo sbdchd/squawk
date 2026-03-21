@@ -1,0 +1,2010 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/sql_pgq.sql
+---
+SOURCE_FILE
+  COMMENT "-- squawk-ignore-file prefer-bigint-over-int, prefer-robust-stmts"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "statement_timeout"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'5s'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "lock_timeout"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'1s'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- via Postgres' docs"
+    WHITESPACE "\n"
+    COMMENT "-- 5.15. Property Graphs"
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "products"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "product_no"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          NAME_KW "name"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "price"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "customers"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "customer_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          NAME_KW "name"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "address"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "orders"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "order_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "ordered_when"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "order_items"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "order_items_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "order_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "orders"
+          WHITESPACE " "
+          L_PAREN "("
+          NAME_REF
+            IDENT "order_id"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "product_no"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "products"
+          WHITESPACE " "
+          L_PAREN "("
+          NAME_REF
+            IDENT "product_no"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "quantity"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "customer_orders"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "customer_orders_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "customer_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "customers"
+          WHITESPACE " "
+          L_PAREN "("
+          NAME_REF
+            IDENT "customer_id"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "order_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "orders"
+          WHITESPACE " "
+          L_PAREN "("
+          NAME_REF
+            IDENT "order_id"
+          R_PAREN ")"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    PROPERTY_KW "PROPERTY"
+    WHITESPACE " "
+    GRAPH_KW "GRAPH"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "myshop"
+    WHITESPACE "\n    "
+    VERTEX_TABLES
+      VERTEX_KW "VERTEX"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "products"
+      COMMA ","
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "customers"
+      COMMA ","
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "orders"
+      WHITESPACE "\n    "
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    EDGE_TABLES
+      EDGE_KW "EDGE"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n        "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "order_items"
+        WHITESPACE " "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          NAME
+            IDENT "orders"
+        WHITESPACE " "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          NAME
+            IDENT "products"
+      COMMA ","
+      WHITESPACE "\n        "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "customer_orders"
+        WHITESPACE " "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          NAME
+            IDENT "customers"
+        WHITESPACE " "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          NAME
+            IDENT "orders"
+      WHITESPACE "\n    "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- get list of customers active today"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "customer_name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "GRAPH_TABLE"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "myshop"
+          WHITESPACE " "
+          MATCH_KW "MATCH"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "c"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "customers"
+                  R_PAREN ")"
+              PATH_FACTOR
+                EDGE_RIGHT
+                  MINUS "-"
+                  L_BRACK "["
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "customer_orders"
+                  R_BRACK "]"
+                  MINUS "-"
+                  R_ANGLE ">"
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "o"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "orders"
+                  WHITESPACE " "
+                  WHERE_CLAUSE
+                    WHERE_KW "WHERE"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "o"
+                        DOT "."
+                        NAME_REF
+                          IDENT "ordered_when"
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      NAME_REF
+                        CURRENT_DATE_KW "current_date"
+                  R_PAREN ")"
+          WHITESPACE " "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          EXPR_AS_NAME_LIST
+            EXPR_AS_NAME
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "c"
+                DOT "."
+                NAME_REF
+                  NAME_KW "name"
+              WHITESPACE " "
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "customer_name"
+          R_PAREN ")"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- get list of customers active today"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "customers"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      JOIN_EXPR
+        JOIN_EXPR
+          FROM_ITEM
+            NAME_REF
+              IDENT "customers"
+          WHITESPACE " "
+          JOIN
+            JOIN_INNER
+              JOIN_KW "JOIN"
+            WHITESPACE " "
+            FROM_ITEM
+              NAME_REF
+                IDENT "customer_orders"
+            WHITESPACE " "
+            JOIN_USING_CLAUSE
+              USING_KW "USING"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "customer_id"
+                R_PAREN ")"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "JOIN"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "orders"
+          WHITESPACE " "
+          JOIN_USING_CLAUSE
+            USING_KW "USING"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "order_id"
+              R_PAREN ")"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "orders"
+          DOT "."
+          NAME_REF
+            IDENT "ordered_when"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        NAME_REF
+          CURRENT_DATE_KW "current_date"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- explicit version that doesn't require primary & foreign keys"
+  WHITESPACE "\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    PROPERTY_KW "PROPERTY"
+    WHITESPACE " "
+    GRAPH_KW "GRAPH"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "myshop"
+    WHITESPACE "\n    "
+    VERTEX_TABLES
+      VERTEX_KW "VERTEX"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "products"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "product_no"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "customers"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "customer_id"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "orders"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "order_id"
+          R_PAREN ")"
+      WHITESPACE "\n    "
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    EDGE_TABLES
+      EDGE_KW "EDGE"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n        "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "order_items"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "order_items_id"
+          R_PAREN ")"
+        WHITESPACE "\n            "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "order_id"
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "orders"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "order_id"
+            R_PAREN ")"
+        WHITESPACE "\n            "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "product_no"
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "products"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "product_no"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n        "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "customer_orders"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "customer_orders_id"
+          R_PAREN ")"
+        WHITESPACE "\n            "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "customer_id"
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "customers"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "customer_id"
+            R_PAREN ")"
+        WHITESPACE "\n            "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "order_id"
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "orders"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "order_id"
+            R_PAREN ")"
+      WHITESPACE "\n    "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    PROPERTY_KW "PROPERTY"
+    WHITESPACE " "
+    GRAPH_KW "GRAPH"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "myshop"
+    WHITESPACE "\n    "
+    VERTEX_TABLES
+      VERTEX_KW "VERTEX"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "products"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "product"
+      COMMA ","
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "customers"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "customer"
+      COMMA ","
+      WHITESPACE "\n        "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "orders"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "\"order\""
+      WHITESPACE "\n    "
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    EDGE_TABLES
+      EDGE_KW "EDGE"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n        "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "order_items"
+        WHITESPACE " "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          NAME
+            IDENT "orders"
+        WHITESPACE " "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          NAME
+            IDENT "products"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "contains"
+      COMMA ","
+      WHITESPACE "\n        "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "customer_orders"
+        WHITESPACE " "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          NAME
+            IDENT "customers"
+        WHITESPACE " "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          NAME
+            IDENT "orders"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "has_placed"
+      WHITESPACE "\n    "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "customer_name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "GRAPH_TABLE"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "myshop"
+          WHITESPACE " "
+          MATCH_KW "MATCH"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "c"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "customer"
+                  R_PAREN ")"
+              PATH_FACTOR
+                EDGE_RIGHT
+                  MINUS "-"
+                  L_BRACK "["
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "has_placed"
+                  R_BRACK "]"
+                  MINUS "-"
+                  R_ANGLE ">"
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "o"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"order\""
+                  WHITESPACE " "
+                  WHERE_CLAUSE
+                    WHERE_KW "WHERE"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "o"
+                        DOT "."
+                        NAME_REF
+                          IDENT "ordered_when"
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      NAME_REF
+                        CURRENT_DATE_KW "current_date"
+                  R_PAREN ")"
+          WHITESPACE " "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          EXPR_AS_NAME_LIST
+            EXPR_AS_NAME
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "c"
+                DOT "."
+                NAME_REF
+                  NAME_KW "name"
+              WHITESPACE " "
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "customer_name"
+          R_PAREN ")"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n"
+      FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "GRAPH_TABLE"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "mygraph"
+          WHITESPACE " "
+          MATCH_KW "MATCH"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "p"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "person"
+                  R_PAREN ")"
+              PATH_FACTOR
+                EDGE_RIGHT
+                  MINUS "-"
+                  L_BRACK "["
+                  NAME
+                    IDENT "h"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "has"
+                  R_BRACK "]"
+                  MINUS "-"
+                  R_ANGLE ">"
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "a"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "account"
+                  R_PAREN ")"
+          WHITESPACE "\n             "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          EXPR_AS_NAME_LIST
+            EXPR_AS_NAME
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  NAME_KW "name"
+              WHITESPACE " "
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "person_name"
+            COMMA ","
+            WHITESPACE " "
+            EXPR_AS_NAME
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "h"
+                DOT "."
+                NAME_REF
+                  IDENT "since"
+              WHITESPACE " "
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "has_account_since"
+            COMMA ","
+            WHITESPACE " "
+            EXPR_AS_NAME
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "a"
+                DOT "."
+                NAME_REF
+                  IDENT "num"
+              WHITESPACE " "
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "account_number"
+          R_PAREN ")"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- via: https://pgql-lang.org"
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "Persons"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          NAME_KW "name"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "company_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "Companies"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "Companies"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          NAME_KW "name"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "Accounts"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "number"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "account_type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "person_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "Persons"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "company_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "Companies"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "Transactions"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "from_account"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "Accounts"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "to_account"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "Accounts"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "date"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "amount"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PROPERTY_GRAPH
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    PROPERTY_KW "PROPERTY"
+    WHITESPACE " "
+    GRAPH_KW "GRAPH"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "financial_transactions"
+    WHITESPACE "\n  "
+    VERTEX_TABLES
+      VERTEX_KW "VERTEX"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COMMENT "-- label that gets used in the query lang below, i.e., IS Person"
+      WHITESPACE "\n    "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "Persons"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "Person"
+            WHITESPACE " "
+            PROPERTIES_LIST
+              PROPERTIES_KW "PROPERTIES"
+              WHITESPACE " "
+              L_PAREN "("
+              WHITESPACE " "
+              EXPR_AS_NAME_LIST
+                EXPR_AS_NAME
+                  NAME_REF
+                    NAME_KW "name"
+              WHITESPACE " "
+              R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "Companies"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "Company"
+            WHITESPACE " "
+            PROPERTIES_LIST
+              PROPERTIES_KW "PROPERTIES"
+              WHITESPACE " "
+              L_PAREN "("
+              WHITESPACE " "
+              EXPR_AS_NAME_LIST
+                EXPR_AS_NAME
+                  NAME_REF
+                    NAME_KW "name"
+              WHITESPACE " "
+              R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      VERTEX_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "Accounts"
+        WHITESPACE " "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              IDENT "Account"
+            WHITESPACE " "
+            PROPERTIES_LIST
+              PROPERTIES_KW "PROPERTIES"
+              WHITESPACE " "
+              L_PAREN "("
+              WHITESPACE " "
+              EXPR_AS_NAME_LIST
+                EXPR_AS_NAME
+                  NAME_REF
+                    IDENT "number"
+              WHITESPACE " "
+              R_PAREN ")"
+      WHITESPACE "\n  "
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    EDGE_TABLES
+      EDGE_KW "EDGE"
+      WHITESPACE " "
+      TABLES_KW "TABLES"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n    "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "Transactions"
+        WHITESPACE "\n      "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "from_account"
+            WHITESPACE " "
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "Accounts"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "number"
+            WHITESPACE " "
+            R_PAREN ")"
+        WHITESPACE "\n      "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "to_account"
+            WHITESPACE " "
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "Accounts"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "number"
+            WHITESPACE " "
+            R_PAREN ")"
+        WHITESPACE "\n      "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              TRANSACTION_KW "transaction"
+            WHITESPACE "\n        "
+            PROPERTIES_LIST
+              PROPERTIES_KW "PROPERTIES"
+              WHITESPACE " "
+              L_PAREN "("
+              WHITESPACE " "
+              EXPR_AS_NAME_LIST
+                EXPR_AS_NAME
+                  NAME_REF
+                    IDENT "amount"
+              WHITESPACE " "
+              R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "Accounts"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "PersonOwner"
+        WHITESPACE "\n      "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "number"
+            WHITESPACE " "
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "Accounts"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "number"
+            WHITESPACE " "
+            R_PAREN ")"
+        WHITESPACE "\n      "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          NAME
+            IDENT "Persons"
+        WHITESPACE "\n      "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              OWNER_KW "owner"
+            WHITESPACE "\n        "
+            NO_PROPERTIES
+              NO_KW "NO"
+              WHITESPACE " "
+              PROPERTIES_KW "PROPERTIES"
+      COMMA ","
+      WHITESPACE "\n    "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "Accounts"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "CompanyOwner"
+        WHITESPACE "\n      "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "number"
+            WHITESPACE " "
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "Accounts"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "number"
+            WHITESPACE " "
+            R_PAREN ")"
+        WHITESPACE "\n      "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          NAME
+            IDENT "Companies"
+        WHITESPACE "\n      "
+        LABEL_AND_PROPERTIES_LIST
+          LABEL_AND_PROPERTIES
+            LABEL_KW "LABEL"
+            WHITESPACE " "
+            NAME
+              OWNER_KW "owner"
+            WHITESPACE "\n        "
+            NO_PROPERTIES
+              NO_KW "NO"
+              WHITESPACE " "
+              PROPERTIES_KW "PROPERTIES"
+      COMMA ","
+      WHITESPACE "\n    "
+      EDGE_TABLE_DEF
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "Persons"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "worksFor"
+        WHITESPACE "\n      "
+        SOURCE_VERTEX_TABLE
+          SOURCE_KW "SOURCE"
+          WHITESPACE " "
+          KEY_KW "KEY"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "id"
+            WHITESPACE " "
+            R_PAREN ")"
+          WHITESPACE " "
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "Persons"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "id"
+            WHITESPACE " "
+            R_PAREN ")"
+        WHITESPACE "\n      "
+        DEST_VERTEX_TABLE
+          DESTINATION_KW "DESTINATION"
+          WHITESPACE " "
+          NAME
+            IDENT "Companies"
+        WHITESPACE "\n        "
+        NO_PROPERTIES
+          NO_KW "NO"
+          WHITESPACE " "
+          PROPERTIES_KW "PROPERTIES"
+      WHITESPACE "\n  "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "account_holder"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "SUM"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "amount"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "total_transacted_with_Nikita"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "GRAPH_TABLE"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "financial_transactions"
+          WHITESPACE "\n  "
+          MATCH_KW "MATCH"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "p"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "Person"
+                  R_PAREN ")"
+              WHITESPACE " "
+              PATH_FACTOR
+                EDGE_LEFT
+                  L_ANGLE "<"
+                  MINUS "-"
+                  L_BRACK "["
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      OWNER_KW "owner"
+                  R_BRACK "]"
+                  MINUS "-"
+              WHITESPACE " "
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "account1"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "Account"
+                  R_PAREN ")"
+            COMMA ","
+            WHITESPACE "\n        "
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "account1"
+                  R_PAREN ")"
+              WHITESPACE " "
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+                  L_BRACK "["
+                  NAME
+                    IDENT "t"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      TRANSACTION_KW "transaction"
+                  R_BRACK "]"
+                  MINUS "-"
+              WHITESPACE " "
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "account2"
+                  R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            COMMENT "/* match both incoming and outgoing transactions */"
+            WHITESPACE "\n        "
+            PATH_PATTERN
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    IDENT "account2"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "Account"
+                  R_PAREN ")"
+              WHITESPACE " "
+              PATH_FACTOR
+                EDGE_RIGHT
+                  MINUS "-"
+                  L_BRACK "["
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    NAME_REF
+                      OWNER_KW "owner"
+                  R_BRACK "]"
+                  MINUS "-"
+                  R_ANGLE ">"
+              WHITESPACE " "
+              PATH_FACTOR
+                VERTEX_PATTERN
+                  L_PAREN "("
+                  NAME
+                    OWNER_KW "owner"
+                  WHITESPACE " "
+                  IS_LABEL
+                    IS_KW "IS"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "Person"
+                      CUSTOM_OP
+                        PIPE "|"
+                      NAME_REF
+                        IDENT "Company"
+                  R_PAREN ")"
+          WHITESPACE "\n  "
+          WHERE_CLAUSE
+            WHERE_KW "WHERE"
+            WHITESPACE " "
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  NAME_KW "name"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                STRING "'Nikita'"
+          WHITESPACE "\n  "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          EXPR_AS_NAME_LIST
+            EXPR_AS_NAME
+              FIELD_EXPR
+                NAME_REF
+                  OWNER_KW "owner"
+                DOT "."
+                NAME_REF
+                  NAME_KW "name"
+              WHITESPACE " "
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "account_holder"
+            COMMA ","
+            WHITESPACE " "
+            EXPR_AS_NAME
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "t"
+                DOT "."
+                NAME_REF
+                  IDENT "amount"
+          R_PAREN ")"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "account_holder"
+  WHITESPACE "\n"

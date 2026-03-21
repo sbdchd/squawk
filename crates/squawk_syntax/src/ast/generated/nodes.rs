@@ -24724,7 +24724,7 @@ impl AstNode for IsJsonValue {
 impl AstNode for IsLabelExpression {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::IS_LABEL_EXPRESSION
+        kind == SyntaxKind::IS_LABEL
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

@@ -4092,6 +4092,7 @@ pub(crate) fn current_operator(p: &Parser<'_>) -> Option<SyntaxKind> {
 }
 
 fn using_index(p: &mut Parser<'_>) {
+    assert!(p.at(USING_KW));
     let m = p.start();
     p.bump(USING_KW);
     p.expect(INDEX_KW);
@@ -8516,12 +8517,15 @@ fn opt_key_columns(p: &mut Parser<'_>) {
 }
 
 fn opt_element_table_label_and_properties(p: &mut Parser<'_>) {
-    if !opt_element_table_properties_clause(p) && p.at(DEFAULT_KW) || p.at(LABEL_KW) {
-        label_and_properties_list(p);
+    if !opt_element_table_properties_clause(p) {
+        opt_label_and_properties_list(p);
     }
 }
 
-fn label_and_properties_list(p: &mut Parser<'_>) {
+fn opt_label_and_properties_list(p: &mut Parser<'_>) {
+    if !p.at(DEFAULT_KW) && !p.at(LABEL_KW) {
+        return;
+    }
     let m = p.start();
     label_and_properties(p);
     while p.at(DEFAULT_KW) || p.at(LABEL_KW) {
@@ -8687,6 +8691,7 @@ fn alter_vertex_edge_table(p: &mut Parser<'_>) {
 }
 
 fn drop_edge_tables(p: &mut Parser<'_>) {
+    assert!(p.at(DROP_KW));
     let m = p.start();
     p.bump(DROP_KW);
     p.bump_any(); // EDGE/RELATIONSHIP
@@ -8871,20 +8876,20 @@ fn vertex_pattern(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(L_PAREN);
     opt_name(p);
-    opt_is_label_expression(p);
+    opt_is_label(p);
     opt_where_clause(p);
     p.expect(R_PAREN);
     m.complete(p, VERTEX_PATTERN);
 }
 
-fn opt_is_label_expression(p: &mut Parser<'_>) {
+fn opt_is_label(p: &mut Parser<'_>) {
     if p.at(IS_KW) {
         let m = p.start();
         p.bump(IS_KW);
         if expr(p).is_none() {
             p.error("expected expression");
         }
-        m.complete(p, IS_LABEL_EXPRESSION);
+        m.complete(p, IS_LABEL);
     }
 }
 
@@ -8920,7 +8925,7 @@ fn edge_with_bracket(p: &mut Parser<'_>) {
 
 fn opt_edge_pattern_inner(p: &mut Parser<'_>) {
     opt_name(p);
-    opt_is_label_expression(p);
+    opt_is_label(p);
     opt_where_clause(p);
 }
 
