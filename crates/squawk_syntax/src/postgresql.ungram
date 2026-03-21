@@ -2390,24 +2390,24 @@ PathPrimary =
 | ParenGraphPattern
 
 VertexPattern =
-  '(' Name? IsLabelExpression? WhereClause? ')'
+  '(' Name? IsLabel? WhereClause? ')'
 
 EdgeLeft =
-  '<' '-' '[' Name? IsLabelExpression? WhereClause? ']' '-'
+  '<' '-' '[' Name? IsLabel? WhereClause? ']' '-'
 | '<' '-'
 
 EdgeRight =
-  '-' '[' Name? IsLabelExpression? WhereClause? ']' '-' '>'
+  '-' '[' Name? IsLabel? WhereClause? ']' '-' '>'
 | '-' '>'
 
 EdgeAny =
-  '-' '[' Name? IsLabelExpression? WhereClause? ']' '-'
+  '-' '[' Name? IsLabel? WhereClause? ']' '-'
 | '-'
 
 ParenGraphPattern =
   '(' PathPattern WhereClause? ')'
 
-IsLabelExpression =
+IsLabel =
   'is' Expr
 
 GraphPatternQualifier =
