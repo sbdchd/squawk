@@ -513,28 +513,31 @@ PercentType =
   '%' 'type'
 
 PathType =
-  Path ArgList?
+  'setof'? Path ArgList?
 
 CharType =
+  'setof'?
   ('varchar' | ( 'character' | 'char' | 'nchar' ) 'varying'? )
   ArgList?
 
 BitType =
-  'bit' 'varying'?  ArgList?
+  'setof'? 'bit' 'varying'?  ArgList?
 
 DoubleType =
-  'double' 'precision'
+  'setof'? 'double' 'precision'
 
 Timezone =
   WithTimezone
 | WithoutTimezone
 
 TimeType =
+  'setof'?
   ('time' | 'timestamp')
   ('(' Literal ')')?
   Timezone?
 
 IntervalType =
+  'setof'?
   'interval'
   (
     'year'

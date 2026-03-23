@@ -983,10 +983,7 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
     col_label(p);
     if p.eat(COMMA) {
         if p.eat(XMLATTRIBUTES_KW) {
-            // TODO: use delimited
-            p.expect(L_PAREN);
             expr_as_name_list(p);
-            p.expect(R_PAREN);
             if p.eat(COMMA) && !opt_expr_list(p) {
                 p.error("expected expression list");
             }
@@ -1002,20 +999,27 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn expr_as_name_list(p: &mut Parser<'_>) {
     let m = p.start();
-    // TODO: use delimited
-    while !p.at(EOF) && !p.at(R_PAREN) {
-        let m = p.start();
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        if p.eat(AS_KW) {
-            col_label(p);
-        }
-        m.complete(p, EXPR_AS_NAME);
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        EXPR_FIRST,
+        |p| {
+            let m = p.start();
+            if opt_expr(p).is_none() {
+                p.error("expected expression");
+                m.abandon(p);
+                return false;
+            }
+            if p.eat(AS_KW) {
+                col_label(p);
+            }
+            m.complete(p, EXPR_AS_NAME);
+            true
+        },
+    );
     m.complete(p, EXPR_AS_NAME_LIST);
 }
 
@@ -1024,9 +1028,7 @@ fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLFOREST_KW));
     let m = p.start();
     p.expect(XMLFOREST_KW);
-    p.expect(L_PAREN);
     expr_as_name_list(p);
-    p.expect(R_PAREN);
     let m = m.complete(p, XML_FOREST_FN).precede(p);
     opt_agg_clauses(p);
     m.complete(p, CALL_EXPR)
@@ -1865,7 +1867,6 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
         return None;
     }
     let m = p.start();
-    // TODO: add to ungram
     p.eat(SETOF_KW);
     let wrapper_type = match p.current() {
         BIT_KW => {
@@ -8560,9 +8561,7 @@ fn opt_element_table_properties_clause(p: &mut Parser<'_>) -> bool {
             p.expect(COLUMNS_KW);
             ALL_PROPERTIES
         } else {
-            p.expect(L_PAREN);
             expr_as_name_list(p);
-            p.expect(R_PAREN);
             PROPERTIES_LIST
         }
     };
@@ -8758,9 +8757,7 @@ fn alter_element_table_actions(p: &mut Parser<'_>) -> SyntaxKind {
         name_ref(p);
         if p.eat(ADD_KW) {
             p.expect(PROPERTIES_KW);
-            p.expect(L_PAREN);
             expr_as_name_list(p);
-            p.expect(R_PAREN);
             ADD_VERTEX_EDGE_LABEL_PROPERTIES
         } else {
             p.expect(DROP_KW);
@@ -8806,9 +8803,7 @@ fn graph_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
     path_pattern_list(p);
     opt_where_clause(p);
     p.expect(COLUMNS_KW);
-    p.expect(L_PAREN);
     expr_as_name_list(p);
-    p.expect(R_PAREN);
     p.expect(R_PAREN);
     m.complete(p, GRAPH_TABLE_FN)
 }
