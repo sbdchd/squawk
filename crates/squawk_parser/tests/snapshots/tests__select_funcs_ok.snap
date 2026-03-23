@@ -847,8 +847,8 @@ SOURCE_FILE
               COMMA ","
               WHITESPACE " "
               XMLATTRIBUTES_KW "xmlattributes"
-              L_PAREN "("
               EXPR_AS_NAME_LIST
+                L_PAREN "("
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "foo"
@@ -862,7 +862,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   NAME
                     IDENT "b"
-              R_PAREN ")"
+                R_PAREN ")"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -912,8 +912,8 @@ SOURCE_FILE
               COMMA ","
               WHITESPACE " "
               XMLATTRIBUTES_KW "xmlattributes"
-              L_PAREN "("
               EXPR_AS_NAME_LIST
+                L_PAREN "("
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "buzz"
@@ -927,7 +927,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   NAME
                     IDENT "c"
-              R_PAREN ")"
+                R_PAREN ")"
               COMMA ","
               WHITESPACE " "
               NAME_REF
@@ -1056,8 +1056,8 @@ SOURCE_FILE
           CALL_EXPR
             XML_FOREST_FN
               XMLFOREST_KW "xmlforest"
-              L_PAREN "("
               EXPR_AS_NAME_LIST
+                L_PAREN "("
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "foo"
@@ -1071,7 +1071,7 @@ SOURCE_FILE
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "buzz"
-              R_PAREN ")"
+                R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlparse"

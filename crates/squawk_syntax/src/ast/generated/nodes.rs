@@ -2492,6 +2492,10 @@ impl BitType {
         support::token(&self.syntax, SyntaxKind::BIT_KW)
     }
     #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
+    #[inline]
     pub fn varying_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VARYING_KW)
     }
@@ -2771,6 +2775,10 @@ impl CharType {
     #[inline]
     pub fn nchar_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NCHAR_KW)
+    }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
     #[inline]
     pub fn varchar_token(&self) -> Option<SyntaxToken> {
@@ -6145,6 +6153,10 @@ impl DoubleType {
     pub fn precision_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PRECISION_KW)
     }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -8026,7 +8038,7 @@ pub struct EdgeAny {
 }
 impl EdgeAny {
     #[inline]
-    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+    pub fn is_label(&self) -> Option<IsLabel> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8057,7 +8069,7 @@ pub struct EdgeLeft {
 }
 impl EdgeLeft {
     #[inline]
-    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+    pub fn is_label(&self) -> Option<IsLabel> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8092,7 +8104,7 @@ pub struct EdgeRight {
 }
 impl EdgeRight {
     #[inline]
-    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+    pub fn is_label(&self) -> Option<IsLabel> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9739,6 +9751,10 @@ impl IntervalType {
         support::token(&self.syntax, SyntaxKind::SECOND_KW)
     }
     #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
+    #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
     }
@@ -9917,10 +9933,10 @@ impl IsJsonValue {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IsLabelExpression {
+pub struct IsLabel {
     pub(crate) syntax: SyntaxNode,
 }
-impl IsLabelExpression {
+impl IsLabel {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -13483,6 +13499,10 @@ impl PathType {
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -16660,6 +16680,10 @@ impl TimeType {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
+    #[inline]
     pub fn time_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TIME_KW)
     }
@@ -17279,7 +17303,7 @@ pub struct VertexPattern {
 }
 impl VertexPattern {
     #[inline]
-    pub fn is_label_expression(&self) -> Option<IsLabelExpression> {
+    pub fn is_label(&self) -> Option<IsLabel> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -24721,7 +24745,7 @@ impl AstNode for IsJsonValue {
         &self.syntax
     }
 }
-impl AstNode for IsLabelExpression {
+impl AstNode for IsLabel {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::IS_LABEL
