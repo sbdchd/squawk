@@ -402,8 +402,8 @@ SOURCE_FILE
         PROPERTIES_LIST
           PROPERTIES_KW "properties"
           WHITESPACE " "
-          L_PAREN "("
           EXPR_AS_NAME_LIST
+            L_PAREN "("
             EXPR_AS_NAME
               NAME_REF
                 IDENT "a"
@@ -422,7 +422,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME
                 IDENT "y"
-          R_PAREN ")"
+            R_PAREN ")"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

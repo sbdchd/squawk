@@ -520,8 +520,8 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          L_PAREN "("
           EXPR_AS_NAME_LIST
+            L_PAREN "("
             EXPR_AS_NAME
               FIELD_EXPR
                 NAME_REF
@@ -534,7 +534,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME
                 IDENT "customer_name"
-          R_PAREN ")"
+            R_PAREN ")"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1026,8 +1026,8 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          L_PAREN "("
           EXPR_AS_NAME_LIST
+            L_PAREN "("
             EXPR_AS_NAME
               FIELD_EXPR
                 NAME_REF
@@ -1040,7 +1040,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME
                 IDENT "customer_name"
-          R_PAREN ")"
+            R_PAREN ")"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -1111,8 +1111,8 @@ SOURCE_FILE
           WHITESPACE "\n             "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          L_PAREN "("
           EXPR_AS_NAME_LIST
+            L_PAREN "("
             EXPR_AS_NAME
               FIELD_EXPR
                 NAME_REF
@@ -1153,7 +1153,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME
                 IDENT "account_number"
-          R_PAREN ")"
+            R_PAREN ")"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1470,14 +1470,14 @@ SOURCE_FILE
             PROPERTIES_LIST
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              L_PAREN "("
-              WHITESPACE " "
               EXPR_AS_NAME_LIST
+                L_PAREN "("
+                WHITESPACE " "
                 EXPR_AS_NAME
                   NAME_REF
                     NAME_KW "name"
-              WHITESPACE " "
-              R_PAREN ")"
+                WHITESPACE " "
+                R_PAREN ")"
       COMMA ","
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
@@ -1496,14 +1496,14 @@ SOURCE_FILE
             PROPERTIES_LIST
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              L_PAREN "("
-              WHITESPACE " "
               EXPR_AS_NAME_LIST
+                L_PAREN "("
+                WHITESPACE " "
                 EXPR_AS_NAME
                   NAME_REF
                     NAME_KW "name"
-              WHITESPACE " "
-              R_PAREN ")"
+                WHITESPACE " "
+                R_PAREN ")"
       COMMA ","
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
@@ -1522,14 +1522,14 @@ SOURCE_FILE
             PROPERTIES_LIST
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              L_PAREN "("
-              WHITESPACE " "
               EXPR_AS_NAME_LIST
+                L_PAREN "("
+                WHITESPACE " "
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "number"
-              WHITESPACE " "
-              R_PAREN ")"
+                WHITESPACE " "
+                R_PAREN ")"
       WHITESPACE "\n  "
       R_PAREN ")"
     WHITESPACE "\n  "
@@ -1612,14 +1612,14 @@ SOURCE_FILE
             PROPERTIES_LIST
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              L_PAREN "("
-              WHITESPACE " "
               EXPR_AS_NAME_LIST
+                L_PAREN "("
+                WHITESPACE " "
                 EXPR_AS_NAME
                   NAME_REF
                     IDENT "amount"
-              WHITESPACE " "
-              R_PAREN ")"
+                WHITESPACE " "
+                R_PAREN ")"
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
@@ -1971,8 +1971,8 @@ SOURCE_FILE
           WHITESPACE "\n  "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          L_PAREN "("
           EXPR_AS_NAME_LIST
+            L_PAREN "("
             EXPR_AS_NAME
               FIELD_EXPR
                 NAME_REF
@@ -1994,7 +1994,7 @@ SOURCE_FILE
                 DOT "."
                 NAME_REF
                   IDENT "amount"
-          R_PAREN ")"
+            R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
     WHITESPACE "\n"
