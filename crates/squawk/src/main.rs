@@ -13,6 +13,7 @@ use debug::debug;
 use reporter::lint_and_report;
 use simplelog::CombinedLogger;
 use squawk_linter::{Rule, Version};
+use squawk_thread::ThreadIntent;
 use std::io;
 use std::panic;
 use std::path::PathBuf;
@@ -147,7 +148,26 @@ struct Opts {
     no_error_on_unmatched_pattern: bool,
 }
 
-#[allow(clippy::too_many_lines)]
+const STACK_SIZE: usize = 1024 * 1024 * 8;
+
+// rust-analyzer and ty both spawn an extra latency sensitive thread to run the
+// language server. This is approach is taken directly from rust-analyzer.
+//
+/// Parts of server can use a lot of stack space, and some operating systems only
+/// give us 1 MB by default (for example Windows), so this spawns a new thread
+/// with a larger stack for the LSP server loop.
+fn with_extra_thread(
+    thread_name: impl Into<String>,
+    thread_intent: ThreadIntent,
+    f: impl FnOnce() -> Result<()> + Send + 'static,
+) -> Result<()> {
+    let handle = squawk_thread::Builder::new(thread_intent, thread_name)
+        .stack_size(STACK_SIZE)
+        .spawn(f)?;
+
+    handle.join()
+}
+
 fn main() -> Result<ExitCode> {
     let version = env!("CARGO_PKG_VERSION");
 
@@ -185,7 +205,12 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
 
     match Cmd::from(opts) {
         Cmd::Server => {
-            squawk_server::run().context("language server failed")?;
+            with_extra_thread(
+                "LspServer",
+                ThreadIntent::LatencySensitive,
+                squawk_server::run,
+            )
+            .context("language server failed")?;
         }
         Cmd::UploadToGithub(config) => {
             github::check_and_comment_on_pr(*config).context("Upload to GitHub failed")?;
