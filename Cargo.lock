@@ -2387,6 +2387,7 @@ dependencies = [
  "squawk-linter",
  "squawk-server",
  "squawk-syntax",
+ "squawk-thread",
  "tempfile",
  "toml",
 ]
