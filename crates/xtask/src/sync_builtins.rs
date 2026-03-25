@@ -154,6 +154,7 @@ begin
     'ltree',
     'pg_stat_statements',
     'pg_trgm',
+    'pg_walinspect',
     'pgcrypto',
     'plpgsql',
     'postgis',

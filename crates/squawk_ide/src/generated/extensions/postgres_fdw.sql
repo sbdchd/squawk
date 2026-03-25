@@ -1,5 +1,5 @@
 -- squawk-ignore-file
--- pg version: 18.2
+-- pg version: 18.3
 -- update via:
 --   cargo xtask sync-builtins
 
