@@ -592,8 +592,6 @@ impl Module {
     }
 }
 
-
-
 fn header(version: &str) -> String {
     format!(
         "\
