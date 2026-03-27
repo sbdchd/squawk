@@ -7,12 +7,12 @@ use lsp_types::{
 };
 
 use crate::lsp_utils;
-use crate::system::System;
+use crate::system::MutableSystem;
 
 pub(crate) fn handle_did_open(
     _connection: &Connection,
     params: DidOpenTextDocumentParams,
-    system: &mut dyn System,
+    system: &mut dyn MutableSystem,
 ) -> Result<()> {
     let uri = params.text_document.uri;
     let content = params.text_document.text;
@@ -25,7 +25,7 @@ pub(crate) fn handle_did_open(
 pub(crate) fn handle_did_change(
     _connection: &Connection,
     params: DidChangeTextDocumentParams,
-    system: &mut dyn System,
+    system: &mut dyn MutableSystem,
 ) -> Result<()> {
     let uri = params.text_document.uri;
 
@@ -43,7 +43,7 @@ pub(crate) fn handle_did_change(
 pub(crate) fn handle_did_close(
     connection: &Connection,
     params: DidCloseTextDocumentParams,
-    system: &mut dyn System,
+    system: &mut dyn MutableSystem,
 ) -> Result<()> {
     let uri = params.text_document.uri;
 

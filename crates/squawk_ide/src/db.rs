@@ -31,7 +31,7 @@ pub fn bind(db: &dyn Db, file: File) -> Binder {
 }
 
 #[salsa::db]
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Database {
     storage: Storage<Self>,
 }

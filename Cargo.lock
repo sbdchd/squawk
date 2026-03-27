@@ -2496,6 +2496,7 @@ name = "squawk-server"
 version = "2.44.0"
 dependencies = [
  "anyhow",
+ "crossbeam-channel",
  "etcetera",
  "insta",
  "line-index",
@@ -2512,6 +2513,7 @@ dependencies = [
  "squawk-lexer",
  "squawk-linter",
  "squawk-syntax",
+ "squawk-thread",
 ]
 
 [[package]]

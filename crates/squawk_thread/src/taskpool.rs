@@ -2,7 +2,7 @@
 // https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/task_pool.rs#L6C19-L6C19
 //! A thin wrapper around [`crate::Pool`] which threads a sender through spawned jobs.
 
-use std::{num::NonZeroUsize, panic::UnwindSafe};
+use std::num::NonZeroUsize;
 
 use crossbeam_channel::Sender;
 
@@ -23,7 +23,7 @@ impl<T> TaskPool<T> {
 
     pub fn spawn<F>(&mut self, intent: ThreadIntent, task: F)
     where
-        F: FnOnce() -> T + Send + UnwindSafe + 'static,
+        F: FnOnce() -> T + Send + 'static,
         T: Send + 'static,
     {
         self.pool.spawn(intent, {
@@ -34,7 +34,7 @@ impl<T> TaskPool<T> {
 
     pub fn spawn_with_sender<F>(&mut self, intent: ThreadIntent, task: F)
     where
-        F: FnOnce(Sender<T>) + Send + UnwindSafe + 'static,
+        F: FnOnce(Sender<T>) + Send + 'static,
         T: Send + 'static,
     {
         self.pool.spawn(intent, {
