@@ -10,6 +10,7 @@ rust-version.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+csv.workspace = true
 clap.workspace = true
 enum-iterator.workspace = true
 reqwest = { workspace = true, features = ["blocking", "json"] }
