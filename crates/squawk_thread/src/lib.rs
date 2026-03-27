@@ -19,9 +19,11 @@ use std::fmt;
 
 pub use crate::intent::ThreadIntent;
 pub use crate::pool::Pool;
+pub use crate::taskpool::TaskPool;
 
 mod intent;
 mod pool;
+mod taskpool;
 
 /// # Panics
 ///
