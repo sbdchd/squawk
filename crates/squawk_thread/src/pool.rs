@@ -54,7 +54,7 @@ impl Pool {
 
         let mut handles = Vec::with_capacity(threads.into());
         for idx in 0..threads.into() {
-            let handle = Builder::new(INITIAL_INTENT, format!("squawk:worker:{idx}",))
+            let handle = Builder::new(INITIAL_INTENT, format!("Worker:{idx}",))
                 .stack_size(STACK_SIZE)
                 .allow_leak(true)
                 .spawn({
