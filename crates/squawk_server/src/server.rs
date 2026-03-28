@@ -1,3 +1,5 @@
+use std::num::NonZeroUsize;
+
 use anyhow::Result;
 use log::info;
 use lsp_server::{Connection, Message};
@@ -90,7 +92,8 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
     let client_name = init_params.client_info.map(|x| x.name);
     info!("Client name: {client_name:?}");
 
-    let mut system = GlobalState::new();
+    let threads = std::thread::available_parallelism().unwrap_or(NonZeroUsize::MIN);
+    let mut system = GlobalState::new(connection.sender.clone(), threads);
 
     for msg in &connection.receiver {
         match msg {
@@ -102,7 +105,7 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     return Ok(());
                 }
 
-                RequestDispatcher::new(&connection, req, &system)
+                RequestDispatcher::new(req, &mut system)
                     .on::<GotoDefinition>(handle_goto_definition)?
                     .on::<HoverRequest>(handle_hover)?
                     .on::<CodeActionRequest>(handle_code_action)?
@@ -110,7 +113,7 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     .on::<InlayHintRequest>(handle_inlay_hints)?
                     .on::<DocumentSymbolRequest>(handle_document_symbol)?
                     .on::<FoldingRangeRequest>(handle_folding_range)?
-                    .on::<Completion>(handle_completion)?
+                    .on_latency_sensitive::<Completion>(handle_completion)?
                     .on::<DocumentDiagnosticRequest>(handle_document_diagnostic)?
                     .on::<SyntaxTreeRequest>(handle_syntax_tree)?
                     .on::<TokensRequest>(handle_tokens)?

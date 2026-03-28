@@ -4,23 +4,18 @@ use anyhow::Result;
 use log::{error, info};
 use lsp_server::{Connection, Message, Response};
 use lsp_types::{notification::Notification as LspNotification, request::Request as LspRequest};
+use squawk_thread::ThreadIntent;
 
-use crate::system::System;
+use crate::system::{GlobalState, MutableSystem, System};
 
 pub(crate) struct RequestDispatcher<'a> {
-    connection: &'a Connection,
     req: Option<lsp_server::Request>,
-    system: &'a dyn System,
+    system: &'a mut GlobalState,
 }
 
 impl<'a> RequestDispatcher<'a> {
-    pub(crate) fn new(
-        connection: &'a Connection,
-        req: lsp_server::Request,
-        system: &'a dyn System,
-    ) -> Self {
+    pub(crate) fn new(req: lsp_server::Request, system: &'a mut GlobalState) -> Self {
         Self {
-            connection,
             req: Some(req),
             system,
         }
@@ -41,7 +36,7 @@ impl<'a> RequestDispatcher<'a> {
                     lsp_server::ErrorCode::ParseError as i32,
                     err.to_string(),
                 );
-                if let Err(err) = self.connection.sender.send(Message::Response(response)) {
+                if let Err(err) = self.system.sender.send(Message::Response(response)) {
                     error!("Failed to send parse error response: {err}");
                 }
                 None
@@ -50,25 +45,54 @@ impl<'a> RequestDispatcher<'a> {
     }
 
     pub(crate) fn on<R>(
-        mut self,
+        self,
         handler: fn(&dyn System, R::Params) -> Result<R::Result>,
     ) -> Result<Self>
     where
         R: LspRequest,
+        R::Params: Send + 'static,
+    {
+        self.on_with_thread_intent::<R>(ThreadIntent::Worker, handler)
+    }
+
+    pub(crate) fn on_latency_sensitive<R>(
+        self,
+        handler: fn(&dyn System, R::Params) -> Result<R::Result>,
+    ) -> Result<Self>
+    where
+        R: LspRequest,
+        R::Params: Send + 'static,
+    {
+        self.on_with_thread_intent::<R>(ThreadIntent::LatencySensitive, handler)
+    }
+
+    fn on_with_thread_intent<R>(
+        mut self,
+        intent: ThreadIntent,
+        handler: fn(&dyn System, R::Params) -> Result<R::Result>,
+    ) -> Result<Self>
+    where
+        R: LspRequest,
+        R::Params: Send + 'static,
     {
         if let Some((id, params)) = self.parse::<R>() {
-            let resp = match handler(self.system, params) {
-                Ok(result) => Response::new_ok(id, result),
-                Err(err) => {
-                    error!("Request handler failed: {err}");
-                    Response::new_err(
-                        id,
-                        lsp_server::ErrorCode::InternalError as i32,
-                        err.to_string(),
-                    )
-                }
-            };
-            self.connection.sender.send(Message::Response(resp))?;
+            let snapshot = self.system.snapshot();
+
+            self.system.task_pool.spawn(intent, move || {
+                let resp = match handler(&snapshot, params) {
+                    Ok(result) => Response::new_ok(id, result),
+                    Err(err) => {
+                        error!("Request handler failed: {err}");
+                        Response::new_err(
+                            id,
+                            lsp_server::ErrorCode::InternalError as i32,
+                            err.to_string(),
+                        )
+                    }
+                };
+
+                Message::Response(resp)
+            });
         }
 
         Ok(self)
@@ -84,14 +108,14 @@ impl<'a> RequestDispatcher<'a> {
 pub(crate) struct NotificationDispatcher<'a> {
     connection: &'a Connection,
     notif: Option<lsp_server::Notification>,
-    system: &'a mut dyn System,
+    system: &'a mut dyn MutableSystem,
 }
 
 impl<'a> NotificationDispatcher<'a> {
     pub(crate) fn new(
         connection: &'a Connection,
         notif: lsp_server::Notification,
-        system: &'a mut dyn System,
+        system: &'a mut dyn MutableSystem,
     ) -> Self {
         Self {
             connection,
@@ -119,7 +143,7 @@ impl<'a> NotificationDispatcher<'a> {
 
     pub(crate) fn on<N>(
         mut self,
-        handler: fn(&Connection, N::Params, &mut dyn System) -> Result<()>,
+        handler: fn(&Connection, N::Params, &mut dyn MutableSystem) -> Result<()>,
     ) -> Result<Self>
     where
         N: LspNotification,
