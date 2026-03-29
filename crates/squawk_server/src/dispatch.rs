@@ -2,11 +2,11 @@
 
 use anyhow::Result;
 use log::{error, info};
-use lsp_server::{Connection, Message, Response};
+use lsp_server::{Message, Response};
 use lsp_types::{notification::Notification as LspNotification, request::Request as LspRequest};
 use squawk_thread::ThreadIntent;
 
-use crate::system::{GlobalState, MutableSystem, System};
+use crate::system::{GlobalState, System};
 
 pub(crate) struct RequestDispatcher<'a> {
     req: Option<lsp_server::Request>,
@@ -106,21 +106,15 @@ impl<'a> RequestDispatcher<'a> {
 }
 
 pub(crate) struct NotificationDispatcher<'a> {
-    connection: &'a Connection,
     notif: Option<lsp_server::Notification>,
-    system: &'a mut dyn MutableSystem,
+    state: &'a mut GlobalState,
 }
 
 impl<'a> NotificationDispatcher<'a> {
-    pub(crate) fn new(
-        connection: &'a Connection,
-        notif: lsp_server::Notification,
-        system: &'a mut dyn MutableSystem,
-    ) -> Self {
+    pub(crate) fn new(notif: lsp_server::Notification, state: &'a mut GlobalState) -> Self {
         Self {
-            connection,
             notif: Some(notif),
-            system,
+            state,
         }
     }
 
@@ -143,13 +137,13 @@ impl<'a> NotificationDispatcher<'a> {
 
     pub(crate) fn on<N>(
         mut self,
-        handler: fn(&Connection, N::Params, &mut dyn MutableSystem) -> Result<()>,
+        handler: fn(&mut GlobalState, N::Params) -> Result<()>,
     ) -> Result<Self>
     where
         N: LspNotification,
     {
         if let Some(params) = self.parse::<N>() {
-            handler(self.connection, params, self.system)?;
+            handler(self.state, params)?;
         }
 
         Ok(self)
