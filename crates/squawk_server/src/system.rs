@@ -13,11 +13,6 @@ pub(crate) trait System {
     fn file(&self, uri: &Url) -> Option<File>;
 }
 
-pub(crate) trait MutableSystem: System {
-    fn set(&mut self, uri: Url, content: String);
-    fn remove(&mut self, uri: &Url);
-}
-
 pub(crate) struct Snapshot {
     db: Database,
     files: Arc<FxHashMap<Url, File>>,
@@ -56,20 +51,16 @@ impl GlobalState {
             files: self.files.clone(),
         }
     }
-}
 
-impl System for GlobalState {
-    fn db(&self) -> &Database {
+    pub(crate) fn db(&self) -> &Database {
         &self.db
     }
 
-    fn file(&self, uri: &Url) -> Option<File> {
+    pub(crate) fn file(&self, uri: &Url) -> Option<File> {
         self.files.get(uri).copied()
     }
-}
 
-impl MutableSystem for GlobalState {
-    fn set(&mut self, uri: Url, content: String) {
+    pub(crate) fn set(&mut self, uri: Url, content: String) {
         if let Some(file) = self.files.get(&uri).copied() {
             file.set_content(&mut self.db).to(content.into());
         } else {
@@ -78,7 +69,7 @@ impl MutableSystem for GlobalState {
         }
     }
 
-    fn remove(&mut self, uri: &Url) {
+    pub(crate) fn remove(&mut self, uri: &Url) {
         Arc::make_mut(&mut self.files).remove(uri);
     }
 }

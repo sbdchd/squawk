@@ -8,7 +8,7 @@ use lsp_types::{
     DiagnosticOptions, DiagnosticServerCapabilities, FoldingRangeProviderCapability,
     HoverProviderCapability, InitializeParams, OneOf, SelectionRangeProviderCapability,
     ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions,
-    notification::{DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument},
+    notification::{Cancel, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument},
     request::{
         CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
         FoldingRangeRequest, GotoDefinition, HoverRequest, InlayHintRequest, References,
@@ -18,10 +18,11 @@ use lsp_types::{
 
 use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
 use crate::handlers::{
-    SyntaxTreeRequest, TokensRequest, handle_code_action, handle_completion, handle_did_change,
-    handle_did_close, handle_did_open, handle_document_diagnostic, handle_document_symbol,
-    handle_folding_range, handle_goto_definition, handle_hover, handle_inlay_hints,
-    handle_references, handle_selection_range, handle_syntax_tree, handle_tokens,
+    SyntaxTreeRequest, TokensRequest, handle_cancel, handle_code_action, handle_completion,
+    handle_did_change, handle_did_close, handle_did_open, handle_document_diagnostic,
+    handle_document_symbol, handle_folding_range, handle_goto_definition, handle_hover,
+    handle_inlay_hints, handle_references, handle_selection_range, handle_syntax_tree,
+    handle_tokens,
 };
 use crate::system::GlobalState;
 
@@ -93,7 +94,7 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
     info!("Client name: {client_name:?}");
 
     let threads = std::thread::available_parallelism().unwrap_or(NonZeroUsize::MIN);
-    let mut system = GlobalState::new(connection.sender.clone(), threads);
+    let mut state = GlobalState::new(connection.sender.clone(), threads);
 
     for msg in &connection.receiver {
         match msg {
@@ -105,7 +106,7 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     return Ok(());
                 }
 
-                RequestDispatcher::new(req, &mut system)
+                RequestDispatcher::new(req, &mut state)
                     .on::<GotoDefinition>(handle_goto_definition)?
                     .on::<HoverRequest>(handle_hover)?
                     .on::<CodeActionRequest>(handle_code_action)?
@@ -126,7 +127,8 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
             Message::Notification(notif) => {
                 info!("Received notification: method={}", notif.method);
 
-                NotificationDispatcher::new(&connection, notif, &mut system)
+                NotificationDispatcher::new(notif, &mut state)
+                    .on::<Cancel>(handle_cancel)?
                     .on::<DidOpenTextDocument>(handle_did_open)?
                     .on::<DidChangeTextDocument>(handle_did_change)?
                     .on::<DidCloseTextDocument>(handle_did_close)?
