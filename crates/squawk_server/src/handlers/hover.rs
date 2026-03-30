@@ -3,8 +3,8 @@ use lsp_types::{Hover, HoverContents, HoverParams, LanguageString, MarkedString}
 use squawk_ide::db::line_index;
 use squawk_ide::hover::hover;
 
-use crate::lsp_utils;
 use crate::global_state::Snapshot;
+use crate::lsp_utils;
 
 pub(crate) fn handle_hover(system: &Snapshot, params: HoverParams) -> Result<Option<Hover>> {
     let uri = params.text_document_position_params.text_document.uri;

@@ -6,8 +6,8 @@ use squawk_ide::builtins::{builtins_line_index, builtins_url};
 use squawk_ide::db::line_index;
 use squawk_ide::inlay_hints::inlay_hints;
 
-use crate::lsp_utils;
 use crate::global_state::Snapshot;
+use crate::lsp_utils;
 
 pub(crate) fn handle_inlay_hints(
     system: &Snapshot,

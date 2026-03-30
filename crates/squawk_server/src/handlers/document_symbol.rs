@@ -4,8 +4,8 @@ use lsp_types::{DocumentSymbol, DocumentSymbolParams, DocumentSymbolResponse, Sy
 use squawk_ide::db::line_index;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 
-use crate::lsp_utils;
 use crate::global_state::Snapshot;
+use crate::lsp_utils;
 
 pub(crate) fn handle_document_symbol(
     system: &Snapshot,

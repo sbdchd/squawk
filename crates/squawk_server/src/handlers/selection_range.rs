@@ -3,8 +3,8 @@ use lsp_types::SelectionRangeParams;
 use rowan::TextRange;
 use squawk_ide::db::{line_index, parse};
 
-use crate::lsp_utils;
 use crate::global_state::Snapshot;
+use crate::lsp_utils;
 
 pub(crate) fn handle_selection_range(
     system: &Snapshot,

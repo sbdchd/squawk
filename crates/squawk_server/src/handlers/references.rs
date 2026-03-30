@@ -3,8 +3,8 @@ use lsp_types::{Location, ReferenceParams};
 use squawk_ide::db::line_index;
 use squawk_ide::find_references::find_references;
 
-use crate::lsp_utils::{self, to_location};
 use crate::global_state::Snapshot;
+use crate::lsp_utils::{self, to_location};
 
 pub(crate) fn handle_references(
     system: &Snapshot,

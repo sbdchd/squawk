@@ -3,8 +3,8 @@ use lsp_types::{FoldingRange, FoldingRangeParams};
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::folding_ranges;
 
-use crate::lsp_utils;
 use crate::global_state::Snapshot;
+use crate::lsp_utils;
 
 pub(crate) fn handle_folding_range(
     system: &Snapshot,
