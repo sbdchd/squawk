@@ -10,13 +10,13 @@ use crate::global_state::Snapshot;
 use crate::lsp_utils;
 
 pub(crate) fn handle_inlay_hints(
-    system: &Snapshot,
+    snapshot: &Snapshot,
     params: InlayHintParams,
 ) -> Result<Option<Vec<InlayHint>>> {
     let uri = params.text_document.uri;
 
-    let db = system.db();
-    let file = system.file(&uri).unwrap();
+    let db = snapshot.db();
+    let file = snapshot.file(&uri).unwrap();
     let line_index = line_index(db, file);
 
     let hints = inlay_hints(db, file);

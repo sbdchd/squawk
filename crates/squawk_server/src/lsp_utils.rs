@@ -211,12 +211,12 @@ pub(crate) fn apply_incremental_changes(
 }
 
 pub(crate) fn to_location(
-    db: &dyn salsa::Database,
-    system: &Snapshot,
+    snapshot: &Snapshot,
     uri: &Url,
     loc: squawk_ide::goto_definition::Location,
 ) -> Option<Location> {
-    let file = system.file(uri).unwrap();
+    let db = snapshot.db();
+    let file = snapshot.file(uri).unwrap();
     let uri = match loc.file {
         squawk_ide::goto_definition::FileId::Current => uri.clone(),
         squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,

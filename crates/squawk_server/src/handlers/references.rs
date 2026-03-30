@@ -7,14 +7,14 @@ use crate::global_state::Snapshot;
 use crate::lsp_utils::{self, to_location};
 
 pub(crate) fn handle_references(
-    system: &Snapshot,
+    snapshot: &Snapshot,
     params: ReferenceParams,
 ) -> Result<Option<Vec<Location>>> {
     let uri = params.text_document_position.text_document.uri;
     let position = params.text_document_position.position;
 
-    let db = system.db();
-    let file = system.file(&uri).unwrap();
+    let db = snapshot.db();
+    let file = snapshot.file(&uri).unwrap();
     let line_index = line_index(db, file);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
@@ -24,7 +24,7 @@ pub(crate) fn handle_references(
     let locations: Vec<Location> = refs
         .into_iter()
         .filter(|loc| include_declaration || !loc.range.contains(offset))
-        .filter_map(|loc| to_location(db, system, &uri, loc))
+        .filter_map(|loc| to_location(snapshot, &uri, loc))
         .collect();
 
     Ok(Some(locations))
