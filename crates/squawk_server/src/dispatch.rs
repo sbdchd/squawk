@@ -14,10 +14,10 @@ pub(crate) struct RequestDispatcher<'a> {
 }
 
 impl<'a> RequestDispatcher<'a> {
-    pub(crate) fn new(req: lsp_server::Request, system: &'a mut GlobalState) -> Self {
+    pub(crate) fn new(req: lsp_server::Request, global_state: &'a mut GlobalState) -> Self {
         Self {
             req: Some(req),
-            global_state: system,
+            global_state,
         }
     }
 

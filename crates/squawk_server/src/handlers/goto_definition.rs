@@ -7,14 +7,14 @@ use crate::global_state::Snapshot;
 use crate::lsp_utils::{self, to_location};
 
 pub(crate) fn handle_goto_definition(
-    system: &Snapshot,
+    snapshot: &Snapshot,
     params: GotoDefinitionParams,
 ) -> Result<Option<GotoDefinitionResponse>> {
     let uri = params.text_document_position_params.text_document.uri;
     let position = params.text_document_position_params.position;
 
-    let db = system.db();
-    let file = system.file(&uri).unwrap();
+    let db = snapshot.db();
+    let file = snapshot.file(&uri).unwrap();
     let line_index = line_index(db, file);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
@@ -25,7 +25,7 @@ pub(crate) fn handle_goto_definition(
                 !location.range.contains(offset),
                 "Our target destination range must not include the source range otherwise go to def won't work in vscode."
             );
-            to_location(db, system, &uri, location)
+            to_location(snapshot, &uri, location)
         })
         .collect();
 

@@ -7,13 +7,13 @@ use crate::global_state::Snapshot;
 use crate::lsp_utils;
 
 pub(crate) fn handle_folding_range(
-    system: &Snapshot,
+    snapshot: &Snapshot,
     params: FoldingRangeParams,
 ) -> Result<Option<Vec<FoldingRange>>> {
     let uri = params.text_document.uri;
 
-    let db = system.db();
-    let file = system.file(&uri).unwrap();
+    let db = snapshot.db();
+    let file = snapshot.file(&uri).unwrap();
     let line_idx = line_index(db, file);
 
     let lsp_folds: Vec<FoldingRange> = folding_ranges(db, file)
