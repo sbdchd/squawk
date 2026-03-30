@@ -2514,6 +2514,7 @@ dependencies = [
  "squawk-linter",
  "squawk-syntax",
  "squawk-thread",
+ "tracing",
 ]
 
 [[package]]

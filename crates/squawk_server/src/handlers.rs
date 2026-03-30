@@ -9,6 +9,7 @@ mod inlay_hints;
 mod notifications;
 mod references;
 mod selection_range;
+mod shutdown;
 mod syntax_tree;
 mod tokens;
 
@@ -25,5 +26,6 @@ pub(crate) use notifications::{
 };
 pub(crate) use references::handle_references;
 pub(crate) use selection_range::handle_selection_range;
+pub(crate) use shutdown::handle_shutdown;
 pub(crate) use syntax_tree::{SyntaxTreeRequest, handle_syntax_tree};
 pub(crate) use tokens::{TokensRequest, handle_tokens};

@@ -4,10 +4,10 @@ use squawk_ide::db::line_index;
 use squawk_ide::find_references::find_references;
 
 use crate::lsp_utils::{self, to_location};
-use crate::system::System;
+use crate::global_state::Snapshot;
 
 pub(crate) fn handle_references(
-    system: &dyn System,
+    system: &Snapshot,
     params: ReferenceParams,
 ) -> Result<Option<Vec<Location>>> {
     let uri = params.text_document_position.text_document.uri;

@@ -6,10 +6,15 @@ use lsp_types::{
     notification::{Notification as _, PublishDiagnostics},
 };
 
+use crate::global_state::GlobalState;
 use crate::lsp_utils;
-use crate::system::GlobalState;
 
-pub(crate) fn handle_cancel(_state: &mut GlobalState, _params: CancelParams) -> Result<()> {
+pub(crate) fn handle_cancel(state: &mut GlobalState, params: CancelParams) -> Result<()> {
+    let id: lsp_server::RequestId = match params.id {
+        lsp_types::NumberOrString::Number(id) => id.into(),
+        lsp_types::NumberOrString::String(id) => id.into(),
+    };
+    state.cancel(id);
     Ok(())
 }
 
@@ -61,7 +66,7 @@ pub(crate) fn handle_did_close(
         params: serde_json::to_value(publish_params)?,
     };
 
-    state.sender.send(Message::Notification(notification))?;
+    state.send(Message::Notification(notification));
 
     Ok(())
 }

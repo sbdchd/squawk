@@ -7,10 +7,10 @@ use squawk_ide::db::line_index;
 use squawk_ide::inlay_hints::inlay_hints;
 
 use crate::lsp_utils;
-use crate::system::System;
+use crate::global_state::Snapshot;
 
 pub(crate) fn handle_inlay_hints(
-    system: &dyn System,
+    system: &Snapshot,
     params: InlayHintParams,
 ) -> Result<Option<Vec<InlayHint>>> {
     let uri = params.text_document.uri;

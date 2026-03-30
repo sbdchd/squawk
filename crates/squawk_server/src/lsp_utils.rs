@@ -13,7 +13,7 @@ use squawk_ide::code_actions::ActionKind;
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::{Fold, FoldKind};
 
-use crate::system::System;
+use crate::global_state::Snapshot;
 
 fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
     let start = offset(index, range.start)?;
@@ -212,7 +212,7 @@ pub(crate) fn apply_incremental_changes(
 
 pub(crate) fn to_location(
     db: &dyn salsa::Database,
-    system: &dyn System,
+    system: &Snapshot,
     uri: &Url,
     loc: squawk_ide::goto_definition::Location,
 ) -> Option<Location> {

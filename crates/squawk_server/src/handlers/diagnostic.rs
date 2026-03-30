@@ -4,10 +4,10 @@ use lsp_types::{
     FullDocumentDiagnosticReport, RelatedFullDocumentDiagnosticReport,
 };
 
-use crate::system::System;
+use crate::global_state::Snapshot;
 
 pub(crate) fn handle_document_diagnostic(
-    system: &dyn System,
+    system: &Snapshot,
     params: DocumentDiagnosticParams,
 ) -> Result<DocumentDiagnosticReportResult> {
     let uri = params.text_document.uri;

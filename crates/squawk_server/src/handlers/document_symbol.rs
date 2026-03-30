@@ -5,10 +5,10 @@ use squawk_ide::db::line_index;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 
 use crate::lsp_utils;
-use crate::system::System;
+use crate::global_state::Snapshot;
 
 pub(crate) fn handle_document_symbol(
-    system: &dyn System,
+    system: &Snapshot,
     params: DocumentSymbolParams,
 ) -> Result<Option<DocumentSymbolResponse>> {
     let uri = params.text_document.uri;

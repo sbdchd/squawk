@@ -4,9 +4,9 @@ use squawk_ide::db::line_index;
 use squawk_ide::hover::hover;
 
 use crate::lsp_utils;
-use crate::system::System;
+use crate::global_state::Snapshot;
 
-pub(crate) fn handle_hover(system: &dyn System, params: HoverParams) -> Result<Option<Hover>> {
+pub(crate) fn handle_hover(system: &Snapshot, params: HoverParams) -> Result<Option<Hover>> {
     let uri = params.text_document_position_params.text_document.uri;
     let position = params.text_document_position_params.position;
 
