@@ -3,11 +3,11 @@ use lsp_types::{CompletionParams, CompletionResponse};
 use squawk_ide::completion::completion;
 use squawk_ide::db::line_index;
 
+use crate::global_state::Snapshot;
 use crate::lsp_utils;
-use crate::system::System;
 
 pub(crate) fn handle_completion(
-    system: &dyn System,
+    system: &Snapshot,
     params: CompletionParams,
 ) -> Result<Option<CompletionResponse>> {
     let uri = params.text_document_position.text_document.uri;

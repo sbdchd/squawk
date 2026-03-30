@@ -3,11 +3,11 @@ use lsp_types::{FoldingRange, FoldingRangeParams};
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::folding_ranges;
 
+use crate::global_state::Snapshot;
 use crate::lsp_utils;
-use crate::system::System;
 
 pub(crate) fn handle_folding_range(
-    system: &dyn System,
+    system: &Snapshot,
     params: FoldingRangeParams,
 ) -> Result<Option<Vec<FoldingRange>>> {
     let uri = params.text_document.uri;

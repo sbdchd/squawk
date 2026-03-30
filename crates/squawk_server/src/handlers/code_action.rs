@@ -8,11 +8,11 @@ use squawk_ide::code_actions::code_actions;
 use squawk_ide::db::line_index;
 
 use crate::diagnostic::{AssociatedDiagnosticData, DIAGNOSTIC_NAME};
+use crate::global_state::Snapshot;
 use crate::lsp_utils;
-use crate::system::System;
 
 pub(crate) fn handle_code_action(
-    system: &dyn System,
+    system: &Snapshot,
     params: CodeActionParams,
 ) -> Result<Option<CodeActionResponse>> {
     let uri = params.text_document.uri;

@@ -6,11 +6,11 @@ use squawk_ide::builtins::{builtins_line_index, builtins_url};
 use squawk_ide::db::line_index;
 use squawk_ide::inlay_hints::inlay_hints;
 
+use crate::global_state::Snapshot;
 use crate::lsp_utils;
-use crate::system::System;
 
 pub(crate) fn handle_inlay_hints(
-    system: &dyn System,
+    system: &Snapshot,
     params: InlayHintParams,
 ) -> Result<Option<Vec<InlayHint>>> {
     let uri = params.text_document.uri;

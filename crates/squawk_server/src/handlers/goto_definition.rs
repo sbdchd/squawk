@@ -3,11 +3,11 @@ use lsp_types::{GotoDefinitionParams, GotoDefinitionResponse};
 use squawk_ide::db::line_index;
 use squawk_ide::goto_definition::goto_definition;
 
+use crate::global_state::Snapshot;
 use crate::lsp_utils::{self, to_location};
-use crate::system::System;
 
 pub(crate) fn handle_goto_definition(
-    system: &dyn System,
+    system: &Snapshot,
     params: GotoDefinitionParams,
 ) -> Result<Option<GotoDefinitionResponse>> {
     let uri = params.text_document_position_params.text_document.uri;

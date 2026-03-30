@@ -2,22 +2,22 @@
 
 use anyhow::Result;
 use log::{error, info};
-use lsp_server::{Message, Response};
+use lsp_server::{RequestId, Response};
 use lsp_types::{notification::Notification as LspNotification, request::Request as LspRequest};
 use squawk_thread::ThreadIntent;
 
-use crate::system::{GlobalState, System};
+use crate::global_state::{GlobalState, Snapshot};
 
 pub(crate) struct RequestDispatcher<'a> {
     req: Option<lsp_server::Request>,
-    system: &'a mut GlobalState,
+    global_state: &'a mut GlobalState,
 }
 
 impl<'a> RequestDispatcher<'a> {
     pub(crate) fn new(req: lsp_server::Request, system: &'a mut GlobalState) -> Self {
         Self {
             req: Some(req),
-            system,
+            global_state: system,
         }
     }
 
@@ -36,18 +36,29 @@ impl<'a> RequestDispatcher<'a> {
                     lsp_server::ErrorCode::ParseError as i32,
                     err.to_string(),
                 );
-                if let Err(err) = self.system.sender.send(Message::Response(response)) {
-                    error!("Failed to send parse error response: {err}");
-                }
+                self.global_state.respond(response);
                 None
             }
         }
     }
 
-    pub(crate) fn on<R>(
-        self,
-        handler: fn(&dyn System, R::Params) -> Result<R::Result>,
-    ) -> Result<Self>
+    pub(crate) fn on_sync_mut<R>(
+        mut self,
+        handler: fn(&mut GlobalState, R::Params) -> Result<R::Result>,
+    ) -> Self
+    where
+        R: LspRequest,
+        R::Params: Send + 'static,
+    {
+        if let Some((id, params)) = self.parse::<R>() {
+            let result = handler(self.global_state, params);
+            let response = result_to_response::<R>(id, result);
+            self.global_state.respond(response);
+        }
+        self
+    }
+
+    pub(crate) fn on<R>(self, handler: fn(&Snapshot, R::Params) -> Result<R::Result>) -> Self
     where
         R: LspRequest,
         R::Params: Send + 'static,
@@ -57,8 +68,8 @@ impl<'a> RequestDispatcher<'a> {
 
     pub(crate) fn on_latency_sensitive<R>(
         self,
-        handler: fn(&dyn System, R::Params) -> Result<R::Result>,
-    ) -> Result<Self>
+        handler: fn(&Snapshot, R::Params) -> Result<R::Result>,
+    ) -> Self
     where
         R: LspRequest,
         R::Params: Send + 'static,
@@ -69,38 +80,44 @@ impl<'a> RequestDispatcher<'a> {
     fn on_with_thread_intent<R>(
         mut self,
         intent: ThreadIntent,
-        handler: fn(&dyn System, R::Params) -> Result<R::Result>,
-    ) -> Result<Self>
+        handler: fn(&Snapshot, R::Params) -> Result<R::Result>,
+    ) -> Self
     where
         R: LspRequest,
         R::Params: Send + 'static,
     {
         if let Some((id, params)) = self.parse::<R>() {
-            let snapshot = self.system.snapshot();
+            let snapshot = self.global_state.snapshot();
 
-            self.system.task_pool.spawn(intent, move || {
-                let resp = match handler(&snapshot, params) {
-                    Ok(result) => Response::new_ok(id, result),
-                    Err(err) => {
-                        error!("Request handler failed: {err}");
-                        Response::new_err(
-                            id,
-                            lsp_server::ErrorCode::InternalError as i32,
-                            err.to_string(),
-                        )
-                    }
-                };
-
-                Message::Response(resp)
+            self.global_state.task_pool.handle.spawn(intent, move || {
+                let result = handler(&snapshot, params);
+                result_to_response::<R>(id, result)
             });
         }
 
-        Ok(self)
+        self
     }
 
     pub(crate) fn finish(self) {
         if let Some(req) = self.req {
             info!("Ignoring unhandled request: {}", req.method);
+        }
+    }
+}
+
+fn result_to_response<R>(id: RequestId, result: Result<R::Result>) -> Response
+where
+    R: LspRequest,
+{
+    match result {
+        Ok(result) => Response::new_ok(id, result),
+        Err(err) => {
+            error!("Request handler failed: {err}");
+            Response::new_err(
+                id,
+                lsp_server::ErrorCode::InternalError as i32,
+                err.to_string(),
+            )
         }
     }
 }
