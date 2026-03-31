@@ -1,5 +1,7 @@
 // Based on https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/handlers/dispatch.rs#L277C5-L277C5
 
+use std::panic::{AssertUnwindSafe, UnwindSafe};
+
 use anyhow::Result;
 use log::{error, info};
 use lsp_server::{RequestId, Response};
@@ -61,7 +63,7 @@ impl<'a> RequestDispatcher<'a> {
     pub(crate) fn on<R>(self, handler: fn(&Snapshot, R::Params) -> Result<R::Result>) -> Self
     where
         R: LspRequest,
-        R::Params: Send + 'static,
+        R::Params: Send + 'static + UnwindSafe,
     {
         self.on_with_thread_intent::<R>(ThreadIntent::Worker, handler)
     }
@@ -72,7 +74,7 @@ impl<'a> RequestDispatcher<'a> {
     ) -> Self
     where
         R: LspRequest,
-        R::Params: Send + 'static,
+        R::Params: Send + 'static + UnwindSafe,
     {
         self.on_with_thread_intent::<R>(ThreadIntent::LatencySensitive, handler)
     }
@@ -84,14 +86,17 @@ impl<'a> RequestDispatcher<'a> {
     ) -> Self
     where
         R: LspRequest,
-        R::Params: Send + 'static,
+        R::Params: Send + 'static + UnwindSafe,
     {
         if let Some((id, params)) = self.parse::<R>() {
             let snapshot = self.global_state.snapshot();
 
             self.global_state.task_pool.handle.spawn(intent, move || {
-                let result = handler(&snapshot, params);
-                result_to_response::<R>(id, result)
+                crate::panic::catch_unwind(|| {
+                    let result = handler(&snapshot, params);
+                    result_to_response::<R>(id.clone(), result)
+                })
+                .unwrap_or_else(|error| panic_response(id, &error))
             });
         }
 
@@ -102,6 +107,28 @@ impl<'a> RequestDispatcher<'a> {
         if let Some(req) = self.req {
             info!("Ignoring unhandled request: {}", req.method);
         }
+    }
+}
+
+fn panic_response(id: RequestId, error: &crate::panic::PanicError) -> Response {
+    // Check if the request was canceled due to some modifications to the salsa database.
+    if error.payload.downcast_ref::<salsa::Cancelled>().is_some() {
+        // TODO: trigger retries when we have that setup, we'll reenque the task
+        log::debug!(
+            "request id={} was cancelled by salsa, sending content modified",
+            id
+        );
+        Response::new_err(
+            id,
+            lsp_server::ErrorCode::ContentModified as i32,
+            "content modified".to_string(),
+        )
+    } else {
+        Response::new_err(
+            id,
+            lsp_server::ErrorCode::InternalError as i32,
+            "request handler error".to_string(),
+        )
     }
 }
 

@@ -66,7 +66,6 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
                 FileId::Current => source_file,
-                // TODO: we should salsa this
                 FileId::Builtins => &parse_builtins(db).tree(),
             };
             // TODO: we should salsa this
@@ -98,7 +97,6 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
         for file_id in [FileId::Current, FileId::Builtins] {
             let file = match file_id {
                 FileId::Current => source_file,
-                // TODO: we should salsa this
                 FileId::Builtins => &parse_builtins(db).tree(),
             };
             // TODO: we should salsa this
