@@ -5,6 +5,7 @@ mod handlers;
 mod ignore;
 mod lint;
 mod lsp_utils;
+mod panic;
 mod server;
 
 pub use server::run;
