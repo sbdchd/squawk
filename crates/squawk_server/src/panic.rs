@@ -56,6 +56,7 @@ impl Payload {
 }
 
 impl PanicError {
+    #[expect(unused)]
     pub(crate) fn to_diagnostic_message(&self, path: Option<impl std::fmt::Display>) -> String {
         use std::fmt::Write;
 

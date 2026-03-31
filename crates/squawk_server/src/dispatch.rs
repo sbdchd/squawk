@@ -1,6 +1,6 @@
 // Based on https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/handlers/dispatch.rs#L277C5-L277C5
 
-use std::panic::{AssertUnwindSafe, UnwindSafe};
+use std::panic::UnwindSafe;
 
 use anyhow::Result;
 use log::{error, info};
