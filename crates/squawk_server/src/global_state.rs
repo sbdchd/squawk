@@ -2,7 +2,7 @@ use std::{num::NonZeroUsize, sync::Arc, time::Instant};
 
 use crossbeam_channel::{Receiver, Sender, select, unbounded};
 use log::info;
-use lsp_server::{Message, Response};
+use lsp_server::{Message, Request, Response};
 use lsp_types::Url;
 use lsp_types::notification::Notification as _;
 use lsp_types::notification::{
@@ -40,7 +40,7 @@ pub(super) struct GlobalState {
     files: Arc<FxHashMap<Url, File>>,
     req_queue: ReqQueue,
     sender: Sender<Message>,
-    pub(crate) task_pool: Handle<TaskPool<Response>, Receiver<Response>>,
+    pub(crate) task_pool: Handle<TaskPool<TaskResult>, Receiver<TaskResult>>,
     shutdown_requested: bool,
 }
 
@@ -119,6 +119,10 @@ impl GlobalState {
         }
     }
 
+    pub(crate) fn is_completed(&self, request: &lsp_server::Request) -> bool {
+        self.req_queue.incoming.is_completed(&request.id)
+    }
+
     pub(crate) fn request_shutdown(&mut self) {
         self.shutdown_requested = true;
     }
@@ -134,41 +138,7 @@ impl GlobalState {
             let loop_start = Instant::now();
             match event {
                 Event::Inbox(msg) => match msg {
-                    Message::Request(req) => {
-                        info!("Received request: method={}, id={:?}", req.method, req.id);
-
-                        self.register_request(&req, loop_start);
-
-                        if self.shutdown_requested {
-                            tracing::warn!(
-                                "Received request `{}` after server shutdown was requested, discarding",
-                                &req.method
-                            );
-
-                            self.respond(Response::new_err(
-                                req.id,
-                                lsp_server::ErrorCode::InvalidRequest as i32,
-                                "Shutdown already requested".to_owned(),
-                            ));
-                            continue;
-                        }
-
-                        RequestDispatcher::new(req, self)
-                            .on_sync_mut::<Shutdown>(handle_shutdown)
-                            .on::<GotoDefinition>(handle_goto_definition)
-                            .on::<HoverRequest>(handle_hover)
-                            .on::<CodeActionRequest>(handle_code_action)
-                            .on::<SelectionRangeRequest>(handle_selection_range)
-                            .on::<InlayHintRequest>(handle_inlay_hints)
-                            .on::<DocumentSymbolRequest>(handle_document_symbol)
-                            .on::<FoldingRangeRequest>(handle_folding_range)
-                            .on_latency_sensitive::<Completion>(handle_completion)
-                            .on::<DocumentDiagnosticRequest>(handle_document_diagnostic)
-                            .on::<SyntaxTreeRequest>(handle_syntax_tree)
-                            .on::<TokensRequest>(handle_tokens)
-                            .on::<References>(handle_references)
-                            .finish();
-                    }
+                    Message::Request(req) => self.handle_request(req, loop_start),
                     Message::Response(resp) => {
                         info!("Received response: id={:?}", resp.id);
                     }
@@ -187,11 +157,19 @@ impl GlobalState {
                             .finish();
                     }
                 },
-                Event::Outbox(response) => {
-                    // Instead of having the tasks send directly via the sender
-                    // channel, we handle them on the main thread so we can check
-                    // for cancellation first.
-                    self.respond(response)
+                Event::Outbox(result) => {
+                    match result {
+                        TaskResult::Response(resp) => {
+                            // Instead of having the tasks send directly via the sender
+                            // channel, we handle them on the main thread so we can check
+                            // for cancellation first.
+                            self.respond(resp)
+                        }
+                        TaskResult::Retry(req) if !self.is_completed(&req) => {
+                            self.handle_request(req, loop_start)
+                        }
+                        TaskResult::Retry(_) => (),
+                    }
                 }
             }
         }
@@ -202,12 +180,57 @@ impl GlobalState {
     fn next_event(
         &self,
         inbox: &Receiver<Message>,
-        outbox: &Receiver<Response>,
+        outbox: &Receiver<TaskResult>,
     ) -> Result<Event, crossbeam_channel::RecvError> {
         select! {
             recv(inbox) -> msg => msg.map(Event::Inbox),
             recv(outbox) -> task => task.map(Event::Outbox),
         }
+    }
+
+    fn handle_request(&mut self, req: Request, loop_start: Instant) {
+        info!("Received request: method={}, id={:?}", req.method, req.id);
+
+        self.register_request(&req, loop_start);
+
+        if self.shutdown_requested {
+            tracing::warn!(
+                "Received request `{}` after server shutdown was requested, discarding",
+                &req.method
+            );
+
+            self.respond(Response::new_err(
+                req.id,
+                lsp_server::ErrorCode::InvalidRequest as i32,
+                "Shutdown already requested".to_owned(),
+            ));
+            return;
+        }
+
+        const RETRY: bool = true;
+        const NO_RETRY: bool = false;
+
+        RequestDispatcher::new(req, self)
+            // Request handlers that must run on the main thread because they
+            // mutate GlobalState:
+            .on_sync_mut::<Shutdown>(handle_shutdown)
+            // Request handlers which are related to the user typing are run on
+            // the main thread to reduce latency:
+            .on_sync::<SelectionRangeRequest>(handle_selection_range)
+            // latency-sensitive but can't run on the main thread due to
+            // semantic analysis, so we use a higher priority thread
+            .on_latency_sensitive::<RETRY, Completion>(handle_completion)
+            .on::<NO_RETRY, GotoDefinition>(handle_goto_definition)
+            .on::<NO_RETRY, HoverRequest>(handle_hover)
+            .on::<NO_RETRY, CodeActionRequest>(handle_code_action)
+            .on::<NO_RETRY, InlayHintRequest>(handle_inlay_hints)
+            .on::<RETRY, DocumentSymbolRequest>(handle_document_symbol)
+            .on::<RETRY, FoldingRangeRequest>(handle_folding_range)
+            .on::<NO_RETRY, DocumentDiagnosticRequest>(handle_document_diagnostic)
+            .on::<NO_RETRY, SyntaxTreeRequest>(handle_syntax_tree)
+            .on::<NO_RETRY, TokensRequest>(handle_tokens)
+            .on::<NO_RETRY, References>(handle_references)
+            .finish();
     }
 }
 
@@ -228,5 +251,10 @@ impl Snapshot {
 
 enum Event {
     Inbox(Message),
-    Outbox(Response),
+    Outbox(TaskResult),
+}
+
+pub(crate) enum TaskResult {
+    Response(Response),
+    Retry(Request),
 }
