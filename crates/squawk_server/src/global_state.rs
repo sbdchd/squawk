@@ -13,6 +13,8 @@ use salsa::Setter;
 use squawk_ide::db::{Database, File};
 use squawk_thread::TaskPool;
 
+use crate::config::LintConfig;
+
 use lsp_types::request::{
     CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
     FoldingRangeRequest, GotoDefinition, HoverRequest, InlayHintRequest, References,
@@ -38,6 +40,7 @@ pub(crate) struct Handle<H, C> {
 pub(super) struct GlobalState {
     db: Database,
     files: Arc<FxHashMap<Url, File>>,
+    config: Arc<LintConfig>,
     req_queue: ReqQueue,
     sender: Sender<Message>,
     pub(crate) task_pool: Handle<TaskPool<TaskResult>, Receiver<TaskResult>>,
@@ -45,7 +48,7 @@ pub(super) struct GlobalState {
 }
 
 impl GlobalState {
-    pub(super) fn new(sender: Sender<Message>) -> Self {
+    pub(super) fn new(sender: Sender<Message>, config: Arc<LintConfig>) -> Self {
         let threads = std::thread::available_parallelism().unwrap_or(NonZeroUsize::MIN);
         let task_pool = {
             let (sender, receiver) = unbounded();
@@ -55,6 +58,7 @@ impl GlobalState {
         Self {
             db: Database::default(),
             files: Arc::new(FxHashMap::default()),
+            config,
             req_queue: ReqQueue::default(),
             task_pool,
             sender,
@@ -67,6 +71,7 @@ impl GlobalState {
         Snapshot {
             db: self.db.clone(),
             files: self.files.clone(),
+            config: self.config.clone(),
         }
     }
 
@@ -237,6 +242,7 @@ impl GlobalState {
 pub(crate) struct Snapshot {
     pub(crate) db: Database,
     pub(crate) files: Arc<FxHashMap<Url, File>>,
+    pub(crate) config: Arc<LintConfig>,
 }
 
 impl Snapshot {

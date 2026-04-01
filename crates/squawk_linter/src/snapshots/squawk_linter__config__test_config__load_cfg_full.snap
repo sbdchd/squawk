@@ -1,12 +1,17 @@
 ---
-source: crates/squawk/src/config.rs
+source: crates/squawk_linter/src/config.rs
+assertion_line: 108
 expression: "ConfigFile::parse(Some(squawk_toml.path().to_path_buf()))"
 ---
 Ok(
     Some(
         ConfigFile {
-            excluded_paths: [],
-            excluded_rules: [],
+            excluded_paths: [
+                "example.sql",
+            ],
+            excluded_rules: [
+                RequireConcurrentIndexCreation,
+            ],
             pg_version: Some(
                 Version {
                     major: 19,
@@ -16,7 +21,9 @@ Ok(
                     patch: None,
                 },
             ),
-            assume_in_transaction: None,
+            assume_in_transaction: Some(
+                true,
+            ),
             upload_to_github: UploadToGitHubConfig {
                 fail_on_violations: None,
             },
