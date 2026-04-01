@@ -4,7 +4,7 @@ use std::panic::UnwindSafe;
 
 use anyhow::Result;
 use log::{error, info};
-use lsp_server::{Request, Response, ResponseError};
+use lsp_server::{Request, Response};
 use lsp_types::{notification::Notification as LspNotification, request::Request as LspRequest};
 use salsa::Cancelled;
 use serde::{Serialize, de::DeserializeOwned};
