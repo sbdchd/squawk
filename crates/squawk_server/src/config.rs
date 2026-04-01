@@ -1,5 +1,6 @@
 use squawk_linter::config::ConfigFile;
 use squawk_linter::{Linter, Rule, Version};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 /// Linter-relevant config extracted from `.squawk.toml`, stored once
@@ -9,10 +10,14 @@ pub(crate) struct LintConfig {
     pub pg_version: Option<Version>,
     pub assume_in_transaction: bool,
     pub excluded_paths: Vec<glob::Pattern>,
+    pub workspace_root: Option<PathBuf>,
 }
 
 impl LintConfig {
-    pub fn from_config_file(config: Option<ConfigFile>) -> Arc<Self> {
+    pub fn from_config_file(
+        config: Option<ConfigFile>,
+        workspace_root: Option<PathBuf>,
+    ) -> Arc<Self> {
         let config = config.unwrap_or_default();
         let excluded_paths = config
             .excluded_paths
@@ -24,6 +29,7 @@ impl LintConfig {
             pg_version: config.pg_version,
             assume_in_transaction: config.assume_in_transaction.unwrap_or(false),
             excluded_paths,
+            workspace_root,
         })
     }
 

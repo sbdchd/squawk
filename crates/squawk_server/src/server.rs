@@ -96,8 +96,8 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
             init_params.root_path.as_ref().map(std::path::PathBuf::from)
         });
 
-    let config_file = workspace_root.and_then(|root| {
-        ConfigFile::find_and_parse(&root)
+    let config_file = workspace_root.as_ref().and_then(|root| {
+        ConfigFile::find_and_parse(root)
             .map_err(|e| {
                 log::warn!("error loading config: {e}");
                 e
@@ -106,7 +106,7 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
             .flatten()
     });
 
-    let config = LintConfig::from_config_file(config_file);
+    let config = LintConfig::from_config_file(config_file, workspace_root);
     info!("excluded rules: {:?}", config.excluded_rules);
     info!("pg version: {:?}", config.pg_version);
     info!("assume in transaction: {}", config.assume_in_transaction);
