@@ -151,9 +151,17 @@ SELECT * FROM GRAPH_TABLE (myshop MATCH (c IS customers)-[IS customer_orders | c
 SELECT * FROM GRAPH_TABLE (myshop MATCH (c IS customers)->(o IS orders) COLUMNS (c.name, o.ordered_when)) ORDER BY 1;
 
 -- lateral test
-CREATE TABLE x1 (a int, b text);
+-- Use table with a column name same as a property in the property graph so as
+-- to test resolution preferences. Property references are preferred over
+-- lateral table references.
+CREATE TABLE x1 (a int, address text);
 INSERT INTO x1 VALUES (1, 'one'), (2, 'two');
 SELECT * FROM x1, GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.address = 'US' AND c.customer_id = x1.a)-[IS customer_orders]->(o IS orders) COLUMNS (c.name AS customer_name, c.customer_id AS cid));
+SELECT x1.a, g.* FROM x1, GRAPH_TABLE (myshop MATCH (x1 IS customers WHERE x1.address = 'US')-[IS customer_orders]->(o IS orders) COLUMNS (x1.name AS customer_name, x1.customer_id AS cid, o.order_id)) g;
+-- non-local property references are not allowed, even if a lateral column
+-- reference is available
+SELECT x1.a, g.* FROM x1, GRAPH_TABLE (myshop MATCH (x1 IS customers)-[IS customer_orders]->(o IS orders WHERE o.order_id = x1.a) COLUMNS (x1.name AS customer_name, x1.customer_id AS cid, o.order_id)) g; -- error
+SELECT x1.a, g.* FROM x1, GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.address = 'US' AND c.customer_id = x1.a)-[IS customer_orders]->(x1 IS orders) COLUMNS (c.name AS customer_name, c.customer_id AS cid, x1.order_id)) g; -- error
 DROP TABLE x1;
 
 CREATE TABLE v1 (
@@ -289,6 +297,16 @@ SELECT * FROM GRAPH_TABLE (g1 MATCH (src IS el1 | vl1)-[conn]->(dest) COLUMNS (c
 SELECT * FROM GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.address = 'US')-[IS customer_orders]->(o IS orders) COLUMNS (c.*));
 -- star anywhere else is not allowed as a property reference
 SELECT * FROM GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.* IS NOT NULL)-[IS customer_orders]->(o IS orders) COLUMNS (c.name));
+-- consecutive element patterns with same kind
+SELECT * FROM GRAPH_TABLE (g1 MATCH ()() COLUMNS (1 as one));
+SELECT * FROM GRAPH_TABLE (g1 MATCH -> COLUMNS (1 AS one));
+SELECT * FROM GRAPH_TABLE (g1 MATCH ()-[]- COLUMNS (1 AS one));
+SELECT * FROM GRAPH_TABLE (g1 MATCH ()-> ->() COLUMNS (1 AS one));
+-- non-local element variable reference with element patterns without variable
+-- names
+SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[WHERE a.vprop1 = 10]->(c) COLUMNS (a.vname AS aname, c.vname AS cname));
+SELECT * FROM GRAPH_TABLE (g1 MATCH (WHERE b.eprop1 = 10001)-[b]->(c) COLUMNS (b.ename AS bname, c.vname AS cname));
+
 
 -- select all the properties across all the labels associated with a given type
 -- of graph element

@@ -1359,11 +1359,16 @@ Update =
   WithClause?
   'update'
   RelationName
+  ForPortionOf?
   Alias?
   SetClause
   FromClause?
   WhereClause?
   ReturningClause?
+
+ForPortionOf =
+  'for' 'portion' 'of' NameRef
+  ('from' Expr 'to' Expr | '(' Expr ')')
 
 ReturningClause =
   'returning'
@@ -1380,7 +1385,9 @@ ReturningOption =
 
 Delete =
   WithClause?
-  'delete' 'from' RelationName Alias?
+  'delete' 'from' RelationName
+  ForPortionOf?
+  Alias?
   UsingClause?
   (WhereClause | WhereCurrentOf)?
   ReturningClause?

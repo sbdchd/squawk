@@ -21,6 +21,10 @@ const START_END_MARKERS: &[(&str, &str)] = &[
     ("-- Multiple VALUES clause", "\tINSERT VALUES (1,1), (2,2);"),
     ("-- SELECT query for INSERT", "\tINSERT SELECT (1, 1);"),
     ("-- UPDATE tablename", "\tUPDATE target SET balance = 0;"),
+    (
+        "-- TO is used for the bound but not the INTERVAL:",
+        "  WHERE id = '[1,2)';",
+    ),
 ];
 
 const IGNORED_LINES: &[&str] = &[
