@@ -5885,6 +5885,10 @@ impl Delete {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn for_portion_of(&self) -> Option<ForPortionOf> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn relation_name(&self) -> Option<RelationName> {
         support::child(&self.syntax)
     }
@@ -8808,6 +8812,53 @@ impl FilterClause {
     #[inline]
     pub fn where_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WHERE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ForPortionOf {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ForPortionOf {
+    #[inline]
+    pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn of_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OF_KW)
+    }
+    #[inline]
+    pub fn portion_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PORTION_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -17040,6 +17091,10 @@ impl Update {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn for_portion_of(&self) -> Option<ForPortionOf> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn from_clause(&self) -> Option<FromClause> {
         support::child(&self.syntax)
     }
@@ -23957,6 +24012,24 @@ impl AstNode for FilterClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::FILTER_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ForPortionOf {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FOR_PORTION_OF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

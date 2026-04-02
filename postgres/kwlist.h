@@ -1,7 +1,7 @@
 // synced from: 
-//   commit: ab697307dd0f0b4f6c6671421d4dd0bc20f176cb
-//   committed at: 2026-03-18T02:04:10Z
-//   file: https://github.com/postgres/postgres/blob/ab697307dd0f0b4f6c6671421d4dd0bc20f176cb/src/include/parser/kwlist.h
+//   commit: effaa464afd355e8927bf430cfe6a0ddd2ee5695
+//   committed at: 2026-04-02T12:39:57Z
+//   file: https://github.com/postgres/postgres/blob/effaa464afd355e8927bf430cfe6a0ddd2ee5695/src/include/parser/kwlist.h
 //
 // update via:
 //   cargo xtask sync-kwlist
@@ -361,6 +361,7 @@ PG_KEYWORD("placing", PLACING, RESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("plan", PLAN, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("plans", PLANS, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("policy", POLICY, UNRESERVED_KEYWORD, BARE_LABEL)
+PG_KEYWORD("portion", PORTION, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("position", POSITION, COL_NAME_KEYWORD, BARE_LABEL)
 PG_KEYWORD("preceding", PRECEDING, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("precision", PRECISION, COL_NAME_KEYWORD, AS_LABEL)
