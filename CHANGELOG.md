@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.45.0 - 2026-04-01
+
+### Added
+
+- server: add multi threading (#1032, #1031, #1030, #1029, #1028, #1026, #1024, #1018)
+- parser: improve error recovery for expr_as_name_list (#1017)
+- parser: sql/pgq cleanup & more sql/pgq test cases (#1016)
+- parser: improve persistence parsing (#1013)
+
+### Internal
+
+- internal: bump rust to 1.94 (#1015)
+
 ## v2.44.0 - 2026-03-19
 
 ### Added
