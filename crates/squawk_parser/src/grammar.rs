@@ -6229,6 +6229,14 @@ fn alter_publication(p: &mut Parser<'_>) -> CompletedMarker {
         SET_KW if p.nth_at(1, L_PAREN) => {
             set_options(p);
         }
+        SET_KW if p.nth_at(1, ALL_KW) => {
+            p.bump(SET_KW);
+            publication_all_object(p);
+            while !p.at(EOF) && p.eat(COMMA) {
+                publication_all_object(p);
+            }
+            opt_except_table_clause(p);
+        }
         SET_KW => {
             p.bump(SET_KW);
             publication_object(p);
@@ -8895,8 +8903,7 @@ fn edge_left(p: &mut Parser<'_>) {
     let m = p.start();
     p.bump(L_ANGLE);
     p.expect(MINUS);
-    if p.at(L_BRACK) {
-        p.bump(L_BRACK);
+    if p.eat(L_BRACK) {
         opt_edge_pattern_inner(p);
         p.expect(R_BRACK);
         p.expect(MINUS);
@@ -9799,15 +9806,17 @@ fn opt_except_table_clause(p: &mut Parser<'_>) {
 
     let m = p.start();
     p.bump(EXCEPT_KW);
-    p.expect(TABLE_KW);
     delimited(
         p,
         L_PAREN,
         R_PAREN,
         COMMA,
         || "unexpected comma".to_string(),
-        RELATION_NAME_FIRST,
-        |p| opt_relation_name(p).is_some(),
+        RELATION_NAME_FIRST.union(TokenSet::new(&[TABLE_KW])),
+        |p| {
+            p.eat(TABLE_KW);
+            opt_relation_name(p).is_some()
+        },
     );
     m.complete(p, EXCEPT_TABLE_CLAUSE);
 }
@@ -9993,8 +10002,7 @@ fn create_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(SUBSCRIPTION_KW);
     name(p);
-    if p.at(SERVER_KW) {
-        p.bump(SERVER_KW);
+    if p.eat(SERVER_KW) {
         name_ref(p);
     } else {
         p.expect(CONNECTION_KW);
@@ -12483,7 +12491,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
 
 fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
     match p.current() {
-        BINARY_KW | FREEZE_KW | CSV_KW | HEADER_KW => {
+        BINARY_KW | FREEZE_KW | CSV_KW | HEADER_KW | JSON_KW => {
             p.bump_any();
         }
         DELIMITER_KW | NULL_KW | QUOTE_KW | ESCAPE_KW => {
@@ -13226,6 +13234,7 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(UPDATE_KW);
     relation_name(p);
+    opt_for_portion_of(p);
     // postgres parser has the same setup, it assumes the alias can never be
     // named `SET`
     if !p.at(SET_KW) {
@@ -13240,6 +13249,35 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
     m.complete(p, UPDATE)
+}
+
+// FOR PORTION OF column_name FROM expr TO expr [ [ AS ] alias ]
+// FOR PORTION OF column_name ( expr ) [ [ AS ] alias ]
+fn opt_for_portion_of(p: &mut Parser<'_>) {
+    if !p.at(FOR_KW) {
+        return;
+    }
+    let m = p.start();
+    p.expect(FOR_KW);
+    p.expect(PORTION_KW);
+    p.expect(OF_KW);
+    name_ref(p);
+    for_portion_of_target(p);
+    m.complete(p, FOR_PORTION_OF);
+}
+
+fn for_portion_of_target(p: &mut Parser<'_>) {
+    if p.eat(L_PAREN) {
+        expr(p);
+        p.expect(R_PAREN);
+    } else {
+        p.expect(FROM_KW);
+        // start time
+        expr(p);
+        p.expect(TO_KW);
+        // end time
+        expr(p);
+    }
 }
 
 fn opt_where_or_current_of(p: &mut Parser<'_>) {
@@ -13291,7 +13329,10 @@ fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     p.bump(DELETE_KW);
     p.expect(FROM_KW);
     relation_name(p);
-    opt_as_alias(p);
+    opt_for_portion_of(p);
+    if !p.at(FOR_KW) {
+        opt_as_alias(p);
+    }
     opt_using_clause(p);
     // [ WHERE condition | WHERE CURRENT OF cursor_name ]
     opt_where_or_current_of(p);
