@@ -27,8 +27,7 @@
     "Linters"
   ],
   "activationEvents": [
-    "onLanguage:sql",
-    "onLanguage:postgres"
+    "onLanguage:sql"
   ],
   "publisher": "sbdchd",
   "main": "./dist/extension.js",
@@ -80,24 +79,23 @@
         "category": "Squawk"
       }
     ],
-    "languages": [
+    "grammars": [
       {
-        "id": "sql",
-        "extensions": [
-          ".sql"
-        ],
-        "aliases": [
-          "SQL",
-          "sql"
-        ],
-        "configuration": "./sql-language-configuration.json"
-      },
+        "language": "postgres",
+        "scopeName": "source.pgsql",
+        "path": "./syntaxes/pgsql.tmLanguage.json"
+      }
+    ],
+    "languages": [
       {
         "id": "postgres",
         "extensions": [
+          ".sql",
           ".psql"
         ],
         "aliases": [
+          "SQL",
+          "sql",
           "PostgreSQL",
           "postgres"
         ],
