@@ -1,5 +1,9 @@
 {
-  "fileTypes": ["sql", "pgsql", "psql"],
+  "fileTypes": [
+    "sql",
+    "pgsql",
+    "psql"
+  ],
   "foldingStartMarker": "\\s*\\(\\s*$",
   "foldingStopMarker": "^\\s*\\)",
   "name": "SQL (PostgreSQL)",

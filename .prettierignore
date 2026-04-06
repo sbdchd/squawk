@@ -8,5 +8,6 @@ coverage/
 .pytest_cache/
 target/
 docs
+squawk-vscode/syntaxes/pgsql.tmLanguage.json
 squawk-vscode/.vscode-test/
 squawk-vscode/dist/
