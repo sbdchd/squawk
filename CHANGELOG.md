@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.46.0 - 2026-04-05
+
+### Added
+
+- ide: goto def support for dec & float(n) types (#1042)
+- vscode: vendor and improve postgres syntax highlighting grammar (#1043, #1041, #1039)
+- parser: sync pg regressions suite & support the new ForPortionOf clause (#1038)
+
+### Fixed
+
+- ide: fix column naming for dec & float(n) (#1040)
+
 ## v2.45.0 - 2026-04-01
 
 ### Added
