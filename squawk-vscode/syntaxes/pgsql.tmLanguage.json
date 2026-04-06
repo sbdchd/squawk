@@ -12,88 +12,16 @@
       "include": "#comments"
     },
     {
-      "begin": "(?i)^\\s*(create)\\s+(or\\s+replace\\s+)?(function|view)\\s+((?:(?:[\\w]+|\".+\")\\.)?(?:[\\w]+|\".+\"))",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.other.create.pgsql"
-        },
-        "2": {
-          "name": "keyword.other.pgsql"
-        },
-        "3": {
-          "name": "keyword.other.pgsql"
-        },
-        "4": {
-          "name": "entity.name.function.pgsql"
-        }
-      },
-      "end": ";\\s*",
-      "name": "meta.statement.pgsql.create",
-      "patterns": [
-        {
-          "include": "#dollar_quotes"
-        },
-        {
-          "include": "#comments"
-        },
-        {
-          "include": "#strings"
-        },
-        {
-          "include": "#keywords"
-        },
-        {
-          "include": "#misc"
-        }
-      ]
-    },
-    {
-      "begin": "(?i:^\\s*(create)\\s+(aggregate|collation|conversion|database|domain|event trigger|group|(?:unique\\s+)?index|language|operator class|operator|rule|schema|sequence|(?:global\\s+|local\\s+)?(?:temp\\s+|temporary\\s+|unlogged\\s+)?table|tablespace|trigger|type|user|(?:materialized\\s+)?view)\\s+)(if\\s+not\\s+exists\\s+)?((?:(?:[\\w]+|\".+\")\\.)?(?:[\\w]+|\".+\"))",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.other.create.pgsql"
-        },
-        "2": {
-          "name": "keyword.other.pgsql"
-        },
-        "3": {
-          "name": "keyword.other.pgsql"
-        },
-        "4": {
-          "name": "entity.name.function.pgsql"
-        }
-      },
-      "end": ";\\s*",
-      "name": "meta.statement.pgsql.create",
-      "patterns": [
-        {
-          "include": "#dollar_quotes"
-        },
-        {
-          "include": "#comments"
-        },
-        {
-          "include": "#strings"
-        },
-        {
-          "include": "#keywords"
-        },
-        {
-          "include": "#misc"
-        }
-      ]
-    },
-    {
-      "begin": "(^\\s*[a-zA-Z]+)",
-      "beginCaptures": {
-        "0": {
-          "name": "keyword.other.pgsql"
-        }
-      },
-      "comment": "Last update (including keywords below) using postgres 9.3. See classes/Help.php for update method. Testing change below to just assume starting word is a SQL keyword.",
+      "begin": "^",
       "end": ";\\s*",
       "name": "meta.statement.pgsql",
       "patterns": [
+        {
+          "include": "#create_entities"
+        },
+        {
+          "include": "#parens"
+        },
         {
           "include": "#dollar_quotes"
         },
@@ -124,6 +52,44 @@
     }
   ],
   "repository": {
+    "create_entities": {
+      "patterns": [
+        {
+          "match": "(?i)\\b(create)\\s+(or\\s+replace\\s+)?(function|view)\\s+((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))",
+          "captures": {
+            "1": {
+              "name": "keyword.other.create.pgsql"
+            },
+            "2": {
+              "name": "keyword.other.pgsql"
+            },
+            "3": {
+              "name": "keyword.other.pgsql"
+            },
+            "4": {
+              "name": "entity.name.function.pgsql"
+            }
+          }
+        },
+        {
+          "match": "(?i)\\b(create)\\s+(aggregate|collation|conversion|database|domain|event\\s+trigger|group|(?:unique\\s+)?index|language|operator\\s+class|operator|rule|schema|sequence|(?:(?:global|local)\\s+)?(?:(?:temp|temporary|unlogged)\\s+)?table|tablespace|trigger|type|user|(?:materialized\\s+)?view)\\s+(if\\s+not\\s+exists\\s+)?((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))",
+          "captures": {
+            "1": {
+              "name": "keyword.other.create.pgsql"
+            },
+            "2": {
+              "name": "keyword.other.pgsql"
+            },
+            "3": {
+              "name": "keyword.other.pgsql"
+            },
+            "4": {
+              "name": "entity.name.function.pgsql"
+            }
+          }
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {
@@ -155,6 +121,9 @@
           "end": "\\1",
           "name": "meta.dollar-quote.pgsql",
           "patterns": [
+            {
+              "include": "#parens"
+            },
             {
               "include": "#dollar_quotes"
             },
@@ -207,6 +176,30 @@
         {
           "match": "\\|\\|",
           "name": "keyword.operator.concatenator.pgsql"
+        }
+      ]
+    },
+    "parens": {
+      "begin": "\\(",
+      "end": "\\)",
+      "patterns": [
+        {
+          "include": "#parens"
+        },
+        {
+          "include": "#dollar_quotes"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#misc"
         }
       ]
     },
