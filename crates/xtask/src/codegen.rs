@@ -81,6 +81,8 @@ pub(crate) fn codegen() -> Result<()> {
     let token_sets_file = project_root().join("crates/squawk_parser/src/generated/token_sets.rs");
     std::fs::write(token_sets_file, token_sets).context("problem writing generated token sets")?;
 
+    update_textmate_keywords(&keyword_kinds.all_keywords)?;
+
     let kinds = generate_kind_src(&ast_src.nodes, &grammar, keyword_kinds.all_keywords);
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
@@ -896,6 +898,29 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
     };
     let output = reformat(file.to_string()).replace("#[derive", "\n#[derive");
     format!("{PRELUDE}{output}")
+}
+
+fn update_textmate_keywords(all_keywords: &[String]) -> Result<()> {
+    let tmlanguage_path = project_root().join("squawk-vscode/syntaxes/pgsql.tmLanguage.json");
+    let content = std::fs::read_to_string(&tmlanguage_path)?;
+    let mut json: serde_json::Value = serde_json::from_str(&content)?;
+
+    let mut keywords = all_keywords
+        .iter()
+        .map(|k| k.to_lowercase())
+        .collect::<Vec<_>>();
+    keywords.sort();
+
+    let keywords_joined = keywords.join("|");
+    let match_pattern = format!("(?xi)\\b({keywords_joined})\\b");
+
+    json["repository"]["keywords"]["patterns"][0]["match"] =
+        serde_json::Value::String(match_pattern);
+
+    let output = serde_json::to_string_pretty(&json)?;
+    std::fs::write(&tmlanguage_path, format!("{output}\n"))?;
+
+    Ok(())
 }
 
 fn generate_tokens(tokens: &[(&'static str, &'static str)]) -> String {
