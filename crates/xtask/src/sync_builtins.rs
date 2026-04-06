@@ -322,6 +322,8 @@ declare
 begin
   foreach extension_name in array array[
     'bloom',
+    'btree_gin',
+    'btree_gist',
     'citext',
     'cube',
     'h3',

@@ -75,13 +75,15 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
             {
-                return name_from_name_ref(name_ref, true).map(|(column, node)| {
-                    let column = match column {
-                        ColumnName::Column(c) => ColumnName::new(c, unknown_column),
-                        _ => column,
-                    };
-                    (column, node)
-                });
+                return name_from_name_ref(name_ref, true, path_type.arg_list().as_ref()).map(
+                    |(column, node)| {
+                        let column = match column {
+                            ColumnName::Column(c) => ColumnName::new(c, unknown_column),
+                            _ => column,
+                        };
+                        (column, node)
+                    },
+                );
             }
         }
         ast::Type::BitType(bit_type) => {
@@ -158,7 +160,11 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
     None
 }
 
-fn name_from_name_ref(name_ref: ast::NameRef, in_type: bool) -> Option<(ColumnName, SyntaxNode)> {
+fn name_from_name_ref(
+    name_ref: ast::NameRef,
+    in_type: bool,
+    arg_list: Option<&ast::ArgList>,
+) -> Option<(ColumnName, SyntaxNode)> {
     if in_type {
         for node in name_ref.syntax().children_with_tokens() {
             match node.kind() {
@@ -174,9 +180,29 @@ fn name_from_name_ref(name_ref: ast::NameRef, in_type: bool) -> Option<(ColumnNa
                         name_ref.syntax().clone(),
                     ));
                 }
-                SyntaxKind::DECIMAL_KW => {
+                SyntaxKind::DEC_KW | SyntaxKind::DECIMAL_KW => {
                     return Some((
                         ColumnName::Column("numeric".to_owned()),
+                        name_ref.syntax().clone(),
+                    ));
+                }
+                SyntaxKind::FLOAT_KW => {
+                    let precision = arg_list.and_then(|arg| {
+                        arg.args_().find_map(|arg| {
+                            if let ast::Expr::Literal(lit) = arg.expr()? {
+                                lit.syntax().text().to_string().parse::<u32>().ok()
+                            } else {
+                                None
+                            }
+                        })
+                    });
+                    let name = if matches!(precision, Some(p) if p <= 24) {
+                        "float4"
+                    } else {
+                        "float8"
+                    };
+                    return Some((
+                        ColumnName::Column(name.to_owned()),
                         name_ref.syntax().clone(),
                     ));
                 }
@@ -409,11 +435,11 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     | ast::Expr::SliceExpr(_) => unreachable!("not possible in the grammar"),
                     ast::Expr::FieldExpr(field_expr) => {
                         if let Some(name_ref) = field_expr.field() {
-                            return name_from_name_ref(name_ref, in_type);
+                            return name_from_name_ref(name_ref, in_type, None);
                         }
                     }
                     ast::Expr::NameRef(name_ref) => {
-                        return name_from_name_ref(name_ref, in_type);
+                        return name_from_name_ref(name_ref, in_type, None);
                     }
                 }
             }
@@ -446,7 +472,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
         }
         ast::Expr::FieldExpr(field_expr) => {
             if let Some(name_ref) = field_expr.field() {
-                return name_from_name_ref(name_ref, in_type);
+                return name_from_name_ref(name_ref, in_type, None);
             }
         }
         ast::Expr::IndexExpr(index_expr) => {
@@ -472,7 +498,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             _ => return Some((ColumnName::UnknownColumn(None), node)),
         },
         ast::Expr::NameRef(name_ref) => {
-            return name_from_name_ref(name_ref, in_type);
+            return name_from_name_ref(name_ref, in_type, None);
         }
         ast::Expr::ParenExpr(paren_expr) => {
             if let Some(expr) = paren_expr.expr() {
@@ -614,13 +640,23 @@ fn examples() {
 
     // bit types
     assert_snapshot!(name("cast('1010' as bit varying(10))"), @"varbit");
+    assert_snapshot!(name("cast('1010' as bit varying)"), @"varbit");
+    assert_snapshot!(name("cast('1010' as bit)"), @"bit");
+
+    // decimal
+    assert_snapshot!(name("cast('1010' as dec)"), @"numeric");
+    assert_snapshot!(name("cast('1010' as dec(10))"), @"numeric");
+    assert_snapshot!(name("cast('1010' as decimal)"), @"numeric");
+    assert_snapshot!(name("cast('1010' as decimal(10))"), @"numeric");
 
     // char types
     assert_snapshot!(name("cast('hello' as character varying(10))"), @"varchar");
     assert_snapshot!(name("cast('hello' as char varying(5))"), @"varchar");
+    assert_snapshot!(name("cast('hello' as nchar varying(10))"), @"varchar");
     assert_snapshot!(name("cast('hello' as char(5))"), @"bpchar");
     assert_snapshot!(name("cast('hello' as character)"), @"bpchar");
     assert_snapshot!(name("cast('hello' as bpchar)"), @"bpchar");
+    assert_snapshot!(name("cast('hello' as nchar(10))"), @"bpchar");
 
     assert_snapshot!(name(r#"cast('hello' as "char")"#), @"char");
 
@@ -628,6 +664,8 @@ fn examples() {
     assert_snapshot!(name("cast(1.5 as double precision)"), @"float8");
     // real
     assert_snapshot!(name("cast(1.5 as real)"), @"float4");
+    assert_snapshot!(name("cast(1.5 as float(8))"), @"float4");
+    assert_snapshot!(name("cast(2.5 as float(25))"), @"float8");
 
     // interval types
     assert_snapshot!(name("cast('1 hour' as interval hour to minute)"), @"interval");

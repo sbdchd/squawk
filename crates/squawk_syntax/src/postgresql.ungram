@@ -61,6 +61,8 @@ ArgList =
  '(' '*' ')'
 | '(' ('distinct' | 'all') 'variadic'? Expr ')'
 | '(' args:(Expr (',' Expr)*)? ')'
+// TODO: Arg should be a union of *, Expr, or Expr list. Right now it doesn't do much
+| '(' args_:(Arg (',' Arg)*)? ')'
 
 CallExpr =
   Expr ArgList WithinClause? FilterClause? OverClause?
