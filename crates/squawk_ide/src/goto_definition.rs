@@ -9117,4 +9117,60 @@ window w as (
           ╰╴       ─ 2. destination
         ");
     }
+
+    #[test]
+    fn goto_cast_float_with_small_arg() {
+        assert_snapshot!(goto("
+create type pg_catalog.float4;
+select '1'::float$0(8);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float4;
+          │                        ────── 2. destination
+        3 │ select '1'::float(8);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_float_with_large_arg() {
+        assert_snapshot!(goto("
+create type pg_catalog.float8;
+select '1'::float$0(25);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float8;
+          │                        ────── 2. destination
+        3 │ select '1'::float(25);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_dec_with_modifier() {
+        assert_snapshot!(goto("
+create type pg_catalog.numeric;
+select '10'::dec$0(10, 2);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.numeric;
+          │                        ─────── 2. destination
+        3 │ select '10'::dec(10, 2);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_dec() {
+        assert_snapshot!(goto("
+create type pg_catalog.numeric;
+select '10'::dec$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.numeric;
+          │                        ─────── 2. destination
+        3 │ select '10'::dec;
+          ╰╴               ─ 1. source
+        ");
+    }
 }
