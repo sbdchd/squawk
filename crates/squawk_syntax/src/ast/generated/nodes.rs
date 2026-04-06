@@ -2094,6 +2094,10 @@ impl ArgList {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn args_(&self) -> AstChildren<Arg> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
@@ -8820,10 +8824,6 @@ pub struct ForPortionOf {
     pub(crate) syntax: SyntaxNode,
 }
 impl ForPortionOf {
-    #[inline]
-    pub fn alias(&self) -> Option<Alias> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
