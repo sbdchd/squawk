@@ -126,6 +126,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             } else {
                 extract_table_schema_from_name_ref(name_ref)?
             };
+            let type_name = resolve_float_precision(name_ref, type_name);
             let position = name_ref.syntax().text_range().start();
             resolve_type_name_ptr(binder, &type_name, &schema, position).map(|ptr| smallvec![ptr])
         }
@@ -609,13 +610,26 @@ fn fallback_type_alias(type_name: &Name) -> Option<Name> {
     match type_name.0.as_str() {
         "bigint" | "bigserial" | "serial8" => Some(Name::from_string("int8")),
         "boolean" => Some(Name::from_string("bool")),
-        "decimal" => Some(Name::from_string("numeric")),
+        "dec" | "decimal" => Some(Name::from_string("numeric")),
         "float" => Some(Name::from_string("float8")),
         "int" | "integer" | "serial" | "serial4" => Some(Name::from_string("int4")),
         "real" => Some(Name::from_string("float4")),
         "smallint" | "smallserial" | "serial2" => Some(Name::from_string("int2")),
         _ => None,
     }
+}
+
+fn resolve_float_precision(name_ref: &ast::NameRef, type_name: Name) -> Name {
+    if type_name.0.as_str() == "float"
+        && let Some(path_type) = name_ref.syntax().ancestors().find_map(ast::PathType::cast)
+        && let Some(arg_list) = path_type.arg_list()
+        && let Some(first_arg) = arg_list.args_().next()
+        && let Some(ast::Expr::Literal(lit)) = first_arg.expr()
+    {
+        let precision: u32 = lit.syntax().text().to_string().parse().unwrap_or(0);
+        return Name::from_string(if precision <= 24 { "float4" } else { "float8" });
+    }
+    type_name
 }
 
 fn resolve_view_name_ptr(
