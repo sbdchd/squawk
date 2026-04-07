@@ -54,8 +54,8 @@ use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::require_enum_value_ordering;
-use rules::require_timeout_settings;
 use rules::require_table_schema;
+use rules::require_timeout_settings;
 use rules::transaction_nesting;
 // xtask:new-rule:rule-import
 
@@ -95,6 +95,14 @@ pub enum Rule {
     RequireEnumValueOrdering,
     RequireTableSchema,
     // xtask:new-rule:error-name
+}
+
+impl Rule {
+    /// Rules that are opt-in are not enabled by default.
+    /// They must be explicitly included via configuration.
+    pub fn is_opt_in(&self) -> bool {
+        matches!(self, Rule::RequireTableSchema)
+    }
 }
 
 impl TryFrom<&str> for Rule {
@@ -459,12 +467,16 @@ impl Linter {
     }
 
     pub fn with_all_rules() -> Self {
-        let rules = all::<Rule>().collect::<FxHashSet<_>>();
+        let rules = all::<Rule>()
+            .filter(|r| !r.is_opt_in())
+            .collect::<FxHashSet<_>>();
         Linter::from(rules)
     }
 
     pub fn without_rules(exclude: &[Rule]) -> Self {
-        let all_rules = all::<Rule>().collect::<FxHashSet<_>>();
+        let all_rules = all::<Rule>()
+            .filter(|r| !r.is_opt_in())
+            .collect::<FxHashSet<_>>();
         let mut exclude_set = FxHashSet::with_capacity_and_hasher(exclude.len(), FxBuildHasher);
         for e in exclude {
             exclude_set.insert(e);

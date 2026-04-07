@@ -157,7 +157,7 @@ alter table t drop column c cascade;
         let sql = "
 -- fooo bar
 -- buzz
--- squawk-ignore prefer-robust-stmts, require-timeout-settings, require-table-schema
+-- squawk-ignore prefer-robust-stmts, require-timeout-settings
 create table x();
 
 select 1;
@@ -242,16 +242,15 @@ alter table t drop column c cascade;
     fn ignore_multiple_stmts() {
         let mut linter = Linter::with_all_rules();
         let sql = r#"
--- squawk-ignore ban-char-field,prefer-robust-stmts,require-timeout-settings,require-table-schema
+-- squawk-ignore ban-char-field,prefer-robust-stmts,require-timeout-settings
 alter table t add column c char;
 
--- squawk-ignore require-table-schema
 ALTER TABLE foo
 -- squawk-ignore adding-field-with-default,prefer-robust-stmts
-ADD COLUMN bar numeric GENERATED
+ADD COLUMN bar numeric GENERATED 
   ALWAYS AS (bar + baz) STORED;
 
--- squawk-ignore prefer-robust-stmts,require-table-schema
+-- squawk-ignore prefer-robust-stmts
 create table users (
 );
 "#;
@@ -313,13 +312,6 @@ create table users (
                 ),
             },
             Violation {
-                code: RequireTableSchema,
-                message: "Table name is not schema-qualified. Use schema.table (e.g., public.my_table).",
-                text_range: 0..31,
-                help: None,
-                fix: None,
-            },
-            Violation {
                 code: PreferRobustStmts,
                 message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
                 text_range: 14..31,
@@ -365,7 +357,7 @@ create table users (
     fn regression_unknown_name() {
         let mut linter = Linter::with_all_rules();
         let sql = r#"
--- squawk-ignore prefer-robust-stmts, require-timeout-settings, require-table-schema
+-- squawk-ignore prefer-robust-stmts, require-timeout-settings
 create table test_table (
   -- squawk-ignore prefer-timestamp-tz
   created_at timestamp default current_timestamp,
@@ -493,9 +485,7 @@ alter table t2 drop column c2 cascade;
         [
             RequireTimeoutSettings,
             RequireTimeoutSettings,
-            RequireTableSchema,
             PreferRobustStmts,
-            RequireTableSchema,
             PreferRobustStmts,
         ]
         ");
@@ -521,9 +511,7 @@ alter table t2 drop column c2 cascade;
         [
             RequireTimeoutSettings,
             RequireTimeoutSettings,
-            RequireTableSchema,
             PreferRobustStmts,
-            RequireTableSchema,
             PreferRobustStmts,
         ]
         ");
@@ -557,20 +545,12 @@ alter table t2 drop column c2 cascade;
                 "Missing `set statement_timeout` before potentially slow operations",
             ),
             (
-                RequireTableSchema,
-                "Table name is not schema-qualified. Use schema.table (e.g., public.my_table).",
-            ),
-            (
                 BanDropColumn,
                 "Dropping a column may break existing clients.",
             ),
             (
                 PreferRobustStmts,
                 "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
-            ),
-            (
-                RequireTableSchema,
-                "Table name is not schema-qualified. Use schema.table (e.g., public.my_table).",
             ),
             (
                 BanDropColumn,
@@ -600,13 +580,11 @@ alter table t2 drop column c2 cascade;
             .map(|x| x.code)
             .collect();
 
-        assert_debug_snapshot!(errors, @r"
+        assert_debug_snapshot!(errors, @"
         [
             RequireTimeoutSettings,
             RequireTimeoutSettings,
-            RequireTableSchema,
             PreferRobustStmts,
-            RequireTableSchema,
             PreferRobustStmts,
         ]
         ");
@@ -627,11 +605,10 @@ alter table t drop column c cascade;
             .map(|x| x.code)
             .collect();
 
-        assert_debug_snapshot!(errors, @r"
+        assert_debug_snapshot!(errors, @"
         [
             RequireTimeoutSettings,
             RequireTimeoutSettings,
-            RequireTableSchema,
         ]
         ");
     }

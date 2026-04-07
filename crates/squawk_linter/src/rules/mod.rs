@@ -27,8 +27,8 @@ pub(crate) mod renaming_table;
 pub(crate) mod require_concurrent_index_creation;
 pub(crate) mod require_concurrent_index_deletion;
 pub(crate) mod require_enum_value_ordering;
-pub(crate) mod require_timeout_settings;
 pub(crate) mod require_table_schema;
+pub(crate) mod require_timeout_settings;
 pub(crate) mod transaction_nesting;
 // xtask:new-rule:mod-decl
 
@@ -61,7 +61,7 @@ pub(crate) use renaming_table::renaming_table;
 pub(crate) use require_concurrent_index_creation::require_concurrent_index_creation;
 pub(crate) use require_concurrent_index_deletion::require_concurrent_index_deletion;
 pub(crate) use require_enum_value_ordering::require_enum_value_ordering;
-pub(crate) use require_timeout_settings::require_timeout_settings;
 pub(crate) use require_table_schema::require_table_schema;
+pub(crate) use require_timeout_settings::require_timeout_settings;
 pub(crate) use transaction_nesting::transaction_nesting;
 // xtask:new-rule:export
