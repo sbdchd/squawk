@@ -902,7 +902,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
 
 // Multi-word keyword phrases that should be highlighted as keywords, not
 // operators.
-const KEYWORD_PHRASES: &[&str] = &["if not exists", "if exists", "or replace"];
+const KEYWORD_PHRASES: &[&str] = &["if not exists", "or replace", "if exists"];
 
 // Multi-word entries must come before their single-word components so the
 // regex engine matches the longest form first.
