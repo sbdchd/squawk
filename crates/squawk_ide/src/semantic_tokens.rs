@@ -131,7 +131,7 @@ mod test {
             let start: usize = token.range.start().into();
             let end: usize = token.range.end().into();
             let token_text = &sql[start..end];
-            // TODO:
+            // TODO: once we get modfifiers, we'll need to update this
             let modifiers_text = "";
             writeln!(
                 result,
