@@ -84,17 +84,16 @@ pub fn semantic_tokens(
 
         match event {
             Enter(NodeOrToken::Node(node)) => {
-                if let Some(target) = ast::Target::cast(node) {
-                    if let Some(as_name) = target.as_name() {
-                        if let Some(name) = as_name.name() {
-                            let range = name.syntax().text_range();
-                            out.push(SemanticToken {
-                                range,
-                                token_type: SemanticTokenType::Name,
-                                modifiers: None,
-                            });
-                        }
-                    }
+                if let Some(target) = ast::Target::cast(node)
+                    && let Some(as_name) = target.as_name()
+                    && let Some(name) = as_name.name()
+                {
+                    let range = name.syntax().text_range();
+                    out.push(SemanticToken {
+                        range,
+                        token_type: SemanticTokenType::Name,
+                        modifiers: None,
+                    });
                 };
             }
             Enter(NodeOrToken::Token(token)) => {
