@@ -190,6 +190,10 @@ sql for benchmarks maybe?
 
   https://github.com/tanelpoder/tpt-postgres/blob/main/demos/pqrsafe.sql
 
+- Absurd
+
+  https://github.com/earendil-works/absurd/blob/56500e5a23beca5e976f329475063f24692d99cc/sql/absurd.sql
+
 ### CLI
 
 from `deno`

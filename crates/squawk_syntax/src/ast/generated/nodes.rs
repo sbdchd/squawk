@@ -12583,6 +12583,10 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn is_normalized(&self) -> Option<IsNormalized> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn is_not(&self) -> Option<IsNot> {
         support::child(&self.syntax)
     }
@@ -12608,6 +12612,10 @@ impl Op {
     }
     #[inline]
     pub fn is_not_json_value(&self) -> Option<IsNotJsonValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_normalized(&self) -> Option<IsNotNormalized> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12701,6 +12709,10 @@ impl Op {
     #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn isnull_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ISNULL_KW)
     }
     #[inline]
     pub fn like_token(&self) -> Option<SyntaxToken> {
