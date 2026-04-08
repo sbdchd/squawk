@@ -52,44 +52,6 @@
     }
   ],
   "repository": {
-    "create_entities": {
-      "patterns": [
-        {
-          "match": "(?i)\\b(create)\\s+(or\\s+replace\\s+)?(function|view)\\s+((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))",
-          "captures": {
-            "1": {
-              "name": "keyword.other.create.pgsql"
-            },
-            "2": {
-              "name": "keyword.other.pgsql"
-            },
-            "3": {
-              "name": "keyword.other.pgsql"
-            },
-            "4": {
-              "name": "entity.name.function.pgsql"
-            }
-          }
-        },
-        {
-          "match": "(?i)\\b(create)\\s+(aggregate|collation|conversion|database|domain|event\\s+trigger|group|(?:unique\\s+)?index|language|operator\\s+class|operator|rule|schema|sequence|(?:(?:global|local)\\s+)?(?:(?:temp|temporary|unlogged)\\s+)?table|tablespace|trigger|type|user|(?:materialized\\s+)?view)\\s+(if\\s+not\\s+exists\\s+)?((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))",
-          "captures": {
-            "1": {
-              "name": "keyword.other.create.pgsql"
-            },
-            "2": {
-              "name": "keyword.other.pgsql"
-            },
-            "3": {
-              "name": "keyword.other.pgsql"
-            },
-            "4": {
-              "name": "entity.name.function.pgsql"
-            }
-          }
-        }
-      ]
-    },
     "comments": {
       "patterns": [
         {
@@ -110,6 +72,44 @@
           },
           "end": "\\*/",
           "name": "comment.block.c"
+        }
+      ]
+    },
+    "create_entities": {
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "keyword.other.create.pgsql"
+            },
+            "2": {
+              "name": "keyword.other.pgsql"
+            },
+            "3": {
+              "name": "keyword.other.pgsql"
+            },
+            "4": {
+              "name": "entity.name.function.pgsql"
+            }
+          },
+          "match": "(?i)\\b(create)\\s+(or\\s+replace\\s+)?(function|view)\\s+((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "keyword.other.create.pgsql"
+            },
+            "2": {
+              "name": "keyword.other.pgsql"
+            },
+            "3": {
+              "name": "keyword.other.pgsql"
+            },
+            "4": {
+              "name": "entity.name.function.pgsql"
+            }
+          },
+          "match": "(?i)\\b(create)\\s+(aggregate|collation|conversion|database|domain|event\\s+trigger|group|(?:unique\\s+)?index|language|operator\\s+class|operator|rule|schema|sequence|(?:(?:global|local)\\s+)?(?:(?:temp|temporary|unlogged)\\s+)?table|tablespace|trigger|type|user|(?:materialized\\s+)?view)\\s+(if\\s+not\\s+exists\\s+)?((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))"
         }
       ]
     },
@@ -146,6 +146,14 @@
     "keywords": {
       "patterns": [
         {
+          "match": "(?i)\\b(if\\s+not\\s+exists|if\\s+exists)\\b",
+          "name": "keyword.other.pgsql"
+        },
+        {
+          "match": "(?i)\\b(not\\s+between\\s+symmetric|is\\s+not\\s+distinct\\s+from|between\\s+symmetric|is\\s+distinct\\s+from|not\\s+similar\\s+to|at\\s+time\\s+zone|not\\s+between|similar\\s+to|not\\s+ilike|not\\s+like|overlaps|between|collate|notnull|is\\s+not|not\\s+in|isnull|ilike|like|and|not|in|is|or)\\b",
+          "name": "keyword.operator.pgsql"
+        },
+        {
           "captures": {
             "1": {
               "name": "keyword.other.pgsql"
@@ -162,20 +170,12 @@
           "name": "constant.numeric.pgsql"
         },
         {
-          "match": "\\*",
-          "name": "keyword.operator.star.pgsql"
+          "match": "::",
+          "name": "keyword.operator.cast.pgsql"
         },
         {
-          "match": "[!<>]?=|<>|<|>",
-          "name": "keyword.operator.comparison.pgsql"
-        },
-        {
-          "match": "-|\\+|/",
-          "name": "keyword.operator.math.pgsql"
-        },
-        {
-          "match": "\\|\\|",
-          "name": "keyword.operator.concatenator.pgsql"
+          "match": "[+\\-*/<>=~!@#%\\^&|`?]",
+          "name": "keyword.operator.pgsql"
         }
       ]
     },

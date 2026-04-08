@@ -2661,7 +2661,7 @@ SOURCE_FILE
             LITERAL
               STRING "'foo'"
             WHITESPACE " "
-            ISNULL_KW "isnull"
+            NOTNULL_KW "notnull"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is true"

@@ -442,7 +442,55 @@ IsNot =
   'is' 'not'
 
 Op =
-'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | NotSimilarTo | AtTimeZone | IsJson | IsJsonValue | IsNotJson | IsJsonObject | IsJsonArray |IsJsonScalar | IsNotJsonValue | IsNotJsonObject | IsNotJsonArray | IsNotJsonScalar
+'or' 
+| '-' 
+| ':' 
+| '/' 
+| '%' 
+| '^' 
+| '+' 
+| '<' 
+| '=' 
+| '>' 
+| 'and' 
+| 'collate' 
+| 'ilike' 
+| 'in' 
+| 'is'
+| 'isnull'
+| 'like' 
+| 'overlaps' 
+| 'value' 
+| AtTimeZone 
+| ColonColon 
+| ColonEq 
+| CustomOp 
+| FatArrow 
+| Gteq 
+| IsDistinctFrom 
+| IsJson 
+| IsJsonArray 
+| IsJsonObject 
+| IsJsonScalar 
+| IsJsonValue 
+| IsNormalized
+| IsNot 
+| IsNotDistinctFrom 
+| IsNotJson 
+| IsNotJsonArray 
+| IsNotJsonObject 
+| IsNotJsonScalar 
+| IsNotJsonValue 
+| IsNotNormalized
+| Lteq 
+| Neq 
+| Neqb 
+| NotIlike 
+| NotIn 
+| NotLike 
+| NotSimilarTo 
+| OperatorCall 
+| SimilarTo 
 
 IsJson =
   'is' 'json' JsonKeysUniqueClause?
