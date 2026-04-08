@@ -2511,7 +2511,9 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         // could be start of `is distinct from`
         && !(p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))
     {
+        let m = p.start();
         col_label(p);
+        m.complete(p, AS_NAME);
         return Some(lhs);
     }
     if r.order_by_allowed && p.at(ORDER_KW) {

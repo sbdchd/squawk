@@ -146,7 +146,7 @@
     "keywords": {
       "patterns": [
         {
-          "match": "(?i)\\b(if\\s+not\\s+exists|if\\s+exists)\\b",
+          "match": "(?i)\\b(if\\s+not\\s+exists|or\\s+replace|if\\s+exists)\\b",
           "name": "keyword.other.pgsql"
         },
         {
