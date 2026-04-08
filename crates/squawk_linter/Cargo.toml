@@ -24,6 +24,12 @@ line-index.workspace = true
 serde_plain.workspace = true
 annotate-snippets.workspace = true
 rustc-hash.workspace = true
+toml.workspace = true
+anyhow.workspace = true
+log.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true

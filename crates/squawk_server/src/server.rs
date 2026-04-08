@@ -7,7 +7,9 @@ use lsp_types::{
     HoverProviderCapability, InitializeParams, OneOf, SelectionRangeProviderCapability,
     ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions,
 };
+use squawk_linter::config::ConfigFile;
 
+use crate::config::LintConfig;
 use crate::global_state::GlobalState;
 
 pub fn run() -> Result<()> {
@@ -77,5 +79,38 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
     let client_name = init_params.client_info.map(|x| x.name);
     info!("Client name: {client_name:?}");
 
-    GlobalState::new(connection.sender).run(connection.receiver)
+    let workspace_root = init_params
+        .workspace_folders
+        .as_ref()
+        .and_then(|folders| folders.first())
+        .and_then(|folder| folder.uri.to_file_path().ok())
+        .or_else(|| {
+            #[allow(deprecated)]
+            init_params
+                .root_uri
+                .as_ref()
+                .and_then(|uri| uri.to_file_path().ok())
+        })
+        .or_else(|| {
+            #[allow(deprecated)]
+            init_params.root_path.as_ref().map(std::path::PathBuf::from)
+        });
+
+    let config_file = workspace_root.as_ref().and_then(|root| {
+        ConfigFile::find_and_parse(root)
+            .map_err(|e| {
+                log::warn!("error loading config: {e}");
+                e
+            })
+            .ok()
+            .flatten()
+    });
+
+    let config = LintConfig::from_config_file(config_file, workspace_root);
+    info!("excluded rules: {:?}", config.excluded_rules);
+    info!("pg version: {:?}", config.pg_version);
+    info!("assume in transaction: {}", config.assume_in_transaction);
+    info!("excluded paths: {:?}", config.excluded_paths);
+
+    GlobalState::new(connection.sender, config).run(connection.receiver)
 }
