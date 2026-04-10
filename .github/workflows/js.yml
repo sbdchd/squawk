@@ -69,4 +69,4 @@ jobs:
       - name: Install dependencies
         run: ./s/ci-install
       - name: Check Formatting
-        run: ./s/prettier
+        run: ./s/oxfmt

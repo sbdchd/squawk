@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": false,
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "build/",
+    "node_modules/",
+    "playground/",
+    "coverage/",
+    ".venv/",
+    ".mypy_cache/",
+    ".terraform/",
+    ".pytest_cache/",
+    "target/",
+    "docs",
+    "squawk-vscode/syntaxes/pgsql.tmLanguage.json",
+    "squawk-vscode/.vscode-test/",
+    "squawk-vscode/dist/"
+  ]
+}
