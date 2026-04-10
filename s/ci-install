@@ -1,2 +1,2 @@
 #!/bin/sh
-exec yarn --frozen-lockfile --ignore-scripts
+exec pnpm install --frozen-lockfile --ignore-scripts
