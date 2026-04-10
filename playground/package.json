@@ -17,7 +17,7 @@
     "@tailwindcss/vite": "^4.1.12",
     "lz-string": "^1.5.0",
     "monaco-editor": "^0.52.2",
-    "oxfmt": "^0.1.0",
+    "oxfmt": "^0.44.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.12"
@@ -37,7 +37,7 @@
     "vite": "^6.4.1"
   },
   "volta": {
-    "node": "18.20.8",
+    "node": "20.19.0",
     "pnpm": "9.15.4"
   }
 }

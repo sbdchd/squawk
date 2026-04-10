@@ -1,4 +1,6 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "semi": false
+  "semi": false,
+  "printWidth": 80,
+  "sortPackageJson": false
 }
