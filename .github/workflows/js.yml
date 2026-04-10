@@ -54,7 +54,7 @@ jobs:
       - name: Lint JS
         run: ./s/eslint
 
-  oxfmt:
+  prettier:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
 
