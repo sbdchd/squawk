@@ -24,6 +24,7 @@ import {
   provideCompletionItems,
   semanticTokensProvider,
 } from "./providers"
+import { language as pgsqlMonarchLanguage } from "./pgsql"
 import BUILTINS_SQL from "./builtins.sql?raw"
 
 const modes = ["Lint", "Syntax Tree", "Tokens"] as const
@@ -282,6 +283,77 @@ function assertNever(x: never): never {
   throw new Error(`expected never, got ${x}`)
 }
 
+const pgsqlConfig: monaco.languages.LanguageConfiguration = {
+  comments: {
+    lineComment: "--",
+    blockComment: ["/*", "*/"],
+  },
+  brackets: [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+  ],
+  autoClosingPairs: [
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "(", close: ")" },
+    { open: '"', close: '"', notIn: ["string"] },
+    { open: "$$", close: "$$", notIn: ["string", "comment"] },
+    { open: "E'", close: "'", notIn: ["string", "comment"] },
+    { open: "e'", close: "'", notIn: ["string", "comment"] },
+    { open: "U&'", close: "'", notIn: ["string", "comment"] },
+    { open: "u&'", close: "'", notIn: ["string", "comment"] },
+    { open: "B'", close: "'", notIn: ["string", "comment"] },
+    { open: "b'", close: "'", notIn: ["string", "comment"] },
+    { open: "X'", close: "'", notIn: ["string", "comment"] },
+    { open: "x'", close: "'", notIn: ["string", "comment"] },
+    { open: "N'", close: "'", notIn: ["string", "comment"] },
+    { open: "'", close: "'", notIn: ["string", "comment"] },
+    { open: "/*", close: " */", notIn: ["string", "comment"] },
+  ],
+  surroundingPairs: [
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "(", close: ")" },
+    { open: '"', close: '"' },
+    { open: "'", close: "'" },
+    { open: "`", close: "`" },
+    { open: "$$", close: "$$" },
+  ],
+  onEnterRules: [
+    {
+      beforeText: /^\s*--.*$/,
+      afterText: /\S/,
+      action: {
+        indentAction: monaco.languages.IndentAction.None,
+        appendText: "-- ",
+      },
+    },
+    {
+      beforeText: /^\s*\/\*/,
+      afterText: /^\s*\*\/$/,
+      action: {
+        indentAction: monaco.languages.IndentAction.IndentOutdent,
+        appendText: " * ",
+      },
+    },
+    {
+      beforeText: /^\s*\/\*(?!.*\*\/).*$/,
+      action: {
+        indentAction: monaco.languages.IndentAction.None,
+        appendText: " * ",
+      },
+    },
+    {
+      beforeText: /^\s*\*(?!\/).*$/,
+      action: {
+        indentAction: monaco.languages.IndentAction.None,
+        appendText: "* ",
+      },
+    },
+  ],
+}
+
 let monacoGlobalProvidersRegistered = false
 // Only want to register these once, otherwise we'll end up with multiple
 // providers running and get dupe results for things like hover
@@ -299,76 +371,15 @@ function registerMonacoProvidersOnce() {
     rules: [{ token: "variable", foreground: "D4D4D4" }],
     colors: {},
   })
-  const languageConfig = monaco.languages.setLanguageConfiguration("pgsql", {
-    comments: {
-      lineComment: "--",
-      blockComment: ["/*", "*/"],
-    },
-    brackets: [
-      ["{", "}"],
-      ["[", "]"],
-      ["(", ")"],
-    ],
-    autoClosingPairs: [
-      { open: "{", close: "}" },
-      { open: "[", close: "]" },
-      { open: "(", close: ")" },
-      { open: '"', close: '"', notIn: ["string"] },
-      { open: "$$", close: "$$", notIn: ["string", "comment"] },
-      { open: "E'", close: "'", notIn: ["string", "comment"] },
-      { open: "e'", close: "'", notIn: ["string", "comment"] },
-      { open: "U&'", close: "'", notIn: ["string", "comment"] },
-      { open: "u&'", close: "'", notIn: ["string", "comment"] },
-      { open: "B'", close: "'", notIn: ["string", "comment"] },
-      { open: "b'", close: "'", notIn: ["string", "comment"] },
-      { open: "X'", close: "'", notIn: ["string", "comment"] },
-      { open: "x'", close: "'", notIn: ["string", "comment"] },
-      { open: "N'", close: "'", notIn: ["string", "comment"] },
-      { open: "'", close: "'", notIn: ["string", "comment"] },
-      { open: "/*", close: " */", notIn: ["string", "comment"] },
-    ],
-    surroundingPairs: [
-      { open: "{", close: "}" },
-      { open: "[", close: "]" },
-      { open: "(", close: ")" },
-      { open: '"', close: '"' },
-      { open: "'", close: "'" },
-      { open: "`", close: "`" },
-      { open: "$$", close: "$$" },
-    ],
-    onEnterRules: [
-      {
-        beforeText: /^\s*--.*$/,
-        afterText: /\S/,
-        action: {
-          indentAction: monaco.languages.IndentAction.None,
-          appendText: "-- ",
-        },
-      },
-      {
-        beforeText: /^\s*\/\*/,
-        afterText: /^\s*\*\/$/,
-        action: {
-          indentAction: monaco.languages.IndentAction.IndentOutdent,
-          appendText: " * ",
-        },
-      },
-      {
-        beforeText: /^\s*\/\*(?!.*\*\/).*$/,
-        action: {
-          indentAction: monaco.languages.IndentAction.None,
-          appendText: " * ",
-        },
-      },
-      {
-        beforeText: /^\s*\*(?!\/).*$/,
-        action: {
-          indentAction: monaco.languages.IndentAction.None,
-          appendText: "* ",
-        },
-      },
-    ],
-  })
+  const languageConfig = monaco.languages.setLanguageConfiguration(
+    "pgsql",
+    pgsqlConfig,
+  )
+  const pgsqlTokenProvider = monaco.languages.setMonarchTokensProvider(
+    "pgsql",
+    pgsqlMonarchLanguage,
+  )
+
   monaco.languages.register({ id: "rast" })
   const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
     tokenizer: {
@@ -492,6 +503,7 @@ function registerMonacoProvidersOnce() {
 
   return () => {
     languageConfig.dispose()
+    pgsqlTokenProvider.dispose()
     codeActionProvider.dispose()
     hoverProvider.dispose()
     definitionProvider.dispose()
