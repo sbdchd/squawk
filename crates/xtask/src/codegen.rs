@@ -83,6 +83,11 @@ pub(crate) fn codegen() -> Result<()> {
 
     update_textmate_keywords(&keyword_kinds.all_keywords)?;
 
+    let playground_keywords = generate_playground_keywords(&keyword_kinds.all_keywords)?;
+    let playground_keywords_file = project_root().join("playground/src/generated/keywords.ts");
+    std::fs::write(playground_keywords_file, playground_keywords)
+        .context("problem writing playground keywords")?;
+
     let kinds = generate_kind_src(&ast_src.nodes, &grammar, keyword_kinds.all_keywords);
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
@@ -954,6 +959,13 @@ fn keywords_match(all_keywords: &[String]) -> String {
     keywords.sort();
     let keywords_joined = keywords.join("|");
     format!("(?xi)\\b({keywords_joined})\\b")
+}
+
+fn generate_playground_keywords(all_keywords: &[String]) -> Result<String> {
+    let keywords_json = serde_json::to_string_pretty(all_keywords)?;
+    Ok(format!(
+        "{PRELUDE}export const keywords = {keywords_json} as const\n"
+    ))
 }
 
 fn update_textmate_keywords(all_keywords: &[String]) -> Result<()> {
