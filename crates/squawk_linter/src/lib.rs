@@ -54,6 +54,7 @@ use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::require_enum_value_ordering;
+use rules::require_table_schema;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
 // xtask:new-rule:rule-import
@@ -92,7 +93,16 @@ pub enum Rule {
     RequireTimeoutSettings,
     BanUncommittedTransaction,
     RequireEnumValueOrdering,
+    RequireTableSchema,
     // xtask:new-rule:error-name
+}
+
+impl Rule {
+    /// Rules that are opt-in are not enabled by default.
+    /// They must be explicitly included via configuration.
+    pub fn is_opt_in(&self) -> bool {
+        matches!(self, Rule::RequireTableSchema)
+    }
 }
 
 impl TryFrom<&str> for Rule {
@@ -135,6 +145,7 @@ impl TryFrom<&str> for Rule {
             "require-timeout-settings" => Ok(Rule::RequireTimeoutSettings),
             "ban-uncommitted-transaction" => Ok(Rule::BanUncommittedTransaction),
             "require-enum-value-ordering" => Ok(Rule::RequireEnumValueOrdering),
+            "require-table-schema" => Ok(Rule::RequireTableSchema),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -198,6 +209,7 @@ impl fmt::Display for Rule {
             Rule::RequireTimeoutSettings => "require-timeout-settings",
             Rule::BanUncommittedTransaction => "ban-uncommitted-transaction",
             Rule::RequireEnumValueOrdering => "require-enum-value-ordering",
+            Rule::RequireTableSchema => "require-table-schema",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -428,6 +440,9 @@ impl Linter {
         if self.rules.contains(&Rule::RequireEnumValueOrdering) {
             require_enum_value_ordering(self, file);
         }
+        if self.rules.contains(&Rule::RequireTableSchema) {
+            require_table_schema(self, file);
+        }
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file
@@ -452,12 +467,16 @@ impl Linter {
     }
 
     pub fn with_all_rules() -> Self {
-        let rules = all::<Rule>().collect::<FxHashSet<_>>();
+        let rules = all::<Rule>()
+            .filter(|r| !r.is_opt_in())
+            .collect::<FxHashSet<_>>();
         Linter::from(rules)
     }
 
     pub fn without_rules(exclude: &[Rule]) -> Self {
-        let all_rules = all::<Rule>().collect::<FxHashSet<_>>();
+        let all_rules = all::<Rule>()
+            .filter(|r| !r.is_opt_in())
+            .collect::<FxHashSet<_>>();
         let mut exclude_set = FxHashSet::with_capacity_and_hasher(exclude.len(), FxBuildHasher);
         for e in exclude {
             exclude_set.insert(e);
