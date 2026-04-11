@@ -909,6 +909,74 @@ select current_timestamp$0;
     }
 
     #[test]
+    fn goto_current_user() {
+        assert_snapshot!(goto("
+create function pg_catalog.current_user() returns name
+  language internal;
+select current_user$0;
+"), @"
+          ╭▸ 
+        2 │ create function pg_catalog.current_user() returns name
+          │                            ──────────── 2. destination
+        3 │   language internal;
+        4 │ select current_user;
+          ╰╴                  ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_user_keyword() {
+        assert_snapshot!(goto("
+create function pg_catalog.current_user() returns name
+  language internal;
+select user$0;
+"), @"
+          ╭▸ 
+        2 │ create function pg_catalog.current_user() returns name
+          │                            ──────────── 2. destination
+        3 │   language internal;
+        4 │ select user;
+          ╰╴          ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_session_user() {
+        assert_snapshot!(goto("
+create function pg_catalog.session_user() returns name
+  language internal;
+select session_user$0;
+"), @"
+          ╭▸ 
+        2 │ create function pg_catalog.session_user() returns name
+          │                            ──────────── 2. destination
+        3 │   language internal;
+        4 │ select session_user;
+          ╰╴                  ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_current_schema() {
+        assert_snapshot!(goto("
+create function current_schema() returns name
+  language internal;
+select current_schema$0;
+"), @"
+          ╭▸ 
+        2 │ create function current_schema() returns name
+          │                 ────────────── 2. destination
+        3 │   language internal;
+        4 │ select current_schema;
+          ╰╴                    ─ 1. source
+        "
+        );
+    }
+
+    #[test]
     fn goto_current_timestamp_cte_column() {
         assert_snapshot!(goto("
 with t as (select 1 current_timestamp)

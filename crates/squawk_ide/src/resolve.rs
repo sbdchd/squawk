@@ -500,7 +500,7 @@ pub(crate) fn resolve_name_ref_ptrs(
                 .map(|ptr| smallvec![ptr])
         }
     }
-    .or_else(|| resolve_current_timestamp_as_now(binder, name_ref))
+    .or_else(|| resolve_special_keyword_as_function(binder, name_ref))
 }
 
 fn resolve_table_name_ptr(
@@ -725,22 +725,24 @@ fn resolve_for_kind_with_params(
     binder.lookup_with_params(name, kind, position, schema, params)
 }
 
-/// `current_timestamp` is equivalent to `now()`
-fn resolve_current_timestamp_as_now(
+// some keywords behave as functions
+fn resolve_special_keyword_as_function(
     binder: &Binder,
     name_ref: &ast::NameRef,
 ) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
-    if name_ref
+    let function_name = name_ref
         .syntax()
         .first_child_or_token()
-        .is_some_and(|t| t.kind() == SyntaxKind::CURRENT_TIMESTAMP_KW)
-    {
-        let now_name = Name::from_string("now");
-        let position = name_ref.syntax().text_range().start();
-        return resolve_function(binder, &now_name, &None, None, position)
-            .map(|ptr| smallvec![ptr]);
-    }
-    None
+        .and_then(|t| match t.kind() {
+            SyntaxKind::CURRENT_SCHEMA_KW => Some("current_schema"),
+            SyntaxKind::CURRENT_TIMESTAMP_KW => Some("now"),
+            SyntaxKind::CURRENT_USER_KW | SyntaxKind::USER_KW => Some("current_user"),
+            SyntaxKind::SESSION_USER_KW => Some("session_user"),
+            _ => None,
+        })?;
+    let function_name = Name::from_string(function_name);
+    let position = name_ref.syntax().text_range().start();
+    resolve_function(binder, &function_name, &None, None, position).map(|ptr| smallvec![ptr])
 }
 
 fn resolve_function(
