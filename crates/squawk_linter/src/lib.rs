@@ -5,6 +5,7 @@ use enum_iterator::Sequence;
 use enum_iterator::all;
 pub use ignore::Ignore;
 use ignore::find_ignores;
+use ignore::find_transaction_override;
 use ignore_index::IgnoreIndex;
 use rowan::TextRange;
 use rowan::TextSize;
@@ -332,6 +333,10 @@ impl Linter {
 
     #[must_use]
     pub fn lint(&mut self, file: &Parse<SourceFile>, text: &str) -> Vec<Violation> {
+        if let Some(override_value) = find_transaction_override(&file.syntax_node()) {
+            self.settings.assume_in_transaction = override_value;
+        }
+
         if self.rules.contains(&Rule::AddingFieldWithDefault) {
             adding_field_with_default(self, file);
         }

@@ -54,6 +54,22 @@ alter table t drop column c cascade;
 create table t (a int);
 ```
 
+### Overriding `assume_in_transaction` via comments
+
+If you have `assume_in_transaction = true` set globally (via config or CLI flag), you can disable it for a specific file with `squawk-disable-assume-in-transaction`:
+
+```sql
+-- squawk-disable-assume-in-transaction
+CREATE INDEX CONCURRENTLY IF NOT EXISTS my_idx ON my_table (col);
+```
+
+Similarly, you can enable it for a specific file with `squawk-enable-assume-in-transaction`:
+
+```sql
+-- squawk-enable-assume-in-transaction
+ALTER TABLE my_table ADD COLUMN my_col integer;
+```
+
 ## Files
 
 Files can be excluded from linting via the `--exclude-path` flag. Glob matching is supported and the flag can be provided multiple times.
