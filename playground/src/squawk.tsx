@@ -121,6 +121,19 @@ export function completion(
   return getDb(content, version).completion(line, column)
 }
 
+export interface SemanticTokensLegend {
+  tokenTypes: string[]
+  tokenModifiers: string[]
+}
+
+export function semantic_tokens(content: string, version: number): Uint32Array {
+  return getDb(content, version).semantic_tokens()
+}
+
+export function semantic_tokens_legend(): SemanticTokensLegend {
+  return SquawkDatabase.semantic_tokens_legend()
+}
+
 export function dump_cst(content: string, version: number): string {
   return getDb(content, version).dump_cst()
 }
