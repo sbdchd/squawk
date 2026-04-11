@@ -1,15 +1,103 @@
 use line_index::LineIndex;
 use log::info;
-use rowan::TextRange;
+use rowan::{TextRange, TextSize};
 use salsa::Setter;
 use serde::{Deserialize, Serialize};
 use squawk_ide::builtins::builtins_line_index;
 use squawk_ide::db::{self, Database, File};
 use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
 use squawk_ide::goto_definition::FileId;
+use squawk_ide::semantic_tokens::{SemanticTokenType, semantic_tokens};
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
 use web_sys::js_sys::Error;
+
+const SEMANTIC_TOKEN_TYPES: &[&str] = &[
+    "comment",
+    "function",
+    "keyword",
+    "namespace",
+    "number",
+    "operator",
+    "parameter",
+    "property",
+    "string",
+    "struct",
+    "type",
+    "variable",
+];
+
+const SEMANTIC_TOKEN_MODIFIERS: &[&str] = &["declaration", "definition", "readonly"];
+
+fn semantic_token_type_name(ty: SemanticTokenType) -> &'static str {
+    match ty {
+        SemanticTokenType::Bool | SemanticTokenType::Keyword => "keyword",
+        SemanticTokenType::Comment => "comment",
+        SemanticTokenType::Function => "function",
+        SemanticTokenType::Name | SemanticTokenType::NameRef => "variable",
+        SemanticTokenType::Number => "number",
+        SemanticTokenType::Operator | SemanticTokenType::Punctuation => "operator",
+        SemanticTokenType::Parameter | SemanticTokenType::PositionalParam => "parameter",
+        SemanticTokenType::String => "string",
+        SemanticTokenType::Type => "type",
+    }
+}
+
+fn semantic_token_type_index(ty: SemanticTokenType) -> u32 {
+    let name = semantic_token_type_name(ty);
+    SEMANTIC_TOKEN_TYPES
+        .iter()
+        .position(|it| *it == name)
+        .unwrap() as u32
+}
+
+struct EncodedSemanticToken {
+    line: u32,
+    start: u32,
+    length: u32,
+    token_type: SemanticTokenType,
+    modifiers: u32,
+}
+
+struct SemanticTokenEncoder {
+    data: Vec<u32>,
+    prev_line: u32,
+    prev_start: u32,
+}
+
+impl SemanticTokenEncoder {
+    fn with_capacity(token_count: usize) -> Self {
+        Self {
+            data: Vec::with_capacity(token_count * 5),
+            prev_line: 0,
+            prev_start: 0,
+        }
+    }
+
+    fn push(&mut self, token: EncodedSemanticToken) {
+        let delta_line = token.line - self.prev_line;
+        let delta_start = if delta_line == 0 {
+            token.start - self.prev_start
+        } else {
+            token.start
+        };
+
+        self.data.extend_from_slice(&[
+            delta_line,
+            delta_start,
+            token.length,
+            semantic_token_type_index(token.token_type),
+            token.modifiers,
+        ]);
+
+        self.prev_line = token.line;
+        self.prev_start = token.start;
+    }
+
+    fn finish(self) -> Vec<u32> {
+        self.data
+    }
+}
 
 #[wasm_bindgen(start)]
 pub fn run() {
@@ -429,6 +517,55 @@ impl SquawkDatabase {
         serde_wasm_bindgen::to_value(&results).map_err(into_error)
     }
 
+    pub fn semantic_tokens(&self) -> Result<Vec<u32>, Error> {
+        let file = self.file()?;
+        let line_index = db::line_index(&self.db, file);
+        let content = file.content(&self.db);
+        let tokens = semantic_tokens(&self.db, file, None);
+
+        let mut encoder = SemanticTokenEncoder::with_capacity(tokens.len());
+
+        // Duplicated from squawk-server, fyi
+        for token in &tokens {
+            // Taken from rust-analyzer, this solves the case where we have a
+            // multi line semantic token which isn't supported by the LSP spec.
+            // see: https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/lsp/to_proto.rs#L781C28-L781C28
+            for mut text_range in line_index.lines(token.range) {
+                if content[text_range].ends_with('\n') {
+                    text_range =
+                        TextRange::new(text_range.start(), text_range.end() - TextSize::of('\n'));
+                }
+                let start_lc = line_index.line_col(text_range.start());
+                let end_lc = line_index.line_col(text_range.end());
+                let start_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, start_lc)
+                    .unwrap();
+                let end_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, end_lc)
+                    .unwrap();
+
+                encoder.push(EncodedSemanticToken {
+                    line: start_wide.line,
+                    start: start_wide.col,
+                    length: end_wide.col - start_wide.col,
+                    token_type: token.token_type,
+                    // TODO: once we get modifiers going, we'll need to update this
+                    modifiers: 0,
+                });
+            }
+        }
+
+        Ok(encoder.finish())
+    }
+
+    pub fn semantic_tokens_legend() -> Result<JsValue, Error> {
+        let legend = SemanticTokensLegend {
+            token_types: SEMANTIC_TOKEN_TYPES.to_vec(),
+            token_modifiers: SEMANTIC_TOKEN_MODIFIERS.to_vec(),
+        };
+        serde_wasm_bindgen::to_value(&legend).map_err(into_error)
+    }
+
     pub fn completion(&self, line: u32, col: u32) -> Result<JsValue, Error> {
         let file = self.file()?;
         let line_index = db::line_index(&self.db, file);
@@ -654,6 +791,14 @@ struct WasmSelectionRange {
     start_column: u32,
     end_line: u32,
     end_column: u32,
+}
+
+#[derive(Serialize)]
+struct SemanticTokensLegend {
+    #[serde(rename = "tokenTypes")]
+    token_types: Vec<&'static str>,
+    #[serde(rename = "tokenModifiers")]
+    token_modifiers: Vec<&'static str>,
 }
 
 #[derive(Serialize)]

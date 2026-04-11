@@ -6,7 +6,6 @@
   "ignorePatterns": [
     "build/",
     "node_modules/",
-    "playground/",
     "coverage/",
     ".venv/",
     ".mypy_cache/",

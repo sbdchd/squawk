@@ -242,6 +242,7 @@ pub(crate) fn to_semantic_tokens(
         prev_start: 0,
     };
 
+    // Duplicated in squawk-wasm, fyi
     for token in &*semantic_tokens {
         // Taken from rust-analyzer, this solves the case where we have a multi
         // line semantic token which isn't supported by the LSP spec.

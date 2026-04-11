@@ -9,6 +9,8 @@ import {
   hover,
   inlay_hints,
   selection_ranges,
+  semantic_tokens,
+  semantic_tokens_legend,
   DocumentSymbol,
 } from "./squawk"
 
@@ -314,6 +316,27 @@ function convertCompletionKind(
       return monaco.languages.CompletionItemKind.Text
   }
 }
+
+export const semanticTokensProvider: monaco.languages.DocumentSemanticTokensProvider =
+  {
+    getLegend() {
+      return semantic_tokens_legend()
+    },
+    provideDocumentSemanticTokens(model) {
+      const content = model.getValue()
+      const version = model.getVersionId()
+      if (!content) return null
+
+      try {
+        const data = semantic_tokens(content, version)
+        return { data, resultId: undefined }
+      } catch (e) {
+        console.error("Error in provideDocumentSemanticTokens:", e)
+        return null
+      }
+    },
+    releaseDocumentSemanticTokens() {},
+  }
 
 export async function provideCompletionItems(
   model: monaco.editor.ITextModel,

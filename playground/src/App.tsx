@@ -22,6 +22,7 @@ import {
   provideFoldingRanges,
   provideSelectionRanges,
   provideCompletionItems,
+  semanticTokensProvider,
 } from "./providers"
 import BUILTINS_SQL from "./builtins.sql?raw"
 
@@ -48,7 +49,7 @@ const SETTINGS = {
   value: DEFAULT_CONTENT,
   language: "pgsql",
   tabSize: 2,
-  theme: "vs-dark",
+  theme: "squawk-dark",
   minimap: { enabled: false },
   automaticLayout: true,
   scrollBeyondLastLine: false,
@@ -64,6 +65,7 @@ const SETTINGS = {
   renderWhitespace: "boundary",
   guides: { indentation: false },
   lineNumbersMinChars: 3,
+  "semanticHighlighting.enabled": true,
 } satisfies monaco.editor.IStandaloneEditorConstructionOptions
 
 function clx(...args: (string | undefined | number | false)[]): string {
@@ -288,6 +290,15 @@ function registerMonacoProvidersOnce() {
     return
   }
   monacoGlobalProvidersRegistered = true
+  // vs-dark maps variable to a blue color which makes everything look like a
+  // keyword. So we use white instead which was what the `foo` in `select 1 foo`
+  // was before semantic syntax highlighting.
+  monaco.editor.defineTheme("squawk-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [{ token: "variable", foreground: "D4D4D4" }],
+    colors: {},
+  })
   const languageConfig = monaco.languages.setLanguageConfiguration("pgsql", {
     comments: {
       lineComment: "--",
@@ -473,6 +484,12 @@ function registerMonacoProvidersOnce() {
     },
   )
 
+  const documentSemanticTokensProvider =
+    monaco.languages.registerDocumentSemanticTokensProvider(
+      "pgsql",
+      semanticTokensProvider,
+    )
+
   return () => {
     languageConfig.dispose()
     codeActionProvider.dispose()
@@ -484,6 +501,7 @@ function registerMonacoProvidersOnce() {
     inlayHintsProvider.dispose()
     selectionRangeProvider.dispose()
     completionProvider.dispose()
+    documentSemanticTokensProvider.dispose()
     tokenProvider.dispose()
   }
 }
