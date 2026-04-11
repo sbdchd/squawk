@@ -512,5 +512,5 @@ export const keywords = [
   "xmltable",
   "year",
   "yes",
-  "zone"
+  "zone",
 ] as const
