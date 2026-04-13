@@ -664,7 +664,6 @@ CompressionMethod =
   'compression' ('#ident' | 'default')
 
 Column =
-  'period'?
   (
     Name WithOptions? constraints:ColumnConstraint*
       DeferrableConstraintOption? NotDeferrableConstraintOption?
@@ -674,7 +673,7 @@ Column =
       DeferrableConstraintOption? NotDeferrableConstraintOption?
       InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
       NotEnforced? Enforced?
-  | NameRef
+  | 'period'? NameRef
   | IndexExpr
   )
 ColumnConstraint =

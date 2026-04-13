@@ -214,7 +214,7 @@
             "1": {
               "name": "punctuation.definition.string.begin.pgsql"
             },
-            "3": {
+            "2": {
               "name": "punctuation.definition.string.end.pgsql"
             }
           },
