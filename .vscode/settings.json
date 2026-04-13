@@ -11,5 +11,8 @@
   },
   "[sql]": {
     "editor.tabSize": 2
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   }
 }
