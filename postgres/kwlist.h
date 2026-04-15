@@ -1,10 +1,10 @@
-// synced from: 
-//   commit: effaa464afd355e8927bf430cfe6a0ddd2ee5695
-//   committed at: 2026-04-02T12:39:57Z
-//   file: https://github.com/postgres/postgres/blob/effaa464afd355e8927bf430cfe6a0ddd2ee5695/src/include/parser/kwlist.h
+// synced from:
+//   commit: 972c14fb9134fdfd76ea6ebcf98a55a945bbc988
+//   committed at: 2026-04-14T21:06:27-04:00
+//   file: https://github.com/postgres/postgres/blob/972c14fb9134fdfd76ea6ebcf98a55a945bbc988/src/include/parser/kwlist.h
 //
 // update via:
-//   cargo xtask sync-kwlist
+//   cargo xtask sync-pg
 
 /*-------------------------------------------------------------------------
  *
