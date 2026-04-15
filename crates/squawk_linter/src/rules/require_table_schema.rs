@@ -22,21 +22,20 @@ pub(crate) fn require_table_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) 
             ast::Stmt::DropTable(drop_table) => {
                 check_path(ctx, drop_table.path(), drop_table.syntax());
             }
-            _ => {}
+            _ => (),
         }
     }
 }
 
 fn check_path(ctx: &mut Linter, path: Option<ast::Path>, syntax: &squawk_syntax::SyntaxNode) {
-    if let Some(path) = path {
-        if path.qualifier().is_none() {
-            ctx.report(Violation::for_node(
-                Rule::RequireTableSchema,
-                "Table name is not schema-qualified. Use schema.table (e.g., public.my_table)."
-                    .into(),
-                syntax,
-            ));
-        }
+    if let Some(path) = path
+        && path.qualifier().is_none()
+    {
+        ctx.report(Violation::for_node(
+            Rule::RequireTableSchema,
+            "Table name is not schema-qualified. Use schema.table (e.g., public.my_table).".into(),
+            syntax,
+        ));
     }
 }
 
