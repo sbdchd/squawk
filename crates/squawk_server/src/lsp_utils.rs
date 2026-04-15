@@ -319,6 +319,9 @@ fn to_token_type(ty: SemanticTokenType) -> lsp_types::SemanticTokenType {
         SemanticTokenType::PositionalParam | SemanticTokenType::Parameter => {
             lsp_types::SemanticTokenType::PARAMETER
         }
+        SemanticTokenType::Column => lsp_types::SemanticTokenType::VARIABLE,
+        SemanticTokenType::Table => lsp_types::SemanticTokenType::STRUCT,
+        SemanticTokenType::Schema => lsp_types::SemanticTokenType::NAMESPACE,
     }
 }
 
