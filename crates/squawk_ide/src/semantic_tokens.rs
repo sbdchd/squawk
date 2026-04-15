@@ -6,6 +6,7 @@ use squawk_syntax::{
 };
 
 use crate::db::{File, parse};
+use crate::goto_definition::{LocationKind, goto_definition};
 
 fn highlight_param_mode(out: &mut SemanticTokenBuilder, mode: ast::ParamMode) {
     match mode {
@@ -71,15 +72,7 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
                 out.push_type(token.into());
             }
         }
-        ast::Type::PathType(path_type) => {
-            if let Some(name_ref) = path_type
-                .path()
-                .and_then(|path| path.segment())
-                .and_then(|ps| ps.name_ref())
-            {
-                out.push_type(name_ref.syntax().clone().into());
-            }
-        }
+        ast::Type::PathType(_) => (),
         ast::Type::PercentType(_) => (),
         ast::Type::TimeType(time_type) => {
             if let Some(token) = time_type
@@ -124,6 +117,59 @@ pub enum SemanticTokenType {
     Type,
     Parameter,
     PositionalParam,
+    Column,
+    Table,
+    Schema,
+}
+
+impl TryFrom<LocationKind> for SemanticTokenType {
+    type Error = LocationKind;
+
+    fn try_from(kind: LocationKind) -> Result<Self, Self::Error> {
+        match kind {
+            LocationKind::Aggregate | LocationKind::Function | LocationKind::Procedure => {
+                Ok(SemanticTokenType::Function)
+            }
+            LocationKind::Column => Ok(SemanticTokenType::Column),
+            LocationKind::NamedArgParameter => Ok(SemanticTokenType::Parameter),
+            LocationKind::Schema => Ok(SemanticTokenType::Schema),
+            LocationKind::Sequence | LocationKind::Table | LocationKind::View => {
+                Ok(SemanticTokenType::Table)
+            }
+            LocationKind::Type => Ok(SemanticTokenType::Type),
+            LocationKind::CaseExpr
+            | LocationKind::Channel
+            | LocationKind::CommitBegin
+            | LocationKind::CommitEnd
+            | LocationKind::Cursor
+            | LocationKind::Database
+            | LocationKind::EventTrigger
+            | LocationKind::Extension
+            | LocationKind::Index
+            | LocationKind::Policy
+            | LocationKind::PreparedStatement
+            | LocationKind::Role
+            | LocationKind::Server
+            | LocationKind::Tablespace
+            | LocationKind::Trigger
+            | LocationKind::Window => Err(kind),
+        }
+    }
+}
+
+fn highlight_name_ref(
+    db: &dyn Db,
+    file: File,
+    out: &mut SemanticTokenBuilder,
+    name_ref: &ast::NameRef,
+) {
+    let offset = name_ref.syntax().text_range().start();
+    let Some(location) = goto_definition(db, file, offset).into_iter().next() else {
+        return;
+    };
+    if let Ok(token_type) = SemanticTokenType::try_from(location.kind) {
+        out.push_token(name_ref.syntax().clone().into(), token_type);
+    }
 }
 
 #[derive(Default)]
@@ -202,8 +248,12 @@ pub fn semantic_tokens(
                     && let Some(as_name) = target.as_name()
                     && let Some(name) = as_name.name()
                 {
-                    out.push_token(name.syntax().clone().into(), SemanticTokenType::Name);
-                };
+                    out.push_token(name.syntax().clone().into(), SemanticTokenType::Column);
+                }
+
+                if let Some(name_ref) = ast::NameRef::cast(node.clone()) {
+                    highlight_name_ref(db, file, &mut out, &name_ref);
+                }
 
                 if let Some(alias) = ast::Alias::cast(node.clone())
                     && let Some(column_list) = alias.column_list()
@@ -219,6 +269,12 @@ pub fn semantic_tokens(
                     && let Some(ty) = cast_expr.ty()
                 {
                     highlight_type(&mut out, ty);
+                }
+
+                if let Some(with_table) = ast::WithTable::cast(node.clone())
+                    && let Some(name) = with_table.name()
+                {
+                    out.push_token(name.syntax().clone().into(), SemanticTokenType::Table);
                 }
 
                 if let Some(create_function) = ast::CreateFunction::cast(node) {
@@ -361,8 +417,8 @@ as '' language plpgsql;
         assert_snapshot!(semantic_tokens("
 select 1 and, 2 select;
 "), @r#"
-        "and" @ 10..13: Name
-        "select" @ 17..23: Name
+        "and" @ 10..13: Column
+        "select" @ 17..23: Column
         "#)
     }
 
@@ -381,7 +437,7 @@ select $1, $2;
         assert_snapshot!(semantic_tokens(
             "
 select *
-from f as t(a int, b jsonb, c text, x int, ca char(5)[], ia int[][], r jbpop);
+from f as t(a int, b jsonb, c text, x int, ca char(5)[], ia int[][], r text);
 ",
         ), @r#"
         "int" @ 24..27: Type
@@ -390,7 +446,7 @@ from f as t(a int, b jsonb, c text, x int, ca char(5)[], ia int[][], r jbpop);
         "int" @ 48..51: Type
         "char" @ 56..60: Type
         "int" @ 70..73: Type
-        "jbpop" @ 81..86: Type
+        "text" @ 81..85: Type
         "#);
     }
 
@@ -418,6 +474,125 @@ select $2::jsonb;
         ), @r#"
         "$2" @ 8..10: PositionalParam
         "jsonb" @ 12..17: Type
+        "#);
+    }
+
+    #[test]
+    fn select_target_column() {
+        assert_snapshot!(semantic_tokens(
+            "
+create table t(a int, b text);
+select a, b from t;
+",
+        ), @r#"
+        "int" @ 18..21: Type
+        "text" @ 25..29: Type
+        "a" @ 39..40: Column
+        "b" @ 42..43: Column
+        "t" @ 49..50: Table
+        "#);
+    }
+
+    #[test]
+    fn select_target_qualified_column() {
+        assert_snapshot!(semantic_tokens(
+            "
+create table t(a int);
+select t.a from t;
+",
+        ), @r#"
+        "int" @ 18..21: Type
+        "t" @ 31..32: Table
+        "a" @ 33..34: Column
+        "t" @ 40..41: Table
+        "#);
+    }
+
+    #[test]
+    fn select_target_function_call() {
+        assert_snapshot!(semantic_tokens(
+            "
+create function f() returns int as 'select 1' language sql;
+select f();
+",
+        ), @r#"
+        "int" @ 29..32: Type
+        "f" @ 68..69: Function
+        "#);
+    }
+
+    #[test]
+    fn select_function_arg_and_qualified_column() {
+        assert_snapshot!(semantic_tokens(
+            "
+create table t(a int);
+create function b(t) returns int as 'select 1' language sql;
+select b(t), t.b from t;
+",
+        ), @r#"
+        "int" @ 18..21: Type
+        "t" @ 42..43: Type
+        "int" @ 53..56: Type
+        "b" @ 92..93: Function
+        "t" @ 94..95: Table
+        "t" @ 98..99: Table
+        "b" @ 100..101: Function
+        "t" @ 107..108: Table
+        "#);
+    }
+
+    #[test]
+    fn policy_field_style_function_call() {
+        assert_snapshot!(semantic_tokens(
+            "
+create table t(c int);
+create function x(t) returns int as 'select 1' language sql;
+create policy p on t
+  with check (t.x > 0 and t.c > 0);
+",
+        ), @r#"
+        "int" @ 18..21: Type
+        "t" @ 42..43: Type
+        "int" @ 53..56: Type
+        "t" @ 104..105: Table
+        "t" @ 120..121: Table
+        "x" @ 122..123: Function
+        "t" @ 132..133: Table
+        "c" @ 134..135: Column
+        "#);
+    }
+
+    #[test]
+    fn with_cte_name() {
+        assert_snapshot!(semantic_tokens(
+            "
+with t as (
+  select 1
+)
+select * from t;
+",
+        ), @r#"
+        "t" @ 6..7: Table
+        "t" @ 40..41: Table
+        "#);
+    }
+
+    #[test]
+    fn select_target_schema_qualified() {
+        assert_snapshot!(semantic_tokens(
+            "
+create schema s;
+create table s.t(a int);
+select s.t.a from s.t;
+",
+        ), @r#"
+        "s" @ 31..32: Schema
+        "int" @ 37..40: Type
+        "s" @ 50..51: Schema
+        "t" @ 52..53: Table
+        "a" @ 54..55: Column
+        "s" @ 61..62: Schema
+        "t" @ 63..64: Table
         "#);
     }
 }

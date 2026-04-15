@@ -32,13 +32,16 @@ const SEMANTIC_TOKEN_MODIFIERS: &[&str] = &["declaration", "definition", "readon
 fn semantic_token_type_name(ty: SemanticTokenType) -> &'static str {
     match ty {
         SemanticTokenType::Bool | SemanticTokenType::Keyword => "keyword",
+        SemanticTokenType::Column => "variable",
         SemanticTokenType::Comment => "comment",
         SemanticTokenType::Function => "function",
         SemanticTokenType::Name | SemanticTokenType::NameRef => "variable",
         SemanticTokenType::Number => "number",
         SemanticTokenType::Operator | SemanticTokenType::Punctuation => "operator",
         SemanticTokenType::Parameter | SemanticTokenType::PositionalParam => "parameter",
+        SemanticTokenType::Schema => "namespace",
         SemanticTokenType::String => "string",
+        SemanticTokenType::Table => "struct",
         SemanticTokenType::Type => "type",
     }
 }

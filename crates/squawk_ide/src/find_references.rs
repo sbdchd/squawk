@@ -1,7 +1,8 @@
 use crate::binder::Binder;
 use crate::builtins::{builtins_binder, parse_builtins};
+use crate::classify::classify_def_node;
 use crate::db::{File, bind, parse};
-use crate::goto_definition::{FileId, Location};
+use crate::goto_definition::{FileId, Location, LocationKind};
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::TextSize;
@@ -23,7 +24,7 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
     let builtins_tree = parse_builtins(db).tree();
     let builtins_binder = builtins_binder(db);
 
-    let Some((target_file, target_defs)) = find_target_defs(
+    let Some((target_file, target_defs, target_kind)) = find_target_defs(
         &source_file,
         offset,
         &current_binder,
@@ -45,6 +46,7 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
             refs.push(Location {
                 file: FileId::Builtins,
                 range: ptr.to_node(builtins_tree.syntax()).text_range(),
+                kind: target_kind,
             });
         }
     }
@@ -60,6 +62,7 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
                         refs.push(Location {
                             file: FileId::Current,
                             range: name_ref.syntax().text_range(),
+                            kind: target_kind,
                         });
                     }
                 },
@@ -70,6 +73,7 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
                         refs.push(Location {
                             file: FileId::Current,
                             range: name.syntax().text_range(),
+                            kind: target_kind,
                         });
                     }
                 },
@@ -88,14 +92,17 @@ fn find_target_defs(
     current_binder: &Binder,
     builtins_tree: &ast::SourceFile,
     builtins_binder: &Binder,
-) -> Option<(FileId, SmallVec<[SyntaxNodePtr; 1]>)> {
+) -> Option<(FileId, SmallVec<[SyntaxNodePtr; 1]>, LocationKind)> {
     let token = token_from_offset(file, offset)?;
     let parent = token.parent()?;
 
-    if let Some(name) = ast::Name::cast(parent.clone()) {
+    if let Some(name) = ast::Name::cast(parent.clone())
+        && let Some(kind) = classify_def_node(name.syntax()).map(LocationKind::from)
+    {
         return Some((
             FileId::Current,
             smallvec![SyntaxNodePtr::new(name.syntax())],
+            kind,
         ));
     }
 
@@ -105,8 +112,8 @@ fn find_target_defs(
                 FileId::Current => (current_binder, file.syntax()),
                 FileId::Builtins => (builtins_binder, builtins_tree.syntax()),
             };
-            if let Some(ptrs) = resolve::resolve_name_ref_ptrs(binder, root, &name_ref) {
-                return Some((file_id, ptrs));
+            if let Some((ptrs, kind)) = resolve::resolve_name_ref(binder, root, &name_ref) {
+                return Some((file_id, ptrs, kind));
             }
         }
     }

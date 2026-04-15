@@ -6,8 +6,9 @@ use squawk_syntax::{
 };
 
 use crate::binder::Binder;
-use crate::classify::{NameRefClass, classify_name_ref};
+use crate::classify::{NameRefClass, classify_def_node, classify_name_ref};
 use crate::column_name::ColumnName;
+use crate::goto_definition::LocationKind;
 use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
@@ -27,6 +28,14 @@ pub(crate) fn resolve_name_ref_ptrs(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
 ) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
+    resolve_name_ref(binder, root, name_ref).map(|(ptrs, _)| ptrs)
+}
+
+pub(crate) fn resolve_name_ref(
+    binder: &Binder,
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+) -> Option<(SmallVec<[SyntaxNodePtr; 1]>, LocationKind)> {
     let context = classify_name_ref(name_ref.syntax())?;
 
     match context {
@@ -37,10 +46,11 @@ pub(crate) fn resolve_name_ref_ptrs(
             if schema.is_none()
                 && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
             {
-                return Some(smallvec![cte_ptr]);
+                return Some((smallvec![cte_ptr], LocationKind::Table));
             }
 
-            resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
+            resolve_table_name_ptr(binder, &table_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::Table))
         }
         NameRefClass::NamedArgParameter => {
             let (function_name, schema) = find_func_call_from_named_arg(name_ref)?;
@@ -58,21 +68,23 @@ pub(crate) fn resolve_name_ref_ptrs(
                 })?;
 
             let param_ptr = find_param_in_func_def(root, function_ptr, &param_name)?;
-            Some(smallvec![param_ptr])
+            Some((smallvec![param_ptr], LocationKind::NamedArgParameter))
         }
         NameRefClass::Cursor => {
             let cursor_name = Name::from_node(name_ref);
             binder
                 .lookup(&cursor_name, SymbolKind::Cursor)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Cursor))
         }
         NameRefClass::PreparedStatement => {
             let statement_name = Name::from_node(name_ref);
-            resolve_prepared_statement_name_ptr(binder, &statement_name).map(|ptr| smallvec![ptr])
+            resolve_prepared_statement_name_ptr(binder, &statement_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::PreparedStatement))
         }
         NameRefClass::Channel => {
             let channel_name = Name::from_node(name_ref);
-            resolve_channel_name_ptr(binder, &channel_name).map(|ptr| smallvec![ptr])
+            resolve_channel_name_ptr(binder, &channel_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::Channel))
         }
         NameRefClass::FromTable => {
             let table_name = Name::from_node(name_ref);
@@ -89,7 +101,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             if schema.is_none()
                 && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
             {
-                return Some(smallvec![cte_ptr]);
+                return Some((smallvec![cte_ptr], LocationKind::Table));
             }
 
             let position = name_ref.syntax().text_range().start();
@@ -97,15 +109,17 @@ pub(crate) fn resolve_name_ref_ptrs(
             if let Some(table_name_ptr) =
                 resolve_table_name_ptr(binder, &table_name, &schema, position)
             {
-                return Some(smallvec![table_name_ptr]);
+                return Some((smallvec![table_name_ptr], LocationKind::Table));
             }
 
-            resolve_view_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
+            resolve_view_name_ptr(binder, &table_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::View))
         }
         NameRefClass::Index => {
             let position = name_ref.syntax().text_range().start();
             let index_name = Name::from_node(name_ref);
-            resolve_index_name_ptr(binder, &index_name, &None, position).map(|ptr| smallvec![ptr])
+            resolve_index_name_ptr(binder, &index_name, &None, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::Index))
         }
         NameRefClass::Type => {
             let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
@@ -128,19 +142,23 @@ pub(crate) fn resolve_name_ref_ptrs(
             };
             let type_name = resolve_float_precision(name_ref, type_name);
             let position = name_ref.syntax().text_range().start();
-            resolve_type_name_ptr(binder, &type_name, &schema, position).map(|ptr| smallvec![ptr])
+            resolve_type_name_ptr(binder, &type_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::Type))
         }
         NameRefClass::View => {
             let (view_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
             let position = name_ref.syntax().text_range().start();
-            resolve_view_name_ptr(binder, &view_name, &schema, position).map(|ptr| smallvec![ptr])
+            resolve_view_name_ptr(binder, &view_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::View))
         }
-        NameRefClass::Window => resolve_window_name_ptr(name_ref).map(|ptr| smallvec![ptr]),
+        NameRefClass::Window => {
+            resolve_window_name_ptr(name_ref).map(|ptr| (smallvec![ptr], LocationKind::Window))
+        }
         NameRefClass::Sequence => {
             let (sequence_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             resolve_sequence_name_ptr(binder, &sequence_name, &schema, position)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Sequence))
         }
         NameRefClass::Trigger => {
             let drop_trigger = name_ref
@@ -158,7 +176,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let table_name = extract_table_name(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_trigger_name_ptr(binder, &trigger_name, &schema, position, Some(table_name))
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Trigger))
         }
         NameRefClass::Policy => {
             let (policy_name, on_table) = name_ref.syntax().ancestors().find_map(|a| {
@@ -173,44 +191,53 @@ pub(crate) fn resolve_name_ref_ptrs(
             let (table_name, schema) = extract_table_schema_from_path(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_policy_name_ptr(binder, &policy_name, &schema, position, table_name)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Policy))
         }
         NameRefClass::EventTrigger => {
             let event_trigger_name = Name::from_node(name_ref);
-            resolve_event_trigger_name_ptr(binder, &event_trigger_name).map(|ptr| smallvec![ptr])
+            resolve_event_trigger_name_ptr(binder, &event_trigger_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::EventTrigger))
         }
         NameRefClass::Database => {
             let database_name = Name::from_node(name_ref);
-            resolve_database_name_ptr(binder, &database_name).map(|ptr| smallvec![ptr])
+            resolve_database_name_ptr(binder, &database_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::Database))
         }
         NameRefClass::Server => {
             let server_name = Name::from_node(name_ref);
-            resolve_server_name_ptr(binder, &server_name).map(|ptr| smallvec![ptr])
+            resolve_server_name_ptr(binder, &server_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::Server))
         }
         NameRefClass::Extension => {
             let extension_name = Name::from_node(name_ref);
-            resolve_extension_name_ptr(binder, &extension_name).map(|ptr| smallvec![ptr])
+            resolve_extension_name_ptr(binder, &extension_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::Extension))
         }
         NameRefClass::Role => {
             let role_name = Name::from_node(name_ref);
-            resolve_role_name_ptr(binder, &role_name).map(|ptr| smallvec![ptr])
+            resolve_role_name_ptr(binder, &role_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::Role))
         }
         NameRefClass::QualifiedColumn => {
             let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
             let column_name = Name::from_node(name_ref);
             let table_path = path.qualifier()?;
-            resolve_column_for_path(binder, root, &table_path, column_name)
-                .map(|ptr| smallvec![ptr])
+            resolve_column_for_path(binder, root, &table_path, column_name).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
         NameRefClass::Tablespace => {
             let tablespace_name = Name::from_node(name_ref);
-            resolve_tablespace_name_ptr(binder, &tablespace_name).map(|ptr| smallvec![ptr])
+            resolve_tablespace_name_ptr(binder, &tablespace_name)
+                .map(|ptr| (smallvec![ptr], LocationKind::Tablespace))
         }
         NameRefClass::ForeignKeyTable => {
             let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
             let (table_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
-            resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
+            resolve_table_name_ptr(binder, &table_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::Table))
         }
         NameRefClass::ForeignKeyColumn => {
             // TODO: the ast is too flat here
@@ -230,19 +257,29 @@ pub(crate) fn resolve_name_ref_ptrs(
                 return None;
             };
             let column_name = Name::from_node(name_ref);
-            resolve_column_for_path(binder, root, &path, column_name).map(|ptr| smallvec![ptr])
+            resolve_column_for_path(binder, root, &path, column_name).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
         NameRefClass::ConstraintColumn => {
             let column_name = Name::from_node(name_ref);
             for ancestor in name_ref.syntax().ancestors() {
                 if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
                     return find_column_in_create_table(binder, root, &create_table, &column_name)
-                        .map(|ptr| smallvec![ptr]);
+                        .map(|ptr| {
+                            let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                            (smallvec![ptr], kind)
+                        });
                 }
                 if let Some(alter_table) = ast::AlterTable::cast(ancestor) {
                     let table_path = alter_table.relation_name()?.path()?;
-                    return resolve_column_for_path(binder, root, &table_path, column_name)
-                        .map(|ptr| smallvec![ptr]);
+                    return resolve_column_for_path(binder, root, &table_path, column_name).map(
+                        |ptr| {
+                            let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                            (smallvec![ptr], kind)
+                        },
+                    );
                 }
             }
             None
@@ -258,8 +295,10 @@ pub(crate) fn resolve_name_ref_ptrs(
                 }
             })?;
             let column_name = Name::from_node(name_ref);
-            resolve_column_for_path(binder, root, &on_table_path, column_name)
-                .map(|ptr| smallvec![ptr])
+            resolve_column_for_path(binder, root, &on_table_path, column_name).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
         NameRefClass::PolicyQualifiedColumnTable => {
             let on_table_path = name_ref.syntax().ancestors().find_map(|n| {
@@ -273,7 +312,8 @@ pub(crate) fn resolve_name_ref_ptrs(
             })?;
             let (table_name, schema) = extract_table_schema_from_path(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
-            resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
+            resolve_table_name_ptr(binder, &table_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::Table))
         }
         NameRefClass::LikeTable => {
             let like_clause = name_ref
@@ -283,7 +323,8 @@ pub(crate) fn resolve_name_ref_ptrs(
             let path = like_clause.path()?;
             let (table_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
-            resolve_table_name_ptr(binder, &table_name, &schema, position).map(|ptr| smallvec![ptr])
+            resolve_table_name_ptr(binder, &table_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::Table))
         }
         NameRefClass::Function => {
             let function_sig = name_ref
@@ -295,7 +336,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let params = extract_param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
             resolve_function(binder, &function_name, &schema, params.as_deref(), position)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Function))
         }
         NameRefClass::Aggregate => {
             let aggregate = name_ref
@@ -313,7 +354,7 @@ pub(crate) fn resolve_name_ref_ptrs(
                 params.as_deref(),
                 position,
             )
-            .map(|ptr| smallvec![ptr])
+            .map(|ptr| (smallvec![ptr], LocationKind::Aggregate))
         }
         NameRefClass::Procedure => {
             let function_sig = name_ref
@@ -331,7 +372,7 @@ pub(crate) fn resolve_name_ref_ptrs(
                 params.as_deref(),
                 position,
             )
-            .map(|ptr| smallvec![ptr])
+            .map(|ptr| (smallvec![ptr], LocationKind::Procedure))
         }
         NameRefClass::Routine => {
             let function_sig = name_ref
@@ -346,17 +387,17 @@ pub(crate) fn resolve_name_ref_ptrs(
             if let Some(ptr) =
                 resolve_function(binder, &routine_name, &schema, params.as_deref(), position)
             {
-                return Some(smallvec![ptr]);
+                return Some((smallvec![ptr], LocationKind::Function));
             }
 
             if let Some(ptr) =
                 resolve_aggregate(binder, &routine_name, &schema, params.as_deref(), position)
             {
-                return Some(smallvec![ptr]);
+                return Some((smallvec![ptr], LocationKind::Aggregate));
             }
 
             resolve_procedure(binder, &routine_name, &schema, params.as_deref(), position)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Procedure))
         }
         NameRefClass::CallProcedure => {
             let call = name_ref.syntax().ancestors().find_map(ast::Call::cast)?;
@@ -364,11 +405,11 @@ pub(crate) fn resolve_name_ref_ptrs(
             let (procedure_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_procedure(binder, &procedure_name, &schema, None, position)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Procedure))
         }
         NameRefClass::Schema => {
             let schema_name = Name::from_node(name_ref);
-            resolve_schema(binder, &schema_name).map(|ptr| smallvec![ptr])
+            resolve_schema(binder, &schema_name).map(|ptr| (smallvec![ptr], LocationKind::Schema))
         }
         NameRefClass::FunctionCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
@@ -383,7 +424,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let function_name = Name::from_node(name_ref);
             let position = name_ref.syntax().text_range().start();
             resolve_function(binder, &function_name, &schema, None, position)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Function))
         }
         NameRefClass::ProcedureCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
@@ -399,7 +440,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let position = name_ref.syntax().text_range().start();
 
             resolve_procedure(binder, &procedure_name, &schema, None, position)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Procedure))
         }
         NameRefClass::FunctionName => {
             let path_type = name_ref
@@ -410,7 +451,7 @@ pub(crate) fn resolve_name_ref_ptrs(
             let (function_name, schema) = extract_table_schema_from_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_function(binder, &function_name, &schema, None, position)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Function))
         }
         NameRefClass::SelectFunctionCall => {
             let schema = if let Some(parent_node) = name_ref.syntax().parent()
@@ -427,12 +468,12 @@ pub(crate) fn resolve_name_ref_ptrs(
 
             // functions take precedence
             if let Some(ptr) = resolve_function(binder, &function_name, &schema, None, position) {
-                return Some(smallvec![ptr]);
+                return Some((smallvec![ptr], LocationKind::Function));
             }
 
             // aggregates take precedence over function-call-style column access
             if let Some(ptr) = resolve_aggregate(binder, &function_name, &schema, None, position) {
-                return Some(smallvec![ptr]);
+                return Some((smallvec![ptr], LocationKind::Aggregate));
             }
 
             // if no function found, check if this is function-call-style column access
@@ -443,52 +484,68 @@ pub(crate) fn resolve_name_ref_ptrs(
             if schema.is_none()
                 && let Some(ptr) = resolve_fn_call_column(binder, root, name_ref)
             {
-                return Some(smallvec![ptr]);
+                return Some((smallvec![ptr], LocationKind::Column));
             }
 
             None
         }
-        NameRefClass::CreateIndexColumn => {
-            resolve_create_index_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
-        }
+        NameRefClass::CreateIndexColumn => resolve_create_index_column_ptr(binder, root, name_ref)
+            .map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            }),
         NameRefClass::SelectColumn => {
-            resolve_select_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
+            resolve_select_column_ptr(binder, root, name_ref).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
         NameRefClass::SelectQualifiedColumnTable => {
             resolve_select_qualified_column_table_name_ptr(binder, name_ref)
-                .map(|ptr| smallvec![ptr])
+                .map(|ptr| (smallvec![ptr], LocationKind::Table))
         }
         NameRefClass::SelectQualifiedColumn => {
-            resolve_select_qualified_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
+            resolve_select_qualified_column_ptr(binder, root, name_ref).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
         NameRefClass::CompositeTypeField => {
-            resolve_composite_type_field_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
+            resolve_composite_type_field_ptr(binder, root, name_ref)
+                .map(|ptr| (smallvec![ptr], LocationKind::Column))
         }
         NameRefClass::InsertColumn => {
-            resolve_insert_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
+            resolve_insert_column_ptr(binder, root, name_ref).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
-        NameRefClass::InsertQualifiedColumnTable => {
-            resolve_insert_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
-        }
+        NameRefClass::InsertQualifiedColumnTable => resolve_insert_table_name_ptr(binder, name_ref)
+            .map(|ptr| (smallvec![ptr], LocationKind::Table)),
         NameRefClass::DeleteColumn => {
-            resolve_delete_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
+            resolve_delete_column_ptr(binder, root, name_ref).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
-        NameRefClass::DeleteQualifiedColumnTable => {
-            resolve_delete_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
-        }
+        NameRefClass::DeleteQualifiedColumnTable => resolve_delete_table_name_ptr(binder, name_ref)
+            .map(|ptr| (smallvec![ptr], LocationKind::Table)),
         NameRefClass::UpdateColumn => {
-            resolve_update_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
+            resolve_update_column_ptr(binder, root, name_ref).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
-        NameRefClass::UpdateQualifiedColumnTable => {
-            resolve_update_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::MergeColumn => {
-            resolve_merge_column_ptr(binder, root, name_ref).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::MergeQualifiedColumnTable => {
-            resolve_merge_table_name_ptr(binder, name_ref).map(|ptr| smallvec![ptr])
-        }
-        NameRefClass::JoinUsingColumn => resolve_join_using_columns(binder, root, name_ref),
+        NameRefClass::UpdateQualifiedColumnTable => resolve_update_table_name_ptr(binder, name_ref)
+            .map(|ptr| (smallvec![ptr], LocationKind::Table)),
+        NameRefClass::MergeColumn => resolve_merge_column_ptr(binder, root, name_ref).map(|ptr| {
+            let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+            (smallvec![ptr], kind)
+        }),
+        NameRefClass::MergeQualifiedColumnTable => resolve_merge_table_name_ptr(binder, name_ref)
+            .map(|ptr| (smallvec![ptr], LocationKind::Table)),
+        NameRefClass::JoinUsingColumn => resolve_join_using_columns(binder, root, name_ref)
+            .map(|ptrs| (ptrs, LocationKind::Column)),
         NameRefClass::AlterColumn => {
             let column_name = Name::from_node(name_ref);
             let alter_table = name_ref
@@ -496,11 +553,23 @@ pub(crate) fn resolve_name_ref_ptrs(
                 .ancestors()
                 .find_map(ast::AlterTable::cast)?;
             let table_path = alter_table.relation_name()?.path()?;
-            resolve_column_for_path(binder, root, &table_path, column_name)
-                .map(|ptr| smallvec![ptr])
+            resolve_column_for_path(binder, root, &table_path, column_name).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
         }
     }
     .or_else(|| resolve_special_keyword_as_function(binder, name_ref))
+}
+
+fn resolved_location_kind(
+    root: &SyntaxNode,
+    ptr: &SyntaxNodePtr,
+    fallback: LocationKind,
+) -> LocationKind {
+    classify_def_node(&ptr.to_node(root))
+        .map(LocationKind::from)
+        .unwrap_or(fallback)
 }
 
 fn resolve_table_name_ptr(
@@ -729,7 +798,7 @@ fn resolve_for_kind_with_params(
 fn resolve_special_keyword_as_function(
     binder: &Binder,
     name_ref: &ast::NameRef,
-) -> Option<SmallVec<[SyntaxNodePtr; 1]>> {
+) -> Option<(SmallVec<[SyntaxNodePtr; 1]>, LocationKind)> {
     let function_name = name_ref
         .syntax()
         .first_child_or_token()
@@ -742,7 +811,8 @@ fn resolve_special_keyword_as_function(
         })?;
     let function_name = Name::from_string(function_name);
     let position = name_ref.syntax().text_range().start();
-    resolve_function(binder, &function_name, &None, None, position).map(|ptr| smallvec![ptr])
+    resolve_function(binder, &function_name, &None, None, position)
+        .map(|ptr| (smallvec![ptr], LocationKind::Function))
 }
 
 fn resolve_function(

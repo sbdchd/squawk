@@ -1,5 +1,6 @@
 use crate::binder;
 use crate::builtins::parse_builtins;
+use crate::classify::{NameRefClass, classify_def_node};
 use crate::db::{File, parse};
 use crate::offsets::token_from_offset;
 use crate::resolve;
@@ -31,7 +32,10 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
             if let Some(case_expr) = ast::CaseExpr::cast(parent)
                 && let Some(case_token) = case_expr.case_token()
             {
-                return smallvec![Location::range(case_token.text_range())];
+                return smallvec![Location::current(
+                    case_token.text_range(),
+                    LocationKind::CaseExpr
+                )];
             }
         }
     }
@@ -40,14 +44,14 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
     if ast::Commit::can_cast(parent.kind())
         && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
     {
-        return smallvec![Location::range(begin_range)];
+        return smallvec![Location::current(begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind())
         && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
     {
-        return smallvec![Location::range(begin_range)];
+        return smallvec![Location::current(begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
@@ -55,11 +59,13 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
         && let Some(end_range) =
             find_following_commit_or_rollback(source_file, token.text_range().end())
     {
-        return smallvec![Location::range(end_range)];
+        return smallvec![Location::current(end_range, LocationKind::CommitEnd)];
     }
 
-    if let Some(name) = ast::Name::cast(parent.clone()) {
-        return smallvec![Location::range(name.syntax().text_range())];
+    if let Some(name) = ast::Name::cast(parent.clone())
+        && let Some(kind) = classify_def_node(name.syntax()).map(LocationKind::from)
+    {
+        return smallvec![Location::current(name.syntax().text_range(), kind)];
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
@@ -71,13 +77,14 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
             // TODO: we should salsa this
             let binder_output = binder::bind(file);
             let root = file.syntax();
-            if let Some(ptrs) = resolve::resolve_name_ref_ptrs(&binder_output, root, &name_ref) {
+            if let Some((ptrs, kind)) = resolve::resolve_name_ref(&binder_output, root, &name_ref) {
                 let ranges = ptrs
                     .iter()
                     .map(|ptr| ptr.to_node(file.syntax()).text_range())
                     .map(|range| Location {
                         file: file_id,
                         range,
+                        kind,
                     })
                     .collect();
                 return ranges;
@@ -106,6 +113,7 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
                 return smallvec![Location {
                     file: file_id,
                     range: ptr.to_node(file.syntax()).text_range(),
+                    kind: LocationKind::Type,
                 }];
             }
         }
@@ -120,17 +128,111 @@ pub enum FileId {
     Builtins,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LocationKind {
+    Aggregate,
+    CaseExpr,
+    Channel,
+    Column,
+    CommitBegin,
+    CommitEnd,
+    Cursor,
+    Database,
+    EventTrigger,
+    Extension,
+    Function,
+    Index,
+    NamedArgParameter,
+    Policy,
+    PreparedStatement,
+    Procedure,
+    Role,
+    Schema,
+    Sequence,
+    Server,
+    Table,
+    Tablespace,
+    Trigger,
+    Type,
+    View,
+    Window,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Location {
     pub file: FileId,
     pub range: TextRange,
+    pub kind: LocationKind,
 }
 
 impl Location {
-    fn range(range: TextRange) -> Location {
+    fn current(range: TextRange, kind: LocationKind) -> Location {
         Location {
             file: FileId::Current,
             range,
+            kind,
+        }
+    }
+}
+
+impl From<NameRefClass> for LocationKind {
+    fn from(class: NameRefClass) -> Self {
+        match class {
+            NameRefClass::Aggregate => LocationKind::Aggregate,
+            NameRefClass::Channel => LocationKind::Channel,
+            NameRefClass::Cursor => LocationKind::Cursor,
+            NameRefClass::Database => LocationKind::Database,
+            NameRefClass::EventTrigger => LocationKind::EventTrigger,
+            NameRefClass::Extension => LocationKind::Extension,
+            NameRefClass::Index => LocationKind::Index,
+            NameRefClass::NamedArgParameter => LocationKind::NamedArgParameter,
+            NameRefClass::Policy => LocationKind::Policy,
+            NameRefClass::PreparedStatement => LocationKind::PreparedStatement,
+            NameRefClass::Role => LocationKind::Role,
+            NameRefClass::Schema => LocationKind::Schema,
+            NameRefClass::Sequence => LocationKind::Sequence,
+            NameRefClass::Server => LocationKind::Server,
+            NameRefClass::Tablespace => LocationKind::Tablespace,
+            NameRefClass::Trigger => LocationKind::Trigger,
+            NameRefClass::Type => LocationKind::Type,
+            NameRefClass::View => LocationKind::View,
+            NameRefClass::Window => LocationKind::Window,
+
+            NameRefClass::CallProcedure | NameRefClass::Procedure | NameRefClass::ProcedureCall => {
+                LocationKind::Procedure
+            }
+
+            NameRefClass::Function
+            | NameRefClass::FunctionCall
+            | NameRefClass::FunctionName
+            | NameRefClass::Routine
+            | NameRefClass::SelectFunctionCall => LocationKind::Function,
+
+            NameRefClass::AlterColumn
+            | NameRefClass::CompositeTypeField
+            | NameRefClass::ConstraintColumn
+            | NameRefClass::CreateIndexColumn
+            | NameRefClass::DeleteColumn
+            | NameRefClass::ForeignKeyColumn
+            | NameRefClass::InsertColumn
+            | NameRefClass::JoinUsingColumn
+            | NameRefClass::MergeColumn
+            | NameRefClass::PolicyColumn
+            | NameRefClass::QualifiedColumn
+            | NameRefClass::SelectColumn
+            | NameRefClass::SelectQualifiedColumn
+            | NameRefClass::UpdateColumn => LocationKind::Column,
+
+            NameRefClass::DeleteQualifiedColumnTable
+            | NameRefClass::ForeignKeyTable
+            | NameRefClass::FromTable
+            | NameRefClass::InsertQualifiedColumnTable
+            | NameRefClass::LikeTable
+            | NameRefClass::MergeQualifiedColumnTable
+            | NameRefClass::PolicyQualifiedColumnTable
+            | NameRefClass::SelectQualifiedColumnTable
+            | NameRefClass::Table
+            | NameRefClass::UpdateQualifiedColumnTable => LocationKind::Table,
         }
     }
 }

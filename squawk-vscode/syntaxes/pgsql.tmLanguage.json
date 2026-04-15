@@ -90,9 +90,21 @@
             },
             "4": {
               "name": "entity.name.function.pgsql"
+            },
+            "5": {
+              "name": "keyword.operator.pgsql"
+            },
+            "6": {
+              "name": "entity.name.function.pgsql"
+            },
+            "7": {
+              "name": "keyword.operator.pgsql"
+            },
+            "8": {
+              "name": "entity.name.function.pgsql"
             }
           },
-          "match": "(?i)\\b(create)\\s+(or\\s+replace\\s+)?(function|view)\\s+((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))"
+          "match": "(?i)\\b(create)\\s+(or\\s+replace\\s+)?(function|view)\\s+((?:[\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\")))?)?"
         },
         {
           "captures": {
@@ -107,9 +119,21 @@
             },
             "4": {
               "name": "entity.name.function.pgsql"
+            },
+            "5": {
+              "name": "keyword.operator.pgsql"
+            },
+            "6": {
+              "name": "entity.name.function.pgsql"
+            },
+            "7": {
+              "name": "keyword.operator.pgsql"
+            },
+            "8": {
+              "name": "entity.name.function.pgsql"
             }
           },
-          "match": "(?i)\\b(create)\\s+(aggregate|collation|conversion|database|domain|event\\s+trigger|group|(?:unique\\s+)?index|language|operator\\s+class|operator|rule|schema|sequence|(?:(?:global|local)\\s+)?(?:(?:temp|temporary|unlogged)\\s+)?table|tablespace|trigger|type|user|(?:materialized\\s+)?view)\\s+(if\\s+not\\s+exists\\s+)?((?:(?:[\\w]+|\".+\")\\.){0,2}(?:[\\w]+|\".+\"))"
+          "match": "(?i)\\b(create)\\s+(aggregate|collation|conversion|database|domain|event\\s+trigger|group|(?:unique\\s+)?index|language|operator\\s+class|operator|rule|schema|sequence|(?:(?:global|local)\\s+)?(?:(?:temp|temporary|unlogged)\\s+)?table|tablespace|trigger|type|user|(?:materialized\\s+)?view)\\s+(if\\s+not\\s+exists\\s+)?((?:[\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\")))?)?"
         }
       ]
     },
@@ -174,7 +198,7 @@
           "name": "keyword.operator.cast.pgsql"
         },
         {
-          "match": "[+\\-*/<>=~!@#%\\^&|`?]",
+          "match": "[+\\-*/<>=~!@#%\\^&|`?\\.]",
           "name": "keyword.operator.pgsql"
         }
       ]
