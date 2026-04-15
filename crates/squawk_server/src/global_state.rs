@@ -16,7 +16,7 @@ use squawk_thread::TaskPool;
 use lsp_types::request::{
     CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
     FoldingRangeRequest, GotoDefinition, HoverRequest, InlayHintRequest, References,
-    SelectionRangeRequest, Shutdown,
+    SelectionRangeRequest, SemanticTokensFullRequest, SemanticTokensRangeRequest, Shutdown,
 };
 
 use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
@@ -24,8 +24,8 @@ use crate::handlers::{
     SyntaxTreeRequest, TokensRequest, handle_cancel, handle_code_action, handle_completion,
     handle_did_change, handle_did_close, handle_did_open, handle_document_diagnostic,
     handle_document_symbol, handle_folding_range, handle_goto_definition, handle_hover,
-    handle_inlay_hints, handle_references, handle_selection_range, handle_shutdown,
-    handle_syntax_tree, handle_tokens,
+    handle_inlay_hints, handle_references, handle_selection_range, handle_semantic_tokens_full,
+    handle_semantic_tokens_range, handle_shutdown, handle_syntax_tree, handle_tokens,
 };
 
 type ReqQueue = lsp_server::ReqQueue<(String, Instant), ()>;
@@ -230,6 +230,8 @@ impl GlobalState {
             .on::<NO_RETRY, SyntaxTreeRequest>(handle_syntax_tree)
             .on::<NO_RETRY, TokensRequest>(handle_tokens)
             .on::<NO_RETRY, References>(handle_references)
+            .on::<NO_RETRY, SemanticTokensFullRequest>(handle_semantic_tokens_full)
+            .on::<NO_RETRY, SemanticTokensRangeRequest>(handle_semantic_tokens_range)
             .finish();
     }
 }

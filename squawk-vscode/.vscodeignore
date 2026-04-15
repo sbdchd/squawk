@@ -9,7 +9,7 @@ esbuild.js
 vsc-extension-quickstart.md
 **/tsconfig.json
 **/eslint.config.mjs
-**/prettier.config.mjs
+**/.oxfmtrc.json
 **/*.map
 **/*.ts
 **/.vscode-test.*

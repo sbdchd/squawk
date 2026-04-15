@@ -2511,7 +2511,9 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         // could be start of `is distinct from`
         && !(p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))
     {
+        let m = p.start();
         col_label(p);
+        m.complete(p, AS_NAME);
         return Some(lhs);
     }
     if r.order_by_allowed && p.at(ORDER_KW) {
@@ -3662,12 +3664,12 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
 fn column(p: &mut Parser<'_>, kind: &ColumnDefKind) -> CompletedMarker {
     assert!(p.at_ts(COLUMN_FIRST));
     let m = p.start();
-    // https://www.depesz.com/2024/10/03/waiting-for-postgresql-18-add-temporal-foreign-key-contraints/
-    // TODO: add validation to ensure this is in the right position
-    p.eat(PERIOD_KW);
     match kind {
         ColumnDefKind::Name => name(p),
         ColumnDefKind::NameRef => {
+            // https://www.depesz.com/2024/10/03/waiting-for-postgresql-18-add-temporal-foreign-key-contraints/
+            // TODO: add validation to ensure this is in the right position
+            p.eat(PERIOD_KW);
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
             name_ref(p).map(|lhs| postfix_expr(p, lhs, true));
@@ -12837,11 +12839,6 @@ fn drop_schema(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // An SQL statement defining an object to be created within the schema.
-//
-// Currently, only CREATE TABLE, CREATE VIEW, CREATE INDEX, CREATE SEQUENCE,
-// CREATE TRIGGER and GRANT are accepted as clauses within CREATE SCHEMA. Other
-// kinds of objects may be created in separate commands after the schema is
-// created.
 fn opt_schema_elements(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         match (p.current(), p.nth(1)) {
@@ -12862,9 +12859,11 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
             }
             (CREATE_KW, OR_KW) => {
                 match p.nth(3) {
+                    AGGREGATE_KW => create_aggregate(p),
                     CONSTRAINT_KW | TRIGGER_KW => create_trigger(p),
+                    PROCEDURE_KW => create_procedure(p),
                     RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => create_view(p),
-                    _ => return,
+                    _ => create_function(p),
                 };
             }
             (CREATE_KW, RECURSIVE_KW | VIEW_KW) => {
@@ -12881,6 +12880,43 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
             }
             (CREATE_KW, INDEX_KW | UNIQUE_KW) => {
                 create_index(p);
+            }
+            (CREATE_KW, AGGREGATE_KW) => {
+                create_aggregate(p);
+            }
+            (CREATE_KW, COLLATION_KW) => {
+                create_collation(p);
+            }
+            (CREATE_KW, DOMAIN_KW) => {
+                create_domain(p);
+            }
+            (CREATE_KW, FUNCTION_KW) => {
+                create_function(p);
+            }
+            (CREATE_KW, OPERATOR_KW) => {
+                match p.nth(2) {
+                    CLASS_KW => create_operator_class(p),
+                    FAMILY_KW => create_operator_family(p),
+                    _ => create_operator(p),
+                };
+            }
+            (CREATE_KW, PROCEDURE_KW) => {
+                create_procedure(p);
+            }
+            (CREATE_KW, TEXT_KW) if p.nth_at(2, SEARCH_KW) => {
+                match p.nth(3) {
+                    CONFIGURATION_KW => create_text_search_config(p),
+                    DICTIONARY_KW => create_text_search_dict(p),
+                    PARSER_KW => create_text_search_parser(p),
+                    TEMPLATE_KW => create_text_search_template(p),
+                    _ => return,
+                };
+            }
+            (CREATE_KW, TYPE_KW) => {
+                create_type(p);
+            }
+            (GRANT_KW, _) => {
+                grant(p);
             }
             _ => return,
         };

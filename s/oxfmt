@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -ex
+
+main() {
+  if [ -n "$CI" ]; then
+    ./node_modules/.bin/oxfmt --check '**/*.{js,tsx,ts,md,yml,json}'
+  else
+    ./node_modules/.bin/oxfmt '**/*.{js,tsx,ts,md,yml,json}' --write
+  fi
+}
+
+main "$@"

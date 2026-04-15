@@ -1,6 +1,6 @@
 {
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "rust-analyzer.check.command": "build",
   "rust-analyzer.showSyntaxTree": true,
   "[rust]": {
@@ -11,5 +11,8 @@
   },
   "[sql]": {
     "editor.tabSize": 2
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   }
 }

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.47.0 - 2026-04-13
+
+### Added
+
+- ide: semantic syntax highlighting (#1057, #1058, #1052)
+- ide: semantic syntax highlighting (#1048)
+- playground: update syntax highlighting language with codegen'd keywords (#1055, #1054)
+- vscode: update syntax highlighting to support more operators (#1047)
+
+- ide: goto def for user, current_user, session_user, & current_schema (#1056)
+
 ## v2.46.0 - 2026-04-05
 
 ### Added
