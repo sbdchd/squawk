@@ -2752,6 +2752,7 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
     }
     opt_from_clause(p);
     opt_where_clause(p);
+    opt_misplaced_joins(p);
     opt_group_by_clause(p);
     opt_having_clause(p);
     opt_window_clause(p);
@@ -3463,6 +3464,16 @@ fn join(p: &mut Parser<'_>) {
         join_using_clause(p);
     }
     m.complete(p, JOIN);
+}
+
+// Improve error recovery for wrong joins
+fn opt_misplaced_joins(p: &mut Parser<'_>) {
+    while p.at_ts(JOIN_FIRST) {
+        let m = p.start();
+        p.error("JOINs must appear before WHERE");
+        join(p);
+        m.complete(p, ERROR);
+    }
 }
 
 fn on_clause(p: &mut Parser<'_>) {
