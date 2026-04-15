@@ -207,6 +207,11 @@ const rules = [
     tags: ["schema"],
     description: "Require BEFORE or AFTER when adding enum values",
   },
+  {
+    name: "require-table-schema",
+    tags: ["schema"],
+    description: "Require explicit schema in table DDL to avoid ambiguity.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
