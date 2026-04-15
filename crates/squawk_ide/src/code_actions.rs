@@ -53,6 +53,7 @@ pub fn code_actions(db: &dyn Db, file: File, offset: TextSize) -> Option<Vec<Cod
     rewrite_cast_to_double_colon(&mut actions, &source_file, offset);
     rewrite_double_colon_to_cast(&mut actions, &source_file, offset);
     rewrite_between_as_binary_expression(&mut actions, &source_file, offset);
+    rewrite_not_equals_operator(&mut actions, &source_file, offset);
     rewrite_timestamp_type(&mut actions, &source_file, offset);
     Some(actions)
 }
@@ -676,6 +677,29 @@ fn rewrite_between_as_binary_expression(
             between_expr.syntax().text_range(),
             replacement,
         )],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn rewrite_not_equals_operator(
+    actions: &mut Vec<CodeAction>,
+    file: &ast::SourceFile,
+    offset: TextSize,
+) -> Option<()> {
+    let token = token_from_offset(file, offset)?;
+    let bin_expr = token.parent_ancestors().find_map(ast::BinExpr::cast)?;
+
+    let (op_token, replacement, title) = match bin_expr.op()? {
+        ast::BinOp::Neq(token) => (token, "<>", "Rewrite `!=` as `<>`"),
+        ast::BinOp::Neqb(token) => (token, "!=", "Rewrite `<>` as `!=`"),
+        _ => return None,
+    };
+
+    actions.push(CodeAction {
+        title: title.to_owned(),
+        edits: vec![Edit::replace(op_token.text_range(), replacement.to_owned())],
         kind: ActionKind::RefactorRewrite,
     });
 
@@ -2000,6 +2024,38 @@ select myschema.f$0();"
         assert!(code_action_not_applicable(
             rewrite_between_as_binary_expression,
             "select 1 +$0 2;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_not_equals_bang_to_angle() {
+        assert_snapshot!(
+            apply_code_action(rewrite_not_equals_operator, "select 1 !$0= 2;"),
+            @"select 1 <> 2;"
+        );
+    }
+
+    #[test]
+    fn rewrite_not_equals_angle_to_bang() {
+        assert_snapshot!(
+            apply_code_action(rewrite_not_equals_operator, "select 1 <$0> 2;"),
+            @"select 1 != 2;"
+        );
+    }
+
+    #[test]
+    fn rewrite_not_equals_cursor_on_operand() {
+        assert_snapshot!(
+            apply_code_action(rewrite_not_equals_operator, "select a$0 != b from t;"),
+            @"select a <> b from t;"
+        );
+    }
+
+    #[test]
+    fn rewrite_not_equals_not_applicable_other_op() {
+        assert!(code_action_not_applicable(
+            rewrite_not_equals_operator,
+            "select 1 =$0 2;"
         ));
     }
 
