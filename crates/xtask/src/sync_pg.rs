@@ -1,13 +1,14 @@
 use crate::path::project_root;
-use anyhow::{Result, bail};
-use camino::Utf8PathBuf;
+use anyhow::Result;
+use camino::{Utf8Path, Utf8PathBuf};
 use regex::Regex;
 use std::fs::{File, create_dir_all, remove_dir_all};
 use std::io::{BufRead, Write};
-use std::process::Command;
+use xshell::{Shell, cmd};
 
 const SQL_REGRESSION_SUITE_DIR: &str = "postgres/regression_suite";
 const PLPGSQL_REGRESSION_SUITE_DIR: &str = "postgres/plpgsql";
+const KWLIST_PATH: &str = "postgres/kwlist.h";
 
 const START_END_MARKERS: &[(&str, &str)] = &[
     (
@@ -109,33 +110,21 @@ const GSET_REPLACEMENTS: &[(&str, &str)] = &[
     ),
 ];
 
-pub(crate) fn sync_regression_suite() -> Result<()> {
-    let sql_target_dir = Utf8PathBuf::try_from(std::env::temp_dir())
-        .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
-        .join("squawk_raw_regression_suite");
+pub(crate) fn sync_pg() -> Result<()> {
+    let clone_dir = clone_postgres()?;
+    let (sha, date) = git_head_info(&clone_dir)?;
 
-    let plpgsql_target_dir = Utf8PathBuf::try_from(std::env::temp_dir())
-        .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
-        .join("squawk_raw_plpgsql_suite");
+    sync_kwlist(&clone_dir, &sha, &date)?;
+    sync_regression_suite(&clone_dir)?;
+    sync_plpgsql_suite(&clone_dir)?;
 
-    download_regression_suite(&sql_target_dir, &plpgsql_target_dir)?;
-    transform_regression_suite(&sql_target_dir)?;
-    copy_plpgsql_suite(&plpgsql_target_dir)?;
+    println!("Cleaning up clone directory...");
+    remove_dir_all(&clone_dir)?;
+
     Ok(())
 }
 
-fn download_regression_suite(
-    sql_target_dir: &Utf8PathBuf,
-    plpgsql_target_dir: &Utf8PathBuf,
-) -> Result<()> {
-    for dir in [sql_target_dir, plpgsql_target_dir] {
-        if dir.exists() {
-            println!("Cleaning temp directory: {dir:?}");
-            remove_dir_all(dir)?;
-        }
-        create_dir_all(dir)?;
-    }
-
+fn clone_postgres() -> Result<Utf8PathBuf> {
     let clone_dir = Utf8PathBuf::try_from(std::env::temp_dir())
         .map_err(|_| anyhow::anyhow!("temp dir path is not valid UTF-8"))?
         .join("postgres_sparse_clone");
@@ -144,94 +133,78 @@ fn download_regression_suite(
         remove_dir_all(&clone_dir)?;
     }
 
+    let sh = Shell::new()?;
+    let url = "https://github.com/postgres/postgres.git";
+    let clone_dir_str = clone_dir.as_str();
+
     println!("Cloning postgres repository with sparse checkout...");
-
-    let status = Command::new("git")
-        .args([
-            "clone",
-            "--filter=blob:none",
-            "--depth=1",
-            "--sparse",
-            "https://github.com/postgres/postgres.git",
-        ])
-        .arg(clone_dir.as_str())
-        .status()?;
-
-    if !status.success() {
-        bail!("Failed to clone postgres repository");
-    }
+    cmd!(
+        sh,
+        "git clone --filter=blob:none --depth=1 --sparse {url} {clone_dir_str}"
+    )
+    .run()?;
 
     println!("Setting up sparse checkout...");
+    sh.change_dir(&clone_dir);
+    cmd!(
+        sh,
+        "git sparse-checkout set --no-cone /src/test/regress/sql /src/pl/plpgsql/src/sql /src/include/parser/kwlist.h"
+    )
+    .run()?;
 
-    let status = Command::new("git")
-        .args([
-            "sparse-checkout",
-            "set",
-            "src/test/regress/sql",
-            "src/pl/plpgsql/src/sql",
-        ])
-        .current_dir(&clone_dir)
-        .status()?;
+    Ok(clone_dir)
+}
 
-    if !status.success() {
-        bail!("Failed to set sparse checkout");
-    }
+fn git_head_info(clone_dir: &Utf8Path) -> Result<(String, String)> {
+    let sh = Shell::new()?;
+    sh.change_dir(clone_dir);
+    let sha = cmd!(sh, "git rev-parse HEAD").read()?;
+    let date = cmd!(sh, "git log -1 --format=%cI").read()?;
+    Ok((sha, date))
+}
 
-    println!("Copying regression SQL files...");
-    let source_dir = clone_dir.join("src/test/regress/sql");
+fn sync_kwlist(clone_dir: &Utf8Path, sha: &str, date: &str) -> Result<()> {
+    println!("Syncing kwlist.h...");
+    let source = clone_dir.join("src/include/parser/kwlist.h");
+    let file_content = std::fs::read_to_string(&source)?;
 
-    let mut file_count = 0;
-    for entry in std::fs::read_dir(&source_dir)? {
-        let entry = entry?;
-        let path = Utf8PathBuf::try_from(entry.path())?;
-        if path.extension() == Some("sql") {
-            let filename = path.file_name().unwrap();
-            if !filename.contains("psql") || filename == "plpgsql.sql" {
-                std::fs::copy(&path, sql_target_dir.join(filename))?;
-                file_count += 1;
-            }
-        }
-    }
+    let preamble = format!(
+        r"// synced from:
+//   commit: {sha}
+//   committed at: {date}
+//   file: https://github.com/postgres/postgres/blob/{sha}/src/include/parser/kwlist.h
+//
+// update via:
+//   cargo xtask sync-pg
 
-    println!("Copied {file_count} regression SQL files");
+"
+    );
 
-    println!("Copying PL/pgSQL SQL files...");
-    let plpgsql_source_dir = clone_dir.join("src/pl/plpgsql/src/sql");
-    let mut plpgsql_count = 0;
-    for entry in std::fs::read_dir(&plpgsql_source_dir)? {
-        let entry = entry?;
-        let path = Utf8PathBuf::try_from(entry.path())?;
-        if path.extension() == Some("sql") {
-            let filename = path.file_name().unwrap();
-            std::fs::copy(&path, plpgsql_target_dir.join(filename))?;
-            plpgsql_count += 1;
-        }
-    }
-
-    println!("Copied {plpgsql_count} PL/pgSQL SQL files");
-
-    println!("Cleaning up clone directory...");
-    remove_dir_all(&clone_dir)?;
-
+    let kwlist_file = project_root().join(KWLIST_PATH);
+    let mut file = File::create(kwlist_file)?;
+    file.write_all((preamble + &file_content).as_bytes())?;
     Ok(())
 }
 
-fn transform_regression_suite(input_dir: &Utf8PathBuf) -> Result<()> {
+fn sync_regression_suite(clone_dir: &Utf8Path) -> Result<()> {
+    let source_dir = clone_dir.join("src/test/regress/sql");
     let output_dir = project_root().join(SQL_REGRESSION_SUITE_DIR);
 
     if output_dir.exists() {
         println!("Cleaning target directory: {output_dir:?}");
         remove_dir_all(&output_dir)?;
     }
-
     create_dir_all(&output_dir)?;
 
     let mut files: Vec<Utf8PathBuf> = vec![];
-    for entry in std::fs::read_dir(input_dir)? {
+    for entry in std::fs::read_dir(&source_dir)? {
         let entry = entry?;
         let path = Utf8PathBuf::try_from(entry.path())?;
         if path.extension() == Some("sql") {
-            files.push(path);
+            let filename = path.file_name().unwrap();
+            if !filename.contains("psql") || filename == "plpgsql.sql" {
+                files.push(path);
+            }
         }
     }
 
@@ -260,18 +233,18 @@ fn transform_regression_suite(input_dir: &Utf8PathBuf) -> Result<()> {
     Ok(())
 }
 
-fn copy_plpgsql_suite(input_dir: &Utf8PathBuf) -> Result<()> {
+fn sync_plpgsql_suite(clone_dir: &Utf8Path) -> Result<()> {
+    let source_dir = clone_dir.join("src/pl/plpgsql/src/sql");
     let output_dir = project_root().join(PLPGSQL_REGRESSION_SUITE_DIR);
 
     if output_dir.exists() {
         println!("Cleaning target directory: {output_dir:?}");
         remove_dir_all(&output_dir)?;
     }
-
     create_dir_all(&output_dir)?;
 
     let mut file_count = 0;
-    for entry in std::fs::read_dir(input_dir)? {
+    for entry in std::fs::read_dir(&source_dir)? {
         let entry = entry?;
         let path = Utf8PathBuf::try_from(entry.path())?;
         if path.extension() == Some("sql") {
@@ -282,7 +255,6 @@ fn copy_plpgsql_suite(input_dir: &Utf8PathBuf) -> Result<()> {
     }
 
     println!("Copied {file_count} PL/pgSQL files to {output_dir}");
-
     Ok(())
 }
 
@@ -488,7 +460,7 @@ mod tests {
     }
 
     #[test]
-    fn test_replacement() {
+    fn replacement() {
         let cases = [
             (
                 "SELECT * FROM foo WHERE bar = :'foo' AND baz = :baz;",

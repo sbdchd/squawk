@@ -13,7 +13,6 @@ anyhow.workspace = true
 csv.workspace = true
 clap.workspace = true
 enum-iterator.workspace = true
-reqwest = { workspace = true, features = ["blocking", "json"] }
 serde.workspace = true
 serde_json.workspace = true
 convert_case.workspace = true
