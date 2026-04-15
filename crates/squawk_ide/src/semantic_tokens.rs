@@ -41,11 +41,7 @@ fn highlight_param_mode(out: &mut SemanticTokenBuilder, mode: ast::ParamMode) {
 
 fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
     match ty {
-        ast::Type::ArrayType(array_type) => {
-            if let Some(ty) = array_type.ty() {
-                highlight_type(out, ty);
-            }
-        }
+        ast::Type::ArrayType(_) => (),
         ast::Type::BitType(bit_type) => {
             if let Some(token) = bit_type.bit_token() {
                 out.push_type(token.into());
@@ -63,6 +59,9 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
         }
         ast::Type::DoubleType(double_type) => {
             if let Some(token) = double_type.double_token() {
+                out.push_type(token.into());
+            }
+            if let Some(token) = double_type.precision_token() {
                 out.push_type(token.into());
             }
         }
@@ -114,10 +113,10 @@ pub enum SemanticTokenType {
     Name,
     NameRef,
     Comment,
+    Column,
     Type,
     Parameter,
     PositionalParam,
-    Column,
     Table,
     Schema,
 }
@@ -157,19 +156,11 @@ impl TryFrom<LocationKind> for SemanticTokenType {
     }
 }
 
-fn highlight_name_ref(
-    db: &dyn Db,
-    file: File,
-    out: &mut SemanticTokenBuilder,
-    name_ref: &ast::NameRef,
-) {
-    let offset = name_ref.syntax().text_range().start();
-    let Some(location) = goto_definition(db, file, offset).into_iter().next() else {
-        return;
-    };
-    if let Ok(token_type) = SemanticTokenType::try_from(location.kind) {
-        out.push_token(name_ref.syntax().clone().into(), token_type);
-    }
+fn token_type_for_node<T: AstNode>(db: &dyn Db, file: File, node: &T) -> Option<SemanticTokenType> {
+    let offset = node.syntax().text_range().start();
+    let location = goto_definition(db, file, offset).into_iter().next()?;
+
+    SemanticTokenType::try_from(location.kind).ok()
 }
 
 #[derive(Default)]
@@ -244,71 +235,43 @@ pub fn semantic_tokens(
 
         match event {
             Enter(NodeOrToken::Node(node)) => {
-                if let Some(target) = ast::Target::cast(node.clone())
-                    && let Some(as_name) = target.as_name()
-                    && let Some(name) = as_name.name()
+                if let Some(name) = ast::Name::cast(node.clone())
+                    && let Some(token_type) = token_type_for_node(db, file, &name)
                 {
-                    out.push_token(name.syntax().clone().into(), SemanticTokenType::Column);
+                    out.push_token(name.syntax().clone().into(), token_type);
                 }
 
-                if let Some(name_ref) = ast::NameRef::cast(node.clone()) {
-                    highlight_name_ref(db, file, &mut out, &name_ref);
+                if let Some(name_ref) = ast::NameRef::cast(node.clone())
+                    && let Some(token_type) = token_type_for_node(db, file, &name_ref)
+                {
+                    out.push_token(name_ref.syntax().clone().into(), token_type);
                 }
 
-                if let Some(alias) = ast::Alias::cast(node.clone())
-                    && let Some(column_list) = alias.column_list()
-                {
-                    for column in column_list.columns() {
-                        if let Some(ty) = column.ty() {
-                            highlight_type(&mut out, ty);
-                        }
-                    }
-                }
-
-                if let Some(cast_expr) = ast::CastExpr::cast(node.clone())
-                    && let Some(ty) = cast_expr.ty()
-                {
+                if let Some(ty) = ast::Type::cast(node.clone()) {
                     highlight_type(&mut out, ty);
                 }
 
-                if let Some(with_table) = ast::WithTable::cast(node.clone())
-                    && let Some(name) = with_table.name()
-                {
-                    out.push_token(name.syntax().clone().into(), SemanticTokenType::Table);
+                if let Some(mode) = ast::ParamMode::cast(node.clone()) {
+                    highlight_param_mode(&mut out, mode);
                 }
 
-                if let Some(create_function) = ast::CreateFunction::cast(node) {
-                    if let Some(param_list) = create_function.param_list() {
-                        for param in param_list.params() {
-                            if let Some(mode) = param.mode() {
-                                highlight_param_mode(&mut out, mode);
-                            }
-                            if let Some(name) = param.name() {
-                                out.push_token(
-                                    name.syntax().clone().into(),
-                                    SemanticTokenType::Parameter,
-                                );
-                            }
-                            if let Some(ty) = param.ty() {
-                                highlight_type(&mut out, ty);
-                            }
-                        }
-                    }
-
-                    if let Some(ret_type) = create_function.ret_type() {
-                        if let Some(ty) = ret_type.ty() {
-                            highlight_type(&mut out, ty);
-                        }
-                        if let Some(table_arg_list) = ret_type.table_arg_list() {
-                            for arg in table_arg_list.args() {
-                                if let ast::TableArg::Column(column) = arg
-                                    && let Some(ty) = column.ty()
-                                {
-                                    highlight_type(&mut out, ty);
-                                }
-                            }
-                        }
-                    }
+                // Cleanup various operators that the textmate grammar
+                // highlights spuriously. These are for the select cases that
+                // aren't easily handled in the textmate grammar.
+                if let Some(like_clause) = ast::LikeClause::cast(node.clone())
+                    && let Some(token) = like_clause.like_token()
+                {
+                    out.push_keyword(token.into());
+                }
+                if let Some(not_null_constraint) = ast::NotNullConstraint::cast(node.clone())
+                    && let Some(token) = not_null_constraint.not_token()
+                {
+                    out.push_keyword(token.into());
+                }
+                if let Some(partition_for_values_in) = ast::PartitionForValuesIn::cast(node.clone())
+                    && let Some(token) = partition_for_values_in.in_token()
+                {
+                    out.push_keyword(token.into());
                 }
             }
             Enter(NodeOrToken::Token(token)) => {
@@ -368,6 +331,7 @@ as 'select $1 + $2'
 language sql;
 ",
         ), @r#"
+        "add" @ 17..20: Function
         "in" @ 24..26: Keyword
         "a" @ 27..28: Parameter
         "int" @ 29..32: Type
@@ -394,6 +358,7 @@ returns void
 as '' language sql;
 ",
         ), @r#"
+        "f" @ 17..18: Function
         "int8" @ 19..23: Parameter
         "in" @ 24..26: Keyword
         "int8" @ 27..31: Type
@@ -409,7 +374,10 @@ create function f(a t.c%type)
 returns t.b%type 
 as '' language plpgsql;
 ",
-        ), @r#""a" @ 19..20: Parameter"#);
+        ), @r#"
+        "f" @ 17..18: Function
+        "a" @ 19..20: Parameter
+        "#);
     }
 
     #[test]
@@ -433,6 +401,31 @@ select $1, $2;
     }
 
     #[test]
+    fn insert_column_list() {
+        assert_snapshot!(semantic_tokens(
+            "
+create table products (product_no bigint, name text, price text);
+insert into products (product_no, name, price) values
+    (1, 'Cheese', 9.99),
+    (2, 'Bread', 1.99),
+    (3, 'Milk', 2.99);
+",
+        ), @r#"
+        "products" @ 14..22: Table
+        "product_no" @ 24..34: Column
+        "bigint" @ 35..41: Type
+        "name" @ 43..47: Column
+        "text" @ 48..52: Type
+        "price" @ 54..59: Column
+        "text" @ 60..64: Type
+        "products" @ 79..87: Table
+        "product_no" @ 89..99: Column
+        "name" @ 101..105: Column
+        "price" @ 107..112: Column
+        "#)
+    }
+
+    #[test]
     fn from_alias_column_types() {
         assert_snapshot!(semantic_tokens(
             "
@@ -440,13 +433,63 @@ select *
 from f as t(a int, b jsonb, c text, x int, ca char(5)[], ia int[][], r text);
 ",
         ), @r#"
+        "t" @ 20..21: Table
+        "a" @ 22..23: Column
         "int" @ 24..27: Type
+        "b" @ 29..30: Column
         "jsonb" @ 31..36: Type
+        "c" @ 38..39: Column
         "text" @ 40..44: Type
+        "x" @ 46..47: Column
         "int" @ 48..51: Type
+        "ca" @ 53..55: Column
         "char" @ 56..60: Type
+        "ia" @ 67..69: Column
         "int" @ 70..73: Type
+        "r" @ 79..80: Column
         "text" @ 81..85: Type
+        "#);
+    }
+
+    #[test]
+    fn json_table_columns() {
+        assert_snapshot!(semantic_tokens(
+            "
+select *
+from my_films,
+json_table(
+  js,
+  '$.favorites[*]' columns (
+    id for ordinality,
+    kind text path '$.kind'
+  )
+) as jt;
+",
+        ), @r#"
+        "id" @ 76..78: Column
+        "kind" @ 99..103: Column
+        "text" @ 104..108: Type
+        "jt" @ 132..134: Table
+        "#);
+    }
+
+    #[test]
+    fn xml_table_columns() {
+        assert_snapshot!(semantic_tokens(
+            "
+select *
+from xmltable(
+  '/root/item'
+  passing xmlparse(document '<root><item id=\"1\"/></root>')
+  columns
+    row_num for ordinality,
+    item_id integer path '@id'
+);
+",
+        ), @r#"
+        "row_num" @ 113..120: Column
+        "item_id" @ 141..148: Column
+        "integer" @ 149..156: Type
         "#);
     }
 
@@ -463,6 +506,83 @@ select '1'::jsonb, '2'::json, cast(1 as integer), cast(1 as int4[][]), cast(1 as
         "int4" @ 61..65: Type
         "varchar" @ 82..89: Type
         "#);
+    }
+
+    #[test]
+    fn cast_double() {
+        assert_snapshot!(semantic_tokens(
+            "
+select '1'::double precision;
+",
+        ), @r#"
+        "double" @ 13..19: Type
+        "precision" @ 20..29: Type
+        "#);
+    }
+
+    #[test]
+    fn create_table_temporal_primary_key_column_types() {
+        assert_snapshot!(semantic_tokens(
+            "
+-- temporal_primary_key
+CREATE TABLE addresses (
+    id int8 generated BY DEFAULT AS IDENTITY,
+    valid_range tstzrange NOT NULL DEFAULT tstzrange(now(), 'infinity', '[)'),
+    recipient text NOT NULL,
+    PRIMARY KEY (id, valid_range WITHOUT OVERLAPS)
+);
+",
+        ), @r#"
+        "addresses" @ 38..47: Table
+        "id" @ 54..56: Column
+        "int8" @ 57..61: Type
+        "valid_range" @ 100..111: Column
+        "tstzrange" @ 112..121: Type
+        "NOT" @ 122..125: Keyword
+        "tstzrange" @ 139..148: Function
+        "now" @ 149..152: Function
+        "recipient" @ 179..188: Column
+        "text" @ 189..193: Type
+        "NOT" @ 194..197: Keyword
+        "id" @ 221..223: Column
+        "valid_range" @ 225..236: Column
+        "#);
+    }
+
+    #[test]
+    fn like_clause_keyword() {
+        assert_snapshot!(semantic_tokens(
+            "
+create table products(a text);
+create table test (
+  like products
+);
+",
+        ), @r#"
+        "products" @ 14..22: Table
+        "a" @ 23..24: Column
+        "text" @ 25..29: Type
+        "test" @ 45..49: Table
+        "like" @ 54..58: Keyword
+        "products" @ 59..67: Table
+        "#)
+    }
+
+    #[test]
+    fn partition_for_values_in_keywords() {
+        assert_snapshot!(semantic_tokens(
+            "
+create table t(a int);
+create table t_1 partition of t for values in (1);
+",
+        ), @r#"
+        "t" @ 14..15: Table
+        "a" @ 16..17: Column
+        "int" @ 18..21: Type
+        "t_1" @ 37..40: Table
+        "t" @ 54..55: Table
+        "in" @ 67..69: Keyword
+        "#)
     }
 
     #[test]
@@ -485,7 +605,10 @@ create table t(a int, b text);
 select a, b from t;
 ",
         ), @r#"
+        "t" @ 14..15: Table
+        "a" @ 16..17: Column
         "int" @ 18..21: Type
+        "b" @ 23..24: Column
         "text" @ 25..29: Type
         "a" @ 39..40: Column
         "b" @ 42..43: Column
@@ -501,6 +624,8 @@ create table t(a int);
 select t.a from t;
 ",
         ), @r#"
+        "t" @ 14..15: Table
+        "a" @ 16..17: Column
         "int" @ 18..21: Type
         "t" @ 31..32: Table
         "a" @ 33..34: Column
@@ -516,6 +641,7 @@ create function f() returns int as 'select 1' language sql;
 select f();
 ",
         ), @r#"
+        "f" @ 17..18: Function
         "int" @ 29..32: Type
         "f" @ 68..69: Function
         "#);
@@ -530,7 +656,10 @@ create function b(t) returns int as 'select 1' language sql;
 select b(t), t.b from t;
 ",
         ), @r#"
+        "t" @ 14..15: Table
+        "a" @ 16..17: Column
         "int" @ 18..21: Type
+        "b" @ 40..41: Function
         "t" @ 42..43: Type
         "int" @ 53..56: Type
         "b" @ 92..93: Function
@@ -551,7 +680,10 @@ create policy p on t
   with check (t.x > 0 and t.c > 0);
 ",
         ), @r#"
+        "t" @ 14..15: Table
+        "c" @ 16..17: Column
         "int" @ 18..21: Type
+        "x" @ 40..41: Function
         "t" @ 42..43: Type
         "int" @ 53..56: Type
         "t" @ 104..105: Table
@@ -586,7 +718,10 @@ create table s.t(a int);
 select s.t.a from s.t;
 ",
         ), @r#"
+        "s" @ 15..16: Schema
         "s" @ 31..32: Schema
+        "t" @ 33..34: Table
+        "a" @ 35..36: Column
         "int" @ 37..40: Type
         "s" @ 50..51: Schema
         "t" @ 52..53: Table

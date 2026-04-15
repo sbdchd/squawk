@@ -170,7 +170,7 @@
     "keywords": {
       "patterns": [
         {
-          "match": "(?i)\\b(if\\s+not\\s+exists|or\\s+replace|if\\s+exists)\\b",
+          "match": "(?i)\\b(as\\s+not\\s+materialized|nulls\\s+not\\s+distinct|truncate\\s+or\\s+delete|when\\s+not\\s+matched|insert\\s+or\\s+delete|delete\\s+or\\s+insert|without\\s+overlaps|not\\s+deferrable|fetch\\s+prior\\s+in|if\\s+not\\s+exists|drop\\s+not\\s+null|for\\s+values\\s+in|in\\s+tablespace|not\\s+leakproof|set\\s+not\\s+null|and\\s+no\\s+chain|in\\s+exclusive|in\\s+database|or\\s+replace|in\\s+schema|not\\s+valid|if\\s+exists|in\\s+access|and\\s+chain|in\\s+share|in\\s+group|in\\s+role|in\\s+row|not\\s+of)\\b",
           "name": "keyword.other.pgsql"
         },
         {
@@ -190,12 +190,20 @@
     "misc": {
       "patterns": [
         {
+          "match": "(?i)(?<![\\w\"])((?:(?:[\\w]+|\"(?:\"\"|[^\"])+\")\\.){0,2}(?:[\\w]+|\"(?:\"\"|[^\"])+\"))(?=\\s*\\()",
+          "name": "entity.name.function.pgsql"
+        },
+        {
           "match": "\\b\\d+\\b",
           "name": "constant.numeric.pgsql"
         },
         {
           "match": "::",
           "name": "keyword.operator.cast.pgsql"
+        },
+        {
+          "match": ":=",
+          "name": "keyword.operator.pgsql"
         },
         {
           "match": "[+\\-*/<>=~!@#%\\^&|`?\\.]",
@@ -266,6 +274,10 @@
               "include": "#string_escape"
             }
           ]
+        },
+        {
+          "match": "(?i)((?:(?:\"(?:\"\"|[^\"])+\")\\.){0,2}\"(?:\"\"|[^\"])+\")(?=\\s*\\()",
+          "name": "entity.name.function.pgsql"
         },
         {
           "comment": "Double quoting treated like strings, but they are really identifiers.",

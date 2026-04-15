@@ -907,7 +907,37 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
 
 // Multi-word keyword phrases that should be highlighted as keywords, not
 // operators.
-const KEYWORD_PHRASES: &[&str] = &["if not exists", "or replace", "if exists"];
+const KEYWORD_PHRASES: &[&str] = &[
+    "as not materialized",
+    "nulls not distinct",
+    "truncate or delete",
+    "when not matched",
+    "insert or delete",
+    "delete or insert",
+    "without overlaps",
+    "not deferrable",
+    "fetch prior in",
+    "if not exists",
+    "drop not null",
+    "for values in",
+    "in tablespace",
+    "not leakproof",
+    "set not null",
+    "and no chain",
+    "in exclusive",
+    "in database",
+    "or replace",
+    "in schema",
+    "not valid",
+    "if exists",
+    "in access",
+    "and chain",
+    "in share",
+    "in group",
+    "in role",
+    "in row",
+    "not of",
+];
 
 // Multi-word entries must come before their single-word components so the
 // regex engine matches the longest form first.
@@ -962,10 +992,12 @@ fn keywords_match(all_keywords: &[String]) -> String {
 }
 
 fn generate_playground_keywords(all_keywords: &[String]) -> Result<String> {
-    let keywords_json = serde_json::to_string_pretty(all_keywords)?;
-    Ok(format!(
-        "{PRELUDE}export const keywords = {keywords_json} as const\n"
-    ))
+    let mut lines = vec![format!("{PRELUDE}export const keywords = [")];
+    for keyword in all_keywords {
+        lines.push(format!("  \"{keyword}\","));
+    }
+    lines.push("] as const\n".to_string());
+    Ok(lines.join("\n"))
 }
 
 fn update_textmate_keywords(all_keywords: &[String]) -> Result<()> {
