@@ -567,7 +567,7 @@ PathType =
 
 CharType =
   'setof'?
-  ('varchar' | ( 'character' | 'char' | 'nchar' ) 'varying'? )
+  ('varchar' | 'national'? ( 'character' | 'char' | 'nchar' ) 'varying'? )
   ArgList?
 
 BitType =

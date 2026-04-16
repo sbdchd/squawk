@@ -13749,6 +13749,9 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
                     // float8 order by
                     //        ^
                     ORDER_KW => true,
+                    // double precision
+                    //        ^
+                    PRECISION_KW if p.at(DOUBLE_KW) => true,
                     // we're at the end of the param, must be a type
                     R_PAREN | EQ | DEFAULT_KW | COMMA => true,
                     _ => false,
@@ -14005,7 +14008,6 @@ fn opt_ret_type(p: &mut Parser<'_>) {
                 p.error("expected table arg list");
             }
         } else {
-            p.eat(SETOF_KW);
             type_name(p);
         }
         m.complete(p, RET_TYPE);
