@@ -314,7 +314,12 @@ impl SquawkDatabase {
         let offset = position_to_offset(&line_index, line, col)?;
         let result = squawk_ide::hover::hover(&self.db, file, offset);
 
-        serde_wasm_bindgen::to_value(&result).map_err(into_error)
+        let converted = result.map(|hover| WasmHover {
+            snippet: hover.snippet,
+            comment: hover.comment,
+        });
+
+        serde_wasm_bindgen::to_value(&converted).map_err(into_error)
     }
 
     pub fn find_references(&self, line: u32, col: u32) -> Result<JsValue, Error> {
@@ -755,6 +760,12 @@ struct WasmCodeAction {
     title: String,
     edits: Vec<TextEdit>,
     kind: String,
+}
+
+#[derive(Serialize)]
+struct WasmHover {
+    snippet: String,
+    comment: Option<String>,
 }
 
 #[derive(Serialize)]
