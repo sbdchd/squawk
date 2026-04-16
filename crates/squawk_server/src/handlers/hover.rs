@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lsp_types::{Hover, HoverContents, HoverParams, LanguageString, MarkedString};
+use lsp_types::{Hover, HoverContents, HoverParams, MarkedString};
 use squawk_ide::db::line_index;
 use squawk_ide::hover::hover;
 
