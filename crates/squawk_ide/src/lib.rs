@@ -3,6 +3,7 @@ pub mod builtins;
 mod classify;
 pub mod code_actions;
 pub mod column_name;
+mod comments;
 pub mod completion;
 pub mod db;
 pub mod document_symbols;

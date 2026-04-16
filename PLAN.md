@@ -194,6 +194,10 @@ sql for benchmarks maybe?
 
   https://github.com/earendil-works/absurd/blob/56500e5a23beca5e976f329475063f24692d99cc/sql/absurd.sql
 
+- pg_6502
+
+  https://github.com/lasect/pg_6502
+
 ### CLI
 
 from `deno`

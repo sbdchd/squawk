@@ -28,6 +28,11 @@ export type LintError = {
   fix?: Fix
 }
 
+export interface HoverResult {
+  snippet: string
+  comment: string | null
+}
+
 let db: SquawkDatabase | null = null
 
 // We pass in content and version here so that we:
@@ -75,7 +80,7 @@ export function hover(
   version: number,
   line: number,
   column: number,
-): string | null {
+): HoverResult | null {
   return getDb(content, version).hover(line, column)
 }
 

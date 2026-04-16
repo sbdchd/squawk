@@ -158,8 +158,18 @@ export async function provideHover(
 
     if (!result) return null
 
+    const contents: monaco.IMarkdownString[] = [
+      {
+        value: `\`\`\`sql\n${result.snippet}\n\`\`\``,
+      },
+    ]
+
+    if (result.comment) {
+      contents.push({ value: `---\n\n${result.comment}` })
+    }
+
     return {
-      contents: [{ value: result }],
+      contents,
     }
   } catch (e) {
     console.error("Error in provideHover:", e)
