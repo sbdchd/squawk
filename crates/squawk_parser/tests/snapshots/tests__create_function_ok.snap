@@ -238,9 +238,9 @@ SOURCE_FILE
     RET_TYPE
       RETURNS_KW "returns"
       WHITESPACE " "
-      SETOF_KW "setof"
-      WHITESPACE " "
       PATH_TYPE
+        SETOF_KW "setof"
+        WHITESPACE " "
         PATH
           PATH
             PATH_SEGMENT
@@ -969,6 +969,47 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- regression"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENTITY_KW "identity"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        DOUBLE_TYPE
+          DOUBLE_KW "double"
+          WHITESPACE " "
+          PRECISION_KW "precision"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      DOUBLE_TYPE
+        DOUBLE_KW "double"
+        WHITESPACE " "
+        PRECISION_KW "precision"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select $1'"
       WHITESPACE "\n"
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
