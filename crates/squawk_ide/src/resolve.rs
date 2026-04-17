@@ -198,6 +198,13 @@ pub(crate) fn resolve_name_ref(
             resolve_event_trigger_name_ptr(binder, &event_trigger_name)
                 .map(|ptr| (smallvec![ptr], LocationKind::EventTrigger))
         }
+        NameRefClass::PropertyGraph => {
+            let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
+            let (property_graph_name, schema) = extract_table_schema_from_path(&path)?;
+            let position = name_ref.syntax().text_range().start();
+            resolve_property_graph_name_ptr(binder, &property_graph_name, &schema, position)
+                .map(|ptr| (smallvec![ptr], LocationKind::PropertyGraph))
+        }
         NameRefClass::Database => {
             let database_name = Name::from_node(name_ref);
             resolve_database_name_ptr(binder, &database_name)
@@ -750,6 +757,20 @@ fn resolve_event_trigger_name_ptr(
     event_trigger_name: &Name,
 ) -> Option<SyntaxNodePtr> {
     binder.lookup(event_trigger_name, SymbolKind::EventTrigger)
+}
+
+fn resolve_property_graph_name_ptr(
+    binder: &Binder,
+    property_graph_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+) -> Option<SyntaxNodePtr> {
+    binder.lookup_with(
+        property_graph_name,
+        SymbolKind::PropertyGraph,
+        position,
+        schema,
+    )
 }
 
 fn resolve_tablespace_name_ptr(binder: &Binder, tablespace_name: &Name) -> Option<SyntaxNodePtr> {
@@ -3401,6 +3422,13 @@ pub(crate) fn resolve_procedure_info(
 
 pub(crate) fn resolve_type_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {
     resolve_symbol_info(binder, path, SymbolKind::Type)
+}
+
+pub(crate) fn resolve_property_graph_info(
+    binder: &Binder,
+    path: &ast::Path,
+) -> Option<(Schema, String)> {
+    resolve_symbol_info(binder, path, SymbolKind::PropertyGraph)
 }
 
 pub(crate) fn resolve_view_info(binder: &Binder, path: &ast::Path) -> Option<(Schema, String)> {

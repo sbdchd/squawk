@@ -21,6 +21,7 @@ pub enum DocumentSymbolKind {
     EventTrigger,
     Role,
     Policy,
+    PropertyGraph,
     Type,
     Enum,
     Index,
@@ -149,6 +150,11 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreatePolicy(create_policy) => {
                 if let Some(symbol) = create_policy_symbol(create_policy) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreatePropertyGraph(create_property_graph) => {
+                if let Some(symbol) = create_property_graph_symbol(create_property_graph) {
                     symbols.push(symbol);
                 }
             }
@@ -679,6 +685,27 @@ fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymb
     })
 }
 
+fn create_property_graph_symbol(
+    create_property_graph: ast::CreatePropertyGraph,
+) -> Option<DocumentSymbol> {
+    let path = create_property_graph.path()?;
+    let name_node = path.segment()?.name()?;
+
+    let name = path.syntax().text().to_string();
+
+    let full_range = create_property_graph.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::PropertyGraph,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_type_symbol(
     binder: &binder::Binder,
     create_type: ast::CreateType,
@@ -892,6 +919,7 @@ mod tests {
             DocumentSymbolKind::EventTrigger => "event trigger",
             DocumentSymbolKind::Role => "role",
             DocumentSymbolKind::Policy => "policy",
+            DocumentSymbolKind::PropertyGraph => "property graph",
             DocumentSymbolKind::Type => "type",
             DocumentSymbolKind::Enum => "enum",
             DocumentSymbolKind::Index => "index",
@@ -1392,6 +1420,23 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
           │ │                         │
           │ │                         focus range
           ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_property_graph() {
+        assert_snapshot!(symbols("
+create property graph foo.bar
+  vertex tables (t key (a) no properties);
+"), @"
+        info: property graph: foo.bar
+          ╭▸ 
+        2 │   create property graph foo.bar
+          │   │                         ━━━ focus range
+          │ ┌─┘
+          │ │
+        3 │ │   vertex tables (t key (a) no properties);
+          ╰╴└─────────────────────────────────────────┘ full range
         ");
     }
 

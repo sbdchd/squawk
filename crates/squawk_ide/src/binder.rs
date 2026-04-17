@@ -283,6 +283,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
+        ast::Stmt::CreatePropertyGraph(create_property_graph) => {
+            bind_create_property_graph(b, create_property_graph)
+        }
         _ => (),
     }
 }
@@ -771,6 +774,30 @@ fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
 
     let root = b.root_scope();
     b.scopes[root].insert(policy_name, policy_id);
+}
+
+fn bind_create_property_graph(b: &mut Binder, create_property_graph: ast::CreatePropertyGraph) {
+    let Some(path) = create_property_graph.path() else {
+        return;
+    };
+    let Some(property_graph_name) = item_name(&path) else {
+        return;
+    };
+    let name_ptr = path_to_ptr(&path);
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let property_graph_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::PropertyGraph,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    let root = b.root_scope();
+    b.scopes[root].insert(property_graph_name, property_graph_id);
 }
 
 fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEventTrigger) {

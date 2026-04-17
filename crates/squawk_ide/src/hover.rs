@@ -191,6 +191,9 @@ pub fn hover(db: &dyn Db, file: File, offset: TextSize) -> Option<Hover> {
             NameClass::CreateView(create_view) => {
                 return format_create_view(&create_view, &binder);
             }
+            NameClass::CreatePropertyGraph(create_property_graph) => {
+                return format_create_property_graph(&create_property_graph, &binder);
+            }
             NameClass::DeclareCursor(declare) => {
                 return format_declare_cursor(&declare);
             }
@@ -286,6 +289,7 @@ fn hover_name_ref(
         NameRefClass::PreparedStatement => hover_prepared_statement(root, name_ref, binder),
         NameRefClass::Channel => hover_channel(root, name_ref, binder),
         NameRefClass::Window => hover_window(root, name_ref, binder),
+        NameRefClass::PropertyGraph => hover_property_graph(root, name_ref, binder),
     }
 }
 
@@ -1107,6 +1111,24 @@ fn hover_policy(
     format_create_policy(&create_policy, binder)
 }
 
+fn hover_property_graph(
+    root: &SyntaxNode,
+    name_ref: &ast::NameRef,
+    binder: &binder::Binder,
+) -> Option<Hover> {
+    let property_graph_ptr = resolve::resolve_name_ref_ptrs(binder, root, name_ref)?
+        .into_iter()
+        .next()?;
+
+    let property_graph_name_node = property_graph_ptr.to_node(root);
+
+    let create_property_graph = property_graph_name_node
+        .ancestors()
+        .find_map(ast::CreatePropertyGraph::cast)?;
+
+    format_create_property_graph(&create_property_graph, binder)
+}
+
 fn hover_event_trigger(
     root: &SyntaxNode,
     name_ref: &ast::NameRef,
@@ -1444,6 +1466,18 @@ fn format_create_policy(
     Some(Hover::snippet(format!(
         "policy {}.{} on {}.{}",
         schema, policy_name, schema, table_name
+    )))
+}
+
+fn format_create_property_graph(
+    create_property_graph: &ast::CreatePropertyGraph,
+    binder: &binder::Binder,
+) -> Option<Hover> {
+    let path = create_property_graph.path()?;
+    let (schema, name) = resolve::resolve_property_graph_info(binder, &path)?;
+    Some(Hover::snippet(format!(
+        "property graph {}.{}",
+        schema, name
     )))
 }
 
@@ -4972,11 +5006,49 @@ notify updates$0;
         assert_snapshot!(check_hover("
 listen updates;
 unlisten updates$0;
-"), @r"
+"), @"
         hover: listen updates
           ╭▸ 
         3 │ unlisten updates;
           ╰╴               ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_property_graph_on_create() {
+        assert_snapshot!(check_hover("
+create property graph foo.ba$0r vertex tables (t key (a) no properties);
+"), @"
+        hover: property graph foo.bar
+          ╭▸ 
+        2 │ create property graph foo.bar vertex tables (t key (a) no properties);
+          ╰╴                           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_property_graph_on_drop() {
+        assert_snapshot!(check_hover("
+create property graph foo.bar vertex tables (t key (a) no properties);
+drop property graph foo.ba$0r;
+"), @"
+        hover: property graph foo.bar
+          ╭▸ 
+        3 │ drop property graph foo.bar;
+          ╰╴                         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_property_graph_on_alter() {
+        assert_snapshot!(check_hover("
+create property graph foo.bar vertex tables (t key (a) no properties);
+alter property graph foo.ba$0r rename to baz;
+"), @"
+        hover: property graph foo.bar
+          ╭▸ 
+        3 │ alter property graph foo.bar rename to baz;
+          ╰╴                          ─ hover
         ");
     }
 }
