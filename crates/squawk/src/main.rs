@@ -108,6 +108,20 @@ struct Opts {
         global = true
     )]
     excluded_rules: Option<Vec<Rule>>,
+    /// Include opt-in rules that are disabled by default
+    ///
+    /// Rules listed in --exclude take precedence over --include.
+    ///
+    /// For example:
+    /// --include=require-table-schema
+    #[arg(
+        short = 'i',
+        long = "include",
+        value_name = "rule",
+        value_delimiter = ',',
+        global = true
+    )]
+    included_rules: Option<Vec<Rule>>,
     /// Specify postgres version
     ///
     /// For example:

@@ -121,6 +121,7 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
     let file_results = lint_files(&LintArgs {
         input: Input::Paths(found_paths),
         excluded_rules: cfg.excluded_rules,
+        included_rules: cfg.included_rules,
         pg_version: cfg.pg_version,
         assume_in_transaction: cfg.assume_in_transaction,
         reporter: cfg.reporter,

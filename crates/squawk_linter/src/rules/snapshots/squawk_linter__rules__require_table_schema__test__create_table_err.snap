@@ -5,4 +5,4 @@ expression: "lint_errors(sql, Rule::RequireTableSchema)"
 warning[require-table-schema]: Table name is not schema-qualified. Use schema.table (e.g., public.my_table).
   ╭▸ 
 2 │ CREATE TABLE my_table (id int);
-  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╰╴             ━━━━━━━━

@@ -58,6 +58,7 @@ impl Cmd {
                 return Cmd::Lint(LintArgs {
                     input,
                     excluded_rules: conf.excluded_rules,
+                    included_rules: conf.included_rules,
                     pg_version: conf.pg_version,
                     assume_in_transaction: conf.assume_in_transaction,
                     reporter: conf.reporter,

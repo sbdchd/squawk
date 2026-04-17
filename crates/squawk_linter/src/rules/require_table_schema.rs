@@ -10,31 +10,30 @@ pub(crate) fn require_table_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) 
     for stmt in file.stmts() {
         match stmt {
             ast::Stmt::CreateTable(create_table) => {
-                check_path(ctx, create_table.path(), create_table.syntax());
+                check_path(ctx, create_table.path());
             }
             ast::Stmt::CreateTableAs(create_table_as) => {
-                check_path(ctx, create_table_as.path(), create_table_as.syntax());
+                check_path(ctx, create_table_as.path());
             }
             ast::Stmt::AlterTable(alter_table) => {
-                let path = alter_table.relation_name().and_then(|r| r.path());
-                check_path(ctx, path, alter_table.syntax());
+                check_path(ctx, alter_table.relation_name().and_then(|r| r.path()));
             }
             ast::Stmt::DropTable(drop_table) => {
-                check_path(ctx, drop_table.path(), drop_table.syntax());
+                check_path(ctx, drop_table.path());
             }
             _ => (),
         }
     }
 }
 
-fn check_path(ctx: &mut Linter, path: Option<ast::Path>, syntax: &squawk_syntax::SyntaxNode) {
+fn check_path(ctx: &mut Linter, path: Option<ast::Path>) {
     if let Some(path) = path
         && path.qualifier().is_none()
     {
         ctx.report(Violation::for_node(
             Rule::RequireTableSchema,
             "Table name is not schema-qualified. Use schema.table (e.g., public.my_table).".into(),
-            syntax,
+            path.syntax(),
         ));
     }
 }

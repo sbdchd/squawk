@@ -22,11 +22,12 @@ use crate::{
 fn check_sql(
     sql: &str,
     path: &str,
+    included_rules: &[Rule],
     excluded_rules: &[Rule],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> CheckReport {
-    let mut linter = Linter::without_rules(excluded_rules);
+    let mut linter = Linter::with_rules(included_rules, excluded_rules);
     if let Some(pg_version) = pg_version {
         linter.settings.pg_version = pg_version;
     }
@@ -142,6 +143,7 @@ fn render_lint_error<W: std::io::Write>(
 pub(crate) struct LintArgs {
     pub(crate) input: Input,
     pub(crate) excluded_rules: Vec<Rule>,
+    pub(crate) included_rules: Vec<Rule>,
     pub(crate) pg_version: Option<Version>,
     pub(crate) assume_in_transaction: bool,
     pub(crate) reporter: Reporter,
@@ -162,6 +164,7 @@ pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
                 let content = check_sql(
                     &sql,
                     &path,
+                    &args.included_rules,
                     &args.excluded_rules,
                     args.pg_version,
                     args.assume_in_transaction,
@@ -176,6 +179,7 @@ pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
                 let content = check_sql(
                     &sql,
                     path.to_str().unwrap(),
+                    &args.included_rules,
                     &args.excluded_rules,
                     args.pg_version,
                     args.assume_in_transaction,
@@ -491,7 +495,7 @@ mod test_check_files {
 select \;
         ";
         let mut buff = Vec::new();
-        let res = check_sql(sql, "test.sql", &[], None, false);
+        let res = check_sql(sql, "test.sql", &[], &[], None, false);
         fmt_json(&mut buff, vec![res]).unwrap();
 
         let val: Value = serde_json::from_slice(&buff).unwrap();
@@ -502,7 +506,7 @@ select \;
     fn skip_lint_on_syntax_error() {
         let error_sql = "ALTER TABLE foo ALTER CONSTRAINT bar RENAME TO quux;";
         let mut buff = vec![];
-        let res = check_sql(error_sql, "test.sql", &[], None, false);
+        let res = check_sql(error_sql, "test.sql", &[], &[], None, false);
         fmt_json(&mut buff, vec![res]).unwrap();
         assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"test.sql","line":0,"column":36,"level":"Error","message":"missing comma","help":null,"rule_name":"syntax-error","column_end":36,"line_end":0}]"#);
     }
@@ -529,7 +533,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Gcc,
             false,
         );
@@ -562,7 +566,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Tty,
             true,
         );
@@ -584,7 +588,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Tty,
             false,
         );
@@ -600,7 +604,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, "main.sql", &[], None, false)],
+            vec![check_sql(sql, "main.sql", &[], &[], None, false)],
             &Reporter::Tty,
             false,
         );
@@ -622,7 +626,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Json,
             false,
         );
@@ -643,7 +647,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Gitlab,
             false,
         );
@@ -662,6 +666,6 @@ ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
         let filename = "main.sql";
-        assert_debug_snapshot!(check_sql(sql, filename, &[], None, false));
+        assert_debug_snapshot!(check_sql(sql, filename, &[], &[], None, false));
     }
 }

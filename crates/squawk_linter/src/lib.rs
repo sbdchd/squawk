@@ -1,4 +1,4 @@
-use rustc_hash::{FxBuildHasher, FxHashSet};
+use rustc_hash::FxHashSet;
 use std::fmt;
 
 use enum_iterator::Sequence;
@@ -466,28 +466,29 @@ impl Linter {
         errors
     }
 
-    pub fn with_all_rules() -> Self {
-        let rules = all::<Rule>()
+    fn default_rules() -> FxHashSet<Rule> {
+        all::<Rule>()
             .filter(|r| !r.is_opt_in())
-            .collect::<FxHashSet<_>>();
+            .collect::<FxHashSet<_>>()
+    }
+
+    pub fn with_default_rules() -> Self {
+        let rules = Linter::default_rules();
         Linter::from(rules)
     }
 
-    pub fn without_rules(exclude: &[Rule]) -> Self {
-        let all_rules = all::<Rule>()
-            .filter(|r| !r.is_opt_in())
-            .collect::<FxHashSet<_>>();
-        let mut exclude_set = FxHashSet::with_capacity_and_hasher(exclude.len(), FxBuildHasher);
-        for e in exclude {
-            exclude_set.insert(e);
+    pub fn with_rules(include: &[Rule], exclude: &[Rule]) -> Self {
+        let mut default_rules = Linter::default_rules();
+
+        for rule in include {
+            default_rules.insert(*rule);
         }
 
-        let rules = all_rules
-            .into_iter()
-            .filter(|x| !exclude_set.contains(x))
-            .collect::<FxHashSet<_>>();
+        for rule in exclude {
+            default_rules.remove(rule);
+        }
 
-        Linter::from(rules)
+        Linter::from(default_rules)
     }
 
     pub fn from(rules: impl IntoIterator<Item = Rule>) -> Self {
@@ -518,5 +519,29 @@ mod tests {
     fn invalid_rule_name() {
         let result: Result<Rule, _> = "invalid-rule-name".parse();
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn with_rules_opt_in_disabled_by_default() {
+        let linter = Linter::with_rules(&[], &[]);
+        assert!(!linter.rules.contains(&Rule::RequireTableSchema));
+    }
+
+    #[test]
+    fn with_rules_opt_in_enabled_via_include() {
+        let linter = Linter::with_rules(&[Rule::RequireTableSchema], &[]);
+        assert!(linter.rules.contains(&Rule::RequireTableSchema));
+    }
+
+    #[test]
+    fn with_rules_exclude_takes_precedence_over_include() {
+        let linter = Linter::with_rules(&[Rule::RequireTableSchema], &[Rule::RequireTableSchema]);
+        assert!(!linter.rules.contains(&Rule::RequireTableSchema));
+    }
+
+    #[test]
+    fn with_rules_exclude_removes_default_rule() {
+        let linter = Linter::with_rules(&[], &[Rule::BanDropTable]);
+        assert!(!linter.rules.contains(&Rule::BanDropTable));
     }
 }
