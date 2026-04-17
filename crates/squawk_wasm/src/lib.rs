@@ -175,7 +175,7 @@ impl SquawkDatabase {
     pub fn lint(&self) -> Result<JsValue, Error> {
         let file = self.file()?;
         let content = file.content(&self.db);
-        let mut linter = squawk_linter::Linter::with_all_rules();
+        let mut linter = squawk_linter::Linter::with_default_rules();
         let parse = db::parse(&self.db, file);
         let parse_errors = parse.errors();
 

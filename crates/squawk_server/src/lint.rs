@@ -24,7 +24,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
     let parse = parse(db, file);
     let content = file.content(db);
     let parse_errors = parse.errors();
-    let mut linter = Linter::with_all_rules();
+    let mut linter = Linter::with_default_rules();
     let violations = linter.lint(&parse, content);
     let line_index = file_line_index(db, file);
 

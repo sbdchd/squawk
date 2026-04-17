@@ -7,6 +7,7 @@ Ok(
         ConfigFile {
             excluded_paths: [],
             excluded_rules: [],
+            included_rules: [],
             pg_version: Some(
                 Version {
                     major: 19,
