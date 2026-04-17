@@ -63,6 +63,7 @@ pub(crate) fn handle_document_symbol(
                 DocumentSymbolKind::EventTrigger => SymbolKind::EVENT,
                 DocumentSymbolKind::Role => SymbolKind::CLASS,
                 DocumentSymbolKind::Policy => SymbolKind::VARIABLE,
+                DocumentSymbolKind::PropertyGraph => SymbolKind::STRUCT,
             },
             tags: None,
             range,

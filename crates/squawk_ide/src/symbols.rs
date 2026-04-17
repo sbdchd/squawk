@@ -64,6 +64,7 @@ pub(crate) enum SymbolKind {
     EventTrigger,
     Role,
     Policy,
+    PropertyGraph,
 }
 
 #[derive(Clone, Debug, PartialEq)]

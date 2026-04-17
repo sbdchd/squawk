@@ -146,6 +146,7 @@ pub enum LocationKind {
     Policy,
     PreparedStatement,
     Procedure,
+    PropertyGraph,
     Role,
     Schema,
     Sequence,
@@ -188,6 +189,7 @@ impl From<NameRefClass> for LocationKind {
             NameRefClass::NamedArgParameter => LocationKind::NamedArgParameter,
             NameRefClass::Policy => LocationKind::Policy,
             NameRefClass::PreparedStatement => LocationKind::PreparedStatement,
+            NameRefClass::PropertyGraph => LocationKind::PropertyGraph,
             NameRefClass::Role => LocationKind::Role,
             NameRefClass::Schema => LocationKind::Schema,
             NameRefClass::Sequence => LocationKind::Sequence,
@@ -9341,6 +9343,71 @@ select '10'::dec$0;
           │                        ─────── 2. destination
         3 │ select '10'::dec;
           ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph() {
+        assert_snapshot!(goto("
+create table buzz.boo(a int, b int);
+create property graph foo.bar
+  vertex tables (buzz.boo$0 key (a, b) no properties)
+  edge tables (foo.bar key (x, y)
+    source key (a, b) references k (t, y)
+    destination key (q, t) references a (r, j)
+    properties all columns);
+"), @"
+          ╭▸ 
+        2 │ create table buzz.boo(a int, b int);
+          │                   ─── 2. destination
+        3 │ create property graph foo.bar
+        4 │   vertex tables (buzz.boo key (a, b) no properties)
+          ╰╴                        ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create table foo.bar(x int, y int);
+create property graph g
+  vertex tables (boo key (a, b) no properties)
+  edge tables (foo.bar$0 key (x, y)
+    source key (a, b) references k (t, y)
+    destination key (q, t) references a (r, j)
+    properties all columns);
+"), @"
+          ╭▸ 
+        2 │ create table foo.bar(x int, y int);
+          │                  ─── 2. destination
+          ‡
+        5 │   edge tables (foo.bar key (x, y)
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_property_graph() {
+        assert_snapshot!(goto("
+create property graph foo.bar vertex tables (t key (a) no properties);
+drop property graph foo.ba$0r;
+"), @"
+          ╭▸ 
+        2 │ create property graph foo.bar vertex tables (t key (a) no properties);
+          │                           ─── 2. destination
+        3 │ drop property graph foo.bar;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_property_graph() {
+        assert_snapshot!(goto("
+create property graph foo.bar vertex tables (t key (a) no properties);
+alter property graph foo.ba$0r rename to baz;
+"), @"
+          ╭▸ 
+        2 │ create property graph foo.bar vertex tables (t key (a) no properties);
+          │                           ─── 2. destination
+        3 │ alter property graph foo.bar rename to baz;
+          ╰╴                          ─ 1. source
         ");
     }
 }
