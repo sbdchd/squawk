@@ -43,11 +43,24 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
     match ty {
         ast::Type::ArrayType(_) => (),
         ast::Type::BitType(bit_type) => {
+            if let Some(token) = bit_type.setof_token() {
+                out.push_type(token.into());
+            }
             if let Some(token) = bit_type.bit_token() {
+                out.push_type(token.into());
+            }
+            if let Some(token) = bit_type.varying_token() {
                 out.push_type(token.into());
             }
         }
         ast::Type::CharType(char_type) => {
+            if let Some(token) = char_type.setof_token() {
+                out.push_type(token.into());
+            }
+            if let Some(token) = char_type.national_token() {
+                out.push_type(token.into());
+            }
+
             if let Some(token) = char_type
                 .varchar_token()
                 .or_else(|| char_type.nchar_token())
@@ -55,9 +68,15 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
                 .or_else(|| char_type.char_token())
             {
                 out.push_type(token.into());
-            };
+            }
+            if let Some(token) = char_type.varying_token() {
+                out.push_type(token.into());
+            }
         }
         ast::Type::DoubleType(double_type) => {
+            if let Some(token) = double_type.setof_token() {
+                out.push_type(token.into());
+            }
             if let Some(token) = double_type.double_token() {
                 out.push_type(token.into());
             }
@@ -67,18 +86,55 @@ fn highlight_type(out: &mut SemanticTokenBuilder, ty: ast::Type) {
         }
         ast::Type::ExprType(_) => (),
         ast::Type::IntervalType(interval_type) => {
+            if let Some(token) = interval_type.setof_token() {
+                out.push_type(token.into());
+            }
             if let Some(token) = interval_type.interval_token() {
                 out.push_type(token.into());
             }
         }
-        ast::Type::PathType(_) => (),
+        ast::Type::PathType(path_type) => {
+            if let Some(token) = path_type.setof_token() {
+                out.push_type(token.into());
+            }
+        }
         ast::Type::PercentType(_) => (),
         ast::Type::TimeType(time_type) => {
+            if let Some(token) = time_type.setof_token() {
+                out.push_type(token.into());
+            }
             if let Some(token) = time_type
                 .timestamp_token()
                 .or_else(|| time_type.time_token())
             {
                 out.push_type(token.into());
+            }
+
+            if let Some(timezone) = time_type.timezone() {
+                match timezone {
+                    ast::Timezone::WithTimezone(with_timezone) => {
+                        if let Some(token) = with_timezone.with_token() {
+                            out.push_type(token.into());
+                        }
+                        if let Some(token) = with_timezone.time_token() {
+                            out.push_type(token.into());
+                        }
+                        if let Some(token) = with_timezone.zone_token() {
+                            out.push_type(token.into());
+                        }
+                    }
+                    ast::Timezone::WithoutTimezone(without_timezone) => {
+                        if let Some(token) = without_timezone.without_token() {
+                            out.push_type(token.into());
+                        }
+                        if let Some(token) = without_timezone.time_token() {
+                            out.push_type(token.into());
+                        }
+                        if let Some(token) = without_timezone.zone_token() {
+                            out.push_type(token.into());
+                        }
+                    }
+                }
             }
         }
     }
@@ -517,6 +573,60 @@ select '1'::double precision;
         ), @r#"
         "double" @ 13..19: Type
         "precision" @ 20..29: Type
+        "#);
+    }
+
+    #[test]
+    fn cast_time_and_timestamp_time_zone() {
+        assert_snapshot!(semantic_tokens(
+            "
+select cast(1 as timestamp with time zone), cast(1 as timestamp without time zone), cast(1 as time with time zone), cast(1 as time without time zone);
+",
+        ), @r#"
+        "timestamp" @ 18..27: Type
+        "with" @ 28..32: Type
+        "time" @ 33..37: Type
+        "zone" @ 38..42: Type
+        "timestamp" @ 55..64: Type
+        "without" @ 65..72: Type
+        "time" @ 73..77: Type
+        "zone" @ 78..82: Type
+        "time" @ 95..99: Type
+        "with" @ 100..104: Type
+        "time" @ 105..109: Type
+        "zone" @ 110..114: Type
+        "time" @ 127..131: Type
+        "without" @ 132..139: Type
+        "time" @ 140..144: Type
+        "zone" @ 145..149: Type
+        "#);
+    }
+
+    #[test]
+    fn cast_national_character_varying_type() {
+        assert_snapshot!(semantic_tokens(
+            "
+select 'foo'::national character varying;
+",
+        ), @r#"
+        "national" @ 15..23: Type
+        "character" @ 24..33: Type
+        "varying" @ 34..41: Type
+        "#);
+    }
+
+    #[test]
+    fn create_function_returns_setof_type() {
+        assert_snapshot!(semantic_tokens(
+            "
+create function f() returns setof int
+as 'select 1'
+language sql;
+",
+        ), @r#"
+        "f" @ 17..18: Function
+        "setof" @ 29..34: Type
+        "int" @ 35..38: Type
         "#);
     }
 

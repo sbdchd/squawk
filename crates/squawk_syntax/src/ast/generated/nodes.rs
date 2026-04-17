@@ -2777,6 +2777,10 @@ impl CharType {
         support::token(&self.syntax, SyntaxKind::CHARACTER_KW)
     }
     #[inline]
+    pub fn national_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NATIONAL_KW)
+    }
+    #[inline]
     pub fn nchar_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NCHAR_KW)
     }
