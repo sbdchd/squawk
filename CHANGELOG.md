@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.48.0 - 2026-04-18
+
+### Added
+
+- linter: add require-table-schema rule (#1046, #1064, #1073). Thanks @Flaiers!
+
+  Note: this rule is disabled by default and must be enabled via the new
+  `--include` flag.
+
+  ```sql
+  -- error
+  create table posts(id bigint);
+
+  -- okay
+  create table public.posts(id bigint);
+  ```
+
+- parser: improve error recovery for misplaced join clauses (#1065)
+
+  The following now gives a concise error message:
+
+  ```sql
+  -- join after the where
+  select * from t
+  where x > 1
+  join k on true;
+  ```
+
+- parser: support more statement kinds in create schema parsing (#1061)
+
+- ide: semantic syntax highlighting improvements (#1059, #1060, #1068)
+
+  We now highlight all the tokens in types. We were missing some like `setof`.
+
+  Additionally, we highlight names by their underlying kind i.e., table, function, column.
+  This is powered by goto def.
+
+  You can't tell from GitHub's highlighting, but if you use the language
+  server, we now highlight the `b` in `t.b` as a function:
+
+  ```sql
+  create table t(a int);
+  create function b(t) returns int as 'select 1' language sql;
+  select b(t), t.b from t;
+  ```
+
+- ide: show function comment on hover (#1070)
+- ide: code action to rewrite between != and <> (#1066)
+- ide: goto def for create property graph (#1074)
+
+### Fixed
+
+- parser: fix param parsing (#1068)
+
+  Before, `double precision` was parsed as a param named `double` with type `precision`.
+  Now it's parsed correctly as an unnamed param of type `double precision`.
+
+  ```sql
+  create function f(double precision) returns int8
+    as 'select $1'
+    language sql;
+  ```
+
 ## v2.47.0 - 2026-04-13
 
 ### Added
