@@ -148,12 +148,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "c"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "k"
             R_PAREN ")"
         COMMA ","
@@ -169,12 +169,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "l"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "u"
             R_PAREN ")"
           WHITESPACE " \n      "
@@ -205,12 +205,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "x"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "y"
             R_PAREN ")"
           WHITESPACE "\n      "
@@ -222,21 +222,22 @@ SOURCE_FILE
             COLUMN_LIST
               L_PAREN "("
               COLUMN
-                NAME
+                NAME_REF
                   IDENT "s"
               R_PAREN ")"
             WHITESPACE " "
-            REFERENCES_KW "references"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "k"
-            WHITESPACE " "
-            COLUMN_LIST
-              L_PAREN "("
-              COLUMN
-                NAME
-                  IDENT "id"
-              R_PAREN ")"
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
           WHITESPACE "\n      "
           DEST_VERTEX_TABLE
             DESTINATION_KW "destination"
@@ -246,21 +247,22 @@ SOURCE_FILE
             COLUMN_LIST
               L_PAREN "("
               COLUMN
-                NAME
+                NAME_REF
                   IDENT "d"
               R_PAREN ")"
             WHITESPACE " "
-            REFERENCES_KW "references"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "k"
-            WHITESPACE " "
-            COLUMN_LIST
-              L_PAREN "("
-              COLUMN
-                NAME
-                  IDENT "id"
-              R_PAREN ")"
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
           WHITESPACE "\n      "
           LABEL_AND_PROPERTIES_LIST
             LABEL_AND_PROPERTIES
@@ -359,7 +361,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "l"
             R_PAREN ")"
           WHITESPACE " \n      "
@@ -392,12 +394,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "x"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "y"
             R_PAREN ")"
           WHITESPACE "\n      "
@@ -409,21 +411,22 @@ SOURCE_FILE
             COLUMN_LIST
               L_PAREN "("
               COLUMN
-                NAME
+                NAME_REF
                   IDENT "s"
               R_PAREN ")"
             WHITESPACE " "
-            REFERENCES_KW "references"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "k"
-            WHITESPACE " "
-            COLUMN_LIST
-              L_PAREN "("
-              COLUMN
-                NAME
-                  IDENT "id"
-              R_PAREN ")"
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
           WHITESPACE "\n      "
           DEST_VERTEX_TABLE
             DESTINATION_KW "destination"
@@ -433,21 +436,22 @@ SOURCE_FILE
             COLUMN_LIST
               L_PAREN "("
               COLUMN
-                NAME
+                NAME_REF
                   IDENT "d"
               R_PAREN ")"
             WHITESPACE " "
-            REFERENCES_KW "references"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "k"
-            WHITESPACE " "
-            COLUMN_LIST
-              L_PAREN "("
-              COLUMN
-                NAME
-                  IDENT "id"
-              R_PAREN ")"
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
         WHITESPACE "\n  "
         R_PAREN ")"
   SEMICOLON ";"

@@ -406,13 +406,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "orders"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "products"
       COMMA ","
       WHITESPACE "\n        "
@@ -425,13 +425,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "customers"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "orders"
       WHITESPACE "\n    "
       R_PAREN ")"
@@ -647,7 +647,7 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            NAME_REF
               IDENT "product_no"
           R_PAREN ")"
       COMMA ","
@@ -663,7 +663,7 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            NAME_REF
               IDENT "customer_id"
           R_PAREN ")"
       COMMA ","
@@ -679,7 +679,7 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            NAME_REF
               IDENT "order_id"
           R_PAREN ")"
       WHITESPACE "\n    "
@@ -703,7 +703,7 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            NAME_REF
               IDENT "order_items_id"
           R_PAREN ")"
         WHITESPACE "\n            "
@@ -715,21 +715,22 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "order_id"
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "orders"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
-            COLUMN
-              NAME
-                IDENT "order_id"
-            R_PAREN ")"
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "orders"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "order_id"
+              R_PAREN ")"
         WHITESPACE "\n            "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
@@ -739,21 +740,22 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "product_no"
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "products"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
-            COLUMN
-              NAME
-                IDENT "product_no"
-            R_PAREN ")"
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "products"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "product_no"
+              R_PAREN ")"
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
@@ -767,7 +769,7 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            NAME_REF
               IDENT "customer_orders_id"
           R_PAREN ")"
         WHITESPACE "\n            "
@@ -779,21 +781,22 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "customer_id"
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "customers"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
-            COLUMN
-              NAME
-                IDENT "customer_id"
-            R_PAREN ")"
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "customers"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "customer_id"
+              R_PAREN ")"
         WHITESPACE "\n            "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
@@ -803,21 +806,22 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "order_id"
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "orders"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
-            COLUMN
-              NAME
-                IDENT "order_id"
-            R_PAREN ")"
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "orders"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "order_id"
+              R_PAREN ")"
       WHITESPACE "\n    "
       R_PAREN ")"
   SEMICOLON ";"
@@ -900,13 +904,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "orders"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "products"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
@@ -926,13 +930,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "customers"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "orders"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
@@ -1555,24 +1559,25 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "from_account"
             WHITESPACE " "
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "Accounts"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            COLUMN
-              NAME
-                IDENT "number"
+            NAME_REF
+              IDENT "Accounts"
             WHITESPACE " "
-            R_PAREN ")"
+            COLUMN_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "number"
+              WHITESPACE " "
+              R_PAREN ")"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
@@ -1583,24 +1588,25 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "to_account"
             WHITESPACE " "
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "Accounts"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            COLUMN
-              NAME
-                IDENT "number"
+            NAME_REF
+              IDENT "Accounts"
             WHITESPACE " "
-            R_PAREN ")"
+            COLUMN_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "number"
+              WHITESPACE " "
+              R_PAREN ")"
         WHITESPACE "\n      "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
@@ -1642,29 +1648,30 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "number"
             WHITESPACE " "
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "Accounts"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            COLUMN
-              NAME
-                IDENT "number"
+            NAME_REF
+              IDENT "Accounts"
             WHITESPACE " "
-            R_PAREN ")"
+            COLUMN_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "number"
+              WHITESPACE " "
+              R_PAREN ")"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "Persons"
         WHITESPACE "\n      "
         LABEL_AND_PROPERTIES_LIST
@@ -1700,29 +1707,30 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "number"
             WHITESPACE " "
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "Accounts"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            COLUMN
-              NAME
-                IDENT "number"
+            NAME_REF
+              IDENT "Accounts"
             WHITESPACE " "
-            R_PAREN ")"
+            COLUMN_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "number"
+              WHITESPACE " "
+              R_PAREN ")"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "Companies"
         WHITESPACE "\n      "
         LABEL_AND_PROPERTIES_LIST
@@ -1758,29 +1766,30 @@ SOURCE_FILE
             L_PAREN "("
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "id"
             WHITESPACE " "
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "REFERENCES"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "Persons"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
+          REFERENCES_TABLE
+            REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            COLUMN
-              NAME
-                IDENT "id"
+            NAME_REF
+              IDENT "Persons"
             WHITESPACE " "
-            R_PAREN ")"
+            COLUMN_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "id"
+              WHITESPACE " "
+              R_PAREN ")"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "Companies"
         WHITESPACE "\n        "
         NO_PROPERTIES

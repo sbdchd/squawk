@@ -40,6 +40,7 @@ pub(crate) enum NameRefClass {
     Procedure,
     ProcedureCall,
     PropertyGraph,
+    PropertyGraphColumn,
     QualifiedColumn,
     Role,
     Routine,
@@ -321,6 +322,14 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         return Some(NameRefClass::PropertyGraph);
     }
 
+    if let Some(parent) = node.parent()
+        && let Some(expr_as_name) = ast::ExprAsName::cast(parent)
+        && let Some(expr_as_name_list) = ast::ExprAsNameList::cast(expr_as_name.syntax().parent()?)
+        && ast::Properties::cast(expr_as_name_list.syntax().parent()?).is_some()
+    {
+        return Some(NameRefClass::PropertyGraphColumn);
+    }
+
     // Check for function/procedure reference in CREATE OPERATOR / CREATE AGGREGATE
     // before the type check
     for ancestor in node.ancestors() {
@@ -371,6 +380,14 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
         if ast::Notify::can_cast(ancestor.kind()) || ast::Unlisten::can_cast(ancestor.kind()) {
             return Some(NameRefClass::Channel);
+        }
+        if in_column_list
+            && (ast::VertexTableDef::can_cast(ancestor.kind())
+                || ast::EdgeTableDef::can_cast(ancestor.kind())
+                || ast::SourceVertexTable::can_cast(ancestor.kind())
+                || ast::DestVertexTable::can_cast(ancestor.kind()))
+        {
+            return Some(NameRefClass::PropertyGraphColumn);
         }
         if ast::DropTable::can_cast(ancestor.kind())
             || ast::DropForeignTable::can_cast(ancestor.kind())

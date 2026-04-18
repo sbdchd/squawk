@@ -2335,7 +2335,7 @@ ElementTableLabelAndProperties =
 ElementTableProperties =
   NoProperties
 | AllProperties
-| PropertiesList
+| Properties
 
 NoProperties =
   'no' 'properties'
@@ -2343,7 +2343,7 @@ NoProperties =
 AllProperties =
   'properties' 'all' 'columns'
 
-PropertiesList = 
+Properties = 
   'properties' '(' ExprAsNameList ')'
 
 LabelAndPropertiesList =
@@ -2369,11 +2369,15 @@ EdgeTableDef =
 
 SourceVertexTable =
   'source' NameRef
-| 'source' 'key' '(' ColumnList ')' 'references' NameRef '(' ColumnList ')'
+| 'source' 'key' '(' ColumnList ')' ReferencesTable
+
+
+ReferencesTable =
+  'references' NameRef '(' ColumnList ')'
 
 DestVertexTable =
   'destination' NameRef
-| 'destination' 'key' '(' ColumnList ')' 'references' NameRef '(' ColumnList ')'
+| 'destination' 'key' '(' ColumnList ')' ReferencesTable
 
 AlterPropertyGraph =
   'alter' 'property' 'graph' IfExists? Path
