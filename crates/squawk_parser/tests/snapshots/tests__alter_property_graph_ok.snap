@@ -271,7 +271,7 @@ SOURCE_FILE
               NAME
                 IDENT "q"
               WHITESPACE " "
-              PROPERTIES_LIST
+              PROPERTIES
                 PROPERTIES_KW "properties"
                 WHITESPACE " "
                 EXPR_AS_NAME_LIST
@@ -303,7 +303,7 @@ SOURCE_FILE
               NAME
                 IDENT "q"
               WHITESPACE " "
-              PROPERTIES_LIST
+              PROPERTIES
                 PROPERTIES_KW "properties"
                 WHITESPACE " "
                 EXPR_AS_NAME_LIST

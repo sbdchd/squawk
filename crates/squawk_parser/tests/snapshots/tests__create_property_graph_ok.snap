@@ -401,7 +401,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "d"
         WHITESPACE "\n    "
-        PROPERTIES_LIST
+        PROPERTIES
           PROPERTIES_KW "properties"
           WHITESPACE " "
           EXPR_AS_NAME_LIST

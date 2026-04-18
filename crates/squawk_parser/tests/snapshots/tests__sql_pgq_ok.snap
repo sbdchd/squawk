@@ -1471,7 +1471,7 @@ SOURCE_FILE
             NAME
               IDENT "Person"
             WHITESPACE " "
-            PROPERTIES_LIST
+            PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
               EXPR_AS_NAME_LIST
@@ -1497,7 +1497,7 @@ SOURCE_FILE
             NAME
               IDENT "Company"
             WHITESPACE " "
-            PROPERTIES_LIST
+            PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
               EXPR_AS_NAME_LIST
@@ -1523,7 +1523,7 @@ SOURCE_FILE
             NAME
               IDENT "Account"
             WHITESPACE " "
-            PROPERTIES_LIST
+            PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
               EXPR_AS_NAME_LIST
@@ -1615,7 +1615,7 @@ SOURCE_FILE
             NAME
               TRANSACTION_KW "transaction"
             WHITESPACE "\n        "
-            PROPERTIES_LIST
+            PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
               EXPR_AS_NAME_LIST
