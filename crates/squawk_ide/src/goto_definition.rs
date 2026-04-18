@@ -190,6 +190,7 @@ impl From<NameRefClass> for LocationKind {
             NameRefClass::Policy => LocationKind::Policy,
             NameRefClass::PreparedStatement => LocationKind::PreparedStatement,
             NameRefClass::PropertyGraph => LocationKind::PropertyGraph,
+            NameRefClass::PropertyGraphColumn => LocationKind::Column,
             NameRefClass::Role => LocationKind::Role,
             NameRefClass::Schema => LocationKind::Schema,
             NameRefClass::Sequence => LocationKind::Sequence,
@@ -9380,6 +9381,317 @@ create property graph g
           ‡
         5 │   edge tables (foo.bar key (x, y)
           ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_sources_table() {
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create table v2 (
+  id int8 primary key,
+  name text
+);
+
+create table v3 (
+  id int8 primary key,
+  name text
+);
+
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create table e2 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v3
+);
+
+create property graph g1
+  vertex tables (v1, v2, v3)
+  edge tables (
+    e1 source v1$0 destination v2,
+    e2 source v1 destination v3);
+"), @"
+           ╭▸ 
+         2 │ create table v1 (
+           │              ── 2. destination
+           ‡
+        32 │     e1 source v1 destination v2,
+           ╰╴               ─ 1. source
+        "
+        );
+
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create table v2 (
+  id int8 primary key,
+  name text
+);
+
+create table v3 (
+  id int8 primary key,
+  name text
+);
+
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create table e2 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v3
+);
+
+create property graph g1
+  vertex tables (v1, v2, v3)
+  edge tables (
+    e1 source v1 destination v2,
+    e2 source v1 destination v3$0);
+"), @"
+           ╭▸ 
+        12 │ create table v3 (
+           │              ── 2. destination
+           ‡
+        33 │     e2 source v1 destination v3);
+           ╰╴                              ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_create_property_graph_references_table() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1
+      source key (source_id) references v1$0 (id)
+      destination key (destination_id) references v2 (id)
+  );
+"), @"
+           ╭▸ 
+         2 │ create table v1 (id int8 primary key);
+           │              ── 2. destination
+           ‡
+        14 │       source key (source_id) references v1 (id)
+           ╰╴                                         ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_create_property_graph_vertex_key_column() {
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create property graph g1
+  vertex tables (v1 key (id$0));
+"), @"
+          ╭▸ 
+        3 │   id int8 primary key,
+          │   ── 2. destination
+          ‡
+        8 │   vertex tables (v1 key (id));
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_source_key_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id$0) references v1 (id)
+      destination key (destination_id) references v2 (id));
+"), @"
+           ╭▸ 
+         6 │   source_id int8 references v1,
+           │   ───────── 2. destination
+           ‡
+        14 │       source key (source_id) references v1 (id)
+           ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_source_references_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id) references v1 (id$0)
+      destination key (destination_id) references v2 (id));
+"), @"
+           ╭▸ 
+         2 │ create table v1 (id int8 primary key);
+           │                  ── 2. destination
+           ‡
+        14 │       source key (source_id) references v1 (id)
+           ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_destination_key_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id) references v1 (id)
+      destination key (destination_id$0) references v2 (id));
+"), @"
+           ╭▸ 
+         7 │   destination_id int8 references v2
+           │   ────────────── 2. destination
+           ‡
+        15 │       destination key (destination_id) references v2 (id));
+           ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_destination_references_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id) references v1 (id)
+      destination key (destination_id) references v2 (id$0));
+"), @"
+           ╭▸ 
+         3 │ create table v2 (id int8 primary key);
+           │                  ── 2. destination
+           ‡
+        15 │       destination key (destination_id) references v2 (id));
+           ╰╴                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_vertex_properties_column() {
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create property graph g1
+  vertex tables (v1 properties (id$0, name));
+"), @"
+          ╭▸ 
+        3 │   id int8 primary key,
+          │   ── 2. destination
+          ‡
+        8 │   vertex tables (v1 properties (id, name));
+          ╰╴                                 ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create property graph g1
+  vertex tables (v1 properties (id, nam$0e));
+"), @"
+          ╭▸ 
+        4 │   name text
+          │   ──── 2. destination
+          ‡
+        8 │   vertex tables (v1 properties (id, name));
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_properties_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1
+      source v1
+      destination v2
+      properties (id, source_id$0, destination_id));
+"), @"
+           ╭▸ 
+         6 │   source_id int8 references v1,
+           │   ───────── 2. destination
+           ‡
+        16 │       properties (id, source_id, destination_id));
+           ╰╴                              ─ 1. source
         ");
     }
 
