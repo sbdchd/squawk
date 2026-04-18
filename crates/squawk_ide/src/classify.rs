@@ -317,7 +317,8 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             .and_then(|p| p.syntax().parent().and_then(ast::Path::cast))
         && let Some(stmt_parent) = path.syntax().parent()
         && (ast::AlterPropertyGraph::can_cast(stmt_parent.kind())
-            || ast::DropPropertyGraph::can_cast(stmt_parent.kind()))
+            || ast::DropPropertyGraph::can_cast(stmt_parent.kind())
+            || ast::GraphTableFn::can_cast(stmt_parent.kind()))
     {
         return Some(NameRefClass::PropertyGraph);
     }
