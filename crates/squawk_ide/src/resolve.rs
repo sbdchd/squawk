@@ -553,6 +553,12 @@ pub(crate) fn resolve_name_ref(
             .map(|ptr| (smallvec![ptr], LocationKind::Table)),
         NameRefClass::JoinUsingColumn => resolve_join_using_columns(binder, root, name_ref)
             .map(|ptrs| (ptrs, LocationKind::Column)),
+        NameRefClass::PropertyGraphColumn => {
+            resolve_property_graph_column_ptr(binder, root, name_ref).map(|ptr| {
+                let kind = resolved_location_kind(root, &ptr, LocationKind::Column);
+                (smallvec![ptr], kind)
+            })
+        }
         NameRefClass::AlterColumn => {
             let column_name = Name::from_node(name_ref);
             let alter_table = name_ref
@@ -907,6 +913,54 @@ fn resolve_create_index_column_ptr(
     resolve_column_for_path(binder, root, &path, column_name)
 }
 
+fn resolve_property_graph_column_ptr(
+    binder: &Binder,
+    root: &SyntaxNode,
+    column_name_ref: &ast::NameRef,
+) -> Option<SyntaxNodePtr> {
+    let column_name = Name::from_node(column_name_ref);
+    let parent = column_name_ref.syntax().parent()?;
+
+    if let Some(column) = ast::Column::cast(parent.clone())
+        && let Some(column_list) = ast::ColumnList::cast(column.syntax().parent()?)
+    {
+        if let Some(references_table) = ast::ReferencesTable::cast(column_list.syntax().parent()?) {
+            let table_name = Name::from_node(&references_table.name_ref()?);
+            let position = column_name_ref.syntax().text_range().start();
+            return resolve_column_for_table(
+                binder,
+                root,
+                &table_name,
+                &None,
+                &column_name,
+                position,
+            );
+        } else if let Some(edge_table_def) = column_list
+            .syntax()
+            .ancestors()
+            .find_map(ast::EdgeTableDef::cast)
+        {
+            return resolve_column_for_path(binder, root, &edge_table_def.path()?, column_name);
+        } else if let Some(vertex_table_def) =
+            ast::VertexTableDef::cast(column_list.syntax().parent()?)
+        {
+            return resolve_column_for_path(binder, root, &vertex_table_def.path()?, column_name);
+        }
+    } else if let Some(expr_as_name) = ast::ExprAsName::cast(parent)
+        && let Some(expr_as_name_list) = ast::ExprAsNameList::cast(expr_as_name.syntax().parent()?)
+        && let Some(properties) = ast::Properties::cast(expr_as_name_list.syntax().parent()?)
+    {
+        let parent = properties.syntax().parent()?;
+        if let Some(edge) = ast::EdgeTableDef::cast(parent.clone()) {
+            return resolve_column_for_path(binder, root, &edge.path()?, column_name);
+        } else if let Some(vertex) = ast::VertexTableDef::cast(parent) {
+            return resolve_column_for_path(binder, root, &vertex.path()?, column_name);
+        }
+    }
+
+    None
+}
+
 fn resolve_column_for_path(
     binder: &Binder,
     root: &SyntaxNode,
@@ -1072,8 +1126,11 @@ fn extract_table_schema_from_path(path: &ast::Path) -> Option<(Name, Option<Sche
 }
 
 fn extract_table_schema_from_name_ref(name_ref: &ast::NameRef) -> Option<(Name, Option<Schema>)> {
-    let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
-    extract_table_schema_from_path(&path)
+    if let Some(path) = name_ref.syntax().ancestors().find_map(ast::Path::cast) {
+        return extract_table_schema_from_path(&path);
+    }
+
+    Some((Name::from_node(name_ref), None))
 }
 
 fn resolve_select_qualified_column_ptr(

@@ -290,6 +290,7 @@ fn hover_name_ref(
         NameRefClass::Channel => hover_channel(root, name_ref, binder),
         NameRefClass::Window => hover_window(root, name_ref, binder),
         NameRefClass::PropertyGraph => hover_property_graph(root, name_ref, binder),
+        NameRefClass::PropertyGraphColumn => hover_column(root, name_ref, binder),
     }
 }
 

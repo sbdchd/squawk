@@ -3626,6 +3626,7 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
+#[derive(Clone, Copy)]
 enum ColumnDefKind {
     Name,
     NameRef,
@@ -3654,7 +3655,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
         if !p.at_ts(COLUMN_FIRST) {
             break;
         }
-        column(p, &kind);
+        column(p, kind);
         if p.at(COMMA) && p.nth_at(1, R_PAREN) {
             p.err_and_bump("unexpected trailing comma");
         }
@@ -3672,7 +3673,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     return true;
 }
 
-fn column(p: &mut Parser<'_>, kind: &ColumnDefKind) -> CompletedMarker {
+fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
     assert!(p.at_ts(COLUMN_FIRST));
     let m = p.start();
     match kind {
@@ -8534,7 +8535,7 @@ fn opt_vertex_table_def(p: &mut Parser<'_>) -> bool {
 
 fn opt_key_columns(p: &mut Parser<'_>) {
     if p.eat(KEY_KW) {
-        opt_column_list_with(p, ColumnDefKind::Name);
+        opt_column_list_with(p, ColumnDefKind::NameRef);
     }
 }
 
@@ -8583,7 +8584,7 @@ fn opt_element_table_properties_clause(p: &mut Parser<'_>) -> bool {
             ALL_PROPERTIES
         } else {
             expr_as_name_list(p);
-            PROPERTIES_LIST
+            PROPERTIES
         }
     };
     m.complete(p, kind);
@@ -8631,18 +8632,24 @@ fn opt_edge_table_def(p: &mut Parser<'_>) -> bool {
     true
 }
 
+fn references_table(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(REFERENCES_KW);
+    name_ref(p);
+    opt_column_list_with(p, ColumnDefKind::NameRef);
+    m.complete(p, REFERENCES_TABLE);
+}
+
 // SOURCE KEY (a, b) REFERENCES t (c, d)
 // SOURCE t
 fn source_vertex_table(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(SOURCE_KW);
     if p.eat(KEY_KW) {
-        opt_column_list_with(p, ColumnDefKind::Name);
-        p.expect(REFERENCES_KW);
-        name_ref(p);
-        opt_column_list_with(p, ColumnDefKind::Name);
+        opt_column_list_with(p, ColumnDefKind::NameRef);
+        references_table(p);
     } else {
-        name(p);
+        name_ref(p);
     }
     m.complete(p, SOURCE_VERTEX_TABLE);
 }
@@ -8653,12 +8660,10 @@ fn dest_vertex_table(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(DESTINATION_KW);
     if p.eat(KEY_KW) {
-        opt_column_list_with(p, ColumnDefKind::Name);
-        p.expect(REFERENCES_KW);
-        name_ref(p);
-        opt_column_list_with(p, ColumnDefKind::Name);
+        opt_column_list_with(p, ColumnDefKind::NameRef);
+        references_table(p);
     } else {
-        name(p);
+        name_ref(p);
     }
     m.complete(p, DEST_VERTEX_TABLE);
 }
@@ -13179,7 +13184,7 @@ fn opt_set_column(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         Some(m.complete(p, SET_MULTIPLE_COLUMNS))
     } else {
         // column_name = { expression | DEFAULT }
-        column(p, &ColumnDefKind::NameRef);
+        column(p, ColumnDefKind::NameRef);
         p.expect(EQ);
         set_expr(p);
         Some(m.complete(p, SET_SINGLE_COLUMN))

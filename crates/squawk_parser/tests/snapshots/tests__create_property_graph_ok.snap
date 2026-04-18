@@ -192,12 +192,12 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            NAME_REF
               IDENT "b"
           R_PAREN ")"
         WHITESPACE " "
@@ -234,12 +234,12 @@ SOURCE_FILE
         COLUMN_LIST
           L_PAREN "("
           COLUMN
-            NAME
+            NAME_REF
               IDENT "x"
           COMMA ","
           WHITESPACE " "
           COLUMN
-            NAME
+            NAME_REF
               IDENT "y"
           R_PAREN ")"
         WHITESPACE "\n    "
@@ -251,31 +251,32 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "b"
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "references"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "k"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
-            COLUMN
-              NAME
-                IDENT "t"
-            COMMA ","
+          REFERENCES_TABLE
+            REFERENCES_KW "references"
             WHITESPACE " "
-            COLUMN
-              NAME
-                IDENT "y"
-            R_PAREN ")"
+            NAME_REF
+              IDENT "k"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "t"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "y"
+              R_PAREN ")"
         WHITESPACE "\n    "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
@@ -285,31 +286,32 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "q"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              NAME_REF
                 IDENT "t"
             R_PAREN ")"
           WHITESPACE " "
-          REFERENCES_KW "references"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "a"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
-            COLUMN
-              NAME
-                IDENT "r"
-            COMMA ","
+          REFERENCES_TABLE
+            REFERENCES_KW "references"
             WHITESPACE " "
-            COLUMN
-              NAME
-                IDENT "j"
-            R_PAREN ")"
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "r"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "j"
+              R_PAREN ")"
         WHITESPACE "\n    "
         ALL_PROPERTIES
           PROPERTIES_KW "properties"
@@ -347,13 +349,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "s"
         WHITESPACE "\n    "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "d"
         WHITESPACE "\n    "
         NO_PROPERTIES
@@ -390,16 +392,16 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "s"
         WHITESPACE "\n    "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "d"
         WHITESPACE "\n    "
-        PROPERTIES_LIST
+        PROPERTIES
           PROPERTIES_KW "properties"
           WHITESPACE " "
           EXPR_AS_NAME_LIST
@@ -474,13 +476,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
@@ -516,13 +518,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
@@ -558,13 +560,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
@@ -625,13 +627,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "y"
       COMMA ","
       WHITESPACE "\n    "
@@ -644,13 +646,13 @@ SOURCE_FILE
         SOURCE_VERTEX_TABLE
           SOURCE_KW "source"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
-          NAME
+          NAME_REF
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
