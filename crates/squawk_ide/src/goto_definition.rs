@@ -9722,4 +9722,20 @@ alter property graph foo.ba$0r rename to baz;
           ╰╴                          ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_graph_table_fn() {
+        assert_snapshot!(goto("
+create property graph myshop vertex tables (t key (a) no properties);
+select 1 from graph_table (myshop$0
+  match (n is t)
+  columns (1 as x));
+"), @"
+          ╭▸ 
+        2 │ create property graph myshop vertex tables (t key (a) no properties);
+          │                       ────── 2. destination
+        3 │ select 1 from graph_table (myshop
+          ╰╴                                ─ 1. source
+        ");
+    }
 }

@@ -41,7 +41,7 @@ fn semantic_token_type_name(ty: SemanticTokenType) -> &'static str {
         SemanticTokenType::Parameter | SemanticTokenType::PositionalParam => "parameter",
         SemanticTokenType::Schema => "namespace",
         SemanticTokenType::String => "string",
-        SemanticTokenType::Table => "struct",
+        SemanticTokenType::PropertyGraph | SemanticTokenType::Table => "struct",
         SemanticTokenType::Type => "type",
     }
 }
