@@ -1,29 +1,16 @@
 #[cfg(not(target_arch = "wasm32"))]
 use etcetera::BaseStrategy;
-use line_index::LineIndex;
 use salsa::Database as Db;
-use squawk_syntax::{Parse, SourceFile};
 #[cfg(not(target_arch = "wasm32"))]
 use url::Url;
 
-use crate::binder::{self, Binder};
+use crate::db::File;
 
 pub(crate) const BUILTINS_SQL: &str = include_str!("generated/builtins.sql");
 
 #[salsa::tracked]
-pub fn parse_builtins(_db: &dyn Db) -> Parse<SourceFile> {
-    SourceFile::parse(BUILTINS_SQL)
-}
-
-#[salsa::tracked]
-pub fn builtins_line_index(_db: &dyn Db) -> LineIndex {
-    LineIndex::new(BUILTINS_SQL)
-}
-
-#[salsa::tracked]
-pub fn builtins_binder(db: &dyn Db) -> Binder {
-    let builtins_tree = parse_builtins(db).tree();
-    binder::bind(&builtins_tree)
+pub fn builtins_file(db: &dyn Db) -> File {
+    File::new(db, BUILTINS_SQL.into())
 }
 
 #[cfg(not(target_arch = "wasm32"))]

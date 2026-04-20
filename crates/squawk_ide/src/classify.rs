@@ -1,4 +1,4 @@
-use crate::symbols::Name;
+use crate::{location::LocationKind, symbols::Name};
 use squawk_syntax::{
     SyntaxKind, SyntaxNode,
     ast::{self, AstNode},
@@ -884,7 +884,7 @@ pub(crate) fn classify_name(name: &ast::Name) -> Option<NameClass> {
     None
 }
 
-pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<NameRefClass> {
+pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
     let mut in_column = false;
     let mut in_column_list = false;
     for ancestor in def_node.ancestors() {
@@ -895,106 +895,106 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<NameRefClass> {
             in_column_list = true;
         }
         if ast::Param::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::NamedArgParameter);
+            return Some(LocationKind::NamedArgParameter);
         }
         if ast::CreateTableLike::can_cast(ancestor.kind()) {
             if in_column {
-                return Some(NameRefClass::SelectColumn);
+                return Some(LocationKind::Column);
             }
-            return Some(NameRefClass::Table);
+            return Some(LocationKind::Table);
         }
         if ast::CreateType::can_cast(ancestor.kind()) {
             if in_column {
-                return Some(NameRefClass::CompositeTypeField);
+                return Some(LocationKind::Column);
             }
-            return Some(NameRefClass::Type);
+            return Some(LocationKind::Type);
         }
         if ast::CreateFunction::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Function);
+            return Some(LocationKind::Function);
         }
         if ast::CreateProcedure::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Procedure);
+            return Some(LocationKind::Procedure);
         }
         if ast::WithTable::can_cast(ancestor.kind()) {
             if in_column_list {
-                return Some(NameRefClass::SelectColumn);
+                return Some(LocationKind::Column);
             }
-            return Some(NameRefClass::Table);
+            return Some(LocationKind::Table);
         }
         if ast::CreateTableAs::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Table);
+            return Some(LocationKind::Table);
         }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Index);
+            return Some(LocationKind::Index);
         }
         if ast::CreateSequence::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Sequence);
+            return Some(LocationKind::Sequence);
         }
         if ast::CreateTrigger::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Trigger);
+            return Some(LocationKind::Trigger);
         }
         if ast::CreateEventTrigger::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::EventTrigger);
+            return Some(LocationKind::EventTrigger);
         }
         if ast::CreateTablespace::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Tablespace);
+            return Some(LocationKind::Tablespace);
         }
         if ast::CreateDatabase::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Database);
+            return Some(LocationKind::Database);
         }
         if ast::CreateServer::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Server);
+            return Some(LocationKind::Server);
         }
         if ast::CreateExtension::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Extension);
+            return Some(LocationKind::Extension);
         }
         if ast::CreateRole::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Role);
+            return Some(LocationKind::Role);
         }
         if ast::CreateAggregate::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Aggregate);
+            return Some(LocationKind::Aggregate);
         }
         if ast::CreateSchema::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Schema);
+            return Some(LocationKind::Schema);
         }
         if ast::CreateView::can_cast(ancestor.kind())
             || ast::CreateMaterializedView::can_cast(ancestor.kind())
         {
             if in_column_list {
-                return Some(NameRefClass::SelectColumn);
+                return Some(LocationKind::Column);
             }
-            return Some(NameRefClass::View);
+            return Some(LocationKind::View);
         }
         if ast::CreatePolicy::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Policy);
+            return Some(LocationKind::Policy);
         }
         if ast::CreatePropertyGraph::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::PropertyGraph);
+            return Some(LocationKind::PropertyGraph);
         }
         if ast::Declare::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Cursor);
+            return Some(LocationKind::Cursor);
         }
         if ast::Prepare::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::PreparedStatement);
+            return Some(LocationKind::PreparedStatement);
         }
         if ast::Listen::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Channel);
+            return Some(LocationKind::Channel);
         }
         if ast::Alias::can_cast(ancestor.kind()) {
             if in_column {
-                return Some(NameRefClass::SelectColumn);
+                return Some(LocationKind::Column);
             }
-            return Some(NameRefClass::FromTable);
+            return Some(LocationKind::Table);
         }
         if ast::WindowDef::can_cast(ancestor.kind()) {
-            return Some(NameRefClass::Window);
+            return Some(LocationKind::Window);
         }
         if ast::AsName::can_cast(ancestor.kind())
             || ast::ParenSelect::can_cast(ancestor.kind())
             || ast::Values::can_cast(ancestor.kind())
             || ast::Select::can_cast(ancestor.kind())
         {
-            return Some(NameRefClass::SelectColumn);
+            return Some(LocationKind::Column);
         }
     }
     None

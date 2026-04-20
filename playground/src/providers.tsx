@@ -333,6 +333,9 @@ export const semanticTokensProvider: monaco.languages.DocumentSemanticTokensProv
       return semantic_tokens_legend()
     },
     provideDocumentSemanticTokens(model) {
+      // TODO: figure out if we can make this faster, it currently takes like
+      // 10+ seconds on the builtins.sql
+      if (model.getLineCount() > 2000) return null
       const content = model.getValue()
       const version = model.getVersionId()
       if (!content) return null

@@ -1,7 +1,6 @@
-use crate::binder;
-use crate::builtins::parse_builtins;
-use crate::classify::{NameRefClass, classify_def_node};
+use crate::builtins::builtins_file;
 use crate::db::{File, parse};
+use crate::location::{Location, LocationKind};
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::{TextRange, TextSize};
@@ -14,9 +13,7 @@ use squawk_syntax::{
 
 #[salsa::tracked]
 pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[Location; 1]> {
-    let parse = parse(db, file);
-    let source_file = &parse.tree();
-    let Some(token) = token_from_offset(source_file, offset) else {
+    let Some(token) = token_from_offset(db, file, offset) else {
         return smallvec![];
     };
     let Some(parent) = token.parent() else {
@@ -33,6 +30,7 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
                 && let Some(case_token) = case_expr.case_token()
             {
                 return smallvec![Location::current(
+                    file,
                     case_token.text_range(),
                     LocationKind::CaseExpr
                 )];
@@ -42,47 +40,47 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
 
     // goto def on COMMIT -> BEGIN/START TRANSACTION
     if ast::Commit::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(db, file, offset)
     {
-        return smallvec![Location::current(begin_range, LocationKind::CommitBegin)];
+        return smallvec![Location::current(
+            file,
+            begin_range,
+            LocationKind::CommitBegin
+        )];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(db, file, offset)
     {
-        return smallvec![Location::current(begin_range, LocationKind::CommitBegin)];
+        return smallvec![Location::current(
+            file,
+            begin_range,
+            LocationKind::CommitBegin
+        )];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
     if ast::Begin::can_cast(parent.kind())
-        && let Some(end_range) =
-            find_following_commit_or_rollback(source_file, token.text_range().end())
+        && let Some(end_range) = find_following_commit_or_rollback(db, file, offset)
     {
-        return smallvec![Location::current(end_range, LocationKind::CommitEnd)];
+        return smallvec![Location::current(file, end_range, LocationKind::CommitEnd)];
     }
 
     if let Some(name) = ast::Name::cast(parent.clone())
-        && let Some(kind) = classify_def_node(name.syntax()).map(LocationKind::from)
+        && let Some(kind) = LocationKind::from_node(name.syntax())
     {
-        return smallvec![Location::current(name.syntax().text_range(), kind)];
+        return smallvec![Location::current(file, name.syntax().text_range(), kind)];
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for file_id in [FileId::Current, FileId::Builtins] {
-            let file = match file_id {
-                FileId::Current => source_file,
-                FileId::Builtins => &parse_builtins(db).tree(),
-            };
-            // TODO: we should salsa this
-            let binder_output = binder::bind(file);
-            let root = file.syntax();
-            if let Some((ptrs, kind)) = resolve::resolve_name_ref(&binder_output, root, &name_ref) {
+        for definition_file in [file, builtins_file(db)] {
+            if let Some((ptrs, kind)) = resolve::resolve_name_ref(db, definition_file, &name_ref) {
                 let ranges = ptrs
                     .iter()
-                    .map(|ptr| ptr.to_node(file.syntax()).text_range())
+                    .map(|ptr| ptr.text_range())
                     .map(|range| Location {
-                        file: file_id,
+                        file: definition_file,
                         range,
                         kind,
                     })
@@ -101,18 +99,14 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
         }
     });
     if let Some(ty) = type_node {
-        for file_id in [FileId::Current, FileId::Builtins] {
-            let file = match file_id {
-                FileId::Current => source_file,
-                FileId::Builtins => &parse_builtins(db).tree(),
-            };
-            // TODO: we should salsa this
-            let binder_output = binder::bind(file);
+        for definition_file in [file, builtins_file(db)] {
             let position = token.text_range().start();
-            if let Some(ptr) = resolve::resolve_type_ptr_from_type(&binder_output, &ty, position) {
+            if let Some(ptr) =
+                resolve::resolve_type_ptr_from_type(db, definition_file, &ty, position)
+            {
                 return smallvec![Location {
-                    file: file_id,
-                    range: ptr.to_node(file.syntax()).text_range(),
+                    file: definition_file,
+                    range: ptr.text_range(),
                     kind: LocationKind::Type,
                 }];
             }
@@ -122,127 +116,9 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
     smallvec![]
 }
 
-#[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord)]
-pub enum FileId {
-    Current,
-    Builtins,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LocationKind {
-    Aggregate,
-    CaseExpr,
-    Channel,
-    Column,
-    CommitBegin,
-    CommitEnd,
-    Cursor,
-    Database,
-    EventTrigger,
-    Extension,
-    Function,
-    Index,
-    NamedArgParameter,
-    Policy,
-    PreparedStatement,
-    Procedure,
-    PropertyGraph,
-    Role,
-    Schema,
-    Sequence,
-    Server,
-    Table,
-    Tablespace,
-    Trigger,
-    Type,
-    View,
-    Window,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Location {
-    pub file: FileId,
-    pub range: TextRange,
-    pub kind: LocationKind,
-}
-
-impl Location {
-    fn current(range: TextRange, kind: LocationKind) -> Location {
-        Location {
-            file: FileId::Current,
-            range,
-            kind,
-        }
-    }
-}
-
-impl From<NameRefClass> for LocationKind {
-    fn from(class: NameRefClass) -> Self {
-        match class {
-            NameRefClass::Aggregate => LocationKind::Aggregate,
-            NameRefClass::Channel => LocationKind::Channel,
-            NameRefClass::Cursor => LocationKind::Cursor,
-            NameRefClass::Database => LocationKind::Database,
-            NameRefClass::EventTrigger => LocationKind::EventTrigger,
-            NameRefClass::Extension => LocationKind::Extension,
-            NameRefClass::Index => LocationKind::Index,
-            NameRefClass::NamedArgParameter => LocationKind::NamedArgParameter,
-            NameRefClass::Policy => LocationKind::Policy,
-            NameRefClass::PreparedStatement => LocationKind::PreparedStatement,
-            NameRefClass::PropertyGraph => LocationKind::PropertyGraph,
-            NameRefClass::PropertyGraphColumn => LocationKind::Column,
-            NameRefClass::Role => LocationKind::Role,
-            NameRefClass::Schema => LocationKind::Schema,
-            NameRefClass::Sequence => LocationKind::Sequence,
-            NameRefClass::Server => LocationKind::Server,
-            NameRefClass::Tablespace => LocationKind::Tablespace,
-            NameRefClass::Trigger => LocationKind::Trigger,
-            NameRefClass::Type => LocationKind::Type,
-            NameRefClass::View => LocationKind::View,
-            NameRefClass::Window => LocationKind::Window,
-
-            NameRefClass::CallProcedure | NameRefClass::Procedure | NameRefClass::ProcedureCall => {
-                LocationKind::Procedure
-            }
-
-            NameRefClass::Function
-            | NameRefClass::FunctionCall
-            | NameRefClass::FunctionName
-            | NameRefClass::Routine
-            | NameRefClass::SelectFunctionCall => LocationKind::Function,
-
-            NameRefClass::AlterColumn
-            | NameRefClass::CompositeTypeField
-            | NameRefClass::ConstraintColumn
-            | NameRefClass::CreateIndexColumn
-            | NameRefClass::DeleteColumn
-            | NameRefClass::ForeignKeyColumn
-            | NameRefClass::InsertColumn
-            | NameRefClass::JoinUsingColumn
-            | NameRefClass::MergeColumn
-            | NameRefClass::PolicyColumn
-            | NameRefClass::QualifiedColumn
-            | NameRefClass::SelectColumn
-            | NameRefClass::SelectQualifiedColumn
-            | NameRefClass::UpdateColumn => LocationKind::Column,
-
-            NameRefClass::DeleteQualifiedColumnTable
-            | NameRefClass::ForeignKeyTable
-            | NameRefClass::FromTable
-            | NameRefClass::InsertQualifiedColumnTable
-            | NameRefClass::LikeTable
-            | NameRefClass::MergeQualifiedColumnTable
-            | NameRefClass::PolicyQualifiedColumnTable
-            | NameRefClass::SelectQualifiedColumnTable
-            | NameRefClass::Table
-            | NameRefClass::UpdateQualifiedColumnTable => LocationKind::Table,
-        }
-    }
-}
-
-fn find_preceding_begin(file: &ast::SourceFile, before: TextSize) -> Option<TextRange> {
+fn find_preceding_begin(db: &dyn Db, file: File, before: TextSize) -> Option<TextRange> {
     let mut last_begin: Option<TextRange> = None;
-    for stmt in file.stmts() {
+    for stmt in parse(db, file).tree().stmts() {
         if let ast::Stmt::Begin(begin) = stmt {
             let range = begin.syntax().text_range();
             if range.end() <= before {
@@ -253,8 +129,12 @@ fn find_preceding_begin(file: &ast::SourceFile, before: TextSize) -> Option<Text
     last_begin
 }
 
-fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) -> Option<TextRange> {
-    for stmt in file.stmts() {
+fn find_following_commit_or_rollback(
+    db: &dyn Db,
+    file: File,
+    after: TextSize,
+) -> Option<TextRange> {
+    for stmt in parse(db, file).tree().stmts() {
         let range = match &stmt {
             ast::Stmt::Commit(commit) => commit.syntax().text_range(),
             ast::Stmt::Rollback(rollback) => rollback.syntax().text_range(),
@@ -269,9 +149,9 @@ fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) ->
 
 #[cfg(test)]
 mod test {
-    use crate::builtins::BUILTINS_SQL;
+    use crate::builtins::{BUILTINS_SQL, builtins_file};
     use crate::db::{Database, File};
-    use crate::goto_definition::{FileId, goto_definition};
+    use crate::goto_definition::goto_definition;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
@@ -298,11 +178,13 @@ mod test {
             let offset: usize = offset.into();
             let mut current_dests = vec![];
             let mut builtin_dests = vec![];
+            let builtins_file = builtins_file(&db);
             for (i, location) in results.iter().enumerate() {
                 let label_index = i + 2;
-                match location.file {
-                    FileId::Current => current_dests.push((label_index, location.range)),
-                    FileId::Builtins => builtin_dests.push((label_index, location.range)),
+                if location.file == file {
+                    current_dests.push((label_index, location.range));
+                } else if location.file == builtins_file {
+                    builtin_dests.push((label_index, location.range));
                 }
             }
 

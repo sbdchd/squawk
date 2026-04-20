@@ -3,10 +3,9 @@ use log::info;
 use rowan::{TextRange, TextSize};
 use salsa::Setter;
 use serde::{Deserialize, Serialize};
-use squawk_ide::builtins::builtins_line_index;
+use squawk_ide::builtins::builtins_file;
 use squawk_ide::db::{self, Database, File};
 use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
-use squawk_ide::goto_definition::FileId;
 use squawk_ide::semantic_tokens::{SemanticTokenType, semantic_tokens};
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
@@ -275,17 +274,14 @@ impl SquawkDatabase {
         let file = self.file()?;
         let current_line_index = db::line_index(&self.db, file);
         let offset = position_to_offset(&current_line_index, line, col)?;
-        let builtins_li = builtins_line_index(&self.db);
         let result = squawk_ide::goto_definition::goto_definition(&self.db, file, offset);
 
         let response: Vec<LocationRange> = result
             .into_iter()
-            .map(|location| {
-                let range = location.range;
-                let (file, line_index) = match location.file {
-                    FileId::Current => ("current", &current_line_index),
-                    FileId::Builtins => ("builtins", &builtins_li),
-                };
+            .map(|loc| {
+                let range = loc.range;
+                let file = file_string(&self.db, loc.file);
+                let line_index = db::line_index(&self.db, loc.file);
                 let start = line_index.line_col(range.start());
                 let end = line_index.line_col(range.end());
                 let start_wide = line_index
@@ -327,18 +323,19 @@ impl SquawkDatabase {
         let line_index = db::line_index(&self.db, file);
         let offset = position_to_offset(&line_index, line, col)?;
         let references = squawk_ide::find_references::find_references(&self.db, file, offset);
-        let builtins_li = builtins_line_index(&self.db);
         let locations: Vec<LocationRange> = references
             .iter()
             .map(|loc| {
-                let (li, file) = match loc.file {
-                    FileId::Current => (&line_index, "current"),
-                    FileId::Builtins => (&builtins_li, "builtins"),
-                };
-                let start = li.line_col(loc.range.start());
-                let end = li.line_col(loc.range.end());
-                let start_wide = li.to_wide(line_index::WideEncoding::Utf16, start).unwrap();
-                let end_wide = li.to_wide(line_index::WideEncoding::Utf16, end).unwrap();
+                let file = file_string(&self.db, loc.file);
+                let line_index = db::line_index(&self.db, loc.file);
+                let start = line_index.line_col(loc.range.start());
+                let end = line_index.line_col(loc.range.end());
+                let start_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, start)
+                    .unwrap();
+                let end_wide = line_index
+                    .to_wide(line_index::WideEncoding::Utf16, end)
+                    .unwrap();
 
                 LocationRange {
                     file: file.to_string(),
@@ -611,6 +608,15 @@ impl SquawkDatabase {
             .collect();
 
         serde_wasm_bindgen::to_value(&converted).map_err(into_error)
+    }
+}
+
+fn file_string(db: &Database, file: File) -> &'static str {
+    // TODO: this will need to change when we add extension support
+    if file == builtins_file(db) {
+        "builtins"
+    } else {
+        "current"
     }
 }
 

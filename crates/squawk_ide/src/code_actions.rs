@@ -9,9 +9,8 @@ use squawk_syntax::{
 use std::iter;
 
 use crate::{
-    binder,
     column_name::ColumnName,
-    db::{File, parse},
+    db::{File, bind, parse},
     offsets::token_from_offset,
     quote::{quote_column_alias, unquote_ident},
     symbols::Name,
@@ -32,38 +31,37 @@ pub struct CodeAction {
 
 #[salsa::tracked]
 pub fn code_actions(db: &dyn Db, file: File, offset: TextSize) -> Option<Vec<CodeAction>> {
-    let parse = parse(db, file);
-    let source_file = parse.tree();
-
     let mut actions = vec![];
-    rewrite_as_regular_string(&mut actions, &source_file, offset);
-    rewrite_as_dollar_quoted_string(&mut actions, &source_file, offset);
-    remove_else_clause(&mut actions, &source_file, offset);
-    rewrite_table_as_select(&mut actions, &source_file, offset);
-    rewrite_select_as_table(&mut actions, &source_file, offset);
-    rewrite_from(&mut actions, &source_file, offset);
-    rewrite_leading_from(&mut actions, &source_file, offset);
-    rewrite_values_as_select(&mut actions, &source_file, offset);
-    rewrite_select_as_values(&mut actions, &source_file, offset);
-    add_schema(&mut actions, &source_file, offset);
-    quote_identifier(&mut actions, &source_file, offset);
-    unquote_identifier(&mut actions, &source_file, offset);
-    add_explicit_alias(&mut actions, &source_file, offset);
-    remove_redundant_alias(&mut actions, &source_file, offset);
-    rewrite_cast_to_double_colon(&mut actions, &source_file, offset);
-    rewrite_double_colon_to_cast(&mut actions, &source_file, offset);
-    rewrite_between_as_binary_expression(&mut actions, &source_file, offset);
-    rewrite_not_equals_operator(&mut actions, &source_file, offset);
-    rewrite_timestamp_type(&mut actions, &source_file, offset);
+    rewrite_as_regular_string(db, file, &mut actions, offset);
+    rewrite_as_dollar_quoted_string(db, file, &mut actions, offset);
+    remove_else_clause(db, file, &mut actions, offset);
+    rewrite_table_as_select(db, file, &mut actions, offset);
+    rewrite_select_as_table(db, file, &mut actions, offset);
+    rewrite_from(db, file, &mut actions, offset);
+    rewrite_leading_from(db, file, &mut actions, offset);
+    rewrite_values_as_select(db, file, &mut actions, offset);
+    rewrite_select_as_values(db, file, &mut actions, offset);
+    add_schema(db, file, &mut actions, offset);
+    quote_identifier(db, file, &mut actions, offset);
+    unquote_identifier(db, file, &mut actions, offset);
+    add_explicit_alias(db, file, &mut actions, offset);
+    remove_redundant_alias(db, file, &mut actions, offset);
+    rewrite_cast_to_double_colon(db, file, &mut actions, offset);
+    rewrite_double_colon_to_cast(db, file, &mut actions, offset);
+    rewrite_between_as_binary_expression(db, file, &mut actions, offset);
+    rewrite_not_equals_operator(db, file, &mut actions, offset);
+    rewrite_timestamp_type(db, file, &mut actions, offset);
     Some(actions)
 }
 
 fn rewrite_as_regular_string(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let dollar_string = file
+    let dollar_string = parse(db, file)
+        .tree()
         .syntax()
         .token_at_offset(offset)
         .find(|token| token.kind() == SyntaxKind::DOLLAR_QUOTED_STRING)?;
@@ -79,11 +77,13 @@ fn rewrite_as_regular_string(
 }
 
 fn rewrite_as_dollar_quoted_string(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let string = file
+    let string = parse(db, file)
+        .tree()
         .syntax()
         .token_at_offset(offset)
         .find(|token| token.kind() == SyntaxKind::STRING)?;
@@ -160,11 +160,14 @@ fn dollar_delimiter(content: &str) -> Option<String> {
 }
 
 fn remove_else_clause(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let else_token = file
+    let source_file = parse(db, file).tree();
+
+    let else_token = source_file
         .syntax()
         .token_at_offset(offset)
         .find(|x| x.kind() == SyntaxKind::ELSE_KW)?;
@@ -188,11 +191,12 @@ fn remove_else_clause(
 }
 
 fn rewrite_table_as_select(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let table = token.parent_ancestors().find_map(ast::Table::cast)?;
 
     let relation_name = table.relation_name()?;
@@ -210,11 +214,12 @@ fn rewrite_table_as_select(
 }
 
 fn rewrite_select_as_table(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let select = token.parent_ancestors().find_map(ast::Select::cast)?;
 
     if !can_transform_select_to_table(&select) {
@@ -244,11 +249,12 @@ fn rewrite_select_as_table(
 }
 
 fn rewrite_from(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let select = token.parent_ancestors().find_map(ast::Select::cast)?;
 
     if select.select_clause().is_some() {
@@ -270,11 +276,12 @@ fn rewrite_from(
 }
 
 fn rewrite_leading_from(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let select = token.parent_ancestors().find_map(ast::Select::cast)?;
 
     let from_clause = select.from_clause()?;
@@ -390,11 +397,12 @@ fn can_transform_select_to_table(select: &ast::Select) -> bool {
 }
 
 fn quote_identifier(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let parent = token.parent()?;
 
     let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
@@ -423,11 +431,12 @@ fn quote_identifier(
 }
 
 fn unquote_identifier(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let parent = token.parent()?;
 
     let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
@@ -453,11 +462,12 @@ fn unquote_identifier(
 // Postgres' parser calls this a column label.
 // Third-party docs call these aliases, so going with that.
 fn add_explicit_alias(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let target = token.parent_ancestors().find_map(ast::Target::cast)?;
 
     if target.as_name().is_some() {
@@ -489,11 +499,12 @@ fn add_explicit_alias(
 }
 
 fn remove_redundant_alias(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let target = token.parent_ancestors().find_map(ast::Target::cast)?;
 
     let as_name = target.as_name()?;
@@ -526,11 +537,12 @@ fn remove_redundant_alias(
 }
 
 fn add_schema(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let range = token.parent_ancestors().find_map(|node| {
         if let Some(path) = ast::Path::cast(node.clone()) {
             if path.qualifier().is_some() {
@@ -556,8 +568,7 @@ fn add_schema(
     }
 
     let position = token.text_range().start();
-    // TODO: we should salsa this
-    let binder = binder::bind(file);
+    let binder = bind(db, file);
     // TODO: we don't need the search path at the current position, we need to
     // lookup the definition of the item and see what the definition's search
     // path is.
@@ -580,11 +591,12 @@ fn add_schema(
 }
 
 fn rewrite_cast_to_double_colon(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let cast_expr = token.parent_ancestors().find_map(ast::CastExpr::cast)?;
 
     if cast_expr.colon_colon().is_some() {
@@ -609,11 +621,12 @@ fn rewrite_cast_to_double_colon(
 }
 
 fn rewrite_double_colon_to_cast(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let cast_expr = token.parent_ancestors().find_map(ast::CastExpr::cast)?;
 
     if cast_expr.cast_token().is_some() {
@@ -638,11 +651,12 @@ fn rewrite_double_colon_to_cast(
 }
 
 fn rewrite_between_as_binary_expression(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let between_expr = token.parent_ancestors().find_map(ast::BetweenExpr::cast)?;
 
     let target = between_expr.target()?;
@@ -684,11 +698,12 @@ fn rewrite_between_as_binary_expression(
 }
 
 fn rewrite_not_equals_operator(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let bin_expr = token.parent_ancestors().find_map(ast::BinExpr::cast)?;
 
     let (op_token, replacement, title) = match bin_expr.op()? {
@@ -707,11 +722,12 @@ fn rewrite_not_equals_operator(
 }
 
 fn rewrite_timestamp_type(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let time_type = token.parent_ancestors().find_map(ast::TimeType::cast)?;
 
     let replacement = match time_type.timezone()? {
@@ -741,11 +757,12 @@ fn rewrite_timestamp_type(
 }
 
 fn rewrite_values_as_select(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
     let values = token.parent_ancestors().find_map(ast::Values::cast)?;
 
     let value_token_start = values.values_token().map(|x| x.text_range().start())?;
@@ -849,11 +866,12 @@ impl SelectContext {
 }
 
 fn rewrite_select_as_values(
+    db: &dyn Db,
+    file: File,
     actions: &mut Vec<CodeAction>,
-    file: &ast::SourceFile,
     offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(file, offset)?;
+    let token = token_from_offset(db, file, offset)?;
 
     let parent = find_select_parent(token)?;
 
@@ -927,23 +945,25 @@ fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::db::{Database, File};
     use crate::test_utils::fixture;
     use insta::assert_snapshot;
     use rowan::TextSize;
     use squawk_syntax::ast;
 
     fn apply_code_action(
-        f: impl Fn(&mut Vec<CodeAction>, &ast::SourceFile, TextSize) -> Option<()>,
+        f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
         sql: &str,
     ) -> String {
         let (mut offset, sql) = fixture(sql);
-        let parse = ast::SourceFile::parse(&sql);
-        let file: ast::SourceFile = parse.tree();
+        let db = Database::default();
+        let file = File::new(&db, sql.clone().into());
+        let parse_result = parse(&db, file);
 
         offset = offset.checked_sub(1.into()).unwrap_or_default();
 
         let mut actions = vec![];
-        f(&mut actions, &file, offset);
+        f(&db, file, &mut actions, offset);
 
         assert!(
             !actions.is_empty(),
@@ -957,7 +977,7 @@ mod test {
                 // Quickfixes can fix syntax errors so we don't assert
             }
             ActionKind::RefactorRewrite => {
-                assert_eq!(parse.errors(), vec![]);
+                assert_eq!(parse_result.errors(), vec![]);
             }
         }
 
@@ -1012,31 +1032,32 @@ mod test {
     }
 
     fn code_action_not_applicable_(
-        f: impl Fn(&mut Vec<CodeAction>, &ast::SourceFile, TextSize) -> Option<()>,
+        f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
         sql: &str,
         allow_errors: bool,
     ) -> bool {
         let (offset, sql) = fixture(sql);
-        let parse = ast::SourceFile::parse(&sql);
+        let db = Database::default();
+        let file = File::new(&db, sql.clone().into());
+        let parse_result = parse(&db, file);
         if !allow_errors {
-            assert_eq!(parse.errors(), vec![]);
+            assert_eq!(parse_result.errors(), vec![]);
         }
-        let file: ast::SourceFile = parse.tree();
 
         let mut actions = vec![];
-        f(&mut actions, &file, offset);
+        f(&db, file, &mut actions, offset);
         actions.is_empty()
     }
 
     fn code_action_not_applicable(
-        f: impl Fn(&mut Vec<CodeAction>, &ast::SourceFile, TextSize) -> Option<()>,
+        f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
         sql: &str,
     ) -> bool {
         code_action_not_applicable_(f, sql, false)
     }
 
     fn code_action_not_applicable_with_errors(
-        f: impl Fn(&mut Vec<CodeAction>, &ast::SourceFile, TextSize) -> Option<()>,
+        f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
         sql: &str,
     ) -> bool {
         code_action_not_applicable_(f, sql, true)
