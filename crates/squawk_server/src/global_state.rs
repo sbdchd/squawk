@@ -10,6 +10,7 @@ use lsp_types::notification::{
 };
 use rustc_hash::FxHashMap;
 use salsa::Setter;
+use squawk_ide::builtins::{builtins_file, builtins_url};
 use squawk_ide::db::{Database, File};
 use squawk_thread::TaskPool;
 
@@ -38,6 +39,7 @@ pub(crate) struct Handle<H, C> {
 pub(super) struct GlobalState {
     db: Database,
     files: Arc<FxHashMap<Url, File>>,
+    uris: Arc<FxHashMap<File, Url>>,
     req_queue: ReqQueue,
     sender: Sender<Message>,
     pub(crate) task_pool: Handle<TaskPool<TaskResult>, Receiver<TaskResult>>,
@@ -52,9 +54,16 @@ impl GlobalState {
             let handle = TaskPool::new_with_threads(sender.clone(), threads);
             Handle { handle, receiver }
         };
+        let db = Database::default();
+        let mut uris = FxHashMap::default();
+        if let Some(uri) = builtins_url(&db) {
+            uris.insert(builtins_file(&db), uri);
+        }
+
         Self {
-            db: Database::default(),
+            db,
             files: Arc::new(FxHashMap::default()),
+            uris: Arc::new(uris),
             req_queue: ReqQueue::default(),
             task_pool,
             sender,
@@ -67,6 +76,7 @@ impl GlobalState {
         Snapshot {
             db: self.db.clone(),
             files: self.files.clone(),
+            uris: self.uris.clone(),
         }
     }
 
@@ -83,12 +93,18 @@ impl GlobalState {
             file.set_content(&mut self.db).to(content.into());
         } else {
             let file = File::new(&self.db, content.into());
-            Arc::make_mut(&mut self.files).insert(uri, file);
+            Arc::make_mut(&mut self.files).insert(uri.clone(), file);
+            Arc::make_mut(&mut self.uris).insert(file, uri);
         }
     }
 
     pub(crate) fn remove(&mut self, uri: &Url) {
-        Arc::make_mut(&mut self.files).remove(uri);
+        if let Some(file) = Arc::make_mut(&mut self.files).remove(uri) {
+            // We can't delete file inputs in Salsa, so just set the content to
+            // empty string.
+            file.set_content(&mut self.db).to("".into());
+            Arc::make_mut(&mut self.uris).remove(&file);
+        }
     }
 
     /// Track the request time and support marking cancellation
@@ -239,6 +255,7 @@ impl GlobalState {
 pub(crate) struct Snapshot {
     pub(crate) db: Database,
     pub(crate) files: Arc<FxHashMap<Url, File>>,
+    pub(crate) uris: Arc<FxHashMap<File, Url>>,
 }
 
 impl Snapshot {
@@ -248,6 +265,10 @@ impl Snapshot {
 
     pub(crate) fn file(&self, uri: &Url) -> Option<File> {
         self.files.get(uri).copied()
+    }
+
+    pub(crate) fn uri(&self, file: File) -> Option<Url> {
+        self.uris.get(&file).cloned()
     }
 }
 

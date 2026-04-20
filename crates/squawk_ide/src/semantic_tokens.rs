@@ -6,7 +6,8 @@ use squawk_syntax::{
 };
 
 use crate::db::{File, parse};
-use crate::goto_definition::{LocationKind, goto_definition};
+use crate::goto_definition::goto_definition;
+use crate::location::LocationKind;
 
 fn highlight_param_mode(out: &mut SemanticTokenBuilder, mode: ast::ParamMode) {
     match mode {

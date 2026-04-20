@@ -15,6 +15,7 @@ pub mod goto_definition;
 pub mod hover;
 mod infer;
 pub mod inlay_hints;
+pub mod location;
 mod offsets;
 mod quote;
 mod resolve;

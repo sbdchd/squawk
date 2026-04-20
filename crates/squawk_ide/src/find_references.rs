@@ -1,8 +1,6 @@
-use crate::binder::Binder;
-use crate::builtins::{builtins_binder, parse_builtins};
-use crate::classify::classify_def_node;
-use crate::db::{File, bind, parse};
-use crate::goto_definition::{FileId, Location, LocationKind};
+use crate::builtins::builtins_file;
+use crate::db::{File, parse};
+use crate::location::{Location, LocationKind};
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::TextSize;
@@ -11,109 +9,65 @@ use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxNodePtr,
     ast::{self, AstNode},
-    match_ast,
 };
 
 #[salsa::tracked]
 pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Location> {
-    let parse = parse(db, file);
-    let source_file = parse.tree();
-
-    let current_binder = bind(db, file);
-
-    let builtins_tree = parse_builtins(db).tree();
-    let builtins_binder = builtins_binder(db);
-
-    let Some((target_file, target_defs, target_kind)) = find_target_defs(
-        &source_file,
-        offset,
-        &current_binder,
-        &builtins_tree,
-        &builtins_binder,
-    ) else {
+    let Some((target_file, target_defs, target_kind)) = find_target_defs(db, offset, file) else {
         return vec![];
-    };
-
-    let (binder, root) = match target_file {
-        FileId::Current => (&current_binder, source_file.syntax()),
-        FileId::Builtins => (&builtins_binder, builtins_tree.syntax()),
     };
 
     let mut refs: Vec<Location> = vec![];
 
-    if target_file == FileId::Builtins {
-        for ptr in &target_defs {
-            refs.push(Location {
-                file: FileId::Builtins,
-                range: ptr.to_node(builtins_tree.syntax()).text_range(),
-                kind: target_kind,
-            });
-        }
+    for ptr in &target_defs {
+        refs.push(Location {
+            file: target_file,
+            range: ptr.text_range(),
+            kind: target_kind,
+        });
     }
 
-    for node in source_file.syntax().descendants() {
-        match_ast! {
-            match node {
-                ast::NameRef(name_ref) => {
-                    // Check if the ref matches one of the defs
-                    if let Some(found_defs) = resolve::resolve_name_ref_ptrs(binder, root, &name_ref)
-                        && found_defs.iter().any(|def| target_defs.contains(def))
-                    {
-                        refs.push(Location {
-                            file: FileId::Current,
-                            range: name_ref.syntax().text_range(),
-                            kind: target_kind,
-                        });
-                    }
-                },
-                ast::Name(name) => {
-                    // Find refs also includes the defs so we have to check.
-                    let found = SyntaxNodePtr::new(name.syntax());
-                    if target_defs.contains(&found) {
-                        refs.push(Location {
-                            file: FileId::Current,
-                            range: name.syntax().text_range(),
-                            kind: target_kind,
-                        });
-                    }
-                },
-                _ => (),
+    for node in parse(db, file).tree().syntax().descendants() {
+        if let Some(name_ref) = ast::NameRef::cast(node) {
+            // Check if the ref matches one of the defs
+            if let Some(found_defs) = resolve::resolve_name_ref_ptrs(db, target_file, &name_ref)
+                && found_defs.iter().any(|def| target_defs.contains(def))
+            {
+                refs.push(Location {
+                    file,
+                    range: name_ref.syntax().text_range(),
+                    kind: target_kind,
+                });
             }
         }
     }
 
-    refs.sort_by_key(|loc| (loc.file, loc.range.start()));
+    refs.sort_by_key(|loc| (loc.file != file, loc.range.start()));
     refs
 }
 
 fn find_target_defs(
-    file: &ast::SourceFile,
+    db: &dyn Db,
     offset: TextSize,
-    current_binder: &Binder,
-    builtins_tree: &ast::SourceFile,
-    builtins_binder: &Binder,
-) -> Option<(FileId, SmallVec<[SyntaxNodePtr; 1]>, LocationKind)> {
-    let token = token_from_offset(file, offset)?;
+    current_file: File,
+) -> Option<(File, SmallVec<[SyntaxNodePtr; 1]>, LocationKind)> {
+    let token = token_from_offset(db, current_file, offset)?;
     let parent = token.parent()?;
 
     if let Some(name) = ast::Name::cast(parent.clone())
-        && let Some(kind) = classify_def_node(name.syntax()).map(LocationKind::from)
+        && let Some(kind) = LocationKind::from_node(name.syntax())
     {
         return Some((
-            FileId::Current,
+            current_file,
             smallvec![SyntaxNodePtr::new(name.syntax())],
             kind,
         ));
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for file_id in [FileId::Current, FileId::Builtins] {
-            let (binder, root) = match file_id {
-                FileId::Current => (current_binder, file.syntax()),
-                FileId::Builtins => (builtins_binder, builtins_tree.syntax()),
-            };
-            if let Some((ptrs, kind)) = resolve::resolve_name_ref(binder, root, &name_ref) {
-                return Some((file_id, ptrs, kind));
+        for target_file in [current_file, builtins_file(db)] {
+            if let Some((ptrs, kind)) = resolve::resolve_name_ref(db, target_file, &name_ref) {
+                return Some((target_file, ptrs, kind));
             }
         }
     }
@@ -123,10 +77,9 @@ fn find_target_defs(
 
 #[cfg(test)]
 mod test {
-    use crate::builtins::BUILTINS_SQL;
+    use crate::builtins::{BUILTINS_SQL, builtins_file};
     use crate::db::{Database, File};
     use crate::find_references::find_references;
-    use crate::goto_definition::FileId;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
@@ -146,11 +99,13 @@ mod test {
 
         let mut current_refs = vec![];
         let mut builtin_refs = vec![];
+        let builtins_file = builtins_file(&db);
         for (i, location) in references.iter().enumerate() {
             let label_index = i + 1;
-            match location.file {
-                FileId::Current => current_refs.push((label_index, location.range)),
-                FileId::Builtins => builtin_refs.push((label_index, location.range)),
+            if location.file == file {
+                current_refs.push((label_index, location.range));
+            } else if location.file == builtins_file {
+                builtin_refs.push((label_index, location.range));
             }
         }
 
