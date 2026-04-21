@@ -1,0 +1,10 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/create_table.sql
+---
+create table u();
+
+create table t(
+  a int,
+  b text
+);

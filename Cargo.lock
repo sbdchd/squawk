@@ -2417,8 +2417,14 @@ dependencies = [
 name = "squawk-fmt"
 version = "2.48.0"
 dependencies = [
+ "anyhow",
+ "camino",
+ "clap",
+ "dir-test",
  "insta",
  "itertools",
+ "rowan",
+ "squawk-lexer",
  "squawk-syntax",
  "tiny_pretty",
 ]
