@@ -149,7 +149,7 @@ fn find_following_commit_or_rollback(
 
 #[cfg(test)]
 mod test {
-    use crate::builtins::{BUILTINS_SQL, builtins_file};
+    use crate::builtins::builtins_file;
     use crate::db::{Database, File};
     use crate::goto_definition::goto_definition;
     use crate::test_utils::fixture;
@@ -157,6 +157,7 @@ mod test {
     use insta::assert_snapshot;
     use log::info;
     use rowan::TextRange;
+    use rustc_hash::FxHashMap;
 
     #[track_caller]
     fn goto(sql: &str) -> String {
@@ -171,60 +172,64 @@ mod test {
         // marker after the item we're trying to go to def on.
         offset = offset.checked_sub(1.into()).unwrap_or_default();
         let db = Database::default();
-        let file = File::new(&db, sql.clone().into());
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
-        let results = goto_definition(&db, file, offset);
-        if !results.is_empty() {
-            let offset: usize = offset.into();
-            let mut current_dests = vec![];
-            let mut builtin_dests = vec![];
-            let builtins_file = builtins_file(&db);
-            for (i, location) in results.iter().enumerate() {
-                let label_index = i + 2;
-                if location.file == file {
-                    current_dests.push((label_index, location.range));
-                } else if location.file == builtins_file {
-                    builtin_dests.push((label_index, location.range));
-                }
-            }
+        let current_file = File::new(&db, sql.into());
+        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
+        let results = goto_definition(&db, current_file, offset);
+        if results.is_empty() {
+            return None;
+        }
 
-            let has_builtins = !builtin_dests.is_empty();
+        let mut file_paths = FxHashMap::default();
+        file_paths.insert(current_file, "current.sql");
+        file_paths.insert(builtins_file(&db), "builtins.sql");
 
-            let mut snippet = Snippet::source(&sql).fold(true);
-            if has_builtins {
-                // only show the current file when we have two file types, aka current and builtins
-                snippet = snippet.path("current.sql");
-            } else {
-                snippet = annotate_destinations(snippet, current_dests);
-            }
-            snippet = snippet.annotation(
-                AnnotationKind::Context
-                    .span(offset..offset + 1)
-                    .label("1. source"),
-            );
+        let offset: usize = offset.into();
+        let mut dests_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
+        for (i, location) in results.iter().enumerate() {
+            dests_by_file
+                .entry(location.file)
+                .or_default()
+                .push((i + 2, location.range));
+        }
 
-            let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
+        let multi_file = dests_by_file.len() > 1 || !dests_by_file.contains_key(&current_file);
 
-            if has_builtins {
-                let builtins_snippet = Snippet::source(BUILTINS_SQL).path("builtin.sql").fold(true);
-                let builtins_snippet = annotate_destinations(builtins_snippet, builtin_dests);
-                groups.push(
-                    Level::INFO
-                        .primary_title("definition")
-                        .element(builtins_snippet),
-                );
-            }
+        let mut snippet = Snippet::source(current_file.content(&db).as_ref()).fold(true);
+        if multi_file {
+            snippet = snippet.path(*file_paths.get(&current_file).unwrap());
+        }
+        if let Some(current_dests) = dests_by_file.remove(&current_file) {
+            snippet = annotate_destinations(snippet, current_dests);
+        }
+        snippet = snippet.annotation(
+            AnnotationKind::Context
+                .span(offset..offset + 1)
+                .label("1. source"),
+        );
 
-            let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
-            return Some(
-                renderer
-                    .render(&groups)
-                    .to_string()
-                    // hacky cleanup to make the text shorter
-                    .replace("info: definition", ""),
+        let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
+
+        for (dest_file, dests) in dests_by_file {
+            let path = file_paths.get(&dest_file).unwrap();
+            let other_snippet = Snippet::source(dest_file.content(&db).as_ref())
+                .path(*path)
+                .fold(true);
+            let other_snippet = annotate_destinations(other_snippet, dests);
+            groups.push(
+                Level::INFO
+                    .primary_title("definition")
+                    .element(other_snippet),
             );
         }
-        None
+
+        let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
+        Some(
+            renderer
+                .render(&groups)
+                .to_string()
+                // hacky cleanup to make the text shorter
+                .replace("info: definition", ""),
+        )
     }
 
     fn goto_not_found(sql: &str) {
@@ -870,7 +875,7 @@ select now$0();
               │          ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
@@ -888,7 +893,7 @@ select current_timestamp$0;
               │                        ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
@@ -989,7 +994,7 @@ select * from t where current_timestamp$0 > t.created_at;
               │                                       ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
