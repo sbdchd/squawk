@@ -77,60 +77,65 @@ fn find_target_defs(
 
 #[cfg(test)]
 mod test {
-    use crate::builtins::{BUILTINS_SQL, builtins_file};
+    use crate::builtins::builtins_file;
     use crate::db::{Database, File};
     use crate::find_references::find_references;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use rowan::TextRange;
+    use rustc_hash::FxHashMap;
 
     #[track_caller]
     fn find_refs(sql: &str) -> String {
         let (mut offset, sql) = fixture(sql);
         offset = offset.checked_sub(1.into()).unwrap_or_default();
         let db = Database::default();
-        let file = File::new(&db, sql.clone().into());
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
+        let current_file = File::new(&db, sql.clone().into());
+        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
 
-        let references = find_references(&db, file, offset);
-
+        let references = find_references(&db, current_file, offset);
         let offset_usize: usize = offset.into();
 
-        let mut current_refs = vec![];
-        let mut builtin_refs = vec![];
-        let builtins_file = builtins_file(&db);
+        let mut file_paths = FxHashMap::default();
+        file_paths.insert(current_file, "current.sql");
+        file_paths.insert(builtins_file(&db), "builtins.sql");
+
+        let mut refs_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in references.iter().enumerate() {
-            let label_index = i + 1;
-            if location.file == file {
-                current_refs.push((label_index, location.range));
-            } else if location.file == builtins_file {
-                builtin_refs.push((label_index, location.range));
-            }
+            refs_by_file
+                .entry(location.file)
+                .or_default()
+                .push((i + 1, location.range));
         }
 
-        let has_builtins = !builtin_refs.is_empty();
+        let multi_file = refs_by_file.len() > 1 || !refs_by_file.contains_key(&current_file);
 
         let mut snippet = Snippet::source(&sql).fold(true);
-        if has_builtins {
-            snippet = snippet.path("current.sql");
+        if multi_file {
+            snippet = snippet.path(*file_paths.get(&current_file).unwrap());
         }
         snippet = snippet.annotation(
             AnnotationKind::Context
                 .span(offset_usize..offset_usize + 1)
                 .label("0. query"),
         );
-        snippet = annotate_refs(snippet, current_refs);
+        if let Some(current_refs) = refs_by_file.remove(&current_file) {
+            snippet = annotate_refs(snippet, current_refs);
+        }
 
         let mut groups = vec![Level::INFO.primary_title("references").element(snippet)];
 
-        if has_builtins {
-            let builtins_snippet = Snippet::source(BUILTINS_SQL).path("builtin.sql").fold(true);
-            let builtins_snippet = annotate_refs(builtins_snippet, builtin_refs);
+        for (ref_file, refs) in refs_by_file {
+            let path = file_paths.get(&ref_file).unwrap();
+            let other_snippet = Snippet::source(ref_file.content(&db).as_ref())
+                .path(*path)
+                .fold(true);
+            let other_snippet = annotate_refs(other_snippet, refs);
             groups.push(
                 Level::INFO
                     .primary_title("references")
-                    .element(builtins_snippet),
+                    .element(other_snippet),
             );
         }
 
@@ -429,7 +434,7 @@ select now();
               │        ─── 2. reference
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 3. reference
