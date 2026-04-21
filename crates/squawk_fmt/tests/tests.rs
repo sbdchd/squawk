@@ -29,7 +29,7 @@ fn fmt(fixture: Fixture<&str>) {
     });
 }
 
-fn meaningful_tokens<'a>(text: &'a str) -> Vec<(TokenKind, &'a str)> {
+fn meaningful_tokens(text: &str) -> Vec<(TokenKind, &str)> {
     let mut tokens: Vec<(TokenKind, &str)> = vec![];
     let mut offset = 0;
     for Token { kind, len } in tokenize(text) {
@@ -66,14 +66,22 @@ fn assert_no_dropped_tokens(before: &str, after: &str) {
             format!(
                 "dropped {} token(s): {}",
                 dropped.len(),
-                dropped.iter().map(|(k, t)| format!("{k:?} {t:?}")).collect::<Vec<_>>().join(", ")
+                dropped
+                    .iter()
+                    .map(|(k, t)| format!("{k:?} {t:?}"))
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )
         } else {
             let extra = &after_tokens[before_len..];
             format!(
                 "extra {} token(s): {}",
                 extra.len(),
-                extra.iter().map(|(k, t)| format!("{k:?} {t:?}")).collect::<Vec<_>>().join(", ")
+                extra
+                    .iter()
+                    .map(|(k, t)| format!("{k:?} {t:?}"))
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )
         }
     );
