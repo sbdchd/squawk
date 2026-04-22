@@ -1147,6 +1147,7 @@ fn resolve_select_qualified_column_table_name_ptr(
 
     let position = table_name_ref.syntax().text_range().start();
     resolve_table_name_ptr(db, file, &table_name, &schema, position)
+        .or_else(|| resolve_view_name_ptr(db, file, &table_name, &schema, position))
 }
 
 enum ReturningClauseMatch {
