@@ -2687,6 +2687,20 @@ select v.a$0 from v;
     }
 
     #[test]
+    fn goto_view_table_qualifier() {
+        assert_snapshot!(goto("
+create view v as select 1 id, 2 b;
+select v$0.id from v;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 id, 2 b;
+          │             ─ 2. destination
+        3 │ select v.id from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_as_column() {
         assert_snapshot!(goto("
 create table t as select 1 a;
