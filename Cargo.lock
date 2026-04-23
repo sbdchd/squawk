@@ -2530,6 +2530,7 @@ dependencies = [
  "annotate-snippets",
  "camino",
  "dir-test",
+ "either",
  "insta",
  "rowan",
  "smol_str",
