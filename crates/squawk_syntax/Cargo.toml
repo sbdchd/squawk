@@ -17,6 +17,7 @@ doctest = false
 squawk-parser.workspace = true
 rowan.workspace = true
 smol_str.workspace = true
+either.workspace = true
 
 [dev-dependencies]
 annotate-snippets.workspace = true
