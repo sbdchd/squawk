@@ -2687,6 +2687,20 @@ select v.a$0 from v;
     }
 
     #[test]
+    fn goto_materialized_view_column_with_explicit_column_list() {
+        assert_snapshot!(goto("
+create materialized view mv (x, y) as select 1 as a, 2 as b;
+select x$0 from mv;
+"), @r"
+          ╭▸ 
+        2 │ create materialized view mv (x, y) as select 1 as a, 2 as b;
+          │                              ─ 2. destination
+        3 │ select x from mv;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_view_table_qualifier() {
         assert_snapshot!(goto("
 create view v as select 1 id, 2 b;

@@ -1,3 +1,4 @@
+use crate::collect;
 use crate::db::{File, parse};
 use crate::goto_definition;
 use crate::resolve;
@@ -131,7 +132,7 @@ fn inlay_hint_insert(
             .collect()
     } else {
         // `insert into t values (1, 2, 3)`
-        resolve::collect_columns_from_create_table(db, def_file, &create_table?)
+        collect::columns_from_create_table(db, def_file, &create_table?)
             .into_iter()
             .map(|(col_name, ptr)| {
                 let target = ptr.map(|p| p.text_range());
@@ -438,7 +439,7 @@ insert into t values (1, 2, 3);
 create table t (a int, b int);
 create table u (c int) inherits (t);
 insert into u select 1, 2, 3;
-"), @r"
+"), @"
         inlay hints:
           ╭▸ 
         4 │ insert into u select a: 1, b: 2, c: 3;

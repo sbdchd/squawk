@@ -1,7 +1,9 @@
+mod ast_nav;
 mod binder;
 pub mod builtins;
 mod classify;
 pub mod code_actions;
+mod collect;
 pub mod column_name;
 mod comments;
 pub mod completion;
