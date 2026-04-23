@@ -1,3 +1,5 @@
+use crate::ast_nav::{iter_from_clause, iter_join_expr};
+use crate::collect;
 use rowan::TextSize;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
@@ -7,7 +9,6 @@ use squawk_syntax::{
 
 use crate::column_name::ColumnName;
 use crate::db::File;
-use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
 use crate::location::LocationKind;
 pub(crate) use crate::symbols::Schema;
 use crate::symbols::{Name, SymbolKind};
@@ -616,7 +617,7 @@ fn resolved_location_kind(
     LocationKind::from_node(&ptr.to_node(root)).unwrap_or(fallback)
 }
 
-fn resolve_table_name_ptr(
+pub(crate) fn resolve_table_name_ptr(
     db: &dyn Db,
     file: File,
     table_name: &Name,
@@ -752,7 +753,7 @@ fn resolve_float_precision(name_ref: &ast::NameRef, type_name: Name) -> Name {
     type_name
 }
 
-fn resolve_view_name_ptr(
+pub(crate) fn resolve_view_name_ptr(
     db: &dyn Db,
     file: File,
     view_name: &Name,
@@ -1196,7 +1197,7 @@ fn match_table_in_returning_clause(
     None
 }
 
-fn extract_table_schema_from_path(path: &ast::Path) -> Option<(Name, Option<Schema>)> {
+pub(crate) fn extract_table_schema_from_path(path: &ast::Path) -> Option<(Name, Option<Schema>)> {
     Some((extract_table_name(path)?, extract_schema_name(path)))
 }
 
@@ -1428,7 +1429,7 @@ fn resolve_column_for_table(
     let resolved = resolve_table_name(db, file, table_name, schema, position)?;
     match resolved {
         ResolvedTableName::View(create_view) => {
-            if let Some(ptr) = find_column_in_create_view(&create_view, column_name) {
+            if let Some(ptr) = find_column_in_create_view_like(&create_view, column_name) {
                 return Some(ptr);
             }
             return resolve_function(db, file, column_name, schema, None, position);
@@ -1453,12 +1454,12 @@ fn resolve_column_for_table(
     }
 }
 
-enum ResolvedTableName {
-    View(ast::CreateView),
+pub(crate) enum ResolvedTableName {
     Table(ast::CreateTableLike),
     TableAs(ast::CreateTableAs),
+    View(ast::CreateViewLike),
 }
-fn resolve_table_name(
+pub(crate) fn resolve_table_name(
     db: &dyn Db,
     file: File,
     table_name: &Name,
@@ -1486,7 +1487,10 @@ fn resolve_table_name(
 
     if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
         let view_name_node = view_name_ptr.to_node(root);
-        if let Some(create_view) = view_name_node.ancestors().find_map(ast::CreateView::cast) {
+        if let Some(create_view) = view_name_node
+            .ancestors()
+            .find_map(ast::CreateViewLike::cast)
+        {
             return Some(View(create_view));
         }
     }
@@ -1730,8 +1734,11 @@ fn resolve_column_from_table_or_view_impl(
     if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
         let view_name_node = view_name_ptr.to_node(root);
 
-        if let Some(create_view) = view_name_node.ancestors().find_map(ast::CreateView::cast) {
-            if let Some(ptr) = find_column_in_create_view(&create_view, column_name) {
+        if let Some(create_view) = view_name_node
+            .ancestors()
+            .find_map(ast::CreateViewLike::cast)
+        {
+            if let Some(ptr) = find_column_in_create_view_like(&create_view, column_name) {
                 return Some(ptr);
             }
 
@@ -1768,29 +1775,6 @@ fn resolve_from_item_for_cte_star(
     resolve_from_item_column_ptr(db, file, from_item, name_ref)
 }
 
-fn resolve_from_join_expr<F>(join_expr: &ast::JoinExpr, try_resolve: &F) -> Option<SyntaxNodePtr>
-where
-    F: Fn(&ast::FromItem) -> Option<SyntaxNodePtr>,
-{
-    if let Some(nested_join) = join_expr.join_expr()
-        && let Some(result) = resolve_from_join_expr(&nested_join, try_resolve)
-    {
-        return Some(result);
-    }
-    if let Some(from_item) = join_expr.from_item()
-        && let Some(result) = try_resolve(&from_item)
-    {
-        return Some(result);
-    }
-    if let Some(join) = join_expr.join()
-        && let Some(from_item) = join.from_item()
-        && let Some(result) = try_resolve(&from_item)
-    {
-        return Some(result);
-    }
-    None
-}
-
 fn resolve_select_column_ptr(
     db: &dyn Db,
     file: File,
@@ -1802,19 +1786,9 @@ fn resolve_select_column_ptr(
         .find_map(ast::Select::cast)?;
     let from_clause = select.from_clause()?;
 
-    for from_item in from_clause.from_items() {
+    for from_item in iter_from_clause(&from_clause) {
         if let Some(column_ptr) =
             resolve_from_item_column_ptr(db, file, &from_item, column_name_ref)
-        {
-            return Some(column_ptr);
-        }
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        if let Some(column_ptr) =
-            resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
-                resolve_from_item_column_ptr(db, file, from_item, column_name_ref)
-            })
         {
             return Some(column_ptr);
         }
@@ -1867,35 +1841,13 @@ fn resolve_join_using_columns(
 
     let mut results: SmallVec<[SyntaxNodePtr; 1]> = SmallVec::new();
 
-    collect_from_join_expr(&join_expr, &mut results, &|from_item: &ast::FromItem| {
-        resolve_from_item_column_ptr(db, file, from_item, name_ref)
-    });
-
-    (!results.is_empty()).then_some(results)
-}
-
-fn collect_from_join_expr<F>(
-    join_expr: &ast::JoinExpr,
-    results: &mut SmallVec<[SyntaxNodePtr; 1]>,
-    try_resolve: &F,
-) where
-    F: Fn(&ast::FromItem) -> Option<SyntaxNodePtr>,
-{
-    if let Some(nested_join) = join_expr.join_expr() {
-        collect_from_join_expr(&nested_join, results, try_resolve);
-    }
-    if let Some(from_item) = join_expr.from_item()
-        && let Some(result) = try_resolve(&from_item)
-    {
-        results.push(result);
-    }
-    if let Some(join) = join_expr.join()
-        && let Some(from_item) = join.from_item()
-    {
-        if let Some(result) = try_resolve(&from_item) {
+    for from_item in iter_join_expr(&join_expr) {
+        if let Some(result) = resolve_from_item_column_ptr(db, file, &from_item, name_ref) {
             results.push(result);
         }
     }
+
+    (!results.is_empty()).then_some(results)
 }
 
 fn resolve_update_column_ptr(
@@ -1912,19 +1864,9 @@ fn resolve_update_column_ptr(
 
     // `update t set a = b from u`
     if let Some(from_clause) = update.from_clause() {
-        for from_item in from_clause.from_items() {
+        for from_item in iter_from_clause(&from_clause) {
             if let Some(result) =
                 resolve_from_item_column_ptr(db, file, &from_item, column_name_ref)
-            {
-                return Some(result);
-            }
-        }
-
-        for join_expr in from_clause.join_exprs() {
-            if let Some(result) =
-                resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
-                    resolve_from_item_column_ptr(db, file, from_item, column_name_ref)
-                })
             {
                 return Some(result);
             }
@@ -1957,18 +1899,10 @@ fn resolve_fn_call_column(
     let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
     let from_clause = select.from_clause()?;
 
-    for from_item in from_clause.from_items() {
+    for from_item in iter_from_clause(&from_clause) {
         if let Some(result) =
             resolve_from_item_for_fn_call_column(db, file, &from_item, &column_name, name_ref)
         {
-            return Some(result);
-        }
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        if let Some(result) = resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
-            resolve_from_item_for_fn_call_column(db, file, from_item, &column_name, name_ref)
-        }) {
             return Some(result);
         }
     }
@@ -1998,7 +1932,9 @@ fn resolve_from_item_for_fn_call_column(
     find_column_in_create_table(db, file, &create_table, column_name)
 }
 
-fn table_and_schema_from_from_item(from_item: &ast::FromItem) -> Option<(Name, Option<Schema>)> {
+pub(crate) fn table_and_schema_from_from_item(
+    from_item: &ast::FromItem,
+) -> Option<(Name, Option<Schema>)> {
     if let Some(name_ref_node) = from_item.name_ref() {
         return Some((Name::from_node(&name_ref_node), None));
     }
@@ -2042,49 +1978,11 @@ fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
     false
 }
 
-fn find_from_item_in_join_expr(
-    join_expr: &ast::JoinExpr,
-    qualifier: &Name,
-) -> Option<ast::FromItem> {
-    if let Some(nested_join_expr) = join_expr.join_expr()
-        && let Some(found) = find_from_item_in_join_expr(&nested_join_expr, qualifier)
-    {
-        return Some(found);
-    }
-
-    if let Some(from_item) = join_expr.from_item()
-        && is_from_item_match(&from_item, qualifier)
-    {
-        return Some(from_item);
-    }
-
-    if let Some(join) = join_expr.join()
-        && let Some(from_item) = join.from_item()
-        && is_from_item_match(&from_item, qualifier)
-    {
-        return Some(from_item);
-    }
-
-    None
-}
-
 pub(crate) fn find_from_item_in_from_clause(
     from_clause: &ast::FromClause,
     qualifier: &Name,
 ) -> Option<ast::FromItem> {
-    for from_item in from_clause.from_items() {
-        if is_from_item_match(&from_item, qualifier) {
-            return Some(from_item);
-        }
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        if let Some(found) = find_from_item_in_join_expr(&join_expr, qualifier) {
-            return Some(found);
-        }
-    }
-
-    None
+    iter_from_clause(from_clause).find(|from_item| is_from_item_match(from_item, qualifier))
 }
 
 fn find_from_item_for_select_qualified_name_ref(
@@ -2138,80 +2036,6 @@ pub(crate) fn extract_column_name(col: &ast::Column) -> Option<Name> {
     Some(name)
 }
 
-pub(crate) fn collect_columns_from_create_table(
-    db: &dyn Db,
-    file: File,
-    create_table: &ast::CreateTableLike,
-) -> Vec<(Name, Option<SyntaxNodePtr>)> {
-    let mut columns = vec![];
-    collect_columns_from_create_table_impl(db, file, create_table, &mut columns, 0);
-    columns
-}
-
-fn collect_columns_from_create_table_impl(
-    db: &dyn Db,
-    file: File,
-    create_table: &ast::CreateTableLike,
-    columns: &mut Vec<(Name, Option<SyntaxNodePtr>)>,
-    depth: usize,
-) {
-    if depth > 40 {
-        log::info!("max depth reached, probably in a cycle");
-        return;
-    }
-
-    if let Some(inherits) = create_table.inherits() {
-        for path in inherits.paths() {
-            if let Some((table_name, schema)) = extract_table_schema_from_path(&path) {
-                let position = path.syntax().text_range().start();
-                if let Some(ResolvedTableName::Table(parent_table)) =
-                    resolve_table_name(db, file, &table_name, &schema, position)
-                {
-                    collect_columns_from_create_table_impl(
-                        db,
-                        file,
-                        &parent_table,
-                        columns,
-                        depth + 1,
-                    );
-                }
-            }
-        }
-    }
-
-    if let Some(arg_list) = create_table.table_arg_list() {
-        for arg in arg_list.args() {
-            match &arg {
-                ast::TableArg::Column(column) => {
-                    if let Some(name) = column.name() {
-                        let col_name = Name::from_node(&name);
-                        columns.push((col_name, Some(SyntaxNodePtr::new(name.syntax()))));
-                    }
-                }
-                ast::TableArg::LikeClause(like_clause) => {
-                    if let Some(path) = like_clause.path()
-                        && let Some((table_name, schema)) = extract_table_schema_from_path(&path)
-                    {
-                        let position = path.syntax().text_range().start();
-                        if let Some(ResolvedTableName::Table(source_table)) =
-                            resolve_table_name(db, file, &table_name, &schema, position)
-                        {
-                            collect_columns_from_create_table_impl(
-                                db,
-                                file,
-                                &source_table,
-                                columns,
-                                depth + 1,
-                            );
-                        }
-                    }
-                }
-                ast::TableArg::TableConstraint(_) => (),
-            }
-        }
-    }
-}
-
 pub(crate) fn find_column_in_create_table(
     db: &dyn Db,
     file: File,
@@ -2231,6 +2055,31 @@ fn find_column_in_create_table_impl(
     if depth > 40 {
         log::info!("max depth reached, probably in a cycle");
         return None;
+    }
+
+    if let Some(inherits) = create_table.inherits() {
+        for path in inherits.paths() {
+            let (table_name, schema) = extract_table_schema_from_path(&path)?;
+            let position = path.syntax().text_range().start();
+
+            if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position) {
+                if let Some(ptr) = match resolved {
+                    ResolvedTableName::Table(parent_table) => find_column_in_create_table_impl(
+                        db,
+                        file,
+                        &parent_table,
+                        column_name,
+                        depth + 1,
+                    ),
+                    ResolvedTableName::TableAs(create_table_as) => {
+                        find_column_in_create_table_as(&create_table_as, column_name)
+                    }
+                    ResolvedTableName::View(_) => None,
+                } {
+                    return Some(ptr);
+                }
+            }
+        }
     }
 
     for arg in create_table.table_arg_list()?.args() {
@@ -2270,37 +2119,12 @@ fn find_column_in_create_table_impl(
         }
     }
 
-    if let Some(inherits) = create_table.inherits() {
-        for path in inherits.paths() {
-            let (table_name, schema) = extract_table_schema_from_path(&path)?;
-            let position = path.syntax().text_range().start();
-
-            if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position) {
-                if let Some(ptr) = match resolved {
-                    ResolvedTableName::Table(parent_table) => find_column_in_create_table_impl(
-                        db,
-                        file,
-                        &parent_table,
-                        column_name,
-                        depth + 1,
-                    ),
-                    ResolvedTableName::TableAs(create_table_as) => {
-                        find_column_in_create_table_as(&create_table_as, column_name)
-                    }
-                    ResolvedTableName::View(_) => None,
-                } {
-                    return Some(ptr);
-                }
-            }
-        }
-    }
-
     None
 }
 
 // TODO: this is similar to the CTE funcs, maybe we can simplify
-fn find_column_in_create_view(
-    create_view: &ast::CreateView,
+fn find_column_in_create_view_like(
+    create_view: &ast::CreateViewLike,
     column_name: &Name,
 ) -> Option<SyntaxNodePtr> {
     let column_list_len = if let Some(column_list) = create_view.column_list() {
@@ -2357,7 +2181,7 @@ fn find_column_in_create_table_as(
     None
 }
 
-fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
+pub(crate) fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
     let with_clause = find_parent_with_clause(name_ref.syntax())?;
     let is_recursive = with_clause.recursive_token().is_some();
     for with_table in with_clause.with_tables() {
@@ -2438,7 +2262,10 @@ fn count_columns_for_table_name(
     if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
         let view_name_node = view_name_ptr.to_node(root);
 
-        if let Some(create_view) = view_name_node.ancestors().find_map(ast::CreateView::cast) {
+        if let Some(create_view) = view_name_node
+            .ancestors()
+            .find_map(ast::CreateViewLike::cast)
+        {
             if let Some(column_list) = create_view.column_list() {
                 return Some(column_list.columns().count());
             }
@@ -2795,19 +2622,9 @@ fn resolve_column_from_select_targets(
             if matches!(col_name, ColumnName::Star)
                 && let Some(from_clause) = &from_clause
             {
-                for from_item in from_clause.from_items() {
+                for from_item in iter_from_clause(from_clause) {
                     if let Some(result) =
                         resolve_from_item_column_ptr(db, file, &from_item, name_ref)
-                    {
-                        return Some(result);
-                    }
-                }
-
-                for join_expr in from_clause.join_exprs() {
-                    if let Some(result) =
-                        resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
-                            resolve_from_item_column_ptr(db, file, from_item, name_ref)
-                        })
                     {
                         return Some(result);
                     }
@@ -2829,7 +2646,7 @@ fn resolve_column_from_select_targets(
     None
 }
 
-fn qualified_star_table_name(field_expr: &ast::FieldExpr) -> Option<Name> {
+pub(crate) fn qualified_star_table_name(field_expr: &ast::FieldExpr) -> Option<Name> {
     field_expr.star_token()?;
 
     match field_expr.base()? {
@@ -3054,12 +2871,8 @@ pub(crate) fn table_ptrs_from_clause(
 ) -> Vec<SyntaxNodePtr> {
     let mut results = vec![];
 
-    for from_item in from_clause.from_items() {
-        collect_tables_from_item(db, file, &from_item, &mut results);
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        collect_table_ptrs_from_join_expr(db, file, &join_expr, &mut results);
+    for from_item in iter_from_clause(from_clause) {
+        collect::tables_from_item(db, file, &from_item, &mut results);
     }
 
     results
@@ -3113,74 +2926,10 @@ fn table_ptr_from_paren_expr(
     None
 }
 
-fn collect_table_ptrs_from_join_expr(
-    db: &dyn Db,
-    file: File,
-    join_expr: &ast::JoinExpr,
-    results: &mut Vec<SyntaxNodePtr>,
-) {
-    if let Some(nested) = join_expr.join_expr() {
-        collect_table_ptrs_from_join_expr(db, file, &nested, results);
-    }
-
-    if let Some(from_item) = join_expr.from_item() {
-        collect_tables_from_item(db, file, &from_item, results);
-    }
-
-    if let Some(join) = join_expr.join()
-        && let Some(from_item) = join.from_item()
-    {
-        collect_tables_from_item(db, file, &from_item, results);
-    }
-}
-
-fn collect_tables_from_item(
-    db: &dyn Db,
-    file: File,
-    from_item: &ast::FromItem,
-    results: &mut Vec<SyntaxNodePtr>,
-) {
-    if let Some(alias) = from_item.alias()
-        && alias.column_list().is_some()
-    {
-        results.push(SyntaxNodePtr::new(alias.syntax()));
-        return;
-    }
-
-    if let Some(paren_select) = from_item.paren_select() {
-        results.push(SyntaxNodePtr::new(paren_select.syntax()));
-        return;
-    }
-
-    let Some((table_name, schema)) = table_and_schema_from_from_item(from_item) else {
-        return;
-    };
-
-    let position = from_item.syntax().text_range().start();
-    if let Some(table_name_ptr) = resolve_table_name_ptr(db, file, &table_name, &schema, position) {
-        results.push(table_name_ptr);
-        return;
-    }
-
-    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, &table_name, &schema, position) {
-        results.push(view_name_ptr);
-        return;
-    }
-
-    if schema.is_none()
-        && let Some(name_ref) = from_item.name_ref()
-        && let Some(cte_ptr) = resolve_cte_table(&name_ref, &table_name)
-    {
-        results.push(cte_ptr);
-        return;
-    }
-}
-
 pub(crate) enum TableSource {
     Alias(ast::Alias),
-    CreateMaterializedView(ast::CreateMaterializedView),
     CreateTable(ast::CreateTableLike),
-    CreateView(ast::CreateView),
+    CreateView(ast::CreateViewLike),
     ParenSelect(ast::ParenSelect),
     WithTable(ast::WithTable),
 }
@@ -3201,15 +2950,8 @@ pub(crate) fn find_table_source(node: &SyntaxNode) -> Option<TableSource> {
             return Some(TableSource::WithTable(with_table));
         }
 
-        if let Some(create_view) = ast::CreateView::cast(ancestor.clone()) {
+        if let Some(create_view) = ast::CreateViewLike::cast(ancestor.clone()) {
             return Some(TableSource::CreateView(create_view));
-        }
-
-        if let Some(create_materialized_view) = ast::CreateMaterializedView::cast(ancestor.clone())
-        {
-            return Some(TableSource::CreateMaterializedView(
-                create_materialized_view,
-            ));
         }
 
         if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
@@ -3264,52 +3006,11 @@ fn count_columns_for_from_clause(
     let mut total: usize = 0;
     let mut found = false;
 
-    for from_item in from_clause.from_items() {
+    for from_item in iter_from_clause(from_clause) {
         if let Some(count) = count_columns_for_from_item(db, file, name_ref, &from_item) {
             total = total.saturating_add(count);
             found = true;
         }
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        if let Some(count) = count_columns_for_join_expr(db, file, name_ref, &join_expr) {
-            total = total.saturating_add(count);
-            found = true;
-        }
-    }
-
-    found.then_some(total)
-}
-
-fn count_columns_for_join_expr(
-    db: &dyn Db,
-    file: File,
-    name_ref: &ast::NameRef,
-    join_expr: &ast::JoinExpr,
-) -> Option<usize> {
-    let mut total: usize = 0;
-    let mut found = false;
-
-    if let Some(nested) = join_expr.join_expr()
-        && let Some(count) = count_columns_for_join_expr(db, file, name_ref, &nested)
-    {
-        total = total.saturating_add(count);
-        found = true;
-    }
-
-    if let Some(from_item) = join_expr.from_item()
-        && let Some(count) = count_columns_for_from_item(db, file, name_ref, &from_item)
-    {
-        total = total.saturating_add(count);
-        found = true;
-    }
-
-    if let Some(join) = join_expr.join()
-        && let Some(from_item) = join.from_item()
-        && let Some(count) = count_columns_for_from_item(db, file, name_ref, &from_item)
-    {
-        total = total.saturating_add(count);
-        found = true;
     }
 
     found.then_some(total)
@@ -3388,18 +3089,10 @@ fn resolve_from_clause_for_cte_star(
     column_name: &Name,
     from_clause: &ast::FromClause,
 ) -> Option<SyntaxNodePtr> {
-    for from_item in from_clause.from_items() {
+    for from_item in iter_from_clause(from_clause) {
         if let Some(result) =
             resolve_from_item_for_cte_star(db, file, &from_item, name_ref, cte_name, column_name)
         {
-            return Some(result);
-        }
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        if let Some(result) = resolve_from_join_expr(&join_expr, &|from_item: &ast::FromItem| {
-            resolve_from_item_for_cte_star(db, file, from_item, name_ref, cte_name, column_name)
-        }) {
             return Some(result);
         }
     }
@@ -3588,168 +3281,6 @@ pub(crate) fn resolve_sequence_info(
     resolve_symbol_info(db, file, path, SymbolKind::Sequence)
 }
 
-pub(crate) fn collect_table_columns(
-    db: &dyn Db,
-    file: File,
-    create_table: &impl ast::HasCreateTable,
-) -> Vec<ast::Column> {
-    collect_table_columns_impl(db, file, create_table, 0)
-}
-
-// TODO: combine with find_column_in_create_table_impl
-fn collect_table_columns_impl(
-    db: &dyn Db,
-    file: File,
-    create_table: &impl ast::HasCreateTable,
-    depth: usize,
-) -> Vec<ast::Column> {
-    if depth > 40 {
-        log::info!("max depth reached, probably in a cycle");
-        return vec![];
-    }
-
-    let mut columns = vec![];
-
-    if let Some(inherits) = create_table.inherits() {
-        for path in inherits.paths() {
-            if let Some((table_name, schema)) = extract_table_schema_from_path(&path) {
-                let position = path.syntax().text_range().start();
-                if let Some(ResolvedTableName::Table(parent_table)) =
-                    resolve_table_name(db, file, &table_name, &schema, position)
-                {
-                    let inherited_columns =
-                        collect_table_columns_impl(db, file, &parent_table, depth + 1);
-                    columns.extend(inherited_columns);
-                }
-            }
-        }
-    }
-
-    if let Some(arg_list) = create_table.table_arg_list() {
-        for arg in arg_list.args() {
-            match &arg {
-                ast::TableArg::Column(column) => {
-                    columns.push(column.clone());
-                }
-                ast::TableArg::LikeClause(like_clause) => {
-                    if let Some(path) = like_clause.path()
-                        && let Some((table_name, schema)) = extract_table_schema_from_path(&path)
-                    {
-                        let position = path.syntax().text_range().start();
-                        if let Some(ResolvedTableName::Table(source_table)) =
-                            resolve_table_name(db, file, &table_name, &schema, position)
-                        {
-                            let like_columns =
-                                collect_table_columns_impl(db, file, &source_table, depth + 1);
-                            columns.extend(like_columns);
-                        }
-                    }
-                }
-                ast::TableArg::TableConstraint(_) => (),
-            }
-        }
-    }
-
-    columns
-}
-
-pub(crate) fn collect_view_column_names(create_view: &ast::CreateView) -> Vec<Name> {
-    if let Some(column_list) = create_view.column_list() {
-        let columns = collect_column_names_from_column_list(&column_list);
-        if !columns.is_empty() {
-            return columns;
-        }
-    }
-
-    let Some(select) = select_from_view_query(create_view) else {
-        return vec![];
-    };
-    let Some(select_clause) = select.select_clause() else {
-        return vec![];
-    };
-    let Some(target_list) = select_clause.target_list() else {
-        return vec![];
-    };
-
-    collect_target_list_column_names(&target_list)
-}
-
-pub(crate) fn collect_view_columns_with_types(
-    create_view: &ast::CreateView,
-) -> Vec<(Name, Option<Type>)> {
-    let Some(select) = select_from_view_query(create_view) else {
-        return vec![];
-    };
-    let Some(select_clause) = select.select_clause() else {
-        return vec![];
-    };
-    let Some(target_list) = select_clause.target_list() else {
-        return vec![];
-    };
-
-    collect_target_list_columns_with_types(&target_list)
-}
-
-pub(crate) fn collect_materialized_view_column_names(
-    create_materialized_view: ast::CreateMaterializedView,
-) -> Vec<Name> {
-    if let Some(column_list) = create_materialized_view.column_list() {
-        let columns = collect_column_names_from_column_list(&column_list);
-        if !columns.is_empty() {
-            return columns;
-        }
-    }
-
-    let Some(select) = select_from_materialized_view_query(create_materialized_view) else {
-        return vec![];
-    };
-    let Some(select_clause) = select.select_clause() else {
-        return vec![];
-    };
-    let Some(target_list) = select_clause.target_list() else {
-        return vec![];
-    };
-
-    collect_target_list_column_names(&target_list)
-}
-
-pub(crate) fn collect_materialized_view_columns_with_types(
-    create_materialized_view: ast::CreateMaterializedView,
-) -> Vec<(Name, Option<Type>)> {
-    let Some(select) = select_from_materialized_view_query(create_materialized_view) else {
-        return vec![];
-    };
-    let Some(select_clause) = select.select_clause() else {
-        return vec![];
-    };
-    let Some(target_list) = select_clause.target_list() else {
-        return vec![];
-    };
-
-    collect_target_list_columns_with_types(&target_list)
-}
-
-fn select_from_materialized_view_query(
-    create_materialized_view: ast::CreateMaterializedView,
-) -> Option<ast::Select> {
-    let query = create_materialized_view.query()?;
-    match query {
-        ast::SelectVariant::Select(select) => Some(select),
-        _ => None,
-    }
-}
-
-pub(crate) fn collect_with_table_column_names(
-    db: &dyn Db,
-    file: File,
-    with_table: ast::WithTable,
-) -> Vec<Name> {
-    collect_with_table_columns_with_types(db, file, with_table)
-        .into_iter()
-        .map(|(name, _)| name)
-        .collect()
-}
-
 fn resolve_symbol_info(
     db: &dyn Db,
     file: File,
@@ -3761,417 +3292,6 @@ fn resolve_symbol_info(
     let schema = extract_schema_from_path(path);
     let position = path.syntax().text_range().start();
     binder.lookup_info(name_str, &schema, kind, position)
-}
-
-fn collect_column_names_from_column_list(column_list: &ast::ColumnList) -> Vec<Name> {
-    let mut columns = vec![];
-    for column in column_list.columns() {
-        if let Some(name) = column.name() {
-            columns.push(Name::from_node(&name));
-        }
-    }
-    columns
-}
-
-fn collect_target_list_column_names(target_list: &ast::TargetList) -> Vec<Name> {
-    let mut columns = vec![];
-    for target in target_list.targets() {
-        if let Some((col_name, _node)) = ColumnName::from_target(target)
-            && let Some(col_name_str) = col_name.to_string()
-        {
-            columns.push(Name::from_string(col_name_str));
-        }
-    }
-    columns
-}
-
-pub(crate) fn collect_with_table_columns_with_types(
-    db: &dyn Db,
-    file: File,
-    with_table: ast::WithTable,
-) -> Vec<(Name, Option<Type>)> {
-    let alias_columns: Vec<Name> = with_table
-        .column_list()
-        .into_iter()
-        .flat_map(|column_list| column_list.columns())
-        .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
-        .collect();
-
-    let base_columns = collect_with_table_query_columns_with_types(db, file, with_table);
-
-    if alias_columns.is_empty() {
-        return base_columns;
-    }
-
-    let mut results = vec![];
-
-    for (idx, alias_name) in alias_columns.iter().enumerate() {
-        results.push((
-            alias_name.clone(),
-            base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
-        ));
-    }
-
-    results.extend(base_columns.into_iter().skip(alias_columns.len()));
-
-    results
-}
-
-fn collect_with_table_query_columns_with_types(
-    db: &dyn Db,
-    file: File,
-    with_table: ast::WithTable,
-) -> Vec<(Name, Option<Type>)> {
-    let Some(query) = with_table.query() else {
-        return vec![];
-    };
-
-    if let ast::WithQuery::Values(values) = query {
-        let mut results = vec![];
-        if let Some(row_list) = values.row_list()
-            && let Some(first_row) = row_list.rows().next()
-        {
-            for (idx, expr) in first_row.exprs().enumerate() {
-                let name = Name::from_string(format!("column{}", idx + 1));
-                let ty = infer_type_from_expr(&expr);
-                results.push((name, ty));
-            }
-        }
-        return results;
-    }
-
-    if let Some(columns) = columns_from_returning_clause_with_types(&query) {
-        return columns;
-    }
-
-    let Some(cte_select) = select_from_with_query(query) else {
-        return vec![];
-    };
-    let Some(select_clause) = cte_select.select_clause() else {
-        return vec![];
-    };
-    let Some(target_list) = select_clause.target_list() else {
-        return vec![];
-    };
-
-    let from_clause = cte_select.from_clause();
-    let mut columns = vec![];
-
-    for target in target_list.targets() {
-        if let Some((col_name, _node)) = ColumnName::from_target(target.clone()) {
-            if let Some(col_name_str) = col_name.to_string() {
-                let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
-                columns.push((Name::from_string(col_name_str), ty));
-                continue;
-            }
-
-            if target.star_token().is_some()
-                && let Some(from_clause) = &from_clause
-            {
-                columns.extend(collect_columns_for_star_from_clause(db, file, from_clause));
-                continue;
-            }
-        }
-
-        if let Some(expr) = target.expr()
-            && let ast::Expr::FieldExpr(field_expr) = expr
-            && let Some(table_name) = qualified_star_table_name(&field_expr)
-            && let Some(from_clause) = &from_clause
-            && let Some(from_item) = find_from_item_in_from_clause(from_clause, &table_name)
-        {
-            columns.extend(collect_columns_for_star_from_from_item(
-                db, file, &from_item,
-            ));
-        }
-    }
-
-    columns
-}
-
-fn columns_from_returning_clause_with_types(
-    query: &ast::WithQuery,
-) -> Option<Vec<(Name, Option<Type>)>> {
-    let returning_clause = match query {
-        ast::WithQuery::Delete(delete) => delete.returning_clause(),
-        ast::WithQuery::Insert(insert) => insert.returning_clause(),
-        ast::WithQuery::Merge(merge) => merge.returning_clause(),
-        ast::WithQuery::Update(update) => update.returning_clause(),
-        ast::WithQuery::Select(_)
-        | ast::WithQuery::CompoundSelect(_)
-        | ast::WithQuery::Table(_)
-        | ast::WithQuery::Values(_)
-        | ast::WithQuery::ParenSelect(_) => None,
-    };
-
-    if let Some(returning_clause) = returning_clause {
-        if let Some(target_list) = returning_clause.target_list() {
-            return Some(collect_target_list_columns_with_types(&target_list));
-        }
-        return Some(vec![]);
-    }
-
-    None
-}
-
-fn collect_columns_for_star_from_clause(
-    db: &dyn Db,
-    file: File,
-    from_clause: &ast::FromClause,
-) -> Vec<(Name, Option<Type>)> {
-    let mut columns = vec![];
-
-    for from_item in from_clause.from_items() {
-        columns.extend(collect_columns_for_star_from_from_item(
-            db, file, &from_item,
-        ));
-    }
-
-    for join_expr in from_clause.join_exprs() {
-        if let Some(from_item) = join_expr.from_item() {
-            columns.extend(collect_columns_for_star_from_from_item(
-                db, file, &from_item,
-            ));
-        }
-
-        if let Some(join) = join_expr.join()
-            && let Some(from_item) = join.from_item()
-        {
-            columns.extend(collect_columns_for_star_from_from_item(
-                db, file, &from_item,
-            ));
-        }
-    }
-
-    columns
-}
-
-fn collect_columns_for_star_from_from_item(
-    db: &dyn Db,
-    file: File,
-    from_item: &ast::FromItem,
-) -> Vec<(Name, Option<Type>)> {
-    if let Some(alias) = from_item.alias()
-        && alias.column_list().is_some()
-    {
-        return collect_columns_for_star_from_alias(db, file, from_item, &alias);
-    }
-
-    let Some(table_ptr) = table_ptr_from_from_item(db, file, from_item) else {
-        return vec![];
-    };
-
-    collect_columns_for_star_from_table_ptr(db, file, &table_ptr)
-}
-
-fn collect_columns_for_star_from_alias(
-    db: &dyn Db,
-    file: File,
-    from_item: &ast::FromItem,
-    alias: &ast::Alias,
-) -> Vec<(Name, Option<Type>)> {
-    let alias_columns: Vec<Name> = alias
-        .column_list()
-        .into_iter()
-        .flat_map(|column_list| column_list.columns())
-        .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
-        .collect();
-
-    let Some(table_ptr) = table_ptr_from_from_item(db, file, from_item) else {
-        return vec![];
-    };
-
-    let base_columns = collect_columns_for_star_from_table_ptr(db, file, &table_ptr);
-    let mut results = vec![];
-
-    for (idx, alias_name) in alias_columns.iter().enumerate() {
-        results.push((
-            alias_name.clone(),
-            base_columns.get(idx).and_then(|(_, ty)| ty.clone()),
-        ));
-    }
-
-    results.extend(base_columns.into_iter().skip(alias_columns.len()));
-
-    results
-}
-
-fn collect_columns_for_star_from_table_ptr(
-    db: &dyn Db,
-    file: File,
-    table_ptr: &SyntaxNodePtr,
-) -> Vec<(Name, Option<Type>)> {
-    let tree = parse(db, file).tree();
-    let root = tree.syntax();
-    let table_node = table_ptr.to_node(root);
-
-    if let Some(paren_select) = ast::ParenSelect::cast(table_node.clone()) {
-        return collect_paren_select_columns_with_types(db, file, &paren_select);
-    }
-
-    match find_table_source(&table_node) {
-        Some(TableSource::Alias(alias)) => {
-            let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
-                return vec![];
-            };
-            collect_columns_for_star_from_alias(db, file, &from_item, &alias)
-        }
-        Some(TableSource::WithTable(with_table)) => {
-            collect_with_table_columns_with_types(db, file, with_table)
-        }
-        Some(TableSource::CreateTable(create_table)) => {
-            collect_table_columns(db, file, &create_table)
-                .into_iter()
-                .filter_map(|column| {
-                    let name = Name::from_node(&column.name()?);
-                    let ty = column.ty().and_then(|ty| infer_type_from_ty(&ty));
-                    Some((name, ty))
-                })
-                .collect()
-        }
-        Some(TableSource::CreateView(create_view)) => collect_view_columns_with_types(&create_view),
-        Some(TableSource::CreateMaterializedView(create_materialized_view)) => {
-            collect_materialized_view_columns_with_types(create_materialized_view)
-        }
-        Some(TableSource::ParenSelect(paren_select)) => {
-            collect_paren_select_columns_with_types(db, file, &paren_select)
-        }
-        None => vec![],
-    }
-}
-
-fn collect_target_list_columns_with_types(
-    target_list: &ast::TargetList,
-) -> Vec<(Name, Option<Type>)> {
-    let mut columns = vec![];
-    for target in target_list.targets() {
-        if let Some((col_name, _node)) = ColumnName::from_target(target.clone())
-            && let Some(col_name_str) = col_name.to_string()
-        {
-            let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
-            columns.push((Name::from_string(col_name_str), ty));
-        }
-    }
-    columns
-}
-
-pub(crate) fn collect_paren_select_columns_with_types(
-    db: &dyn Db,
-    file: File,
-    paren_select: &ast::ParenSelect,
-) -> Vec<(Name, Option<Type>)> {
-    let Some(select_variant) = paren_select.select() else {
-        return vec![];
-    };
-    collect_select_variant_columns_with_types(db, file, &select_variant)
-}
-
-fn collect_select_variant_columns_with_types(
-    db: &dyn Db,
-    file: File,
-    select_variant: &ast::SelectVariant,
-) -> Vec<(Name, Option<Type>)> {
-    let binder = bind(db, file);
-    let tree = parse(db, file).tree();
-    let root = tree.syntax();
-    match select_variant {
-        ast::SelectVariant::Values(values) => {
-            let mut results = vec![];
-            if let Some(row_list) = values.row_list()
-                && let Some(first_row) = row_list.rows().next()
-            {
-                for (idx, expr) in first_row.exprs().enumerate() {
-                    let name = Name::from_string(format!("column{}", idx + 1));
-                    let ty = infer_type_from_expr(&expr);
-                    results.push((name, ty));
-                }
-            }
-            results
-        }
-        ast::SelectVariant::Select(select) => {
-            let Some(select_clause) = select.select_clause() else {
-                return vec![];
-            };
-            let Some(target_list) = select_clause.target_list() else {
-                return vec![];
-            };
-            collect_target_list_columns_with_types(&target_list)
-        }
-        ast::SelectVariant::SelectInto(select_into) => {
-            let Some(select_clause) = select_into.select_clause() else {
-                return vec![];
-            };
-            let Some(target_list) = select_clause.target_list() else {
-                return vec![];
-            };
-            collect_target_list_columns_with_types(&target_list)
-        }
-        ast::SelectVariant::ParenSelect(nested) => {
-            collect_paren_select_columns_with_types(db, file, nested)
-        }
-        ast::SelectVariant::CompoundSelect(compound) => {
-            let Some(lhs) = compound.lhs() else {
-                return vec![];
-            };
-            collect_select_variant_columns_with_types(db, file, &lhs)
-        }
-        ast::SelectVariant::Table(table) => {
-            let Some(path) = table.relation_name().and_then(|r| r.path()) else {
-                return vec![];
-            };
-            let Some((table_name, schema)) = extract_table_schema_from_path(&path) else {
-                return vec![];
-            };
-
-            if schema.is_none()
-                && let Some(name_ref) = path.segment().and_then(|segment| segment.name_ref())
-                && let Some(with_table_ptr) = resolve_cte_table(&name_ref, &table_name)
-                && let Some(with_table) = with_table_ptr
-                    .to_node(root)
-                    .ancestors()
-                    .find_map(ast::WithTable::cast)
-            {
-                return collect_with_table_column_names(db, file, with_table)
-                    .into_iter()
-                    .map(|name| (name, None))
-                    .collect();
-            }
-
-            let position = table.syntax().text_range().start();
-            let Some(table_ptr) =
-                binder.lookup_with(&table_name, SymbolKind::Table, position, &schema)
-            else {
-                return vec![];
-            };
-            let Some(create_table) = table_ptr
-                .to_node(root)
-                .ancestors()
-                .find_map(ast::CreateTableLike::cast)
-            else {
-                return vec![];
-            };
-            let columns = collect_table_columns(db, file, &create_table);
-            columns
-                .into_iter()
-                .filter_map(|col| {
-                    let name = Name::from_node(&col.name()?);
-                    let ty = col.ty().and_then(|t| infer_type_from_ty(&t));
-                    Some((name, ty))
-                })
-                .collect()
-        }
-    }
-}
-
-fn select_from_view_query(create_view: &ast::CreateView) -> Option<ast::Select> {
-    let query = create_view.query()?;
-    match query {
-        ast::SelectVariant::Select(select) => Some(select),
-        ast::SelectVariant::ParenSelect(paren_select) => match paren_select.select()? {
-            ast::SelectVariant::Select(select) => Some(select),
-            _ => None,
-        },
-        _ => None,
-    }
 }
 
 fn extract_table_name_from_path(path: &ast::Path) -> Option<String> {
