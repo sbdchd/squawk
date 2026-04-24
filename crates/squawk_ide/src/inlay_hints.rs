@@ -1,3 +1,4 @@
+use crate::collect;
 use crate::db::{File, parse};
 use crate::goto_definition;
 use crate::resolve;
@@ -131,7 +132,7 @@ fn inlay_hint_insert(
             .collect()
     } else {
         // `insert into t values (1, 2, 3)`
-        resolve::collect_columns_from_create_table(db, def_file, &create_table?)
+        collect::columns_from_create_table(db, def_file, &create_table?)
             .into_iter()
             .map(|(col_name, ptr)| {
                 let target = ptr.map(|p| p.text_range());
@@ -169,9 +170,7 @@ fn inlay_hint_insert_select(
     let target_list = match stmt {
         ast::Stmt::Select(select) => select.select_clause()?.target_list(),
         ast::Stmt::SelectInto(select_into) => select_into.select_clause()?.target_list(),
-        ast::Stmt::ParenSelect(paren_select) => {
-            target_list_from_select_variant(paren_select.select()?)
-        }
+        ast::Stmt::ParenSelect(paren_select) => paren_select.select()?.target_list(),
         _ => None,
     }?;
 
@@ -188,25 +187,6 @@ fn inlay_hint_insert_select(
     }
 
     Some(())
-}
-
-fn target_list_from_select_variant(select: ast::SelectVariant) -> Option<ast::TargetList> {
-    let mut current = select;
-    for _ in 0..100 {
-        match current {
-            ast::SelectVariant::Select(select) => {
-                return select.select_clause()?.target_list();
-            }
-            ast::SelectVariant::SelectInto(select_into) => {
-                return select_into.select_clause()?.target_list();
-            }
-            ast::SelectVariant::ParenSelect(paren_select) => {
-                current = paren_select.select()?;
-            }
-            _ => return None,
-        }
-    }
-    None
 }
 
 #[cfg(test)]
@@ -438,7 +418,7 @@ insert into t values (1, 2, 3);
 create table t (a int, b int);
 create table u (c int) inherits (t);
 insert into u select 1, 2, 3;
-"), @r"
+"), @"
         inlay hints:
           ╭▸ 
         4 │ insert into u select a: 1, b: 2, c: 3;

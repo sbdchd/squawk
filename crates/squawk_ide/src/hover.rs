@@ -1,5 +1,7 @@
+use crate::ast_nav;
 use crate::builtins::builtins_file;
 use crate::classify::{NameClass, classify_name};
+use crate::collect;
 use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
 use crate::db::{File, bind, parse};
@@ -249,6 +251,11 @@ impl ColumnHover {
     fn table_column(table_name: &str, column_name: &str) -> String {
         format!("column {table_name}.{column_name}")
     }
+
+    fn table_column_type(table_name: &str, column_name: &str, ty: &str) -> String {
+        format!("column {table_name}.{column_name} {ty}")
+    }
+
     fn schema_table_column_type(
         schema: &str,
         table_name: &str,
@@ -331,7 +338,7 @@ fn format_hover_for_column_ptr(
             } else {
                 Name::from_string(column_name_node.text().to_string())
             };
-            let ty = resolve::collect_paren_select_columns_with_types(db, file, &paren_select)
+            let ty = collect::paren_select_columns_with_types(db, file, &paren_select)
                 .into_iter()
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty)?;
@@ -448,18 +455,20 @@ fn hover_column_definition(
     )))
 }
 
-fn format_table_source(db: &dyn Db, file: File, source: resolve::TableSource) -> Option<Hover> {
+fn format_table_source(db: &dyn Db, file: File, source: ast_nav::ParentSouce) -> Option<Hover> {
     match source {
-        resolve::TableSource::Alias(alias) => format_alias_with_column_list(db, file, alias),
-        resolve::TableSource::WithTable(with_table) => format_with_table(with_table),
-        resolve::TableSource::CreateView(create_view) => format_create_view(db, file, create_view),
-        resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
-            format_create_materialized_view(db, file, create_materialized_view)
+        ast_nav::ParentSouce::Alias(alias) => format_alias_with_column_list(db, file, alias),
+        ast_nav::ParentSouce::WithTable(with_table) => format_with_table(with_table),
+        ast_nav::ParentSouce::CreateView(create_view) => {
+            format_create_view_like(db, file, create_view)
         }
-        resolve::TableSource::CreateTable(create_table) => {
+        ast_nav::ParentSouce::CreateTable(create_table) => {
             format_create_table(db, file, create_table)
         }
-        resolve::TableSource::ParenSelect(paren_select) => format_paren_select(paren_select),
+        ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
+            format_create_table_as(db, file, create_table_as)
+        }
+        ast_nav::ParentSouce::ParenSelect(paren_select) => format_paren_select(paren_select),
     }
 }
 
@@ -468,7 +477,7 @@ fn hover_table(db: &dyn Db, file: File, def_node: &SyntaxNode) -> Option<Hover> 
         return Some(result);
     }
 
-    if let Some(source) = resolve::find_table_source(def_node) {
+    if let Some(source) = ast_nav::parent_source(def_node) {
         return format_table_source(db, file, source);
     }
 
@@ -492,7 +501,7 @@ fn format_alias_with_column_list(db: &dyn Db, file: File, alias: ast::Alias) -> 
     if let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast)
         && let Some(table_ptr) = resolve::table_ptr_from_from_item(db, file, &from_item)
     {
-        let base_columns = collect_star_column_names(db, file, &table_ptr);
+        let base_columns = collect::star_column_names(db, file, &table_ptr);
         for column in base_columns.iter().skip(columns.len()) {
             columns.push(column.clone());
         }
@@ -598,23 +607,23 @@ fn hover_qualified_star_columns(
         return hover_qualified_star_columns_from_subquery(db, file, &paren_select);
     }
 
-    match resolve::find_table_source(&table_name_node)? {
-        resolve::TableSource::Alias(alias) => {
+    match ast_nav::parent_source(&table_name_node)? {
+        ast_nav::ParentSouce::Alias(alias) => {
             hover_qualified_star_columns_from_alias(db, file, &alias)
         }
-        resolve::TableSource::WithTable(with_table) => {
+        ast_nav::ParentSouce::WithTable(with_table) => {
             hover_qualified_star_columns_from_cte(db, file, with_table)
         }
-        resolve::TableSource::CreateTable(create_table) => {
+        ast_nav::ParentSouce::CreateTable(create_table) => {
             hover_qualified_star_columns_from_table(db, file, create_table)
         }
-        resolve::TableSource::CreateView(create_view) => {
-            hover_qualified_star_columns_from_view(db, file, &create_view)
+        ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
+            hover_qualified_star_columns_from_table_as(db, file, &create_table_as)
         }
-        resolve::TableSource::CreateMaterializedView(create_materialized_view) => {
-            hover_qualified_star_columns_from_materialized_view(db, file, create_materialized_view)
+        ast_nav::ParentSouce::CreateView(create_view) => {
+            hover_qualified_star_columns_from_view_like(db, file, &create_view)
         }
-        resolve::TableSource::ParenSelect(paren_select) => {
+        ast_nav::ParentSouce::ParenSelect(paren_select) => {
             hover_qualified_star_columns_from_subquery(db, file, &paren_select)
         }
     }
@@ -648,7 +657,7 @@ fn hover_qualified_star_columns_from_alias(
 
     let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
     let table_ptr = resolve::table_ptr_from_from_item(db, file, &from_item)?;
-    let base_column_names = collect_star_column_names(db, file, &table_ptr);
+    let base_column_names = collect::star_column_names(db, file, &table_ptr);
 
     for column_name in base_column_names.iter().skip(alias_columns.len()) {
         results.push(Hover::snippet(ColumnHover::table_column(
@@ -660,87 +669,6 @@ fn hover_qualified_star_columns_from_alias(
     merge_hovers(results)
 }
 
-fn collect_star_column_names(
-    db: &dyn Db,
-    file: File,
-    table_ptr: &squawk_syntax::SyntaxNodePtr,
-) -> Vec<Name> {
-    let source_file = parse(db, file).tree();
-    let root = source_file.syntax();
-    let table_name_node = table_ptr.to_node(root);
-
-    if let Some(paren_select) = ast::ParenSelect::cast(table_name_node.clone()) {
-        let columns: Vec<Name> =
-            resolve::collect_paren_select_columns_with_types(db, file, &paren_select)
-                .into_iter()
-                .map(|(name, _ty)| name)
-                .collect();
-        if !columns.is_empty() {
-            return columns;
-        }
-        return collect_star_column_names_from_paren_select(db, file, &paren_select);
-    }
-
-    match resolve::find_table_source(&table_name_node) {
-        Some(resolve::TableSource::Alias(alias)) => alias
-            .column_list()
-            .into_iter()
-            .flat_map(|column_list| column_list.columns())
-            .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
-            .collect(),
-        Some(resolve::TableSource::WithTable(with_table)) => {
-            let columns = resolve::collect_with_table_column_names(db, file, with_table.clone());
-            if !columns.is_empty() {
-                return columns;
-            }
-
-            resolve::collect_with_table_column_names(db, builtins_file(db), with_table)
-        }
-        Some(resolve::TableSource::CreateTable(create_table)) => {
-            resolve::collect_table_columns(db, file, &create_table)
-                .into_iter()
-                .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
-                .collect()
-        }
-        Some(resolve::TableSource::CreateView(create_view)) => {
-            resolve::collect_view_column_names(&create_view)
-        }
-        Some(resolve::TableSource::CreateMaterializedView(create_materialized_view)) => {
-            resolve::collect_materialized_view_column_names(create_materialized_view)
-        }
-        Some(resolve::TableSource::ParenSelect(paren_select)) => {
-            resolve::collect_paren_select_columns_with_types(db, file, &paren_select)
-                .into_iter()
-                .map(|(name, _ty)| name)
-                .collect()
-        }
-        None => vec![],
-    }
-}
-
-fn collect_star_column_names_from_paren_select(
-    db: &dyn Db,
-    file: File,
-    paren_select: &ast::ParenSelect,
-) -> Vec<Name> {
-    let Some(select_variant) = paren_select.select() else {
-        return vec![];
-    };
-    let ast::SelectVariant::Select(select) = select_variant else {
-        return vec![];
-    };
-    let Some(from_clause) = select.from_clause() else {
-        return vec![];
-    };
-    let mut columns = vec![];
-    for from_item in from_clause.from_items() {
-        if let Some(table_ptr) = resolve::table_ptr_from_from_item(db, file, &from_item) {
-            columns.extend(collect_star_column_names(db, file, &table_ptr));
-        }
-    }
-    columns
-}
-
 fn hover_qualified_star_columns_from_table(
     db: &dyn Db,
     file: File,
@@ -749,18 +677,48 @@ fn hover_qualified_star_columns_from_table(
     let path = create_table.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
     let schema = schema.to_string();
-    let results: Vec<Hover> = resolve::collect_table_columns(db, file, &create_table)
+    let results: Vec<Hover> = collect::table_columns(db, file, &create_table)
         .into_iter()
-        .filter_map(|column| {
-            let column_name = Name::from_node(&column.name()?);
-            let ty = column.ty()?;
-            let ty = &ty.syntax().text().to_string();
+        .filter_map(|(column_name, ty)| {
+            let ty = ty?;
             Some(Hover::snippet(ColumnHover::schema_table_column_type(
                 &schema,
                 &table_name,
                 &column_name.to_string(),
-                ty,
+                &ty.to_string(),
             )))
+        })
+        .collect();
+
+    merge_hovers(results)
+}
+
+fn hover_qualified_star_columns_from_table_as(
+    db: &dyn Db,
+    file: File,
+    create_table_as: &ast::CreateTableAs,
+) -> Option<Hover> {
+    let path = create_table_as.path()?;
+    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let schema_str = schema.to_string();
+
+    let columns = collect::create_table_as_columns_with_types(create_table_as);
+    let results: Vec<Hover> = columns
+        .into_iter()
+        .map(|(column_name, ty)| {
+            if let Some(ty) = ty {
+                return Hover::snippet(ColumnHover::schema_table_column_type(
+                    &schema_str,
+                    &table_name,
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                ));
+            }
+            Hover::snippet(ColumnHover::schema_table_column(
+                &schema_str,
+                &table_name,
+                &column_name.to_string(),
+            ))
         })
         .collect();
 
@@ -773,57 +731,49 @@ fn hover_qualified_star_columns_from_cte(
     with_table: ast::WithTable,
 ) -> Option<Hover> {
     let cte_name = Name::from_node(&with_table.name()?);
-    let column_names = resolve::collect_with_table_column_names(db, file, with_table);
-    let results: Vec<Hover> = column_names
-        .iter()
-        .map(|column_name| {
-            Hover::snippet(ColumnHover::table_column(
-                &cte_name.to_string(),
-                &column_name.to_string(),
-            ))
+    let cte_name = cte_name.to_string();
+    let columns = collect::with_table_columns_with_types(db, file, with_table);
+    let results: Vec<Hover> = columns
+        .into_iter()
+        .map(|(column_name, ty)| {
+            let column_name = column_name.to_string();
+            if let Some(ty) = ty {
+                return Hover::snippet(ColumnHover::table_column_type(
+                    &cte_name,
+                    &column_name,
+                    &ty.to_string(),
+                ));
+            }
+
+            Hover::snippet(ColumnHover::table_column(&cte_name, &column_name))
         })
         .collect();
 
     merge_hovers(results)
 }
 
-fn hover_qualified_star_columns_from_view(
+fn hover_qualified_star_columns_from_view_like(
     db: &dyn Db,
     file: File,
-    create_view: &ast::CreateView,
+    create_view: &ast::CreateViewLike,
 ) -> Option<Hover> {
     let path = create_view.path()?;
     let (schema, view_name) = resolve::resolve_view_info(db, file, &path)?;
 
     let schema_str = schema.to_string();
-    let column_names = resolve::collect_view_column_names(create_view);
-    let results: Vec<Hover> = column_names
-        .iter()
-        .map(|column_name| {
-            Hover::snippet(ColumnHover::schema_table_column(
-                &schema_str,
-                &view_name,
-                &column_name.to_string(),
-            ))
-        })
-        .collect();
+    let columns = collect::view_like_columns_with_types(create_view);
+    let results: Vec<Hover> = columns
+        .into_iter()
+        .map(|(column_name, ty)| {
+            if let Some(ty) = ty {
+                return Hover::snippet(ColumnHover::schema_table_column_type(
+                    &schema_str,
+                    &view_name,
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                ));
+            }
 
-    merge_hovers(results)
-}
-
-fn hover_qualified_star_columns_from_materialized_view(
-    db: &dyn Db,
-    file: File,
-    create_materialized_view: ast::CreateMaterializedView,
-) -> Option<Hover> {
-    let path = create_materialized_view.path()?;
-    let (schema, view_name) = resolve::resolve_view_info(db, file, &path)?;
-
-    let schema_str = schema.to_string();
-    let column_names = resolve::collect_materialized_view_column_names(create_materialized_view);
-    let results: Vec<Hover> = column_names
-        .iter()
-        .map(|column_name| {
             Hover::snippet(ColumnHover::schema_table_column(
                 &schema_str,
                 &view_name,
@@ -842,7 +792,7 @@ fn hover_qualified_star_columns_from_subquery(
 ) -> Option<Hover> {
     let select_variant = paren_select.select()?;
 
-    if let ast::SelectVariant::Select(select) = select_variant {
+    if let Some(select) = ast_nav::select_from_variant(select_variant) {
         let select_clause = select.select_clause()?;
         let target_list = select_clause.target_list()?;
 
@@ -871,25 +821,24 @@ fn hover_qualified_star_columns_from_subquery(
     }
 
     let subquery_alias = subquery_alias_name(paren_select);
-    let results: Vec<Hover> =
-        resolve::collect_paren_select_columns_with_types(db, file, paren_select)
-            .into_iter()
-            .map(|(column_name, ty)| {
-                if let Some(alias) = &subquery_alias {
-                    return Hover::snippet(ColumnHover::table_column(
-                        &alias.to_string(),
-                        &column_name.to_string(),
-                    ));
-                }
-                if let Some(ty) = ty {
-                    return Hover::snippet(ColumnHover::anon_column_type(
-                        &column_name.to_string(),
-                        &ty.to_string(),
-                    ));
-                }
-                Hover::snippet(ColumnHover::anon_column(&column_name.to_string()))
-            })
-            .collect();
+    let results: Vec<Hover> = collect::paren_select_columns_with_types(db, file, paren_select)
+        .into_iter()
+        .map(|(column_name, ty)| {
+            if let Some(alias) = &subquery_alias {
+                return Hover::snippet(ColumnHover::table_column(
+                    &alias.to_string(),
+                    &column_name.to_string(),
+                ));
+            }
+            if let Some(ty) = ty {
+                return Hover::snippet(ColumnHover::anon_column_type(
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                ));
+            }
+            Hover::snippet(ColumnHover::anon_column(&column_name.to_string()))
+        })
+        .collect();
 
     merge_hovers(results)
 }
@@ -1211,7 +1160,30 @@ fn format_create_table(
     )))
 }
 
+fn format_create_table_as(
+    db: &dyn Db,
+    file: File,
+    create_table_as: ast::CreateTableAs,
+) -> Option<Hover> {
+    let path = create_table_as.path()?;
+    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let query = create_table_as.query()?.syntax().text().to_string();
+    Some(Hover::snippet(format!(
+        "table {}.{} as {}",
+        schema, table_name, query
+    )))
+}
+
 fn format_create_view(db: &dyn Db, file: File, create_view: ast::CreateView) -> Option<Hover> {
+    let create_view = ast::CreateViewLike::cast(create_view.syntax().clone())?;
+    format_create_view_like(db, file, create_view)
+}
+
+fn format_create_view_like(
+    db: &dyn Db,
+    file: File,
+    create_view: ast::CreateViewLike,
+) -> Option<Hover> {
     let path = create_view.path()?;
     // TODO: we use this to infer the schema, we should either rename this or
     // create a different function
@@ -1225,34 +1197,14 @@ fn format_create_view(db: &dyn Db, file: File, create_view: ast::CreateView) -> 
 
     let query = create_view.query()?.syntax().text().to_string();
 
-    Some(Hover::snippet(format!(
-        "view {}.{}{} as {}",
-        schema, view_name, column_list, query
-    )))
-}
-
-fn format_create_materialized_view(
-    db: &dyn Db,
-    file: File,
-    create_materialized_view: ast::CreateMaterializedView,
-) -> Option<Hover> {
-    let path = create_materialized_view.path()?;
-    let (schema, view_name) = resolve::resolve_view_info(db, file, &path)?;
-    let schema = schema.to_string();
-
-    let column_list = create_materialized_view
-        .column_list()
-        .map(|cl| cl.syntax().text().to_string())
-        .unwrap_or_default();
-
-    let query = create_materialized_view
-        .query()?
-        .syntax()
-        .text()
-        .to_string();
+    let view_kind = if create_view.syntax().kind() == SyntaxKind::CREATE_MATERIALIZED_VIEW {
+        "materialized view"
+    } else {
+        "view"
+    };
 
     Some(Hover::snippet(format!(
-        "materialized view {}.{}{} as {}",
+        "{view_kind} {}.{}{} as {}",
         schema, view_name, column_list, query
     )))
 }
@@ -3296,9 +3248,9 @@ select column1$0 from (values (1, 'foo'));
         assert_snapshot!(check_hover("
 with u as (select 1 id, 2 b)
 select u.*$0 from u;
-"), @r"
-        hover: column u.id
-              column u.b
+"), @"
+        hover: column u.id integer
+              column u.b integer
           ╭▸ 
         3 │ select u.* from u;
           ╰╴         ─ hover
@@ -3310,9 +3262,9 @@ select u.*$0 from u;
         assert_snapshot!(check_hover("
 with t as (values (1, 2), (3, 4))
 select t.*$0 from t;
-"), @r"
-        hover: column t.column1
-              column t.column2
+"), @"
+        hover: column t.column1 integer
+              column t.column2 integer
           ╭▸ 
         3 │ select t.* from t;
           ╰╴         ─ hover
@@ -3451,13 +3403,13 @@ select *$0 from t;
         assert_snapshot!(check_hover("
 with u as (select 1 id, 2 b)
 select *$0 from (select *, *, * from u);
-"), @r"
-        hover: column u.id
-              column u.b
-              column u.id
-              column u.b
-              column u.id
-              column u.b
+"), @"
+        hover: column u.id integer
+              column u.b integer
+              column u.id integer
+              column u.b integer
+              column u.id integer
+              column u.b integer
           ╭▸ 
         3 │ select * from (select *, *, * from u);
           ╰╴       ─ hover
@@ -3496,13 +3448,13 @@ select *$0 from (table t);
         assert_snapshot!(check_hover("
 select *$0 from information_schema.sql_features;
 "), @"
-        hover: column information_schema.sql_features.feature_id information_schema.character_data
-              column information_schema.sql_features.feature_name information_schema.character_data
-              column information_schema.sql_features.sub_feature_id information_schema.character_data
-              column information_schema.sql_features.sub_feature_name information_schema.character_data
-              column information_schema.sql_features.is_supported information_schema.yes_or_no
-              column information_schema.sql_features.is_verified_by information_schema.character_data
-              column information_schema.sql_features.comments information_schema.character_data
+        hover: column information_schema.sql_features.feature_id character_data
+              column information_schema.sql_features.feature_name character_data
+              column information_schema.sql_features.sub_feature_id character_data
+              column information_schema.sql_features.sub_feature_name character_data
+              column information_schema.sql_features.is_supported yes_or_no
+              column information_schema.sql_features.is_verified_by character_data
+              column information_schema.sql_features.comments character_data
           ╭▸ 
         2 │ select * from information_schema.sql_features;
           ╰╴       ─ hover
@@ -3538,12 +3490,56 @@ select *$0 from (select 1) as sub;
         assert_snapshot!(check_hover("
 create view v as select 1 id, 2 b;
 select v.*$0 from v;
-"), @r"
-        hover: column public.v.id
-              column public.v.b
+"), @"
+        hover: column public.v.id integer
+              column public.v.b integer
           ╭▸ 
         3 │ select v.* from v;
           ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_materialized_view_qualified_star() {
+        assert_snapshot!(check_hover("
+  create materialized view v as select 1 id, 2 b;
+  select v.*$0 from v;
+  "), @"
+        hover: column public.v.id integer
+              column public.v.b integer
+          ╭▸ 
+        3 │   select v.* from v;
+          ╰╴           ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_view_qualified_star_with_column_list() {
+        assert_snapshot!(check_hover("
+create view v (x, y) as select 1, 2, 3;
+select v.*$0 from v;
+"), @"
+        hover: column public.v.x integer
+              column public.v.y integer
+              column public.v.?column? integer
+          ╭▸ 
+        3 │ select v.* from v;
+          ╰╴         ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_materialized_view_qualified_star_with_column_list() {
+        assert_snapshot!(check_hover("
+create materialized view mv (x, y) as select 1, 2, 3;
+select mv.*$0 from mv;
+"), @"
+        hover: column public.mv.x integer
+              column public.mv.y integer
+              column public.mv.?column? integer
+          ╭▸ 
+        3 │ select mv.* from mv;
+          ╰╴          ─ hover
         ");
     }
 
@@ -4056,7 +4052,7 @@ select a$0, b from v;
     }
 
     #[test]
-    fn hover_on_select_column_from_create_table_as() {
+    fn hover_on_create_table_as_column() {
         assert_snapshot!(check_hover("
 create table t as select 1 a;
 select a$0 from t;
@@ -4065,6 +4061,19 @@ select a$0 from t;
           ╭▸ 
         3 │ select a from t;
           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_table_as_table() {
+        assert_snapshot!(check_hover("
+create table t as select 1 a;
+select a from t$0;
+"), @"
+        hover: table public.t as select 1 a
+          ╭▸ 
+        3 │ select a from t;
+          ╰╴              ─ hover
         ");
     }
 

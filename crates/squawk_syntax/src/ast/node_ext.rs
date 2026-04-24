@@ -461,6 +461,24 @@ impl ast::WithQuery {
     }
 }
 
+impl ast::SelectVariant {
+    #[inline]
+    pub fn target_list(&self) -> Option<ast::TargetList> {
+        match self {
+            ast::SelectVariant::Select(select) => {
+                return select.select_clause()?.target_list();
+            }
+            ast::SelectVariant::SelectInto(select_into) => {
+                return select_into.select_clause()?.target_list();
+            }
+            ast::SelectVariant::ParenSelect(paren_select) => {
+                return paren_select.select()?.target_list();
+            }
+            _ => return None,
+        }
+    }
+}
+
 impl ast::HasParamList for ast::FunctionSig {}
 impl ast::HasParamList for ast::Aggregate {}
 
