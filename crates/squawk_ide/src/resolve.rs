@@ -2002,7 +2002,8 @@ pub(crate) fn find_from_item_in_from_clause(
     from_clause: &ast::FromClause,
     qualifier: &Name,
 ) -> Option<ast::FromItem> {
-    ast_nav::iter_from_clause(from_clause).find(|from_item| is_from_item_match(from_item, qualifier))
+    ast_nav::iter_from_clause(from_clause)
+        .find(|from_item| is_from_item_match(from_item, qualifier))
 }
 
 fn find_from_item_for_select_qualified_name_ref(
@@ -2829,7 +2830,6 @@ fn table_ptr_from_paren_expr(
     }
     None
 }
-
 
 fn count_columns_for_target(
     db: &dyn Db,
