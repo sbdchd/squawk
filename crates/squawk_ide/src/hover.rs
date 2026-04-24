@@ -1,3 +1,4 @@
+use crate::ast_nav;
 use crate::builtins::builtins_file;
 use crate::classify::{NameClass, classify_name};
 use crate::collect;
@@ -454,17 +455,20 @@ fn hover_column_definition(
     )))
 }
 
-fn format_table_source(db: &dyn Db, file: File, source: resolve::TableSource) -> Option<Hover> {
+fn format_table_source(db: &dyn Db, file: File, source: ast_nav::ParentSouce) -> Option<Hover> {
     match source {
-        resolve::TableSource::Alias(alias) => format_alias_with_column_list(db, file, alias),
-        resolve::TableSource::WithTable(with_table) => format_with_table(with_table),
-        resolve::TableSource::CreateView(create_view) => {
+        ast_nav::ParentSouce::Alias(alias) => format_alias_with_column_list(db, file, alias),
+        ast_nav::ParentSouce::WithTable(with_table) => format_with_table(with_table),
+        ast_nav::ParentSouce::CreateView(create_view) => {
             format_create_view_like(db, file, create_view)
         }
-        resolve::TableSource::CreateTable(create_table) => {
+        ast_nav::ParentSouce::CreateTable(create_table) => {
             format_create_table(db, file, create_table)
         }
-        resolve::TableSource::ParenSelect(paren_select) => format_paren_select(paren_select),
+        ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
+            format_create_table_as(db, file, create_table_as)
+        }
+        ast_nav::ParentSouce::ParenSelect(paren_select) => format_paren_select(paren_select),
     }
 }
 
@@ -473,7 +477,7 @@ fn hover_table(db: &dyn Db, file: File, def_node: &SyntaxNode) -> Option<Hover> 
         return Some(result);
     }
 
-    if let Some(source) = resolve::find_table_source(def_node) {
+    if let Some(source) = ast_nav::parent_source(def_node) {
         return format_table_source(db, file, source);
     }
 
@@ -603,20 +607,23 @@ fn hover_qualified_star_columns(
         return hover_qualified_star_columns_from_subquery(db, file, &paren_select);
     }
 
-    match resolve::find_table_source(&table_name_node)? {
-        resolve::TableSource::Alias(alias) => {
+    match ast_nav::parent_source(&table_name_node)? {
+        ast_nav::ParentSouce::Alias(alias) => {
             hover_qualified_star_columns_from_alias(db, file, &alias)
         }
-        resolve::TableSource::WithTable(with_table) => {
+        ast_nav::ParentSouce::WithTable(with_table) => {
             hover_qualified_star_columns_from_cte(db, file, with_table)
         }
-        resolve::TableSource::CreateTable(create_table) => {
+        ast_nav::ParentSouce::CreateTable(create_table) => {
             hover_qualified_star_columns_from_table(db, file, create_table)
         }
-        resolve::TableSource::CreateView(create_view) => {
+        ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
+            hover_qualified_star_columns_from_table_as(db, file, &create_table_as)
+        }
+        ast_nav::ParentSouce::CreateView(create_view) => {
             hover_qualified_star_columns_from_view_like(db, file, &create_view)
         }
-        resolve::TableSource::ParenSelect(paren_select) => {
+        ast_nav::ParentSouce::ParenSelect(paren_select) => {
             hover_qualified_star_columns_from_subquery(db, file, &paren_select)
         }
     }
@@ -680,6 +687,38 @@ fn hover_qualified_star_columns_from_table(
                 &column_name.to_string(),
                 &ty.to_string(),
             )))
+        })
+        .collect();
+
+    merge_hovers(results)
+}
+
+fn hover_qualified_star_columns_from_table_as(
+    db: &dyn Db,
+    file: File,
+    create_table_as: &ast::CreateTableAs,
+) -> Option<Hover> {
+    let path = create_table_as.path()?;
+    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let schema_str = schema.to_string();
+
+    let columns = collect::create_table_as_columns_with_types(create_table_as);
+    let results: Vec<Hover> = columns
+        .into_iter()
+        .map(|(column_name, ty)| {
+            if let Some(ty) = ty {
+                return Hover::snippet(ColumnHover::schema_table_column_type(
+                    &schema_str,
+                    &table_name,
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                ));
+            }
+            Hover::snippet(ColumnHover::schema_table_column(
+                &schema_str,
+                &table_name,
+                &column_name.to_string(),
+            ))
         })
         .collect();
 
@@ -753,7 +792,7 @@ fn hover_qualified_star_columns_from_subquery(
 ) -> Option<Hover> {
     let select_variant = paren_select.select()?;
 
-    if let ast::SelectVariant::Select(select) = select_variant {
+    if let Some(select) = ast_nav::select_from_variant(select_variant) {
         let select_clause = select.select_clause()?;
         let target_list = select_clause.target_list()?;
 
@@ -1118,6 +1157,20 @@ fn format_create_table(
 
     Some(Hover::snippet(format!(
         "{foreign}table {schema}.{table_name}{args}"
+    )))
+}
+
+fn format_create_table_as(
+    db: &dyn Db,
+    file: File,
+    create_table_as: ast::CreateTableAs,
+) -> Option<Hover> {
+    let path = create_table_as.path()?;
+    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let query = create_table_as.query()?.syntax().text().to_string();
+    Some(Hover::snippet(format!(
+        "table {}.{} as {}",
+        schema, table_name, query
     )))
 }
 
@@ -3999,7 +4052,7 @@ select a$0, b from v;
     }
 
     #[test]
-    fn hover_on_select_column_from_create_table_as() {
+    fn hover_on_create_table_as_column() {
         assert_snapshot!(check_hover("
 create table t as select 1 a;
 select a$0 from t;
@@ -4008,6 +4061,19 @@ select a$0 from t;
           ╭▸ 
         3 │ select a from t;
           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_table_as_table() {
+        assert_snapshot!(check_hover("
+create table t as select 1 a;
+select a from t$0;
+"), @"
+        hover: table public.t as select 1 a
+          ╭▸ 
+        3 │ select a from t;
+          ╰╴              ─ hover
         ");
     }
 

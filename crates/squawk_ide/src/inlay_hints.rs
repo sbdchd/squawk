@@ -170,9 +170,7 @@ fn inlay_hint_insert_select(
     let target_list = match stmt {
         ast::Stmt::Select(select) => select.select_clause()?.target_list(),
         ast::Stmt::SelectInto(select_into) => select_into.select_clause()?.target_list(),
-        ast::Stmt::ParenSelect(paren_select) => {
-            target_list_from_select_variant(paren_select.select()?)
-        }
+        ast::Stmt::ParenSelect(paren_select) => paren_select.select()?.target_list(),
         _ => None,
     }?;
 
@@ -189,25 +187,6 @@ fn inlay_hint_insert_select(
     }
 
     Some(())
-}
-
-fn target_list_from_select_variant(select: ast::SelectVariant) -> Option<ast::TargetList> {
-    let mut current = select;
-    for _ in 0..100 {
-        match current {
-            ast::SelectVariant::Select(select) => {
-                return select.select_clause()?.target_list();
-            }
-            ast::SelectVariant::SelectInto(select_into) => {
-                return select_into.select_clause()?.target_list();
-            }
-            ast::SelectVariant::ParenSelect(paren_select) => {
-                current = paren_select.select()?;
-            }
-            _ => return None,
-        }
-    }
-    None
 }
 
 #[cfg(test)]

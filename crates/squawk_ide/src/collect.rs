@@ -1,13 +1,12 @@
-use crate::ast_nav::iter_from_clause;
+use crate::ast_nav;
 use crate::builtins::builtins_file;
 use crate::column_name::ColumnName;
 use crate::db::{File, bind, parse};
 use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
 use crate::resolve::{
-    ResolvedTableName, TableSource, extract_table_schema_from_path, find_from_item_in_from_clause,
-    find_table_source, qualified_star_table_name, resolve_cte_table, resolve_table_name,
-    resolve_table_name_ptr, resolve_view_name_ptr, select_from_with_query,
-    table_and_schema_from_from_item, table_ptr_from_from_item,
+    ResolvedTableName, extract_table_schema_from_path, find_from_item_in_from_clause,
+    qualified_star_table_name, resolve_cte_table, resolve_table_name, resolve_table_name_ptr,
+    resolve_view_name_ptr, table_and_schema_from_from_item, table_ptr_from_from_item,
 };
 use crate::symbols::{Name, SymbolKind};
 use salsa::Database as Db;
@@ -192,16 +191,16 @@ fn table_columns_impl(
     columns
 }
 
-fn select_from_view_like_query(create_view: &ast::CreateViewLike) -> Option<ast::Select> {
-    let query = create_view.query()?;
-    match query {
-        ast::SelectVariant::Select(select) => Some(select),
-        ast::SelectVariant::ParenSelect(paren_select) => match paren_select.select()? {
-            ast::SelectVariant::Select(select) => Some(select),
-            _ => None,
-        },
-        _ => None,
-    }
+pub(crate) fn create_table_as_columns_with_types(
+    create_table_as: &ast::CreateTableAs,
+) -> Vec<(Name, Option<Type>)> {
+    create_table_as
+        .query()
+        .and_then(ast_nav::select_from_variant)
+        .and_then(|x| x.select_clause())
+        .and_then(|x| x.target_list())
+        .map(|x| target_list_columns_with_types(&x))
+        .unwrap_or_default()
 }
 
 fn columns_from_returning_clause_with_types(
@@ -239,7 +238,7 @@ pub(crate) fn view_like_columns_with_types(
         .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
         .collect();
 
-    let Some(select) = select_from_view_like_query(create_view) else {
+    let Some(select) = create_view.query().and_then(ast_nav::select_from_variant) else {
         return vec![];
     };
     let Some(select_clause) = select.select_clause() else {
@@ -339,13 +338,10 @@ fn with_table_query_columns_with_types(
         return columns;
     }
 
-    let Some(cte_select) = select_from_with_query(query) else {
+    let Some(cte_select) = ast_nav::select_from_with_query(query) else {
         return vec![];
     };
-    let Some(select_clause) = cte_select.select_clause() else {
-        return vec![];
-    };
-    let Some(target_list) = select_clause.target_list() else {
+    let Some(target_list) = cte_select.select_clause().and_then(|x| x.target_list()) else {
         return vec![];
     };
 
@@ -388,7 +384,7 @@ fn columns_for_star_from_clause(
 ) -> Vec<(Name, Option<Type>)> {
     let mut columns = vec![];
 
-    for from_item in iter_from_clause(from_clause) {
+    for from_item in ast_nav::iter_from_clause(from_clause) {
         columns.extend(columns_for_star_from_from_item(db, file, &from_item));
     }
 
@@ -454,23 +450,26 @@ fn columns_for_star_from_table_ptr(
     let root = tree.syntax();
     let table_node = table_ptr.to_node(root);
 
-    if let Some(paren_select) = ast::ParenSelect::cast(table_node.clone()) {
-        return paren_select_columns_with_types(db, file, &paren_select);
-    }
-
-    match find_table_source(&table_node) {
-        Some(TableSource::Alias(alias)) => {
+    match ast_nav::parent_source(&table_node) {
+        Some(ast_nav::ParentSouce::Alias(alias)) => {
             let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
                 return vec![];
             };
             columns_for_star_from_alias(db, file, &from_item, &alias)
         }
-        Some(TableSource::WithTable(with_table)) => {
+        Some(ast_nav::ParentSouce::WithTable(with_table)) => {
             with_table_columns_with_types(db, file, with_table)
         }
-        Some(TableSource::CreateTable(create_table)) => table_columns(db, file, &create_table),
-        Some(TableSource::CreateView(create_view)) => view_like_columns_with_types(&create_view),
-        Some(TableSource::ParenSelect(paren_select)) => {
+        Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
+            table_columns(db, file, &create_table)
+        }
+        Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
+            create_table_as_columns_with_types(&create_table_as)
+        }
+        Some(ast_nav::ParentSouce::CreateView(create_view)) => {
+            view_like_columns_with_types(&create_view)
+        }
+        Some(ast_nav::ParentSouce::ParenSelect(paren_select)) => {
             paren_select_columns_with_types(db, file, &paren_select)
         }
         None => vec![],
@@ -597,25 +596,14 @@ pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodeP
     let root = source_file.syntax();
     let table_name_node = table_ptr.to_node(root);
 
-    if let Some(paren_select) = ast::ParenSelect::cast(table_name_node.clone()) {
-        let columns: Vec<Name> = paren_select_columns_with_types(db, file, &paren_select)
-            .into_iter()
-            .map(|(name, _ty)| name)
-            .collect();
-        if !columns.is_empty() {
-            return columns;
-        }
-        return star_column_names_from_paren_select(db, file, &paren_select);
-    }
-
-    match find_table_source(&table_name_node) {
-        Some(TableSource::Alias(alias)) => alias
+    match ast_nav::parent_source(&table_name_node) {
+        Some(ast_nav::ParentSouce::Alias(alias)) => alias
             .column_list()
             .into_iter()
             .flat_map(|column_list| column_list.columns())
             .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
             .collect(),
-        Some(TableSource::WithTable(with_table)) => {
+        Some(ast_nav::ParentSouce::WithTable(with_table)) => {
             let columns = with_table_column_names(db, file, with_table.clone());
             if !columns.is_empty() {
                 return columns;
@@ -623,19 +611,33 @@ pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodeP
 
             with_table_column_names(db, builtins_file(db), with_table)
         }
-        Some(TableSource::CreateTable(create_table)) => table_columns(db, file, &create_table)
-            .into_iter()
-            .map(|(name, _)| name)
-            .collect(),
-        Some(TableSource::CreateView(create_view)) => view_like_columns_with_types(&create_view)
-            .into_iter()
-            .map(|(name, _)| name)
-            .collect(),
-        Some(TableSource::ParenSelect(paren_select)) => {
-            paren_select_columns_with_types(db, file, &paren_select)
+        Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
+            table_columns(db, file, &create_table)
+                .into_iter()
+                .map(|(name, _)| name)
+                .collect()
+        }
+        Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
+            create_table_as_columns_with_types(&create_table_as)
+                .into_iter()
+                .map(|(name, _)| name)
+                .collect()
+        }
+        Some(ast_nav::ParentSouce::CreateView(create_view)) => {
+            view_like_columns_with_types(&create_view)
+                .into_iter()
+                .map(|(name, _)| name)
+                .collect()
+        }
+        Some(ast_nav::ParentSouce::ParenSelect(paren_select)) => {
+            let columns: Vec<Name> = paren_select_columns_with_types(db, file, &paren_select)
                 .into_iter()
                 .map(|(name, _ty)| name)
-                .collect()
+                .collect();
+            if !columns.is_empty() {
+                return columns;
+            }
+            return star_column_names_from_paren_select(db, file, &paren_select);
         }
         None => vec![],
     }
@@ -653,7 +655,7 @@ fn star_column_names_from_paren_select(
         return vec![];
     };
     let mut columns = vec![];
-    for from_item in iter_from_clause(&from_clause) {
+    for from_item in ast_nav::iter_from_clause(&from_clause) {
         if let Some(table_ptr) = table_ptr_from_from_item(db, file, &from_item) {
             columns.extend(star_column_names(db, file, &table_ptr));
         }
