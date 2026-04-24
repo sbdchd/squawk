@@ -1,6 +1,5 @@
 use crate::ast_nav;
 use crate::builtins::builtins_file;
-use crate::classify::{NameClass, classify_name};
 use crate::collect;
 use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
@@ -114,81 +113,69 @@ pub fn hover(db: &dyn Db, file: File, offset: TextSize) -> Option<Hover> {
             rowan::NodeOrToken::Token(token) => token.parent()?,
             rowan::NodeOrToken::Node(node) => node,
         };
-        return hover_name_ref(db, def.file, &name_ref, def.kind, &def_node);
+        return hover_name_ref(db, def.file, name_ref, def.kind, &def_node);
     }
 
     if let Some(name) = ast::Name::cast(parent) {
-        let context = classify_name(&name)?;
-        match context {
-            NameClass::ColumnDefinition {
-                create_table,
-                column,
-            } => return hover_column_definition(db, file, create_table, column),
-            NameClass::CreateTable(create_table) => {
-                return format_create_table(db, file, create_table);
+        return hover_name(db, file, name);
+    }
+
+    None
+}
+
+fn hover_name(db: &dyn Db, file: File, name: ast::Name) -> Option<Hover> {
+    let def_node = name.syntax();
+    match LocationKind::from_node(def_node)? {
+        LocationKind::Aggregate => hover_aggregate(db, file, def_node),
+        LocationKind::CaseExpr | LocationKind::CommitBegin | LocationKind::CommitEnd => None,
+        LocationKind::Channel => hover_channel(def_node),
+        LocationKind::Column => hover_name_column(db, file, def_node),
+        LocationKind::Cursor => hover_cursor(def_node),
+        LocationKind::Database => hover_database(def_node),
+        LocationKind::EventTrigger => hover_event_trigger(def_node),
+        LocationKind::Extension => hover_extension(def_node),
+        LocationKind::Function => hover_function(db, file, def_node),
+        LocationKind::Index => hover_index(db, file, def_node),
+        LocationKind::NamedArgParameter => hover_named_arg_parameter(db, file, def_node),
+        LocationKind::Policy => hover_policy(db, file, def_node),
+        LocationKind::PreparedStatement => hover_prepared_statement(def_node),
+        LocationKind::Procedure => hover_procedure(db, file, def_node),
+        LocationKind::PropertyGraph => hover_property_graph(db, file, def_node),
+        LocationKind::Role => hover_role(def_node),
+        LocationKind::Schema => hover_schema(def_node),
+        LocationKind::Sequence => hover_sequence(db, file, def_node),
+        LocationKind::Server => hover_server(def_node),
+        LocationKind::Table => hover_table(db, file, def_node),
+        LocationKind::Tablespace => hover_tablespace(def_node),
+        LocationKind::View => {
+            if let Some(hover) = format_create_view(db, file, def_node) {
+                return Some(hover);
             }
-            NameClass::WithTable(with_table) => return format_with_table(with_table),
-            NameClass::CreateIndex(create_index) => {
-                return format_create_index(db, file, create_index);
-            }
-            NameClass::CreateSequence(create_sequence) => {
-                return format_create_sequence(db, file, create_sequence);
-            }
-            NameClass::CreateTrigger(create_trigger) => {
-                return format_create_trigger(db, file, create_trigger);
-            }
-            NameClass::CreateEventTrigger(create_event_trigger) => {
-                return format_create_event_trigger(create_event_trigger);
-            }
-            NameClass::CreateTablespace(create_tablespace) => {
-                return format_create_tablespace(create_tablespace);
-            }
-            NameClass::CreateDatabase(create_database) => {
-                return format_create_database(create_database);
-            }
-            NameClass::CreateServer(create_server) => {
-                return format_create_server(create_server);
-            }
-            NameClass::CreateExtension(create_extension) => {
-                return format_create_extension(create_extension);
-            }
-            NameClass::CreateRole(create_role) => {
-                return format_create_role(create_role);
-            }
-            NameClass::CreateType(create_type) => {
-                return format_create_type(db, file, create_type);
-            }
-            NameClass::CreateFunction(create_function) => {
-                return format_create_function(db, file, create_function);
-            }
-            NameClass::CreateAggregate(create_aggregate) => {
-                return format_create_aggregate(db, file, create_aggregate);
-            }
-            NameClass::CreateProcedure(create_procedure) => {
-                return format_create_procedure(db, file, create_procedure);
-            }
-            NameClass::CreateSchema(create_schema) => {
-                return format_create_schema(create_schema);
-            }
-            NameClass::ViewColumnList { create_view, name } => {
-                return format_view_column(db, file, create_view, Name::from_node(&name));
-            }
-            NameClass::CreateView(create_view) => {
-                return format_create_view(db, file, create_view);
-            }
-            NameClass::CreatePropertyGraph(create_property_graph) => {
-                return format_create_property_graph(db, file, create_property_graph);
-            }
-            NameClass::DeclareCursor(declare) => {
-                return format_declare_cursor(declare);
-            }
-            NameClass::PrepareStatement(prepare) => {
-                return format_prepare(prepare);
-            }
-            NameClass::Listen(listen) => {
-                return format_listen(listen);
-            }
+            hover_table(db, file, def_node)
         }
+        LocationKind::Trigger => hover_trigger(db, file, def_node),
+        LocationKind::Type => hover_type(db, file, def_node),
+        LocationKind::Window => hover_window(def_node),
+    }
+}
+
+fn hover_name_column(db: &dyn Db, file: File, def_node: &SyntaxNode) -> Option<Hover> {
+    if let Some(result) = hover_composite_type_field(db, file, def_node) {
+        return Some(result);
+    }
+
+    if let Some(column) = def_node.parent().and_then(ast::Column::cast)
+        && let Some(create_table) = def_node.ancestors().find_map(ast::CreateTableLike::cast)
+    {
+        return hover_column_definition(db, file, create_table, column);
+    }
+
+    if def_node
+        .ancestors()
+        .any(|ancestor| ast::ColumnList::can_cast(ancestor.kind()))
+        && let Some(create_view) = def_node.ancestors().find_map(ast::CreateView::cast)
+    {
+        return format_view_column(db, file, create_view, def_node);
     }
 
     None
@@ -197,7 +184,7 @@ pub fn hover(db: &dyn Db, file: File, offset: TextSize) -> Option<Hover> {
 fn hover_name_ref(
     db: &dyn Db,
     file: File,
-    name_ref: &ast::NameRef,
+    name_ref: ast::NameRef,
     context: LocationKind,
     def_node: &SyntaxNode,
 ) -> Option<Hover> {
@@ -280,8 +267,8 @@ impl ColumnHover {
     }
 }
 
-fn hover_column(db: &dyn Db, file: File, name_ref: &ast::NameRef) -> Option<Hover> {
-    let column_ptrs = resolve::resolve_name_ref_ptrs(db, file, name_ref)?;
+fn hover_column(db: &dyn Db, file: File, name_ref: ast::NameRef) -> Option<Hover> {
+    let column_ptrs = resolve::resolve_name_ref_ptrs(db, file, &name_ref)?;
 
     let results: Vec<Hover> = column_ptrs
         .into_iter()
@@ -844,10 +831,10 @@ fn hover_subquery_target_column(
     }
 
     let result = match target.expr()? {
-        ast::Expr::NameRef(name_ref) => hover_column(db, file, &name_ref),
+        ast::Expr::NameRef(name_ref) => hover_column(db, file, name_ref),
         ast::Expr::FieldExpr(field_expr) => {
             let field = field_expr.field()?;
-            hover_column(db, file, &field)
+            hover_column(db, file, field)
         }
         _ => None,
     };
@@ -901,22 +888,37 @@ fn hover_event_trigger(def_node: &SyntaxNode) -> Option<Hover> {
 }
 
 fn hover_tablespace(def_node: &SyntaxNode) -> Option<Hover> {
+    if let Some(create_tablespace) = def_node.ancestors().find_map(ast::CreateTablespace::cast) {
+        return format_create_tablespace(create_tablespace);
+    }
     Some(Hover::snippet(format!("tablespace {}", def_node.text())))
 }
 
 fn hover_database(def_node: &SyntaxNode) -> Option<Hover> {
+    if let Some(create_database) = def_node.ancestors().find_map(ast::CreateDatabase::cast) {
+        return format_create_database(create_database);
+    }
     Some(Hover::snippet(format!("database {}", def_node.text())))
 }
 
 fn hover_server(def_node: &SyntaxNode) -> Option<Hover> {
+    if let Some(create_server) = def_node.ancestors().find_map(ast::CreateServer::cast) {
+        return format_create_server(create_server);
+    }
     Some(Hover::snippet(format!("server {}", def_node.text())))
 }
 
 fn hover_extension(def_node: &SyntaxNode) -> Option<Hover> {
+    if let Some(create_extension) = def_node.ancestors().find_map(ast::CreateExtension::cast) {
+        return format_create_extension(create_extension);
+    }
     Some(Hover::snippet(format!("extension {}", def_node.text())))
 }
 
 fn hover_role(def_node: &SyntaxNode) -> Option<Hover> {
+    if let Some(create_role) = def_node.ancestors().find_map(ast::CreateRole::cast) {
+        return format_create_role(create_role);
+    }
     Some(Hover::snippet(format!("role {}", def_node.text())))
 }
 
@@ -1009,8 +1011,8 @@ fn format_create_table_as(
     )))
 }
 
-fn format_create_view(db: &dyn Db, file: File, create_view: ast::CreateView) -> Option<Hover> {
-    let create_view = ast::CreateViewLike::cast(create_view.syntax().clone())?;
+fn format_create_view(db: &dyn Db, file: File, def_node: &SyntaxNode) -> Option<Hover> {
+    let create_view = ast::CreateViewLike::cast(def_node.clone())?;
     format_create_view_like(db, file, create_view)
 }
 
@@ -1048,14 +1050,14 @@ fn format_view_column(
     db: &dyn Db,
     file: File,
     create_view: ast::CreateView,
-    column_name: Name,
+    def_node: &SyntaxNode,
 ) -> Option<Hover> {
     let path = create_view.path()?;
     let (schema, view_name) = resolve::resolve_view_info(db, file, &path)?;
     Some(Hover::snippet(ColumnHover::schema_table_column(
         &schema.to_string(),
         &view_name,
-        &column_name.to_string(),
+        &def_node.to_string(),
     )))
 }
 
