@@ -42,7 +42,9 @@ pub(crate) fn infer_type_from_expr(expr: &ast::Expr) -> Option<Type> {
             let elem_ty = infer_type_from_expr(&first_elem)?;
             Some(Type::Array(Box::new(elem_ty)))
         }
-        ast::Expr::BinExpr(_bin_expr) => todo!(),
+        // TODO: we need to infer both lhs and rhs, BUT we also need to support
+        // looking up the operator since there's operator overloading
+        ast::Expr::BinExpr(_bin_expr) => None,
         ast::Expr::Literal(literal) => infer_type_from_literal(literal),
         ast::Expr::ParenExpr(paren) => paren.expr().and_then(|e| infer_type_from_expr(&e)),
         ast::Expr::TupleExpr(_) => Some(Type::Record),

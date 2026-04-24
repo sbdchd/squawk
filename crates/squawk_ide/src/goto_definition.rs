@@ -2715,6 +2715,34 @@ select v$0.id from v;
     }
 
     #[test]
+    fn goto_select_into_column() {
+        assert_snapshot!(goto("
+select 1 a into t;
+select a$0 from t;
+"), @"
+          ╭▸ 
+        2 │ select 1 a into t;
+          │          ─ 2. destination
+        3 │ select a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_into_table() {
+        assert_snapshot!(goto("
+select 1 a into t;
+select a from t$0;
+"), @"
+          ╭▸ 
+        2 │ select 1 a into t;
+          │                 ─ 2. destination
+        3 │ select a from t;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_as_column() {
         assert_snapshot!(goto("
 create table t as select 1 a;

@@ -3,6 +3,7 @@ use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 
+use crate::ast_nav;
 use crate::binder;
 use crate::collect;
 use crate::db::{File, bind, parse};
@@ -343,8 +344,8 @@ fn column_completions_from_clause(
     let syntax_root = from_clause.syntax().ancestors().last().unwrap();
     for table_ptr in resolve::table_ptrs_from_clause(db, file, from_clause) {
         let table_node = table_ptr.to_node(&syntax_root);
-        match resolve::find_table_source(&table_node) {
-            Some(resolve::TableSource::CreateTable(create_table)) => {
+        match ast_nav::parent_source(&table_node) {
+            Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
                 let columns = collect::table_columns(db, file, &create_table);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
@@ -356,7 +357,7 @@ fn column_completions_from_clause(
                     sort_text: None,
                 }));
             }
-            Some(resolve::TableSource::WithTable(with_table)) => {
+            Some(ast_nav::ParentSouce::WithTable(with_table)) => {
                 let columns = collect::with_table_columns_with_types(db, file, with_table);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
@@ -368,7 +369,19 @@ fn column_completions_from_clause(
                     sort_text: None,
                 }));
             }
-            Some(resolve::TableSource::CreateView(create_view)) => {
+            Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
+                let columns = collect::create_table_as_columns_with_types(&create_table_as);
+                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
+                    label: name.to_string(),
+                    kind: CompletionItemKind::Column,
+                    detail: ty.map(|t| t.to_string()),
+                    insert_text: None,
+                    insert_text_format: None,
+                    trigger_completion_after_insert: false,
+                    sort_text: None,
+                }));
+            }
+            Some(ast_nav::ParentSouce::CreateView(create_view)) => {
                 let columns = collect::view_like_columns_with_types(&create_view);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
@@ -380,7 +393,7 @@ fn column_completions_from_clause(
                     sort_text: None,
                 }));
             }
-            Some(resolve::TableSource::Alias(alias)) => {
+            Some(ast_nav::ParentSouce::Alias(alias)) => {
                 let alias_columns: Vec<Name> = alias
                     .column_list()
                     .into_iter()
@@ -418,7 +431,7 @@ fn column_completions_from_clause(
                         }),
                 );
             }
-            Some(resolve::TableSource::ParenSelect(paren_select)) => {
+            Some(ast_nav::ParentSouce::ParenSelect(paren_select)) => {
                 let columns = collect::paren_select_columns_with_types(db, file, &paren_select);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
@@ -451,32 +464,38 @@ fn alias_base_columns_with_types(
 
     let table_node = table_ptr.to_node(syntax_root);
 
-    match resolve::find_table_source(&table_node) {
-        Some(resolve::TableSource::CreateTable(create_table)) => {
+    match ast_nav::parent_source(&table_node) {
+        Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
             collect::table_columns(db, file, &create_table)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
         }
-        Some(resolve::TableSource::WithTable(with_table)) => {
+        Some(ast_nav::ParentSouce::WithTable(with_table)) => {
             collect::with_table_columns_with_types(db, file, with_table)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
         }
-        Some(resolve::TableSource::CreateView(create_view)) => {
+        Some(ast_nav::ParentSouce::CreateView(create_view)) => {
             collect::view_like_columns_with_types(&create_view)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
         }
-        Some(resolve::TableSource::ParenSelect(paren_select)) => {
+        Some(ast_nav::ParentSouce::ParenSelect(paren_select)) => {
             collect::paren_select_columns_with_types(db, file, &paren_select)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
         }
-        Some(resolve::TableSource::Alias(_)) | None => vec![],
+        Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
+            collect::create_table_as_columns_with_types(&create_table_as)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(ast_nav::ParentSouce::Alias(_)) | None => vec![],
     }
 }
 
