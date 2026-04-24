@@ -120,6 +120,7 @@ pub(crate) fn select_from_variant(select_variant: ast::SelectVariant) -> Option<
     }
 }
 
+#[derive(Debug)]
 pub(crate) enum ParentSouce {
     Alias(ast::Alias),
     CreateTable(ast::CreateTableLike),
@@ -135,9 +136,11 @@ pub(crate) fn parent_source(node: &SyntaxNode) -> Option<ParentSouce> {
     }
 
     for ancestor in node.ancestors() {
-        if let Some(alias) = ast::Alias::cast(ancestor.clone())
-            && alias.column_list().is_some()
-        {
+        if let Some(paren_select) = ast::ParenSelect::cast(ancestor.clone()) {
+            return Some(ParentSouce::ParenSelect(paren_select));
+        }
+
+        if let Some(alias) = ast::Alias::cast(ancestor.clone()) {
             return Some(ParentSouce::Alias(alias));
         }
 

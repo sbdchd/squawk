@@ -1,78 +1,39 @@
-use crate::builtins::builtins_file;
 use crate::db::{File, parse};
-use crate::location::{Location, LocationKind};
-use crate::offsets::token_from_offset;
-use crate::resolve;
+use crate::goto_definition;
+use crate::location::Location;
 use rowan::TextSize;
 use salsa::Database as Db;
-use smallvec::{SmallVec, smallvec};
-use squawk_syntax::{
-    SyntaxNodePtr,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 #[salsa::tracked]
 pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Location> {
-    let Some((target_file, target_defs, target_kind)) = find_target_defs(db, offset, file) else {
+    let targets = goto_definition::goto_definition(db, file, offset);
+    let Some(first) = targets.first() else {
         return vec![];
     };
 
-    let mut refs: Vec<Location> = vec![];
+    let mut refs = targets.to_vec();
 
-    for ptr in &target_defs {
-        refs.push(Location {
-            file: target_file,
-            range: ptr.text_range(),
-            kind: target_kind,
-        });
-    }
-
-    for node in parse(db, file).tree().syntax().descendants() {
-        if let Some(name_ref) = ast::NameRef::cast(node) {
-            // Check if the ref matches one of the defs
-            if let Some(found_defs) = resolve::resolve_name_ref_ptrs(db, target_file, &name_ref)
-                && found_defs.iter().any(|def| target_defs.contains(def))
-            {
-                refs.push(Location {
-                    file,
-                    range: name_ref.syntax().text_range(),
-                    kind: target_kind,
-                });
-            }
+    for node in parse(db, file)
+        .tree()
+        .syntax()
+        .descendants()
+        .filter(|x| ast::NameRef::can_cast(x.kind()))
+    {
+        let range = node.text_range();
+        let matches = goto_definition::goto_definition(db, file, range.start())
+            .into_iter()
+            .any(|location| targets.contains(&location));
+        if matches {
+            refs.push(Location {
+                file,
+                range,
+                kind: first.kind,
+            });
         }
     }
-
     refs.sort_by_key(|loc| (loc.file != file, loc.range.start()));
     refs
-}
-
-fn find_target_defs(
-    db: &dyn Db,
-    offset: TextSize,
-    current_file: File,
-) -> Option<(File, SmallVec<[SyntaxNodePtr; 1]>, LocationKind)> {
-    let token = token_from_offset(db, current_file, offset)?;
-    let parent = token.parent()?;
-
-    if let Some(name) = ast::Name::cast(parent.clone())
-        && let Some(kind) = LocationKind::from_node(name.syntax())
-    {
-        return Some((
-            current_file,
-            smallvec![SyntaxNodePtr::new(name.syntax())],
-            kind,
-        ));
-    }
-
-    if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for target_file in [current_file, builtins_file(db)] {
-            if let Some((ptrs, kind)) = resolve::resolve_name_ref(db, target_file, &name_ref) {
-                return Some((target_file, ptrs, kind));
-            }
-        }
-    }
-
-    None
 }
 
 #[cfg(test)]
