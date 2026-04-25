@@ -122,11 +122,12 @@ fn inlay_hint_insert(
         column_list
             .columns()
             .filter_map(|col| {
-                let col_name = resolve::extract_column_name(&col)?;
+                let col_name = col.name_ref().map(|x| Name::from_node(&x))?;
                 let target = create_table
                     .as_ref()
                     .and_then(|x| resolve::find_column_in_create_table(db, def_file, x, &col_name))
-                    .map(|x| x.text_range());
+                    .and_then(|x| x.into_iter().next())
+                    .map(|x| x.range);
                 Some((col_name, target, location.as_ref().map(|x| x.file)))
             })
             .collect()
