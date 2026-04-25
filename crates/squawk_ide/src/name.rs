@@ -56,8 +56,7 @@ pub(crate) fn schema_and_table_name(name_ref: &ast::NameRef) -> Option<(Option<S
 pub(crate) fn schema_and_name(name_ref: &ast::NameRef) -> (Option<Schema>, Name) {
     let table_name = Name::from_node(name_ref);
     let schema = if let Some(parent) = name_ref.syntax().parent()
-        && let Some(field_expr) = ast::FieldExpr::cast(parent)
-        && let Some(base) = field_expr.base()
+        && let Some(base) = ast::FieldExpr::cast(parent).and_then(|x| x.base())
         && let Some(schema_name_ref) = ast::NameRef::cast(base.syntax().clone())
     {
         Some(Schema(Name::from_node(&schema_name_ref)))
@@ -85,8 +84,13 @@ pub(crate) fn schema_and_func_name(call_expr: &ast::CallExpr) -> Option<(Option<
 
 pub(crate) fn table_name(path: &ast::Path) -> Option<Name> {
     let segment = path.segment()?;
-    let name_ref = segment.name_ref()?;
-    Some(Name::from_node(&name_ref))
+    if let Some(name_ref) = segment.name_ref() {
+        return Some(Name::from_node(&name_ref));
+    }
+    if let Some(name) = segment.name() {
+        return Some(Name::from_node(&name));
+    }
+    None
 }
 
 pub(crate) fn schema_name(path: &ast::Path) -> Option<Schema> {
@@ -94,6 +98,42 @@ pub(crate) fn schema_name(path: &ast::Path) -> Option<Schema> {
         .and_then(|q| q.segment())
         .and_then(|s| s.name_ref())
         .map(|name_ref| Schema(Name::from_node(&name_ref)))
+}
+
+pub(crate) fn schema_and_table_from_from_item(
+    from_item: &ast::FromItem,
+) -> Option<(Option<Schema>, Name)> {
+    if let Some(name_ref_node) = from_item.name_ref() {
+        Some((None, Name::from_node(&name_ref_node)))
+    } else if let Some(from_field_expr) = from_item.field_expr() {
+        let table_name = Name::from_node(&from_field_expr.field()?);
+        let ast::Expr::NameRef(schema_name_ref) = from_field_expr.base()? else {
+            return None;
+        };
+        let schema = Schema(Name::from_node(&schema_name_ref));
+        Some((Some(schema), table_name))
+    } else {
+        None
+    }
+}
+
+pub(crate) fn schema_and_table_from_field_expr(
+    field_expr: &ast::FieldExpr,
+) -> Option<(Option<Schema>, Name)> {
+    match field_expr.base()? {
+        ast::Expr::NameRef(name_ref) => Some((None, Name::from_node(&name_ref))),
+        ast::Expr::FieldExpr(field_expr) => {
+            let field = field_expr.field()?;
+            let ast::Expr::NameRef(schema) = field_expr.base()? else {
+                return None;
+            };
+            Some((
+                Some(Schema(Name::from_node(&schema))),
+                Name::from_node(&field),
+            ))
+        }
+        _ => None,
+    }
 }
 
 pub(crate) fn schema_and_type_name(ty: &ast::Type) -> Option<(Option<Schema>, Name)> {
@@ -116,8 +156,7 @@ pub(crate) fn schema_and_type_name(ty: &ast::Type) -> Option<(Option<Schema>, Na
             schema_and_name_path(&path)
         }
         ast::Type::ExprType(expr_type) => {
-            let expr = expr_type.expr()?;
-            if let ast::Expr::FieldExpr(field_expr) = expr
+            if let ast::Expr::FieldExpr(field_expr) = expr_type.expr()?
                 && let Some(field) = field_expr.field()
                 && let Some(ast::Expr::NameRef(schema_name_ref)) = field_expr.base()
             {
