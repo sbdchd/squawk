@@ -7,8 +7,9 @@ use crate::ast_nav;
 use crate::binder;
 use crate::collect;
 use crate::db::{File, bind, parse};
+use crate::name::{self, Name, Schema};
 use crate::resolve;
-use crate::symbols::{Name, Schema, SymbolKind};
+use crate::symbols::SymbolKind;
 use crate::tokens::is_string_or_comment;
 
 const COMPLETION_MARKER: &str = "squawkCompletionMarker";
@@ -625,7 +626,7 @@ fn delete_expr_completions(
         return completions;
     };
 
-    let Some(delete_table_name) = resolve::extract_table_name(&path) else {
+    let Some(delete_table_name) = name::table_name(&path) else {
         return completions;
     };
 
@@ -667,7 +668,7 @@ fn delete_expr_completions(
         });
     }
 
-    let schema = resolve::extract_schema_name(&path);
+    let schema = name::schema_name(&path);
     if let Some(table_ptr) =
         binder.lookup_with(&delete_table_name, SymbolKind::Table, position, &schema)
         && let Some(create_table) = table_ptr
