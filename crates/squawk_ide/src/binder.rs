@@ -132,16 +132,15 @@ impl Binder {
 
     pub(crate) fn lookup_info(
         &self,
-        name_str: String,
-        schema: &Option<String>,
+        name: &Name,
+        schema: Option<&Schema>,
         kind: SymbolKind,
         position: TextSize,
     ) -> Option<(Schema, String)> {
-        let name_normalized = Name::from_string(name_str.clone());
-        let symbols = self.scope.get(&name_normalized)?;
+        let symbols = self.scope.get(name)?;
 
-        let search_paths = match schema {
-            Some(schema_name) => &[Schema::new(schema_name)],
+        let search_paths: &[Schema] = match schema {
+            Some(s) => std::slice::from_ref(s),
             None => self.search_path_at(position),
         };
 
@@ -151,7 +150,7 @@ impl Binder {
                 symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
             }) {
                 let symbol = &self.symbols[symbol_id];
-                return Some((symbol.schema.clone()?, name_str));
+                return Some((symbol.schema.clone()?, name.to_string()));
             }
         }
         None

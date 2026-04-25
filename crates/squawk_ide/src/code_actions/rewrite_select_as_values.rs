@@ -1,12 +1,13 @@
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
-use squawk_syntax::{
-    SyntaxToken,
-    ast::{self, AstNode},
-};
-use std::iter;
+use squawk_syntax::ast::{self, AstNode};
 
-use crate::{db::File, offsets::token_from_offset, symbols::Name};
+use crate::{
+    ast_nav::{self, SelectContext},
+    db::File,
+    offsets::token_from_offset,
+    symbols::Name,
+};
 
 use super::{ActionKind, CodeAction};
 
@@ -18,7 +19,7 @@ pub(super) fn rewrite_select_as_values(
 ) -> Option<()> {
     let token = token_from_offset(db, file, offset)?;
 
-    let parent = find_select_parent(token)?;
+    let parent = ast_nav::find_select_parent(token)?;
 
     let mut selects = parent.iter()?.peekable();
     let select_token_start = selects
@@ -79,67 +80,6 @@ fn is_values_row_column_name(target: &ast::Target, idx: usize) -> bool {
         return false;
     }
     true
-}
-
-enum SelectContext {
-    Compound(ast::CompoundSelect),
-    Single(ast::Select),
-}
-
-impl SelectContext {
-    fn iter(&self) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
-        fn variant_iter(
-            variant: ast::SelectVariant,
-        ) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
-            match variant {
-                ast::SelectVariant::Select(select) => Some(Box::new(iter::once(select))),
-                ast::SelectVariant::CompoundSelect(compound) => compound_iter(&compound),
-                ast::SelectVariant::ParenSelect(_)
-                | ast::SelectVariant::SelectInto(_)
-                | ast::SelectVariant::Table(_)
-                | ast::SelectVariant::Values(_) => None,
-            }
-        }
-
-        fn compound_iter(
-            node: &ast::CompoundSelect,
-        ) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
-            let lhs_iter = node
-                .lhs()
-                .map(variant_iter)
-                .unwrap_or_else(|| Some(Box::new(iter::empty())))?;
-            let rhs_iter = node
-                .rhs()
-                .map(variant_iter)
-                .unwrap_or_else(|| Some(Box::new(iter::empty())))?;
-            Some(Box::new(lhs_iter.chain(rhs_iter)))
-        }
-
-        match self {
-            SelectContext::Compound(compound) => compound_iter(compound),
-            SelectContext::Single(select) => Some(Box::new(iter::once(select.clone()))),
-        }
-    }
-}
-
-fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
-    let mut found_select = None;
-    let mut found_compound = None;
-    for node in token.parent_ancestors() {
-        if let Some(compound_select) = ast::CompoundSelect::cast(node.clone()) {
-            if compound_select.union_token().is_some() && compound_select.all_token().is_some() {
-                found_compound = Some(SelectContext::Compound(compound_select));
-            } else {
-                break;
-            }
-        }
-        if found_select.is_none()
-            && let Some(select) = ast::Select::cast(node)
-        {
-            found_select = Some(SelectContext::Single(select));
-        }
-    }
-    found_compound.or(found_select)
 }
 
 #[cfg(test)]

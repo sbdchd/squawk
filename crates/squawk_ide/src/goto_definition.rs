@@ -4630,6 +4630,23 @@ select u.id$0 from u;
     }
 
     #[test]
+    fn goto_qualified_table_ref_prefers_schema_qualified_from_item_over_cte() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t(a int);
+with t as (select 1 a)
+select t$0.a from s.t;
+"), @r"
+          ╭▸ 
+        3 │ create table s.t(a int);
+          │                ─ 2. destination
+        4 │ with t as (select 1 a)
+        5 │ select t.a from s.t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_subquery_qualified_column() {
         assert_snapshot!(goto("
 select t.a$0 from (select 1 a) t;

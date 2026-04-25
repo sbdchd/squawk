@@ -2,9 +2,10 @@
 ///
 /// There shouldn't be any dependency on Salsa.
 use squawk_syntax::{
-    SyntaxNode,
+    SyntaxNode, SyntaxToken,
     ast::{self, AstNode},
 };
+use std::iter;
 
 use crate::symbols::Name;
 
@@ -72,6 +73,71 @@ pub(crate) fn node_parent_query(node: &SyntaxNode) -> Option<ParentQuery> {
     }
 
     None
+}
+
+#[derive(Debug)]
+pub(crate) enum SelectContext {
+    Compound(ast::CompoundSelect),
+    Single(ast::Select),
+}
+
+impl SelectContext {
+    pub(crate) fn iter(&self) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
+        fn variant_iter(
+            variant: ast::SelectVariant,
+        ) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
+            match variant {
+                ast::SelectVariant::Select(select) => Some(Box::new(iter::once(select))),
+                ast::SelectVariant::CompoundSelect(compound) => compound_iter(&compound),
+                ast::SelectVariant::ParenSelect(_)
+                | ast::SelectVariant::SelectInto(_)
+                | ast::SelectVariant::Table(_)
+                | ast::SelectVariant::Values(_) => None,
+            }
+        }
+
+        fn compound_iter(
+            node: &ast::CompoundSelect,
+        ) -> Option<Box<dyn Iterator<Item = ast::Select>>> {
+            let lhs_iter = node
+                .lhs()
+                .map(variant_iter)
+                .unwrap_or_else(|| Some(Box::new(iter::empty())))?;
+            let rhs_iter = node
+                .rhs()
+                .map(variant_iter)
+                .unwrap_or_else(|| Some(Box::new(iter::empty())))?;
+            Some(Box::new(lhs_iter.chain(rhs_iter)))
+        }
+
+        match self {
+            SelectContext::Compound(compound) => compound_iter(compound),
+            SelectContext::Single(select) => Some(Box::new(iter::once(select.clone()))),
+        }
+    }
+}
+
+pub(crate) fn find_select_parent(token: SyntaxToken) -> Option<SelectContext> {
+    let mut found_select = None;
+    let mut found_compound = None;
+
+    for ancestor in token.parent_ancestors() {
+        if let Some(compound_select) = ast::CompoundSelect::cast(ancestor.clone()) {
+            if compound_select.union_token().is_some() && compound_select.all_token().is_some() {
+                found_compound = Some(SelectContext::Compound(compound_select));
+            } else {
+                break;
+            }
+        }
+
+        if found_select.is_none()
+            && let Some(select) = ast::Select::cast(ancestor)
+        {
+            found_select = Some(SelectContext::Single(select));
+        }
+    }
+
+    found_compound.or(found_select)
 }
 
 ///
@@ -162,6 +228,28 @@ pub(crate) fn parent_source(node: &SyntaxNode) -> Option<ParentSouce> {
     }
 
     None
+}
+
+struct UnwrapParenExpr {
+    current: Option<ast::Expr>,
+}
+
+impl Iterator for UnwrapParenExpr {
+    type Item = ast::Expr;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let expr = self.current.take()?;
+        if let ast::Expr::ParenExpr(paren_expr) = &expr {
+            self.current = paren_expr.expr();
+        }
+        Some(expr)
+    }
+}
+
+pub(crate) fn unwrap_paren_expr(expr: ast::Expr) -> impl Iterator<Item = ast::Expr> {
+    UnwrapParenExpr {
+        current: Some(expr),
+    }
 }
 
 pub(crate) fn iter_from_clause(

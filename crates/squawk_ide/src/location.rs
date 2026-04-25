@@ -39,12 +39,6 @@ pub enum LocationKind {
     Window,
 }
 
-impl LocationKind {
-    pub(crate) fn from_node(node: &SyntaxNode) -> Option<LocationKind> {
-        classify_def_node(node)
-    }
-}
-
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Location {
     pub file: File,
@@ -58,7 +52,7 @@ impl Location {
     }
 
     pub(crate) fn from_node(file: File, node: &SyntaxNode) -> Option<Location> {
-        let kind = LocationKind::from_node(node)?;
+        let kind = classify_def_node(node)?;
         Some(Location::new(file, node.text_range(), kind))
     }
 

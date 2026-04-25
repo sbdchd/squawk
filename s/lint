@@ -3,8 +3,8 @@ set -e
 
 if [ -n "$CI" ]; then
   cargo fmt -- --check
-  cargo clippy --all-targets --all-features -- -D warnings
-  cargo check --locked
+  cargo clippy --workspace --all-targets --all-features -- -D warnings
+  cargo check --workspace --locked
 else
   cargo fmt
   ./s/oxfmt
