@@ -3,11 +3,12 @@ use crate::builtins::builtins_file;
 use crate::column_name::ColumnName;
 use crate::db::{File, bind, parse};
 use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
+use crate::name::{self, Name};
 use crate::resolve::{
-    ResolvedTableName, extract_table_schema_from_path, find_from_item_in_from_clause,
-    qualified_star_table_name, resolve_cte_table, resolve_table_name, table_ptr_from_from_item,
+    ResolvedTableName, find_from_item_in_from_clause, qualified_star_table_name, resolve_cte_table,
+    resolve_table_name, table_ptr_from_from_item,
 };
-use crate::symbols::{Name, SymbolKind};
+use crate::symbols::SymbolKind;
 use salsa::Database as Db;
 use squawk_syntax::{
     SyntaxNodePtr,
@@ -38,7 +39,7 @@ fn columns_from_create_table_impl(
 
     if let Some(inherits) = create_table.inherits() {
         for path in inherits.paths() {
-            if let Some((table_name, schema)) = extract_table_schema_from_path(&path) {
+            if let Some((schema, table_name)) = name::schema_and_name_path(&path) {
                 let position = path.syntax().text_range().start();
                 if let Some(ResolvedTableName::Table(parent_table)) =
                     resolve_table_name(db, file, &table_name, &schema, position)
@@ -60,7 +61,7 @@ fn columns_from_create_table_impl(
                 }
                 ast::TableArg::LikeClause(like_clause) => {
                     if let Some(path) = like_clause.path()
-                        && let Some((table_name, schema)) = extract_table_schema_from_path(&path)
+                        && let Some((schema, table_name)) = name::schema_and_name_path(&path)
                     {
                         let position = path.syntax().text_range().start();
                         if let Some(ResolvedTableName::Table(source_table)) =
@@ -106,7 +107,7 @@ fn table_columns_impl(
 
     if let Some(inherits) = create_table.inherits() {
         for path in inherits.paths() {
-            if let Some((table_name, schema)) = extract_table_schema_from_path(&path) {
+            if let Some((schema, table_name)) = name::schema_and_name_path(&path) {
                 let position = path.syntax().text_range().start();
                 if let Some(ResolvedTableName::Table(parent_table)) =
                     resolve_table_name(db, file, &table_name, &schema, position)
@@ -129,7 +130,7 @@ fn table_columns_impl(
                 }
                 ast::TableArg::LikeClause(like_clause) => {
                     if let Some(path) = like_clause.path()
-                        && let Some((table_name, schema)) = extract_table_schema_from_path(&path)
+                        && let Some((schema, table_name)) = name::schema_and_name_path(&path)
                     {
                         let position = path.syntax().text_range().start();
                         if let Some(ResolvedTableName::Table(source_table)) =
@@ -513,7 +514,7 @@ fn select_variant_columns_with_types(
             let Some(path) = table.relation_name().and_then(|r| r.path()) else {
                 return vec![];
             };
-            let Some((table_name, schema)) = extract_table_schema_from_path(&path) else {
+            let Some((schema, table_name)) = name::schema_and_name_path(&path) else {
                 return vec![];
             };
 

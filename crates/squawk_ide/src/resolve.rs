@@ -9,8 +9,8 @@ use squawk_syntax::{
 use crate::column_name::ColumnName;
 use crate::db::File;
 use crate::location::{Location, LocationKind};
-pub(crate) use crate::symbols::Schema;
-use crate::symbols::{Name, SymbolKind};
+use crate::name::{self, Name, Schema};
+use crate::symbols::SymbolKind;
 use crate::{
     classify::{NameRefClass, classify_name_ref},
     db::{bind, parse},
@@ -37,7 +37,7 @@ pub(crate) fn resolve_name_ref(
 
     match context {
         NameRefClass::Table => {
-            let (table_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
+            let (schema, table_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
 
             if schema.is_none()
@@ -58,7 +58,15 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::NamedArgParameter => {
-            let (function_name, schema) = find_func_call_from_named_arg(name_ref)?;
+            let (schema, function_name) = name_ref.syntax().ancestors().find_map(|a| {
+                if let Some(call_expr) = ast::CallExpr::cast(a.clone()) {
+                    name::schema_and_func_name(&call_expr)
+                } else if let Some(call) = ast::Call::cast(a) {
+                    name::schema_and_name_path(&call.path()?)
+                } else {
+                    None
+                }
+            })?;
             let param_name = Name::from_node(name_ref);
             let position = name_ref.syntax().text_range().start();
 
@@ -109,17 +117,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::FromTable => {
-            let table_name = Name::from_node(name_ref);
-            let schema = if let Some(parent) = name_ref.syntax().parent()
-                && let Some(field_expr) = ast::FieldExpr::cast(parent)
-                && let Some(base) = field_expr.base()
-                && let Some(schema_name_ref) = ast::NameRef::cast(base.syntax().clone())
-            {
-                Some(Schema(Name::from_node(&schema_name_ref)))
-            } else {
-                None
-            };
-
+            let (schema, table_name) = name::schema_and_name(name_ref);
             if schema.is_none()
                 && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
             {
@@ -161,24 +159,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::Type => {
-            let (type_name, schema) = if let Some(parent) = name_ref.syntax().parent()
-                && let Some(field_expr) = ast::FieldExpr::cast(parent)
-                && field_expr
-                    .field()
-                    .is_some_and(|field| field.syntax() == name_ref.syntax())
-            {
-                let type_name = Name::from_node(name_ref);
-                let schema = if let Some(base) = field_expr.base()
-                    && let ast::Expr::NameRef(schema_name_ref) = base
-                {
-                    Some(Schema(Name::from_node(&schema_name_ref)))
-                } else {
-                    None
-                };
-                (type_name, schema)
-            } else {
-                extract_table_schema_from_name_ref(name_ref)?
-            };
+            let (schema, type_name) = name::schema_and_table_name(name_ref)?;
             let type_name = resolve_float_precision(name_ref, type_name);
             let position = name_ref.syntax().text_range().start();
             let ptr = resolve_type_name_ptr(db, file, &type_name, &schema, position)?;
@@ -189,7 +170,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::View => {
-            let (view_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
+            let (schema, view_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let ptr = resolve_view_name_ptr(db, file, &view_name, &schema, position)?;
             Some(smallvec![Location::new(
@@ -216,7 +197,7 @@ pub(crate) fn resolve_name_ref(
             None
         }
         NameRefClass::Sequence => {
-            let (sequence_name, schema) = extract_table_schema_from_name_ref(name_ref)?;
+            let (schema, sequence_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let ptr =
@@ -233,14 +214,14 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::DropTrigger::cast)?;
             let path = drop_trigger.path()?;
-            let (trigger_name, mut schema) = extract_table_schema_from_path(&path)?;
+            let (mut schema, trigger_name) = name::schema_and_name_path(&path)?;
             let on_table_path = drop_trigger
                 .on_table()
                 .and_then(|on_table| on_table.path())?;
             if schema.is_none() {
-                schema = extract_schema_name(&on_table_path);
+                schema = name::schema_name(&on_table_path);
             }
-            let table_name = extract_table_name(&on_table_path)?;
+            let table_name = name::table_name(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let ptr = binder.lookup_with_table(
@@ -266,7 +247,7 @@ pub(crate) fn resolve_name_ref(
             })?;
             let policy_name = Name::from_node(&policy_name?);
             let on_table_path = on_table.and_then(|on_table| on_table.path())?;
-            let (table_name, schema) = extract_table_schema_from_path(&on_table_path)?;
+            let (schema, table_name) = name::schema_and_name_path(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let ptr = binder.lookup_with_table(
@@ -294,7 +275,7 @@ pub(crate) fn resolve_name_ref(
         }
         NameRefClass::PropertyGraph => {
             let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
-            let (property_graph_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, property_graph_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let ptr = binder.lookup_with(
@@ -367,7 +348,7 @@ pub(crate) fn resolve_name_ref(
         }
         NameRefClass::ForeignKeyTable => {
             let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
-            let (table_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
             Some(smallvec![Location::new(
@@ -432,7 +413,7 @@ pub(crate) fn resolve_name_ref(
                     None
                 }
             })?;
-            let (table_name, schema) = extract_table_schema_from_path(&on_table_path)?;
+            let (schema, table_name) = name::schema_and_name_path(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
             let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
             Some(smallvec![Location::new(
@@ -447,7 +428,7 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::LikeClause::cast)?;
             let path = like_clause.path()?;
-            let (table_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
             Some(smallvec![Location::new(
@@ -462,7 +443,7 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::FunctionSig::cast)?;
             let path = function_sig.path()?;
-            let (function_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, function_name) = name::schema_and_name_path(&path)?;
             let params = extract_param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
             resolve_function(
@@ -480,7 +461,7 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::Aggregate::cast)?;
             let path = aggregate.path()?;
-            let (aggregate_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, aggregate_name) = name::schema_and_name_path(&path)?;
             let params = extract_param_signature(&aggregate);
             let position = name_ref.syntax().text_range().start();
             resolve_aggregate(
@@ -498,7 +479,7 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::FunctionSig::cast)?;
             let path = function_sig.path()?;
-            let (procedure_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, procedure_name) = name::schema_and_name_path(&path)?;
             let params = extract_param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
             resolve_procedure(
@@ -516,7 +497,7 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::FunctionSig::cast)?;
             let path = function_sig.path()?;
-            let (routine_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, routine_name) = name::schema_and_name_path(&path)?;
             let params = extract_param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
 
@@ -554,7 +535,7 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::CallProcedure => {
             let call = name_ref.syntax().ancestors().find_map(ast::Call::cast)?;
             let path = call.path()?;
-            let (procedure_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, procedure_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_procedure(db, file, &procedure_name, &schema, None, position)
         }
@@ -569,30 +550,12 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::FunctionCall => {
-            let schema = if let Some(parent_node) = name_ref.syntax().parent()
-                && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
-            {
-                let base = field_expr.base()?;
-                let schema_name_ref = ast::NameRef::cast(base.syntax().clone())?;
-                Some(Schema(Name::from_node(&schema_name_ref)))
-            } else {
-                None
-            };
-            let function_name = Name::from_node(name_ref);
+            let (schema, function_name) = name::schema_and_name(name_ref);
             let position = name_ref.syntax().text_range().start();
             resolve_function(db, file, &function_name, &schema, None, position)
         }
         NameRefClass::ProcedureCall => {
-            let schema = if let Some(parent_node) = name_ref.syntax().parent()
-                && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
-            {
-                let base = field_expr.base()?;
-                let schema_name_ref = ast::NameRef::cast(base.syntax().clone())?;
-                Some(Schema(Name::from_node(&schema_name_ref)))
-            } else {
-                None
-            };
-            let procedure_name = Name::from_node(name_ref);
+            let (schema, procedure_name) = name::schema_and_name(name_ref);
             let position = name_ref.syntax().text_range().start();
 
             resolve_procedure(db, file, &procedure_name, &schema, None, position)
@@ -603,21 +566,12 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::PathType::cast)?;
             let path = path_type.path()?;
-            let (function_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, function_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             resolve_function(db, file, &function_name, &schema, None, position)
         }
         NameRefClass::SelectFunctionCall => {
-            let schema = if let Some(parent_node) = name_ref.syntax().parent()
-                && let Some(field_expr) = ast::FieldExpr::cast(parent_node)
-            {
-                let base = field_expr.base()?;
-                let schema_name_ref = ast::NameRef::cast(base.syntax().clone())?;
-                Some(Schema(Name::from_node(&schema_name_ref)))
-            } else {
-                None
-            };
-            let function_name = Name::from_node(name_ref);
+            let (schema, function_name) = name::schema_and_name(name_ref);
             let position = name_ref.syntax().text_range().start();
 
             // functions take precedence
@@ -791,65 +745,8 @@ pub(crate) fn resolve_type_ptr_from_type(
     ty: &ast::Type,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
-    let (type_name, schema) = type_name_and_schema_from_type(ty)?;
+    let (schema, type_name) = name::schema_and_type_name(ty)?;
     resolve_type_name_ptr(db, file, &type_name, &schema, position)
-}
-
-fn type_name_and_schema_from_type(ty: &ast::Type) -> Option<(Name, Option<Schema>)> {
-    match ty {
-        ast::Type::ArrayType(array_type) => {
-            let inner = array_type.ty()?;
-            type_name_and_schema_from_type(&inner)
-        }
-        ast::Type::BitType(bit_type) => {
-            let name = if bit_type.varying_token().is_some() {
-                "varbit"
-            } else {
-                "bit"
-            };
-            Some((Name::from_string(name), None))
-        }
-        ast::Type::IntervalType(_) => Some((Name::from_string("interval"), None)),
-        ast::Type::PathType(path_type) => {
-            let path = path_type.path()?;
-            extract_table_schema_from_path(&path)
-        }
-        ast::Type::ExprType(expr_type) => {
-            let expr = expr_type.expr()?;
-            if let ast::Expr::FieldExpr(field_expr) = expr
-                && let Some(field) = field_expr.field()
-                && let Some(ast::Expr::NameRef(schema_name_ref)) = field_expr.base()
-            {
-                let type_name = Name::from_node(&field);
-                let schema = Some(Schema(Name::from_node(&schema_name_ref)));
-                Some((type_name, schema))
-            } else {
-                None
-            }
-        }
-        ast::Type::CharType(char_type) => {
-            let name = if char_type.varchar_token().is_some() || char_type.varying_token().is_some()
-            {
-                "varchar"
-            } else {
-                "bpchar"
-            };
-            Some((Name::from_string(name), None))
-        }
-        ast::Type::DoubleType(_) => Some((Name::from_string("float8"), None)),
-        ast::Type::TimeType(time_type) => {
-            let mut name = if time_type.timestamp_token().is_some() {
-                "timestamp".to_string()
-            } else {
-                "time".to_string()
-            };
-            if let Some(ast::Timezone::WithTimezone(_)) = time_type.timezone() {
-                name.push_str("tz");
-            }
-            Some((Name::from_string(name), None))
-        }
-        ast::Type::PercentType(_) => None,
-    }
 }
 
 fn fallback_type_alias(type_name: &Name) -> Option<Name> {
@@ -1058,7 +955,7 @@ fn resolve_column_for_path(
     path: &ast::Path,
     column_name: Name,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let (table_name, schema) = extract_table_schema_from_path(path)?;
+    let (schema, table_name) = name::schema_and_name_path(path)?;
     let position = path.syntax().text_range().start();
 
     resolve_column_for_table(db, file, &table_name, &schema, &column_name, position)
@@ -1112,8 +1009,7 @@ fn resolve_select_qualified_column_table_name_ptr(
     }
 
     if let Some(call_expr) = from_item.call_expr()
-        && let Some((function_name, function_schema)) =
-            function_name_and_schema_from_call_expr(&call_expr)
+        && let Some((function_schema, function_name)) = name::schema_and_func_name(&call_expr)
         && function_name == table_name
         && function_schema == explicit_schema
     {
@@ -1131,7 +1027,7 @@ fn resolve_select_qualified_column_table_name_ptr(
         )]);
     }
 
-    let (table_name, schema) = if let Some(name_ref_node) = from_item.name_ref() {
+    let (schema, table_name) = if let Some(name_ref_node) = from_item.name_ref() {
         if let Some(cte_ptr) = resolve_cte_table(table_name_ref, &table_name) {
             return Some(smallvec![Location::new(
                 file,
@@ -1143,7 +1039,7 @@ fn resolve_select_qualified_column_table_name_ptr(
         // `from foo`
         let from_table_name = Name::from_node(&name_ref_node);
         if from_table_name == table_name {
-            (from_table_name, None)
+            (None, from_table_name)
         } else {
             return None;
         }
@@ -1158,7 +1054,7 @@ fn resolve_select_qualified_column_table_name_ptr(
             return None;
         };
         let schema = Schema(Name::from_node(&schema_name_ref));
-        (from_table_name, Some(schema))
+        (Some(schema), from_table_name)
     };
 
     let position = table_name_ref.syntax().text_range().start();
@@ -1223,18 +1119,6 @@ fn match_table_in_returning_clause(
     None
 }
 
-pub(crate) fn extract_table_schema_from_path(path: &ast::Path) -> Option<(Name, Option<Schema>)> {
-    Some((extract_table_name(path)?, extract_schema_name(path)))
-}
-
-fn extract_table_schema_from_name_ref(name_ref: &ast::NameRef) -> Option<(Name, Option<Schema>)> {
-    if let Some(path) = name_ref.syntax().ancestors().find_map(ast::Path::cast) {
-        return extract_table_schema_from_path(&path);
-    }
-
-    Some((Name::from_node(name_ref), None))
-}
-
 fn resolve_select_qualified_column_ptr(
     db: &dyn Db,
     file: File,
@@ -1247,12 +1131,12 @@ fn resolve_select_qualified_column_ptr(
         .parent()
         .and_then(ast::FieldExpr::cast)?;
 
-    let (column_table_name, explicit_schema) =
+    let (explicit_schema, column_table_name) =
     // if we're at `base` in `base.field`
     if let Some(base) = field_expr.base()
         && let ast::Expr::NameRef(table_name_ref) = base
     {
-        (Name::from_node(&table_name_ref), None)
+        (None, Name::from_node(&table_name_ref))
     // we have `foo.bar.buzz`
     } else if let Some(base) = field_expr.base()
         && let ast::Expr::FieldExpr(inner_field_expr) = base
@@ -1260,18 +1144,15 @@ fn resolve_select_qualified_column_ptr(
         && let Some(inner_base) = inner_field_expr.base()
         && let ast::Expr::NameRef(schema_name_ref) = inner_base
     {
-        (
-            Name::from_node(&table_field),
-            Some(Schema(Name::from_node(&schema_name_ref))),
-        )
+        (Some(Schema(Name::from_node(&schema_name_ref))), Name::from_node(&table_field))
     } else {
         return None;
     };
 
     let position = column_name_ref.syntax().text_range().start();
 
-    let (mut table_name, schema) = if let Some(schema) = explicit_schema {
-        (column_table_name, Some(schema))
+    let (schema, mut table_name) = if let Some(schema) = explicit_schema {
+        (Some(schema), column_table_name)
     } else {
         match ast_nav::node_parent_query(column_name_ref.syntax())? {
             ast_nav::ParentQuery::Select(_select) => {
@@ -1354,7 +1235,7 @@ fn resolve_select_qualified_column_ptr(
 
                     // `from t as u`
                     if let Some(name_ref_node) = from_item.name_ref() {
-                        (Name::from_node(&name_ref_node), None)
+                        (None, Name::from_node(&name_ref_node))
                     // `from foo.t as u`
                     } else if let Some(from_field_expr) = from_item.field_expr() {
                         let table_name = Name::from_node(&from_field_expr.field()?);
@@ -1362,7 +1243,7 @@ fn resolve_select_qualified_column_ptr(
                             return None;
                         };
                         let schema = Schema(Name::from_node(&schema_name_ref));
-                        (table_name, Some(schema))
+                        (Some(schema), table_name)
                     } else {
                         return None;
                     }
@@ -1370,7 +1251,7 @@ fn resolve_select_qualified_column_ptr(
                     // `from bar`
                     let from_table_name = Name::from_node(&name_ref_node);
                     if from_table_name == column_table_name {
-                        (from_table_name, None)
+                        (None, from_table_name)
                     } else {
                         return None;
                     }
@@ -1385,20 +1266,20 @@ fn resolve_select_qualified_column_ptr(
                         return None;
                     };
                     let schema = Schema(Name::from_node(&schema_name_ref));
-                    (from_table_name, Some(schema))
+                    (Some(schema), from_table_name)
                 }
             }
             ast_nav::ParentQuery::Update(update) => {
                 let path = update.relation_name()?.path()?;
-                extract_table_schema_from_path(&path)?
+                name::schema_and_name_path(&path)?
             }
             ast_nav::ParentQuery::Delete(delete) => {
                 let path = delete.relation_name()?.path()?;
-                extract_table_schema_from_path(&path)?
+                name::schema_and_name_path(&path)?
             }
             ast_nav::ParentQuery::Insert(insert) => {
                 let path = insert.path()?;
-                extract_table_schema_from_path(&path)?
+                name::schema_and_name_path(&path)?
             }
             ast_nav::ParentQuery::Merge(merge) => {
                 let found_in_using = if let Some(using_on) = merge.using_on_clause()
@@ -1408,13 +1289,13 @@ fn resolve_select_qualified_column_ptr(
                         && let item_name = Name::from_node(&item_name_ref)
                         && item_name == column_table_name
                     {
-                        Some((item_name, None))
+                        Some((None, item_name))
                     } else if let Some(alias) = from_item.alias()
                         && let Some(alias_name) = alias.name()
                         && let alias_name = Name::from_node(&alias_name)
                         && alias_name == column_table_name
                     {
-                        Some((alias_name, None))
+                        Some((None, alias_name))
                     } else {
                         None
                     }
@@ -1426,7 +1307,7 @@ fn resolve_select_qualified_column_ptr(
                     result
                 } else {
                     let path = merge.relation_name()?.path()?;
-                    extract_table_schema_from_path(&path)?
+                    name::schema_and_name_path(&path)?
                 }
             }
         }
@@ -1760,8 +1641,7 @@ fn resolve_column_from_table_or_view_impl(
                 && let Some(partition_of) = create_table_node.partition_of()
                 && let Some(parent_path) = partition_of.path()
             {
-                let (parent_table_name, parent_schema) =
-                    extract_table_schema_from_path(&parent_path)?;
+                let (parent_schema, parent_table_name) = name::schema_and_name_path(&parent_path)?;
                 return resolve_column_from_table_or_view_impl(
                     db,
                     file,
@@ -1966,7 +1846,7 @@ fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
     }
 
     if let Some(call_expr) = from_item.call_expr()
-        && let Some((function_name, _schema)) = function_name_and_schema_from_call_expr(&call_expr)
+        && let Some((_schema, function_name)) = name::schema_and_func_name(&call_expr)
         && function_name == *qualifier
     {
         return true;
@@ -2024,19 +1904,6 @@ fn find_from_item_for_select_qualified_name_ref(
     None
 }
 
-pub(crate) fn extract_table_name(path: &ast::Path) -> Option<Name> {
-    let segment = path.segment()?;
-    let name_ref = segment.name_ref()?;
-    Some(Name::from_node(&name_ref))
-}
-
-pub(crate) fn extract_schema_name(path: &ast::Path) -> Option<Schema> {
-    path.qualifier()
-        .and_then(|q| q.segment())
-        .and_then(|s| s.name_ref())
-        .map(|name_ref| Schema(Name::from_node(&name_ref)))
-}
-
 pub(crate) fn find_column_in_create_table(
     db: &dyn Db,
     file: File,
@@ -2060,7 +1927,7 @@ fn find_column_in_create_table_impl(
 
     if let Some(inherits) = create_table.inherits() {
         for path in inherits.paths() {
-            let (table_name, schema) = extract_table_schema_from_path(&path)?;
+            let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = path.syntax().text_range().start();
 
             if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position) {
@@ -2102,7 +1969,7 @@ fn find_column_in_create_table_impl(
             }
             ast::TableArg::LikeClause(like_clause) => {
                 let path = like_clause.path()?;
-                let (table_name, schema) = extract_table_schema_from_path(&path)?;
+                let (schema, table_name) = name::schema_and_name_path(&path)?;
                 let position = path.syntax().text_range().start();
 
                 if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position)
@@ -2239,7 +2106,7 @@ pub(crate) fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Opt
 }
 
 fn count_columns_for_path(db: &dyn Db, file: File, path: &ast::Path) -> Option<usize> {
-    let (table_name, schema) = extract_table_schema_from_path(path)?;
+    let (schema, table_name) = name::schema_and_name_path(path)?;
     let position = path.syntax().text_range().start();
 
     count_columns_for_table_name(db, file, &table_name, &schema, position)
@@ -2366,7 +2233,7 @@ fn resolve_cte_column(
 
     if let ast::WithQuery::Table(table) = query {
         let path = table.relation_name()?.path()?;
-        let (table_name, schema) = extract_table_schema_from_path(&path)?;
+        let (schema, table_name) = name::schema_and_name_path(&path)?;
 
         if schema.is_none()
             && let Some(nested_cte_column) =
@@ -2561,7 +2428,7 @@ fn resolve_subquery_column_ptr(
     // TODO: this should just be a match stmt
     if let ast::SelectVariant::Table(table) = select_variant {
         let path = table.relation_name()?.path()?;
-        let (table_name, schema) = extract_table_schema_from_path(&path)?;
+        let (schema, table_name) = name::schema_and_name_path(&path)?;
 
         if schema.is_none()
             && let Some(cte_column_ptr) =
@@ -2740,7 +2607,7 @@ fn resolve_table_or_view_or_cte_ptrs(
     position: TextSize,
     path: &ast::Path,
 ) -> Option<Vec<SyntaxNodePtr>> {
-    let (table_name, schema) = extract_table_schema_from_path(path)?;
+    let (schema, table_name) = name::schema_and_name_path(path)?;
 
     let mut results = vec![];
 
@@ -3110,7 +2977,7 @@ fn resolve_column_from_call_expr_return_table(
     min_index: usize,
 ) -> Option<SmallVec<[Location; 1]>> {
     let position = name_ref.syntax().text_range().start();
-    let (function_name, schema) = function_name_and_schema_from_call_expr(call_expr)?;
+    let (schema, function_name) = name::schema_and_func_name(call_expr)?;
     let function_locs = resolve_function(db, file, &function_name, &schema, None, position)?;
     let function_node = function_locs.first()?.to_node(db)?;
     let create_function = function_node
@@ -3134,23 +3001,6 @@ fn resolve_column_from_call_expr_return_table(
         }
     }
     None
-}
-
-fn function_name_and_schema_from_call_expr(
-    call_expr: &ast::CallExpr,
-) -> Option<(Name, Option<Schema>)> {
-    match call_expr.expr()? {
-        ast::Expr::NameRef(name_ref) => Some((Name::from_node(&name_ref), None)),
-        ast::Expr::FieldExpr(field_expr) => {
-            let function_name = Name::from_node(&field_expr.field()?);
-            let ast::Expr::NameRef(schema_name_ref) = field_expr.base()? else {
-                return None;
-            };
-            let schema = Schema(Name::from_node(&schema_name_ref));
-            Some((function_name, Some(schema)))
-        }
-        _ => None,
-    }
 }
 
 pub(crate) fn resolve_table_info(
@@ -3305,12 +3155,8 @@ fn resolve_composite_type_field_ptr(
     let column_locs = resolve_select_column_ptr(db, file, &base_name_ref)?;
     let column_node = column_locs.first()?.to_node(db)?;
 
-    let (type_name, schema) =
-        if let Some(type_info) = resolve_composite_type_from_column_node(&column_node) {
-            type_info
-        } else {
-            resolve_composite_type_from_cast_node(&column_node)?
-        };
+    let (schema, type_name) = resolve_composite_type_from_column_node(&column_node)
+        .or_else(|| resolve_composite_type_from_cast_node(&column_node))?;
 
     let position = field_name_ref.syntax().text_range().start();
     let type_name_ptr = resolve_type_name_ptr(db, file, &type_name, &schema, position)?;
@@ -3337,45 +3183,21 @@ fn resolve_composite_type_field_ptr(
 
 fn resolve_composite_type_from_column_node(
     column_node: &SyntaxNode,
-) -> Option<(Name, Option<Schema>)> {
+) -> Option<(Option<Schema>, Name)> {
     let column = column_node.ancestors().find_map(ast::Column::cast)?;
     let ty = column.ty()?;
-    extract_type_name_and_schema(&ty)
+    name::schema_and_type_name(&ty)
 }
 
 fn resolve_composite_type_from_cast_node(
     column_node: &SyntaxNode,
-) -> Option<(Name, Option<Schema>)> {
+) -> Option<(Option<Schema>, Name)> {
     let target = column_node.ancestors().find_map(ast::Target::cast)?;
     let ast::Expr::CastExpr(cast_expr) = target.expr()? else {
         return None;
     };
     let ty = cast_expr.ty()?;
-    extract_type_name_and_schema(&ty)
-}
-
-fn extract_type_name_and_schema(ty: &ast::Type) -> Option<(Name, Option<Schema>)> {
-    match ty {
-        ast::Type::PathType(path_type) => {
-            let path = path_type.path()?;
-            let (type_name, schema) = extract_table_schema_from_path(&path)?;
-            Some((type_name, schema))
-        }
-        ast::Type::ExprType(expr_type) => {
-            let expr = expr_type.expr()?;
-            if let ast::Expr::FieldExpr(field_expr) = expr
-                && let Some(field) = field_expr.field()
-                && let Some(ast::Expr::NameRef(schema_name_ref)) = field_expr.base()
-            {
-                let type_name = Name::from_node(&field);
-                let schema = Some(Schema(Name::from_node(&schema_name_ref)));
-                Some((type_name, schema))
-            } else {
-                None
-            }
-        }
-        _ => None,
-    }
+    name::schema_and_type_name(&ty)
 }
 
 fn resolve_merge_column_ptr(
@@ -3412,7 +3234,7 @@ fn resolve_table_in_returning_clause(
     returning_clause: Option<ast::ReturningClause>,
 ) -> Option<SmallVec<[Location; 1]>> {
     let table_name = Name::from_node(table_name_ref);
-    let (stmt_table_name, schema) = extract_table_schema_from_path(path)?;
+    let (schema, stmt_table_name) = name::schema_and_name_path(path)?;
 
     let matched =
         match_table_in_returning_clause(&table_name, &stmt_table_name, alias, returning_clause)?;
@@ -3513,39 +3335,6 @@ fn resolve_merge_table_name_ptr(
         &path,
         merge.returning_clause(),
     )
-}
-
-fn find_func_call_from_named_arg(name_ref: &ast::NameRef) -> Option<(Name, Option<Schema>)> {
-    for a in name_ref.syntax().ancestors() {
-        if let Some(call_expr) = ast::CallExpr::cast(a.clone()) {
-            return match call_expr.expr()? {
-                ast::Expr::NameRef(func_name_ref) => {
-                    let func_name = Name::from_node(&func_name_ref);
-                    Some((func_name, None))
-                }
-                ast::Expr::FieldExpr(field_expr) => {
-                    let func_name_ref = field_expr.field()?;
-                    let func_name = Name::from_node(&func_name_ref);
-
-                    let schema = if let Some(base) = field_expr.base()
-                        && let ast::Expr::NameRef(schema_name_ref) = base
-                    {
-                        Some(Schema(Name::from_node(&schema_name_ref)))
-                    } else {
-                        None
-                    };
-
-                    Some((func_name, schema))
-                }
-                _ => None,
-            };
-        } else if let Some(call) = ast::Call::cast(a) {
-            let path = call.path()?;
-            let (function_name, schema) = extract_table_schema_from_path(&path)?;
-            return Some((function_name, schema));
-        }
-    }
-    None
 }
 
 fn find_param_in_func_def(
