@@ -29,7 +29,7 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
             if let Some(case_expr) = ast::CaseExpr::cast(parent)
                 && let Some(case_token) = case_expr.case_token()
             {
-                return smallvec![Location::current(
+                return smallvec![Location::new(
                     file,
                     case_token.text_range(),
                     LocationKind::CaseExpr
@@ -42,50 +42,33 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
     if ast::Commit::can_cast(parent.kind())
         && let Some(begin_range) = find_preceding_begin(db, file, offset)
     {
-        return smallvec![Location::current(
-            file,
-            begin_range,
-            LocationKind::CommitBegin
-        )];
+        return smallvec![Location::new(file, begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind())
         && let Some(begin_range) = find_preceding_begin(db, file, offset)
     {
-        return smallvec![Location::current(
-            file,
-            begin_range,
-            LocationKind::CommitBegin
-        )];
+        return smallvec![Location::new(file, begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
     if ast::Begin::can_cast(parent.kind())
         && let Some(end_range) = find_following_commit_or_rollback(db, file, offset)
     {
-        return smallvec![Location::current(file, end_range, LocationKind::CommitEnd)];
+        return smallvec![Location::new(file, end_range, LocationKind::CommitEnd)];
     }
 
     if let Some(name) = ast::Name::cast(parent.clone())
-        && let Some(kind) = LocationKind::from_node(name.syntax())
+        && let Some(location) = Location::from_node(file, name.syntax())
     {
-        return smallvec![Location::current(file, name.syntax().text_range(), kind)];
+        return smallvec![location];
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         for definition_file in [file, builtins_file(db)] {
-            if let Some((ptrs, kind)) = resolve::resolve_name_ref(db, definition_file, &name_ref) {
-                let ranges = ptrs
-                    .iter()
-                    .map(|ptr| ptr.text_range())
-                    .map(|range| Location {
-                        file: definition_file,
-                        range,
-                        kind,
-                    })
-                    .collect();
-                return ranges;
+            if let Some(locations) = resolve::resolve_name_ref(db, definition_file, &name_ref) {
+                return locations;
             }
         }
     }
@@ -5783,6 +5766,20 @@ select t$0 from t;
           │                ─ 2. destination
         3 │ select t from t;
           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_view_name_from_view() {
+        assert_snapshot!(goto("
+create view boop as select 1 a;
+select boop$0 from boop;
+"), @"
+          ╭▸ 
+        2 │ create view boop as select 1 a;
+          │             ──── 2. destination
+        3 │ select boop from boop;
+          ╰╴          ─ 1. source
         ");
     }
 

@@ -5,8 +5,7 @@ use crate::db::{File, bind, parse};
 use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
 use crate::resolve::{
     ResolvedTableName, extract_table_schema_from_path, find_from_item_in_from_clause,
-    qualified_star_table_name, resolve_cte_table, resolve_table_name, resolve_table_name_ptr,
-    resolve_view_name_ptr, table_and_schema_from_from_item, table_ptr_from_from_item,
+    qualified_star_table_name, resolve_cte_table, resolve_table_name, table_ptr_from_from_item,
 };
 use crate::symbols::{Name, SymbolKind};
 use salsa::Database as Db;
@@ -80,47 +79,6 @@ fn columns_from_create_table_impl(
                 ast::TableArg::TableConstraint(_) => (),
             }
         }
-    }
-}
-
-pub(crate) fn tables_from_item(
-    db: &dyn Db,
-    file: File,
-    from_item: &ast::FromItem,
-    results: &mut Vec<SyntaxNodePtr>,
-) {
-    if let Some(alias) = from_item.alias()
-        && alias.column_list().is_some()
-    {
-        results.push(SyntaxNodePtr::new(alias.syntax()));
-        return;
-    }
-
-    if let Some(paren_select) = from_item.paren_select() {
-        results.push(SyntaxNodePtr::new(paren_select.syntax()));
-        return;
-    }
-
-    let Some((table_name, schema)) = table_and_schema_from_from_item(from_item) else {
-        return;
-    };
-
-    let position = from_item.syntax().text_range().start();
-    if let Some(table_name_ptr) = resolve_table_name_ptr(db, file, &table_name, &schema, position) {
-        results.push(table_name_ptr);
-        return;
-    }
-
-    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, &table_name, &schema, position) {
-        results.push(view_name_ptr);
-        return;
-    }
-
-    if schema.is_none()
-        && let Some(name_ref) = from_item.name_ref()
-        && let Some(cte_ptr) = resolve_cte_table(&name_ref, &table_name)
-    {
-        results.push(cte_ptr);
     }
 }
 
