@@ -1175,10 +1175,11 @@ fn format_create_role(create_role: ast::CreateRole) -> Option<Hover> {
 }
 
 fn index_schema(db: &dyn Db, file: File, create_index: ast::CreateIndex) -> Option<String> {
-    let binder = bind(db, file);
     let position = create_index.syntax().text_range().start();
-    let search_path = binder.search_path_at(position);
-    search_path.first().map(|s| s.to_string())
+    bind(db, file)
+        .search_path_at(position)
+        .first()
+        .map(|s| s.to_string())
 }
 
 fn format_create_type(db: &dyn Db, file: File, create_type: ast::CreateType) -> Option<Hover> {
