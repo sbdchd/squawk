@@ -1,7 +1,7 @@
 use rustc_hash::{FxHashMap, FxHashSet};
 
 use squawk_syntax::{
-    Parse, SourceFile,
+    Parse, SourceFile, SyntaxNode,
     ast::{self, AstNode},
     identifier::Identifier,
 };
@@ -51,10 +51,13 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
     let mut not_null_constraints: FxHashMap<Identifier, TableColumn> = FxHashMap::default();
     let mut validated_not_null_columns: FxHashSet<TableColumn> = FxHashSet::default();
-    // Tables where VALIDATE CONSTRAINT was seen without a matching ADD CONSTRAINT
-    // in the same file (cross-migration pattern).
-    let mut tables_with_external_validated_constraints: FxHashSet<Identifier> =
-        FxHashSet::default();
+
+    // Cross-migration pattern tracking: VALIDATE CONSTRAINT without a matching
+    // ADD CONSTRAINT in the same file. We require a corresponding DROP CONSTRAINT
+    // to treat it as a NOT NULL helper (validate+drop pairing).
+    let mut external_validates: FxHashSet<(Identifier, Identifier)> = FxHashSet::default();
+    let mut dropped_constraints: FxHashSet<(Identifier, Identifier)> = FxHashSet::default();
+    let mut deferred_violations: Vec<(Identifier, SyntaxNode)> = Vec::new();
 
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
@@ -97,11 +100,17 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             {
                                 validated_not_null_columns.insert(table_column.clone());
                             } else {
-                                // Cross-migration pattern: the ADD CONSTRAINT ... NOT VALID
-                                // was in a previous migration file. Track the table so that
-                                // a subsequent SET NOT NULL is considered safe.
-                                tables_with_external_validated_constraints.insert(table.clone());
+                                external_validates.insert((table.clone(), constraint_name));
                             }
+                        }
+                    }
+                    // Track DROP CONSTRAINT for cross-migration pairing
+                    ast::AlterTableAction::DropConstraint(drop_constraint) if is_pg12_plus => {
+                        if let Some(constraint_name) = drop_constraint
+                            .name_ref()
+                            .map(|x| Identifier::new(&x.text()))
+                        {
+                            dropped_constraints.insert((table.clone(), constraint_name));
                         }
                     }
                     // Step 3: Check that we're altering a validated constraint
@@ -120,9 +129,13 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                                 table: table.clone(),
                                 column,
                             };
-                            if validated_not_null_columns.contains(&table_column)
-                                || tables_with_external_validated_constraints.contains(&table)
-                            {
+                            if validated_not_null_columns.contains(&table_column) {
+                                continue;
+                            }
+                            // Defer if there are external validates on this table —
+                            // we need to see the full file before deciding.
+                            if external_validates.iter().any(|(t, _)| *t == table) {
+                                deferred_violations.push((table.clone(), option.syntax().clone()));
                                 continue;
                             }
                         }
@@ -141,6 +154,32 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                 }
             }
         }
+    }
+
+    // Resolve deferred violations: each validate+drop pair on a table can
+    // suppress one SET NOT NULL violation.
+    let mut resolved_per_table: FxHashMap<Identifier, usize> = FxHashMap::default();
+    for (table, constraint_name) in &external_validates {
+        if dropped_constraints.contains(&(table.clone(), constraint_name.clone())) {
+            *resolved_per_table.entry(table.clone()).or_default() += 1;
+        }
+    }
+
+    for (table, node) in &deferred_violations {
+        if let Some(count) = resolved_per_table.get_mut(table) {
+            if *count > 0 {
+                *count -= 1;
+                continue;
+            }
+        }
+        ctx.report(
+            Violation::for_node(
+                Rule::AddingNotNullableField,
+                "Setting a column `NOT NULL` blocks reads while the table is scanned.".into(),
+                node,
+            )
+            .help("Make the field nullable and use a `CHECK` constraint instead."),
+        );
     }
 }
 
@@ -315,7 +354,8 @@ ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
     }
 
     // Cross-migration pattern: ADD CONSTRAINT was in a previous migration file,
-    // so only VALIDATE CONSTRAINT + SET NOT NULL appear in this file.
+    // so only VALIDATE CONSTRAINT + SET NOT NULL + DROP CONSTRAINT appear in this file.
+    // The validate+drop pairing signals it was a NOT NULL helper constraint.
     #[test]
     fn pg16_cross_migration_validate_then_set_not_null_ok() {
         let sql = r#"
@@ -353,6 +393,40 @@ ALTER TABLE foo DROP CONSTRAINT foo_bar_not_null;
             },
             Rule::AddingNotNullableField,
         );
+    }
+
+    // Validating an unrelated constraint should NOT suppress SET NOT NULL warnings.
+    #[test]
+    fn pg12_cross_migration_unrelated_validate_err() {
+        let sql = r#"
+ALTER TABLE foo VALIDATE CONSTRAINT some_other_check;
+ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
+        "#;
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                pg_version: "12".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField
+        ));
+    }
+
+    // Validate without a corresponding DROP is not the helper pattern.
+    #[test]
+    fn pg12_cross_migration_validate_no_drop_err() {
+        let sql = r#"
+ALTER TABLE foo VALIDATE CONSTRAINT bar_not_null;
+ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
+        "#;
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                pg_version: "12".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField
+        ));
     }
 
     #[test]
