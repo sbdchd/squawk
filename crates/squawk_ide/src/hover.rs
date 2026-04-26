@@ -5,12 +5,14 @@ use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
 use crate::db::{File, bind, parse};
 use crate::location::{Location, LocationKind};
+use crate::name;
 use crate::offsets::token_from_offset;
 use crate::symbols::{Name, Schema};
 use crate::{goto_definition, resolve};
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::SyntaxNode;
+use squawk_syntax::SyntaxNodePtr;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
@@ -467,7 +469,7 @@ fn format_alias_with_column_list(db: &dyn Db, file: File, alias: ast::Alias) -> 
 }
 
 fn hover_qualified_star(db: &dyn Db, file: File, field_expr: ast::FieldExpr) -> Option<Hover> {
-    let table_ptr = resolve::resolve_qualified_star_table_ptr(db, file, field_expr)?;
+    let table_ptr = qualified_star_table_ptr(db, file, field_expr)?;
     hover_qualified_star_columns(db, file, &table_ptr)
 }
 
@@ -484,7 +486,7 @@ fn hover_unqualified_star(db: &dyn Db, file: File, target: ast::Target) -> Optio
 fn hover_unqualified_star_with_binder(db: &dyn Db, file: File, target: &ast::Target) -> Vec<Hover> {
     let mut results = vec![];
 
-    if let Some(table_ptrs) = resolve::resolve_unqualified_star_table_ptrs(db, file, target) {
+    if let Some(table_ptrs) = unqualified_star_table_ptrs(db, file, target) {
         for table_ptr in table_ptrs {
             if let Some(columns) = hover_qualified_star_columns(db, file, &table_ptr) {
                 results.push(columns);
@@ -517,7 +519,7 @@ fn hover_unqualified_star_in_arg_list(
     file: File,
     arg_list: ast::ArgList,
 ) -> Option<Hover> {
-    let table_ptrs = resolve::resolve_unqualified_star_in_arg_list_ptrs(db, file, &arg_list)?;
+    let table_ptrs = unqualified_star_in_arg_list_ptrs(db, file, &arg_list)?;
     let mut results = vec![];
     for table_ptr in table_ptrs {
         if let Some(columns) = hover_qualified_star_columns(db, file, &table_ptr) {
@@ -736,7 +738,7 @@ fn hover_qualified_star_columns_from_subquery(
 
         for target in target_list.targets() {
             if target.star_token().is_some() {
-                let table_ptrs = resolve::resolve_unqualified_star_table_ptrs(db, file, &target)?;
+                let table_ptrs = unqualified_star_table_ptrs(db, file, &target)?;
                 for table_ptr in table_ptrs {
                     if let Some(columns) = hover_qualified_star_columns(db, file, &table_ptr) {
                         results.push(columns)
@@ -1392,6 +1394,123 @@ fn hover_routine(db: &dyn Db, def: Location) -> Option<Hover> {
     }
 
     None
+}
+
+fn qualified_star_table_ptr(
+    db: &dyn Db,
+    file: File,
+    field_expr: ast::FieldExpr,
+) -> Option<SyntaxNodePtr> {
+    let table_name = resolve::qualified_star_table_name(&field_expr)?;
+    let position = field_expr.syntax().text_range().start();
+    let target = field_expr
+        .syntax()
+        .ancestors()
+        .find_map(ast::Target::cast)?;
+
+    let path = match ast_nav::target_parent_query(target)? {
+        ast_nav::ParentQuery::Select(select) => {
+            let from_clause = select.from_clause()?;
+            let from_item = resolve::find_from_item_in_from_clause(&from_clause, &table_name)?;
+
+            if let Some(alias) = from_item.alias()
+                && alias.column_list().is_some()
+            {
+                return Some(SyntaxNodePtr::new(alias.syntax()));
+            }
+
+            let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
+
+            let name_ref = from_item.name_ref();
+            if let Some((table_like_ptr, _kind)) = resolve::resolve_table_like(
+                db,
+                file,
+                name_ref.as_ref(),
+                &table_name,
+                &schema,
+                position,
+            ) {
+                return Some(table_like_ptr);
+            }
+
+            return None;
+        }
+        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path()?,
+        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path()?,
+        ast_nav::ParentQuery::Insert(insert) => insert.path()?,
+        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path()?,
+    };
+
+    table_or_view_or_cte_ptrs(db, file, position, &path)?
+        .into_iter()
+        .next()
+}
+
+fn table_or_view_or_cte_ptrs(
+    db: &dyn Db,
+    file: File,
+    position: TextSize,
+    path: &ast::Path,
+) -> Option<Vec<SyntaxNodePtr>> {
+    let (schema, table_name) = name::schema_and_name_path(path)?;
+    let mut results = vec![];
+    let name_ref = path.segment().and_then(|x| x.name_ref());
+
+    if let Some((table_like_ptr, _kind)) =
+        resolve::resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
+    {
+        results.push(table_like_ptr);
+    }
+
+    if results.is_empty() {
+        return None;
+    }
+    Some(results)
+}
+
+fn unqualified_star_table_ptrs(
+    db: &dyn Db,
+    file: File,
+    target: &ast::Target,
+) -> Option<Vec<SyntaxNodePtr>> {
+    target.star_token()?;
+
+    let path = match ast_nav::target_parent_query(target.clone())? {
+        ast_nav::ParentQuery::Select(select) => {
+            let from_clause = select.from_clause()?;
+            let results = resolve::table_ptrs_from_clause(db, file, &from_clause);
+            if results.is_empty() {
+                return None;
+            }
+            return Some(results);
+        }
+        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path(),
+        ast_nav::ParentQuery::Insert(insert) => insert.path(),
+        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path(),
+        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path(),
+    }?;
+
+    let position = target.syntax().text_range().start();
+    table_or_view_or_cte_ptrs(db, file, position, &path)
+}
+
+fn unqualified_star_in_arg_list_ptrs(
+    db: &dyn Db,
+    file: File,
+    arg_list: &ast::ArgList,
+) -> Option<Vec<SyntaxNodePtr>> {
+    let from_clause = arg_list
+        .syntax()
+        .ancestors()
+        .find_map(ast::Select::cast)?
+        .from_clause()?;
+    let results = resolve::table_ptrs_from_clause(db, file, &from_clause);
+
+    if results.is_empty() {
+        return None;
+    }
+
+    Some(results)
 }
 
 #[cfg(test)]

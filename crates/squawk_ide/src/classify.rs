@@ -28,6 +28,7 @@ pub(crate) enum NameRefClass {
     Index,
     InsertColumn,
     InsertQualifiedColumnTable,
+    InsertTable,
     JoinUsingColumn,
     LikeTable,
     MergeColumn,
@@ -706,7 +707,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             {
                 return Some(NameRefClass::InsertColumn);
             }
-            return Some(NameRefClass::Table);
+            return Some(NameRefClass::InsertTable);
         }
         if ast::JoinUsingClause::can_cast(ancestor.kind()) && in_column_list {
             return Some(NameRefClass::JoinUsingColumn);
