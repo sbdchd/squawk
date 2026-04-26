@@ -1,14 +1,14 @@
 use crate::ast_nav;
 use crate::builtins::builtins_file;
 use crate::column_name::ColumnName;
-use crate::db::{File, bind, parse};
+use crate::db::{File, parse};
 use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
+use crate::location::LocationKind;
 use crate::name::{self, Name};
 use crate::resolve::{
-    ResolvedTableName, find_from_item_in_from_clause, qualified_star_table_name, resolve_cte_table,
-    resolve_table_name, table_ptr_from_from_item,
+    ResolvedTableName, find_from_item_in_from_clause, qualified_star_table_name,
+    resolve_table_like, resolve_table_name, table_ptr_from_from_item,
 };
-use crate::symbols::SymbolKind;
 use salsa::Database as Db;
 use squawk_syntax::{
     SyntaxNodePtr,
@@ -227,11 +227,7 @@ pub(crate) fn view_like_columns_with_types(
     results
 }
 
-pub(crate) fn with_table_column_names(
-    db: &dyn Db,
-    file: File,
-    with_table: ast::WithTable,
-) -> Vec<Name> {
+fn with_table_column_names(db: &dyn Db, file: File, with_table: ast::WithTable) -> Vec<Name> {
     with_table_columns_with_types(db, file, with_table)
         .into_iter()
         .map(|(name, _)| name)
@@ -435,9 +431,7 @@ fn columns_for_star_from_table_ptr(
     }
 }
 
-pub(crate) fn target_list_columns_with_types(
-    target_list: &ast::TargetList,
-) -> Vec<(Name, Option<Type>)> {
+fn target_list_columns_with_types(target_list: &ast::TargetList) -> Vec<(Name, Option<Type>)> {
     let mut columns = vec![];
     for target in target_list.targets() {
         if let Some((col_name, _node)) = ColumnName::from_target(target.clone())
@@ -466,7 +460,6 @@ fn select_variant_columns_with_types(
     file: File,
     select_variant: &ast::SelectVariant,
 ) -> Vec<(Name, Option<Type>)> {
-    let binder = bind(db, file);
     let tree = parse(db, file).tree();
     let root = tree.syntax();
     match select_variant {
@@ -517,35 +510,34 @@ fn select_variant_columns_with_types(
             let Some((schema, table_name)) = name::schema_and_name_path(&path) else {
                 return vec![];
             };
-
-            if schema.is_none()
-                && let Some(name_ref) = path.segment().and_then(|segment| segment.name_ref())
-                && let Some(with_table_ptr) = resolve_cte_table(&name_ref, &table_name)
-                && let Some(with_table) = with_table_ptr
-                    .to_node(root)
-                    .ancestors()
-                    .find_map(ast::WithTable::cast)
-            {
-                return with_table_column_names(db, file, with_table)
-                    .into_iter()
-                    .map(|name| (name, None))
-                    .collect();
-            }
-
+            let name_ref = path.segment().and_then(|segment| segment.name_ref());
             let position = table.syntax().text_range().start();
-            let Some(table_ptr) =
-                binder.lookup_with(&table_name, SymbolKind::Table, position, &schema)
+            let Some((ptr, kind)) =
+                resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
             else {
                 return vec![];
             };
-            let Some(create_table) = table_ptr
-                .to_node(root)
-                .ancestors()
-                .find_map(ast::CreateTableLike::cast)
-            else {
-                return vec![];
-            };
-            table_columns(db, file, &create_table)
+            let node = ptr.to_node(root);
+            match kind {
+                LocationKind::View => node
+                    .ancestors()
+                    .find_map(ast::CreateViewLike::cast)
+                    .map(|v| view_like_columns_with_types(&v))
+                    .unwrap_or_default(),
+                LocationKind::Table => {
+                    if let Some(with_table) = node.ancestors().find_map(ast::WithTable::cast) {
+                        return with_table_column_names(db, file, with_table)
+                            .into_iter()
+                            .map(|name| (name, None))
+                            .collect();
+                    }
+                    node.ancestors()
+                        .find_map(ast::CreateTableLike::cast)
+                        .map(|t| table_columns(db, file, &t))
+                        .unwrap_or_default()
+                }
+                _ => vec![],
+            }
         }
     }
 }

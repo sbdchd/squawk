@@ -57,6 +57,25 @@ pub(crate) fn resolve_name_ref(
                 LocationKind::Table
             )])
         }
+        NameRefClass::InsertTable => {
+            let (schema, relation_name) = name::schema_and_table_name(name_ref)?;
+            let position = name_ref.syntax().text_range().start();
+
+            if let Some(ptr) = resolve_table_name_ptr(db, file, &relation_name, &schema, position) {
+                return Some(smallvec![Location::new(
+                    file,
+                    ptr.text_range(),
+                    LocationKind::Table
+                )]);
+            }
+
+            let ptr = resolve_view_name_ptr(db, file, &relation_name, &schema, position)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::View
+            )])
+        }
         NameRefClass::NamedArgParameter => {
             let (schema, function_name) = name_ref.syntax().ancestors().find_map(|a| {
                 if let Some(call_expr) = ast::CallExpr::cast(a.clone()) {
@@ -118,34 +137,10 @@ pub(crate) fn resolve_name_ref(
         }
         NameRefClass::FromTable => {
             let (schema, table_name) = name::schema_and_name(name_ref);
-            if schema.is_none()
-                && let Some(cte_ptr) = resolve_cte_table(name_ref, &table_name)
-            {
-                return Some(smallvec![Location::new(
-                    file,
-                    cte_ptr.text_range(),
-                    LocationKind::Table
-                )]);
-            }
-
             let position = name_ref.syntax().text_range().start();
-
-            if let Some(table_name_ptr) =
-                resolve_table_name_ptr(db, file, &table_name, &schema, position)
-            {
-                return Some(smallvec![Location::new(
-                    file,
-                    table_name_ptr.text_range(),
-                    LocationKind::Table
-                )]);
-            }
-
-            let ptr = resolve_view_name_ptr(db, file, &table_name, &schema, position)?;
-            Some(smallvec![Location::new(
-                file,
-                ptr.text_range(),
-                LocationKind::View
-            )])
+            let (ptr, kind) =
+                resolve_table_like(db, file, Some(name_ref), &table_name, &schema, position)?;
+            Some(smallvec![Location::new(file, ptr.text_range(), kind)])
         }
         NameRefClass::Index => {
             let position = name_ref.syntax().text_range().start();
@@ -786,6 +781,32 @@ fn resolve_view_name_ptr(
     binder.lookup_with(view_name, SymbolKind::View, position, schema)
 }
 
+pub(crate) fn resolve_table_like(
+    db: &dyn Db,
+    file: File,
+    name_ref: Option<&ast::NameRef>,
+    table_name: &Name,
+    schema: &Option<Schema>,
+    position: TextSize,
+) -> Option<(SyntaxNodePtr, LocationKind)> {
+    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
+        return Some((view_name_ptr, LocationKind::View));
+    }
+
+    if let Some(table_name_ptr) = resolve_table_name_ptr(db, file, table_name, schema, position) {
+        return Some((table_name_ptr, LocationKind::Table));
+    }
+
+    if schema.is_none()
+        && let Some(name_ref) = name_ref
+        && let Some(cte_ptr) = resolve_cte_table(name_ref, table_name)
+    {
+        return Some((cte_ptr, LocationKind::Table));
+    }
+
+    None
+}
+
 fn resolve_for_kind_with_params(
     db: &dyn Db,
     file: File,
@@ -1011,40 +1032,21 @@ fn resolve_select_qualified_column_table_name_ptr(
         return resolve_function(db, file, &function_name, &function_schema, None, position);
     }
 
-    if let Some(schema) = explicit_schema {
-        let position = table_name_ref.syntax().text_range().start();
-        let ptr = resolve_table_name_ptr(db, file, &table_name, &Some(schema), position)?;
-        return Some(smallvec![Location::new(
-            file,
-            ptr.text_range(),
-            LocationKind::Table
-        )]);
-    }
-
-    let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
-    if schema.is_none()
-        && let Some(cte_ptr) = resolve_cte_table(table_name_ref, &table_name)
-    {
-        return Some(smallvec![Location::new(
-            file,
-            cte_ptr.text_range(),
-            LocationKind::Table
-        )]);
-    }
+    let (schema, table_name) = if let Some(schema) = explicit_schema {
+        (Some(schema), table_name)
+    } else {
+        name::schema_and_table_from_from_item(&from_item)?
+    };
     let position = table_name_ref.syntax().text_range().start();
-    if let Some(ptr) = resolve_table_name_ptr(db, file, &table_name, &schema, position) {
-        return Some(smallvec![Location::new(
-            file,
-            ptr.text_range(),
-            LocationKind::Table
-        )]);
-    }
-    let ptr = resolve_view_name_ptr(db, file, &table_name, &schema, position)?;
-    Some(smallvec![Location::new(
+    let (ptr, kind) = resolve_table_like(
+        db,
         file,
-        ptr.text_range(),
-        LocationKind::View
-    )])
+        Some(table_name_ref),
+        &table_name,
+        &schema,
+        position,
+    )?;
+    Some(smallvec![Location::new(file, ptr.text_range(), kind)])
 }
 
 enum ReturningClauseMatch {
@@ -1297,6 +1299,8 @@ pub(crate) enum ResolvedTableName {
     SelectInto(ast::SelectInto),
     View(ast::CreateViewLike),
 }
+// TODO: basically goto def for a table name, we should refactor into an ast_nav
+// + goto def setup
 pub(crate) fn resolve_table_name(
     db: &dyn Db,
     file: File,
@@ -1304,38 +1308,31 @@ pub(crate) fn resolve_table_name(
     schema: &Option<Schema>,
     position: TextSize,
 ) -> Option<ResolvedTableName> {
+    use ResolvedTableName::*;
+    let (ptr, kind) = resolve_table_like(db, file, None, table_name, schema, position)?;
     let tree = parse(db, file).tree();
     let root = tree.syntax();
-    use ResolvedTableName::*;
-    if let Some(table_name_ptr) = resolve_table_name_ptr(db, file, table_name, schema, position) {
-        let table_name_node = table_name_ptr.to_node(root);
-        if let Some(create_table) = table_name_node
-            .ancestors()
-            .find_map(ast::CreateTableLike::cast)
-        {
-            return Some(Table(create_table));
-        }
-        if let Some(create_table_as) = table_name_node
-            .ancestors()
-            .find_map(ast::CreateTableAs::cast)
-        {
-            return Some(TableAs(create_table_as));
-        }
-        if let Some(select_into) = table_name_node.ancestors().find_map(ast::SelectInto::cast) {
-            return Some(SelectInto(select_into));
-        }
-    }
+    let node = ptr.to_node(root);
 
-    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
-        let view_name_node = view_name_ptr.to_node(root);
-        if let Some(create_view) = view_name_node
+    match kind {
+        LocationKind::Table => {
+            if let Some(create_table) = node.ancestors().find_map(ast::CreateTableLike::cast) {
+                return Some(Table(create_table));
+            }
+            if let Some(create_table_as) = node.ancestors().find_map(ast::CreateTableAs::cast) {
+                return Some(TableAs(create_table_as));
+            }
+            if let Some(select_into) = node.ancestors().find_map(ast::SelectInto::cast) {
+                return Some(SelectInto(select_into));
+            }
+            None
+        }
+        LocationKind::View => node
             .ancestors()
             .find_map(ast::CreateViewLike::cast)
-        {
-            return Some(View(create_view));
-        }
+            .map(View),
+        _ => None,
     }
-    None
 }
 
 fn resolve_merge_alias(name_ref: &ast::NameRef, table_name: &Name) -> Option<Name> {
@@ -1448,34 +1445,7 @@ fn resolve_from_item_column_ptr(
 
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
 
-    if schema.is_none()
-        && let Some(cte_ptr) = resolve_cte_table(column_name_ref, &table_name)
-    {
-        if let Some(cte_column_ptr) =
-            resolve_cte_column(db, file, column_name_ref, &table_name, &column_name)
-        {
-            return Some(cte_column_ptr);
-        }
-        if column_name == table_name {
-            return Some(smallvec![Location::new(
-                file,
-                cte_ptr.text_range(),
-                LocationKind::Table
-            )]);
-        }
-        if let Some(alias_name) = from_item.alias().and_then(|x| x.name())
-            && Name::from_node(&alias_name) == column_name
-        {
-            return Some(smallvec![Location::new(
-                file,
-                alias_name.syntax().text_range(),
-                LocationKind::Table
-            )]);
-        }
-        return None;
-    }
-
-    if let Some(ptr) = resolve_column_from_table_or_view(
+    if let Some(ptr) = resolve_column_from_table_or_view_or_cte(
         db,
         file,
         column_name_ref,
@@ -1499,7 +1469,7 @@ fn resolve_from_item_column_ptr(
     None
 }
 
-fn resolve_column_from_table_or_view(
+fn resolve_column_from_table_or_view_or_cte(
     db: &dyn Db,
     file: File,
     name_ref: &ast::NameRef,
@@ -1507,10 +1477,18 @@ fn resolve_column_from_table_or_view(
     schema: &Option<Schema>,
     column_name: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
-    resolve_column_from_table_or_view_impl(db, file, name_ref, table_name, schema, column_name, 0)
+    resolve_column_from_table_or_view_or_cte_impl(
+        db,
+        file,
+        name_ref,
+        table_name,
+        schema,
+        column_name,
+        0,
+    )
 }
 
-fn resolve_column_from_table_or_view_impl(
+fn resolve_column_from_table_or_view_or_cte_impl(
     db: &dyn Db,
     file: File,
     name_ref: &ast::NameRef,
@@ -1519,114 +1497,120 @@ fn resolve_column_from_table_or_view_impl(
     column_name: &Name,
     depth: u32,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let tree = parse(db, file).tree();
-    let root = tree.syntax();
     if depth > 40 {
         log::info!("max resolve depth reached, probably in a cycle");
         return None;
     }
 
     let position = name_ref.syntax().text_range().start();
+    let (table_like_ptr, kind) =
+        resolve_table_like(db, file, Some(name_ref), table_name, schema, position)?;
 
-    if let Some(table_name_ptr) = resolve_table_name_ptr(db, file, table_name, schema, position) {
-        let table_name_node = table_name_ptr.to_node(root);
-
-        if let Some(create_table) = table_name_node
-            .ancestors()
-            .find_map(ast::CreateTableLike::cast)
-        {
-            // 1. try to find a matching column
-            if let Some(ptr) = find_column_in_create_table(db, file, &create_table, column_name) {
-                return Some(ptr);
+    match kind {
+        LocationKind::Table => {
+            if schema.is_none() && resolve_cte_table(name_ref, table_name).is_some() {
+                return resolve_cte_column(db, file, name_ref, table_name, column_name);
             }
 
-            // 2. No column found, check if this is a partitioned table
-            if let Some(parent_path) = ast::CreateTable::cast(create_table.syntax().clone())
-                .and_then(|x| x.partition_of())
-                .and_then(|x| x.path())
-            {
-                let (parent_schema, parent_table_name) = name::schema_and_name_path(&parent_path)?;
-                return resolve_column_from_table_or_view_impl(
-                    db,
-                    file,
-                    name_ref,
-                    &parent_table_name,
-                    &parent_schema,
-                    column_name,
-                    depth + 1,
-                );
+            let tree = parse(db, file).tree();
+            let root = tree.syntax();
+            let node = table_like_ptr.to_node(root);
+
+            if let Some(create_table) = node.ancestors().find_map(ast::CreateTableLike::cast) {
+                if let Some(cols) =
+                    find_column_in_create_table(db, file, &create_table, column_name)
+                {
+                    return Some(cols);
+                }
+
+                // check if this is a partitioned table
+                if let Some(parent_path) = ast::CreateTable::cast(create_table.syntax().clone())
+                    .and_then(|x| x.partition_of())
+                    .and_then(|x| x.path())
+                {
+                    let (parent_schema, parent_table_name) =
+                        name::schema_and_name_path(&parent_path)?;
+                    return resolve_column_from_table_or_view_or_cte_impl(
+                        db,
+                        file,
+                        name_ref,
+                        &parent_table_name,
+                        &parent_schema,
+                        column_name,
+                        depth + 1,
+                    );
+                }
+
+                // For example, in:
+                // ```sql
+                // create table t(a int);
+                // select t from t;
+                // ```
+                if column_name == table_name {
+                    return Some(smallvec![Location::new(
+                        file,
+                        table_like_ptr.text_range(),
+                        LocationKind::Table
+                    )]);
+                }
             }
 
-            // 3. No column found, check if the name matches the table name.
-            // For example, in:
-            // ```sql
-            // create table t(a int);
-            // select t from t;
-            // ```
-            if column_name == table_name {
-                return Some(smallvec![Location::new(
-                    file,
-                    table_name_ptr.text_range(),
-                    LocationKind::Table
-                )]);
+            if let Some(create_table_as) = node.ancestors().find_map(ast::CreateTableAs::cast) {
+                if let Some(cols) =
+                    find_column_in_create_table_as(file, &create_table_as, column_name)
+                {
+                    return Some(cols);
+                }
+
+                if column_name == table_name {
+                    return Some(smallvec![Location::new(
+                        file,
+                        table_like_ptr.text_range(),
+                        LocationKind::Table
+                    )]);
+                }
             }
+
+            if let Some(select_into) = node.ancestors().find_map(ast::SelectInto::cast) {
+                if let Some(cols) = find_column_in_select_into(file, &select_into, column_name) {
+                    return Some(cols);
+                }
+
+                if column_name == table_name {
+                    return Some(smallvec![Location::new(
+                        file,
+                        table_like_ptr.text_range(),
+                        LocationKind::Table
+                    )]);
+                }
+            }
+
+            None
         }
+        LocationKind::View => {
+            let tree = parse(db, file).tree();
+            let root = tree.syntax();
+            let node = table_like_ptr.to_node(root);
 
-        if let Some(create_table_as) = table_name_node
-            .ancestors()
-            .find_map(ast::CreateTableAs::cast)
-        {
-            if let Some(ptr) = find_column_in_create_table_as(file, &create_table_as, column_name) {
-                return Some(ptr);
+            if let Some(create_view) = node.ancestors().find_map(ast::CreateViewLike::cast) {
+                if let Some(cols) = find_column_in_create_view_like(file, &create_view, column_name)
+                {
+                    return Some(cols);
+                }
+
+                if column_name == table_name {
+                    return Some(smallvec![Location::new(
+                        file,
+                        table_like_ptr.text_range(),
+                        LocationKind::View
+                    )]);
+                }
             }
 
-            if column_name == table_name {
-                return Some(smallvec![Location::new(
-                    file,
-                    table_name_ptr.text_range(),
-                    LocationKind::Table
-                )]);
-            }
+            None
         }
-
-        if let Some(select_into) = table_name_node.ancestors().find_map(ast::SelectInto::cast) {
-            if let Some(ptr) = find_column_in_select_into(file, &select_into, column_name) {
-                return Some(ptr);
-            }
-
-            if column_name == table_name {
-                return Some(smallvec![Location::new(
-                    file,
-                    table_name_ptr.text_range(),
-                    LocationKind::Table
-                )]);
-            }
-        }
+        _ => None,
     }
-
-    // ditto as above but with view
-    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
-        let view_name_node = view_name_ptr.to_node(root);
-
-        if let Some(create_view) = view_name_node
-            .ancestors()
-            .find_map(ast::CreateViewLike::cast)
-        {
-            if let Some(ptr) = find_column_in_create_view_like(file, &create_view, column_name) {
-                return Some(ptr);
-            }
-
-            if column_name == table_name {
-                return Some(smallvec![Location::new(
-                    file,
-                    view_name_ptr.text_range(),
-                    LocationKind::View
-                )]);
-            }
-        }
-    }
-
-    None
 }
 
 fn resolve_from_item_for_cte_star(
@@ -1640,14 +1624,8 @@ fn resolve_from_item_for_cte_star(
     if let Some((schema, table_name)) = name::schema_and_table_from_from_item(from_item)
         && table_name == *cte_name
     {
-        return resolve_column_from_table_or_view(
-            db,
-            file,
-            name_ref,
-            &table_name,
-            &schema,
-            column_name,
-        );
+        let position = name_ref.syntax().text_range().start();
+        return resolve_column_for_table(db, file, &table_name, &schema, column_name, position);
     }
 
     resolve_from_item_column_ptr(db, file, from_item, name_ref)
@@ -1696,36 +1674,21 @@ fn resolve_fn_call_column(
     let from_clause = select.from_clause()?;
 
     for from_item in ast_nav::iter_from_clause(&from_clause) {
-        if let Some(result) =
-            resolve_from_item_for_fn_call_column(db, file, &from_item, &column_name, name_ref)
+        if let Some((schema, table_name)) = name::schema_and_table_from_from_item(&from_item)
+            && let Some(result) = resolve_column_from_table_or_view_or_cte(
+                db,
+                file,
+                name_ref,
+                &table_name,
+                &schema,
+                &column_name,
+            )
         {
             return Some(result);
         }
     }
 
     None
-}
-
-fn resolve_from_item_for_fn_call_column(
-    db: &dyn Db,
-    file: File,
-    from_item: &ast::FromItem,
-    column_name: &Name,
-    name_ref: &ast::NameRef,
-) -> Option<SmallVec<[Location; 1]>> {
-    let tree = parse(db, file).tree();
-    let root = tree.syntax();
-    let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
-
-    let position = name_ref.syntax().text_range().start();
-    let table_ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
-
-    let table_name_node = table_ptr.to_node(root);
-    let create_table = table_name_node
-        .ancestors()
-        .find_map(ast::CreateTableLike::cast)?;
-
-    find_column_in_create_table(db, file, &create_table, column_name)
 }
 
 fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
@@ -1983,7 +1946,7 @@ fn find_column_in_select_into(
     None
 }
 
-pub(crate) fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
+fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
     let with_table = ast_nav::find_cte_with_table(name_ref, cte_name)?;
     Some(SyntaxNodePtr::new(with_table.name()?.syntax()))
 }
@@ -1992,7 +1955,7 @@ fn count_columns_for_path(db: &dyn Db, file: File, path: &ast::Path) -> Option<u
     let (schema, table_name) = name::schema_and_name_path(path)?;
     let position = path.syntax().text_range().start();
 
-    count_columns_for_table_name(db, file, &table_name, &schema, position)
+    count_columns_for_table_name(db, file, &table_name, &schema, position, None)
 }
 
 fn count_columns_for_table_name(
@@ -2001,67 +1964,98 @@ fn count_columns_for_table_name(
     table_name: &Name,
     schema: &Option<Schema>,
     position: TextSize,
+    name_ref: Option<&ast::NameRef>,
 ) -> Option<usize> {
     let tree = parse(db, file).tree();
     let root = tree.syntax();
-    if let Some(table_name_ptr) = resolve_table_name_ptr(db, file, table_name, schema, position) {
-        let table_name_node = table_name_ptr.to_node(root);
+    let (table_like_ptr, kind) =
+        resolve_table_like(db, file, name_ref, table_name, schema, position)?;
 
-        if let Some(create_table) = table_name_node
-            .ancestors()
-            .find_map(ast::CreateTableLike::cast)
-        {
-            let mut count: usize = 0;
-            if let Some(args) = create_table.table_arg_list() {
-                for arg in args.args() {
-                    if matches!(arg, ast::TableArg::Column(_)) {
-                        count = count.saturating_add(1);
+    match kind {
+        LocationKind::Table => {
+            if schema.is_none()
+                && let Some(name_ref) = name_ref
+                && let Some(with_table) = ast_nav::find_cte_with_table(name_ref, table_name)
+            {
+                return count_columns_for_with_table(with_table);
+            }
+
+            let table_like_node = table_like_ptr.to_node(root);
+            if let Some(create_table) = table_like_node
+                .ancestors()
+                .find_map(ast::CreateTableLike::cast)
+            {
+                let mut count: usize = 0;
+                if let Some(args) = create_table.table_arg_list() {
+                    for arg in args.args() {
+                        if matches!(arg, ast::TableArg::Column(_)) {
+                            count = count.saturating_add(1);
+                        }
                     }
                 }
+                return Some(count);
             }
-            return Some(count);
-        }
 
-        if let Some(create_table_as) = table_name_node
-            .ancestors()
-            .find_map(ast::CreateTableAs::cast)
-        {
-            let select = ast_nav::select_from_variant(create_table_as.query()?)?;
-
-            if let Some(target_list) = select.select_clause().and_then(|c| c.target_list()) {
-                return Some(target_list.targets().count());
+            if let Some(create_table_as) = table_like_node
+                .ancestors()
+                .find_map(ast::CreateTableAs::cast)
+            {
+                let select = ast_nav::select_from_variant(create_table_as.query()?)?;
+                if let Some(target_list) = select.select_clause().and_then(|c| c.target_list()) {
+                    return Some(target_list.targets().count());
+                }
             }
-        }
 
-        if let Some(select_into) = table_name_node.ancestors().find_map(ast::SelectInto::cast) {
-            if let Some(target_list) = select_into.select_clause().and_then(|c| c.target_list()) {
-                return Some(target_list.targets().count());
+            if let Some(select_into) = table_like_node.ancestors().find_map(ast::SelectInto::cast) {
+                if let Some(target_list) = select_into.select_clause().and_then(|c| c.target_list())
+                {
+                    return Some(target_list.targets().count());
+                }
             }
+
+            None
         }
-    }
-
-    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
-        let view_name_node = view_name_ptr.to_node(root);
-
-        if let Some(create_view) = view_name_node
-            .ancestors()
-            .find_map(ast::CreateViewLike::cast)
-        {
+        LocationKind::View => {
+            let table_like_node = table_like_ptr.to_node(root);
+            let create_view = table_like_node
+                .ancestors()
+                .find_map(ast::CreateViewLike::cast)?;
             if let Some(column_list) = create_view.column_list() {
                 return Some(column_list.columns().count());
             }
 
             let select = ast_nav::select_from_variant(create_view.query()?)?;
-
             if let Some(target_list) = select.select_clause().and_then(|c| c.target_list()) {
                 // This is not quite right if there's a `*` in the view definition.
                 // It becomes recursive.
                 // For now, let's assume simple views.
                 return Some(target_list.targets().count());
             }
+
+            None
         }
+        _ => None,
     }
-    None
+}
+
+fn count_columns_for_with_table(with_table: ast::WithTable) -> Option<usize> {
+    if let Some(column_list) = with_table.column_list() {
+        return Some(column_list.columns().count());
+    }
+
+    let query = with_table.query()?;
+    if let ast::WithQuery::Values(values) = query {
+        return values
+            .row_list()
+            .and_then(|x| x.rows().next())
+            .map(|row| row.exprs().count());
+    }
+
+    let select = ast_nav::select_from_with_query(query)?;
+    select
+        .select_clause()
+        .and_then(|c| c.target_list())
+        .map(|t| t.targets().count())
 }
 
 fn resolve_cte_column(
@@ -2116,14 +2110,7 @@ fn resolve_cte_column(
         let path = table.relation_name()?.path()?;
         let (schema, table_name) = name::schema_and_name_path(&path)?;
 
-        if schema.is_none()
-            && let Some(nested_cte_column) =
-                resolve_cte_column(db, file, name_ref, &table_name, column_name)
-        {
-            return Some(nested_cte_column);
-        }
-
-        return resolve_column_from_table_or_view(
+        return resolve_column_from_table_or_view_or_cte(
             db,
             file,
             name_ref,
@@ -2199,6 +2186,16 @@ fn resolve_cte_column(
         }
 
         column_index = column_list_end;
+    }
+
+    if column_name == cte_name
+        && let Some(name_node) = with_table.name()
+    {
+        return Some(smallvec![Location::new(
+            file,
+            name_node.syntax().text_range(),
+            LocationKind::Table
+        )]);
     }
 
     None
@@ -2305,14 +2302,7 @@ fn resolve_subquery_column_ptr(
         let path = table.relation_name()?.path()?;
         let (schema, table_name) = name::schema_and_name_path(&path)?;
 
-        if schema.is_none()
-            && let Some(cte_column_ptr) =
-                resolve_cte_column(db, file, name_ref, &table_name, column_name)
-        {
-            return Some(cte_column_ptr);
-        }
-
-        return resolve_column_from_table_or_view(
+        return resolve_column_from_table_or_view_or_cte(
             db,
             file,
             name_ref,
@@ -2415,139 +2405,6 @@ pub(crate) fn qualified_star_table_name(field_expr: &ast::FieldExpr) -> Option<N
     }
 }
 
-pub(crate) fn resolve_qualified_star_table_ptr(
-    db: &dyn Db,
-    file: File,
-    field_expr: ast::FieldExpr,
-) -> Option<SyntaxNodePtr> {
-    let table_name = qualified_star_table_name(&field_expr)?;
-    let position = field_expr.syntax().text_range().start();
-    let target = field_expr
-        .syntax()
-        .ancestors()
-        .find_map(ast::Target::cast)?;
-
-    let res = ast_nav::target_parent_query(target)?;
-
-    let path = match res {
-        ast_nav::ParentQuery::Select(select) => {
-            let from_clause = select.from_clause()?;
-            let from_item = find_from_item_in_from_clause(&from_clause, &table_name)?;
-
-            if let Some(alias) = from_item.alias()
-                && alias.column_list().is_some()
-            {
-                return Some(SyntaxNodePtr::new(alias.syntax()));
-            }
-
-            let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
-
-            if let Some(table_name_ptr) =
-                resolve_table_name_ptr(db, file, &table_name, &schema, position)
-            {
-                return Some(table_name_ptr);
-            }
-
-            if let Some(view_name_ptr) =
-                resolve_view_name_ptr(db, file, &table_name, &schema, position)
-            {
-                return Some(view_name_ptr);
-            }
-
-            if schema.is_none()
-                && let Some(name_ref) = from_item.name_ref()
-            {
-                return resolve_cte_table(&name_ref, &table_name);
-            }
-
-            return None;
-        }
-        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path()?,
-        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path()?,
-        ast_nav::ParentQuery::Insert(insert) => insert.path()?,
-        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path()?,
-    };
-
-    return resolve_table_or_view_or_cte_ptrs(db, file, position, &path)?
-        .into_iter()
-        .next();
-}
-
-fn resolve_table_or_view_or_cte_ptrs(
-    db: &dyn Db,
-    file: File,
-    position: TextSize,
-    path: &ast::Path,
-) -> Option<Vec<SyntaxNodePtr>> {
-    let (schema, table_name) = name::schema_and_name_path(path)?;
-
-    let mut results = vec![];
-
-    if let Some(table_name_ptr) = resolve_table_name_ptr(db, file, &table_name, &schema, position) {
-        results.push(table_name_ptr);
-    }
-
-    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, &table_name, &schema, position) {
-        results.push(view_name_ptr);
-    }
-
-    if schema.is_none()
-        && let Some(name_ref) = path.segment().and_then(|x| x.name_ref())
-        && let Some(cte_ptr) = resolve_cte_table(&name_ref, &table_name)
-    {
-        results.push(cte_ptr);
-    }
-
-    if results.is_empty() {
-        return None;
-    }
-
-    Some(results)
-}
-
-pub(crate) fn resolve_unqualified_star_table_ptrs(
-    db: &dyn Db,
-    file: File,
-    target: &ast::Target,
-) -> Option<Vec<SyntaxNodePtr>> {
-    target.star_token()?;
-
-    let position = target.syntax().text_range().start();
-
-    let path = match ast_nav::target_parent_query(target.clone())? {
-        ast_nav::ParentQuery::Select(select) => {
-            let from_clause = select.from_clause()?;
-            let results = table_ptrs_from_clause(db, file, &from_clause);
-            if results.is_empty() {
-                return None;
-            }
-            return Some(results);
-        }
-        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path(),
-        ast_nav::ParentQuery::Insert(insert) => insert.path(),
-        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path(),
-        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path(),
-    }?;
-
-    resolve_table_or_view_or_cte_ptrs(db, file, position, &path)
-}
-
-pub(crate) fn resolve_unqualified_star_in_arg_list_ptrs(
-    db: &dyn Db,
-    file: File,
-    arg_list: &ast::ArgList,
-) -> Option<Vec<SyntaxNodePtr>> {
-    let select = arg_list.syntax().ancestors().find_map(ast::Select::cast)?;
-    let from_clause = select.from_clause()?;
-    let results = table_ptrs_from_clause(db, file, &from_clause);
-
-    if results.is_empty() {
-        return None;
-    }
-
-    Some(results)
-}
-
 // TODO: I don't think we should be passing in file here and using it, we want
 // to use the content from the updated file with the completion marker
 pub(crate) fn table_ptrs_from_clause(
@@ -2574,25 +2431,12 @@ pub(crate) fn table_ptrs_from_clause(
             continue;
         };
 
+        let name_ref = from_item.name_ref();
         let position = from_item.syntax().text_range().start();
-        if let Some(table_name_ptr) =
-            resolve_table_name_ptr(db, file, &table_name, &schema, position)
+        if let Some((table_like_ptr, _kind)) =
+            resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
         {
-            results.push(table_name_ptr);
-            continue;
-        }
-
-        if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, &table_name, &schema, position)
-        {
-            results.push(view_name_ptr);
-            continue;
-        }
-
-        if schema.is_none()
-            && let Some(name_ref) = from_item.name_ref()
-            && let Some(cte_ptr) = resolve_cte_table(&name_ref, &table_name)
-        {
-            results.push(cte_ptr);
+            results.push(table_like_ptr);
         }
     }
 
@@ -2613,24 +2457,11 @@ pub(crate) fn table_ptr_from_from_item(
     }
 
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
+    let name_ref = from_item.name_ref();
     let position = from_item.syntax().text_range().start();
 
-    if let Some(table_ptr) = resolve_table_name_ptr(db, file, &table_name, &schema, position) {
-        return Some(table_ptr);
-    }
-
-    if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, &table_name, &schema, position) {
-        return Some(view_name_ptr);
-    }
-
-    if schema.is_none()
-        && let Some(name_ref) = from_item.name_ref()
-        && let Some(cte_ptr) = resolve_cte_table(&name_ref, &table_name)
-    {
-        return Some(cte_ptr);
-    }
-
-    None
+    resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
+        .map(|(table_like_ptr, _kind)| table_like_ptr)
 }
 
 fn table_ptr_from_paren_expr(
@@ -2695,43 +2526,7 @@ fn count_columns_for_from_item(
 ) -> Option<usize> {
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
     let position = name_ref.syntax().text_range().start();
-
-    if let Some(count) = count_columns_for_table_name(db, file, &table_name, &schema, position) {
-        return Some(count);
-    }
-
-    if schema.is_none()
-        && let Some(cte_column_count) = count_columns_for_cte(name_ref, &table_name)
-    {
-        return Some(cte_column_count);
-    }
-
-    None
-}
-
-fn count_columns_for_cte(name_ref: &ast::NameRef, cte_name: &Name) -> Option<usize> {
-    let with_table = ast_nav::find_cte_with_table(name_ref, cte_name)?;
-
-    if let Some(column_list) = with_table.column_list() {
-        return Some(column_list.columns().count());
-    }
-
-    let query = with_table.query()?;
-
-    if let ast::WithQuery::Values(values) = query {
-        if let Some(first_row) = values.row_list().and_then(|x| x.rows().next()) {
-            return Some(first_row.exprs().count());
-        }
-        return None;
-    }
-
-    let select = ast_nav::select_from_with_query(query)?;
-
-    if let Some(target_list) = select.select_clause().and_then(|c| c.target_list()) {
-        return Some(target_list.targets().count());
-    }
-
-    None
+    count_columns_for_table_name(db, file, &table_name, &schema, position, Some(name_ref))
 }
 
 fn resolve_from_clause_for_cte_star(
@@ -3115,20 +2910,16 @@ fn resolve_merge_table_name_ptr(
         if let Some(item_name_ref) = from_item.name_ref() {
             let item_name = Name::from_node(&item_name_ref);
             if item_name == table_name {
-                if let Some(cte_ptr) = resolve_cte_table(table_name_ref, &table_name) {
-                    return Some(smallvec![Location::new(
-                        file,
-                        cte_ptr.text_range(),
-                        LocationKind::Table
-                    )]);
-                }
                 let position = table_name_ref.syntax().text_range().start();
-                let ptr = resolve_table_name_ptr(db, file, &item_name, &None, position)?;
-                return Some(smallvec![Location::new(
+                let (ptr, kind) = resolve_table_like(
+                    db,
                     file,
-                    ptr.text_range(),
-                    LocationKind::Table
-                )]);
+                    Some(table_name_ref),
+                    &item_name,
+                    &None,
+                    position,
+                )?;
+                return Some(smallvec![Location::new(file, ptr.text_range(), kind)]);
             }
         }
         // Check for aliased source tables

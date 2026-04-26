@@ -534,6 +534,24 @@ select t$0.* from t;
     }
 
     #[test]
+    fn goto_cte_shadowed_table_star_column_count_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+with
+  t as (
+    select 1
+  ),
+  -- yy overrides y since there's only 1 column in the *
+  u(x, yy) as (
+    select *, 2 y, 3 z from t
+  )
+select y$0 from u;
+",
+        );
+    }
+
+    #[test]
     fn goto_cross_join_func_column() {
         assert_snapshot!(goto(r#"
 with t(x) as (select $$[{"a":1,"b":2}]$$::json)
@@ -4193,6 +4211,34 @@ select f2$0 from dup(42) as u(x, y);
     }
 
     #[test]
+    fn goto_fn_call_column_from_cte() {
+        assert_snapshot!(goto("
+with cte as (select 1 as a)
+select a$0(cte) from cte;
+"), @"
+          ╭▸ 
+        2 │ with cte as (select 1 as a)
+          │                          ─ 2. destination
+        3 │ select a(cte) from cte;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_fn_call_column_from_view() {
+        assert_snapshot!(goto("
+create view v as select 1 as a;
+select a$0(v) from v;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 as a;
+          │                              ─ 2. destination
+        3 │ select a(v) from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_select_aggregate_call() {
         assert_snapshot!(goto("
 create aggregate foo(int) (
@@ -5337,6 +5383,26 @@ insert into public.users$0(id, email) values (1, 'test@example.com');
         2 │ create table public.users(id int, email text);
           │                     ───── 2. destination
         3 │ insert into public.users(id, email) values (1, 'test@example.com');
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_view() {
+        assert_snapshot!(goto("
+create table users as select 1 id, 'joe' name, 'joe@example.com' email, 'active' status;
+create view active_users as
+  select id, name, email
+  from users
+  where status = 'active';
+insert into active_users$0 (name, email)
+values ('Alice', 'alice@example.com');
+"), @"
+          ╭▸ 
+        3 │ create view active_users as
+          │             ──────────── 2. destination
+          ‡
+        7 │ insert into active_users (name, email)
           ╰╴                       ─ 1. source
         ");
     }
