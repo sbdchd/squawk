@@ -1327,11 +1327,10 @@ pub(crate) fn resolve_table_name(
             }
             None
         }
-        LocationKind::View => {
-            node.ancestors()
-                .find_map(ast::CreateViewLike::cast)
-                .map(View)
-        }
+        LocationKind::View => node
+            .ancestors()
+            .find_map(ast::CreateViewLike::cast)
+            .map(View),
         _ => None,
     }
 }
@@ -1518,7 +1517,9 @@ fn resolve_column_from_table_or_view_or_cte_impl(
             let node = table_like_ptr.to_node(root);
 
             if let Some(create_table) = node.ancestors().find_map(ast::CreateTableLike::cast) {
-                if let Some(cols) = find_column_in_create_table(db, file, &create_table, column_name) {
+                if let Some(cols) =
+                    find_column_in_create_table(db, file, &create_table, column_name)
+                {
                     return Some(cols);
                 }
 
@@ -1554,9 +1555,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                 }
             }
 
-            if let Some(create_table_as) =
-                node.ancestors().find_map(ast::CreateTableAs::cast)
-            {
+            if let Some(create_table_as) = node.ancestors().find_map(ast::CreateTableAs::cast) {
                 if let Some(cols) =
                     find_column_in_create_table_as(file, &create_table_as, column_name)
                 {
@@ -1594,8 +1593,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
             let node = table_like_ptr.to_node(root);
 
             if let Some(create_view) = node.ancestors().find_map(ast::CreateViewLike::cast) {
-                if let Some(cols) =
-                    find_column_in_create_view_like(file, &create_view, column_name)
+                if let Some(cols) = find_column_in_create_view_like(file, &create_view, column_name)
                 {
                     return Some(cols);
                 }
