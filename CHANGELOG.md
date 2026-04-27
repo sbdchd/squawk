@@ -49,7 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     columns (1 as x));
   ```
 
-
 - fmt: more work towards full select and create table support (#1079)
 
   ```sql
@@ -73,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- ide: fix shadowing cte column w/ `*` hover + func call syntax for cte & views  (#1094)
+- ide: fix shadowing cte column w/ `*` hover + func call syntax for cte & views (#1094)
 
   ```sql
   -- shadowing
@@ -89,7 +88,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   select y from u;
   --     ^ 1. goto def src - doesn't resolve because of override above
   ```
-
 
   ```sql
   -- function call syntax for cte column
