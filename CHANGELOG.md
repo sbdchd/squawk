@@ -7,6 +7,117 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.49.0 - 2026-04-27
+
+### Added
+
+- ide: goto def for select into (#1086)
+
+  ```sql
+  select 1 a into t;
+  --       ^ 2. dest
+  select a from t;
+  --     ^ 1. goto def src
+  ```
+
+  and
+
+  ```sql
+  select 1 a into t;
+  --              ^ 2. dest
+  select a from t;
+  --            ^ 1. goto def src
+  ```
+
+- ide: goto def with view & qualified column (#1081)
+
+  ```sql
+  create view v as select 1 id, 2 b;
+  --          ^ 2. dest
+  select v.id from v;
+  --     ^ 1. goto def src
+  ```
+
+- ide: goto def from graph_table to create property graph (#1077)
+
+  ```sql
+  create property graph myshop vertex tables (t key (a) no properties);
+  --                    ^ 2. dest
+  select 1 from graph_table (myshop
+  --                         ^ 1. goto def src
+    match (n is t)
+    columns (1 as x));
+  ```
+
+- fmt: more work towards full select and create table support (#1079)
+
+  ```sql
+  -- before
+  create table t(a int,b text);
+
+  -- after
+  create table t(
+    a int,
+    b text
+  );
+  ```
+
+  ```sql
+  -- before
+  select array[[1,2],[3,4]];
+
+  -- after
+  select array[[1, 2], [3, 4]];
+  ```
+
+### Fixed
+
+- ide: fix shadowing cte column w/ `*` hover + func call syntax for cte & views (#1094)
+
+  ```sql
+  -- shadowing
+  create table t(a int, b int);
+  with
+    t as (
+      select 1
+    ),
+    -- yy overrides y since there's only 1 column in the *
+    u(x, yy) as (
+      select *, 2 y, 3 z from t
+    )
+  select y from u;
+  --     ^ 1. goto def src - doesn't resolve because of override above
+  ```
+
+  ```sql
+  -- function call syntax for cte column
+  with cte as (select 1 as a)
+  --                       ^ 2. dest
+  select a(cte) from cte;
+  --     ^ 1. goto def src
+  ```
+
+  ```sql
+  -- function call syntax for view column
+  create view v as select 1 as a;
+  --                           ^ 2. dest
+  select a(v) from v;
+  --     ^ 1. goto def src
+  ```
+
+### Internal
+
+- ide/server/wasm: use salsa for binder caching (#1078)
+- ide: cleanup goto def & find ref tests to prep for extension support (#1080)
+- ide: split resolve into resolve/collect/ast_nav & dedupe code (#1085)
+- ide: consolidate name helpers (#1090)
+- ide: update return types in resolve_name_ref to use Location (#1089)
+- ide: simplify hovering for names (#1088)
+- ide: refactor hover & find refs to use goto_def (#1087)
+- ide: refactor resolve and fix a couple edge cases (#1094)
+- ide: refactor resolve to use name related functions (#1092)
+- ide: refactor code actions into their own modules (#1091)
+
 ## v2.48.0 - 2026-04-18
 
 ### Added
