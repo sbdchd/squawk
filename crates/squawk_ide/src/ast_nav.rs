@@ -230,6 +230,37 @@ pub(crate) fn parent_source(node: &SyntaxNode) -> Option<ParentSouce> {
     None
 }
 
+pub(crate) enum CreateTableArg {
+    Column(ast::Column),
+    Inherits(ast::Path),
+    LikeClause(ast::LikeClause),
+    TableConstraint(#[expect(unused)] ast::TableConstraint),
+}
+
+pub(crate) fn create_table_args(
+    create_table: &impl ast::HasCreateTable,
+) -> impl Iterator<Item = CreateTableArg> {
+    let inherits_iter = create_table
+        .inherits()
+        .into_iter()
+        .flat_map(|inherits| inherits.paths())
+        .map(CreateTableArg::Inherits);
+
+    let args_iter = create_table
+        .table_arg_list()
+        .into_iter()
+        .flat_map(|arg_list| arg_list.args())
+        .map(|arg| match arg {
+            ast::TableArg::Column(column) => CreateTableArg::Column(column),
+            ast::TableArg::LikeClause(like_clause) => CreateTableArg::LikeClause(like_clause),
+            ast::TableArg::TableConstraint(constraint) => {
+                CreateTableArg::TableConstraint(constraint)
+            }
+        });
+
+    inherits_iter.chain(args_iter)
+}
+
 struct UnwrapParenExpr {
     current: Option<ast::Expr>,
 }

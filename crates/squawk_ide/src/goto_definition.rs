@@ -6178,6 +6178,18 @@ select COLUMN1$0, COLUMN2 from t;
     }
 
     #[test]
+    fn goto_cte_values_with_explicit_column_list_column1_not_found() {
+        goto_not_found(
+            "
+with t(a, b) as (
+    values (1, 2), (3, 4)
+)
+select column1$0 from t;
+",
+        );
+    }
+
+    #[test]
     fn goto_qualified_column_with_schema_in_from_table() {
         assert_snapshot!(goto("
 create table foo.t(a int, b int);

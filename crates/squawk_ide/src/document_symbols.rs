@@ -273,8 +273,7 @@ fn create_table_symbol(
     create_table: impl ast::HasCreateTable,
 ) -> Option<DocumentSymbol> {
     let path = create_table.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, table_name) = resolve_table_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, table_name);
@@ -283,13 +282,11 @@ fn create_table_symbol(
     let focus_range = name_node.syntax().text_range();
 
     let mut children = vec![];
-    if let Some(table_arg_list) = create_table.table_arg_list() {
-        for arg in table_arg_list.args() {
-            if let ast::TableArg::Column(column) = arg
-                && let Some(column_symbol) = create_column_symbol(column)
-            {
-                children.push(column_symbol);
-            }
+    for arg in create_table.table_arg_list()?.args() {
+        if let ast::TableArg::Column(column) = arg
+            && let Some(column_symbol) = create_column_symbol(column)
+        {
+            children.push(column_symbol);
         }
     }
 
@@ -309,12 +306,7 @@ fn create_table_as_symbol(
     create_table_as: ast::CreateTableAs,
 ) -> Option<DocumentSymbol> {
     let path = create_table_as.path()?;
-    let segment = path.segment()?;
-    let name_node = if let Some(name) = segment.name() {
-        name.syntax().clone()
-    } else {
-        return None;
-    };
+    let name_node = path.segment()?.name()?.syntax().clone();
 
     let (schema, table_name) = resolve_table_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, table_name);
@@ -340,8 +332,7 @@ fn create_view_symbol(
     create_view: ast::CreateView,
 ) -> Option<DocumentSymbol> {
     let path = create_view.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, view_name) = resolve_view_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, view_name);
@@ -391,8 +382,7 @@ fn create_materialized_view_symbol(
     create_view: ast::CreateMaterializedView,
 ) -> Option<DocumentSymbol> {
     let path = create_view.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, view_name) = resolve_view_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, view_name);
@@ -415,8 +405,7 @@ fn create_function_symbol(
     create_function: ast::CreateFunction,
 ) -> Option<DocumentSymbol> {
     let path = create_function.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, function_name) = resolve_function_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, function_name);
@@ -440,8 +429,7 @@ fn create_aggregate_symbol(
     create_aggregate: ast::CreateAggregate,
 ) -> Option<DocumentSymbol> {
     let path = create_aggregate.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, aggregate_name) = resolve_aggregate_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, aggregate_name);
@@ -465,8 +453,7 @@ fn create_procedure_symbol(
     create_procedure: ast::CreateProcedure,
 ) -> Option<DocumentSymbol> {
     let path = create_procedure.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, procedure_name) = resolve_procedure_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, procedure_name);
@@ -507,8 +494,7 @@ fn create_domain_symbol(
     create_domain: ast::CreateDomain,
 ) -> Option<DocumentSymbol> {
     let path = create_domain.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, domain_name) = resolve_type_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, domain_name);
@@ -532,8 +518,7 @@ fn create_sequence_symbol(
     create_sequence: ast::CreateSequence,
 ) -> Option<DocumentSymbol> {
     let path = create_sequence.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, sequence_name) = resolve_sequence_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, sequence_name);
@@ -716,8 +701,7 @@ fn create_type_symbol(
     create_type: ast::CreateType,
 ) -> Option<DocumentSymbol> {
     let path = create_type.path()?;
-    let segment = path.segment()?;
-    let name_node = segment.name()?;
+    let name_node = path.segment()?.name()?;
 
     let (schema, type_name) = resolve_type_info(db, file, &path)?;
     let name = format!("{}.{}", schema.0, type_name);
