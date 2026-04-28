@@ -37,48 +37,37 @@ fn columns_from_create_table_impl(
         return;
     }
 
-    if let Some(inherits) = create_table.inherits() {
-        for path in inherits.paths() {
-            if let Some((schema, table_name)) = name::schema_and_name_path(&path) {
-                let position = path.syntax().text_range().start();
-                if let Some(ResolvedTableName::Table(parent_table)) =
-                    resolve_table_name(db, file, &table_name, &schema, position)
-                {
-                    columns_from_create_table_impl(db, file, &parent_table, columns, depth + 1);
-                }
-            }
-        }
-    }
-
-    if let Some(arg_list) = create_table.table_arg_list() {
-        for arg in arg_list.args() {
-            match &arg {
-                ast::TableArg::Column(column) => {
-                    if let Some(name) = column.name() {
-                        let col_name = Name::from_node(&name);
-                        columns.push((col_name, Some(SyntaxNodePtr::new(name.syntax()))));
-                    }
-                }
-                ast::TableArg::LikeClause(like_clause) => {
-                    if let Some(path) = like_clause.path()
-                        && let Some((schema, table_name)) = name::schema_and_name_path(&path)
+    for arg in ast_nav::create_table_args(create_table) {
+        match arg {
+            ast_nav::CreateTableArg::Inherits(path) => {
+                if let Some((schema, table_name)) = name::schema_and_name_path(&path) {
+                    let position = path.syntax().text_range().start();
+                    if let Some(ResolvedTableName::Table(parent_table)) =
+                        resolve_table_name(db, file, &table_name, &schema, position)
                     {
-                        let position = path.syntax().text_range().start();
-                        if let Some(ResolvedTableName::Table(source_table)) =
-                            resolve_table_name(db, file, &table_name, &schema, position)
-                        {
-                            columns_from_create_table_impl(
-                                db,
-                                file,
-                                &source_table,
-                                columns,
-                                depth + 1,
-                            );
-                        }
+                        columns_from_create_table_impl(db, file, &parent_table, columns, depth + 1);
                     }
                 }
-                ast::TableArg::TableConstraint(_) => (),
             }
+            ast_nav::CreateTableArg::Column(column) => {
+                if let Some(name) = column.name() {
+                    let col_name = Name::from_node(&name);
+                    columns.push((col_name, Some(SyntaxNodePtr::new(name.syntax()))));
+                }
+            }
+            ast_nav::CreateTableArg::LikeClause(like_clause) => {
+                if let Some(path) = like_clause.path()
+                    && let Some((schema, table_name)) = name::schema_and_name_path(&path)
+                {
+                    let position = path.syntax().text_range().start();
+                    if let Some(ResolvedTableName::Table(source_table)) =
+                        resolve_table_name(db, file, &table_name, &schema, position)
+                    {
+                        columns_from_create_table_impl(db, file, &source_table, columns, depth + 1);
+                    }
+                }
+            }
+            ast_nav::CreateTableArg::TableConstraint(_) => (),
         }
     }
 }
@@ -105,45 +94,37 @@ fn table_columns_impl(
 
     let mut columns = vec![];
 
-    if let Some(inherits) = create_table.inherits() {
-        for path in inherits.paths() {
-            if let Some((schema, table_name)) = name::schema_and_name_path(&path) {
-                let position = path.syntax().text_range().start();
-                if let Some(ResolvedTableName::Table(parent_table)) =
-                    resolve_table_name(db, file, &table_name, &schema, position)
-                {
-                    let inherited_columns = table_columns_impl(db, file, &parent_table, depth + 1);
-                    columns.extend(inherited_columns);
-                }
-            }
-        }
-    }
-
-    if let Some(arg_list) = create_table.table_arg_list() {
-        for arg in arg_list.args() {
-            match &arg {
-                ast::TableArg::Column(column) => {
-                    if let Some(name) = column.name() {
-                        let ty = column.ty().and_then(|ty| infer_type_from_ty(&ty));
-                        columns.push((Name::from_node(&name), ty));
-                    }
-                }
-                ast::TableArg::LikeClause(like_clause) => {
-                    if let Some(path) = like_clause.path()
-                        && let Some((schema, table_name)) = name::schema_and_name_path(&path)
+    for arg in ast_nav::create_table_args(create_table) {
+        match arg {
+            ast_nav::CreateTableArg::Inherits(path) => {
+                if let Some((schema, table_name)) = name::schema_and_name_path(&path) {
+                    let position = path.syntax().text_range().start();
+                    if let Some(ResolvedTableName::Table(parent_table)) =
+                        resolve_table_name(db, file, &table_name, &schema, position)
                     {
-                        let position = path.syntax().text_range().start();
-                        if let Some(ResolvedTableName::Table(source_table)) =
-                            resolve_table_name(db, file, &table_name, &schema, position)
-                        {
-                            let like_columns =
-                                table_columns_impl(db, file, &source_table, depth + 1);
-                            columns.extend(like_columns);
-                        }
+                        columns.extend(table_columns_impl(db, file, &parent_table, depth + 1));
                     }
                 }
-                ast::TableArg::TableConstraint(_) => (),
             }
+            ast_nav::CreateTableArg::Column(column) => {
+                if let Some(name) = column.name() {
+                    let ty = column.ty().and_then(|ty| infer_type_from_ty(&ty));
+                    columns.push((Name::from_node(&name), ty));
+                }
+            }
+            ast_nav::CreateTableArg::LikeClause(like_clause) => {
+                if let Some(path) = like_clause.path()
+                    && let Some((schema, table_name)) = name::schema_and_name_path(&path)
+                {
+                    let position = path.syntax().text_range().start();
+                    if let Some(ResolvedTableName::Table(source_table)) =
+                        resolve_table_name(db, file, &table_name, &schema, position)
+                    {
+                        columns.extend(table_columns_impl(db, file, &source_table, depth + 1));
+                    }
+                }
+            }
+            ast_nav::CreateTableArg::TableConstraint(_) => (),
         }
     }
 

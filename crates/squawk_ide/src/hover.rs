@@ -278,8 +278,12 @@ fn column_name_from_node(column_name_node: &SyntaxNode) -> Option<Name> {
             .exprs()
             .position(|expr| expr.syntax() == column_name_node)?;
         Some(Name::from_string(format!("column{}", idx + 1)))
+    } else if let Some(name) = ast::Name::cast(column_name_node.clone()) {
+        Some(Name::from_node(&name))
     } else {
-        Some(Name::from_string(column_name_node.text().to_string()))
+        let target = column_name_node.ancestors().find_map(ast::Target::cast)?;
+        let (col_name, _) = ColumnName::from_target(target)?;
+        Some(Name::from_string(col_name.to_string()?))
     }
 }
 
@@ -298,7 +302,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         ast_nav::ParentSouce::ParenSelect(paren_select) => {
             // Qualified access like `t.a`
             if let Some(table_name) = subquery_alias_name(&paren_select) {
-                let column_name = Name::from_string(def_node.text().to_string());
+                let column_name = column_name_from_node(def_node)?;
                 return Some(Hover::snippet(ColumnHover::table_column(
                     &table_name.to_string(),
                     &column_name.to_string(),
@@ -321,8 +325,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         // select a from v;
         //        ^
         ast_nav::ParentSouce::CreateView(create_view) => {
-            let column_name =
-                ast::Name::cast(def_node.clone()).map(|name| Name::from_node(&name))?;
+            let column_name = column_name_from_node(def_node)?;
             let path = create_view.path()?;
             let (schema, view_name) = resolve::resolve_view_info(db, def.file, &path)?;
             return Some(Hover::snippet(ColumnHover::schema_table_column(
@@ -342,8 +345,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
             )));
         }
         ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
-            let name = ast::Name::cast(def_node.clone())?;
-            let column_name = Name::from_node(&name);
+            let column_name = column_name_from_node(def_node)?;
             let path = create_table_as.path()?;
             let (schema, table_name) = resolve::resolve_table_info(db, def.file, &path)?;
             return Some(Hover::snippet(ColumnHover::schema_table_column(
@@ -3405,6 +3407,69 @@ select *$0 from (select 1) as sub;
         2 │ select * from (select 1) as sub;
           ╰╴       ─ hover
         ");
+    }
+
+    #[test]
+    fn hover_on_view_inferred_column_anme() {
+        assert_snapshot!(check_hover(r#"
+create view v as select 1;
+select "?column?"$0 from v;
+"#), @r#"
+        hover: column public.v.?column?
+          ╭▸ 
+        3 │ select "?column?" from v;
+          ╰╴                ─ hover
+        "#);
+    }
+
+    #[test]
+    fn hover_on_cte_inferred_column_name() {
+        assert_snapshot!(check_hover(r#"
+with x as (select 1)
+select "?column?"$0 from x;
+"#), @r#"
+        hover: column x.?column?
+          ╭▸ 
+        3 │ select "?column?" from x;
+          ╰╴                ─ hover
+        "#);
+    }
+
+    #[test]
+    fn hover_on_create_table_as_inferred_column_name() {
+        assert_snapshot!(check_hover(r#"
+create table t as select 1;
+select "?column?"$0 from t;
+"#), @r#"
+        hover: column public.t.?column?
+          ╭▸ 
+        3 │ select "?column?" from t;
+          ╰╴                ─ hover
+        "#);
+    }
+
+    #[test]
+    fn hover_on_paren_select_inferred_column_name() {
+        assert_snapshot!(check_hover(r#"
+select "?column?"$0 from (select 1);
+"#), @r#"
+        hover: column ?column? integer
+          ╭▸ 
+        2 │ select "?column?" from (select 1);
+          ╰╴                ─ hover
+        "#);
+    }
+
+    #[test]
+    fn hover_on_paren_select_aliased_inferred_column_name() {
+        assert_snapshot!(check_hover(r#"
+select sub."?column?"$0 from (select 1) sub;
+"#), @r#"
+        hover: column sub.?column?
+          ╭▸ 
+        2 │ select sub."?column?" from (select 1) sub;
+          ╰╴                    ─ hover
+        "#);
     }
 
     #[test]

@@ -1777,37 +1777,33 @@ fn find_column_in_create_table_impl(
         return None;
     }
 
-    if let Some(inherits) = create_table.inherits() {
-        for path in inherits.paths() {
-            let (schema, table_name) = name::schema_and_name_path(&path)?;
-            let position = path.syntax().text_range().start();
-
-            if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position) {
-                if let Some(ptr) = match resolved {
-                    ResolvedTableName::Table(parent_table) => find_column_in_create_table_impl(
-                        db,
-                        file,
-                        &parent_table,
-                        column_name,
-                        depth + 1,
-                    ),
-                    ResolvedTableName::TableAs(create_table_as) => {
-                        find_column_in_create_table_as(file, &create_table_as, column_name)
+    for arg in ast_nav::create_table_args(create_table) {
+        match arg {
+            ast_nav::CreateTableArg::Inherits(path) => {
+                let (schema, table_name) = name::schema_and_name_path(&path)?;
+                let position = path.syntax().text_range().start();
+                if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position)
+                    && let Some(ptr) = match resolved {
+                        ResolvedTableName::Table(parent_table) => find_column_in_create_table_impl(
+                            db,
+                            file,
+                            &parent_table,
+                            column_name,
+                            depth + 1,
+                        ),
+                        ResolvedTableName::TableAs(create_table_as) => {
+                            find_column_in_create_table_as(file, &create_table_as, column_name)
+                        }
+                        ResolvedTableName::SelectInto(select_into) => {
+                            find_column_in_select_into(file, &select_into, column_name)
+                        }
+                        ResolvedTableName::View(_) => None,
                     }
-                    ResolvedTableName::SelectInto(select_into) => {
-                        find_column_in_select_into(file, &select_into, column_name)
-                    }
-                    ResolvedTableName::View(_) => None,
-                } {
+                {
                     return Some(ptr);
                 }
             }
-        }
-    }
-
-    for arg in create_table.table_arg_list()?.args() {
-        match &arg {
-            ast::TableArg::Column(column) => {
+            ast_nav::CreateTableArg::Column(column) => {
                 if let Some(name) = column.name()
                     && Name::from_node(&name) == *column_name
                 {
@@ -1818,14 +1814,12 @@ fn find_column_in_create_table_impl(
                     )]);
                 }
             }
-            ast::TableArg::LikeClause(like_clause) => {
+            ast_nav::CreateTableArg::LikeClause(like_clause) => {
                 let path = like_clause.path()?;
                 let (schema, table_name) = name::schema_and_name_path(&path)?;
                 let position = path.syntax().text_range().start();
-
                 if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position)
-                {
-                    if let Some(ptr) = match resolved {
+                    && let Some(ptr) = match resolved {
                         ResolvedTableName::Table(source_table) => find_column_in_create_table_impl(
                             db,
                             file,
@@ -1840,12 +1834,12 @@ fn find_column_in_create_table_impl(
                             find_column_in_select_into(file, &select_into, column_name)
                         }
                         ResolvedTableName::View(_) => None,
-                    } {
-                        return Some(ptr);
                     }
+                {
+                    return Some(ptr);
                 }
             }
-            ast::TableArg::TableConstraint(_) => (),
+            ast_nav::CreateTableArg::TableConstraint(_) => (),
         }
     }
 
@@ -1877,10 +1871,7 @@ fn find_column_in_create_view_like(
 
     let select = ast_nav::select_from_variant(create_view.query()?)?;
 
-    let select_clause = select.select_clause()?;
-    let target_list = select_clause.target_list()?;
-
-    for (idx, target) in target_list.targets().enumerate() {
+    for (idx, target) in select.select_clause()?.target_list()?.targets().enumerate() {
         if idx < column_list_len {
             continue;
         }
@@ -1954,7 +1945,6 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
 fn count_columns_for_path(db: &dyn Db, file: File, path: &ast::Path) -> Option<usize> {
     let (schema, table_name) = name::schema_and_name_path(path)?;
     let position = path.syntax().text_range().start();
-
     count_columns_for_table_name(db, file, &table_name, &schema, position, None)
 }
 
@@ -2126,8 +2116,7 @@ fn resolve_cte_column(
 
     let cte_select = ast_nav::select_from_with_query(query)?;
 
-    let select_clause = cte_select.select_clause()?;
-    let target_list = select_clause.target_list()?;
+    let target_list = cte_select.select_clause()?.target_list()?;
     let from_clause = cte_select.from_clause();
     let mut column_index: usize = 0;
 
@@ -2209,19 +2198,14 @@ fn column_in_with_query(
     column_list_len: usize,
 ) -> Option<SmallVec<[Location; 1]>> {
     let (returning_clause, path) = match query {
-        ast::WithQuery::Delete(delete) => (
-            delete.returning_clause(),
-            delete.relation_name().and_then(|r| r.path()),
-        ),
-        ast::WithQuery::Insert(insert) => (insert.returning_clause(), insert.path()),
-        ast::WithQuery::Merge(merge) => (
-            merge.returning_clause(),
-            merge.relation_name().and_then(|r| r.path()),
-        ),
-        ast::WithQuery::Update(update) => (
-            update.returning_clause(),
-            update.relation_name().and_then(|r| r.path()),
-        ),
+        ast::WithQuery::Delete(delete) => {
+            (delete.returning_clause(), delete.relation_name()?.path()?)
+        }
+        ast::WithQuery::Insert(insert) => (insert.returning_clause(), insert.path()?),
+        ast::WithQuery::Merge(merge) => (merge.returning_clause(), merge.relation_name()?.path()?),
+        ast::WithQuery::Update(update) => {
+            (update.returning_clause(), update.relation_name()?.path()?)
+        }
         ast::WithQuery::Select(_)
         | ast::WithQuery::CompoundSelect(_)
         | ast::WithQuery::Table(_)
@@ -2229,10 +2213,8 @@ fn column_in_with_query(
         | ast::WithQuery::ParenSelect(_) => return None,
     };
 
-    let target_list = returning_clause?.target_list()?;
-    let path = path?;
     let mut column_index: usize = 0;
-    for target in target_list.targets() {
+    for target in returning_clause?.target_list()?.targets() {
         let target_column_count = if target.star_token().is_some() {
             count_columns_for_path(db, file, &path).unwrap_or(1)
         } else {
@@ -2316,9 +2298,9 @@ fn resolve_subquery_column_ptr(
         if let Some(num_str) = column_name.0.strip_prefix("column")
             && let Ok(col_num) = num_str.parse::<usize>()
             && col_num > 0
-            && let Some(row_list) = values.row_list()
-            && let Some(first_row) = row_list.rows().next()
-            && let Some(expr) = first_row.exprs().nth(col_num - 1)
+            && let Some(expr) = values
+                .row_list()
+                .and_then(|x| x.rows().next()?.exprs().nth(col_num - 1))
         {
             return Some(smallvec![Location::new(
                 file,
@@ -2348,11 +2330,9 @@ fn resolve_column_from_select_targets(
     column_name: &Name,
     skip_target_count: usize,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let select_clause = select.select_clause()?;
-    let target_list = select_clause.target_list()?;
     let from_clause = select.from_clause();
 
-    for (i, target) in target_list.targets().enumerate() {
+    for (i, target) in select.select_clause()?.target_list()?.targets().enumerate() {
         if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
             if i < skip_target_count && !matches!(col_name, ColumnName::Star) {
                 continue;
