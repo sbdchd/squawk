@@ -215,7 +215,12 @@ const rules = [
   {
     name: "identifier-too-long",
     tags: ["schema"],
-    description: "Warn about implicit truncation for identifiers that are too long.",
+    description: "Prevent implicit truncation for identifiers that are too long.",
+  },
+  {
+    name: "require-concurrent-partition-detach",
+    tags: ["schema", "locking"],
+    description: "Prevent blocking reads/writes to table while partition is detached.",
   },
   // xtask:new-rule:rule-doc-meta
 ]
