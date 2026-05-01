@@ -14,6 +14,57 @@ struct TableColumn {
     column: Identifier,
 }
 
+#[derive(Default)]
+struct NotNullValidation {
+    not_null_constraints: FxHashMap<Identifier, TableColumn>,
+    validated_columns: FxHashSet<TableColumn>,
+    external_validates: FxHashSet<(Identifier, Identifier)>,
+    dropped_constraints: FxHashSet<(Identifier, Identifier)>,
+}
+
+impl NotNullValidation {
+    fn record_not_null_constraint(&mut self, name: Identifier, table_column: TableColumn) {
+        self.not_null_constraints.insert(name, table_column);
+    }
+
+    fn record_validate(&mut self, table: Identifier, constraint: Identifier) {
+        if let Some(table_column) = self.not_null_constraints.get(&constraint)
+            && table_column.table == table
+        {
+            self.validated_columns.insert(table_column.clone());
+        } else {
+            self.external_validates.insert((table, constraint));
+        }
+    }
+
+    fn record_drop(&mut self, table: Identifier, constraint: Identifier) {
+        self.dropped_constraints.insert((table, constraint));
+    }
+
+    fn is_column_validated(&self, table_column: &TableColumn) -> bool {
+        self.validated_columns.contains(table_column)
+    }
+
+    fn has_external_validate_for(&self, table: &Identifier) -> bool {
+        self.external_validates.iter().any(|(t, _)| t == table)
+    }
+
+    // Each external validate that is paired with a matching DROP CONSTRAINT in
+    // the same file can suppress one SET NOT NULL violation on that table.
+    fn resolved_per_table(&self) -> FxHashMap<Identifier, usize> {
+        let mut counts: FxHashMap<Identifier, usize> = FxHashMap::default();
+        for (table, constraint) in &self.external_validates {
+            if self
+                .dropped_constraints
+                .contains(&(table.clone(), constraint.clone()))
+            {
+                *counts.entry(table.clone()).or_default() += 1;
+            }
+        }
+        counts
+    }
+}
+
 fn is_not_null_check(expr: &ast::Expr) -> Option<Identifier> {
     let ast::Expr::BinExpr(bin_expr) = expr else {
         return None;
@@ -49,14 +100,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
     let is_pg12_plus = ctx.settings.pg_version >= Version::new(12, None, None);
 
-    let mut not_null_constraints: FxHashMap<Identifier, TableColumn> = FxHashMap::default();
-    let mut validated_not_null_columns: FxHashSet<TableColumn> = FxHashSet::default();
-
-    // Cross-migration pattern tracking: VALIDATE CONSTRAINT without a matching
-    // ADD CONSTRAINT in the same file. We require a corresponding DROP CONSTRAINT
-    // to treat it as a NOT NULL helper (validate+drop pairing).
-    let mut external_validates: FxHashSet<(Identifier, Identifier)> = FxHashSet::default();
-    let mut dropped_constraints: FxHashSet<(Identifier, Identifier)> = FxHashSet::default();
+    let mut validation = NotNullValidation::default();
     let mut deferred_violations: Vec<(Identifier, SyntaxNode)> = Vec::new();
 
     for stmt in file.stmts() {
@@ -78,7 +122,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             && let Some(expr) = check.expr()
                             && let Some(column) = is_not_null_check(&expr)
                         {
-                            not_null_constraints.insert(
+                            validation.record_not_null_constraint(
                                 Identifier::new(&constraint_name.text()),
                                 TableColumn {
                                     table: table.clone(),
@@ -95,13 +139,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             .name_ref()
                             .map(|x| Identifier::new(&x.text()))
                         {
-                            if let Some(table_column) = not_null_constraints.get(&constraint_name)
-                                && table_column.table == table
-                            {
-                                validated_not_null_columns.insert(table_column.clone());
-                            } else {
-                                external_validates.insert((table.clone(), constraint_name));
-                            }
+                            validation.record_validate(table.clone(), constraint_name);
                         }
                     }
                     // Track DROP CONSTRAINT for cross-migration pairing
@@ -110,7 +148,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             .name_ref()
                             .map(|x| Identifier::new(&x.text()))
                         {
-                            dropped_constraints.insert((table.clone(), constraint_name));
+                            validation.record_drop(table.clone(), constraint_name);
                         }
                     }
                     // Step 3: Check that we're altering a validated constraint
@@ -129,12 +167,12 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                                 table: table.clone(),
                                 column,
                             };
-                            if validated_not_null_columns.contains(&table_column) {
+                            if validation.is_column_validated(&table_column) {
                                 continue;
                             }
                             // Defer if there are external validates on this table —
                             // we need to see the full file before deciding.
-                            if external_validates.iter().any(|(t, _)| *t == table) {
+                            if validation.has_external_validate_for(&table) {
                                 deferred_violations.push((table.clone(), option.syntax().clone()));
                                 continue;
                             }
@@ -156,21 +194,13 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
         }
     }
 
-    // Resolve deferred violations: each validate+drop pair on a table can
-    // suppress one SET NOT NULL violation.
-    let mut resolved_per_table: FxHashMap<Identifier, usize> = FxHashMap::default();
-    for (table, constraint_name) in &external_validates {
-        if dropped_constraints.contains(&(table.clone(), constraint_name.clone())) {
-            *resolved_per_table.entry(table.clone()).or_default() += 1;
-        }
-    }
-
+    let mut resolved_per_table = validation.resolved_per_table();
     for (table, node) in &deferred_violations {
-        if let Some(count) = resolved_per_table.get_mut(table) {
-            if *count > 0 {
-                *count -= 1;
-                continue;
-            }
+        if let Some(count) = resolved_per_table.get_mut(table)
+            && *count > 0
+        {
+            *count -= 1;
+            continue;
         }
         ctx.report(
             Violation::for_node(
