@@ -4,6 +4,7 @@ use console::style;
 use line_index::LineIndex;
 use line_index::TextRange;
 use log::info;
+use rayon::prelude::*;
 use serde::Serialize;
 use squawk_linter::{Fix, Linter, Rule, Version};
 use squawk_syntax::SourceFile;
@@ -151,44 +152,45 @@ pub(crate) struct LintArgs {
 }
 
 pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
-    let mut violations = vec![];
     match &args.input {
         Input::Stdin(stdin) => {
             info!("reading content from stdin");
             let sql = sql_from_stdin()?;
-            // ignore stdin if it's empty.
             if sql.trim().is_empty() {
                 info!("ignoring empty stdin");
-            } else {
-                let path = stdin.path.clone().unwrap_or_else(|| "stdin".into());
-                let content = check_sql(
-                    &sql,
-                    &path,
-                    &args.included_rules,
-                    &args.excluded_rules,
-                    args.pg_version,
-                    args.assume_in_transaction,
-                );
-                violations.push(content);
+                return Ok(vec![]);
             }
+            let path = stdin.path.clone().unwrap_or_else(|| "stdin".into());
+            let content = check_sql(
+                &sql,
+                &path,
+                &args.included_rules,
+                &args.excluded_rules,
+                args.pg_version,
+                args.assume_in_transaction,
+            );
+            Ok(vec![content])
         }
         Input::Paths(path_bufs) => {
-            for path in path_bufs {
-                info!("checking file path: {}", path.display());
-                let sql = sql_from_path(path)?;
-                let content = check_sql(
-                    &sql,
-                    path.to_str().unwrap(),
-                    &args.included_rules,
-                    &args.excluded_rules,
-                    args.pg_version,
-                    args.assume_in_transaction,
-                );
-                violations.push(content);
-            }
+            let mut reports: Vec<CheckReport> = path_bufs
+                .par_iter()
+                .map(|path| {
+                    info!("checking file path: {}", path.display());
+                    let sql = sql_from_path(path)?;
+                    Ok(check_sql(
+                        &sql,
+                        path.to_str().unwrap(),
+                        &args.included_rules,
+                        &args.excluded_rules,
+                        args.pg_version,
+                        args.assume_in_transaction,
+                    ))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            reports.sort_by(|a, b| a.filename.cmp(&b.filename));
+            Ok(reports)
         }
     }
-    Ok(violations)
 }
 
 pub fn lint_and_report<W: io::Write>(f: &mut W, args: LintArgs) -> Result<ExitCode> {
@@ -460,6 +462,7 @@ fn fmt_gitlab<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> 
 
 #[derive(Debug)]
 pub struct CheckReport {
+    // TODO: rename this to path
     pub filename: String,
     pub sql: String,
     pub violations: Vec<ReportViolation>,
