@@ -81,7 +81,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                             stmt.syntax(),
                         )
                         .help("Configure a `lock_timeout` before this statement.".to_string())
-                        .fix(Some(create_lock_timeout_fix(&file))),
+                        .fix(create_lock_timeout_fix(&file)),
                     );
                     lock_timeout = ReportOnce::Reported;
                 }
@@ -94,7 +94,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                             stmt.syntax(),
                         )
                         .help("Configure a `statement_timeout` before this statement".to_string())
-                        .fix(Some(create_stmt_timeout_fix(&file))),
+                        .fix(create_stmt_timeout_fix(&file)),
                     );
                     stmt_timeout = ReportOnce::Reported;
                 }

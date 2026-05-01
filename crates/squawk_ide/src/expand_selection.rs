@@ -290,13 +290,15 @@ fn extend_list_item(node: &SyntaxNode) -> Option<TextRange> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use insta::assert_debug_snapshot;
     use squawk_syntax::{SourceFile, ast::AstNode};
 
     fn expand(sql: &str) -> Vec<String> {
-        let (offset, sql) = fixture(sql);
-        let parse = SourceFile::parse(&sql);
+        let fixture = Fixture::new(sql);
+        let offset = fixture.marker().offset();
+        let sql = fixture.sql();
+        let parse = SourceFile::parse(sql);
         let file = parse.tree();
         let root = file.syntax();
 

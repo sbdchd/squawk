@@ -32,7 +32,7 @@ pub(crate) fn ban_uncommitted_transaction(ctx: &mut Linter, parse: &Parse<Source
                 begin.syntax(),
             )
             .help("Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.")
-            .fix(Some(fix)),
+            .fix(fix),
         );
     }
 }

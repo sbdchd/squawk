@@ -932,13 +932,15 @@ pub struct CompletionItem {
 mod tests {
     use super::completion;
     use crate::db::{Database, File};
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use insta::assert_snapshot;
     use tabled::builder::Builder;
     use tabled::settings::Style;
 
     fn completions(sql: &str) -> String {
-        let (offset, sql) = fixture(sql);
+        let fixture = Fixture::new(sql);
+        let offset = fixture.marker().offset();
+        let sql = fixture.sql();
         let db = Database::default();
         let file = File::new(&db, sql.into());
         let items = completion(&db, file, offset);
@@ -950,7 +952,9 @@ mod tests {
     }
 
     fn completions_not_found(sql: &str) {
-        let (offset, sql) = fixture(sql);
+        let fixture = Fixture::new(sql);
+        let offset = fixture.marker().offset();
+        let sql = fixture.sql();
         let db = Database::default();
         let file = File::new(&db, sql.into());
         let items = completion(&db, file, offset);

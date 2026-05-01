@@ -135,7 +135,7 @@ mod test {
     use crate::builtins::builtins_file;
     use crate::db::{Database, File};
     use crate::goto_definition::goto_definition;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use log::info;
@@ -150,10 +150,13 @@ mod test {
     #[track_caller]
     fn goto_(sql: &str) -> Option<String> {
         info!("starting");
-        let (mut offset, sql) = fixture(sql);
+        let fixture = Fixture::new(sql);
         // For go to def we want the previous character since we usually put the
         // marker after the item we're trying to go to def on.
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
+        let marker = fixture.marker();
+        let offset = marker.offset_before();
+        let source_span = marker.range();
+        let sql = fixture.sql();
         let db = Database::default();
         let current_file = File::new(&db, sql.into());
         assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
@@ -166,7 +169,6 @@ mod test {
         file_paths.insert(current_file, "current.sql");
         file_paths.insert(builtins_file(&db), "builtins.sql");
 
-        let offset: usize = offset.into();
         let mut dests_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in results.iter().enumerate() {
             dests_by_file
@@ -184,11 +186,7 @@ mod test {
         if let Some(current_dests) = dests_by_file.remove(&current_file) {
             snippet = annotate_destinations(snippet, current_dests);
         }
-        snippet = snippet.annotation(
-            AnnotationKind::Context
-                .span(offset..offset + 1)
-                .label("1. source"),
-        );
+        snippet = snippet.annotation(AnnotationKind::Context.span(source_span).label("1. source"));
 
         let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
 
@@ -980,6 +978,32 @@ select current_timestamp$0 from t;
           │                     ───────────────── 2. destination
         3 │ select current_timestamp from t;
           ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_casing() {
+        // postgres only folds ascii characters so Ä doesn't become ä
+        goto_not_found(
+            "
+    with t as (select 1 Äpfel)
+    select äpfel$0 from t;
+    ",
+        );
+    }
+
+    #[test]
+    fn goto_cte_emoji() {
+        assert_snapshot!(goto(
+            "
+    with t as (select 1 🦀)
+    select 🦀$0 from t;
+    "), @"
+          ╭▸ 
+        2 │     with t as (select 1 🦀)
+          │                         ── 2. destination
+        3 │     select 🦀 from t;
+          ╰╴           ── 1. source
         ");
     }
 
