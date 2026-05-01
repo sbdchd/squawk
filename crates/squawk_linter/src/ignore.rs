@@ -129,9 +129,8 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
 }
 
 const DISABLE_ASSUME_IN_TRANSACTION: &str = "squawk-disable-assume-in-transaction";
-const ENABLE_ASSUME_IN_TRANSACTION: &str = "squawk-enable-assume-in-transaction";
 
-pub fn find_transaction_override(file: &SyntaxNode) -> Option<bool> {
+pub fn has_disable_assume_in_transaction(file: &SyntaxNode) -> bool {
     for event in file.preorder_with_tokens() {
         match event {
             rowan::WalkEvent::Enter(NodeOrToken::Token(token))
@@ -143,17 +142,14 @@ pub fn find_transaction_override(file: &SyntaxNode) -> Option<bool> {
                         .find("--")
                         .map_or(trimmed, |idx| trimmed[..idx].trim_end());
                     if trimmed == DISABLE_ASSUME_IN_TRANSACTION {
-                        return Some(false);
-                    }
-                    if trimmed == ENABLE_ASSUME_IN_TRANSACTION {
-                        return Some(true);
+                        return true;
                     }
                 }
             }
             _ => (),
         }
     }
-    None
+    false
 }
 
 #[cfg(test)]
@@ -643,41 +639,33 @@ alter table t drop column c cascade;
 
     #[test]
     fn disable_assume_in_transaction() {
-        use super::find_transaction_override;
+        use super::has_disable_assume_in_transaction;
         let sql = "-- squawk-disable-assume-in-transaction\nSELECT 1;";
         let parse = squawk_syntax::SourceFile::parse(sql);
-        assert_eq!(find_transaction_override(&parse.syntax_node()), Some(false));
-    }
-
-    #[test]
-    fn enable_assume_in_transaction() {
-        use super::find_transaction_override;
-        let sql = "-- squawk-enable-assume-in-transaction\nSELECT 1;";
-        let parse = squawk_syntax::SourceFile::parse(sql);
-        assert_eq!(find_transaction_override(&parse.syntax_node()), Some(true));
+        assert!(has_disable_assume_in_transaction(&parse.syntax_node()));
     }
 
     #[test]
     fn disable_assume_in_transaction_c_style_comment() {
-        use super::find_transaction_override;
+        use super::has_disable_assume_in_transaction;
         let sql = "/* squawk-disable-assume-in-transaction */\nSELECT 1;";
         let parse = squawk_syntax::SourceFile::parse(sql);
-        assert_eq!(find_transaction_override(&parse.syntax_node()), Some(false));
+        assert!(has_disable_assume_in_transaction(&parse.syntax_node()));
     }
 
     #[test]
     fn disable_assume_in_transaction_with_trailing_comment() {
-        use super::find_transaction_override;
+        use super::has_disable_assume_in_transaction;
         let sql = "-- squawk-disable-assume-in-transaction -- not in a transaction\nSELECT 1;";
         let parse = squawk_syntax::SourceFile::parse(sql);
-        assert_eq!(find_transaction_override(&parse.syntax_node()), Some(false));
+        assert!(has_disable_assume_in_transaction(&parse.syntax_node()));
     }
 
     #[test]
     fn transaction_override_none_when_absent() {
-        use super::find_transaction_override;
+        use super::has_disable_assume_in_transaction;
         let sql = "SELECT 1;";
         let parse = squawk_syntax::SourceFile::parse(sql);
-        assert_eq!(find_transaction_override(&parse.syntax_node()), None);
+        assert!(!has_disable_assume_in_transaction(&parse.syntax_node()));
     }
 }
