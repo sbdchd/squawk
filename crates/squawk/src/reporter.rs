@@ -61,7 +61,7 @@ fn check_sql(
             })
             .collect();
         return CheckReport {
-            filename: path.into(),
+            path: path.into(),
             sql: sql.into(),
             violations,
         };
@@ -92,7 +92,7 @@ fn check_sql(
         .collect();
 
     CheckReport {
-        filename: path.into(),
+        path: path.into(),
         sql: sql.into(),
         violations,
     }
@@ -187,7 +187,7 @@ pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
                     ))
                 })
                 .collect::<Result<Vec<_>>>()?;
-            reports.sort_by(|a, b| a.filename.cmp(&b.filename));
+            reports.sort_by(|a, b| a.path.cmp(&b.path));
             Ok(reports)
         }
     }
@@ -339,7 +339,7 @@ pub fn fmt_tty<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
     let summary = Summary::from(reports);
     for report in reports {
         for violation in &report.violations {
-            fmt_tty_violation(f, violation, &report.filename, &report.sql)?;
+            fmt_tty_violation(f, violation, &report.path, &report.sql)?;
         }
     }
     print_summary(f, &summary)?;
@@ -462,8 +462,7 @@ fn fmt_gitlab<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> 
 
 #[derive(Debug)]
 pub struct CheckReport {
-    // TODO: rename this to path
-    pub filename: String,
+    pub path: String,
     pub sql: String,
     pub violations: Vec<ReportViolation>,
 }
