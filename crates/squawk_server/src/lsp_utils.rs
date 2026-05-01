@@ -244,6 +244,7 @@ pub(crate) fn to_semantic_tokens(
                 text_range =
                     TextRange::new(text_range.start(), text_range.end() - TextSize::of('\n'));
             }
+            // TODO: Convert these UTF-8 line columns to UTF-16 before encoding semantic tokens.
             let lsp_range = range(&line_index, text_range);
             let len = lsp_range.end.character - lsp_range.start.character;
             encoder.push_token_at(lsp_range.start, len, token.token_type, token.modifiers);
