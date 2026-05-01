@@ -18,7 +18,6 @@ squawk-syntax.workspace = true
 
 rowan.workspace = true
 serde.workspace = true
-insta.workspace = true
 enum-iterator.workspace = true
 line-index.workspace = true
 serde_plain.workspace = true
@@ -30,6 +29,7 @@ log.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
+insta.workspace = true
 
 [lints]
 workspace = true

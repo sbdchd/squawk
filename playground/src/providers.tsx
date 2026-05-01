@@ -9,6 +9,8 @@ import {
   hover,
   inlay_hints,
   selection_ranges,
+  semantic_tokens,
+  semantic_tokens_legend,
   DocumentSymbol,
 } from "./squawk"
 
@@ -156,8 +158,18 @@ export async function provideHover(
 
     if (!result) return null
 
+    const contents: monaco.IMarkdownString[] = [
+      {
+        value: `\`\`\`sql\n${result.snippet}\n\`\`\``,
+      },
+    ]
+
+    if (result.comment) {
+      contents.push({ value: `---\n\n${result.comment}` })
+    }
+
     return {
-      contents: [{ value: result }],
+      contents,
     }
   } catch (e) {
     console.error("Error in provideHover:", e)
@@ -314,6 +326,30 @@ function convertCompletionKind(
       return monaco.languages.CompletionItemKind.Text
   }
 }
+
+export const semanticTokensProvider: monaco.languages.DocumentSemanticTokensProvider =
+  {
+    getLegend() {
+      return semantic_tokens_legend()
+    },
+    provideDocumentSemanticTokens(model) {
+      // TODO: figure out if we can make this faster, it currently takes like
+      // 10+ seconds on the builtins.sql
+      if (model.getLineCount() > 2000) return null
+      const content = model.getValue()
+      const version = model.getVersionId()
+      if (!content) return null
+
+      try {
+        const data = semantic_tokens(content, version)
+        return { data, resultId: undefined }
+      } catch (e) {
+        console.error("Error in provideDocumentSemanticTokens:", e)
+        return null
+      }
+    },
+    releaseDocumentSemanticTokens() {},
+  }
 
 export async function provideCompletionItems(
   model: monaco.editor.ITextModel,

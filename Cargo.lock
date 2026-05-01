@@ -1545,9 +1545,9 @@ checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
 
 [[package]]
 name = "openssl"
-version = "0.10.73"
+version = "0.10.78"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8505734d46c8ab1e19a1dce3aef597ad87dcb4c37e7188231769bd6bd51cebf8"
+checksum = "f38c4372413cdaaf3cc79dd92d29d7d9f5ab09b51b10dded508fb90bb70b9222"
 dependencies = [
  "bitflags 2.9.3",
  "cfg-if",
@@ -1586,9 +1586,9 @@ dependencies = [
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.109"
+version = "0.9.114"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90096e2e47630d78b7d1c20952dc621f957103f8bc2c8359ec81290d75238571"
+checksum = "13ce1245cd07fcc4cfdb438f7507b0c7e4f3849a69fd84d52374c66d83741bb6"
 dependencies = [
  "cc",
  "libc",
@@ -1816,9 +1816,9 @@ checksum = "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f"
 
 [[package]]
 name = "rand"
-version = "0.8.5"
+version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34af8d1a0e25924bc5b7c43c079c942339d8f0a8b57c39049bef581b46327404"
+checksum = "5ca0ecfa931c29007047d1bc58e623ab12e5590e8c7cc53200d5202b69266d8a"
 dependencies = [
  "libc",
  "rand_chacha",
@@ -2385,7 +2385,7 @@ dependencies = [
 
 [[package]]
 name = "squawk"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "annotate-snippets",
  "anyhow",
@@ -2399,6 +2399,7 @@ dependencies = [
  "log",
  "lsp-server",
  "lsp-types",
+ "rayon",
  "serde",
  "serde_json",
  "simplelog",
@@ -2415,17 +2416,23 @@ dependencies = [
 
 [[package]]
 name = "squawk-fmt"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
+ "anyhow",
+ "camino",
+ "clap",
+ "dir-test",
  "insta",
  "itertools",
+ "rowan",
+ "squawk-lexer",
  "squawk-syntax",
  "tiny_pretty",
 ]
 
 [[package]]
 name = "squawk-github"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "jsonwebtoken",
  "log",
@@ -2436,7 +2443,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-ide"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "annotate-snippets",
  "etcetera",
@@ -2458,14 +2465,14 @@ dependencies = [
 
 [[package]]
 name = "squawk-lexer"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "insta",
 ]
 
 [[package]]
 name = "squawk-linter"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "annotate-snippets",
  "anyhow",
@@ -2484,7 +2491,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-parser"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "annotate-snippets",
  "camino",
@@ -2497,7 +2504,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-server"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "anyhow",
  "crossbeam-channel",
@@ -2524,11 +2531,12 @@ dependencies = [
 
 [[package]]
 name = "squawk-syntax"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "annotate-snippets",
  "camino",
  "dir-test",
+ "either",
  "insta",
  "rowan",
  "smol_str",
@@ -2537,7 +2545,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-thread"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "crossbeam-channel",
  "crossbeam-utils",
@@ -2549,7 +2557,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-wasm"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -2718,9 +2726,9 @@ checksum = "f18aa187839b2bdb1ad2fa35ead8c4c2976b64e4363c386d45ac0f7ee85c9233"
 
 [[package]]
 name = "thin-vec"
-version = "0.2.14"
+version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "144f754d318415ac792f9d69fc87abbbfc043ce2ef041c60f16ad828f638717d"
+checksum = "259cdf8ed4e4aca6f1e9d011e10bd53f524a2d0637d7b28450f6c64ac298c4c6"
 
 [[package]]
 name = "thiserror"
@@ -3425,7 +3433,7 @@ checksum = "32ac00cd3f8ec9c1d33fb3e7958a82df6989c42d747bd326c822b1d625283547"
 
 [[package]]
 name = "xtask"
-version = "2.44.0"
+version = "2.49.0"
 dependencies = [
  "anyhow",
  "camino",
@@ -3436,7 +3444,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "regex",
- "reqwest",
  "rustc-hash 2.1.1",
  "serde",
  "serde_json",

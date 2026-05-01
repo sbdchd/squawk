@@ -13,13 +13,23 @@ repository.workspace = true
 [lib]
 doctest = false
 
+[[bin]]
+name = "squawk-fmt"
+path = "src/main.rs"
+
 [dependencies]
 tiny_pretty.workspace = true
 itertools.workspace = true
 squawk-syntax.workspace = true
+rowan.workspace = true
+clap.workspace = true
+anyhow.workspace = true
 
 [dev-dependencies]
 insta.workspace = true
+dir-test.workspace = true
+camino.workspace = true
+squawk-lexer.workspace = true
 
 [lints]
 workspace = true

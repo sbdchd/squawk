@@ -10,6 +10,7 @@ use lsp_types::notification::{
 };
 use rustc_hash::FxHashMap;
 use salsa::Setter;
+use squawk_ide::builtins::{builtins_file, builtins_url};
 use squawk_ide::db::{Database, File};
 use squawk_thread::TaskPool;
 
@@ -18,7 +19,7 @@ use crate::config::LintConfig;
 use lsp_types::request::{
     CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
     FoldingRangeRequest, GotoDefinition, HoverRequest, InlayHintRequest, References,
-    SelectionRangeRequest, Shutdown,
+    SelectionRangeRequest, SemanticTokensFullRequest, SemanticTokensRangeRequest, Shutdown,
 };
 
 use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
@@ -26,8 +27,8 @@ use crate::handlers::{
     SyntaxTreeRequest, TokensRequest, handle_cancel, handle_code_action, handle_completion,
     handle_did_change, handle_did_close, handle_did_open, handle_document_diagnostic,
     handle_document_symbol, handle_folding_range, handle_goto_definition, handle_hover,
-    handle_inlay_hints, handle_references, handle_selection_range, handle_shutdown,
-    handle_syntax_tree, handle_tokens,
+    handle_inlay_hints, handle_references, handle_selection_range, handle_semantic_tokens_full,
+    handle_semantic_tokens_range, handle_shutdown, handle_syntax_tree, handle_tokens,
 };
 
 type ReqQueue = lsp_server::ReqQueue<(String, Instant), ()>;
@@ -40,6 +41,7 @@ pub(crate) struct Handle<H, C> {
 pub(super) struct GlobalState {
     db: Database,
     files: Arc<FxHashMap<Url, File>>,
+    uris: Arc<FxHashMap<File, Url>>,
     config: Arc<LintConfig>,
     req_queue: ReqQueue,
     sender: Sender<Message>,
@@ -55,9 +57,16 @@ impl GlobalState {
             let handle = TaskPool::new_with_threads(sender.clone(), threads);
             Handle { handle, receiver }
         };
+        let db = Database::default();
+        let mut uris = FxHashMap::default();
+        if let Some(uri) = builtins_url(&db) {
+            uris.insert(builtins_file(&db), uri);
+        }
+
         Self {
-            db: Database::default(),
+            db,
             files: Arc::new(FxHashMap::default()),
+            uris: Arc::new(uris),
             config,
             req_queue: ReqQueue::default(),
             task_pool,
@@ -71,6 +80,7 @@ impl GlobalState {
         Snapshot {
             db: self.db.clone(),
             files: self.files.clone(),
+            uris: self.uris.clone(),
             config: self.config.clone(),
         }
     }
@@ -88,12 +98,18 @@ impl GlobalState {
             file.set_content(&mut self.db).to(content.into());
         } else {
             let file = File::new(&self.db, content.into());
-            Arc::make_mut(&mut self.files).insert(uri, file);
+            Arc::make_mut(&mut self.files).insert(uri.clone(), file);
+            Arc::make_mut(&mut self.uris).insert(file, uri);
         }
     }
 
     pub(crate) fn remove(&mut self, uri: &Url) {
-        Arc::make_mut(&mut self.files).remove(uri);
+        if let Some(file) = Arc::make_mut(&mut self.files).remove(uri) {
+            // We can't delete file inputs in Salsa, so just set the content to
+            // empty string.
+            file.set_content(&mut self.db).to("".into());
+            Arc::make_mut(&mut self.uris).remove(&file);
+        }
     }
 
     /// Track the request time and support marking cancellation
@@ -235,6 +251,8 @@ impl GlobalState {
             .on::<NO_RETRY, SyntaxTreeRequest>(handle_syntax_tree)
             .on::<NO_RETRY, TokensRequest>(handle_tokens)
             .on::<NO_RETRY, References>(handle_references)
+            .on::<NO_RETRY, SemanticTokensFullRequest>(handle_semantic_tokens_full)
+            .on::<NO_RETRY, SemanticTokensRangeRequest>(handle_semantic_tokens_range)
             .finish();
     }
 }
@@ -242,6 +260,7 @@ impl GlobalState {
 pub(crate) struct Snapshot {
     pub(crate) db: Database,
     pub(crate) files: Arc<FxHashMap<Url, File>>,
+    pub(crate) uris: Arc<FxHashMap<File, Url>>,
     pub(crate) config: Arc<LintConfig>,
 }
 
@@ -252,6 +271,10 @@ impl Snapshot {
 
     pub(crate) fn file(&self, uri: &Url) -> Option<File> {
         self.files.get(uri).copied()
+    }
+
+    pub(crate) fn uri(&self, file: File) -> Option<Url> {
+        self.uris.get(&file).cloned()
     }
 }
 

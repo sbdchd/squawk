@@ -24,6 +24,17 @@ create type public.gidx;
 -- size: 65, align: 8
 create type public.spheroid;
 
+create type public.geometry_dump as (
+  path integer[],
+  geom geometry
+);
+
+create type public.valid_detail as (
+  valid boolean,
+  reason character varying,
+  location geometry
+);
+
 create table public.spatial_ref_sys (
   srid integer,
   auth_name character varying(256),

@@ -4,4 +4,4 @@ if ! command -v cargo-insta >/dev/null 2>&1; then
   cargo install cargo-insta --locked
 fi
 
-cargo insta test --check --unreferenced reject
+cargo insta test --workspace --check --unreferenced reject

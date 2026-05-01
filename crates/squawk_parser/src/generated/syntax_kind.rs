@@ -367,6 +367,7 @@ pub enum SyntaxKind {
     PLAN_KW,
     PLANS_KW,
     POLICY_KW,
+    PORTION_KW,
     POSITION_KW,
     PRECEDING_KW,
     PRECISION_KW,
@@ -844,6 +845,7 @@ pub enum SyntaxKind {
     FILTER_CLAUSE,
     FORCE_RLS,
     FOREIGN_KEY_CONSTRAINT,
+    FOR_PORTION_OF,
     FOR_PROVIDER,
     FRAME_CLAUSE,
     FROM_CLAUSE,
@@ -1058,7 +1060,7 @@ pub enum SyntaxKind {
     PRIMARY_KEY_CONSTRAINT,
     PRIVILEGES,
     PRIVILEGE_TARGET,
-    PROPERTIES_LIST,
+    PROPERTIES,
     PUBLICATION_OBJECT,
     READ_COMMITTED,
     READ_ONLY,
@@ -1066,6 +1068,7 @@ pub enum SyntaxKind {
     READ_WRITE,
     REASSIGN,
     REFERENCES_CONSTRAINT,
+    REFERENCES_TABLE,
     REFERENCING,
     REFERENCING_TABLE,
     REFRESH,
@@ -1911,6 +1914,8 @@ impl SyntaxKind {
             SyntaxKind::PLANS_KW
         } else if ident.eq_ignore_ascii_case("policy") {
             SyntaxKind::POLICY_KW
+        } else if ident.eq_ignore_ascii_case("portion") {
+            SyntaxKind::PORTION_KW
         } else if ident.eq_ignore_ascii_case("position") {
             SyntaxKind::POSITION_KW
         } else if ident.eq_ignore_ascii_case("preceding") {

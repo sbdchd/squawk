@@ -8,6 +8,7 @@ Ok(
         ConfigFile {
             excluded_paths: [],
             excluded_rules: [],
+            included_rules: [],
             pg_version: None,
             assume_in_transaction: None,
             upload_to_github: UploadToGitHubConfig {

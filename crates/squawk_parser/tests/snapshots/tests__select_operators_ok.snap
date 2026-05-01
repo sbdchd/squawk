@@ -1765,7 +1765,8 @@ SOURCE_FILE
             IS_NORMALIZED
               IS_KW "is"
               WHITESPACE " "
-              NFC_KW "nfc"
+              UNICODE_NORMAL_FORM
+                NFC_KW "nfc"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
   SEMICOLON ";"
@@ -1783,7 +1784,8 @@ SOURCE_FILE
             IS_NORMALIZED
               IS_KW "is"
               WHITESPACE " "
-              NFD_KW "nfd"
+              UNICODE_NORMAL_FORM
+                NFD_KW "nfd"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
   SEMICOLON ";"
@@ -1801,7 +1803,8 @@ SOURCE_FILE
             IS_NORMALIZED
               IS_KW "is"
               WHITESPACE " "
-              NFKC_KW "nfkc"
+              UNICODE_NORMAL_FORM
+                NFKC_KW "nfkc"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
   SEMICOLON ";"
@@ -1819,7 +1822,8 @@ SOURCE_FILE
             IS_NORMALIZED
               IS_KW "is"
               WHITESPACE " "
-              NFKD_KW "nfkd"
+              UNICODE_NORMAL_FORM
+                NFKD_KW "nfkd"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
   SEMICOLON ";"
@@ -1830,20 +1834,18 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          POSTFIX_EXPR
             LITERAL
               UNICODE_ESC_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
-            IS_NOT
+            IS_NOT_NORMALIZED
               IS_KW "is"
               WHITESPACE " "
               NOT_KW "not"
-            WHITESPACE " "
-            NAME_REF
-              NFD_KW "nfd"
-          WHITESPACE " "
-          AS_NAME
-            NAME
+              WHITESPACE " "
+              UNICODE_NORMAL_FORM
+                NFD_KW "nfd"
+              WHITESPACE " "
               NORMALIZED_KW "normalized"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2661,7 +2663,7 @@ SOURCE_FILE
             LITERAL
               STRING "'foo'"
             WHITESPACE " "
-            ISNULL_KW "isnull"
+            NOTNULL_KW "notnull"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is true"

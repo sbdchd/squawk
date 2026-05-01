@@ -10,6 +10,7 @@ Ok(
             excluded_rules: [
                 RequireConcurrentIndexCreation,
             ],
+            included_rules: [],
             pg_version: None,
             assume_in_transaction: None,
             upload_to_github: UploadToGitHubConfig {

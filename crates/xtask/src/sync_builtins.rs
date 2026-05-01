@@ -5,9 +5,19 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 use anyhow::{Context, Result, bail};
-use serde::Deserialize;
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Deserializer};
 
 use crate::path::project_root;
+
+fn deserialize_json_string<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: DeserializeOwned,
+{
+    let s = String::deserialize(deserializer)?;
+    serde_json::from_str(&s).map_err(serde::de::Error::custom)
+}
 
 const PG_TEMP_SCHEMA_SQL: &str = "create schema pg_temp;\n\n";
 
@@ -129,7 +139,8 @@ struct RelationQuery {
     relkind: String,
     description: String,
     extension_name: String,
-    columns: String,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    columns: Vec<Column>,
 }
 
 impl Query for RelationQuery {
@@ -213,6 +224,49 @@ order by n.nspname, p.proname, pg_get_function_arguments(p.oid), pg_get_function
 }
 
 #[derive(Deserialize)]
+struct CompositeTypeQuery {
+    schema: String,
+    name: String,
+    description: String,
+    extension_name: String,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    columns: Vec<Column>,
+}
+
+impl Query for CompositeTypeQuery {
+    const QUERY: &'static str = r"
+select
+  n.nspname as schema,
+  t.typname as name,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name,
+  json_agg(
+    json_build_object(
+      'name', a.attname,
+      'data_type', format_type(a.atttypid, a.atttypmod)
+    )
+    order by a.attnum
+  ) as columns
+from pg_type t
+  join pg_namespace n on n.oid = t.typnamespace
+  join pg_class c on c.oid = t.typrelid
+  join pg_attribute a on a.attrelid = c.oid
+  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_type'::regclass
+  left join pg_depend dep on dep.classid = 'pg_type'::regclass and dep.objid = t.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+  and t.typtype = 'c'
+  and c.relkind = 'c'
+  and a.attnum > 0
+  and not a.attisdropped
+group by t.oid, n.nspname, t.typname, d.description, ext.extname
+order by n.nspname, t.typname, t.oid;
+";
+}
+
+#[derive(Deserialize)]
 struct OperatorQuery {
     schema: String,
     name: String,
@@ -268,6 +322,8 @@ declare
 begin
   foreach extension_name in array array[
     'bloom',
+    'btree_gin',
+    'btree_gist',
     'citext',
     'cube',
     'h3',
@@ -282,6 +338,7 @@ begin
     'plpgsql',
     'postgis',
     'postgres_fdw',
+    'tablefunc',
     'vector'
   ] loop
     execute format('create extension if not exists %I', extension_name);
@@ -358,6 +415,31 @@ impl WriteSql for RangeTypeDef {
             "create type {}.{} as range (subtype = {});",
             self.schema, self.name, self.subtype
         )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct CompositeTypeDef {
+    schema: String,
+    name: String,
+    description: String,
+    columns: Vec<Column>,
+}
+
+impl WriteSql for CompositeTypeDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        writeln!(f, "create type {}.{} as (", self.schema, self.name)?;
+        for (index, column) in self.columns.iter().enumerate() {
+            let comma = if index + 1 < self.columns.len() {
+                ","
+            } else {
+                ""
+            };
+            writeln!(f, "  {} {}{comma}", column.name, column.data_type)?;
+        }
+        writeln!(f, ");")?;
         writeln!(f)?;
         Ok(())
     }
@@ -552,6 +634,7 @@ struct Module {
     schemas: Vec<SchemaDef>,
     types: Vec<TypeDef>,
     range_types: Vec<RangeTypeDef>,
+    composite_types: Vec<CompositeTypeDef>,
     tables: Vec<TableDef>,
     views: Vec<ViewDef>,
     functions: Vec<FunctionDef>,
@@ -570,6 +653,10 @@ impl Module {
 
         for range_type in &self.range_types {
             range_type.write_sql(f)?;
+        }
+
+        for composite_type in &self.composite_types {
+            composite_type.write_sql(f)?;
         }
 
         for table in &self.tables {
@@ -663,21 +750,35 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     Ok(())
 }
 
+fn query_composite_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in CompositeTypeQuery::run()? {
+        modules
+            .entry(row.extension_name)
+            .or_default()
+            .composite_types
+            .push(CompositeTypeDef {
+                columns: row.columns,
+                description: row.description,
+                name: row.name,
+                schema: row.schema,
+            });
+    }
+
+    Ok(())
+}
+
 fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     for row in RelationQuery::run()? {
-        let columns: Vec<Column> =
-            serde_json::from_str(&row.columns).context("expected valid column json")?;
-
         let module = modules.entry(row.extension_name).or_default();
         match row.relkind.as_str() {
             "r" => module.tables.push(TableDef {
-                columns,
+                columns: row.columns,
                 description: row.description,
                 name: row.name,
                 schema: row.schema,
             }),
             "v" => module.views.push(ViewDef {
-                columns,
+                columns: row.columns,
                 description: row.description,
                 name: row.name,
                 schema: row.schema,
@@ -759,6 +860,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
 
     query_schemas(&mut modules)?;
     query_types(&mut modules)?;
+    query_composite_types(&mut modules)?;
     query_relations(&mut modules)?;
     query_functions(&mut modules)?;
     query_operators(&mut modules)?;

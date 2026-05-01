@@ -12,6 +12,7 @@ Ok(
             excluded_rules: [
                 RequireConcurrentIndexCreation,
             ],
+            included_rules: [],
             pg_version: Some(
                 Version {
                     major: 19,

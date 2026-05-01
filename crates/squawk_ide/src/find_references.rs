@@ -1,174 +1,102 @@
-use crate::binder::Binder;
-use crate::builtins::{builtins_binder, parse_builtins};
-use crate::db::{File, bind, parse};
-use crate::goto_definition::{FileId, Location};
-use crate::offsets::token_from_offset;
-use crate::resolve;
+use crate::db::{File, parse};
+use crate::goto_definition;
+use crate::location::Location;
 use rowan::TextSize;
 use salsa::Database as Db;
-use smallvec::{SmallVec, smallvec};
-use squawk_syntax::{
-    SyntaxNodePtr,
-    ast::{self, AstNode},
-    match_ast,
-};
+use squawk_syntax::ast::{self, AstNode};
 
 #[salsa::tracked]
 pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Location> {
-    let parse = parse(db, file);
-    let source_file = parse.tree();
-
-    let current_binder = bind(db, file);
-
-    let builtins_tree = parse_builtins(db).tree();
-    let builtins_binder = builtins_binder(db);
-
-    let Some((target_file, target_defs)) = find_target_defs(
-        &source_file,
-        offset,
-        &current_binder,
-        &builtins_tree,
-        &builtins_binder,
-    ) else {
+    let targets = goto_definition::goto_definition(db, file, offset);
+    let Some(first) = targets.first() else {
         return vec![];
     };
 
-    let (binder, root) = match target_file {
-        FileId::Current => (&current_binder, source_file.syntax()),
-        FileId::Builtins => (&builtins_binder, builtins_tree.syntax()),
-    };
+    let mut refs = targets.to_vec();
 
-    let mut refs: Vec<Location> = vec![];
-
-    if target_file == FileId::Builtins {
-        for ptr in &target_defs {
+    for node in parse(db, file)
+        .tree()
+        .syntax()
+        .descendants()
+        .filter(|x| ast::NameRef::can_cast(x.kind()))
+    {
+        let range = node.text_range();
+        let matches = goto_definition::goto_definition(db, file, range.start())
+            .into_iter()
+            .any(|location| targets.contains(&location));
+        if matches {
             refs.push(Location {
-                file: FileId::Builtins,
-                range: ptr.to_node(builtins_tree.syntax()).text_range(),
+                file,
+                range,
+                kind: first.kind,
             });
         }
     }
-
-    for node in source_file.syntax().descendants() {
-        match_ast! {
-            match node {
-                ast::NameRef(name_ref) => {
-                    // Check if the ref matches one of the defs
-                    if let Some(found_defs) = resolve::resolve_name_ref_ptrs(binder, root, &name_ref)
-                        && found_defs.iter().any(|def| target_defs.contains(def))
-                    {
-                        refs.push(Location {
-                            file: FileId::Current,
-                            range: name_ref.syntax().text_range(),
-                        });
-                    }
-                },
-                ast::Name(name) => {
-                    // Find refs also includes the defs so we have to check.
-                    let found = SyntaxNodePtr::new(name.syntax());
-                    if target_defs.contains(&found) {
-                        refs.push(Location {
-                            file: FileId::Current,
-                            range: name.syntax().text_range(),
-                        });
-                    }
-                },
-                _ => (),
-            }
-        }
-    }
-
-    refs.sort_by_key(|loc| (loc.file, loc.range.start()));
+    refs.sort_by_key(|loc| (loc.file != file, loc.range.start()));
     refs
-}
-
-fn find_target_defs(
-    file: &ast::SourceFile,
-    offset: TextSize,
-    current_binder: &Binder,
-    builtins_tree: &ast::SourceFile,
-    builtins_binder: &Binder,
-) -> Option<(FileId, SmallVec<[SyntaxNodePtr; 1]>)> {
-    let token = token_from_offset(file, offset)?;
-    let parent = token.parent()?;
-
-    if let Some(name) = ast::Name::cast(parent.clone()) {
-        return Some((
-            FileId::Current,
-            smallvec![SyntaxNodePtr::new(name.syntax())],
-        ));
-    }
-
-    if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for file_id in [FileId::Current, FileId::Builtins] {
-            let (binder, root) = match file_id {
-                FileId::Current => (current_binder, file.syntax()),
-                FileId::Builtins => (builtins_binder, builtins_tree.syntax()),
-            };
-            if let Some(ptrs) = resolve::resolve_name_ref_ptrs(binder, root, &name_ref) {
-                return Some((file_id, ptrs));
-            }
-        }
-    }
-
-    None
 }
 
 #[cfg(test)]
 mod test {
-    use crate::builtins::BUILTINS_SQL;
+    use crate::builtins::builtins_file;
     use crate::db::{Database, File};
     use crate::find_references::find_references;
-    use crate::goto_definition::FileId;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use rowan::TextRange;
+    use rustc_hash::FxHashMap;
 
     #[track_caller]
     fn find_refs(sql: &str) -> String {
         let (mut offset, sql) = fixture(sql);
         offset = offset.checked_sub(1.into()).unwrap_or_default();
         let db = Database::default();
-        let file = File::new(&db, sql.clone().into());
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
+        let current_file = File::new(&db, sql.clone().into());
+        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
 
-        let references = find_references(&db, file, offset);
-
+        let references = find_references(&db, current_file, offset);
         let offset_usize: usize = offset.into();
 
-        let mut current_refs = vec![];
-        let mut builtin_refs = vec![];
+        let mut file_paths = FxHashMap::default();
+        file_paths.insert(current_file, "current.sql");
+        file_paths.insert(builtins_file(&db), "builtins.sql");
+
+        let mut refs_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in references.iter().enumerate() {
-            let label_index = i + 1;
-            match location.file {
-                FileId::Current => current_refs.push((label_index, location.range)),
-                FileId::Builtins => builtin_refs.push((label_index, location.range)),
-            }
+            refs_by_file
+                .entry(location.file)
+                .or_default()
+                .push((i + 1, location.range));
         }
 
-        let has_builtins = !builtin_refs.is_empty();
+        let multi_file = refs_by_file.len() > 1 || !refs_by_file.contains_key(&current_file);
 
         let mut snippet = Snippet::source(&sql).fold(true);
-        if has_builtins {
-            snippet = snippet.path("current.sql");
+        if multi_file {
+            snippet = snippet.path(*file_paths.get(&current_file).unwrap());
         }
         snippet = snippet.annotation(
             AnnotationKind::Context
                 .span(offset_usize..offset_usize + 1)
                 .label("0. query"),
         );
-        snippet = annotate_refs(snippet, current_refs);
+        if let Some(current_refs) = refs_by_file.remove(&current_file) {
+            snippet = annotate_refs(snippet, current_refs);
+        }
 
         let mut groups = vec![Level::INFO.primary_title("references").element(snippet)];
 
-        if has_builtins {
-            let builtins_snippet = Snippet::source(BUILTINS_SQL).path("builtin.sql").fold(true);
-            let builtins_snippet = annotate_refs(builtins_snippet, builtin_refs);
+        for (ref_file, refs) in refs_by_file {
+            let path = file_paths.get(&ref_file).unwrap();
+            let other_snippet = Snippet::source(ref_file.content(&db).as_ref())
+                .path(*path)
+                .fold(true);
+            let other_snippet = annotate_refs(other_snippet, refs);
             groups.push(
                 Level::INFO
                     .primary_title("references")
-                    .element(builtins_snippet),
+                    .element(other_snippet),
             );
         }
 
@@ -467,7 +395,7 @@ select now();
               │        ─── 2. reference
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 3. reference

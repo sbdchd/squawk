@@ -2,7 +2,7 @@
 set -ex
 
 main() {
-  pin-github-action  --allow='actions/*' ./github/workflows/*
+  pin-github-action  --allow='actions/*' ./.github/workflows/*
 }
 
 main "$@" 

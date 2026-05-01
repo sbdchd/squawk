@@ -81,6 +81,13 @@ pub(crate) fn codegen() -> Result<()> {
     let token_sets_file = project_root().join("crates/squawk_parser/src/generated/token_sets.rs");
     std::fs::write(token_sets_file, token_sets).context("problem writing generated token sets")?;
 
+    update_textmate_keywords(&keyword_kinds.all_keywords)?;
+
+    let playground_keywords = generate_playground_keywords(&keyword_kinds.all_keywords)?;
+    let playground_keywords_file = project_root().join("playground/src/generated/keywords.ts");
+    std::fs::write(playground_keywords_file, playground_keywords)
+        .context("problem writing playground keywords")?;
+
     let kinds = generate_kind_src(&ast_src.nodes, &grammar, keyword_kinds.all_keywords);
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
@@ -898,6 +905,116 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
     format!("{PRELUDE}{output}")
 }
 
+// Multi-word keyword phrases that should be highlighted as keywords, not
+// operators.
+const KEYWORD_PHRASES: &[&str] = &[
+    "as not materialized",
+    "nulls not distinct",
+    "truncate or delete",
+    "when not matched",
+    "insert or delete",
+    "delete or insert",
+    "without overlaps",
+    "not deferrable",
+    "fetch prior in",
+    "if not exists",
+    "drop not null",
+    "for values in",
+    "in tablespace",
+    "not leakproof",
+    "set not null",
+    "and no chain",
+    "in exclusive",
+    "in database",
+    "or replace",
+    "in schema",
+    "not valid",
+    "if exists",
+    "in access",
+    "and chain",
+    "in share",
+    "in group",
+    "in role",
+    "in row",
+    "not of",
+];
+
+// Multi-word entries must come before their single-word components so the
+// regex engine matches the longest form first.
+const KEYWORD_OPERATORS: &[&str] = &[
+    "not between symmetric",
+    "is not distinct from",
+    "between symmetric",
+    "is distinct from",
+    "not similar to",
+    "at time zone",
+    "not between",
+    "similar to",
+    "not ilike",
+    "not like",
+    "overlaps",
+    "between",
+    "collate",
+    "notnull",
+    "is not",
+    "not in",
+    "isnull",
+    "ilike",
+    "like",
+    "and",
+    "not",
+    "in",
+    "is",
+    "or",
+];
+
+fn keyword_phrases_match() -> String {
+    let patterns: Vec<String> = KEYWORD_PHRASES
+        .iter()
+        .map(|p| p.replace(' ', "\\s+"))
+        .collect();
+    format!("(?i)\\b({})\\b", patterns.join("|"))
+}
+
+fn operator_match() -> String {
+    let operator_patterns: Vec<String> = KEYWORD_OPERATORS
+        .iter()
+        .map(|op| op.replace(' ', "\\s+"))
+        .collect();
+    format!("(?i)\\b({})\\b", operator_patterns.join("|"))
+}
+
+fn keywords_match(all_keywords: &[String]) -> String {
+    let mut keywords: Vec<String> = all_keywords.iter().map(|k| k.to_lowercase()).collect();
+    keywords.sort();
+    let keywords_joined = keywords.join("|");
+    format!("(?xi)\\b({keywords_joined})\\b")
+}
+
+fn generate_playground_keywords(all_keywords: &[String]) -> Result<String> {
+    let mut lines = vec![format!("{PRELUDE}export const keywords = [")];
+    for keyword in all_keywords {
+        lines.push(format!("  \"{keyword}\","));
+    }
+    lines.push("] as const\n".to_string());
+    Ok(lines.join("\n"))
+}
+
+fn update_textmate_keywords(all_keywords: &[String]) -> Result<()> {
+    let tmlanguage_path = project_root().join("squawk-vscode/syntaxes/pgsql.tmLanguage.json");
+    let content = std::fs::read_to_string(&tmlanguage_path)?;
+    let mut json: serde_json::Value = serde_json::from_str(&content)?;
+
+    json["repository"]["keywords"]["patterns"][0]["match"] = keyword_phrases_match().into();
+    json["repository"]["keywords"]["patterns"][1]["match"] = operator_match().into();
+    json["repository"]["keywords"]["patterns"][2]["match"] = keywords_match(all_keywords).into();
+
+    let output = serde_json::to_string_pretty(&json)?;
+    std::fs::write(&tmlanguage_path, format!("{output}\n"))?;
+
+    Ok(())
+}
+
 fn generate_tokens(tokens: &[(&'static str, &'static str)]) -> String {
     let tokens = tokens.iter().map(|(name, kind)| {
         let name = format_ident!("{}", name.to_case(Case::Pascal));
@@ -938,4 +1055,33 @@ fn generate_tokens(tokens: &[(&'static str, &'static str)]) -> String {
 
     let output = reformat(file.to_string()).replace("#[derive", "\n#[derive");
     format!("{PRELUDE}{output}")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[track_caller]
+    fn assert_sorted(list: &[&str], name: &str) {
+        for window in list.windows(2) {
+            let (a, b) = (window[0], window[1]);
+            assert!(
+                a.len() >= b.len(),
+                "{name} not sorted by length descending: \
+                 {a:?} (len {}) comes before {b:?} (len {})",
+                a.len(),
+                b.len(),
+            );
+        }
+    }
+
+    #[test]
+    fn keyword_operators_sorted_by_length_desc() {
+        assert_sorted(KEYWORD_OPERATORS, "KEYWORD_OPERATORS");
+    }
+
+    #[test]
+    fn keyword_phrases_sorted_by_length_desc() {
+        assert_sorted(KEYWORD_PHRASES, "KEYWORD_PHRASES");
+    }
 }

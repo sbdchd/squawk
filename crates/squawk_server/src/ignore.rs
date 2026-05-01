@@ -203,7 +203,7 @@ create table c (
     fn lint_sql(sql: &str) -> Vec<lsp_types::Diagnostic> {
         let db = Database::default();
         let file = File::new(&db, sql.to_owned().into());
-        let config = crate::config::LintConfig::from_config_file(None, None);
+        let config = crate::config::LintConfig::default();
         lint(&db, file, &config)
     }
 }

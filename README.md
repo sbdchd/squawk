@@ -108,65 +108,78 @@ Found 6 issues in 1 file (checked 1 source file)
 ### `squawk --help`
 
 ```
-squawk
 Find problems in your SQL
 
-USAGE:
-    squawk [FLAGS] [OPTIONS] [path]... [SUBCOMMAND]
+Usage: squawk [OPTIONS] [path]... [COMMAND]
 
-FLAGS:
-        --assume-in-transaction
-            Assume that a transaction will wrap each SQL file when run by a migration tool
+Commands:
+  server            Run the language server
+  upload-to-github  Comment on a PR with Squawk's results
+  help              Print this message or the help of the given subcommand(s)
 
-            Use --no-assume-in-transaction to override this setting in any config file that exists
-    -h, --help
-            Prints help information
+Arguments:
+  [path]...
+          Paths or patterns to search
 
-    -V, --version
-            Prints version information
+Options:
+      --exclude-path <EXCLUDED_PATH>
+          Paths to exclude
 
-        --verbose
-            Enable debug logging output
+          For example:
 
+          `--exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql`
 
-OPTIONS:
-    -c, --config <config-path>
-            Path to the squawk config file (.squawk.toml)
+          `--exclude-path='*user_ids.sql'`
 
-        --debug <format>
-            Output debug info [possible values: Lex, Parse]
+  -e, --exclude <rule>
+          Exclude specific warnings
 
-        --exclude-path <excluded-path>...
-            Paths to exclude
+          For example: --exclude=require-concurrent-index-creation,ban-drop-database
 
-            For example: --exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql
+  -i, --include <rule>
+          Include opt-in rules that are disabled by default
 
-            --exclude-path='*user_ids.sql'
+          Rules listed in --exclude take precedence over --include.
 
-    -e, --exclude <rule>...
-            Exclude specific warnings
+          For example: --include=require-table-schema
 
-            For example: --exclude=require-concurrent-index-creation,ban-drop-database
+      --pg-version <PG_VERSION>
+          Specify postgres version
 
-        --pg-version <pg-version>
-            Specify postgres version
+          For example: --pg-version=13.0
 
-            For example: --pg-version=13.0
-        --reporter <reporter>
-            Style of error reporting [possible values: Tty, Gcc, Json]
+      --debug <format>
+          Output debug format
 
-        --stdin-filepath <filepath>
-            Path to use in reporting for stdin
+          [possible values: lex, parse, ast]
 
+      --reporter <REPORTER>
+          Style of error reporting
 
-ARGS:
-    <path>...
-            Paths to search
+          [possible values: tty, gcc, json, gitlab]
 
+      --stdin-filepath <filepath>
+          Path to use in reporting for stdin
 
-SUBCOMMANDS:
-    help                Prints this message or the help of the given subcommand(s)
-    upload-to-github    Comment on a PR with Squawk's results
+      --verbose
+          Enable debug logging output
+
+  -c, --config <CONFIG_PATH>
+          Path to the squawk config file (.squawk.toml)
+
+      --assume-in-transaction
+          Assume that a transaction will wrap each SQL file when run by a migration tool
+
+          Use --no-assume-in-transaction to override any config file that sets this
+
+      --no-error-on-unmatched-pattern
+          Do not exit with an error when provided path patterns do not match any files
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
 ```
 
 ## Rules
@@ -252,7 +265,7 @@ to your project's `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/sbdchd/squawk
-    rev: 2.44.0
+    rev: 2.49.0
     hooks:
       - id: squawk
         files: path/to/postgres/migrations/written/in/sql

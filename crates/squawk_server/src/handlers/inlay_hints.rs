@@ -2,7 +2,6 @@ use anyhow::Result;
 use lsp_types::{
     InlayHint, InlayHintKind, InlayHintLabel, InlayHintLabelPart, InlayHintParams, Location,
 };
-use squawk_ide::builtins::{builtins_line_index, builtins_url};
 use squawk_ide::db::line_index;
 use squawk_ide::inlay_hints::inlay_hints;
 
@@ -17,25 +16,24 @@ pub(crate) fn handle_inlay_hints(
 
     let db = snapshot.db();
     let file = snapshot.file(&uri).unwrap();
-    let line_index = line_index(db, file);
+    let current_line_index = line_index(db, file);
 
     let hints = inlay_hints(db, file);
 
     let lsp_hints: Vec<InlayHint> = hints
         .into_iter()
         .flat_map(|hint| {
-            let line_col = line_index.line_col(hint.position);
+            let line_col = current_line_index.line_col(hint.position);
             let position = lsp_types::Position::new(line_col.line, line_col.col);
 
-            let uri = match hint.file {
-                Some(squawk_ide::goto_definition::FileId::Current) | None => uri.clone(),
-                Some(squawk_ide::goto_definition::FileId::Builtins) => builtins_url(db)?,
+            let target_file = hint.file;
+            let uri = match target_file {
+                Some(target_file) => snapshot.uri(target_file)?,
+                None => uri.clone(),
             };
 
-            let line_index = match hint.file {
-                Some(squawk_ide::goto_definition::FileId::Current) | None => &line_index,
-                Some(squawk_ide::goto_definition::FileId::Builtins) => &builtins_line_index(db),
-            };
+            let target_line_index = target_file.map(|target_file| line_index(db, target_file));
+            let line_index = target_line_index.as_ref().unwrap_or(&current_line_index);
 
             let kind: InlayHintKind = match hint.kind {
                 squawk_ide::inlay_hints::InlayHintKind::Parameter => InlayHintKind::PARAMETER,

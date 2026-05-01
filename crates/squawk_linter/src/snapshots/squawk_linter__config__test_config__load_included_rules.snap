@@ -1,0 +1,20 @@
+---
+source: crates/squawk_linter/src/config.rs
+expression: "ConfigFile::parse(Some(squawk_toml.path().to_path_buf()))"
+---
+Ok(
+    Some(
+        ConfigFile {
+            excluded_paths: [],
+            excluded_rules: [],
+            included_rules: [
+                RequireTableSchema,
+            ],
+            pg_version: None,
+            assume_in_transaction: None,
+            upload_to_github: UploadToGitHubConfig {
+                fail_on_violations: None,
+            },
+        },
+    ),
+)
