@@ -2399,6 +2399,7 @@ dependencies = [
  "log",
  "lsp-server",
  "lsp-types",
+ "rayon",
  "serde",
  "serde_json",
  "simplelog",
