@@ -298,7 +298,7 @@ mod tests {
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset();
         let sql = fixture.sql();
-        let parse = SourceFile::parse(&sql);
+        let parse = SourceFile::parse(sql);
         let file = parse.tree();
         let root = file.syntax();
 
