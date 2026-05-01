@@ -22,7 +22,6 @@ drop_bomb.workspace = true
 insta.workspace = true
 dir-test.workspace = true
 camino.workspace = true
-pg_query.workspace = true
 xshell.workspace = true
 annotate-snippets.workspace = true
 

@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use rowan::{NodeOrToken, TextRange, TextSize};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
@@ -14,7 +14,7 @@ pub enum IgnoreKind {
 #[derive(Debug)]
 pub struct Ignore {
     pub range: TextRange,
-    pub violation_names: HashSet<Rule>,
+    pub violation_names: FxHashSet<Rule>,
     pub ignore_all: bool,
     pub kind: IgnoreKind,
 }
@@ -79,7 +79,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                 if token.kind() == SyntaxKind::COMMENT =>
             {
                 if let Some((rule_names, range, kind)) = ignore_rule_info(&token) {
-                    let mut set = HashSet::new();
+                    let mut set = FxHashSet::default();
                     let mut offset = 0usize;
                     // We have a specific check instead of going off of empty
                     // rules in case we have invalid rule names specified in the
@@ -188,7 +188,7 @@ select 1;
 ";
 
         let parse = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         find_ignores(&mut linter, &parse.syntax_node());
 
         assert_eq!(linter.ignores.len(), 1);
@@ -264,7 +264,7 @@ alter table t drop column c cascade;
 
     #[test]
     fn ignore_multiple_stmts() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"
 -- squawk-ignore ban-char-field,prefer-robust-stmts,require-timeout-settings
 alter table t add column c char;
@@ -286,7 +286,7 @@ create table users (
 
     #[test]
     fn starting_line_aka_zero() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"alter table t add column c char;"#;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
@@ -379,7 +379,7 @@ create table users (
 
     #[test]
     fn regression_unknown_name() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"
 -- squawk-ignore prefer-robust-stmts, require-timeout-settings
 create table test_table (
@@ -491,7 +491,7 @@ alter table t drop column c cascade;
 
     #[test]
     fn file_level_only_ignores_specific_rules() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"
 -- squawk-ignore-file ban-drop-column
 alter table t drop column c cascade;
@@ -517,7 +517,7 @@ alter table t2 drop column c2 cascade;
 
     #[test]
     fn file_ignore_at_end_of_file_is_fine() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"
 alter table t drop column c cascade;
 alter table t2 drop column c2 cascade;
@@ -543,7 +543,7 @@ alter table t2 drop column c2 cascade;
 
     #[test]
     fn file_ignore_with_invalid_rules() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"
 -- squawk-ignore-file ban-ban-ban-drop-column ignore-something hmm
 alter table t drop column c cascade;
@@ -590,7 +590,7 @@ alter table t2 drop column c2 cascade;
 
     #[test]
     fn file_ignore_with_trailing_comment() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"
 -- squawk-ignore-file ban-drop-column -- some comment here
 alter table t drop column c cascade;
@@ -616,7 +616,7 @@ alter table t2 drop column c2 cascade;
 
     #[test]
     fn line_ignore_with_trailing_comment() {
-        let mut linter = Linter::with_all_rules();
+        let mut linter = Linter::with_default_rules();
         let sql = r#"
 -- squawk-ignore ban-drop-column,prefer-robust-stmts -- drop is intentional
 alter table t drop column c cascade;

@@ -1,1 +1,0 @@
-set catalog 'foo';

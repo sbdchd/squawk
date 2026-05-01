@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast, identifier::Identifier};
@@ -8,16 +8,19 @@ use crate::{Edit, Fix, Linter, Rule, Violation};
 use crate::visitors::check_not_allowed_types;
 use crate::visitors::is_not_valid_int_type;
 
-use lazy_static::lazy_static;
+use std::sync::OnceLock;
 
-lazy_static! {
-    static ref INT_TYPES: HashSet<Identifier> = HashSet::from([
-        Identifier::new("int"),
-        Identifier::new("integer"),
-        Identifier::new("int4"),
-        Identifier::new("serial"),
-        Identifier::new("serial4"),
-    ]);
+fn int_types() -> &'static FxHashSet<Identifier> {
+    static INT_TYPES: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
+    INT_TYPES.get_or_init(|| {
+        FxHashSet::from_iter([
+            Identifier::new("int"),
+            Identifier::new("integer"),
+            Identifier::new("int4"),
+            Identifier::new("serial"),
+            Identifier::new("serial4"),
+        ])
+    })
 }
 
 fn int_to_bigint_replacement(int_type: &str) -> &'static str {
@@ -42,7 +45,7 @@ fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
 
 fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
-        if is_not_valid_int_type(&ty, &INT_TYPES) {
+        if is_not_valid_int_type(&ty, int_types()) {
             let fix = create_bigint_fix(&ty);
 
             ctx.report(

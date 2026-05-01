@@ -17,6 +17,8 @@ pub enum SyntaxKind {
     R_PAREN,
     L_BRACK,
     R_BRACK,
+    L_CURLY,
+    R_CURLY,
     L_ANGLE,
     R_ANGLE,
     AT,
@@ -148,6 +150,7 @@ pub enum SyntaxKind {
     DEPENDS_KW,
     DEPTH_KW,
     DESC_KW,
+    DESTINATION_KW,
     DETACH_KW,
     DICTIONARY_KW,
     DISABLE_KW,
@@ -159,6 +162,7 @@ pub enum SyntaxKind {
     DOUBLE_KW,
     DROP_KW,
     EACH_KW,
+    EDGE_KW,
     ELSE_KW,
     EMPTY_KW,
     ENABLE_KW,
@@ -203,6 +207,8 @@ pub enum SyntaxKind {
     GLOBAL_KW,
     GRANT_KW,
     GRANTED_KW,
+    GRAPH_KW,
+    GRAPH_TABLE_KW,
     GREATEST_KW,
     GROUP_KW,
     GROUPING_KW,
@@ -309,6 +315,7 @@ pub enum SyntaxKind {
     NFKC_KW,
     NFKD_KW,
     NO_KW,
+    NODE_KW,
     NONE_KW,
     NORMALIZE_KW,
     NORMALIZED_KW,
@@ -360,6 +367,7 @@ pub enum SyntaxKind {
     PLAN_KW,
     PLANS_KW,
     POLICY_KW,
+    PORTION_KW,
     POSITION_KW,
     PRECEDING_KW,
     PRECISION_KW,
@@ -373,6 +381,8 @@ pub enum SyntaxKind {
     PROCEDURE_KW,
     PROCEDURES_KW,
     PROGRAM_KW,
+    PROPERTIES_KW,
+    PROPERTY_KW,
     PUBLICATION_KW,
     QUOTE_KW,
     QUOTES_KW,
@@ -386,9 +396,11 @@ pub enum SyntaxKind {
     REFERENCING_KW,
     REFRESH_KW,
     REINDEX_KW,
+    RELATIONSHIP_KW,
     RELATIVE_KW,
     RELEASE_KW,
     RENAME_KW,
+    REPACK_KW,
     REPEATABLE_KW,
     REPLACE_KW,
     REPLICA_KW,
@@ -507,6 +519,7 @@ pub enum SyntaxKind {
     VARYING_KW,
     VERBOSE_KW,
     VERSION_KW,
+    VERTEX_KW,
     VIEW_KW,
     VIEWS_KW,
     VIRTUAL_KW,
@@ -555,12 +568,16 @@ pub enum SyntaxKind {
     ADD_COLUMN,
     ADD_CONSTRAINT,
     ADD_GENERATED,
+    ADD_LABEL,
     ADD_OP_CLASS_OPTIONS,
     ADD_VALUE,
+    ADD_VERTEX_EDGE_LABEL_PROPERTIES,
+    ADD_VERTEX_EDGE_TABLES,
     AFTER_VALUE,
     AGGREGATE,
     ALIAS,
     ALL_FN,
+    ALL_PROPERTIES,
     ALTER_AGGREGATE,
     ALTER_ATTRIBUTE,
     ALTER_COLLATION,
@@ -587,6 +604,7 @@ pub enum SyntaxKind {
     ALTER_OPTION_LIST,
     ALTER_POLICY,
     ALTER_PROCEDURE,
+    ALTER_PROPERTY_GRAPH,
     ALTER_PUBLICATION,
     ALTER_ROLE,
     ALTER_ROUTINE,
@@ -608,6 +626,7 @@ pub enum SyntaxKind {
     ALTER_TYPE,
     ALTER_USER,
     ALTER_USER_MAPPING,
+    ALTER_VERTEX_EDGE_LABELS,
     ALTER_VIEW,
     ANALYZE,
     ANY_FN,
@@ -692,6 +711,7 @@ pub enum SyntaxKind {
     CREATE_OPERATOR_FAMILY,
     CREATE_POLICY,
     CREATE_PROCEDURE,
+    CREATE_PROPERTY_GRAPH,
     CREATE_PUBLICATION,
     CREATE_ROLE,
     CREATE_RULE,
@@ -722,6 +742,7 @@ pub enum SyntaxKind {
     DELETE,
     DELETE_ROWS,
     DEPENDS_ON_EXTENSION,
+    DEST_VERTEX_TABLE,
     DETACH_PARTITION,
     DISABLE_RLS,
     DISABLE_RULE,
@@ -742,6 +763,7 @@ pub enum SyntaxKind {
     DROP_DATABASE,
     DROP_DEFAULT,
     DROP_DOMAIN,
+    DROP_EDGE_TABLES,
     DROP_EVENT_TRIGGER,
     DROP_EXPRESSION,
     DROP_EXTENSION,
@@ -763,6 +785,7 @@ pub enum SyntaxKind {
     DROP_OWNED,
     DROP_POLICY,
     DROP_PROCEDURE,
+    DROP_PROPERTY_GRAPH,
     DROP_PUBLICATION,
     DROP_ROLE,
     DROP_ROUTINE,
@@ -783,7 +806,15 @@ pub enum SyntaxKind {
     DROP_TYPE,
     DROP_USER,
     DROP_USER_MAPPING,
+    DROP_VERTEX_EDGE_LABEL,
+    DROP_VERTEX_EDGE_LABEL_PROPERTIES,
+    DROP_VERTEX_TABLES,
     DROP_VIEW,
+    EDGE_ANY,
+    EDGE_LEFT,
+    EDGE_RIGHT,
+    EDGE_TABLES,
+    EDGE_TABLE_DEF,
     ELSE_CLAUSE,
     ENABLE_ALWAYS_RULE,
     ENABLE_ALWAYS_TRIGGER,
@@ -802,6 +833,7 @@ pub enum SyntaxKind {
     EXISTS_FN,
     EXPLAIN,
     EXPR_AS_NAME,
+    EXPR_AS_NAME_LIST,
     EXPR_TYPE,
     EXTRACT_FN,
     FAT_ARROW,
@@ -813,6 +845,7 @@ pub enum SyntaxKind {
     FILTER_CLAUSE,
     FORCE_RLS,
     FOREIGN_KEY_CONSTRAINT,
+    FOR_PORTION_OF,
     FOR_PROVIDER,
     FRAME_CLAUSE,
     FROM_CLAUSE,
@@ -824,6 +857,8 @@ pub enum SyntaxKind {
     GENERATED_CONSTRAINT,
     GRANT,
     GRANT_DEFAULT_PRIVILEGES,
+    GRAPH_PATTERN_QUALIFIER,
+    GRAPH_TABLE_FN,
     GROUPING_CUBE,
     GROUPING_EXPR,
     GROUPING_ROLLUP,
@@ -852,6 +887,7 @@ pub enum SyntaxKind {
     IS_JSON_OBJECT,
     IS_JSON_SCALAR,
     IS_JSON_VALUE,
+    IS_LABEL,
     IS_NORMALIZED,
     IS_NOT,
     IS_NOT_DISTINCT_FROM,
@@ -907,6 +943,8 @@ pub enum SyntaxKind {
     JSON_VALUE_EXPR,
     JSON_VALUE_FN,
     JSON_WRAPPER_BEHAVIOR_CLAUSE,
+    LABEL_AND_PROPERTIES,
+    LABEL_AND_PROPERTIES_LIST,
     LANGUAGE_FUNC_OPTION,
     LEAKPROOF_FUNC_OPTION,
     LIKE_CLAUSE,
@@ -956,6 +994,7 @@ pub enum SyntaxKind {
     NO_FORCE_RLS,
     NO_INHERIT,
     NO_INHERIT_TABLE,
+    NO_PROPERTIES,
     NULLS_DISTINCT,
     NULLS_FIRST,
     NULLS_LAST,
@@ -992,6 +1031,7 @@ pub enum SyntaxKind {
     PARAM_OUT,
     PARAM_VARIADIC,
     PAREN_EXPR,
+    PAREN_GRAPH_PATTERN,
     PAREN_SELECT,
     PARTITION,
     PARTITION_BY,
@@ -1004,6 +1044,9 @@ pub enum SyntaxKind {
     PARTITION_LIST,
     PARTITION_OF,
     PATH,
+    PATH_FACTOR,
+    PATH_PATTERN,
+    PATH_PATTERN_LIST,
     PATH_SEGMENT,
     PATH_TYPE,
     PERCENT_TYPE,
@@ -1017,6 +1060,7 @@ pub enum SyntaxKind {
     PRIMARY_KEY_CONSTRAINT,
     PRIVILEGES,
     PRIVILEGE_TARGET,
+    PROPERTIES,
     PUBLICATION_OBJECT,
     READ_COMMITTED,
     READ_ONLY,
@@ -1024,6 +1068,7 @@ pub enum SyntaxKind {
     READ_WRITE,
     REASSIGN,
     REFERENCES_CONSTRAINT,
+    REFERENCES_TABLE,
     REFERENCING,
     REFERENCING_TABLE,
     REFRESH,
@@ -1037,6 +1082,7 @@ pub enum SyntaxKind {
     RENAME_CONSTRAINT,
     RENAME_TO,
     RENAME_VALUE,
+    REPACK,
     REPEATABLE_CLAUSE,
     REPEATABLE_READ,
     REPLICA_IDENTITY,
@@ -1119,6 +1165,7 @@ pub enum SyntaxKind {
     SORT_DESC,
     SORT_USING,
     SOURCE_FILE,
+    SOURCE_VERTEX_TABLE,
     SPLIT_PARTITION,
     STORAGE,
     STRICT_FUNC_OPTION,
@@ -1133,6 +1180,7 @@ pub enum SyntaxKind {
     TABLE_LIST,
     TARGET,
     TARGET_LIST,
+    TEMP,
     TIME_TYPE,
     TIMING,
     TRANSACTION_MODE_LIST,
@@ -1148,6 +1196,7 @@ pub enum SyntaxKind {
     UNICODE_NORMAL_FORM,
     UNIQUE_CONSTRAINT,
     UNLISTEN,
+    UNLOGGED,
     UPDATE,
     USING_CLAUSE,
     USING_EXPR_CLAUSE,
@@ -1161,6 +1210,9 @@ pub enum SyntaxKind {
     VALUES,
     VARIANT,
     VARIANT_LIST,
+    VERTEX_PATTERN,
+    VERTEX_TABLES,
+    VERTEX_TABLE_DEF,
     VOLATILITY_FUNC_OPTION,
     WHEN_CLAUSE,
     WHEN_CLAUSE_LIST,
@@ -1183,7 +1235,6 @@ pub enum SyntaxKind {
     WITH_PARAMS,
     WITH_TABLE,
     WITH_TIMEZONE,
-    XML_ATTRIBUTE_LIST,
     XML_COLUMN_OPTION,
     XML_COLUMN_OPTION_LIST,
     XML_ELEMENT_FN,
@@ -1429,6 +1480,8 @@ impl SyntaxKind {
             SyntaxKind::DEPTH_KW
         } else if ident.eq_ignore_ascii_case("desc") {
             SyntaxKind::DESC_KW
+        } else if ident.eq_ignore_ascii_case("destination") {
+            SyntaxKind::DESTINATION_KW
         } else if ident.eq_ignore_ascii_case("detach") {
             SyntaxKind::DETACH_KW
         } else if ident.eq_ignore_ascii_case("dictionary") {
@@ -1451,6 +1504,8 @@ impl SyntaxKind {
             SyntaxKind::DROP_KW
         } else if ident.eq_ignore_ascii_case("each") {
             SyntaxKind::EACH_KW
+        } else if ident.eq_ignore_ascii_case("edge") {
+            SyntaxKind::EDGE_KW
         } else if ident.eq_ignore_ascii_case("else") {
             SyntaxKind::ELSE_KW
         } else if ident.eq_ignore_ascii_case("empty") {
@@ -1539,6 +1594,10 @@ impl SyntaxKind {
             SyntaxKind::GRANT_KW
         } else if ident.eq_ignore_ascii_case("granted") {
             SyntaxKind::GRANTED_KW
+        } else if ident.eq_ignore_ascii_case("graph") {
+            SyntaxKind::GRAPH_KW
+        } else if ident.eq_ignore_ascii_case("graph_table") {
+            SyntaxKind::GRAPH_TABLE_KW
         } else if ident.eq_ignore_ascii_case("greatest") {
             SyntaxKind::GREATEST_KW
         } else if ident.eq_ignore_ascii_case("group") {
@@ -1751,6 +1810,8 @@ impl SyntaxKind {
             SyntaxKind::NFKD_KW
         } else if ident.eq_ignore_ascii_case("no") {
             SyntaxKind::NO_KW
+        } else if ident.eq_ignore_ascii_case("node") {
+            SyntaxKind::NODE_KW
         } else if ident.eq_ignore_ascii_case("none") {
             SyntaxKind::NONE_KW
         } else if ident.eq_ignore_ascii_case("normalize") {
@@ -1853,6 +1914,8 @@ impl SyntaxKind {
             SyntaxKind::PLANS_KW
         } else if ident.eq_ignore_ascii_case("policy") {
             SyntaxKind::POLICY_KW
+        } else if ident.eq_ignore_ascii_case("portion") {
+            SyntaxKind::PORTION_KW
         } else if ident.eq_ignore_ascii_case("position") {
             SyntaxKind::POSITION_KW
         } else if ident.eq_ignore_ascii_case("preceding") {
@@ -1879,6 +1942,10 @@ impl SyntaxKind {
             SyntaxKind::PROCEDURES_KW
         } else if ident.eq_ignore_ascii_case("program") {
             SyntaxKind::PROGRAM_KW
+        } else if ident.eq_ignore_ascii_case("properties") {
+            SyntaxKind::PROPERTIES_KW
+        } else if ident.eq_ignore_ascii_case("property") {
+            SyntaxKind::PROPERTY_KW
         } else if ident.eq_ignore_ascii_case("publication") {
             SyntaxKind::PUBLICATION_KW
         } else if ident.eq_ignore_ascii_case("quote") {
@@ -1905,12 +1972,16 @@ impl SyntaxKind {
             SyntaxKind::REFRESH_KW
         } else if ident.eq_ignore_ascii_case("reindex") {
             SyntaxKind::REINDEX_KW
+        } else if ident.eq_ignore_ascii_case("relationship") {
+            SyntaxKind::RELATIONSHIP_KW
         } else if ident.eq_ignore_ascii_case("relative") {
             SyntaxKind::RELATIVE_KW
         } else if ident.eq_ignore_ascii_case("release") {
             SyntaxKind::RELEASE_KW
         } else if ident.eq_ignore_ascii_case("rename") {
             SyntaxKind::RENAME_KW
+        } else if ident.eq_ignore_ascii_case("repack") {
+            SyntaxKind::REPACK_KW
         } else if ident.eq_ignore_ascii_case("repeatable") {
             SyntaxKind::REPEATABLE_KW
         } else if ident.eq_ignore_ascii_case("replace") {
@@ -2147,6 +2218,8 @@ impl SyntaxKind {
             SyntaxKind::VERBOSE_KW
         } else if ident.eq_ignore_ascii_case("version") {
             SyntaxKind::VERSION_KW
+        } else if ident.eq_ignore_ascii_case("vertex") {
+            SyntaxKind::VERTEX_KW
         } else if ident.eq_ignore_ascii_case("view") {
             SyntaxKind::VIEW_KW
         } else if ident.eq_ignore_ascii_case("views") {

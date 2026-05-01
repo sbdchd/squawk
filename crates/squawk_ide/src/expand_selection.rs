@@ -59,7 +59,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::REVOKE_COMMAND_LIST,
     SyntaxKind::ROLE_REF_LIST,
     SyntaxKind::ROW_LIST,
-    SyntaxKind::XML_ATTRIBUTE_LIST,
+    SyntaxKind::EXPR_AS_NAME_LIST,
     SyntaxKind::XML_NAMESPACE_LIST,
     SyntaxKind::SET_COLUMN_LIST,
     SyntaxKind::SET_EXPR_LIST,
@@ -73,6 +73,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::VACUUM_OPTION_LIST,
     SyntaxKind::VARIANT_LIST,
     SyntaxKind::XML_TABLE_COLUMN_LIST,
+    SyntaxKind::PATH_PATTERN_LIST,
 ];
 
 pub fn extend_selection(root: &SyntaxNode, range: TextRange) -> TextRange {
@@ -553,6 +554,7 @@ $0
             SyntaxKind::TRIGGER_EVENT_LIST,
             SyntaxKind::XML_COLUMN_OPTION_LIST,
             SyntaxKind::WHEN_CLAUSE_LIST,
+            SyntaxKind::LABEL_AND_PROPERTIES_LIST,
         ];
 
         let unhandled_list_kinds = (0..SyntaxKind::__LAST as u16)

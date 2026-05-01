@@ -26,6 +26,8 @@ pub struct ConfigFile {
     #[serde(default)]
     pub excluded_rules: Vec<Rule>,
     #[serde(default)]
+    pub included_rules: Vec<Rule>,
+    #[serde(default)]
     pub pg_version: Option<Version>,
     #[serde(default)]
     pub assume_in_transaction: Option<bool>,
@@ -56,6 +58,7 @@ impl ConfigFile {
 pub struct Config {
     pub excluded_paths: Vec<String>,
     pub excluded_rules: Vec<Rule>,
+    pub included_rules: Vec<Rule>,
     pub pg_version: Option<Version>,
     pub assume_in_transaction: bool,
     pub upload_to_github: UploadToGitHubConfig,
@@ -84,6 +87,13 @@ impl Config {
             excluded_rules
         } else {
             conf.excluded_rules.clone()
+        };
+
+        // the --include flag completely overrides the configuration file.
+        let included_rules = if let Some(included_rules) = opts.included_rules {
+            included_rules
+        } else {
+            conf.included_rules.clone()
         };
 
         // the --exclude-path flag completely overrides the configuration file.
@@ -115,6 +125,7 @@ impl Config {
 
         info!("pg version: {pg_version:?}");
         info!("excluded rules: {:?}", &excluded_rules);
+        info!("included rules: {:?}", &included_rules);
         info!("excluded paths: {:?}", &excluded_paths);
         info!("assume in a transaction: {assume_in_transaction:?}");
         info!("no error on unmatched pattern: {no_error_on_unmatched_pattern:?}");
@@ -138,6 +149,7 @@ impl Config {
         Config {
             excluded_paths,
             excluded_rules,
+            included_rules,
             pg_version,
             assume_in_transaction,
             upload_to_github,
@@ -242,6 +254,16 @@ assume_in_transaction = false
 [upload_to_github]
 fail_on_violations = true        
         ";
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+    #[test]
+    fn load_included_rules() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+included_rules = ["require-table-schema"]
+
+        "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
         assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }

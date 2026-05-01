@@ -27,6 +27,7 @@
 pub mod ast;
 pub mod identifier;
 mod parsing;
+mod ptr;
 pub mod syntax_error;
 mod syntax_node;
 mod token_text;
@@ -40,9 +41,10 @@ use std::{marker::PhantomData, sync::Arc};
 pub use squawk_parser::SyntaxKind;
 
 use ast::AstNode;
+pub use ptr::{AstPtr, SyntaxNodePtr};
 use rowan::GreenNode;
 use syntax_error::SyntaxError;
-pub use syntax_node::{SyntaxNode, SyntaxNodePtr, SyntaxToken};
+pub use syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
 pub use token_text::TokenText;
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of

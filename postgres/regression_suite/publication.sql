@@ -106,26 +106,75 @@ SELECT pubname, puballtables FROM pg_publication WHERE pubname = 'testpub_forall
 -- \dRp+ testpub_foralltables
 
 ---------------------------------------------
--- EXCEPT TABLE tests for normal tables
+-- EXCEPT clause tests for normal tables
 ---------------------------------------------
 SET client_min_messages = 'ERROR';
--- Specify table list in the EXCEPT TABLE clause of a FOR ALL TABLES publication
-CREATE PUBLICATION testpub_foralltables_excepttable FOR ALL TABLES EXCEPT TABLE (testpub_tbl1, testpub_tbl2);
+CREATE TABLE testpub_tbl3 (id serial primary key, data text);
+-- Specify table list in the EXCEPT clause of a FOR ALL TABLES publication
+CREATE PUBLICATION testpub_foralltables_excepttable FOR ALL TABLES EXCEPT (TABLE testpub_tbl1, testpub_tbl2, TABLE testpub_tbl3);
 -- \dRp+ testpub_foralltables_excepttable
--- Specify table in the EXCEPT TABLE clause of a FOR ALL TABLES publication
-CREATE PUBLICATION testpub_foralltables_excepttable1 FOR ALL TABLES EXCEPT TABLE (testpub_tbl1);
+-- Specify table in the EXCEPT clause of a FOR ALL TABLES publication
+CREATE PUBLICATION testpub_foralltables_excepttable1 FOR ALL TABLES EXCEPT (TABLE testpub_tbl1);
 -- \dRp+ testpub_foralltables_excepttable1
 -- Check that the table description shows the publications where it is listed
--- in the EXCEPT TABLE clause
+-- in the EXCEPT clause
 -- \d testpub_tbl1
+-- fail - first table in the EXCEPT list should use TABLE keyword
+CREATE PUBLICATION testpub_foralltables_excepttable2 FOR ALL TABLES EXCEPT (testpub_tbl1, testpub_tbl2);
+
+---------------------------------------------
+-- SET ALL TABLES/SEQUENCES
+---------------------------------------------
+-- Replace the existing table list in the EXCEPT clause (testpub_tbl1,
+-- testpub_tbl2, testpub_tbl3) with table (testpub_tbl2).
+ALTER PUBLICATION testpub_foralltables_excepttable SET ALL TABLES EXCEPT (TABLE testpub_tbl2);
+-- \dRp+ testpub_foralltables_excepttable
+
+-- Replace the existing table list in the EXCEPT clause (testpub_tbl2) with a
+-- table list containing (testpub_tbl1, testpub_tbl2, testpub_tbl3).
+ALTER PUBLICATION testpub_foralltables_excepttable SET ALL TABLES EXCEPT (TABLE testpub_tbl1, testpub_tbl2, TABLE testpub_tbl3);
+-- \dRp+ testpub_foralltables_excepttable
+
+-- Clear the table list in the EXCEPT clause, making the publication include all
+-- tables.
+ALTER PUBLICATION testpub_foralltables_excepttable SET ALL TABLES;
+-- \dRp+ testpub_foralltables_excepttable
+
+-- Create an empty publication for subsequent tests.
+CREATE PUBLICATION testpub_forall_tbls_seqs;
+
+-- Enable both puballtables and puballsequences
+ALTER PUBLICATION testpub_forall_tbls_seqs SET ALL TABLES, ALL SEQUENCES;
+-- \dRp+ testpub_forall_tbls_seqs
+
+-- Explicitly test that SET ALL TABLES resets puballsequences to false
+-- Result should be: puballtables = true, puballsequences = false
+ALTER PUBLICATION testpub_forall_tbls_seqs SET ALL TABLES;
+-- \dRp+ testpub_forall_tbls_seqs
+
+-- Explicitly test that SET ALL SEQUENCES resets puballtables to false
+-- Result should be: puballtables = false, puballsequences = true
+ALTER PUBLICATION testpub_forall_tbls_seqs SET ALL SEQUENCES;
+-- \dRp+ testpub_forall_tbls_seqs
+
+-- fail - SET ALL TABLES/SEQUENCES is not allowed for a 'FOR TABLE' publication
+ALTER PUBLICATION testpub_fortable SET ALL TABLES EXCEPT (TABLE testpub_tbl1);
+ALTER PUBLICATION testpub_fortable SET ALL TABLES;
+ALTER PUBLICATION testpub_fortable SET ALL SEQUENCES;
+
+-- fail - SET ALL TABLES/SEQUENCES is not allowed for a schema publication
+ALTER PUBLICATION testpub_forschema SET ALL TABLES EXCEPT (TABLE pub_test.testpub_nopk);
+ALTER PUBLICATION testpub_forschema SET ALL TABLES;
+ALTER PUBLICATION testpub_forschema SET ALL SEQUENCES;
 
 RESET client_min_messages;
-DROP TABLE testpub_tbl2;
-DROP PUBLICATION testpub_foralltables, testpub_fortable, testpub_forschema, testpub_for_tbl_schema, testpub_foralltables_excepttable, testpub_foralltables_excepttable1;
+DROP TABLE testpub_tbl2, testpub_tbl3;
+DROP PUBLICATION testpub_foralltables, testpub_fortable, testpub_forschema, testpub_for_tbl_schema;
+DROP PUBLICATION testpub_forall_tbls_seqs, testpub_foralltables_excepttable, testpub_foralltables_excepttable1;
 
 ---------------------------------------------
 -- Tests for inherited tables, and
--- EXCEPT TABLE tests for inherited tables
+-- EXCEPT clause tests for inherited tables
 ---------------------------------------------
 SET client_min_messages = 'ERROR';
 CREATE TABLE testpub_tbl_parent (a int);
@@ -134,14 +183,14 @@ CREATE PUBLICATION testpub3 FOR TABLE testpub_tbl_parent;
 -- \dRp+ testpub3
 CREATE PUBLICATION testpub4 FOR TABLE ONLY testpub_tbl_parent;
 -- \dRp+ testpub4
--- List the parent table in the EXCEPT TABLE clause (without ONLY or '*')
-CREATE PUBLICATION testpub5 FOR ALL TABLES EXCEPT TABLE (testpub_tbl_parent);
+-- List the parent table in the EXCEPT clause (without ONLY or '*')
+CREATE PUBLICATION testpub5 FOR ALL TABLES EXCEPT (TABLE testpub_tbl_parent);
 -- \dRp+ testpub5
--- EXCEPT with '*': list the table and all its descendants in the EXCEPT TABLE clause
-CREATE PUBLICATION testpub6 FOR ALL TABLES EXCEPT TABLE (testpub_tbl_parent *);
+-- EXCEPT with '*': list the table and all its descendants in the EXCEPT clause
+CREATE PUBLICATION testpub6 FOR ALL TABLES EXCEPT (TABLE testpub_tbl_parent *);
 -- \dRp+ testpub6
--- EXCEPT with ONLY: list the table in the EXCEPT TABLE clause, but not its descendants
-CREATE PUBLICATION testpub7 FOR ALL TABLES EXCEPT TABLE (ONLY testpub_tbl_parent);
+-- EXCEPT with ONLY: list the table in the EXCEPT clause, but not its descendants
+CREATE PUBLICATION testpub7 FOR ALL TABLES EXCEPT (TABLE ONLY testpub_tbl_parent);
 -- \dRp+ testpub7
 
 RESET client_min_messages;
@@ -149,20 +198,20 @@ DROP TABLE testpub_tbl_parent, testpub_tbl_child;
 DROP PUBLICATION testpub3, testpub4, testpub5, testpub6, testpub7;
 
 ---------------------------------------------
--- EXCEPT TABLE tests for partitioned tables
+-- EXCEPT clause tests for partitioned tables
 ---------------------------------------------
 SET client_min_messages = 'ERROR';
 CREATE TABLE testpub_root(a int) PARTITION BY RANGE(a);
 CREATE TABLE testpub_part1 PARTITION OF testpub_root FOR VALUES FROM (0) TO (100);
-CREATE PUBLICATION testpub8 FOR ALL TABLES EXCEPT TABLE (testpub_root);
+CREATE PUBLICATION testpub8 FOR ALL TABLES EXCEPT (TABLE testpub_root);
 -- \dRp+ testpub8;
 -- \d testpub_part1
 -- \d testpub_root
-CREATE PUBLICATION testpub9 FOR ALL TABLES EXCEPT TABLE (testpub_part1);
+CREATE PUBLICATION testpub9 FOR ALL TABLES EXCEPT (TABLE testpub_part1);
 
 CREATE TABLE tab_main (a int) PARTITION BY RANGE(a);
 -- Attaching a partition is not allowed if the partitioned table appears in a
--- publication's EXCEPT TABLE clause.
+-- publication's EXCEPT clause.
 ALTER TABLE tab_main ATTACH PARTITION testpub_root FOR VALUES FROM (0) TO (200);
 
 RESET client_min_messages;
@@ -991,7 +1040,18 @@ ALTER PUBLICATION testpub4 owner to regress_publication_user2; -- fail
 ALTER PUBLICATION testpub4 owner to regress_publication_user; -- ok
 
 SET ROLE regress_publication_user;
-DROP PUBLICATION testpub4;
+SET client_min_messages = 'ERROR';
+CREATE PUBLICATION testpub5 FOR ALL TABLES;
+RESET client_min_messages;
+ALTER PUBLICATION testpub5 OWNER TO regress_publication_user3;
+SET ROLE regress_publication_user3;
+-- fail - SET ALL TABLES/SEQUENCES on a publication requires superuser privileges
+ALTER PUBLICATION testpub5 SET ALL TABLES EXCEPT (TABLE testpub_tbl1); -- fail
+ALTER PUBLICATION testpub5 SET ALL TABLES; -- fail
+ALTER PUBLICATION testpub5 SET ALL SEQUENCES; -- fail
+
+SET ROLE regress_publication_user;
+DROP PUBLICATION testpub4, testpub5;
 DROP ROLE regress_publication_user3;
 
 REVOKE CREATE ON DATABASE regression FROM regress_publication_user2;
@@ -1377,6 +1437,113 @@ DROP TABLE testpub_merge_pk;
 RESET SESSION AUTHORIZATION;
 DROP ROLE regress_publication_user, regress_publication_user2;
 DROP ROLE regress_publication_user_dummy;
+
+-- Test pg_get_publication_tables(text[], oid) function
+CREATE SCHEMA gpt_test_sch;
+CREATE TABLE gpt_test_sch.tbl_sch (id int);
+CREATE TABLE tbl_normal (id int);
+CREATE TABLE tbl_parent (id1 int, id2 int, id3 int) PARTITION BY RANGE (id1);
+CREATE TABLE tbl_part1 PARTITION OF tbl_parent FOR VALUES FROM (1) TO (10);
+CREATE VIEW gpt_test_view AS SELECT * FROM tbl_normal;
+
+SET client_min_messages = 'ERROR';
+CREATE PUBLICATION pub_all FOR ALL TABLES WITH (publish_via_partition_root = true);
+CREATE PUBLICATION pub_all_no_viaroot FOR ALL TABLES WITH (publish_via_partition_root = false);
+CREATE PUBLICATION pub_all_except FOR ALL TABLES EXCEPT (TABLE tbl_parent, gpt_test_sch.tbl_sch) WITH (publish_via_partition_root = true);
+CREATE PUBLICATION pub_all_except_no_viaroot FOR ALL TABLES EXCEPT (TABLE tbl_parent, gpt_test_sch.tbl_sch) WITH (publish_via_partition_root = false);
+CREATE PUBLICATION pub_schema FOR TABLES IN SCHEMA gpt_test_sch;
+CREATE PUBLICATION pub_normal FOR TABLE tbl_normal WHERE (id < 10);
+CREATE PUBLICATION pub_part_leaf FOR TABLE tbl_part1 WITH (publish_via_partition_root = false);
+CREATE PUBLICATION pub_part_parent FOR TABLE tbl_parent (id1, id2) WHERE (id1 = 10) WITH (publish_via_partition_root = true);
+CREATE PUBLICATION pub_part_parent_no_viaroot FOR TABLE tbl_parent WITH (publish_via_partition_root = false);
+CREATE PUBLICATION pub_part_parent_child FOR TABLE tbl_parent, tbl_part1 WITH (publish_via_partition_root = true);
+RESET client_min_messages;
+
+CREATE FUNCTION test_gpt(pubnames text[], relname text)
+RETURNS TABLE (
+  pubname text,
+  relname name,
+  attrs text,
+  qual text
+)
+BEGIN ATOMIC
+  SELECT p.pubname, c.relname, gpt.attrs::text, pg_get_expr(gpt.qual, gpt.relid)
+    FROM pg_get_publication_tables(pubnames, relname::regclass::oid) gpt
+    JOIN pg_publication p ON p.oid = gpt.pubid
+    JOIN pg_class c ON c.oid = gpt.relid
+  ORDER BY p.pubname, c.relname;
+END;
+
+SELECT * FROM test_gpt(ARRAY['pub_normal'], 'tbl_normal');
+SELECT * FROM test_gpt(ARRAY['pub_normal'], 'gpt_test_sch.tbl_sch'); -- no result
+
+SELECT * FROM test_gpt(ARRAY['pub_schema'], 'gpt_test_sch.tbl_sch');
+SELECT * FROM test_gpt(ARRAY['pub_schema'], 'tbl_normal'); -- no result
+
+SELECT * FROM test_gpt(ARRAY['pub_part_parent'], 'tbl_parent');
+SELECT * FROM test_gpt(ARRAY['pub_part_parent'], 'tbl_part1'); -- no result
+
+SELECT * FROM test_gpt(ARRAY['pub_part_parent_no_viaroot'], 'tbl_part1');
+SELECT * FROM test_gpt(ARRAY['pub_part_parent_no_viaroot'], 'tbl_parent'); -- no result
+
+SELECT * FROM test_gpt(ARRAY['pub_part_leaf'], 'tbl_part1');
+SELECT * FROM test_gpt(ARRAY['pub_part_leaf'], 'tbl_parent'); -- no result
+
+SELECT * FROM test_gpt(ARRAY['pub_all'], 'tbl_parent');
+SELECT * FROM test_gpt(ARRAY['pub_all'], 'tbl_part1'); -- no result
+
+SELECT * FROM test_gpt(ARRAY['pub_all_no_viaroot'], 'tbl_part1');
+SELECT * FROM test_gpt(ARRAY['pub_all_no_viaroot'], 'tbl_parent'); -- no result
+
+SELECT * FROM test_gpt(ARRAY['pub_part_parent_child'], 'tbl_parent');
+SELECT * FROM test_gpt(ARRAY['pub_part_parent_child'], 'tbl_part1'); -- no result
+
+-- test for the EXCEPT clause
+SELECT * FROM test_gpt(ARRAY['pub_all_except'], 'tbl_normal');
+SELECT * FROM test_gpt(ARRAY['pub_all_except'], 'gpt_test_sch.tbl_sch'); -- no result (excluded)
+SELECT * FROM test_gpt(ARRAY['pub_all_except'], 'tbl_parent'); -- no result (excluded)
+SELECT * FROM test_gpt(ARRAY['pub_all_except'], 'tbl_part1'); -- no result
+SELECT * FROM test_gpt(ARRAY['pub_all_except_no_viaroot'], 'tbl_normal');
+SELECT * FROM test_gpt(ARRAY['pub_all_except_no_viaroot'], 'gpt_test_sch.tbl_sch'); -- no result (excluded)
+SELECT * FROM test_gpt(ARRAY['pub_all_except_no_viaroot'], 'tbl_parent'); -- no result (excluded)
+SELECT * FROM test_gpt(ARRAY['pub_all_except_no_viaroot'], 'tbl_part1'); -- no result
+
+-- two rows with different row filter
+SELECT * FROM test_gpt(ARRAY['pub_all', 'pub_normal'], 'tbl_normal');
+
+-- one row with 'pub_part_parent'
+SELECT * FROM test_gpt(ARRAY['pub_part_parent', 'pub_part_parent_no_viaroot'], 'tbl_parent');
+
+-- no result, tbl_parent is the effective published OID due to pubviaroot
+SELECT * FROM test_gpt(ARRAY['pub_part_parent', 'pub_all'], 'tbl_part1');
+
+-- no result, non-existent publication
+SELECT * FROM test_gpt(ARRAY['no_such_pub'], 'tbl_normal');
+
+-- no result, non-table object
+SELECT * FROM test_gpt(ARRAY['pub_all'], 'gpt_test_view');
+
+-- no result, empty publication array
+SELECT * FROM test_gpt(ARRAY[]::text[], 'tbl_normal');
+
+-- no result, OID 0 as target_relid
+SELECT * FROM pg_get_publication_tables(ARRAY['pub_normal'], 0::oid);
+
+-- Clean up
+DROP FUNCTION test_gpt(text[], text);
+DROP PUBLICATION pub_all;
+DROP PUBLICATION pub_all_no_viaroot;
+DROP PUBLICATION pub_all_except;
+DROP PUBLICATION pub_all_except_no_viaroot;
+DROP PUBLICATION pub_schema;
+DROP PUBLICATION pub_normal;
+DROP PUBLICATION pub_part_leaf;
+DROP PUBLICATION pub_part_parent;
+DROP PUBLICATION pub_part_parent_no_viaroot;
+DROP PUBLICATION pub_part_parent_child;
+DROP VIEW gpt_test_view;
+DROP TABLE tbl_normal, tbl_parent, tbl_part1;
+DROP SCHEMA gpt_test_sch CASCADE;
 
 -- stage objects for pg_dump tests
 CREATE SCHEMA pubme CREATE TABLE t0 (c int, d int) CREATE TABLE t1 (c int);

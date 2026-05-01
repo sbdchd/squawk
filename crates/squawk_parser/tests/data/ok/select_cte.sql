@@ -137,3 +137,9 @@ WHERE notification_id IN (
 -- paren select cte
 with t as (select 1)
 (select 1);
+
+-- group by all
+with x as (
+  select * from t group by all
+)
+select * from x;

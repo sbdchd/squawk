@@ -1,6 +1,6 @@
-use crate::binder;
-use crate::builtins::parse_builtins;
+use crate::builtins::builtins_file;
 use crate::db::{File, parse};
+use crate::location::{Location, LocationKind};
 use crate::offsets::token_from_offset;
 use crate::resolve;
 use rowan::{TextRange, TextSize};
@@ -13,9 +13,7 @@ use squawk_syntax::{
 
 #[salsa::tracked]
 pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[Location; 1]> {
-    let parse = parse(db, file);
-    let source_file = &parse.tree();
-    let Some(token) = token_from_offset(source_file, offset) else {
+    let Some(token) = token_from_offset(db, file, offset) else {
         return smallvec![];
     };
     let Some(parent) = token.parent() else {
@@ -31,57 +29,46 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
             if let Some(case_expr) = ast::CaseExpr::cast(parent)
                 && let Some(case_token) = case_expr.case_token()
             {
-                return smallvec![Location::range(case_token.text_range())];
+                return smallvec![Location::new(
+                    file,
+                    case_token.text_range(),
+                    LocationKind::CaseExpr
+                )];
             }
         }
     }
 
     // goto def on COMMIT -> BEGIN/START TRANSACTION
     if ast::Commit::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(db, file, offset)
     {
-        return smallvec![Location::range(begin_range)];
+        return smallvec![Location::new(file, begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(source_file, token.text_range().start())
+        && let Some(begin_range) = find_preceding_begin(db, file, offset)
     {
-        return smallvec![Location::range(begin_range)];
+        return smallvec![Location::new(file, begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
     if ast::Begin::can_cast(parent.kind())
-        && let Some(end_range) =
-            find_following_commit_or_rollback(source_file, token.text_range().end())
+        && let Some(end_range) = find_following_commit_or_rollback(db, file, offset)
     {
-        return smallvec![Location::range(end_range)];
+        return smallvec![Location::new(file, end_range, LocationKind::CommitEnd)];
     }
 
-    if let Some(name) = ast::Name::cast(parent.clone()) {
-        return smallvec![Location::range(name.syntax().text_range())];
+    if let Some(name) = ast::Name::cast(parent.clone())
+        && let Some(location) = Location::from_node(file, name.syntax())
+    {
+        return smallvec![location];
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for file_id in [FileId::Current, FileId::Builtins] {
-            let file = match file_id {
-                FileId::Current => source_file,
-                // TODO: we should salsa this
-                FileId::Builtins => &parse_builtins(db).tree(),
-            };
-            // TODO: we should salsa this
-            let binder_output = binder::bind(file);
-            let root = file.syntax();
-            if let Some(ptrs) = resolve::resolve_name_ref_ptrs(&binder_output, root, &name_ref) {
-                let ranges = ptrs
-                    .iter()
-                    .map(|ptr| ptr.to_node(file.syntax()).text_range())
-                    .map(|range| Location {
-                        file: file_id,
-                        range,
-                    })
-                    .collect();
-                return ranges;
+        for definition_file in [file, builtins_file(db)] {
+            if let Some(locations) = resolve::resolve_name_ref(db, definition_file, &name_ref) {
+                return locations;
             }
         }
     }
@@ -95,19 +82,15 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
         }
     });
     if let Some(ty) = type_node {
-        for file_id in [FileId::Current, FileId::Builtins] {
-            let file = match file_id {
-                FileId::Current => source_file,
-                // TODO: we should salsa this
-                FileId::Builtins => &parse_builtins(db).tree(),
-            };
-            // TODO: we should salsa this
-            let binder_output = binder::bind(file);
+        for definition_file in [file, builtins_file(db)] {
             let position = token.text_range().start();
-            if let Some(ptr) = resolve::resolve_type_ptr_from_type(&binder_output, &ty, position) {
+            if let Some(ptr) =
+                resolve::resolve_type_ptr_from_type(db, definition_file, &ty, position)
+            {
                 return smallvec![Location {
-                    file: file_id,
-                    range: ptr.to_node(file.syntax()).text_range(),
+                    file: definition_file,
+                    range: ptr.text_range(),
+                    kind: LocationKind::Type,
                 }];
             }
         }
@@ -116,30 +99,9 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
     smallvec![]
 }
 
-#[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord)]
-pub enum FileId {
-    Current,
-    Builtins,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Location {
-    pub file: FileId,
-    pub range: TextRange,
-}
-
-impl Location {
-    fn range(range: TextRange) -> Location {
-        Location {
-            file: FileId::Current,
-            range,
-        }
-    }
-}
-
-fn find_preceding_begin(file: &ast::SourceFile, before: TextSize) -> Option<TextRange> {
+fn find_preceding_begin(db: &dyn Db, file: File, before: TextSize) -> Option<TextRange> {
     let mut last_begin: Option<TextRange> = None;
-    for stmt in file.stmts() {
+    for stmt in parse(db, file).tree().stmts() {
         if let ast::Stmt::Begin(begin) = stmt {
             let range = begin.syntax().text_range();
             if range.end() <= before {
@@ -150,8 +112,12 @@ fn find_preceding_begin(file: &ast::SourceFile, before: TextSize) -> Option<Text
     last_begin
 }
 
-fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) -> Option<TextRange> {
-    for stmt in file.stmts() {
+fn find_following_commit_or_rollback(
+    db: &dyn Db,
+    file: File,
+    after: TextSize,
+) -> Option<TextRange> {
+    for stmt in parse(db, file).tree().stmts() {
         let range = match &stmt {
             ast::Stmt::Commit(commit) => commit.syntax().text_range(),
             ast::Stmt::Rollback(rollback) => rollback.syntax().text_range(),
@@ -166,14 +132,15 @@ fn find_following_commit_or_rollback(file: &ast::SourceFile, after: TextSize) ->
 
 #[cfg(test)]
 mod test {
-    use crate::builtins::BUILTINS_SQL;
+    use crate::builtins::builtins_file;
     use crate::db::{Database, File};
-    use crate::goto_definition::{FileId, goto_definition};
+    use crate::goto_definition::goto_definition;
     use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use log::info;
     use rowan::TextRange;
+    use rustc_hash::FxHashMap;
 
     #[track_caller]
     fn goto(sql: &str) -> String {
@@ -188,58 +155,64 @@ mod test {
         // marker after the item we're trying to go to def on.
         offset = offset.checked_sub(1.into()).unwrap_or_default();
         let db = Database::default();
-        let file = File::new(&db, sql.clone(), 0);
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
-        let results = goto_definition(&db, file, offset);
-        if !results.is_empty() {
-            let offset: usize = offset.into();
-            let mut current_dests = vec![];
-            let mut builtin_dests = vec![];
-            for (i, location) in results.iter().enumerate() {
-                let label_index = i + 2;
-                match location.file {
-                    FileId::Current => current_dests.push((label_index, location.range)),
-                    FileId::Builtins => builtin_dests.push((label_index, location.range)),
-                }
-            }
+        let current_file = File::new(&db, sql.into());
+        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
+        let results = goto_definition(&db, current_file, offset);
+        if results.is_empty() {
+            return None;
+        }
 
-            let has_builtins = !builtin_dests.is_empty();
+        let mut file_paths = FxHashMap::default();
+        file_paths.insert(current_file, "current.sql");
+        file_paths.insert(builtins_file(&db), "builtins.sql");
 
-            let mut snippet = Snippet::source(&sql).fold(true);
-            if has_builtins {
-                // only show the current file when we have two file types, aka current and builtins
-                snippet = snippet.path("current.sql");
-            } else {
-                snippet = annotate_destinations(snippet, current_dests);
-            }
-            snippet = snippet.annotation(
-                AnnotationKind::Context
-                    .span(offset..offset + 1)
-                    .label("1. source"),
-            );
+        let offset: usize = offset.into();
+        let mut dests_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
+        for (i, location) in results.iter().enumerate() {
+            dests_by_file
+                .entry(location.file)
+                .or_default()
+                .push((i + 2, location.range));
+        }
 
-            let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
+        let multi_file = dests_by_file.len() > 1 || !dests_by_file.contains_key(&current_file);
 
-            if has_builtins {
-                let builtins_snippet = Snippet::source(BUILTINS_SQL).path("builtin.sql").fold(true);
-                let builtins_snippet = annotate_destinations(builtins_snippet, builtin_dests);
-                groups.push(
-                    Level::INFO
-                        .primary_title("definition")
-                        .element(builtins_snippet),
-                );
-            }
+        let mut snippet = Snippet::source(current_file.content(&db).as_ref()).fold(true);
+        if multi_file {
+            snippet = snippet.path(*file_paths.get(&current_file).unwrap());
+        }
+        if let Some(current_dests) = dests_by_file.remove(&current_file) {
+            snippet = annotate_destinations(snippet, current_dests);
+        }
+        snippet = snippet.annotation(
+            AnnotationKind::Context
+                .span(offset..offset + 1)
+                .label("1. source"),
+        );
 
-            let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
-            return Some(
-                renderer
-                    .render(&groups)
-                    .to_string()
-                    // hacky cleanup to make the text shorter
-                    .replace("info: definition", ""),
+        let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
+
+        for (dest_file, dests) in dests_by_file {
+            let path = file_paths.get(&dest_file).unwrap();
+            let other_snippet = Snippet::source(dest_file.content(&db).as_ref())
+                .path(*path)
+                .fold(true);
+            let other_snippet = annotate_destinations(other_snippet, dests);
+            groups.push(
+                Level::INFO
+                    .primary_title("definition")
+                    .element(other_snippet),
             );
         }
-        None
+
+        let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
+        Some(
+            renderer
+                .render(&groups)
+                .to_string()
+                // hacky cleanup to make the text shorter
+                .replace("info: definition", ""),
+        )
     }
 
     fn goto_not_found(sql: &str) {
@@ -558,6 +531,24 @@ select t$0.* from t;
         3 │ select t.* from t;
           ╰╴       ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_cte_shadowed_table_star_column_count_not_found() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+with
+  t as (
+    select 1
+  ),
+  -- yy overrides y since there's only 1 column in the *
+  u(x, yy) as (
+    select *, 2 y, 3 z from t
+  )
+select y$0 from u;
+",
+        );
     }
 
     #[test]
@@ -885,7 +876,7 @@ select now$0();
               │          ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
@@ -903,11 +894,79 @@ select current_timestamp$0;
               │                        ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
         ");
+    }
+
+    #[test]
+    fn goto_current_user() {
+        assert_snapshot!(goto("
+create function pg_catalog.current_user() returns name
+  language internal;
+select current_user$0;
+"), @"
+          ╭▸ 
+        2 │ create function pg_catalog.current_user() returns name
+          │                            ──────────── 2. destination
+        3 │   language internal;
+        4 │ select current_user;
+          ╰╴                  ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_user_keyword() {
+        assert_snapshot!(goto("
+create function pg_catalog.current_user() returns name
+  language internal;
+select user$0;
+"), @"
+          ╭▸ 
+        2 │ create function pg_catalog.current_user() returns name
+          │                            ──────────── 2. destination
+        3 │   language internal;
+        4 │ select user;
+          ╰╴          ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_session_user() {
+        assert_snapshot!(goto("
+create function pg_catalog.session_user() returns name
+  language internal;
+select session_user$0;
+"), @"
+          ╭▸ 
+        2 │ create function pg_catalog.session_user() returns name
+          │                            ──────────── 2. destination
+        3 │   language internal;
+        4 │ select session_user;
+          ╰╴                  ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_current_schema() {
+        assert_snapshot!(goto("
+create function current_schema() returns name
+  language internal;
+select current_schema$0;
+"), @"
+          ╭▸ 
+        2 │ create function current_schema() returns name
+          │                 ────────────── 2. destination
+        3 │   language internal;
+        4 │ select current_schema;
+          ╰╴                    ─ 1. source
+        "
+        );
     }
 
     #[test]
@@ -936,7 +995,7 @@ select * from t where current_timestamp$0 > t.created_at;
               │                                       ─ 1. source
               ╰╴
 
-              ╭▸ builtin.sql:11089:28
+              ╭▸ builtins.sql:11089:28
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 2. destination
@@ -2318,13 +2377,13 @@ drop type person$0;
     fn goto_create_table_type_reference() {
         assert_snapshot!(goto("
 create type person_info as (name text, email text);
-create table user(id int, member person_info$0);
-"), @r"
+create table users(id int, member person_info$0);
+"), @"
           ╭▸ 
         2 │ create type person_info as (name text, email text);
           │             ─────────── 2. destination
-        3 │ create table user(id int, member person_info);
-          ╰╴                                           ─ 1. source
+        3 │ create table users(id int, member person_info);
+          ╰╴                                            ─ 1. source
         ");
     }
 
@@ -2416,14 +2475,14 @@ create table data(id int, value myint$0);
     fn goto_composite_type_field() {
         assert_snapshot!(goto("
 create type person_info as (name text, email text);
-create table user(id int, member person_info);
-select (member).name$0 from user;
-"), @r"
+create table users(id int, member person_info);
+select (member).name$0 from users;
+"), @"
           ╭▸ 
         2 │ create type person_info as (name text, email text);
           │                             ──── 2. destination
-        3 │ create table user(id int, member person_info);
-        4 │ select (member).name from user;
+        3 │ create table users(id int, member person_info);
+        4 │ select (member).name from users;
           ╰╴                   ─ 1. source
         ");
     }
@@ -2625,6 +2684,62 @@ select v.a$0 from v;
           │                              ─ 2. destination
         3 │ select v.a from v;
           ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_materialized_view_column_with_explicit_column_list() {
+        assert_snapshot!(goto("
+create materialized view mv (x, y) as select 1 as a, 2 as b;
+select x$0 from mv;
+"), @r"
+          ╭▸ 
+        2 │ create materialized view mv (x, y) as select 1 as a, 2 as b;
+          │                              ─ 2. destination
+        3 │ select x from mv;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_table_qualifier() {
+        assert_snapshot!(goto("
+create view v as select 1 id, 2 b;
+select v$0.id from v;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 id, 2 b;
+          │             ─ 2. destination
+        3 │ select v.id from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_into_column() {
+        assert_snapshot!(goto("
+select 1 a into t;
+select a$0 from t;
+"), @"
+          ╭▸ 
+        2 │ select 1 a into t;
+          │          ─ 2. destination
+        3 │ select a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_into_table() {
+        assert_snapshot!(goto("
+select 1 a into t;
+select a from t$0;
+"), @"
+          ╭▸ 
+        2 │ select 1 a into t;
+          │                 ─ 2. destination
+        3 │ select a from t;
+          ╰╴              ─ 1. source
         ");
     }
 
@@ -4096,6 +4211,34 @@ select f2$0 from dup(42) as u(x, y);
     }
 
     #[test]
+    fn goto_fn_call_column_from_cte() {
+        assert_snapshot!(goto("
+with cte as (select 1 as a)
+select a$0(cte) from cte;
+"), @"
+          ╭▸ 
+        2 │ with cte as (select 1 as a)
+          │                          ─ 2. destination
+        3 │ select a(cte) from cte;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_fn_call_column_from_view() {
+        assert_snapshot!(goto("
+create view v as select 1 as a;
+select a$0(v) from v;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 as a;
+          │                              ─ 2. destination
+        3 │ select a(v) from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_select_aggregate_call() {
         assert_snapshot!(goto("
 create aggregate foo(int) (
@@ -4529,6 +4672,23 @@ select u.id$0 from u;
           │                     ── 2. destination
         4 │ select u.id from u;
           ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_qualified_table_ref_prefers_schema_qualified_from_item_over_cte() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t(a int);
+with t as (select 1 a)
+select t$0.a from s.t;
+"), @r"
+          ╭▸ 
+        3 │ create table s.t(a int);
+          │                ─ 2. destination
+        4 │ with t as (select 1 a)
+        5 │ select t.a from s.t;
+          ╰╴       ─ 1. source
         ");
     }
 
@@ -5228,6 +5388,26 @@ insert into public.users$0(id, email) values (1, 'test@example.com');
     }
 
     #[test]
+    fn goto_insert_view() {
+        assert_snapshot!(goto("
+create table users as select 1 id, 'joe' name, 'joe@example.com' email, 'active' status;
+create view active_users as
+  select id, name, email
+  from users
+  where status = 'active';
+insert into active_users$0 (name, email)
+values ('Alice', 'alice@example.com');
+"), @"
+          ╭▸ 
+        3 │ create view active_users as
+          │             ──────────── 2. destination
+          ‡
+        7 │ insert into active_users (name, email)
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_insert_column() {
         assert_snapshot!(goto("
 create table users(id int, email text);
@@ -5673,6 +5853,20 @@ select t$0 from t;
     }
 
     #[test]
+    fn goto_select_view_name_from_view() {
+        assert_snapshot!(goto("
+create view boop as select 1 a;
+select boop$0 from boop;
+"), @"
+          ╭▸ 
+        2 │ create view boop as select 1 a;
+          │             ──── 2. destination
+        3 │ select boop from boop;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_schema() {
         assert_snapshot!(goto("
 create schema foo;
@@ -5981,6 +6175,18 @@ select COLUMN1$0, COLUMN2 from t;
         5 │ select COLUMN1, COLUMN2 from t;
           ╰╴             ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_cte_values_with_explicit_column_list_column1_not_found() {
+        goto_not_found(
+            "
+with t(a, b) as (
+    values (1, 2), (3, 4)
+)
+select column1$0 from t;
+",
+        );
     }
 
     #[test]
@@ -9117,6 +9323,454 @@ window w as (
        13 │ from tbl
        14 │ window w as (
           ╰╴       ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_cast_float_with_small_arg() {
+        assert_snapshot!(goto("
+create type pg_catalog.float4;
+select '1'::float$0(8);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float4;
+          │                        ────── 2. destination
+        3 │ select '1'::float(8);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_float_with_large_arg() {
+        assert_snapshot!(goto("
+create type pg_catalog.float8;
+select '1'::float$0(25);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.float8;
+          │                        ────── 2. destination
+        3 │ select '1'::float(25);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_dec_with_modifier() {
+        assert_snapshot!(goto("
+create type pg_catalog.numeric;
+select '10'::dec$0(10, 2);
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.numeric;
+          │                        ─────── 2. destination
+        3 │ select '10'::dec(10, 2);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cast_dec() {
+        assert_snapshot!(goto("
+create type pg_catalog.numeric;
+select '10'::dec$0;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.numeric;
+          │                        ─────── 2. destination
+        3 │ select '10'::dec;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph() {
+        assert_snapshot!(goto("
+create table buzz.boo(a int, b int);
+create property graph foo.bar
+  vertex tables (buzz.boo$0 key (a, b) no properties)
+  edge tables (foo.bar key (x, y)
+    source key (a, b) references k (t, y)
+    destination key (q, t) references a (r, j)
+    properties all columns);
+"), @"
+          ╭▸ 
+        2 │ create table buzz.boo(a int, b int);
+          │                   ─── 2. destination
+        3 │ create property graph foo.bar
+        4 │   vertex tables (buzz.boo key (a, b) no properties)
+          ╰╴                        ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create table foo.bar(x int, y int);
+create property graph g
+  vertex tables (boo key (a, b) no properties)
+  edge tables (foo.bar$0 key (x, y)
+    source key (a, b) references k (t, y)
+    destination key (q, t) references a (r, j)
+    properties all columns);
+"), @"
+          ╭▸ 
+        2 │ create table foo.bar(x int, y int);
+          │                  ─── 2. destination
+          ‡
+        5 │   edge tables (foo.bar key (x, y)
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_sources_table() {
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create table v2 (
+  id int8 primary key,
+  name text
+);
+
+create table v3 (
+  id int8 primary key,
+  name text
+);
+
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create table e2 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v3
+);
+
+create property graph g1
+  vertex tables (v1, v2, v3)
+  edge tables (
+    e1 source v1$0 destination v2,
+    e2 source v1 destination v3);
+"), @"
+           ╭▸ 
+         2 │ create table v1 (
+           │              ── 2. destination
+           ‡
+        32 │     e1 source v1 destination v2,
+           ╰╴               ─ 1. source
+        "
+        );
+
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create table v2 (
+  id int8 primary key,
+  name text
+);
+
+create table v3 (
+  id int8 primary key,
+  name text
+);
+
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create table e2 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v3
+);
+
+create property graph g1
+  vertex tables (v1, v2, v3)
+  edge tables (
+    e1 source v1 destination v2,
+    e2 source v1 destination v3$0);
+"), @"
+           ╭▸ 
+        12 │ create table v3 (
+           │              ── 2. destination
+           ‡
+        33 │     e2 source v1 destination v3);
+           ╰╴                              ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_create_property_graph_references_table() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1
+      source key (source_id) references v1$0 (id)
+      destination key (destination_id) references v2 (id)
+  );
+"), @"
+           ╭▸ 
+         2 │ create table v1 (id int8 primary key);
+           │              ── 2. destination
+           ‡
+        14 │       source key (source_id) references v1 (id)
+           ╰╴                                         ─ 1. source
+        "
+        );
+    }
+
+    #[test]
+    fn goto_create_property_graph_vertex_key_column() {
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create property graph g1
+  vertex tables (v1 key (id$0));
+"), @"
+          ╭▸ 
+        3 │   id int8 primary key,
+          │   ── 2. destination
+          ‡
+        8 │   vertex tables (v1 key (id));
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_source_key_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id$0) references v1 (id)
+      destination key (destination_id) references v2 (id));
+"), @"
+           ╭▸ 
+         6 │   source_id int8 references v1,
+           │   ───────── 2. destination
+           ‡
+        14 │       source key (source_id) references v1 (id)
+           ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_source_references_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id) references v1 (id$0)
+      destination key (destination_id) references v2 (id));
+"), @"
+           ╭▸ 
+         2 │ create table v1 (id int8 primary key);
+           │                  ── 2. destination
+           ‡
+        14 │       source key (source_id) references v1 (id)
+           ╰╴                                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_destination_key_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id) references v1 (id)
+      destination key (destination_id$0) references v2 (id));
+"), @"
+           ╭▸ 
+         7 │   destination_id int8 references v2
+           │   ────────────── 2. destination
+           ‡
+        15 │       destination key (destination_id) references v2 (id));
+           ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_destination_references_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1 key (id)
+      source key (source_id) references v1 (id)
+      destination key (destination_id) references v2 (id$0));
+"), @"
+           ╭▸ 
+         3 │ create table v2 (id int8 primary key);
+           │                  ── 2. destination
+           ‡
+        15 │       destination key (destination_id) references v2 (id));
+           ╰╴                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_vertex_properties_column() {
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create property graph g1
+  vertex tables (v1 properties (id$0, name));
+"), @"
+          ╭▸ 
+        3 │   id int8 primary key,
+          │   ── 2. destination
+          ‡
+        8 │   vertex tables (v1 properties (id, name));
+          ╰╴                                 ─ 1. source
+        ");
+
+        assert_snapshot!(goto("
+create table v1 (
+  id int8 primary key,
+  name text
+);
+
+create property graph g1
+  vertex tables (v1 properties (id, nam$0e));
+"), @"
+          ╭▸ 
+        4 │   name text
+          │   ──── 2. destination
+          ‡
+        8 │   vertex tables (v1 properties (id, name));
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_property_graph_edge_properties_column() {
+        assert_snapshot!(goto("
+create table v1 (id int8 primary key);
+create table v2 (id int8 primary key);
+create table e1 (
+  id int8 primary key,
+  source_id int8 references v1,
+  destination_id int8 references v2
+);
+
+create property graph g1
+  vertex tables (v1, v2)
+  edge tables (
+    e1
+      source v1
+      destination v2
+      properties (id, source_id$0, destination_id));
+"), @"
+           ╭▸ 
+         6 │   source_id int8 references v1,
+           │   ───────── 2. destination
+           ‡
+        16 │       properties (id, source_id, destination_id));
+           ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_property_graph() {
+        assert_snapshot!(goto("
+create property graph foo.bar vertex tables (t key (a) no properties);
+drop property graph foo.ba$0r;
+"), @"
+          ╭▸ 
+        2 │ create property graph foo.bar vertex tables (t key (a) no properties);
+          │                           ─── 2. destination
+        3 │ drop property graph foo.bar;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_property_graph() {
+        assert_snapshot!(goto("
+create property graph foo.bar vertex tables (t key (a) no properties);
+alter property graph foo.ba$0r rename to baz;
+"), @"
+          ╭▸ 
+        2 │ create property graph foo.bar vertex tables (t key (a) no properties);
+          │                           ─── 2. destination
+        3 │ alter property graph foo.bar rename to baz;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_graph_table_fn() {
+        assert_snapshot!(goto("
+create property graph myshop vertex tables (t key (a) no properties);
+select 1 from graph_table (myshop$0
+  match (n is t)
+  columns (1 as x));
+"), @"
+          ╭▸ 
+        2 │ create property graph myshop vertex tables (t key (a) no properties);
+          │                       ────── 2. destination
+        3 │ select 1 from graph_table (myshop
+          ╰╴                                ─ 1. source
         ");
     }
 }

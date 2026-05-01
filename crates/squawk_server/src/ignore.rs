@@ -202,7 +202,7 @@ create table c (
 
     fn lint_sql(sql: &str) -> Vec<lsp_types::Diagnostic> {
         let db = Database::default();
-        let file = File::new(&db, sql.to_owned(), 0);
+        let file = File::new(&db, sql.to_owned().into());
         lint(&db, file)
     }
 }

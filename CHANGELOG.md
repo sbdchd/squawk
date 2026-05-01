@@ -7,6 +7,251 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.49.0 - 2026-04-27
+
+### Added
+
+- ide: goto def for select into (#1086)
+
+  ```sql
+  select 1 a into t;
+  --       ^ 2. dest
+  select a from t;
+  --     ^ 1. goto def src
+  ```
+
+  and
+
+  ```sql
+  select 1 a into t;
+  --              ^ 2. dest
+  select a from t;
+  --            ^ 1. goto def src
+  ```
+
+- ide: goto def with view & qualified column (#1081)
+
+  ```sql
+  create view v as select 1 id, 2 b;
+  --          ^ 2. dest
+  select v.id from v;
+  --     ^ 1. goto def src
+  ```
+
+- ide: goto def from graph_table to create property graph (#1077)
+
+  ```sql
+  create property graph myshop vertex tables (t key (a) no properties);
+  --                    ^ 2. dest
+  select 1 from graph_table (myshop
+  --                         ^ 1. goto def src
+    match (n is t)
+    columns (1 as x));
+  ```
+
+- fmt: more work towards full select and create table support (#1079)
+
+  ```sql
+  -- before
+  create table t(a int,b text);
+
+  -- after
+  create table t(
+    a int,
+    b text
+  );
+  ```
+
+  ```sql
+  -- before
+  select array[[1,2],[3,4]];
+
+  -- after
+  select array[[1, 2], [3, 4]];
+  ```
+
+### Fixed
+
+- ide: fix shadowing cte column w/ `*` hover + func call syntax for cte & views (#1094)
+
+  ```sql
+  -- shadowing
+  create table t(a int, b int);
+  with
+    t as (
+      select 1
+    ),
+    -- yy overrides y since there's only 1 column in the *
+    u(x, yy) as (
+      select *, 2 y, 3 z from t
+    )
+  select y from u;
+  --     ^ 1. goto def src - doesn't resolve because of override above
+  ```
+
+  ```sql
+  -- function call syntax for cte column
+  with cte as (select 1 as a)
+  --                       ^ 2. dest
+  select a(cte) from cte;
+  --     ^ 1. goto def src
+  ```
+
+  ```sql
+  -- function call syntax for view column
+  create view v as select 1 as a;
+  --                           ^ 2. dest
+  select a(v) from v;
+  --     ^ 1. goto def src
+  ```
+
+### Internal
+
+- ide/server/wasm: use salsa for binder caching (#1078)
+- ide: cleanup goto def & find ref tests to prep for extension support (#1080)
+- ide: split resolve into resolve/collect/ast_nav & dedupe code (#1085)
+- ide: consolidate name helpers (#1090)
+- ide: update return types in resolve_name_ref to use Location (#1089)
+- ide: simplify hovering for names (#1088)
+- ide: refactor hover & find refs to use goto_def (#1087)
+- ide: refactor resolve and fix a couple edge cases (#1094)
+- ide: refactor resolve to use name related functions (#1092)
+- ide: refactor code actions into their own modules (#1091)
+
+## v2.48.0 - 2026-04-18
+
+### Added
+
+- linter: add require-table-schema rule (#1046, #1064, #1073). Thanks @Flaiers!
+
+  Note: this rule is disabled by default and must be enabled via the new
+  `--include` flag.
+
+  ```sql
+  -- error
+  create table posts(id bigint);
+
+  -- okay
+  create table public.posts(id bigint);
+  ```
+
+- parser: improve error recovery for misplaced join clauses (#1065)
+
+  The following now gives a concise error message:
+
+  ```sql
+  -- join after the where
+  select * from t
+  where x > 1
+  join k on true;
+  ```
+
+- parser: support more statement kinds in create schema parsing (#1061)
+
+- ide: semantic syntax highlighting improvements (#1059, #1060, #1068)
+
+  We now highlight all the tokens in types. We were missing some like `setof`.
+
+  Additionally, we highlight names by their underlying kind i.e., table, function, column.
+  This is powered by goto def.
+
+  You can't tell from GitHub's highlighting, but if you use the language
+  server, we now highlight the `b` in `t.b` as a function:
+
+  ```sql
+  create table t(a int);
+  create function b(t) returns int as 'select 1' language sql;
+  select b(t), t.b from t;
+  ```
+
+- ide: show function comment on hover (#1070)
+- ide: code action to rewrite between != and <> (#1066)
+- ide: goto def for create property graph (#1074)
+
+### Fixed
+
+- parser: fix param parsing (#1068)
+
+  Before, `double precision` was parsed as a param named `double` with type `precision`.
+  Now it's parsed correctly as an unnamed param of type `double precision`.
+
+  ```sql
+  create function f(double precision) returns int8
+    as 'select $1'
+    language sql;
+  ```
+
+## v2.47.0 - 2026-04-13
+
+### Added
+
+- ide: semantic syntax highlighting (#1057, #1058, #1052)
+- ide: semantic syntax highlighting (#1048)
+- playground: update syntax highlighting language with codegen'd keywords (#1055, #1054)
+- vscode: update syntax highlighting to support more operators (#1047)
+
+- ide: goto def for user, current_user, session_user, & current_schema (#1056)
+
+## v2.46.0 - 2026-04-05
+
+### Added
+
+- ide: goto def support for dec & float(n) types (#1042)
+- vscode: vendor and improve postgres syntax highlighting grammar (#1043, #1041, #1039)
+- parser: sync pg regressions suite & support the new ForPortionOf clause (#1038)
+
+### Fixed
+
+- ide: fix column naming for dec & float(n) (#1040)
+
+## v2.45.0 - 2026-04-01
+
+### Added
+
+- server: add multi threading (#1032, #1031, #1030, #1029, #1028, #1026, #1024, #1018)
+- parser: improve error recovery for expr_as_name_list (#1017)
+- parser: sql/pgq cleanup & more sql/pgq test cases (#1016)
+- parser: improve persistence parsing (#1013)
+
+### Internal
+
+- internal: bump rust to 1.94 (#1015)
+
+## v2.44.0 - 2026-03-19
+
+### Added
+
+- linter: add require-enum-value-ordering rule (#992). Thanks @cabello!
+- linter: add cross-file validation for `NOT NULL` constraint pattern (#957). Thanks @reteps!
+- parser: support postgres 18 graph language (#1010)
+- parser: support new except table clause (#986)
+- parser: alter type ast improvements (#993)
+- playground: add code folding support (#1000)
+- ide: folding range support (#999)
+- ide: goto def window defs & over clauses (#994)
+- ide: goto def subquery compound selects (#988)
+
+### Fixed
+
+- server: handle errors from handlers by converting to a lsp err response (#1005)
+- parser: we weren't handling compound selects with extra parens (#989)
+
+### Changed
+
+- server: pull based diagnostics (#1006)
+
+### Internal
+
+- internal: replace lazy_static with std::sync::OnceLock (#1009)
+- internal: HashMap -> FxHashMap, FxHashSet (#1007)
+- server: refactor notification handling to embrace types (#1004)
+- server: refactor request handling to embrace types (#1003)
+- server: refactor lib.rs into separate files (#1002)
+- ide: add thread module from rust-analyzer (#1001)
+- parser: sync plpgsql test suite from postgres (#991)
+- ide/playground: salsa most of the server functions (#981)
+- ide: update sql stub codegen to include some extensions (#984)
+
 ## v2.43.0 - 2026-02-28
 
 ### Added

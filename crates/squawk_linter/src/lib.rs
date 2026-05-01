@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 use std::fmt;
 
 use enum_iterator::Sequence;
@@ -55,6 +55,7 @@ use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::require_enum_value_ordering;
+use rules::require_table_schema;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
 // xtask:new-rule:rule-import
@@ -93,7 +94,16 @@ pub enum Rule {
     RequireTimeoutSettings,
     BanUncommittedTransaction,
     RequireEnumValueOrdering,
+    RequireTableSchema,
     // xtask:new-rule:error-name
+}
+
+impl Rule {
+    /// Rules that are opt-in are not enabled by default.
+    /// They must be explicitly included via configuration.
+    pub fn is_opt_in(&self) -> bool {
+        matches!(self, Rule::RequireTableSchema)
+    }
 }
 
 impl TryFrom<&str> for Rule {
@@ -136,6 +146,7 @@ impl TryFrom<&str> for Rule {
             "require-timeout-settings" => Ok(Rule::RequireTimeoutSettings),
             "ban-uncommitted-transaction" => Ok(Rule::BanUncommittedTransaction),
             "require-enum-value-ordering" => Ok(Rule::RequireEnumValueOrdering),
+            "require-table-schema" => Ok(Rule::RequireTableSchema),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -199,6 +210,7 @@ impl fmt::Display for Rule {
             Rule::RequireTimeoutSettings => "require-timeout-settings",
             Rule::BanUncommittedTransaction => "ban-uncommitted-transaction",
             Rule::RequireEnumValueOrdering => "require-enum-value-ordering",
+            Rule::RequireTableSchema => "require-table-schema",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -318,7 +330,7 @@ pub struct LinterSettings {
 pub struct Linter {
     errors: Vec<Violation>,
     ignores: Vec<Ignore>,
-    pub rules: HashSet<Rule>,
+    pub rules: FxHashSet<Rule>,
     pub settings: LinterSettings,
 }
 
@@ -433,6 +445,9 @@ impl Linter {
         if self.rules.contains(&Rule::RequireEnumValueOrdering) {
             require_enum_value_ordering(self, file);
         }
+        if self.rules.contains(&Rule::RequireTableSchema) {
+            require_table_schema(self, file);
+        }
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file
@@ -456,31 +471,36 @@ impl Linter {
         errors
     }
 
-    pub fn with_all_rules() -> Self {
-        let rules = all::<Rule>().collect::<HashSet<_>>();
+    fn default_rules() -> FxHashSet<Rule> {
+        all::<Rule>()
+            .filter(|r| !r.is_opt_in())
+            .collect::<FxHashSet<_>>()
+    }
+
+    pub fn with_default_rules() -> Self {
+        let rules = Linter::default_rules();
         Linter::from(rules)
     }
 
-    pub fn without_rules(exclude: &[Rule]) -> Self {
-        let all_rules = all::<Rule>().collect::<HashSet<_>>();
-        let mut exclude_set = HashSet::with_capacity(exclude.len());
-        for e in exclude {
-            exclude_set.insert(e);
+    pub fn with_rules(include: &[Rule], exclude: &[Rule]) -> Self {
+        let mut default_rules = Linter::default_rules();
+
+        for rule in include {
+            default_rules.insert(*rule);
         }
 
-        let rules = all_rules
-            .into_iter()
-            .filter(|x| !exclude_set.contains(x))
-            .collect::<HashSet<_>>();
+        for rule in exclude {
+            default_rules.remove(rule);
+        }
 
-        Linter::from(rules)
+        Linter::from(default_rules)
     }
 
-    pub fn from(rules: impl Into<HashSet<Rule>>) -> Self {
+    pub fn from(rules: impl IntoIterator<Item = Rule>) -> Self {
         Self {
             errors: vec![],
             ignores: vec![],
-            rules: rules.into(),
+            rules: rules.into_iter().collect(),
             settings: Default::default(),
         }
     }
@@ -504,5 +524,29 @@ mod tests {
     fn invalid_rule_name() {
         let result: Result<Rule, _> = "invalid-rule-name".parse();
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn with_rules_opt_in_disabled_by_default() {
+        let linter = Linter::with_rules(&[], &[]);
+        assert!(!linter.rules.contains(&Rule::RequireTableSchema));
+    }
+
+    #[test]
+    fn with_rules_opt_in_enabled_via_include() {
+        let linter = Linter::with_rules(&[Rule::RequireTableSchema], &[]);
+        assert!(linter.rules.contains(&Rule::RequireTableSchema));
+    }
+
+    #[test]
+    fn with_rules_exclude_takes_precedence_over_include() {
+        let linter = Linter::with_rules(&[Rule::RequireTableSchema], &[Rule::RequireTableSchema]);
+        assert!(!linter.rules.contains(&Rule::RequireTableSchema));
+    }
+
+    #[test]
+    fn with_rules_exclude_removes_default_rule() {
+        let linter = Linter::with_rules(&[], &[Rule::BanDropTable]);
+        assert!(!linter.rules.contains(&Rule::BanDropTable));
     }
 }

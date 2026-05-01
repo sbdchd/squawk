@@ -4,10 +4,13 @@ import {
   completion,
   document_symbols,
   find_references,
+  folding_ranges,
   goto_definition,
   hover,
   inlay_hints,
   selection_ranges,
+  semantic_tokens,
+  semantic_tokens_legend,
   DocumentSymbol,
 } from "./squawk"
 
@@ -155,8 +158,18 @@ export async function provideHover(
 
     if (!result) return null
 
+    const contents: monaco.IMarkdownString[] = [
+      {
+        value: `\`\`\`sql\n${result.snippet}\n\`\`\``,
+      },
+    ]
+
+    if (result.comment) {
+      contents.push({ value: `---\n\n${result.comment}` })
+    }
+
     return {
-      contents: [{ value: result }],
+      contents,
     }
   } catch (e) {
     console.error("Error in provideHover:", e)
@@ -267,6 +280,30 @@ export async function provideSelectionRanges(
   }
 }
 
+export async function provideFoldingRanges(
+  model: monaco.editor.ITextModel,
+): Promise<monaco.languages.FoldingRange[]> {
+  const content = model.getValue()
+  const version = model.getVersionId()
+  if (!content) return []
+
+  try {
+    const wasmRanges = folding_ranges(content, version)
+
+    return wasmRanges.map((range) => ({
+      start: range.start_line + 1,
+      end: range.end_line + 1,
+      kind:
+        range.kind === "comment"
+          ? monaco.languages.FoldingRangeKind.Comment
+          : monaco.languages.FoldingRangeKind.Region,
+    }))
+  } catch (e) {
+    console.error("Error in provideFoldingRanges:", e)
+    return []
+  }
+}
+
 function convertCompletionKind(
   kind: string,
 ): monaco.languages.CompletionItemKind {
@@ -289,6 +326,30 @@ function convertCompletionKind(
       return monaco.languages.CompletionItemKind.Text
   }
 }
+
+export const semanticTokensProvider: monaco.languages.DocumentSemanticTokensProvider =
+  {
+    getLegend() {
+      return semantic_tokens_legend()
+    },
+    provideDocumentSemanticTokens(model) {
+      // TODO: figure out if we can make this faster, it currently takes like
+      // 10+ seconds on the builtins.sql
+      if (model.getLineCount() > 2000) return null
+      const content = model.getValue()
+      const version = model.getVersionId()
+      if (!content) return null
+
+      try {
+        const data = semantic_tokens(content, version)
+        return { data, resultId: undefined }
+      } catch (e) {
+        console.error("Error in provideDocumentSemanticTokens:", e)
+        return null
+      }
+    },
+    releaseDocumentSemanticTokens() {},
+  }
 
 export async function provideCompletionItems(
   model: monaco.editor.ITextModel,

@@ -5780,8 +5780,9 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          NAME
-            IS_KW "is"
+          AS_NAME
+            NAME
+              IS_KW "is"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -5793,8 +5794,9 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          NAME
-            AND_KW "and"
+          AS_NAME
+            NAME
+              AND_KW "and"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -5806,8 +5808,9 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          NAME
-            OR_KW "or"
+          AS_NAME
+            NAME
+              OR_KW "or"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -5819,8 +5822,9 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          NAME
-            COLLATE_KW "collate"
+          AS_NAME
+            NAME
+              COLLATE_KW "collate"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT

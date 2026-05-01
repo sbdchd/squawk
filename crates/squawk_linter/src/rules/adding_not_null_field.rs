@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use rustc_hash::{FxHashMap, FxHashSet};
 
 use squawk_syntax::{
     Parse, SourceFile,
@@ -49,11 +49,12 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
     let is_pg12_plus = ctx.settings.pg_version >= Version::new(12, None, None);
 
-    let mut not_null_constraints: HashMap<Identifier, TableColumn> = HashMap::new();
-    let mut validated_not_null_columns: HashSet<TableColumn> = HashSet::new();
+    let mut not_null_constraints: FxHashMap<Identifier, TableColumn> = FxHashMap::default();
+    let mut validated_not_null_columns: FxHashSet<TableColumn> = FxHashSet::default();
     // Tables where VALIDATE CONSTRAINT was seen without a matching ADD CONSTRAINT
     // in the same file (cross-migration pattern).
-    let mut tables_with_external_validated_constraints: HashSet<Identifier> = HashSet::new();
+    let mut tables_with_external_validated_constraints: FxHashSet<Identifier> =
+        FxHashSet::default();
 
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {

@@ -1,0 +1,57 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/select_graph_table_fn.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          L_PAREN "("
+          WHITESPACE "\n  "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          PATH_PATTERN_LIST
+            PATH_PATTERN
+              PATH_FACTOR
+                EDGE_ANY
+                  MINUS "-"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_NAME
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            EXPR_AS_NAME
+              NAME_REF
+                IDENT "b"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          COMMENT "--                      ^ comma missing"
+          WHITESPACE "\n"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected COMMA
+  ╭▸ 
+2 │   foo match - columns (a b)
+  ╰╴                        ━

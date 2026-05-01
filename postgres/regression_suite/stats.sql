@@ -416,9 +416,17 @@ COMMIT;
 -- check that the stats are reset.
 SELECT (n_tup_ins + n_tup_upd) > 0 AS has_data FROM pg_stat_all_tables
   WHERE relid = 'pg_shdescription'::regclass;
+-- stats_reset may not be set for datid=0 and shared objects in
+-- pg_stat_database, so reset once.
 SELECT pg_stat_reset_single_table_counters('pg_shdescription'::regclass);
 SELECT (n_tup_ins + n_tup_upd) > 0 AS has_data FROM pg_stat_all_tables
   WHERE relid = 'pg_shdescription'::regclass;
+SELECT stats_reset AS shared_db_reset_before
+  FROM pg_stat_database WHERE datid = 0 /* \gset */;
+-- Second reset for comparison.
+SELECT pg_stat_reset_single_table_counters('pg_shdescription'::regclass);
+SELECT stats_reset > 'shared_db_reset_before'::timestamptz AS has_updated
+  FROM pg_stat_database WHERE datid = 0;
 
 -- set back comment
 -- \if :{?description_before}
@@ -432,10 +440,10 @@ SELECT (n_tup_ins + n_tup_upd) > 0 AS has_data FROM pg_stat_all_tables
 -----
 
 -- Test that sessions is incremented when a new session is started in pg_stat_database
-SELECT sessions AS db_stat_sessions FROM pg_stat_database WHERE datname = (SELECT current_database()) /* \gset */;
+SELECT sessions AS db_stat_sessions FROM pg_stat_database WHERE datname = current_database() /* \gset */;
 -- \c
 SELECT pg_stat_force_next_flush();
-SELECT sessions > 'db_stat_sessions' FROM pg_stat_database WHERE datname = (SELECT current_database());
+SELECT sessions > 'db_stat_sessions' FROM pg_stat_database WHERE datname = current_database();
 
 -- Test pg_stat_checkpointer checkpointer-related stats, together with pg_stat_wal
 SELECT num_requested AS rqst_ckpts_before FROM pg_stat_checkpointer /* \gset */;
@@ -523,13 +531,33 @@ SELECT stats_reset > 'wal_reset_ts'::timestamptz FROM pg_stat_wal;
 -- Test error case for reset_shared with unknown stats type
 SELECT pg_stat_reset_shared('unknown');
 
--- Test that reset works for pg_stat_database
+-- Test that reset works for pg_stat_database and pg_stat_database_conflicts
 
--- Since pg_stat_database stats_reset starts out as NULL, reset it once first so we have something to compare it to
+-- Since pg_stat_database stats_reset starts out as NULL, reset it once first so that we
+-- have a baseline for comparison. The same for pg_stat_database_conflicts as it shares
+-- the same stats_reset as pg_stat_database.
 SELECT pg_stat_reset();
-SELECT stats_reset AS db_reset_ts FROM pg_stat_database WHERE datname = (SELECT current_database()) /* \gset */;
+SELECT stats_reset AS db_reset_ts FROM pg_stat_database WHERE datname = current_database() /* \gset */;
+SELECT stats_reset AS dbc_reset_ts FROM pg_stat_database_conflicts WHERE datname = current_database() /* \gset */;
+SELECT 'db_reset_ts'::timestamptz = 'dbc_reset_ts'::timestamptz;
 SELECT pg_stat_reset();
-SELECT stats_reset > 'db_reset_ts'::timestamptz FROM pg_stat_database WHERE datname = (SELECT current_database());
+SELECT stats_reset > 'db_reset_ts'::timestamptz FROM pg_stat_database WHERE datname = current_database();
+SELECT stats_reset > 'dbc_reset_ts'::timestamptz FROM pg_stat_database_conflicts WHERE datname = current_database();
+
+-- Test that reset works for pg_statio_all_sequences
+
+-- Use the sequence to accumulate its stats, and reset them once first
+-- so that we have a baseline for comparison, similar to the previous test.
+-- stats_reset to compare to.
+CREATE SEQUENCE test_seq1;
+SELECT nextval('test_seq1');
+SELECT pg_stat_reset_single_table_counters('test_seq1'::regclass);
+SELECT stats_reset AS seq_reset_ts
+  FROM pg_statio_all_sequences WHERE relname ='test_seq1' /* \gset */;
+SELECT pg_stat_reset_single_table_counters('test_seq1'::regclass);
+SELECT stats_reset > 'seq_reset_ts'::timestamptz
+  FROM pg_statio_all_sequences WHERE relname ='test_seq1';
+DROP SEQUENCE test_seq1;
 
 
 ----
@@ -943,5 +971,41 @@ SELECT 'x' FROM generate_series(1,1000);
 SELECT * FROM check_estimated_rows('SELECT * FROM table_fillfactor');
 
 DROP TABLE table_fillfactor;
+
+-- Test fastpath_exceeded stat
+CREATE TABLE part_test (id int) PARTITION BY RANGE (id);
+
+SELECT pg_stat_reset_shared('lock');
+
+-- Create partitions (exceeds number of slots)
+DO $$
+DECLARE
+  max_locks int;
+BEGIN
+  SELECT setting::int INTO max_locks
+  FROM pg_settings
+  WHERE name = 'max_locks_per_transaction';
+
+  FOR i IN 1..(max_locks + 10) LOOP
+    EXECUTE format(
+      'CREATE TABLE part_test_%s PARTITION OF part_test
+       FOR VALUES FROM (%s) TO (%s)',
+      i, (i-1)*1000, i*1000
+    );
+  END LOOP;
+END;
+$$;
+
+SELECT fastpath_exceeded AS fastpath_exceeded_before FROM pg_stat_lock WHERE locktype = 'relation' /* \gset */;
+
+-- Needs a lock on each partition
+SELECT count(*) FROM part_test;
+
+-- Ensure pending stats are flushed
+SELECT pg_stat_force_next_flush();
+
+SELECT fastpath_exceeded > 'fastpath_exceeded_before' FROM pg_stat_lock WHERE locktype = 'relation';
+
+DROP TABLE part_test;
 
 -- End of Stats Test

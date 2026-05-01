@@ -269,3 +269,10 @@ alter table t detach partition f finalize;
 alter table foo
   add constraint foo_bar_id_fkey foreign key (bar_id)
   references bar (id) on update cascade on delete cascade;
+
+
+alter table t alter c set expression as ( a > b );
+
+alter table t set access method default;
+
+alter table t add foreign key (a, b) references t1 match partial;

@@ -983,10 +983,7 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
     col_label(p);
     if p.eat(COMMA) {
         if p.eat(XMLATTRIBUTES_KW) {
-            // TODO: use delimited
-            p.expect(L_PAREN);
-            xml_attribute_list(p);
-            p.expect(R_PAREN);
+            expr_as_name_list(p);
             if p.eat(COMMA) && !opt_expr_list(p) {
                 p.error("expected expression list");
             }
@@ -1000,23 +997,30 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, CALL_EXPR)
 }
 
-fn xml_attribute_list(p: &mut Parser<'_>) {
+fn expr_as_name_list(p: &mut Parser<'_>) {
     let m = p.start();
-    // TODO: use delimited
-    while !p.at(EOF) && !p.at(R_PAREN) {
-        let m = p.start();
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        if p.eat(AS_KW) {
-            col_label(p);
-        }
-        m.complete(p, EXPR_AS_NAME);
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    m.complete(p, XML_ATTRIBUTE_LIST);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        EXPR_FIRST,
+        |p| {
+            let m = p.start();
+            if opt_expr(p).is_none() {
+                p.error("expected expression");
+                m.abandon(p);
+                return false;
+            }
+            if p.eat(AS_KW) {
+                col_label(p);
+            }
+            m.complete(p, EXPR_AS_NAME);
+            true
+        },
+    );
+    m.complete(p, EXPR_AS_NAME_LIST);
 }
 
 // XMLFOREST '(' xml_attribute_list ')'
@@ -1024,9 +1028,7 @@ fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLFOREST_KW));
     let m = p.start();
     p.expect(XMLFOREST_KW);
-    p.expect(L_PAREN);
-    xml_attribute_list(p);
-    p.expect(R_PAREN);
+    expr_as_name_list(p);
     let m = m.complete(p, XML_FOREST_FN).precede(p);
     opt_agg_clauses(p);
     m.complete(p, CALL_EXPR)
@@ -1687,7 +1689,7 @@ fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
     m.complete(p, PATH_SEGMENT);
 }
 
-const PATH_FIRST: TokenSet = COL_LABEL_FIRST;
+const PATH_FIRST: TokenSet = NON_RESERVED_WORD;
 
 fn opt_path(p: &mut Parser<'_>, kind: SyntaxKind) -> Option<CompletedMarker> {
     if !p.at_ts(PATH_FIRST) {
@@ -1865,7 +1867,6 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
         return None;
     }
     let m = p.start();
-    // TODO: add to ungram
     p.eat(SETOF_KW);
     let wrapper_type = match p.current() {
         BIT_KW => {
@@ -2510,7 +2511,9 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         // could be start of `is distinct from`
         && !(p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))
     {
+        let m = p.start();
         col_label(p);
+        m.complete(p, AS_NAME);
         return Some(lhs);
     }
     if r.order_by_allowed && p.at(ORDER_KW) {
@@ -2749,6 +2752,7 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
     }
     opt_from_clause(p);
     opt_where_clause(p);
+    opt_misplaced_joins(p);
     opt_group_by_clause(p);
     opt_having_clause(p);
     opt_window_clause(p);
@@ -2795,7 +2799,7 @@ fn opt_into_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(INTO_KW) {
         let m = p.start();
         p.bump(INTO_KW);
-        let _ = opt_temp(p) || p.eat(UNLOGGED_KW);
+        opt_persistence(p);
         p.eat(TABLE_KW);
         path_name(p);
         Some(m.complete(p, INTO_CLAUSE))
@@ -3115,11 +3119,12 @@ const FROM_ITEM_KEYWORDS_FIRST: TokenSet = TokenSet::new(&[])
     .union(FUNC_EXPR_COMMON_SUBEXPR_FIRST);
 
 const FROM_ITEM_FIRST: TokenSet = TokenSet::new(&[
-    ONLY_KW,    // optional
-    IDENT,      // table_name, with_query_name, function_name
-    L_PAREN,    // nested select stmt
-    LATERAL_KW, // optional
-    ROWS_KW,    // rows from
+    ONLY_KW,        // optional
+    IDENT,          // table_name, with_query_name, function_name
+    L_PAREN,        // nested select stmt
+    LATERAL_KW,     // optional
+    ROWS_KW,        // rows from
+    GRAPH_TABLE_KW, // GRAPH_TABLE(...)
 ])
 .union(FROM_ITEM_KEYWORDS_FIRST);
 
@@ -3165,6 +3170,10 @@ fn data_source(p: &mut Parser<'_>) {
         }
         JSON_TABLE_KW => {
             json_table_fn(p);
+            opt_alias(p);
+        }
+        GRAPH_TABLE_KW => {
+            graph_table_fn(p);
             opt_alias(p);
         }
         XMLTABLE_KW => {
@@ -3457,6 +3466,16 @@ fn join(p: &mut Parser<'_>) {
     m.complete(p, JOIN);
 }
 
+// Improve error recovery for wrong joins
+fn opt_misplaced_joins(p: &mut Parser<'_>) {
+    while p.at_ts(JOIN_FIRST) {
+        let m = p.start();
+        p.error("JOINs must appear before WHERE");
+        join(p);
+        m.complete(p, ERROR);
+    }
+}
+
 fn on_clause(p: &mut Parser<'_>) {
     assert!(p.at(ON_KW));
     let m = p.start();
@@ -3607,6 +3626,7 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
+#[derive(Clone, Copy)]
 enum ColumnDefKind {
     Name,
     NameRef,
@@ -3635,7 +3655,7 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
         if !p.at_ts(COLUMN_FIRST) {
             break;
         }
-        column(p, &kind);
+        column(p, kind);
         if p.at(COMMA) && p.nth_at(1, R_PAREN) {
             p.err_and_bump("unexpected trailing comma");
         }
@@ -3653,15 +3673,15 @@ fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     return true;
 }
 
-fn column(p: &mut Parser<'_>, kind: &ColumnDefKind) -> CompletedMarker {
+fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
     assert!(p.at_ts(COLUMN_FIRST));
     let m = p.start();
-    // https://www.depesz.com/2024/10/03/waiting-for-postgresql-18-add-temporal-foreign-key-contraints/
-    // TODO: add validation to ensure this is in the right position
-    p.eat(PERIOD_KW);
     match kind {
         ColumnDefKind::Name => name(p),
         ColumnDefKind::NameRef => {
+            // https://www.depesz.com/2024/10/03/waiting-for-postgresql-18-add-temporal-foreign-key-contraints/
+            // TODO: add validation to ensure this is in the right position
+            p.eat(PERIOD_KW);
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
             name_ref(p).map(|lhs| postfix_expr(p, lhs, true));
@@ -4087,10 +4107,11 @@ pub(crate) fn current_operator(p: &Parser<'_>) -> Option<SyntaxKind> {
 }
 
 fn using_index(p: &mut Parser<'_>) {
+    assert!(p.at(USING_KW));
     let m = p.start();
     p.bump(USING_KW);
     p.expect(INDEX_KW);
-    name_ref(p);
+    opt_name_ref(p);
     m.complete(p, USING_INDEX);
 }
 
@@ -5236,7 +5257,7 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.expect(CREATE_KW);
-    opt_temp_or_unlogged(p);
+    opt_persistence(p);
     p.expect(TABLE_KW);
     opt_if_not_exists(p);
     path_name(p);
@@ -5285,18 +5306,27 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, CREATE_TABLE)
 }
 
-fn opt_temp_or_unlogged(p: &mut Parser<'_>) {
-    // [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ]
-    if !p.eat(UNLOGGED_KW) {
-        // [ GLOBAL | LOCAL ] { TEMPORARY | TEMP }
-        let require_temp = p.eat(GLOBAL_KW) || p.eat(LOCAL_KW);
-        if require_temp {
-            if !opt_temp(p) {
-                p.error("expected temp or temporary");
-            }
-        } else {
-            opt_temp(p);
+// [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ]
+fn opt_persistence(p: &mut Parser<'_>) -> bool {
+    let m = p.start();
+    if p.eat(UNLOGGED_KW) {
+        m.complete(p, UNLOGGED);
+        return true;
+    }
+    // [ GLOBAL | LOCAL ] { TEMPORARY | TEMP }
+    let require_temp = p.eat(GLOBAL_KW) || p.eat(LOCAL_KW);
+    if require_temp {
+        if !opt_temp(p) {
+            p.error("expected temp or temporary");
         }
+        m.complete(p, TEMP);
+        true
+    } else if opt_temp(p) {
+        m.complete(p, TEMP);
+        true
+    } else {
+        m.abandon(p);
+        false
     }
 }
 
@@ -5667,6 +5697,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (ALTER_KW, OPERATOR_KW) if p.nth_at(2, FAMILY_KW) => Some(alter_operator_family(p)),
         (ALTER_KW, OPERATOR_KW) => Some(alter_operator(p)),
         (ALTER_KW, POLICY_KW) => Some(alter_policy(p)),
+        (ALTER_KW, PROPERTY_KW) => Some(alter_property_graph(p)),
         (ALTER_KW, PROCEDURAL_KW | LANGUAGE_KW) => Some(alter_language(p)),
         (ALTER_KW, PROCEDURE_KW) => Some(alter_procedure(p)),
         (ALTER_KW, PUBLICATION_KW) => Some(alter_publication(p)),
@@ -5746,6 +5777,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
                 _ => Some(create_function(p)),
             }
         }
+        (CREATE_KW, PROPERTY_KW) => Some(create_property_graph(p)),
         (CREATE_KW, POLICY_KW) => Some(create_policy(p)),
         (CREATE_KW, PROCEDURE_KW) => Some(create_procedure(p)),
         (CREATE_KW, PUBLICATION_KW) => Some(create_publication(p)),
@@ -5757,6 +5789,10 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (CREATE_KW, SERVER_KW) => Some(create_server(p)),
         (CREATE_KW, STATISTICS_KW) => Some(create_statistics(p)),
         (CREATE_KW, SUBSCRIPTION_KW) => Some(create_subscription(p)),
+        (CREATE_KW, UNLOGGED_KW) if p.nth_at(2, PROPERTY_KW) => Some(create_property_graph(p)),
+        (CREATE_KW, LOCAL_KW | GLOBAL_KW) if p.nth_at(3, PROPERTY_KW) => {
+            Some(create_property_graph(p))
+        }
         (CREATE_KW, TABLE_KW | GLOBAL_KW | LOCAL_KW | UNLOGGED_KW) if !p.nth_at(2, SEQUENCE_KW) => {
             Some(create_table(p))
         }
@@ -5768,6 +5804,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             match p.nth(2) {
                 RECURSIVE_KW | VIEW_KW => Some(create_view(p)),
                 SEQUENCE_KW => Some(create_sequence(p)),
+                PROPERTY_KW => Some(create_property_graph(p)),
                 _ => Some(create_table(p)),
             }
         }
@@ -5820,6 +5857,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             _ => Some(drop_operator(p)),
         },
         (DROP_KW, OWNED_KW) => Some(drop_owned(p)),
+        (DROP_KW, PROPERTY_KW) => Some(drop_property_graph(p)),
         (DROP_KW, POLICY_KW) => Some(drop_policy(p)),
         (DROP_KW, PROCEDURE_KW) => Some(drop_procedure(p)),
         (DROP_KW, PUBLICATION_KW) => Some(drop_publication(p)),
@@ -5873,6 +5911,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (NOTIFY_KW, _) => Some(notify(p)),
         (PREPARE_KW, TRANSACTION_KW) => Some(prepare_transaction(p)),
         (PREPARE_KW, _) => Some(prepare(p)),
+        (REPACK_KW, _) => Some(repack(p)),
         (REASSIGN_KW, _) => Some(reassign(p)),
         (REFRESH_KW, _) => Some(refresh(p)),
         (REINDEX_KW, _) => Some(reindex(p)),
@@ -6203,6 +6242,14 @@ fn alter_publication(p: &mut Parser<'_>) -> CompletedMarker {
         }
         SET_KW if p.nth_at(1, L_PAREN) => {
             set_options(p);
+        }
+        SET_KW if p.nth_at(1, ALL_KW) => {
+            p.bump(SET_KW);
+            publication_all_object(p);
+            while !p.at(EOF) && p.eat(COMMA) {
+                publication_all_object(p);
+            }
+            opt_except_table_clause(p);
         }
         SET_KW => {
             p.bump(SET_KW);
@@ -8367,6 +8414,11 @@ fn comment(p: &mut Parser<'_>) -> CompletedMarker {
             p.expect(ON_KW);
             path_name_ref(p);
         }
+        PROPERTY_KW => {
+            p.bump_any();
+            p.expect(GRAPH_KW);
+            path_name_ref(p);
+        }
         PROCEDURAL_KW => {
             p.bump_any();
             p.expect(LANGUAGE_KW);
@@ -8417,6 +8469,520 @@ fn cluster(p: &mut Parser<'_>) -> CompletedMarker {
     }
     opt_using_method(p);
     m.complete(p, CLUSTER)
+}
+
+fn repack(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(REPACK_KW));
+    let m = p.start();
+    p.bump(REPACK_KW);
+    opt_option_list(p);
+    opt_table_and_columns_list(p);
+    if p.at(USING_KW) {
+        using_index(p);
+    }
+    m.complete(p, REPACK)
+}
+
+fn create_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(CREATE_KW));
+    let m = p.start();
+    p.bump(CREATE_KW);
+    opt_persistence(p);
+    p.expect(PROPERTY_KW);
+    p.expect(GRAPH_KW);
+    path_name(p);
+    opt_vertex_tables(p);
+    opt_edge_tables(p);
+    m.complete(p, CREATE_PROPERTY_GRAPH)
+}
+
+fn opt_vertex_tables(p: &mut Parser<'_>) -> bool {
+    if !p.at(VERTEX_KW) && !p.at(NODE_KW) {
+        return false;
+    }
+    let m = p.start();
+    p.bump_any(); // VERTEX or NODE
+    p.expect(TABLES_KW);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        VERTEX_TABLE_DEF_FIRST,
+        opt_vertex_table_def,
+    );
+    m.complete(p, VERTEX_TABLES);
+    true
+}
+
+const VERTEX_TABLE_DEF_FIRST: TokenSet = PATH_FIRST;
+
+fn opt_vertex_table_def(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(PATH_FIRST) {
+        return false;
+    }
+    let m = p.start();
+    path_name_ref(p);
+    if p.eat(AS_KW) {
+        name(p);
+    }
+    opt_key_columns(p);
+    opt_element_table_label_and_properties(p);
+    m.complete(p, VERTEX_TABLE_DEF);
+    true
+}
+
+fn opt_key_columns(p: &mut Parser<'_>) {
+    if p.eat(KEY_KW) {
+        opt_column_list_with(p, ColumnDefKind::NameRef);
+    }
+}
+
+fn opt_element_table_label_and_properties(p: &mut Parser<'_>) {
+    if !opt_element_table_properties_clause(p) {
+        opt_label_and_properties_list(p);
+    }
+}
+
+fn opt_label_and_properties_list(p: &mut Parser<'_>) {
+    if !p.at(DEFAULT_KW) && !p.at(LABEL_KW) {
+        return;
+    }
+    let m = p.start();
+    label_and_properties(p);
+    while p.at(DEFAULT_KW) || p.at(LABEL_KW) {
+        label_and_properties(p);
+    }
+    m.complete(p, LABEL_AND_PROPERTIES_LIST);
+}
+
+fn label_and_properties(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.eat(DEFAULT_KW) {
+        p.expect(LABEL_KW);
+    } else {
+        p.expect(LABEL_KW);
+        name(p);
+    }
+    opt_element_table_properties_clause(p);
+    m.complete(p, LABEL_AND_PROPERTIES);
+}
+
+fn opt_element_table_properties_clause(p: &mut Parser<'_>) -> bool {
+    if !p.at(NO_KW) && !p.at(PROPERTIES_KW) {
+        return false;
+    }
+    let m = p.start();
+    let kind = if p.eat(NO_KW) {
+        p.expect(PROPERTIES_KW);
+        NO_PROPERTIES
+    } else {
+        p.expect(PROPERTIES_KW);
+        if p.eat(ALL_KW) {
+            p.expect(COLUMNS_KW);
+            ALL_PROPERTIES
+        } else {
+            expr_as_name_list(p);
+            PROPERTIES
+        }
+    };
+    m.complete(p, kind);
+    true
+}
+
+fn opt_edge_tables(p: &mut Parser<'_>) {
+    if !p.at(EDGE_KW) && !p.at(RELATIONSHIP_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump_any();
+    p.expect(TABLES_KW);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        EDGE_TABLE_DEF_FIRST,
+        opt_edge_table_def,
+    );
+    m.complete(p, EDGE_TABLES);
+}
+
+const EDGE_TABLE_DEF_FIRST: TokenSet = PATH_FIRST;
+
+// foo AS bar KEY (a, b)
+//   SOURCE KEY (a, b) REFERENCES t (c, d)
+//   DESTINATION KEY (a, b) REFERENCES t (c, d)
+fn opt_edge_table_def(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(EDGE_TABLE_DEF_FIRST) {
+        return false;
+    }
+    let m = p.start();
+    path_name_ref(p);
+    if p.eat(AS_KW) {
+        name(p);
+    }
+    opt_key_columns(p);
+    source_vertex_table(p);
+    dest_vertex_table(p);
+    opt_element_table_label_and_properties(p);
+    m.complete(p, EDGE_TABLE_DEF);
+    true
+}
+
+fn references_table(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(REFERENCES_KW);
+    name_ref(p);
+    opt_column_list_with(p, ColumnDefKind::NameRef);
+    m.complete(p, REFERENCES_TABLE);
+}
+
+// SOURCE KEY (a, b) REFERENCES t (c, d)
+// SOURCE t
+fn source_vertex_table(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(SOURCE_KW);
+    if p.eat(KEY_KW) {
+        opt_column_list_with(p, ColumnDefKind::NameRef);
+        references_table(p);
+    } else {
+        name_ref(p);
+    }
+    m.complete(p, SOURCE_VERTEX_TABLE);
+}
+
+// DESTINATION KEY (a, b) REFERENCES t (c, d)
+// DESTINATION t
+fn dest_vertex_table(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(DESTINATION_KW);
+    if p.eat(KEY_KW) {
+        opt_column_list_with(p, ColumnDefKind::NameRef);
+        references_table(p);
+    } else {
+        name_ref(p);
+    }
+    m.complete(p, DEST_VERTEX_TABLE);
+}
+
+fn alter_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(ALTER_KW));
+    let m = p.start();
+    p.bump(ALTER_KW);
+    p.expect(PROPERTY_KW);
+    p.expect(GRAPH_KW);
+    opt_if_exists(p);
+    path_name_ref(p);
+    alter_property_graph_action(p);
+    m.complete(p, ALTER_PROPERTY_GRAPH)
+}
+
+const VERTEX: TokenSet = TokenSet::new(&[VERTEX_KW, NODE_KW]);
+const EDGE: TokenSet = TokenSet::new(&[EDGE_KW, RELATIONSHIP_KW]);
+const VERTEX_OR_EDGE: TokenSet = VERTEX.union(EDGE);
+
+fn alter_property_graph_action(p: &mut Parser<'_>) {
+    if p.at(RENAME_KW) {
+        rename_to(p);
+    } else if p.at(OWNER_KW) {
+        owner_to(p);
+    } else if p.at(SET_KW) {
+        set_schema(p);
+    } else if p.at(ADD_KW) {
+        add_vertex_edge_tables(p);
+    } else if p.at(DROP_KW) && p.nth_at_ts(1, VERTEX) {
+        drop_vertex_tables(p);
+    } else if p.at(DROP_KW) && p.nth_at_ts(1, EDGE) {
+        drop_edge_tables(p);
+    } else if p.at(ALTER_KW) && p.nth_at_ts(1, VERTEX_OR_EDGE) {
+        alter_vertex_edge_table(p);
+    } else {
+        p.error("expected alter property graph action");
+    }
+}
+
+fn alter_vertex_edge_table(p: &mut Parser<'_>) {
+    assert!(p.at(ALTER_KW) && p.nth_at_ts(1, VERTEX_OR_EDGE));
+    let m = p.start();
+    p.bump(ALTER_KW);
+    p.bump_any();
+    p.expect(TABLE_KW);
+    path_name_ref(p);
+    let kind = alter_element_table_actions(p);
+    m.complete(p, kind);
+}
+
+fn drop_edge_tables(p: &mut Parser<'_>) {
+    assert!(p.at(DROP_KW));
+    let m = p.start();
+    p.bump(DROP_KW);
+    p.bump_any(); // EDGE/RELATIONSHIP
+    p.expect(TABLES_KW);
+    p.expect(L_PAREN);
+    path_name_ref(p);
+    while p.eat(COMMA) {
+        path_name_ref(p);
+    }
+    p.expect(R_PAREN);
+    opt_cascade_or_restrict(p);
+    m.complete(p, DROP_EDGE_TABLES);
+}
+
+fn drop_vertex_tables(p: &mut Parser<'_>) {
+    assert!(p.at(DROP_KW));
+    let m = p.start();
+    p.bump(DROP_KW);
+    p.bump_any(); // VERTEX/NODE
+    p.expect(TABLES_KW);
+    p.expect(L_PAREN);
+    path_name_ref(p);
+    while p.eat(COMMA) {
+        path_name_ref(p);
+    }
+    p.expect(R_PAREN);
+    opt_cascade_or_restrict(p);
+    m.complete(p, DROP_VERTEX_TABLES);
+}
+
+fn add_vertex_edge_tables(p: &mut Parser<'_>) {
+    assert!(p.at(ADD_KW));
+    let m = p.start();
+    p.bump(ADD_KW);
+    let is_vertex = opt_vertex_tables(p);
+    if p.eat(ADD_KW) || !is_vertex {
+        opt_edge_tables(p);
+    }
+    m.complete(p, ADD_VERTEX_EDGE_TABLES);
+}
+
+fn alter_element_table_actions(p: &mut Parser<'_>) -> SyntaxKind {
+    if p.at(ADD_KW) {
+        add_label(p);
+        while p.at(ADD_KW) {
+            add_label(p);
+        }
+        ALTER_VERTEX_EDGE_LABELS
+    } else if p.at(DROP_KW) && (p.nth_at(1, LABEL_KW) || p.nth_at(1, PROPERTIES_KW)) {
+        p.bump(DROP_KW);
+        if p.eat(LABEL_KW) {
+            name_ref(p);
+            DROP_VERTEX_EDGE_LABEL
+        } else {
+            p.expect(PROPERTIES_KW);
+            if !opt_paren_name_ref_list(p) {
+                p.error("expected name ref list")
+            }
+            DROP_VERTEX_EDGE_LABEL_PROPERTIES
+        }
+    } else {
+        p.expect(ALTER_KW);
+        p.expect(LABEL_KW);
+        name_ref(p);
+        if p.eat(ADD_KW) {
+            p.expect(PROPERTIES_KW);
+            expr_as_name_list(p);
+            ADD_VERTEX_EDGE_LABEL_PROPERTIES
+        } else {
+            p.expect(DROP_KW);
+            p.expect(PROPERTIES_KW);
+            if !opt_paren_name_ref_list(p) {
+                p.error("expected name ref list")
+            }
+            opt_cascade_or_restrict(p);
+            DROP_VERTEX_EDGE_LABEL_PROPERTIES
+        }
+    }
+}
+
+fn add_label(p: &mut Parser<'_>) {
+    assert!(p.at(ADD_KW));
+    let m = p.start();
+    p.bump(ADD_KW);
+    p.expect(LABEL_KW);
+    name(p);
+    opt_element_table_properties_clause(p);
+    m.complete(p, ADD_LABEL);
+}
+
+fn drop_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(DROP_KW));
+    let m = p.start();
+    p.bump(DROP_KW);
+    p.expect(PROPERTY_KW);
+    p.expect(GRAPH_KW);
+    opt_if_exists(p);
+    path_name_ref(p);
+    opt_cascade_or_restrict(p);
+    m.complete(p, DROP_PROPERTY_GRAPH)
+}
+
+fn graph_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(GRAPH_TABLE_KW));
+    let m = p.start();
+    p.bump(GRAPH_TABLE_KW);
+    p.expect(L_PAREN);
+    path_name_ref(p);
+    p.expect(MATCH_KW);
+    path_pattern_list(p);
+    opt_where_clause(p);
+    p.expect(COLUMNS_KW);
+    expr_as_name_list(p);
+    p.expect(R_PAREN);
+    m.complete(p, GRAPH_TABLE_FN)
+}
+
+fn path_pattern_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.at(L_PAREN) || p.at(MINUS) || p.at(L_ANGLE) {
+        path_pattern(p);
+        while p.eat(COMMA) {
+            path_pattern(p);
+        }
+    }
+    m.complete(p, PATH_PATTERN_LIST);
+}
+
+fn path_pattern(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_factor(p);
+    while p.at_ts(PATH_FACTOR_FIRST) {
+        path_factor(p);
+    }
+    m.complete(p, PATH_PATTERN);
+}
+
+const PATH_FACTOR_FIRST: TokenSet = TokenSet::new(&[L_PAREN, MINUS, L_ANGLE]);
+
+fn path_factor(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_primary(p);
+    opt_graph_pattern_qualifier(p);
+    m.complete(p, PATH_FACTOR);
+}
+
+fn path_primary(p: &mut Parser<'_>) {
+    if p.at(L_PAREN) {
+        if p.nth_at_ts(1, PATH_FACTOR_FIRST) {
+            paren_graph_pattern(p);
+        } else {
+            vertex_pattern(p);
+        }
+    } else if p.at(L_ANGLE) {
+        // <-
+        // <-[...]-
+        edge_left(p);
+    } else if p.at(MINUS) {
+        if p.nth_at(1, L_BRACK) {
+            // -[...]-  or  -[...]->
+            edge_with_bracket(p);
+        } else if p.nth_at(1, R_ANGLE) {
+            // ->
+            let m = p.start();
+            p.bump(MINUS);
+            p.bump(R_ANGLE);
+            m.complete(p, EDGE_RIGHT);
+        } else {
+            // -
+            let m = p.start();
+            p.bump(MINUS);
+            m.complete(p, EDGE_ANY);
+        }
+    }
+}
+
+fn vertex_pattern(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(L_PAREN);
+    opt_name(p);
+    opt_is_label(p);
+    opt_where_clause(p);
+    p.expect(R_PAREN);
+    m.complete(p, VERTEX_PATTERN);
+}
+
+fn opt_is_label(p: &mut Parser<'_>) {
+    if p.at(IS_KW) {
+        let m = p.start();
+        p.bump(IS_KW);
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+        m.complete(p, IS_LABEL);
+    }
+}
+
+// <-
+// <-[ a is foo where c > 10 ]-
+fn edge_left(p: &mut Parser<'_>) {
+    assert!(p.at(L_ANGLE));
+    let m = p.start();
+    p.bump(L_ANGLE);
+    p.expect(MINUS);
+    if p.eat(L_BRACK) {
+        opt_edge_pattern_inner(p);
+        p.expect(R_BRACK);
+        p.expect(MINUS);
+    }
+    m.complete(p, EDGE_LEFT);
+}
+
+// -[ ... ]->
+// -[ ... ]-
+fn edge_with_bracket(p: &mut Parser<'_>) {
+    assert!(p.at(MINUS) && p.nth_at(1, L_BRACK));
+    let m = p.start();
+    p.bump(MINUS);
+    p.bump(L_BRACK);
+    opt_edge_pattern_inner(p);
+    p.expect(R_BRACK);
+    p.expect(MINUS);
+    let kind = if p.eat(R_ANGLE) { EDGE_RIGHT } else { EDGE_ANY };
+    m.complete(p, kind);
+}
+
+fn opt_edge_pattern_inner(p: &mut Parser<'_>) {
+    opt_name(p);
+    opt_is_label(p);
+    opt_where_clause(p);
+}
+
+fn paren_graph_pattern(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(L_PAREN);
+    path_pattern(p);
+    opt_where_clause(p);
+    p.expect(R_PAREN);
+    m.complete(p, PAREN_GRAPH_PATTERN);
+}
+
+// { Iconst }
+// { , Iconst }
+// { Iconst , Iconst }
+fn opt_graph_pattern_qualifier(p: &mut Parser<'_>) {
+    if !p.at(L_CURLY) {
+        return;
+    }
+    let m = p.start();
+    p.expect(L_CURLY);
+    if p.eat(COMMA) {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+    } else {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+        if p.eat(COMMA) {
+            if expr(p).is_none() {
+                p.error("expected expression");
+            }
+        }
+    }
+    p.expect(R_CURLY);
+    m.complete(p, GRAPH_PATTERN_QUALIFIER);
 }
 
 const OPTION_FIRST: TokenSet =
@@ -9258,15 +9824,17 @@ fn opt_except_table_clause(p: &mut Parser<'_>) {
 
     let m = p.start();
     p.bump(EXCEPT_KW);
-    p.expect(TABLE_KW);
     delimited(
         p,
         L_PAREN,
         R_PAREN,
         COMMA,
         || "unexpected comma".to_string(),
-        RELATION_NAME_FIRST,
-        |p| opt_relation_name(p).is_some(),
+        RELATION_NAME_FIRST.union(TokenSet::new(&[TABLE_KW])),
+        |p| {
+            p.eat(TABLE_KW);
+            opt_relation_name(p).is_some()
+        },
     );
     m.complete(p, EXCEPT_TABLE_CLAUSE);
 }
@@ -9369,7 +9937,7 @@ fn create_sequence(p: &mut Parser<'_>) -> CompletedMarker {
     );
     let m = p.start();
     p.bump(CREATE_KW);
-    let _ = opt_temp(p) || p.eat(UNLOGGED_KW);
+    opt_persistence(p);
     p.expect(SEQUENCE_KW);
     opt_if_not_exists(p);
     path_name(p);
@@ -9452,8 +10020,7 @@ fn create_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(SUBSCRIPTION_KW);
     name(p);
-    if p.at(SERVER_KW) {
-        p.bump(SERVER_KW);
+    if p.eat(SERVER_KW) {
         name_ref(p);
     } else {
         p.expect(CONNECTION_KW);
@@ -10845,6 +11412,11 @@ fn privilege_target(p: &mut Parser<'_>) {
                     }
                 }
             }
+            PROPERTY_KW => {
+                p.bump(PROPERTY_KW);
+                p.expect(GRAPH_KW);
+                path_name_ref_list(p);
+            }
             // table_name [, ...]
             _ if p.at_ts(COL_LABEL_FIRST) => {
                 path_name_ref_list(p);
@@ -11416,7 +11988,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(CREATE_KW);
     opt_or_replace(p);
-    opt_temp(p);
+    opt_persistence(p);
     p.eat(RECURSIVE_KW);
     p.expect(VIEW_KW);
     path_name(p);
@@ -11937,7 +12509,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
 
 fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
     match p.current() {
-        BINARY_KW | FREEZE_KW | CSV_KW | HEADER_KW => {
+        BINARY_KW | FREEZE_KW | CSV_KW | HEADER_KW | JSON_KW => {
             p.bump_any();
         }
         DELIMITER_KW | NULL_KW | QUOTE_KW | ESCAPE_KW => {
@@ -12283,11 +12855,6 @@ fn drop_schema(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // An SQL statement defining an object to be created within the schema.
-//
-// Currently, only CREATE TABLE, CREATE VIEW, CREATE INDEX, CREATE SEQUENCE,
-// CREATE TRIGGER and GRANT are accepted as clauses within CREATE SCHEMA. Other
-// kinds of objects may be created in separate commands after the schema is
-// created.
 fn opt_schema_elements(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         match (p.current(), p.nth(1)) {
@@ -12308,9 +12875,11 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
             }
             (CREATE_KW, OR_KW) => {
                 match p.nth(3) {
+                    AGGREGATE_KW => create_aggregate(p),
                     CONSTRAINT_KW | TRIGGER_KW => create_trigger(p),
+                    PROCEDURE_KW => create_procedure(p),
                     RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => create_view(p),
-                    _ => return,
+                    _ => create_function(p),
                 };
             }
             (CREATE_KW, RECURSIVE_KW | VIEW_KW) => {
@@ -12327,6 +12896,43 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
             }
             (CREATE_KW, INDEX_KW | UNIQUE_KW) => {
                 create_index(p);
+            }
+            (CREATE_KW, AGGREGATE_KW) => {
+                create_aggregate(p);
+            }
+            (CREATE_KW, COLLATION_KW) => {
+                create_collation(p);
+            }
+            (CREATE_KW, DOMAIN_KW) => {
+                create_domain(p);
+            }
+            (CREATE_KW, FUNCTION_KW) => {
+                create_function(p);
+            }
+            (CREATE_KW, OPERATOR_KW) => {
+                match p.nth(2) {
+                    CLASS_KW => create_operator_class(p),
+                    FAMILY_KW => create_operator_family(p),
+                    _ => create_operator(p),
+                };
+            }
+            (CREATE_KW, PROCEDURE_KW) => {
+                create_procedure(p);
+            }
+            (CREATE_KW, TEXT_KW) if p.nth_at(2, SEARCH_KW) => {
+                match p.nth(3) {
+                    CONFIGURATION_KW => create_text_search_config(p),
+                    DICTIONARY_KW => create_text_search_dict(p),
+                    PARSER_KW => create_text_search_parser(p),
+                    TEMPLATE_KW => create_text_search_template(p),
+                    _ => return,
+                };
+            }
+            (CREATE_KW, TYPE_KW) => {
+                create_type(p);
+            }
+            (GRANT_KW, _) => {
+                grant(p);
             }
             _ => return,
         };
@@ -12578,7 +13184,7 @@ fn opt_set_column(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         Some(m.complete(p, SET_MULTIPLE_COLUMNS))
     } else {
         // column_name = { expression | DEFAULT }
-        column(p, &ColumnDefKind::NameRef);
+        column(p, ColumnDefKind::NameRef);
         p.expect(EQ);
         set_expr(p);
         Some(m.complete(p, SET_SINGLE_COLUMN))
@@ -12680,6 +13286,7 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(UPDATE_KW);
     relation_name(p);
+    opt_for_portion_of(p);
     // postgres parser has the same setup, it assumes the alias can never be
     // named `SET`
     if !p.at(SET_KW) {
@@ -12694,6 +13301,35 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
     m.complete(p, UPDATE)
+}
+
+// FOR PORTION OF column_name FROM expr TO expr [ [ AS ] alias ]
+// FOR PORTION OF column_name ( expr ) [ [ AS ] alias ]
+fn opt_for_portion_of(p: &mut Parser<'_>) {
+    if !p.at(FOR_KW) {
+        return;
+    }
+    let m = p.start();
+    p.expect(FOR_KW);
+    p.expect(PORTION_KW);
+    p.expect(OF_KW);
+    name_ref(p);
+    for_portion_of_target(p);
+    m.complete(p, FOR_PORTION_OF);
+}
+
+fn for_portion_of_target(p: &mut Parser<'_>) {
+    if p.eat(L_PAREN) {
+        expr(p);
+        p.expect(R_PAREN);
+    } else {
+        p.expect(FROM_KW);
+        // start time
+        expr(p);
+        p.expect(TO_KW);
+        // end time
+        expr(p);
+    }
 }
 
 fn opt_where_or_current_of(p: &mut Parser<'_>) {
@@ -12745,7 +13381,10 @@ fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     p.bump(DELETE_KW);
     p.expect(FROM_KW);
     relation_name(p);
-    opt_as_alias(p);
+    opt_for_portion_of(p);
+    if !p.at(FOR_KW) {
+        opt_as_alias(p);
+    }
     opt_using_clause(p);
     // [ WHERE condition | WHERE CURRENT OF cursor_name ]
     opt_where_or_current_of(p);
@@ -13115,6 +13754,9 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
                     // float8 order by
                     //        ^
                     ORDER_KW => true,
+                    // double precision
+                    //        ^
+                    PRECISION_KW if p.at(DOUBLE_KW) => true,
                     // we're at the end of the param, must be a type
                     R_PAREN | EQ | DEFAULT_KW | COMMA => true,
                     _ => false,
@@ -13371,7 +14013,6 @@ fn opt_ret_type(p: &mut Parser<'_>) {
                 p.error("expected table arg list");
             }
         } else {
-            p.eat(SETOF_KW);
             type_name(p);
         }
         m.complete(p, RET_TYPE);

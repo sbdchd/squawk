@@ -61,10 +61,13 @@ ArgList =
  '(' '*' ')'
 | '(' ('distinct' | 'all') 'variadic'? Expr ')'
 | '(' args:(Expr (',' Expr)*)? ')'
+// TODO: Arg should be a union of *, Expr, or Expr list. Right now it doesn't do much
+| '(' args_:(Arg (',' Arg)*)? ')'
 
 CallExpr =
   Expr ArgList WithinClause? FilterClause? OverClause?
 | ExtractFn
+| GraphTableFn
 | JsonExistsFn
 | JsonArrayFn
 | JsonObjectFn
@@ -289,7 +292,7 @@ XmlElementFn =
     Name
     (
       ',' 'xmlattributes' '('
-           XmlAttributeList
+           ExprAsNameList
         ')'
         (',' (Expr (',' Expr)*))?
     | ',' (Expr (',' Expr)*)
@@ -299,11 +302,11 @@ XmlElementFn =
 ExprAsName =
   Expr AsName?
 
-XmlAttributeList =
+ExprAsNameList =
   (ExprAsName (',' ExprAsName)*)
 
 XmlForestFn =
-  'xmlforest' '(' XmlAttributeList ')'
+  'xmlforest' '(' ExprAsNameList ')'
 
 XmlExistsFn =
   'xmlexists' '('
@@ -439,7 +442,55 @@ IsNot =
   'is' 'not'
 
 Op =
-'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | NotSimilarTo | AtTimeZone | IsJson | IsJsonValue | IsNotJson | IsJsonObject | IsJsonArray |IsJsonScalar | IsNotJsonValue | IsNotJsonObject | IsNotJsonArray | IsNotJsonScalar
+'or' 
+| '-' 
+| ':' 
+| '/' 
+| '%' 
+| '^' 
+| '+' 
+| '<' 
+| '=' 
+| '>' 
+| 'and' 
+| 'collate' 
+| 'ilike' 
+| 'in' 
+| 'is'
+| 'isnull'
+| 'like' 
+| 'overlaps' 
+| 'value' 
+| AtTimeZone 
+| ColonColon 
+| ColonEq 
+| CustomOp 
+| FatArrow 
+| Gteq 
+| IsDistinctFrom 
+| IsJson 
+| IsJsonArray 
+| IsJsonObject 
+| IsJsonScalar 
+| IsJsonValue 
+| IsNormalized
+| IsNot 
+| IsNotDistinctFrom 
+| IsNotJson 
+| IsNotJsonArray 
+| IsNotJsonObject 
+| IsNotJsonScalar 
+| IsNotJsonValue 
+| IsNotNormalized
+| Lteq 
+| Neq 
+| Neqb 
+| NotIlike 
+| NotIn 
+| NotLike 
+| NotSimilarTo 
+| OperatorCall 
+| SimilarTo 
 
 IsJson =
   'is' 'json' JsonKeysUniqueClause?
@@ -512,28 +563,31 @@ PercentType =
   '%' 'type'
 
 PathType =
-  Path ArgList?
+  'setof'? Path ArgList?
 
 CharType =
-  ('varchar' | ( 'character' | 'char' | 'nchar' ) 'varying'? )
+  'setof'?
+  ('varchar' | 'national'? ( 'character' | 'char' | 'nchar' ) 'varying'? )
   ArgList?
 
 BitType =
-  'bit' 'varying'?  ArgList?
+  'setof'? 'bit' 'varying'?  ArgList?
 
 DoubleType =
-  'double' 'precision'
+  'setof'? 'double' 'precision'
 
 Timezone =
   WithTimezone
 | WithoutTimezone
 
 TimeType =
+  'setof'?
   ('time' | 'timestamp')
   ('(' Literal ')')?
   Timezone?
 
 IntervalType =
+  'setof'?
   'interval'
   (
     'year'
@@ -610,7 +664,6 @@ CompressionMethod =
   'compression' ('#ident' | 'default')
 
 Column =
-  'period'?
   (
     Name WithOptions? constraints:ColumnConstraint*
       DeferrableConstraintOption? NotDeferrableConstraintOption?
@@ -620,7 +673,7 @@ Column =
       DeferrableConstraintOption? NotDeferrableConstraintOption?
       InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
       NotEnforced? Enforced?
-  | NameRef
+  | 'period'? NameRef
   | IndexExpr
   )
 ColumnConstraint =
@@ -1121,7 +1174,7 @@ PartitionBy =
 
 CreateTable =
   'create'
-  (('global' | 'local')? ('temporary' | 'temp' | 'unlogged' ))?
+  Persistence?
   'table' IfNotExists? Path
   PartitionOf?
   OfType?
@@ -1355,11 +1408,16 @@ Update =
   WithClause?
   'update'
   RelationName
+  ForPortionOf?
   Alias?
   SetClause
   FromClause?
   WhereClause?
   ReturningClause?
+
+ForPortionOf =
+  'for' 'portion' 'of' NameRef
+  ('from' Expr 'to' Expr | '(' Expr ')')
 
 ReturningClause =
   'returning'
@@ -1376,7 +1434,9 @@ ReturningOption =
 
 Delete =
   WithClause?
-  'delete' 'from' RelationName Alias?
+  'delete' 'from' RelationName
+  ForPortionOf?
+  Alias?
   UsingClause?
   (WhereClause | WhereCurrentOf)?
   ReturningClause?
@@ -1453,7 +1513,7 @@ WithNoData =
 
 CreateTableAs =
   'create'
-  (('global' | 'local')? ('temporary' | 'temp' | 'unlogged' ))?
+  Persistence?
   'table'
   IfNotExists?
   Path
@@ -1683,7 +1743,7 @@ SelectInto =
   FilterClause?
 
 IntoClause =
-  'into' Path
+  'into' Persistence? 'table'? Path
 
 LockingClause =
   'for'
@@ -2199,6 +2259,7 @@ CommentOn =
   | 'operator' 'class' Path UsingMethod
   | 'operator' 'family' Path UsingMethod
   | 'policy' NameRef 'on' Path
+  | 'property' 'graph' Path
   | 'procedural'? 'language' Path
   | 'procedure' FunctionSig
   | 'publication' Path
@@ -2229,6 +2290,194 @@ Cluster =
   ('verbose' | OptionItemList)?
   Path?
   UsingMethod?
+
+Repack =
+  'repack'
+  OptionItemList?
+  TableAndColumnsList?
+  (
+     'using' 'index' NameRef?
+  )?
+
+Persistence =
+  Temp
+| Unlogged
+
+Temp =
+  'temporary'
+| 'temp'
+| 'local' 'temporary'
+| 'local' 'temp'
+| 'global' 'temporary'
+| 'global' 'temp'
+
+Unlogged =
+  'unlogged'
+
+CreatePropertyGraph =
+  'create' Persistence? 'property' 'graph' Path
+  VertexTables?
+  EdgeTables?
+
+VertexTables =
+  ('vertex' | 'node') 'tables' '(' (VertexTableDef (',' VertexTableDef)*)  ')'
+
+VertexTableDef =
+  Path
+  ('as' Name)?
+  ('key' '(' ColumnList ')')?
+  ElementTableLabelAndProperties?
+
+ElementTableLabelAndProperties =
+  ElementTableProperties
+| LabelAndPropertiesList
+
+ElementTableProperties =
+  NoProperties
+| AllProperties
+| Properties
+
+NoProperties =
+  'no' 'properties'
+
+AllProperties =
+  'properties' 'all' 'columns'
+
+Properties = 
+  'properties' '(' ExprAsNameList ')'
+
+LabelAndPropertiesList =
+  (LabelAndProperties (',' LabelAndProperties)*)
+
+LabelAndProperties = 
+  (
+    'label' Name
+  | 'default' 'label'
+  )
+  ElementTableProperties?
+
+EdgeTables =
+  ('edge' | 'relationship') 'tables' '(' (EdgeTableDef (',' EdgeTableDef)*)  ')'
+
+EdgeTableDef =
+  Path
+  ('as' Name)?
+  ('key' '(' ColumnList ')')?
+  SourceVertexTable
+  DestVertexTable
+  ElementTableLabelAndProperties?
+
+SourceVertexTable =
+  'source' NameRef
+| 'source' 'key' '(' ColumnList ')' ReferencesTable
+
+
+ReferencesTable =
+  'references' NameRef '(' ColumnList ')'
+
+DestVertexTable =
+  'destination' NameRef
+| 'destination' 'key' '(' ColumnList ')' ReferencesTable
+
+AlterPropertyGraph =
+  'alter' 'property' 'graph' IfExists? Path
+  AlterPropertyGraphAction
+
+AlterPropertyGraphAction =
+  RenameTo
+| SetSchema
+| OwnerTo
+| AddVertexEdgeTables
+| DropVertexTables
+| DropEdgeTables
+| AlterVertexEdgeLabels
+| DropVertexEdgeLabel
+| AddVertexEdgeLabelProperties
+| DropVertexEdgeLabelProperties
+
+AddVertexEdgeTables =
+  ('add' VertexTables)? ('add' EdgeTables)?
+
+DropVertexTables =
+  'drop' ('vertex' | 'node')
+  'tables' '(' (Name (',' Name)*) ')'
+  ('cascade' | 'restrict')?
+
+DropEdgeTables =
+  'drop' ('edge' | 'relationship')
+  'tables' '(' (Name (',' Name)*) ')'
+  ('cascade' | 'restrict')?
+
+AlterVertexEdgeLabels =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' Name
+    AddLabel AddLabel*
+
+AddLabel =
+  'add' 'label' Name ElementTableProperties
+
+DropVertexEdgeLabel =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' NameRef
+    'drop' 'label' NameRef ('cascade' | 'restrict')?
+
+AddVertexEdgeLabelProperties =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' NameRef
+    'alter' 'label' NameRef
+    'add' 'properties' '(' ExprAsNameList ')'
+
+DropVertexEdgeLabelProperties =
+  'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' NameRef
+    'alter' 'label' NameRef
+    'drop' 'properties' '(' (Name (',' Name)*) ')' ('cascade' | 'restrict')?
+
+DropPropertyGraph =
+  'drop' 'property' 'graph' IfExists? Path ('cascade' | 'restrict')?
+
+GraphTableFn =
+  'graph_table' '(' Path 'match' PathPatternList WhereClause? 'columns' '(' ExprAsNameList ')' ')'
+
+PathPatternList =
+  (PathPattern (',' PathPattern)*)
+
+PathPattern =
+  PathFactor PathFactor*
+
+PathFactor =
+  PathPrimary
+  GraphPatternQualifier?
+
+PathPrimary =
+  VertexPattern
+| EdgeLeft
+| EdgeRight
+| EdgeAny
+| ParenGraphPattern
+
+VertexPattern =
+  '(' Name? IsLabel? WhereClause? ')'
+
+EdgeLeft =
+  '<' '-' '[' Name? IsLabel? WhereClause? ']' '-'
+| '<' '-'
+
+EdgeRight =
+  '-' '[' Name? IsLabel? WhereClause? ']' '-' '>'
+| '-' '>'
+
+EdgeAny =
+  '-' '[' Name? IsLabel? WhereClause? ']' '-'
+| '-'
+
+ParenGraphPattern =
+  '(' PathPattern WhereClause? ')'
+
+IsLabel =
+  'is' Expr
+
+GraphPatternQualifier =
+// TODO: these should be integers, not Literals
+  '{' Literal '}'
+| '{' ',' Literal '}'
+| '{' Literal ',' Literal '}'
 
 CreateAccessMethod =
   'create' 'access' 'method' name:Path
@@ -2365,7 +2614,7 @@ CreateRule =
   'do' ('also' | 'instead')? ('nothing' | '(' (Stmt (',' Stmt)*) ')' | Stmt)
 
 CreateSequence =
-  'create' ('temporary' | 'temp' | 'unlogged')? 'sequence' IfNotExists? Path
+  'create' Persistence? 'sequence' IfNotExists? Path
   SequenceOption*
 
 CreateServer =
@@ -2707,7 +2956,7 @@ Reindex =
   'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? Path?
 
 CreateView =
-  'create' OrReplace? ('temp' | 'temporary')? 'recursive'? 'view' Path ColumnList?
+  'create' OrReplace? Persistence? 'recursive'? 'view' Path ColumnList?
   WithParams?
   'as' query:SelectVariant
   ('with' ('cascaded' | 'local')? 'check' 'option')?
@@ -3191,6 +3440,7 @@ Stmt =
 | AlterOperator
 | AlterOperatorClass
 | AlterOperatorFamily
+| AlterPropertyGraph
 | AlterPolicy
 | AlterProcedure
 | AlterPublication
@@ -3244,6 +3494,7 @@ Stmt =
 | CreateOperator
 | CreateOperatorClass
 | CreateOperatorFamily
+| CreatePropertyGraph
 | CreatePolicy
 | CreateProcedure
 | CreatePublication
@@ -3292,6 +3543,7 @@ Stmt =
 | DropOperatorClass
 | DropOperatorFamily
 | DropOwned
+| DropPropertyGraph
 | DropPolicy
 | DropProcedure
 | DropPublication
@@ -3331,6 +3583,7 @@ Stmt =
 | Notify
 | Prepare
 | PrepareTransaction
+| Repack
 | Reassign
 | Refresh
 | Reindex

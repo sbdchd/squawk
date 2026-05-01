@@ -1,0 +1,25 @@
+[package]
+name = "squawk-thread"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Thread pool and related utilities for Squawk"
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[lib]
+doctest = false
+
+[dependencies]
+crossbeam-channel.workspace = true
+crossbeam-utils.workspace = true
+jod-thread.workspace = true
+libc.workspace = true
+salsa.workspace = true
+tracing.workspace = true
+
+[lints]
+workspace = true

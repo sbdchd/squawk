@@ -123,6 +123,11 @@ returns null on null input
 as ''
 language sql;
 
+-- regression
+create function identity(double precision) returns double precision
+as 'select $1'
+language sql;
+
 create function f()
 returns void
 strict

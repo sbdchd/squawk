@@ -4,7 +4,7 @@ use la_arena::Arena;
 use rowan::TextSize;
 use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 
-use crate::scope::{Scope, ScopeId};
+use crate::scope::Scope;
 use crate::symbols::{Name, Schema, Symbol, SymbolKind};
 
 #[derive(Clone, PartialEq)]
@@ -15,18 +15,15 @@ struct SearchPathChange {
 
 #[derive(Clone, PartialEq)]
 pub(crate) struct Binder {
-    // TODO: doesn't seem like we need this with our resolve setup
-    scopes: Arena<Scope>,
+    scope: Scope,
     symbols: Arena<Symbol>,
     search_path_changes: Vec<SearchPathChange>,
 }
 
 impl Binder {
     fn new() -> Self {
-        let mut scopes = Arena::new();
-        let _root_scope = scopes.alloc(Scope::with_parent(None));
         Binder {
-            scopes,
+            scope: Scope::default(),
             symbols: Arena::new(),
             search_path_changes: vec![SearchPathChange {
                 position: TextSize::from(0),
@@ -39,16 +36,8 @@ impl Binder {
         }
     }
 
-    fn root_scope(&self) -> ScopeId {
-        self.scopes
-            .iter()
-            .next()
-            .map(|(id, _)| id)
-            .expect("root scope must exist")
-    }
-
     pub(crate) fn lookup(&self, name: &Name, kind: SymbolKind) -> Option<SyntaxNodePtr> {
-        let symbols = self.scopes[self.root_scope()].get(name)?;
+        let symbols = self.scope.get(name)?;
         let symbol_id = symbols.iter().copied().find(|id| {
             let symbol = &self.symbols[*id];
             symbol.kind == kind
@@ -63,7 +52,7 @@ impl Binder {
         position: TextSize,
         schema: &Option<Schema>,
     ) -> Option<SyntaxNodePtr> {
-        let symbols = self.scopes[self.root_scope()].get(name)?;
+        let symbols = self.scope.get(name)?;
 
         let search_paths = match schema {
             Some(s) => std::slice::from_ref(s),
@@ -89,7 +78,7 @@ impl Binder {
         schema: &Option<Schema>,
         params: Option<&[Name]>,
     ) -> Option<SyntaxNodePtr> {
-        let symbols = self.scopes[self.root_scope()].get(name)?;
+        let symbols = self.scope.get(name)?;
 
         let search_paths = match schema {
             Some(s) => std::slice::from_ref(s),
@@ -121,7 +110,7 @@ impl Binder {
         schema: &Option<Schema>,
         table: &Option<Name>,
     ) -> Option<SyntaxNodePtr> {
-        let symbols = self.scopes[self.root_scope()].get(name)?;
+        let symbols = self.scope.get(name)?;
 
         let search_paths = match schema {
             Some(s) => std::slice::from_ref(s),
@@ -143,16 +132,15 @@ impl Binder {
 
     pub(crate) fn lookup_info(
         &self,
-        name_str: String,
-        schema: &Option<String>,
+        name: &Name,
+        schema: Option<&Schema>,
         kind: SymbolKind,
         position: TextSize,
     ) -> Option<(Schema, String)> {
-        let name_normalized = Name::from_string(name_str.clone());
-        let symbols = self.scopes[self.root_scope()].get(&name_normalized)?;
+        let symbols = self.scope.get(name)?;
 
-        let search_paths = match schema {
-            Some(schema_name) => &[Schema::new(schema_name)],
+        let search_paths: &[Schema] = match schema {
+            Some(s) => std::slice::from_ref(s),
             None => self.search_path_at(position),
         };
 
@@ -162,7 +150,7 @@ impl Binder {
                 symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
             }) {
                 let symbol = &self.symbols[symbol_id];
-                return Some((symbol.schema.clone()?, name_str));
+                return Some((symbol.schema.clone()?, name.to_string()));
             }
         }
         None
@@ -193,11 +181,8 @@ impl Binder {
         kind: SymbolKind,
         schema: Option<&Schema>,
     ) -> Vec<&Name> {
-        let root_scope = self.root_scope();
-        let scope = &self.scopes[root_scope];
-
         let mut names = vec![];
-        for (name, symbol_ids) in &scope.entries {
+        for (name, symbol_ids) in &self.scope.entries {
             for symbol_id in symbol_ids {
                 let symbol = &self.symbols[*symbol_id];
                 if symbol.kind == kind
@@ -212,11 +197,8 @@ impl Binder {
     }
 
     pub(crate) fn functions_with_single_param(&self, param_type: &Name) -> Vec<&Name> {
-        let root_scope = self.root_scope();
-        let scope = &self.scopes[root_scope];
-
         let mut names = vec![];
-        for (name, symbol_ids) in &scope.entries {
+        for (name, symbol_ids) in &self.scope.entries {
             for symbol_id in symbol_ids {
                 let symbol = &self.symbols[*symbol_id];
                 if symbol.kind == SymbolKind::Function
@@ -252,6 +234,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
     match stmt {
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
         ast::Stmt::CreateTableAs(create_table_as) => bind_create_table_as(b, create_table_as),
+        ast::Stmt::SelectInto(select_into) => bind_select_into(b, select_into),
         ast::Stmt::CreateForeignTable(create_foreign_table) => {
             bind_create_table(b, create_foreign_table)
         }
@@ -283,6 +266,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
+        ast::Stmt::CreatePropertyGraph(create_property_graph) => {
+            bind_create_property_graph(b, create_property_graph)
+        }
         _ => (),
     }
 }
@@ -295,7 +281,9 @@ fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
         return;
     };
     let name_ptr = path_to_ptr(&path);
-    let is_temp = create_table.temp_token().is_some() || create_table.temporary_token().is_some();
+    let is_temp = create_table
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
     };
@@ -316,9 +304,8 @@ fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(table_name.clone(), table_id);
-    b.scopes[root].insert(table_name, type_id);
+    b.scope.insert(table_name.clone(), table_id);
+    b.scope.insert(table_name, type_id);
 }
 
 fn bind_create_table_as(b: &mut Binder, create_table_as: ast::CreateTableAs) {
@@ -329,8 +316,9 @@ fn bind_create_table_as(b: &mut Binder, create_table_as: ast::CreateTableAs) {
         return;
     };
     let name_ptr = path_to_ptr(&path);
-    let is_temp =
-        create_table_as.temp_token().is_some() || create_table_as.temporary_token().is_some();
+    let is_temp = create_table_as
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
     };
@@ -351,9 +339,46 @@ fn bind_create_table_as(b: &mut Binder, create_table_as: ast::CreateTableAs) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(table_name.clone(), table_id);
-    b.scopes[root].insert(table_name, type_id);
+    b.scope.insert(table_name.clone(), table_id);
+    b.scope.insert(table_name, type_id);
+}
+
+fn bind_select_into(b: &mut Binder, select_into: ast::SelectInto) {
+    let Some(into_clause) = select_into.into_clause() else {
+        return;
+    };
+    let Some(path) = into_clause.path() else {
+        return;
+    };
+    let Some(table_name) = item_name(&path) else {
+        return;
+    };
+    let name_ptr = path_to_ptr(&path);
+    let is_temp = into_clause
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
+    let Some(schema) = schema_name(b, &path, is_temp) else {
+        return;
+    };
+
+    let table_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Table,
+        ptr: name_ptr,
+        schema: Some(schema.clone()),
+        params: None,
+        table: None,
+    });
+
+    let type_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Type,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(table_name.clone(), table_id);
+    b.scope.insert(table_name, type_id);
 }
 
 fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
@@ -376,8 +401,7 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(index_name, index_id);
+    b.scope.insert(index_name, index_id);
 }
 
 fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
@@ -405,8 +429,7 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(function_name, function_id);
+    b.scope.insert(function_name, function_id);
 }
 
 fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate) {
@@ -434,8 +457,7 @@ fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate)
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(aggregate_name, aggregate_id);
+    b.scope.insert(aggregate_name, aggregate_id);
 }
 
 fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure) {
@@ -463,8 +485,7 @@ fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure)
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(procedure_name, procedure_id);
+    b.scope.insert(procedure_name, procedure_id);
 }
 
 fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
@@ -488,8 +509,7 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(schema_name, schema_id);
+    b.scope.insert(schema_name, schema_id);
 }
 
 fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
@@ -515,8 +535,7 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(type_name.clone(), type_id);
+    b.scope.insert(type_name.clone(), type_id);
 
     if create_type.range_token().is_some() {
         if let Some((multirange_name, multirange_ptr, multirange_schema)) =
@@ -529,7 +548,7 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
                 params: None,
                 table: None,
             });
-            b.scopes[root].insert(multirange_name, multirange_id);
+            b.scope.insert(multirange_name, multirange_id);
         }
     }
 }
@@ -557,8 +576,7 @@ fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(domain_name, type_id);
+    b.scope.insert(domain_name, type_id);
 }
 
 fn multirange_type_from_range(
@@ -628,7 +646,9 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
     };
 
     let name_ptr = path_to_ptr(&path);
-    let is_temp = create_view.temp_token().is_some() || create_view.temporary_token().is_some();
+    let is_temp = create_view
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
 
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
@@ -642,8 +662,7 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(view_name, view_id);
+    b.scope.insert(view_name, view_id);
 }
 
 // TODO: combine with create_view
@@ -670,8 +689,7 @@ fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMateria
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(view_name, view_id);
+    b.scope.insert(view_name, view_id);
 }
 
 fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
@@ -684,8 +702,9 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
     };
 
     let name_ptr = path_to_ptr(&path);
-    let is_temp =
-        create_sequence.temp_token().is_some() || create_sequence.temporary_token().is_some();
+    let is_temp = create_sequence
+        .persistence()
+        .is_some_and(|p| matches!(p, ast::Persistence::Temp(_)));
 
     let Some(schema) = schema_name(b, &path, is_temp) else {
         return;
@@ -699,8 +718,7 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(sequence_name, sequence_id);
+    b.scope.insert(sequence_name, sequence_id);
 }
 
 fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
@@ -731,8 +749,7 @@ fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
         table: Some(table_name),
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(trigger_name, trigger_id);
+    b.scope.insert(trigger_name, trigger_id);
 }
 
 fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
@@ -763,8 +780,30 @@ fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
         table: Some(table_name),
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(policy_name, policy_id);
+    b.scope.insert(policy_name, policy_id);
+}
+
+fn bind_create_property_graph(b: &mut Binder, create_property_graph: ast::CreatePropertyGraph) {
+    let Some(path) = create_property_graph.path() else {
+        return;
+    };
+    let Some(property_graph_name) = item_name(&path) else {
+        return;
+    };
+    let name_ptr = path_to_ptr(&path);
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let property_graph_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::PropertyGraph,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(property_graph_name, property_graph_id);
 }
 
 fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEventTrigger) {
@@ -783,8 +822,7 @@ fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEv
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(event_trigger_name, event_trigger_id);
+    b.scope.insert(event_trigger_name, event_trigger_id);
 }
 
 fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespace) {
@@ -803,8 +841,7 @@ fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespa
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(tablespace_name, tablespace_id);
+    b.scope.insert(tablespace_name, tablespace_id);
 }
 
 fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
@@ -823,8 +860,7 @@ fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(database_name, database_id);
+    b.scope.insert(database_name, database_id);
 }
 
 fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
@@ -843,8 +879,7 @@ fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(server_name, server_id);
+    b.scope.insert(server_name, server_id);
 }
 
 fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension) {
@@ -863,8 +898,7 @@ fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension)
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(extension_name, extension_id);
+    b.scope.insert(extension_name, extension_id);
 }
 
 fn bind_create_role(b: &mut Binder, create_role: ast::CreateRole) {
@@ -883,8 +917,7 @@ fn bind_create_role(b: &mut Binder, create_role: ast::CreateRole) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(role_name, role_id);
+    b.scope.insert(role_name, role_id);
 }
 
 fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
@@ -903,8 +936,7 @@ fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(cursor_name, cursor_id);
+    b.scope.insert(cursor_name, cursor_id);
 }
 
 fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
@@ -923,8 +955,7 @@ fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(statement_name, statement_id);
+    b.scope.insert(statement_name, statement_id);
 }
 
 fn bind_listen(b: &mut Binder, listen: ast::Listen) {
@@ -943,8 +974,7 @@ fn bind_listen(b: &mut Binder, listen: ast::Listen) {
         table: None,
     });
 
-    let root = b.root_scope();
-    b.scopes[root].insert(channel_name, channel_id);
+    b.scope.insert(channel_name, channel_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {

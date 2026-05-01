@@ -1,0 +1,8 @@
+---
+source: crates/squawk_linter/src/rules/require_table_schema.rs
+expression: "lint_errors(sql, Rule::RequireTableSchema)"
+---
+warning[require-table-schema]: Table name is not schema-qualified. Use schema.table (e.g., public.my_table).
+  ╭▸ 
+2 │ DROP TABLE my_table;
+  ╰╴           ━━━━━━━━

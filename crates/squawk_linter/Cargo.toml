@@ -18,13 +18,14 @@ squawk-syntax.workspace = true
 
 rowan.workspace = true
 serde.workspace = true
-lazy_static.workspace = true
-insta.workspace = true
 enum-iterator.workspace = true
 line-index.workspace = true
 serde_plain.workspace = true
 annotate-snippets.workspace = true
+rustc-hash.workspace = true
 
+[dev-dependencies]
+insta.workspace = true
 
 [lints]
 workspace = true

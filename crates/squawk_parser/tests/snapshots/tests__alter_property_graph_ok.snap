@@ -1,0 +1,458 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/alter_property_graph.sql
+---
+SOURCE_FILE
+  COMMENT "-- rename to"
+  WHITESPACE "\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE "\n  "
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set owner"
+  WHITESPACE "\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE "\n  "
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_REF
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set schema"
+  WHITESPACE "\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE "\n  "
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add vertex/edge tables"
+  WHITESPACE "\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE "\n  "
+    ADD_VERTEX_EDGE_TABLES
+      ADD_KW "add"
+      WHITESPACE " "
+      VERTEX_TABLES
+        VERTEX_KW "vertex"
+        WHITESPACE " "
+        TABLES_KW "tables"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        VERTEX_TABLE_DEF
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          WHITESPACE " "
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "c"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "k"
+            R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n    "
+        VERTEX_TABLE_DEF
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "d"
+          WHITESPACE " "
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "l"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "u"
+            R_PAREN ")"
+          WHITESPACE " \n      "
+          NO_PROPERTIES
+            NO_KW "no"
+            WHITESPACE " "
+            PROPERTIES_KW "properties"
+        WHITESPACE "\n  "
+        R_PAREN ")"
+      WHITESPACE "\n  "
+      ADD_KW "add"
+      WHITESPACE " "
+      EDGE_TABLES
+        EDGE_KW "edge"
+        WHITESPACE " "
+        TABLES_KW "tables"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        EDGE_TABLE_DEF
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          WHITESPACE " "
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "x"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "y"
+            R_PAREN ")"
+          WHITESPACE "\n      "
+          SOURCE_VERTEX_TABLE
+            SOURCE_KW "source"
+            WHITESPACE " "
+            KEY_KW "key"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "s"
+              R_PAREN ")"
+            WHITESPACE " "
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
+          WHITESPACE "\n      "
+          DEST_VERTEX_TABLE
+            DESTINATION_KW "destination"
+            WHITESPACE " "
+            KEY_KW "key"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "d"
+              R_PAREN ")"
+            WHITESPACE " "
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
+          WHITESPACE "\n      "
+          LABEL_AND_PROPERTIES_LIST
+            LABEL_AND_PROPERTIES
+              LABEL_KW "label"
+              WHITESPACE " "
+              NAME
+                IDENT "q"
+              WHITESPACE " "
+              PROPERTIES
+                PROPERTIES_KW "properties"
+                WHITESPACE " "
+                EXPR_AS_NAME_LIST
+                  L_PAREN "("
+                  EXPR_AS_NAME
+                    NAME_REF
+                      IDENT "o"
+                  COMMA ","
+                  WHITESPACE " "
+                  EXPR_AS_NAME
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "f"
+                      WHITESPACE " "
+                      STAR "*"
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "10"
+                    WHITESPACE " "
+                    AS_KW "as"
+                    WHITESPACE " "
+                    NAME
+                      IDENT "p"
+                  R_PAREN ")"
+            WHITESPACE "\n      "
+            LABEL_AND_PROPERTIES
+              LABEL_KW "label"
+              WHITESPACE " "
+              NAME
+                IDENT "q"
+              WHITESPACE " "
+              PROPERTIES
+                PROPERTIES_KW "properties"
+                WHITESPACE " "
+                EXPR_AS_NAME_LIST
+                  L_PAREN "("
+                  EXPR_AS_NAME
+                    NAME_REF
+                      IDENT "i"
+                    WHITESPACE " "
+                    AS_KW "as"
+                    WHITESPACE " "
+                    NAME
+                      IDENT "x"
+                  R_PAREN ")"
+        WHITESPACE "\n  "
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add vertex/edge tables part 2"
+  WHITESPACE "\n"
+  ALTER_PROPERTY_GRAPH
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROPERTY_KW "property"
+    WHITESPACE " "
+    GRAPH_KW "graph"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "g"
+    WHITESPACE "\n  "
+    ADD_VERTEX_EDGE_TABLES
+      ADD_KW "add"
+      WHITESPACE " "
+      VERTEX_TABLES
+        VERTEX_KW "vertex"
+        WHITESPACE " "
+        TABLES_KW "tables"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        VERTEX_TABLE_DEF
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "d"
+          WHITESPACE " "
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "l"
+            R_PAREN ")"
+          WHITESPACE " \n      "
+          ALL_PROPERTIES
+            PROPERTIES_KW "properties"
+            WHITESPACE " "
+            ALL_KW "all"
+            WHITESPACE " "
+            COLUMNS_KW "columns"
+        WHITESPACE "\n  "
+        R_PAREN ")"
+      WHITESPACE "\n  "
+      ADD_KW "add"
+      WHITESPACE " "
+      EDGE_TABLES
+        EDGE_KW "edge"
+        WHITESPACE " "
+        TABLES_KW "tables"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        EDGE_TABLE_DEF
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          WHITESPACE " "
+          KEY_KW "key"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "x"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "y"
+            R_PAREN ")"
+          WHITESPACE "\n      "
+          SOURCE_VERTEX_TABLE
+            SOURCE_KW "source"
+            WHITESPACE " "
+            KEY_KW "key"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "s"
+              R_PAREN ")"
+            WHITESPACE " "
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
+          WHITESPACE "\n      "
+          DEST_VERTEX_TABLE
+            DESTINATION_KW "destination"
+            WHITESPACE " "
+            KEY_KW "key"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "d"
+              R_PAREN ")"
+            WHITESPACE " "
+            REFERENCES_TABLE
+              REFERENCES_KW "references"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "k"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
+        WHITESPACE "\n  "
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

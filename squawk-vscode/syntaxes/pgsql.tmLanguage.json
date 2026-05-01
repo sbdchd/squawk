@@ -1,0 +1,298 @@
+{
+  "fileTypes": [
+    "sql",
+    "pgsql",
+    "psql"
+  ],
+  "foldingStartMarker": "\\s*\\(\\s*$",
+  "foldingStopMarker": "^\\s*\\)",
+  "name": "SQL (PostgreSQL)",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "begin": "^",
+      "end": ";\\s*",
+      "name": "meta.statement.pgsql",
+      "patterns": [
+        {
+          "include": "#create_entities"
+        },
+        {
+          "include": "#parens"
+        },
+        {
+          "include": "#dollar_quotes"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#misc"
+        }
+      ]
+    },
+    {
+      "begin": "^(\\\\[\\S]+)",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.pgsql"
+        }
+      },
+      "comment": "psql directives",
+      "end": "\\n",
+      "name": "meta.statement.pgsql.psql"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.pgsql"
+            }
+          },
+          "match": "(--).*$\\n?",
+          "name": "comment.line.double-dash.pgsql"
+        },
+        {
+          "begin": "/\\*",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.pgsql"
+            }
+          },
+          "end": "\\*/",
+          "name": "comment.block.c"
+        }
+      ]
+    },
+    "create_entities": {
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "keyword.other.create.pgsql"
+            },
+            "2": {
+              "name": "keyword.other.pgsql"
+            },
+            "3": {
+              "name": "keyword.other.pgsql"
+            },
+            "4": {
+              "name": "entity.name.function.pgsql"
+            },
+            "5": {
+              "name": "keyword.operator.pgsql"
+            },
+            "6": {
+              "name": "entity.name.function.pgsql"
+            },
+            "7": {
+              "name": "keyword.operator.pgsql"
+            },
+            "8": {
+              "name": "entity.name.function.pgsql"
+            }
+          },
+          "match": "(?i)\\b(create)\\s+(or\\s+replace\\s+)?(function|view)\\s+((?:[\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\")))?)?"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "keyword.other.create.pgsql"
+            },
+            "2": {
+              "name": "keyword.other.pgsql"
+            },
+            "3": {
+              "name": "keyword.other.pgsql"
+            },
+            "4": {
+              "name": "entity.name.function.pgsql"
+            },
+            "5": {
+              "name": "keyword.operator.pgsql"
+            },
+            "6": {
+              "name": "entity.name.function.pgsql"
+            },
+            "7": {
+              "name": "keyword.operator.pgsql"
+            },
+            "8": {
+              "name": "entity.name.function.pgsql"
+            }
+          },
+          "match": "(?i)\\b(create)\\s+(aggregate|collation|conversion|database|domain|event\\s+trigger|group|(?:unique\\s+)?index|language|operator\\s+class|operator|rule|schema|sequence|(?:(?:global|local)\\s+)?(?:(?:temp|temporary|unlogged)\\s+)?table|tablespace|trigger|type|user|(?:materialized\\s+)?view)\\s+(if\\s+not\\s+exists\\s+)?((?:[\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\"))(?:(\\.)(?:([\\w]+|\"[^\"]+\")))?)?"
+        }
+      ]
+    },
+    "dollar_quotes": {
+      "patterns": [
+        {
+          "begin": "(\\$[\\w_0-9]*\\$)$",
+          "comment": "Assume multiline dollar quote is SQL; start if quote is at the end of the line.\n\t\t                This could easily support other PL languages like PHP and Ruby -- see PHP heredoc as an example.",
+          "end": "\\1",
+          "name": "meta.dollar-quote.pgsql",
+          "patterns": [
+            {
+              "include": "#parens"
+            },
+            {
+              "include": "#dollar_quotes"
+            },
+            {
+              "include": "#comments"
+            },
+            {
+              "include": "#strings"
+            },
+            {
+              "include": "#keywords"
+            },
+            {
+              "include": "#misc"
+            }
+          ]
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "(?i)\\b(as\\s+not\\s+materialized|nulls\\s+not\\s+distinct|truncate\\s+or\\s+delete|when\\s+not\\s+matched|insert\\s+or\\s+delete|delete\\s+or\\s+insert|without\\s+overlaps|not\\s+deferrable|fetch\\s+prior\\s+in|if\\s+not\\s+exists|drop\\s+not\\s+null|for\\s+values\\s+in|in\\s+tablespace|not\\s+leakproof|set\\s+not\\s+null|and\\s+no\\s+chain|in\\s+exclusive|in\\s+database|or\\s+replace|in\\s+schema|not\\s+valid|if\\s+exists|in\\s+access|and\\s+chain|in\\s+share|in\\s+group|in\\s+role|in\\s+row|not\\s+of)\\b",
+          "name": "keyword.other.pgsql"
+        },
+        {
+          "match": "(?i)\\b(not\\s+between\\s+symmetric|is\\s+not\\s+distinct\\s+from|between\\s+symmetric|is\\s+distinct\\s+from|not\\s+similar\\s+to|at\\s+time\\s+zone|not\\s+between|similar\\s+to|not\\s+ilike|not\\s+like|overlaps|between|collate|notnull|is\\s+not|not\\s+in|isnull|ilike|like|and|not|in|is|or)\\b",
+          "name": "keyword.operator.pgsql"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "keyword.other.pgsql"
+            }
+          },
+          "match": "(?xi)\\b(abort|absent|absolute|access|action|add|admin|after|aggregate|all|also|alter|always|analyse|analyze|and|any|array|as|asc|asensitive|assertion|assignment|asymmetric|at|atomic|attach|attribute|authorization|backward|before|begin|between|bigint|binary|bit|boolean|both|breadth|by|cache|call|called|cascade|cascaded|case|cast|catalog|chain|char|character|characteristics|check|checkpoint|class|close|cluster|coalesce|collate|collation|column|columns|comment|comments|commit|committed|compression|concurrently|conditional|configuration|conflict|connection|constraint|constraints|content|continue|conversion|copy|cost|create|cross|csv|cube|current|current_catalog|current_date|current_role|current_schema|current_time|current_timestamp|current_user|cursor|cycle|data|database|day|deallocate|dec|decimal|declare|default|defaults|deferrable|deferred|definer|delete|delimiter|delimiters|depends|depth|desc|destination|detach|dictionary|disable|discard|distinct|do|document|domain|double|drop|each|edge|else|empty|enable|encoding|encrypted|end|enforced|enum|error|escape|event|except|exclude|excluding|exclusive|execute|exists|explain|expression|extension|external|extract|false|family|fetch|filter|finalize|first|float|following|for|force|foreign|format|forward|freeze|from|full|function|functions|generated|global|grant|granted|graph|graph_table|greatest|group|grouping|groups|handler|having|header|hold|hour|identity|if|ignore|ilike|immediate|immutable|implicit|import|in|include|including|increment|indent|index|indexes|inherit|inherits|initially|inline|inner|inout|input|insensitive|insert|instead|int|integer|intersect|interval|into|invoker|is|isnull|isolation|join|json|json_array|json_arrayagg|json_exists|json_object|json_objectagg|json_query|json_scalar|json_serialize|json_table|json_value|keep|key|keys|label|language|large|last|lateral|leading|leakproof|least|left|level|like|limit|listen|load|local|localtime|localtimestamp|location|lock|locked|logged|lsn|mapping|match|matched|materialized|maxvalue|merge|merge_action|method|minute|minvalue|mode|month|move|name|names|national|natural|nchar|nested|new|next|nfc|nfd|nfkc|nfkd|no|node|none|normalize|normalized|not|nothing|notify|notnull|nowait|null|nullif|nulls|numeric|object|objects|of|off|offset|oids|old|omit|on|only|operator|option|options|or|order|ordinality|others|out|outer|over|overlaps|overlay|overriding|owned|owner|parallel|parameter|parser|partial|partition|partitions|passing|password|path|period|placing|plan|plans|policy|portion|position|preceding|precision|prepare|prepared|preserve|primary|prior|privileges|procedural|procedure|procedures|program|properties|property|publication|quote|quotes|range|read|real|reassign|recursive|ref|references|referencing|refresh|reindex|relationship|relative|release|rename|repack|repeatable|replace|replica|reset|respect|restart|restrict|return|returning|returns|revoke|right|role|rollback|rollup|routine|routines|row|rows|rule|savepoint|scalar|schema|schemas|scroll|search|second|security|select|sequence|sequences|serializable|server|session|session_user|set|setof|sets|share|show|similar|simple|skip|smallint|snapshot|some|source|split|sql|stable|standalone|start|statement|statistics|stdin|stdout|storage|stored|strict|string|strip|subscription|substring|support|symmetric|sysid|system|system_user|table|tables|tablesample|tablespace|target|temp|template|temporary|text|then|ties|time|timestamp|to|trailing|transaction|transform|treat|trigger|trim|true|truncate|trusted|type|types|uescape|unbounded|uncommitted|unconditional|unencrypted|union|unique|unknown|unlisten|unlogged|until|update|user|using|vacuum|valid|validate|validator|value|values|varchar|variadic|varying|verbose|version|vertex|view|views|virtual|volatile|wait|when|where|whitespace|window|with|within|without|work|wrapper|write|xml|xmlattributes|xmlconcat|xmlelement|xmlexists|xmlforest|xmlnamespaces|xmlparse|xmlpi|xmlroot|xmlserialize|xmltable|year|yes|zone)\\b"
+        }
+      ]
+    },
+    "misc": {
+      "patterns": [
+        {
+          "match": "(?i)(?<![\\w\"])((?:(?:[\\w]+|\"(?:\"\"|[^\"])+\")\\.){0,2}(?:[\\w]+|\"(?:\"\"|[^\"])+\"))(?=\\s*\\()",
+          "name": "entity.name.function.pgsql"
+        },
+        {
+          "match": "\\b\\d+\\b",
+          "name": "constant.numeric.pgsql"
+        },
+        {
+          "match": "::",
+          "name": "keyword.operator.cast.pgsql"
+        },
+        {
+          "match": ":=",
+          "name": "keyword.operator.pgsql"
+        },
+        {
+          "match": "[+\\-*/<>=~!@#%\\^&|`?\\.]",
+          "name": "keyword.operator.pgsql"
+        }
+      ]
+    },
+    "parens": {
+      "begin": "\\(",
+      "end": "\\)",
+      "patterns": [
+        {
+          "include": "#parens"
+        },
+        {
+          "include": "#dollar_quotes"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#misc"
+        }
+      ]
+    },
+    "string_escape": {
+      "match": "\\\\.",
+      "name": "constant.character.escape.pgsql"
+    },
+    "strings": {
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.pgsql"
+            },
+            "2": {
+              "name": "punctuation.definition.string.end.pgsql"
+            }
+          },
+          "comment": "This is faster than the next begin/end rule since sub-pattern will match till end-of-line and SQL files tend to have very long lines.",
+          "match": "(')[^'\\\\]*(')",
+          "name": "string.quoted.single.pgsql"
+        },
+        {
+          "begin": "'",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.pgsql"
+            }
+          },
+          "comment": "Need to implement escape rule with two single quotes in a row. Lots of other escaping issues with single quotes.",
+          "end": "'",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.pgsql"
+            }
+          },
+          "name": "string.quoted.single.pgsql",
+          "patterns": [
+            {
+              "include": "#string_escape"
+            }
+          ]
+        },
+        {
+          "match": "(?i)((?:(?:\"(?:\"\"|[^\"])+\")\\.){0,2}\"(?:\"\"|[^\"])+\")(?=\\s*\\()",
+          "name": "entity.name.function.pgsql"
+        },
+        {
+          "comment": "Double quoting treated like strings, but they are really identifiers.",
+          "match": "(\")[^\"#]*(\")",
+          "name": "variable.other.pgsql"
+        },
+        {
+          "begin": "(\\$[\\w_0-9]*\\$)",
+          "comment": "Color as a string if dollar quote did not start at the end of a line.",
+          "end": "\\1",
+          "name": "string.unquoted.dollar.pgsql"
+        }
+      ]
+    }
+  },
+  "scopeName": "source.pgsql",
+  "uuid": "4D6B679D-111C-4529-B558-3F25487D9E27"
+}

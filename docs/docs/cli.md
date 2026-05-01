@@ -21,6 +21,14 @@ Individual rules can be disabled via the `--exclude` flag
 squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.sql
 ```
 
+Rules that are disabled by default can be enabled via the `--include` flag
+
+```shell
+squawk --include=require-table-schema example.sql
+```
+
+Note: `--exclude` takes precedence over `--include`.
+
 ### Disabling rules via comments
 
 Rule violations can be ignored via the `squawk-ignore` comment:
@@ -81,7 +89,7 @@ By default, Squawk will traverse up from the current directory to find a `.squaw
 squawk --config=~/.squawk.toml example.sql
 ```
 
-The `--exclude`, `--exclude-path`, and `--pg-version` flags will always be prioritized over the configuration file.
+The `--exclude`, `--include`, `--exclude-path`, and `--pg-version` flags will always be prioritized over the configuration file.
 
 ## Example `.squawk.toml` configurations
 
@@ -94,6 +102,19 @@ excluded_rules = [
     "require-concurrent-index-deletion",
 ]
 ```
+
+### Including rules
+
+Rules that are disabled by default can be enabled via `included_rules`.
+
+```toml
+# .squawk.toml
+included_rules = [
+    "require-table-schema",
+]
+```
+
+Note: `excluded_rules` takes precedence over `included_rules`.
 
 ### Specifying postgres version
 
@@ -118,6 +139,9 @@ excluded_rules = [
     "require-concurrent-index-creation",
     "require-concurrent-index-deletion",
 ]
+included_rules = [
+    "require-table-schema",
+]
 assume_in_transaction = true
 excluded_paths = [
     "005_user_ids.sql",
@@ -132,67 +156,76 @@ See the [Squawk website](https://squawkhq.com/docs/rules) for documentation on e
 ## `squawk --help`
 
 ```
-squawk
 Find problems in your SQL
 
-USAGE:
-    squawk [FLAGS] [OPTIONS] [path]... [SUBCOMMAND]
+Usage: squawk [OPTIONS] [path]... [COMMAND]
 
-FLAGS:
-        --assume-in-transaction            
-            Assume that a transaction will wrap each SQL file when run by a migration tool
-            
-            Use --no-assume-in-transaction to override any config file that sets this
-    -h, --help                             
-            Prints help information
+Commands:
+  server            Run the language server
+  upload-to-github  Comment on a PR with Squawk's results
+  help              Print this message or the help of the given subcommand(s)
 
-        --no-error-on-unmatched-pattern    
-            Do not exit with an error when provided path patterns do not match any files
+Arguments:
+  [path]...
+          Paths or patterns to search
 
-    -V, --version                          
-            Prints version information
+Options:
+      --exclude-path <EXCLUDED_PATH>
+          Paths to exclude
 
-        --verbose                          
-            Enable debug logging output
+          For example:
 
+          `--exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql`
 
-OPTIONS:
-    -c, --config <config-path>               
-            Path to the squawk config file (.squawk.toml)
+          `--exclude-path='*user_ids.sql'`
 
-        --debug <format>                     
-            Output debug format [possible values: Lex, Parse, Ast]
+  -e, --exclude <rule>
+          Exclude specific warnings
 
-        --exclude-path <excluded-path>...    
-            Paths to exclude
-            
-            For example:
-            
-            `--exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql`
-            
-            `--exclude-path='*user_ids.sql'`
-    -e, --exclude <rule>...                  
-            Exclude specific warnings
-            
-            For example: --exclude=require-concurrent-index-creation,ban-drop-database
-        --pg-version <pg-version>            
-            Specify postgres version
-            
-            For example: --pg-version=13.0
-        --reporter <reporter>                
-            Style of error reporting [possible values: Tty, Gcc, Json, Gitlab]
+          For example: --exclude=require-concurrent-index-creation,ban-drop-database
 
-        --stdin-filepath <filepath>          
-            Path to use in reporting for stdin
+  -i, --include <rule>
+          Include opt-in rules that are disabled by default
 
+          Rules listed in --exclude take precedence over --include.
 
-ARGS:
-    <path>...    
-            Paths or patterns to search
+          For example: --include=require-table-schema
 
+      --pg-version <PG_VERSION>
+          Specify postgres version
 
-SUBCOMMANDS:
-    help                Prints this message or the help of the given subcommand(s)
-    server              Run the language server
-    upload-to-github    Comment on a PR with Squawk's results
+          For example: --pg-version=13.0
+
+      --debug <format>
+          Output debug format
+
+          [possible values: lex, parse, ast]
+
+      --reporter <REPORTER>
+          Style of error reporting
+
+          [possible values: tty, gcc, json, gitlab]
+
+      --stdin-filepath <filepath>
+          Path to use in reporting for stdin
+
+      --verbose
+          Enable debug logging output
+
+  -c, --config <CONFIG_PATH>
+          Path to the squawk config file (.squawk.toml)
+
+      --assume-in-transaction
+          Assume that a transaction will wrap each SQL file when run by a migration tool
+
+          Use --no-assume-in-transaction to override any config file that sets this
+
+      --no-error-on-unmatched-pattern
+          Do not exit with an error when provided path patterns do not match any files
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
 ```

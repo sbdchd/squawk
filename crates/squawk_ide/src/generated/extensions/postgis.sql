@@ -1,5 +1,5 @@
 -- squawk-ignore-file
--- pg version: 18.2
+-- pg version: 18.3
 -- update via:
 --   cargo xtask sync-builtins
 
@@ -23,6 +23,17 @@ create type public.gidx;
 
 -- size: 65, align: 8
 create type public.spheroid;
+
+create type public.geometry_dump as (
+  path integer[],
+  geom geometry
+);
+
+create type public.valid_detail as (
+  valid boolean,
+  reason character varying,
+  location geometry
+);
 
 create table public.spatial_ref_sys (
   srid integer,

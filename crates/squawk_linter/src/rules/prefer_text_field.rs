@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
@@ -9,12 +7,6 @@ use squawk_syntax::{
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
 use crate::visitors::check_not_allowed_types;
-
-use lazy_static::lazy_static;
-
-lazy_static! {
-    static ref VARCHAR_TYPE_NAMES: HashSet<&'static str> = HashSet::from(["varchar"]);
-}
 
 fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
     match ty {

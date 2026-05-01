@@ -1,7 +1,6 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt,
-};
+use std::fmt;
+
+use rustc_hash::{FxHashMap, FxHashSet};
 
 use line_index::LineIndex;
 use rowan::TextRange;
@@ -9,8 +8,8 @@ use rowan::TextRange;
 use crate::{Ignore, Rule, ignore::IgnoreKind};
 
 pub(crate) struct IgnoreIndex {
-    line_to_ignored: HashMap<u32, HashSet<Rule>>,
-    file_ignored: HashSet<Rule>,
+    line_to_ignored: FxHashMap<u32, FxHashSet<Rule>>,
+    file_ignored: FxHashSet<Rule>,
     ignore_all: bool,
     line_index: LineIndex,
 }
@@ -32,8 +31,8 @@ impl fmt::Debug for IgnoreIndex {
 impl IgnoreIndex {
     pub(crate) fn new(text: &str, ignores: &[Ignore]) -> Self {
         let line_index = LineIndex::new(text);
-        let mut line_to_ignored: HashMap<u32, HashSet<Rule>> = HashMap::new();
-        let mut file_ignored: HashSet<Rule> = HashSet::new();
+        let mut line_to_ignored: FxHashMap<u32, FxHashSet<Rule>> = FxHashMap::default();
+        let mut file_ignored: FxHashSet<Rule> = FxHashSet::default();
         let mut ignore_all = false;
         for ignore in ignores {
             match ignore.kind {

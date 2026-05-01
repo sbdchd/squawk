@@ -1,9 +1,8 @@
-use crate::builtins::parse_builtins;
+use crate::collect;
 use crate::db::{File, parse};
-use crate::goto_definition::FileId;
+use crate::goto_definition;
 use crate::resolve;
 use crate::symbols::Name;
-use crate::{binder, goto_definition};
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
@@ -15,7 +14,7 @@ pub enum InlayHintKind {
     Parameter,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct InlayHint {
     pub position: TextSize,
     pub label: String,
@@ -25,20 +24,17 @@ pub struct InlayHint {
     // For example: `insert into t(a, b) values (1, 2)`
     pub target: Option<TextRange>,
     // TODO: combine with the target range above
-    pub file: Option<FileId>,
+    pub file: Option<File>,
 }
 
 #[salsa::tracked]
 pub fn inlay_hints(db: &dyn Db, file: File) -> Vec<InlayHint> {
-    let parse = parse(db, file);
-    let source_file = parse.tree();
-
     let mut hints = vec![];
-    for node in source_file.syntax().descendants() {
+    for node in parse(db, file).tree().syntax().descendants() {
         if let Some(call_expr) = ast::CallExpr::cast(node.clone()) {
-            inlay_hint_call_expr(db, &mut hints, file, &source_file, call_expr);
+            inlay_hint_call_expr(db, &mut hints, file, call_expr);
         } else if let Some(insert) = ast::Insert::cast(node) {
-            inlay_hint_insert(db, &mut hints, file, &source_file, insert);
+            inlay_hint_insert(db, &mut hints, file, insert);
         }
     }
     hints
@@ -48,7 +44,6 @@ fn inlay_hint_call_expr(
     db: &dyn Db,
     hints: &mut Vec<InlayHint>,
     file_id: File,
-    file: &ast::SourceFile,
     call_expr: ast::CallExpr,
 ) -> Option<()> {
     let arg_list = call_expr.arg_list()?;
@@ -65,12 +60,9 @@ fn inlay_hint_call_expr(
             .into_iter()
             .next()?;
 
-    let file = match location.file {
-        goto_definition::FileId::Current => file,
-        goto_definition::FileId::Builtins => &parse_builtins(db).tree(),
-    };
+    let def_file = parse(db, location.file).tree();
 
-    let function_name_node = file.syntax().covering_element(location.range);
+    let function_name_node = def_file.syntax().covering_element(location.range);
 
     if let Some(create_function) = function_name_node
         .ancestors()
@@ -99,7 +91,6 @@ fn inlay_hint_insert(
     db: &dyn Db,
     hints: &mut Vec<InlayHint>,
     file_id: File,
-    file: &ast::SourceFile,
     insert: ast::Insert,
 ) -> Option<()> {
     let name_start = insert
@@ -115,46 +106,37 @@ fn inlay_hint_insert(
         .into_iter()
         .next();
 
-    let file = match location.as_ref().map(|x| x.file) {
-        Some(goto_definition::FileId::Current) | None => file,
-        Some(goto_definition::FileId::Builtins) => &parse_builtins(db).tree(),
-    };
+    let def_file = location.as_ref().map(|loc| loc.file).unwrap_or(file_id);
+    let def_tree = parse(db, def_file).tree();
 
-    let create_table = {
-        let range = location.as_ref().map(|x| x.range);
-
-        range.and_then(|range| {
-            file.syntax()
-                .covering_element(range)
-                .ancestors()
-                .find_map(ast::CreateTableLike::cast)
-        })
-    };
-
-    // TODO: we should salsa this
-    let binder = binder::bind(file);
+    let create_table = location.as_ref().and_then(|loc| {
+        def_tree
+            .syntax()
+            .covering_element(loc.range)
+            .ancestors()
+            .find_map(ast::CreateTableLike::cast)
+    });
 
     let columns = if let Some(column_list) = insert.column_list() {
         // `insert into t(a, b, c) values (1, 2, 3)`
         column_list
             .columns()
             .filter_map(|col| {
-                let col_name = resolve::extract_column_name(&col)?;
+                let col_name = col.name_ref().map(|x| Name::from_node(&x))?;
                 let target = create_table
                     .as_ref()
-                    .and_then(|x| {
-                        resolve::find_column_in_create_table(&binder, file.syntax(), x, &col_name)
-                    })
-                    .map(|x| x.text_range());
+                    .and_then(|x| resolve::find_column_in_create_table(db, def_file, x, &col_name))
+                    .and_then(|x| x.into_iter().next())
+                    .map(|x| x.range);
                 Some((col_name, target, location.as_ref().map(|x| x.file)))
             })
             .collect()
     } else {
         // `insert into t values (1, 2, 3)`
-        resolve::collect_columns_from_create_table(&binder, file.syntax(), &create_table?)
+        collect::columns_from_create_table(db, def_file, &create_table?)
             .into_iter()
             .map(|(col_name, ptr)| {
-                let target = ptr.map(|p| p.to_node(file.syntax()).text_range());
+                let target = ptr.map(|p| p.text_range());
                 (col_name, target, location.as_ref().map(|x| x.file))
             })
             .collect()
@@ -183,15 +165,13 @@ fn inlay_hint_insert(
 
 fn inlay_hint_insert_select(
     hints: &mut Vec<InlayHint>,
-    columns: Vec<(Name, Option<TextRange>, Option<FileId>)>,
+    columns: Vec<(Name, Option<TextRange>, Option<File>)>,
     stmt: ast::Stmt,
 ) -> Option<()> {
     let target_list = match stmt {
         ast::Stmt::Select(select) => select.select_clause()?.target_list(),
         ast::Stmt::SelectInto(select_into) => select_into.select_clause()?.target_list(),
-        ast::Stmt::ParenSelect(paren_select) => {
-            target_list_from_select_variant(paren_select.select()?)
-        }
+        ast::Stmt::ParenSelect(paren_select) => paren_select.select()?.target_list(),
         _ => None,
     }?;
 
@@ -210,25 +190,6 @@ fn inlay_hint_insert_select(
     Some(())
 }
 
-fn target_list_from_select_variant(select: ast::SelectVariant) -> Option<ast::TargetList> {
-    let mut current = select;
-    for _ in 0..100 {
-        match current {
-            ast::SelectVariant::Select(select) => {
-                return select.select_clause()?.target_list();
-            }
-            ast::SelectVariant::SelectInto(select_into) => {
-                return select_into.select_clause()?.target_list();
-            }
-            ast::SelectVariant::ParenSelect(paren_select) => {
-                current = paren_select.select()?;
-            }
-            _ => return None,
-        }
-    }
-    None
-}
-
 #[cfg(test)]
 mod test {
     use crate::db::{Database, File};
@@ -239,7 +200,7 @@ mod test {
     #[track_caller]
     fn check_inlay_hints(sql: &str) -> String {
         let db = Database::default();
-        let file = File::new(&db, sql.to_string(), 0);
+        let file = File::new(&db, sql.to_string().into());
 
         assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
@@ -458,7 +419,7 @@ insert into t values (1, 2, 3);
 create table t (a int, b int);
 create table u (c int) inherits (t);
 insert into u select 1, 2, 3;
-"), @r"
+"), @"
         inlay hints:
           ╭▸ 
         4 │ insert into u select a: 1, b: 2, c: 3;

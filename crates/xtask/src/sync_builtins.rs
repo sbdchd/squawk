@@ -5,16 +5,34 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 use anyhow::{Context, Result, bail};
-use serde::Deserialize;
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Deserializer};
 
 use crate::path::project_root;
 
+fn deserialize_json_string<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: DeserializeOwned,
+{
+    let s = String::deserialize(deserializer)?;
+    serde_json::from_str(&s).map_err(serde::de::Error::custom)
+}
+
 const PG_TEMP_SCHEMA_SQL: &str = "create schema pg_temp;\n\n";
 
-const SCHEMAS_QUERY: &str = r"
+#[derive(Deserialize)]
+struct SchemaQuery {
+    schema: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for SchemaQuery {
+    const QUERY: &'static str = r"
 select
-  n.nspname,
-  coalesce(d.description, ''),
+  n.nspname as schema,
+  coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_namespace n
   left join pg_description d on d.objoid = n.oid and d.classoid = 'pg_namespace'::regclass
@@ -24,21 +42,78 @@ where n.nspname not like 'pg_temp%'
   and n.nspname not like 'pg_toast%'
 order by n.nspname, ext.extname, n.oid;
 ";
+}
 
-const TYPES_QUERY: &str = r"
+trait Query {
+    const QUERY: &'static str;
+
+    fn run() -> Result<Vec<Self>>
+    where
+        Self: serde::de::DeserializeOwned,
+    {
+        let output = Command::new("psql")
+            .args(["--csv", "--command", Self::QUERY])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .output()
+            .context("Failed to run psql.")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8(output.stderr).context("Invalid utf8")?;
+            bail!("psql failed: {}", stderr);
+        }
+
+        let mut reader = csv::Reader::from_reader(output.stdout.as_slice());
+        let mut rows = vec![];
+        for result in reader.deserialize() {
+            rows.push(result.context("failed to parse csv record")?);
+        }
+        Ok(rows)
+    }
+
+    fn execute() -> Result<()> {
+        let output = Command::new("psql")
+            .args(["--command", Self::QUERY])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .output()
+            .context("Failed to run psql.")?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8(output.stderr).context("Invalid utf8")?;
+            bail!("psql failed: {}", stderr);
+        }
+        Ok(())
+    }
+}
+
+#[derive(Deserialize)]
+struct TypeQuery {
+    schema: String,
+    name: String,
+    size: String,
+    align: String,
+    subtype: String,
+    is_range: i32,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for TypeQuery {
+    const QUERY: &'static str = r"
 select
-  n.nspname,
-  t.typname,
-  t.typlen,
+  n.nspname as schema,
+  t.typname as name,
+  t.typlen as size,
   case t.typalign
     when 'c' then 1
     when 's' then 2
     when 'i' then 4
     when 'd' then 8
-  end as typalign,
+  end as align,
   coalesce(format_type(r.rngsubtype, null), '') as subtype,
   case when r.rngtypid is null then 0 else 1 end as is_range,
-  coalesce(d.description, ''),
+  coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_type t
   join pg_namespace n on n.oid = t.typnamespace
@@ -55,13 +130,26 @@ where n.nspname not like 'pg_temp%'
   )
 order by n.nspname, t.typname, t.oid;
 ";
+}
 
-const TABLES_QUERY: &str = r"
+#[derive(Deserialize)]
+struct RelationQuery {
+    schema: String,
+    name: String,
+    relkind: String,
+    description: String,
+    extension_name: String,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    columns: Vec<Column>,
+}
+
+impl Query for RelationQuery {
+    const QUERY: &'static str = r"
 select
-  n.nspname,
-  c.relname,
-  c.relkind,
-  coalesce(d.description, ''),
+  n.nspname as schema,
+  c.relname as name,
+  c.relkind as relkind,
+  coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name,
   json_agg(
     json_build_object(
@@ -82,19 +170,38 @@ where n.nspname not like 'pg_temp%'
   and c.relkind in ('r', 'v')
   and a.attnum > 0
   and not a.attisdropped
-group by c.oid, n.nspname, c.relname, c.relkind, coalesce(d.description, ''), coalesce(ext.extname, 'builtins')
+group by c.oid, schema, name, relkind, description, extension_name
 order by n.nspname, c.relname, c.oid;
 ";
+}
 
-const FUNCTIONS_QUERY: &str = r"
+#[derive(Deserialize)]
+struct FunctionQuery {
+    schema: String,
+    name: String,
+    args: String,
+    result: String,
+    language: String,
+    description: String,
+    prokind: String,
+    trans_fn: String,
+    trans_type: String,
+    final_fn: String,
+    combine_fn: String,
+    init_val: String,
+    extension_name: String,
+}
+
+impl Query for FunctionQuery {
+    const QUERY: &'static str = r"
 select
-  n.nspname,
-  p.proname,
+  n.nspname as schema,
+  p.proname as name,
   pg_get_function_arguments(p.oid) as args,
   pg_get_function_result(p.oid) as result,
-  l.lanname,
-  coalesce(d.description, ''),
-  p.prokind,
+  l.lanname as language,
+  coalesce(d.description, '') as description,
+  p.prokind as prokind,
   a.aggtransfn::regproc::text as trans_fn,
   format_type(a.aggtranstype, null) as trans_type,
   a.aggfinalfn::regproc::text as final_fn,
@@ -114,16 +221,73 @@ where n.nspname not like 'pg_temp%'
   and pg_get_function_arguments(p.oid) not like '%ORDER BY%'
 order by n.nspname, p.proname, pg_get_function_arguments(p.oid), pg_get_function_result(p.oid), p.oid;
 ";
+}
 
-const OPERATORS_QUERY: &str = r"
+#[derive(Deserialize)]
+struct CompositeTypeQuery {
+    schema: String,
+    name: String,
+    description: String,
+    extension_name: String,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    columns: Vec<Column>,
+}
+
+impl Query for CompositeTypeQuery {
+    const QUERY: &'static str = r"
 select
-  n.nspname,
-  o.oprname,
+  n.nspname as schema,
+  t.typname as name,
+  coalesce(d.description, '') as description,
+  coalesce(ext.extname, 'builtins') as extension_name,
+  json_agg(
+    json_build_object(
+      'name', a.attname,
+      'data_type', format_type(a.atttypid, a.atttypmod)
+    )
+    order by a.attnum
+  ) as columns
+from pg_type t
+  join pg_namespace n on n.oid = t.typnamespace
+  join pg_class c on c.oid = t.typrelid
+  join pg_attribute a on a.attrelid = c.oid
+  left join pg_description d on d.objoid = t.oid and d.classoid = 'pg_type'::regclass
+  left join pg_depend dep on dep.classid = 'pg_type'::regclass and dep.objid = t.oid and dep.objsubid = 0 and dep.deptype = 'e'
+  left join pg_extension ext on ext.oid = dep.refobjid
+where n.nspname not like 'pg_temp%'
+  and n.nspname not like 'pg_toast%'
+  and (n.nspname != 'public' or ext.extname is not null)
+  and t.typtype = 'c'
+  and c.relkind = 'c'
+  and a.attnum > 0
+  and not a.attisdropped
+group by t.oid, n.nspname, t.typname, d.description, ext.extname
+order by n.nspname, t.typname, t.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct OperatorQuery {
+    schema: String,
+    name: String,
+    left_type: String,
+    right_type: String,
+    func_schema: String,
+    func_name: String,
+    description: String,
+    extension_name: String,
+}
+
+impl Query for OperatorQuery {
+    const QUERY: &'static str = r"
+select
+  n.nspname as schema,
+  o.oprname as name,
   format_type(o.oprleft, null) as left_type,
   format_type(o.oprright, null) as right_type,
   pn.nspname as func_schema,
   p.proname as func_name,
-  coalesce(d.description, ''),
+  coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_operator o
   join pg_namespace n on n.oid = o.oprnamespace
@@ -137,33 +301,51 @@ where n.nspname not like 'pg_temp%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, o.oprname, format_type(o.oprleft, null), format_type(o.oprright, null), pn.nspname, p.proname, o.oid;
 ";
+}
 
-const PG_VERSION_QUERY: &str = "show server_version;";
+#[derive(Deserialize)]
+struct VersionQuery {
+    server_version: String,
+}
 
-const CREATE_EXTENSIONS_QUERY: &str = r"
+impl Query for VersionQuery {
+    const QUERY: &'static str = "show server_version;";
+}
+
+struct CreateExtensionsQuery;
+
+impl Query for CreateExtensionsQuery {
+    const QUERY: &'static str = r"
 do $$
 declare
   extension_name text;
 begin
   foreach extension_name in array array[
     'bloom',
+    'btree_gin',
+    'btree_gist',
     'citext',
     'cube',
+    'h3',
+    'hll',
     'hstore',
     'isn',
     'ltree',
     'pg_stat_statements',
     'pg_trgm',
+    'pg_walinspect',
     'pgcrypto',
     'plpgsql',
     'postgis',
     'postgres_fdw',
+    'tablefunc',
     'vector'
   ] loop
     execute format('create extension if not exists %I', extension_name);
   end loop;
 end $$;
 ";
+}
 
 fn write_description<W: Write>(f: &mut W, description: &str) -> io::Result<()> {
     if !description.is_empty() {
@@ -233,6 +415,31 @@ impl WriteSql for RangeTypeDef {
             "create type {}.{} as range (subtype = {});",
             self.schema, self.name, self.subtype
         )?;
+        writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct CompositeTypeDef {
+    schema: String,
+    name: String,
+    description: String,
+    columns: Vec<Column>,
+}
+
+impl WriteSql for CompositeTypeDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write_description(f, &self.description)?;
+        writeln!(f, "create type {}.{} as (", self.schema, self.name)?;
+        for (index, column) in self.columns.iter().enumerate() {
+            let comma = if index + 1 < self.columns.len() {
+                ","
+            } else {
+                ""
+            };
+            writeln!(f, "  {} {}{comma}", column.name, column.data_type)?;
+        }
+        writeln!(f, ");")?;
         writeln!(f)?;
         Ok(())
     }
@@ -427,6 +634,7 @@ struct Module {
     schemas: Vec<SchemaDef>,
     types: Vec<TypeDef>,
     range_types: Vec<RangeTypeDef>,
+    composite_types: Vec<CompositeTypeDef>,
     tables: Vec<TableDef>,
     views: Vec<ViewDef>,
     functions: Vec<FunctionDef>,
@@ -447,6 +655,10 @@ impl Module {
             range_type.write_sql(f)?;
         }
 
+        for composite_type in &self.composite_types {
+            composite_type.write_sql(f)?;
+        }
+
         for table in &self.tables {
             table.write_sql(f)?;
         }
@@ -465,34 +677,6 @@ impl Module {
 
         Ok(())
     }
-}
-
-fn run_sql(query: &str) -> Result<String> {
-    let output = Command::new("psql")
-        .args([
-            "--tuples-only",
-            "--no-align",
-            "--field-separator",
-            "\t",
-            "--command",
-            query,
-        ])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()
-        .context("Failed to run psql.")?;
-
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr).context("Invalid utf8")?;
-        bail!("psql failed: {}", stderr);
-    }
-
-    String::from_utf8(output.stdout).context("Invalid utf8")
-}
-
-fn create_extensions_if_missing() -> Result<()> {
-    run_sql(CREATE_EXTENSIONS_QUERY)?;
-    Ok(())
 }
 
 fn header(version: &str) -> String {
@@ -523,62 +707,42 @@ fn write_module(
 }
 
 fn query_schemas(modules: &mut BTreeMap<String, Module>) -> Result<()> {
-    for line in run_sql(SCHEMAS_QUERY)?
-        .lines()
-        .filter(|line| !line.is_empty())
-    {
-        let mut parts = line.split('\t');
-        let schema = parts.next().context("expected schema name")?;
-        let description = parts.next().context("expected schema description")?;
-        let extension_name = parts.next().context("expected extension name")?;
-
+    for row in SchemaQuery::run()? {
         modules
-            .entry(extension_name.to_string())
+            .entry(row.extension_name)
             .or_default()
             .schemas
             .push(SchemaDef {
-                description: description.to_string(),
-                schema: schema.to_string(),
+                description: row.description,
+                schema: row.schema,
             });
     }
     Ok(())
 }
 
 fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
-    for line in run_sql(TYPES_QUERY)?
-        .lines()
-        .filter(|line| !line.is_empty())
-    {
-        let mut parts = line.split('\t');
-        let schema = parts.next().context("expected schema name")?;
-        let type_name = parts.next().context("expected type name")?;
-        let type_size = parts.next().context("expected type size")?;
-        let type_align = parts.next().context("expected type alignment")?;
-        let subtype = parts.next().context("expected subtype")?;
-        let is_range = parts.next().context("expected is_range")?;
-        let description = parts.next().context("expected type description")?;
-        let extension_name = parts.next().context("expected extension name")?;
-        if type_align.is_empty() {
-            bail!("unexpected type alignment for {schema}.{type_name}");
+    for row in TypeQuery::run()? {
+        if row.align.is_empty() {
+            bail!("unexpected type alignment for {}.{}", row.schema, row.name);
         }
 
-        let module = modules.entry(extension_name.to_string()).or_default();
-        if is_range == "1" {
+        let module = modules.entry(row.extension_name).or_default();
+        if row.is_range == 1 {
             module.range_types.push(RangeTypeDef {
-                align: type_align.to_string(),
-                description: description.to_string(),
-                name: type_name.to_string(),
-                schema: schema.to_string(),
-                size: type_size.to_string(),
-                subtype: subtype.to_string(),
+                align: row.align,
+                description: row.description,
+                name: row.name,
+                schema: row.schema,
+                size: row.size,
+                subtype: row.subtype,
             });
         } else {
             module.types.push(TypeDef {
-                align: type_align.to_string(),
-                description: description.to_string(),
-                name: type_name.to_string(),
-                schema: schema.to_string(),
-                size: type_size.to_string(),
+                align: row.align,
+                description: row.description,
+                name: row.name,
+                schema: row.schema,
+                size: row.size,
             });
         }
     }
@@ -586,37 +750,40 @@ fn query_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
     Ok(())
 }
 
+fn query_composite_types(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    for row in CompositeTypeQuery::run()? {
+        modules
+            .entry(row.extension_name)
+            .or_default()
+            .composite_types
+            .push(CompositeTypeDef {
+                columns: row.columns,
+                description: row.description,
+                name: row.name,
+                schema: row.schema,
+            });
+    }
+
+    Ok(())
+}
+
 fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
-    for line in run_sql(TABLES_QUERY)?
-        .lines()
-        .filter(|line| !line.is_empty())
-    {
-        let mut parts = line.split('\t');
-        let schema = parts.next().context("expected schema name")?;
-        let rel_name = parts.next().context("expected relation name")?;
-        let relkind = parts.next().context("expected relkind")?;
-        let description = parts.next().context("expected description")?;
-        let extension_name = parts.next().context("expected extension name")?;
-        let columns = parts.next().context("expected columns")?;
-
-        let columns: Vec<Column> =
-            serde_json::from_str(columns).context("expected valid column json")?;
-
-        let module = modules.entry(extension_name.to_string()).or_default();
-        match relkind {
+    for row in RelationQuery::run()? {
+        let module = modules.entry(row.extension_name).or_default();
+        match row.relkind.as_str() {
             "r" => module.tables.push(TableDef {
-                columns,
-                description: description.to_string(),
-                name: rel_name.to_string(),
-                schema: schema.to_string(),
+                columns: row.columns,
+                description: row.description,
+                name: row.name,
+                schema: row.schema,
             }),
             "v" => module.views.push(ViewDef {
-                columns,
-                description: description.to_string(),
-                name: rel_name.to_string(),
-                schema: schema.to_string(),
+                columns: row.columns,
+                description: row.description,
+                name: row.name,
+                schema: row.schema,
             }),
-            _ => bail!("unexpected relation kind: {relkind}"),
+            _ => bail!("unexpected relation kind: {}", row.relkind),
         }
     }
 
@@ -624,50 +791,32 @@ fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 }
 
 fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
-    for line in run_sql(FUNCTIONS_QUERY)?
-        .lines()
-        .filter(|line| !line.is_empty())
-    {
-        let mut parts = line.split('\t');
-        let schema = parts.next().context("expected schema name")?;
-        let func_name = parts.next().context("expected function name")?;
-        let args = parts.next().context("expected function arguments")?;
-        let result = parts.next().context("expected function result")?;
-        let language = parts.next().context("expected function language")?;
-        let description = parts.next().context("expected function description")?;
-        let prokind = parts.next().context("expected function kind")?;
-        let trans_fn = parts.next().context("expected aggregate trans fn")?;
-        let trans_type = parts.next().context("expected aggregate trans type")?;
-        let final_fn = parts.next().context("expected aggregate final fn")?;
-        let combine_fn = parts.next().context("expected aggregate combine fn")?;
-        let init_val = parts.next().context("expected aggregate init value")?;
-        let extension_name = parts.next().context("expected extension name")?;
-
-        let function = if prokind == "a" {
+    for row in FunctionQuery::run()? {
+        let function = if row.prokind == "a" {
             FunctionDef::Aggregate(AggregateDef {
-                args: args.to_string(),
-                combine_fn: combine_fn.to_string(),
-                description: description.to_string(),
-                final_fn: final_fn.to_string(),
-                init_val: init_val.to_string(),
-                name: func_name.to_string(),
-                schema: schema.to_string(),
-                trans_fn: trans_fn.to_string(),
-                trans_type: trans_type.to_string(),
+                args: row.args,
+                combine_fn: row.combine_fn,
+                description: row.description,
+                final_fn: row.final_fn,
+                init_val: row.init_val,
+                name: row.name,
+                schema: row.schema,
+                trans_fn: row.trans_fn,
+                trans_type: row.trans_type,
             })
         } else {
             FunctionDef::Regular(RegularFunctionDef {
-                args: args.to_string(),
-                description: description.to_string(),
-                language: language.to_string(),
-                name: func_name.to_string(),
-                result: result.to_string(),
-                schema: schema.to_string(),
+                args: row.args,
+                description: row.description,
+                language: row.language,
+                name: row.name,
+                result: row.result,
+                schema: row.schema,
             })
         };
 
         modules
-            .entry(extension_name.to_string())
+            .entry(row.extension_name)
             .or_default()
             .functions
             .push(function);
@@ -677,32 +826,19 @@ fn query_functions(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 }
 
 fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
-    for line in run_sql(OPERATORS_QUERY)?
-        .lines()
-        .filter(|line| !line.is_empty())
-    {
-        let mut parts = line.split('\t');
-        let schema = parts.next().context("expected schema name")?;
-        let op_name = parts.next().context("expected operator name")?;
-        let left_type = parts.next().context("expected left type")?;
-        let right_type = parts.next().context("expected right type")?;
-        let func_schema = parts.next().context("expected function schema")?;
-        let func_name = parts.next().context("expected function name")?;
-        let description = parts.next().context("expected operator description")?;
-        let extension_name = parts.next().context("expected extension name")?;
-
+    for row in OperatorQuery::run()? {
         modules
-            .entry(extension_name.to_string())
+            .entry(row.extension_name)
             .or_default()
             .operators
             .push(OperatorDef {
-                description: description.to_string(),
-                function_name: func_name.to_string(),
-                function_schema: func_schema.to_string(),
-                left_type: left_type.to_string(),
-                name: op_name.to_string(),
-                right_type: right_type.to_string(),
-                schema: schema.to_string(),
+                description: row.description,
+                function_name: row.func_name,
+                function_schema: row.func_schema,
+                left_type: row.left_type,
+                name: row.name,
+                right_type: row.right_type,
+                schema: row.schema,
             });
     }
 
@@ -710,10 +846,12 @@ fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
 }
 
 pub(crate) fn sync_builtins() -> Result<()> {
-    create_extensions_if_missing()?;
+    CreateExtensionsQuery::execute()?;
 
-    let version = run_sql(PG_VERSION_QUERY)?;
-    let version = version
+    let version_rows = VersionQuery::run()?;
+    let version_row = version_rows.first().context("version not found")?;
+    let version = version_row
+        .server_version
         .split_whitespace()
         .next()
         .context("version not found")?;
@@ -722,6 +860,7 @@ pub(crate) fn sync_builtins() -> Result<()> {
 
     query_schemas(&mut modules)?;
     query_types(&mut modules)?;
+    query_composite_types(&mut modules)?;
     query_relations(&mut modules)?;
     query_functions(&mut modules)?;
     query_operators(&mut modules)?;

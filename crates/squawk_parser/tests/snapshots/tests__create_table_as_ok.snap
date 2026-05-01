@@ -8,7 +8,8 @@ SOURCE_FILE
   CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
-    TEMP_KW "temp"
+    TEMP
+      TEMP_KW "temp"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
@@ -110,9 +111,10 @@ SOURCE_FILE
   CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
-    LOCAL_KW "local"
-    WHITESPACE " "
-    TEMPORARY_KW "temporary"
+    TEMP
+      LOCAL_KW "local"
+      WHITESPACE " "
+      TEMPORARY_KW "temporary"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " \n  "
@@ -201,9 +203,10 @@ SOURCE_FILE
   CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
-    GLOBAL_KW "global"
-    WHITESPACE " "
-    TEMP_KW "temp"
+    TEMP
+      GLOBAL_KW "global"
+      WHITESPACE " "
+      TEMP_KW "temp"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " \n  "
@@ -277,7 +280,8 @@ SOURCE_FILE
   CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
-    UNLOGGED_KW "unlogged"
+    UNLOGGED
+      UNLOGGED_KW "unlogged"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
@@ -303,7 +307,8 @@ SOURCE_FILE
   CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
-    TEMPORARY_KW "temporary"
+    TEMP
+      TEMPORARY_KW "temporary"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
@@ -328,7 +333,8 @@ SOURCE_FILE
   CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
-    TEMPORARY_KW "temporary"
+    TEMP
+      TEMPORARY_KW "temporary"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "

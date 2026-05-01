@@ -272,7 +272,7 @@ select 'null' is not null;
 select 1 isnull;
 
 -- notnull (non-standard syntax)
-select 'foo' isnull;
+select 'foo' notnull;
 
 -- is true
 select true is true;

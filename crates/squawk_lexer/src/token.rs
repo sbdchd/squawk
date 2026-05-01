@@ -69,6 +69,10 @@ pub enum TokenKind {
     CloseBracket,
     /// `[`
     OpenBracket,
+    /// `}`
+    CloseCurly,
+    /// `{`
+    OpenCurly,
     /// `)`
     CloseParen,
     /// `(`

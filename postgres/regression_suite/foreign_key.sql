@@ -243,6 +243,70 @@ DROP TABLE FKTABLE;
 DROP TABLE PKTABLE;
 
 --
+-- Check RLS
+--
+CREATE TABLE PKTABLE ( ptest1 int PRIMARY KEY, ptest2 text );
+CREATE TABLE FKTABLE ( ftest1 int REFERENCES PKTABLE, ftest2 int );
+
+-- Insert test data into PKTABLE
+INSERT INTO PKTABLE VALUES (1, 'Test1');
+INSERT INTO PKTABLE VALUES (2, 'Test2');
+INSERT INTO PKTABLE VALUES (3, 'Test3');
+
+-- Grant privileges on PKTABLE/FKTABLE to user regress_foreign_key_user
+CREATE USER regress_foreign_key_user NOLOGIN;
+GRANT SELECT ON PKTABLE TO regress_foreign_key_user;
+GRANT SELECT, INSERT ON FKTABLE TO regress_foreign_key_user;
+
+-- Enable RLS on PKTABLE and Create policies
+ALTER TABLE PKTABLE ENABLE ROW LEVEL SECURITY;
+CREATE POLICY pktable_view_odd_policy ON PKTABLE TO regress_foreign_key_user USING (ptest1 % 2 = 1);
+
+ALTER TABLE PKTABLE OWNER to regress_foreign_key_user;
+
+SET ROLE regress_foreign_key_user;
+
+INSERT INTO FKTABLE VALUES (3, 5);
+INSERT INTO FKTABLE VALUES (2, 5); -- success, REFERENCES are not subject to row security
+
+RESET ROLE;
+
+DROP TABLE FKTABLE;
+DROP TABLE PKTABLE;
+DROP USER regress_foreign_key_user;
+
+--
+-- Check ACL
+--
+CREATE TABLE PKTABLE ( ptest1 int PRIMARY KEY, ptest2 text );
+CREATE TABLE FKTABLE ( ftest1 int REFERENCES PKTABLE, ftest2 int );
+
+-- Insert test data into PKTABLE
+INSERT INTO PKTABLE VALUES (1, 'Test1');
+INSERT INTO PKTABLE VALUES (2, 'Test2');
+INSERT INTO PKTABLE VALUES (3, 'Test3');
+
+-- Grant usage on PKTABLE to user regress_foreign_key_user
+CREATE USER regress_foreign_key_user NOLOGIN;
+GRANT SELECT ON PKTABLE TO regress_foreign_key_user;
+
+ALTER TABLE PKTABLE OWNER to regress_foreign_key_user;
+
+-- Inserting into FKTABLE should work
+INSERT INTO FKTABLE VALUES (3, 5);
+
+-- Revoke usage on PKTABLE from user regress_foreign_key_user
+REVOKE SELECT ON PKTABLE FROM regress_foreign_key_user;
+
+-- Inserting into FKTABLE should fail
+INSERT INTO FKTABLE VALUES (2, 6);
+
+DROP TABLE FKTABLE;
+DROP TABLE PKTABLE;
+
+DROP USER regress_foreign_key_user;
+
+--
 -- Check initial check upon ALTER TABLE
 --
 CREATE TABLE PKTABLE ( ptest1 int, ptest2 int, PRIMARY KEY(ptest1, ptest2) );
@@ -782,6 +846,43 @@ SET CONSTRAINTS ALL IMMEDIATE;
 -- should fail
 INSERT INTO fktable VALUES (500, 1000);
 
+COMMIT;
+
+-- Check that the existing FK trigger is both deferrable and initially deferred
+SELECT conname, tgrelid::regclass as tgrel,
+       regexp_replace(tgname, '[0-9]+', 'N') as tgname, tgtype,
+       tgdeferrable, tginitdeferred
+FROM pg_trigger t JOIN pg_constraint c ON (t.tgconstraint = c.oid)
+WHERE conrelid = 'fktable'::regclass AND conname = 'fktable_fk_fkey'
+ORDER BY tgrelid, tgtype;
+
+-- Changing the constraint to NOT ENFORCED drops the associated FK triggers
+ALTER TABLE FKTABLE ALTER CONSTRAINT fktable_fk_fkey NOT ENFORCED;
+SELECT conname, tgrelid::regclass as tgrel,
+       regexp_replace(tgname, '[0-9]+', 'N') as tgname, tgtype,
+       tgdeferrable, tginitdeferred
+FROM pg_trigger t JOIN pg_constraint c ON (t.tgconstraint = c.oid)
+WHERE conrelid = 'fktable'::regclass AND conname = 'fktable_fk_fkey'
+ORDER BY tgrelid, tgtype;
+
+-- Changing it back to ENFORCED will recreate the necessary FK triggers
+-- that are deferrable and initially deferred
+ALTER TABLE FKTABLE ALTER CONSTRAINT fktable_fk_fkey ENFORCED;
+SELECT conname, tgrelid::regclass as tgrel,
+       regexp_replace(tgname, '[0-9]+', 'N') as tgname, tgtype,
+       tgdeferrable, tginitdeferred
+FROM pg_trigger t JOIN pg_constraint c ON (t.tgconstraint = c.oid)
+WHERE conrelid = 'fktable'::regclass AND conname = 'fktable_fk_fkey'
+ORDER BY tgrelid, tgtype;
+
+-- Verify that a deferrable, initially deferred foreign key still works
+-- as expected after being set to NOT ENFORCED and then re-enabled
+BEGIN;
+
+-- doesn't match PK, but no error yet
+INSERT INTO fktable VALUES (2, 20);
+
+-- should catch error from INSERT at commit
 COMMIT;
 
 DROP TABLE fktable, pktable;
@@ -2434,3 +2535,148 @@ WITH cte AS (
 
 DROP SCHEMA fkpart13 CASCADE;
 RESET search_path;
+
+-- Tests foreign key check fast-path no-cache path.
+CREATE TABLE fp_pk_alter (a int PRIMARY KEY);
+INSERT INTO fp_pk_alter SELECT generate_series(1, 100);
+CREATE TABLE fp_fk_alter (a int);
+INSERT INTO fp_fk_alter SELECT generate_series(1, 100);
+-- Validation path: should succeed
+ALTER TABLE fp_fk_alter ADD FOREIGN KEY (a) REFERENCES fp_pk_alter;
+INSERT INTO fp_fk_alter VALUES (101);  -- should fail (constraint active)
+DROP TABLE fp_fk_alter, fp_pk_alter;
+
+-- Separate test: validation catches existing violation
+CREATE TABLE fp_pk_alter2 (a int PRIMARY KEY);
+INSERT INTO fp_pk_alter2 VALUES (1);
+CREATE TABLE fp_fk_alter2 (a int);
+INSERT INTO fp_fk_alter2 VALUES (1), (200);  -- 200 has no PK match
+ALTER TABLE fp_fk_alter2 ADD FOREIGN KEY (a) REFERENCES fp_pk_alter2;  -- should fail
+DROP TABLE fp_fk_alter2, fp_pk_alter2;
+
+-- Tests that the fast-path handles caching for multiple constraints
+CREATE TABLE fp_pk1 (a int PRIMARY KEY);
+CREATE TABLE fp_pk2 (b int PRIMARY KEY);
+INSERT INTO fp_pk1 VALUES (1);
+INSERT INTO fp_pk2 VALUES (1);
+CREATE TABLE fp_multi_fk (
+    a int REFERENCES fp_pk1,
+    b int REFERENCES fp_pk2
+);
+INSERT INTO fp_multi_fk VALUES (1, 1);  -- two constraints, one batch
+INSERT INTO fp_multi_fk VALUES (1, 2);  -- second constraint fails
+DROP TABLE fp_multi_fk, fp_pk1, fp_pk2;
+
+-- Test that fast-path cache handles deferred constraints and SET CONSTRAINTS IMMEDIATE
+CREATE TABLE fp_pk_defer (a int PRIMARY KEY);
+CREATE TABLE fp_fk_defer (a int REFERENCES fp_pk_defer DEFERRABLE INITIALLY DEFERRED);
+INSERT INTO fp_pk_defer VALUES (1), (2);
+
+BEGIN;
+INSERT INTO fp_fk_defer VALUES (1);
+INSERT INTO fp_fk_defer VALUES (2);
+SET CONSTRAINTS ALL IMMEDIATE;  -- fires batch callback here
+INSERT INTO fp_fk_defer VALUES (3);  -- should fail, also tests that cache was cleaned up
+COMMIT;
+DROP TABLE fp_pk_defer, fp_fk_defer;
+
+-- Subtransaction abort: cached state must be invalidated on ROLLBACK TO
+CREATE TABLE fp_pk_subxact (a int PRIMARY KEY);
+CREATE TABLE fp_fk_subxact (a int REFERENCES fp_pk_subxact);
+INSERT INTO fp_pk_subxact VALUES (1), (2);
+BEGIN;
+INSERT INTO fp_fk_subxact VALUES (1);
+SAVEPOINT sp1;
+INSERT INTO fp_fk_subxact VALUES (2);
+ROLLBACK TO sp1;
+INSERT INTO fp_fk_subxact VALUES (1);
+COMMIT;
+SELECT * FROM fp_fk_subxact;
+DROP TABLE fp_fk_subxact, fp_pk_subxact;
+
+-- FK check must see PK rows inserted by earlier AFTER triggers
+-- firing on the same statement
+CREATE TABLE fp_pk_cci (a int PRIMARY KEY);
+CREATE TABLE fp_fk_cci (a int REFERENCES fp_pk_cci);
+
+CREATE FUNCTION fp_auto_pk() RETURNS trigger AS $$
+BEGIN
+  RAISE NOTICE 'fp_auto_pk called';
+  INSERT INTO fp_pk_cci VALUES (NEW.a);
+  RETURN NEW;
+END $$ LANGUAGE plpgsql;
+
+-- Name sorts before the RI trigger, so fires first per row
+CREATE TRIGGER "AAA_auto" AFTER INSERT ON fp_fk_cci
+  FOR EACH ROW EXECUTE FUNCTION fp_auto_pk();
+
+-- Should succeed: AAA_auto provisions the PK row before RI check
+INSERT INTO fp_fk_cci VALUES (1), (2), (3);
+
+DROP TABLE fp_fk_cci, fp_pk_cci;
+DROP FUNCTION fp_auto_pk;
+
+-- Multi-column FK: exercises batched per-row probing with composite keys
+CREATE TABLE fp_pk_multi (a int, b int, PRIMARY KEY (a, b));
+INSERT INTO fp_pk_multi SELECT i, i FROM generate_series(1, 100) i;
+CREATE TABLE fp_fk_multi (x int, a int, b int,
+    FOREIGN KEY (a, b) REFERENCES fp_pk_multi);
+INSERT INTO fp_fk_multi SELECT i, i, i FROM generate_series(1, 100) i;
+INSERT INTO fp_fk_multi VALUES (1, 999, 999);
+DROP TABLE fp_fk_multi, fp_pk_multi;
+
+-- Multi-column FK with columns in different order than PK index.
+-- The FK references columns in a different order than they appear in the
+-- PK's primary key, which requires mapping constraint key positions to
+-- index column positions when building scan keys.
+CREATE TABLE fp_pk_order (a int, b text, c int, PRIMARY KEY (a, b, c));
+INSERT INTO fp_pk_order VALUES (1, 'one', 10), (2, 'two', 20);
+CREATE TABLE fp_fk_order (
+    x int,
+    c int,
+    b text,
+    a int,
+    FOREIGN KEY (a, c, b) REFERENCES fp_pk_order (a, c, b)  -- c and b swapped
+);
+INSERT INTO fp_fk_order VALUES (1, 10, 'one', 1);  -- should succeed
+INSERT INTO fp_fk_order VALUES (2, 20, 'two', 2);  -- should succeed
+INSERT INTO fp_fk_order VALUES (3, 99, 'none', 9);  -- should fail
+DROP TABLE fp_fk_order, fp_pk_order;
+
+-- Same-type columns in different order:
+CREATE TABLE fp_pk_same (c1 int, c2 int, PRIMARY KEY (c1, c2));
+INSERT INTO fp_pk_same VALUES (1, 2);
+CREATE TABLE fp_fk_same (c1 int, c2 int,
+    FOREIGN KEY (c2, c1) REFERENCES fp_pk_same (c2, c1));
+INSERT INTO fp_fk_same VALUES (1, 2);  -- should succeed
+INSERT INTO fp_fk_same VALUES (9, 9);  -- should fail
+DROP TABLE fp_fk_same, fp_pk_same;
+
+-- Deferred constraint: batch flushed at COMMIT, not at statement end
+CREATE TABLE fp_pk_commit (a int PRIMARY KEY);
+CREATE TABLE fp_fk_commit (a int REFERENCES fp_pk_commit
+    DEFERRABLE INITIALLY DEFERRED);
+INSERT INTO fp_pk_commit VALUES (1);
+BEGIN;
+INSERT INTO fp_fk_commit VALUES (1);
+INSERT INTO fp_fk_commit VALUES (1);
+INSERT INTO fp_fk_commit VALUES (999);
+COMMIT;
+DROP TABLE fp_fk_commit, fp_pk_commit;
+
+-- Cross-type FK with bulk insert: int8 FK referencing int4 PK,
+-- values cast during array construction
+CREATE TABLE fp_pk_cross (a int4 PRIMARY KEY);
+INSERT INTO fp_pk_cross SELECT generate_series(1, 200);
+CREATE TABLE fp_fk_cross (a int8 REFERENCES fp_pk_cross);
+INSERT INTO fp_fk_cross SELECT generate_series(1, 200);
+INSERT INTO fp_fk_cross VALUES (999);
+DROP TABLE fp_fk_cross, fp_pk_cross;
+
+-- Duplicate FK values: when using the batched SAOP path, every
+-- row must be recognized as satisfied, not just the first match
+CREATE TABLE fp_pk_dup (a int PRIMARY KEY);
+INSERT INTO fp_pk_dup VALUES (1);
+CREATE TABLE fp_fk_dup (a int REFERENCES fp_pk_dup);
+INSERT INTO fp_fk_dup SELECT 1 FROM generate_series(1, 100);
+DROP TABLE fp_fk_dup, fp_pk_dup;

@@ -28,6 +28,11 @@ export type LintError = {
   fix?: Fix
 }
 
+export interface HoverResult {
+  snippet: string
+  comment: string | null
+}
+
 let db: SquawkDatabase | null = null
 
 // We pass in content and version here so that we:
@@ -75,7 +80,7 @@ export function hover(
   version: number,
   line: number,
   column: number,
-): string | null {
+): HoverResult | null {
   return getDb(content, version).hover(line, column)
 }
 
@@ -105,6 +110,13 @@ export function selection_ranges(
   return getDb(content, version).selection_ranges(positions)
 }
 
+export function folding_ranges(
+  content: string,
+  version: number,
+): FoldingRange[] {
+  return getDb(content, version).folding_ranges()
+}
+
 export function completion(
   content: string,
   version: number,
@@ -112,6 +124,19 @@ export function completion(
   column: number,
 ): CompletionItem[] {
   return getDb(content, version).completion(line, column)
+}
+
+export interface SemanticTokensLegend {
+  tokenTypes: string[]
+  tokenModifiers: string[]
+}
+
+export function semantic_tokens(content: string, version: number): Uint32Array {
+  return getDb(content, version).semantic_tokens()
+}
+
+export function semantic_tokens_legend(): SemanticTokensLegend {
+  return SquawkDatabase.semantic_tokens_legend()
 }
 
 export function dump_cst(content: string, version: number): string {
@@ -203,6 +228,12 @@ interface InlayHint {
   line: number
   column: number
   label: string
+  kind: string
+}
+
+export interface FoldingRange {
+  start_line: number
+  end_line: number
   kind: string
 }
 

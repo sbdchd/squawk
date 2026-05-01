@@ -76,3 +76,5 @@ select operator(-) 4;
 
 select operator(a.b.-) 4;
 
+
+set catalog 'foo';

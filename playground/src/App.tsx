@@ -19,9 +19,12 @@ import {
   provideDefinition,
   provideReferences,
   provideDocumentSymbols,
+  provideFoldingRanges,
   provideSelectionRanges,
   provideCompletionItems,
+  semanticTokensProvider,
 } from "./providers"
+import { language as pgsqlMonarchLanguage } from "./pgsql"
 import BUILTINS_SQL from "./builtins.sql?raw"
 
 const modes = ["Lint", "Syntax Tree", "Tokens"] as const
@@ -47,12 +50,12 @@ const SETTINGS = {
   value: DEFAULT_CONTENT,
   language: "pgsql",
   tabSize: 2,
-  theme: "vs-dark",
+  theme: "squawk-dark",
   minimap: { enabled: false },
   automaticLayout: true,
   scrollBeyondLastLine: false,
-  folding: false,
-  showFoldingControls: "never",
+  folding: true,
+  showFoldingControls: "mouseover",
   occurrencesHighlight: "off",
   stickyScroll: { enabled: false },
   fontSize: 16,
@@ -63,6 +66,7 @@ const SETTINGS = {
   renderWhitespace: "boundary",
   guides: { indentation: false },
   lineNumbersMinChars: 3,
+  "semanticHighlighting.enabled": true,
 } satisfies monaco.editor.IStandaloneEditorConstructionOptions
 
 function clx(...args: (string | undefined | number | false)[]): string {
@@ -279,6 +283,77 @@ function assertNever(x: never): never {
   throw new Error(`expected never, got ${x}`)
 }
 
+const pgsqlConfig: monaco.languages.LanguageConfiguration = {
+  comments: {
+    lineComment: "--",
+    blockComment: ["/*", "*/"],
+  },
+  brackets: [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+  ],
+  autoClosingPairs: [
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "(", close: ")" },
+    { open: '"', close: '"', notIn: ["string"] },
+    { open: "$$", close: "$$", notIn: ["string", "comment"] },
+    { open: "E'", close: "'", notIn: ["string", "comment"] },
+    { open: "e'", close: "'", notIn: ["string", "comment"] },
+    { open: "U&'", close: "'", notIn: ["string", "comment"] },
+    { open: "u&'", close: "'", notIn: ["string", "comment"] },
+    { open: "B'", close: "'", notIn: ["string", "comment"] },
+    { open: "b'", close: "'", notIn: ["string", "comment"] },
+    { open: "X'", close: "'", notIn: ["string", "comment"] },
+    { open: "x'", close: "'", notIn: ["string", "comment"] },
+    { open: "N'", close: "'", notIn: ["string", "comment"] },
+    { open: "'", close: "'", notIn: ["string", "comment"] },
+    { open: "/*", close: " */", notIn: ["string", "comment"] },
+  ],
+  surroundingPairs: [
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "(", close: ")" },
+    { open: '"', close: '"' },
+    { open: "'", close: "'" },
+    { open: "`", close: "`" },
+    { open: "$$", close: "$$" },
+  ],
+  onEnterRules: [
+    {
+      beforeText: /^\s*--.*$/,
+      afterText: /\S/,
+      action: {
+        indentAction: monaco.languages.IndentAction.None,
+        appendText: "-- ",
+      },
+    },
+    {
+      beforeText: /^\s*\/\*/,
+      afterText: /^\s*\*\/$/,
+      action: {
+        indentAction: monaco.languages.IndentAction.IndentOutdent,
+        appendText: " * ",
+      },
+    },
+    {
+      beforeText: /^\s*\/\*(?!.*\*\/).*$/,
+      action: {
+        indentAction: monaco.languages.IndentAction.None,
+        appendText: " * ",
+      },
+    },
+    {
+      beforeText: /^\s*\*(?!\/).*$/,
+      action: {
+        indentAction: monaco.languages.IndentAction.None,
+        appendText: "* ",
+      },
+    },
+  ],
+}
+
 let monacoGlobalProvidersRegistered = false
 // Only want to register these once, otherwise we'll end up with multiple
 // providers running and get dupe results for things like hover
@@ -287,76 +362,24 @@ function registerMonacoProvidersOnce() {
     return
   }
   monacoGlobalProvidersRegistered = true
-  const languageConfig = monaco.languages.setLanguageConfiguration("pgsql", {
-    comments: {
-      lineComment: "--",
-      blockComment: ["/*", "*/"],
-    },
-    brackets: [
-      ["{", "}"],
-      ["[", "]"],
-      ["(", ")"],
-    ],
-    autoClosingPairs: [
-      { open: "{", close: "}" },
-      { open: "[", close: "]" },
-      { open: "(", close: ")" },
-      { open: '"', close: '"', notIn: ["string"] },
-      { open: "$$", close: "$$", notIn: ["string", "comment"] },
-      { open: "E'", close: "'", notIn: ["string", "comment"] },
-      { open: "e'", close: "'", notIn: ["string", "comment"] },
-      { open: "U&'", close: "'", notIn: ["string", "comment"] },
-      { open: "u&'", close: "'", notIn: ["string", "comment"] },
-      { open: "B'", close: "'", notIn: ["string", "comment"] },
-      { open: "b'", close: "'", notIn: ["string", "comment"] },
-      { open: "X'", close: "'", notIn: ["string", "comment"] },
-      { open: "x'", close: "'", notIn: ["string", "comment"] },
-      { open: "N'", close: "'", notIn: ["string", "comment"] },
-      { open: "'", close: "'", notIn: ["string", "comment"] },
-      { open: "/*", close: " */", notIn: ["string", "comment"] },
-    ],
-    surroundingPairs: [
-      { open: "{", close: "}" },
-      { open: "[", close: "]" },
-      { open: "(", close: ")" },
-      { open: '"', close: '"' },
-      { open: "'", close: "'" },
-      { open: "`", close: "`" },
-      { open: "$$", close: "$$" },
-    ],
-    onEnterRules: [
-      {
-        beforeText: /^\s*--.*$/,
-        afterText: /\S/,
-        action: {
-          indentAction: monaco.languages.IndentAction.None,
-          appendText: "-- ",
-        },
-      },
-      {
-        beforeText: /^\s*\/\*/,
-        afterText: /^\s*\*\/$/,
-        action: {
-          indentAction: monaco.languages.IndentAction.IndentOutdent,
-          appendText: " * ",
-        },
-      },
-      {
-        beforeText: /^\s*\/\*(?!.*\*\/).*$/,
-        action: {
-          indentAction: monaco.languages.IndentAction.None,
-          appendText: " * ",
-        },
-      },
-      {
-        beforeText: /^\s*\*(?!\/).*$/,
-        action: {
-          indentAction: monaco.languages.IndentAction.None,
-          appendText: "* ",
-        },
-      },
-    ],
+  // vs-dark maps variable to a blue color which makes everything look like a
+  // keyword. So we use white instead which was what the `foo` in `select 1 foo`
+  // was before semantic syntax highlighting.
+  monaco.editor.defineTheme("squawk-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [{ token: "variable", foreground: "D4D4D4" }],
+    colors: {},
   })
+  const languageConfig = monaco.languages.setLanguageConfiguration(
+    "pgsql",
+    pgsqlConfig,
+  )
+  const pgsqlTokenProvider = monaco.languages.setMonarchTokensProvider(
+    "pgsql",
+    pgsqlMonarchLanguage,
+  )
+
   monaco.languages.register({ id: "rast" })
   const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
     tokenizer: {
@@ -452,6 +475,13 @@ function registerMonacoProvidersOnce() {
     },
   )
 
+  const foldingRangeProvider = monaco.languages.registerFoldingRangeProvider(
+    "pgsql",
+    {
+      provideFoldingRanges,
+    },
+  )
+
   const selectionRangeProvider =
     monaco.languages.registerSelectionRangeProvider("pgsql", {
       provideSelectionRanges,
@@ -465,16 +495,25 @@ function registerMonacoProvidersOnce() {
     },
   )
 
+  const documentSemanticTokensProvider =
+    monaco.languages.registerDocumentSemanticTokensProvider(
+      "pgsql",
+      semanticTokensProvider,
+    )
+
   return () => {
     languageConfig.dispose()
+    pgsqlTokenProvider.dispose()
     codeActionProvider.dispose()
     hoverProvider.dispose()
     definitionProvider.dispose()
     referencesProvider.dispose()
     documentSymbolProvider.dispose()
+    foldingRangeProvider.dispose()
     inlayHintsProvider.dispose()
     selectionRangeProvider.dispose()
     completionProvider.dispose()
+    documentSemanticTokensProvider.dispose()
     tokenProvider.dispose()
   }
 }

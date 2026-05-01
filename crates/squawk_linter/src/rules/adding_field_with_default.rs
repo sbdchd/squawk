@@ -1,5 +1,6 @@
-use lazy_static::lazy_static;
-use std::collections::HashSet;
+use std::sync::OnceLock;
+
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, SyntaxKind};
@@ -7,15 +8,16 @@ use squawk_syntax::{ast, identifier::Identifier};
 
 use crate::{Linter, Rule, Version, Violation};
 
-lazy_static! {
-    static ref NON_VOLATILE_FUNCS: HashSet<Identifier> = {
+fn non_volatile_funcs() -> &'static FxHashSet<Identifier> {
+    static NON_VOLATILE_FUNCS: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
+    NON_VOLATILE_FUNCS.get_or_init(|| {
         NON_VOLATILE_BUILT_IN_FUNCTIONS
             .split('\n')
             .map(|x| x.trim())
             .filter(|x| !x.is_empty())
             .map(Identifier::new)
             .collect()
-    };
+    })
 }
 
 fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
@@ -40,7 +42,7 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
                 };
 
                 let non_volatile_name =
-                    NON_VOLATILE_FUNCS.contains(&Identifier::new(name_ref.text().as_str()));
+                    non_volatile_funcs().contains(&Identifier::new(name_ref.text().as_str()));
 
                 no_args && non_volatile_name
             } else {

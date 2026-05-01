@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 use squawk_syntax::{
     Parse, SourceFile,
@@ -8,19 +8,22 @@ use squawk_syntax::{
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
-use lazy_static::lazy_static;
+use std::sync::OnceLock;
 
 use crate::visitors::{check_not_allowed_types, is_not_valid_int_type};
 
-lazy_static! {
-    static ref SERIAL_TYPES: HashSet<Identifier> = HashSet::from([
-        Identifier::new("serial"),
-        Identifier::new("serial2"),
-        Identifier::new("serial4"),
-        Identifier::new("serial8"),
-        Identifier::new("smallserial"),
-        Identifier::new("bigserial"),
-    ]);
+fn serial_types() -> &'static FxHashSet<Identifier> {
+    static SERIAL_TYPES: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
+    SERIAL_TYPES.get_or_init(|| {
+        FxHashSet::from_iter([
+            Identifier::new("serial"),
+            Identifier::new("serial2"),
+            Identifier::new("serial4"),
+            Identifier::new("serial8"),
+            Identifier::new("smallserial"),
+            Identifier::new("bigserial"),
+        ])
+    })
 }
 
 fn replace_serial(serial_type: &str) -> &'static str {
@@ -41,7 +44,7 @@ fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
 
 fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
-        if is_not_valid_int_type(&ty, &SERIAL_TYPES) {
+        if is_not_valid_int_type(&ty, serial_types()) {
             let fix = create_identity_fix(&ty);
 
             ctx.report(

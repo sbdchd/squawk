@@ -4,27 +4,23 @@ use clap::{Args, Parser, Subcommand};
 use codegen::codegen;
 use new_rule::new_lint;
 use sync_builtins::sync_builtins;
-use sync_kwlist::sync_kwlist;
-use sync_regression_suite::sync_regression_suite;
+use sync_pg::sync_pg;
 
 mod codegen;
 mod keywords;
 mod new_rule;
 mod path;
 mod sync_builtins;
-mod sync_kwlist;
-mod sync_regression_suite;
+mod sync_pg;
 
 #[derive(Subcommand, Debug)]
 enum TaskName {
     #[command(long_about = "Generate code for AST, SyntaxKind, and TokenSets")]
     Codegen,
-    #[command(long_about = "Fetch the latest version of kwlist.h from Postgres")]
-    SyncKwlist,
     #[command(long_about = "Create a new linter rule")]
     NewRule(NewRuleArgs),
-    #[command(long_about = "Fetch the latest regression suite from Postgres")]
-    SyncRegressionSuite,
+    #[command(long_about = "Fetch the latest kwlist.h and regression suite from Postgres")]
+    SyncPg,
     #[command(long_about = "Generate builtins.sql from PostgreSQL pg_type catalog")]
     SyncBuiltins,
 }
@@ -46,8 +42,7 @@ struct Arguments {
 fn main() -> Result<()> {
     let args = Arguments::parse();
     match args.task {
-        TaskName::SyncKwlist => sync_kwlist(),
-        TaskName::SyncRegressionSuite => sync_regression_suite(),
+        TaskName::SyncPg => sync_pg(),
         TaskName::NewRule(args) => new_lint(args),
         TaskName::Codegen => codegen(),
         TaskName::SyncBuiltins => sync_builtins(),
