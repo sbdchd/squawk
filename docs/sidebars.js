@@ -37,6 +37,7 @@ module.exports = {
       "require-enum-value-ordering",
       "require-table-schema",
       "identifier-too-long",
+      "require-concurrent-partition-detach",
       // xtask:new-rule:error-name
     ],
   },

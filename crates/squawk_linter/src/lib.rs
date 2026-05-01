@@ -58,6 +58,7 @@ use rules::require_enum_value_ordering;
 use rules::require_table_schema;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
+use rules::require_concurrent_partition_detach;
 // xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, Sequence)]
@@ -96,6 +97,7 @@ pub enum Rule {
     RequireEnumValueOrdering,
     RequireTableSchema,
     IdentifierTooLong,
+    RequireConcurrentPartitionDetach,
     // xtask:new-rule:error-name
 }
 
@@ -149,6 +151,7 @@ impl TryFrom<&str> for Rule {
             "require-enum-value-ordering" => Ok(Rule::RequireEnumValueOrdering),
             "require-table-schema" => Ok(Rule::RequireTableSchema),
             "identifier-too-long" => Ok(Rule::IdentifierTooLong),
+            "require-concurrent-partition-detach" => Ok(Rule::RequireConcurrentPartitionDetach),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -214,6 +217,7 @@ impl fmt::Display for Rule {
             Rule::RequireEnumValueOrdering => "require-enum-value-ordering",
             Rule::RequireTableSchema => "require-table-schema",
             Rule::IdentifierTooLong => "identifier-too-long",
+            Rule::RequireConcurrentPartitionDetach => "require-concurrent-partition-detach",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -449,6 +453,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::IdentifierTooLong) {
             identifier_too_long(self, file);
+        }
+        if self.rules.contains(&Rule::RequireConcurrentPartitionDetach) {
+            require_concurrent_partition_detach(self, &file);
         }
         // xtask:new-rule:rule-call
 
