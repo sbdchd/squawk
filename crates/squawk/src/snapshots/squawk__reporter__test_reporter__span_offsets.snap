@@ -1,9 +1,9 @@
 ---
 source: crates/squawk/src/reporter.rs
-expression: "check_sql(sql, filename, &[], None, false)"
+expression: "check_sql(sql, filename, &[], &[], None, false)"
 ---
 CheckReport {
-    filename: "main.sql",
+    path: "main.sql",
     sql: "\n\n   ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;\nALTER TABLE \"core_foo\" ADD COLUMN \"bar\" integer NOT NULL;\nSELECT 1;\n",
     violations: [
         ReportViolation {

@@ -88,11 +88,11 @@ pub enum BinOp {
     Caret(SyntaxToken),
     Collate(SyntaxToken),
     ColonColon(ast::ColonColon),
-    ColonEq(ast::ColonEq),
+    ColonEq(SyntaxToken),
     CustomOp(ast::CustomOp),
     Eq(SyntaxToken),
-    FatArrow(ast::FatArrow),
-    Gteq(ast::Gteq),
+    FatArrow(SyntaxToken),
+    Gteq(SyntaxToken),
     Ilike(SyntaxToken),
     In(SyntaxToken),
     Is(SyntaxToken),
@@ -101,10 +101,10 @@ pub enum BinOp {
     IsNotDistinctFrom(ast::IsNotDistinctFrom),
     LAngle(SyntaxToken),
     Like(SyntaxToken),
-    Lteq(ast::Lteq),
+    Lteq(SyntaxToken),
     Minus(SyntaxToken),
-    Neq(ast::Neq),
-    Neqb(ast::Neqb),
+    Neq(SyntaxToken),
+    Neqb(SyntaxToken),
     NotIlike(ast::NotIlike),
     NotIn(ast::NotIn),
     NotLike(ast::NotLike),
@@ -159,13 +159,19 @@ impl ast::BinExpr {
                         SyntaxKind::AND_KW => BinOp::And(token),
                         SyntaxKind::CARET => BinOp::Caret(token),
                         SyntaxKind::COLLATE_KW => BinOp::Collate(token),
+                        SyntaxKind::COLON_EQ => BinOp::ColonEq(token),
                         SyntaxKind::EQ => BinOp::Eq(token),
+                        SyntaxKind::FAT_ARROW => BinOp::FatArrow(token),
+                        SyntaxKind::GTEQ => BinOp::Gteq(token),
                         SyntaxKind::ILIKE_KW => BinOp::Ilike(token),
                         SyntaxKind::IN_KW => BinOp::In(token),
                         SyntaxKind::IS_KW => BinOp::Is(token),
                         SyntaxKind::L_ANGLE => BinOp::LAngle(token),
                         SyntaxKind::LIKE_KW => BinOp::Like(token),
+                        SyntaxKind::LTEQ => BinOp::Lteq(token),
                         SyntaxKind::MINUS => BinOp::Minus(token),
+                        SyntaxKind::NEQ => BinOp::Neq(token),
+                        SyntaxKind::NEQB => BinOp::Neqb(token),
                         SyntaxKind::OR_KW => BinOp::Or(token),
                         SyntaxKind::OVERLAPS_KW => BinOp::Overlaps(token),
                         SyntaxKind::PERCENT => BinOp::Percent(token),
@@ -185,10 +191,7 @@ impl ast::BinExpr {
                         SyntaxKind::COLON_COLON => {
                             BinOp::ColonColon(ast::ColonColon { syntax: node })
                         }
-                        SyntaxKind::COLON_EQ => BinOp::ColonEq(ast::ColonEq { syntax: node }),
                         SyntaxKind::CUSTOM_OP => BinOp::CustomOp(ast::CustomOp { syntax: node }),
-                        SyntaxKind::FAT_ARROW => BinOp::FatArrow(ast::FatArrow { syntax: node }),
-                        SyntaxKind::GTEQ => BinOp::Gteq(ast::Gteq { syntax: node }),
                         SyntaxKind::IS_DISTINCT_FROM => {
                             BinOp::IsDistinctFrom(ast::IsDistinctFrom { syntax: node })
                         }
@@ -196,9 +199,6 @@ impl ast::BinExpr {
                         SyntaxKind::IS_NOT_DISTINCT_FROM => {
                             BinOp::IsNotDistinctFrom(ast::IsNotDistinctFrom { syntax: node })
                         }
-                        SyntaxKind::LTEQ => BinOp::Lteq(ast::Lteq { syntax: node }),
-                        SyntaxKind::NEQ => BinOp::Neq(ast::Neq { syntax: node }),
-                        SyntaxKind::NEQB => BinOp::Neqb(ast::Neqb { syntax: node }),
                         SyntaxKind::NOT_ILIKE => BinOp::NotIlike(ast::NotIlike { syntax: node }),
                         SyntaxKind::NOT_IN => BinOp::NotIn(ast::NotIn { syntax: node }),
                         SyntaxKind::NOT_LIKE => BinOp::NotLike(ast::NotLike { syntax: node }),
@@ -458,6 +458,24 @@ impl ast::WithQuery {
     #[inline]
     pub fn with_clause(&self) -> Option<ast::WithClause> {
         support::child(self.syntax())
+    }
+}
+
+impl ast::SelectVariant {
+    #[inline]
+    pub fn target_list(&self) -> Option<ast::TargetList> {
+        match self {
+            ast::SelectVariant::Select(select) => {
+                return select.select_clause()?.target_list();
+            }
+            ast::SelectVariant::SelectInto(select_into) => {
+                return select_into.select_clause()?.target_list();
+            }
+            ast::SelectVariant::ParenSelect(paren_select) => {
+                return paren_select.select()?.target_list();
+            }
+            _ => return None,
+        }
     }
 }
 

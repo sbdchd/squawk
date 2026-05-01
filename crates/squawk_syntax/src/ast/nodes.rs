@@ -47,3 +47,43 @@ impl AstNode for CreateTableLike {
         &self.syntax
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CreateViewLike {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CreateViewLike {
+    #[inline]
+    pub fn column_list(&self) -> Option<ast::ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<ast::Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn query(&self) -> Option<ast::SelectVariant> {
+        support::child(&self.syntax)
+    }
+}
+impl AstNode for CreateViewLike {
+    #[inline]
+    fn can_cast(kind: ast::SyntaxKind) -> bool {
+        matches!(
+            kind,
+            ast::SyntaxKind::CREATE_MATERIALIZED_VIEW | ast::SyntaxKind::CREATE_VIEW
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}

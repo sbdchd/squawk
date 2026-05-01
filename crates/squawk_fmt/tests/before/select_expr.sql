@@ -1,0 +1,57 @@
+select
+  -- array expr
+  array[1,2],
+  array(select 1),
+  array[[1,2],[3,4]],
+  -- between expr
+  2  between  1  and  3,
+  2  not  between  1  and  3,
+  2  between  symmetric  1  and  3,
+  -- bin expr
+  1 + 1,
+  2@@@2,
+  -- call expr
+  date_trunc('month', now()),
+  -- case expr
+  case when x > 1 then 1 else 0 end ,
+  -- cast expr
+  cast(1 as int8),
+  treat(2 as bigint),
+  1::int8,
+  int8 '1',
+  -- field expr
+  foo.bar,
+  -- index expr
+  a[1],
+  -- literal
+  42,
+  -- name ref
+  foo,
+  -- paren expr
+  (1),
+  -- postfix expr
+  1  isnull,
+  2  notnull,
+  x  is  json,
+  x  is  json  with  unique  keys,
+  x  is  json  without  unique  keys,
+  x  is  json  array,
+  x  is  json  array  with  unique  keys,
+  x  is  json  object,
+  x  is  json  scalar,
+  x  is  json  value,
+  x  is  normalized,
+  x  is  nfc  normalized,
+  x  is  not  json,
+  x  is  not  json  array,
+  x  is  not  json  object,
+  x  is  not  json  scalar,
+  x  is  not  json  value,
+  x  is  not  normalized,
+  x  is  not  nfkd  normalized,
+  -- prefix expr
+  @-@ 10,
+  -- slice expr
+  c[:2][2:],
+  -- tuple expr
+  (1, 2, 3);

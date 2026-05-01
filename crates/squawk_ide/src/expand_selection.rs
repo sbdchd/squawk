@@ -74,7 +74,6 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::VARIANT_LIST,
     SyntaxKind::XML_TABLE_COLUMN_LIST,
     SyntaxKind::PATH_PATTERN_LIST,
-    SyntaxKind::PROPERTIES_LIST,
 ];
 
 pub fn extend_selection(root: &SyntaxNode, range: TextRange) -> TextRange {

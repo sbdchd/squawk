@@ -121,6 +121,7 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
     let file_results = lint_files(&LintArgs {
         input: Input::Paths(found_paths),
         excluded_rules: cfg.excluded_rules,
+        included_rules: cfg.included_rules,
         pg_version: cfg.pg_version,
         assume_in_transaction: cfg.assume_in_transaction,
         reporter: cfg.reporter,
@@ -204,7 +205,7 @@ fn get_summary_comment_body(
 
         let summary = format!(
             r"
-<h3><code>{filename}</code></h3>
+<h3><code>{path}</code></h3>
 
 📄 **{line_count} lines** | {violations_emoji} **{violation_count} violations**
 
@@ -212,7 +213,7 @@ fn get_summary_comment_body(
 
 ---
     ",
-            filename = file.filename,
+            path = file.path,
             line_count = line_count,
             violations_emoji = violations_emoji,
             violation_count = violation_count,
@@ -311,7 +312,7 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
     let mut buff = Vec::new();
     let violation_count = violation.violations.len();
     for v in &violation.violations {
-        fmt_tty_violation(&mut buff, v, &violation.filename, sql)?;
+        fmt_tty_violation(&mut buff, v, &violation.path, sql)?;
     }
     let violations_text_raw = &String::from_utf8_lossy(&buff);
     let violations_text = strip_ansi_codes(violations_text_raw);
@@ -339,7 +340,7 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
 
     Ok(format!(
         r"
-<h3><code>{filename}</code></h3>
+<h3><code>{path}</code></h3>
 
 ```sql
 {sql}
@@ -352,7 +353,7 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
 ---
     ",
         violations_emoji = violations_emoji,
-        filename = violation.filename,
+        path = violation.path,
         sql = display_sql,
         truncation_notice = truncation_notice,
         violation_count = violation_count,
@@ -375,7 +376,7 @@ mod test_github_comment {
     #[test]
     fn generating_comment_multiple_files() {
         let violations = vec![CheckReport {
-            filename: "alpha.sql".into(),
+            path: "alpha.sql".into(),
             sql: "SELECT 1;".into(),
             violations: vec![ReportViolation {
                 file: "alpha.sql".into(),
@@ -404,7 +405,7 @@ mod test_github_comment {
     fn generating_comment_no_violations() {
         let violations = vec![
             CheckReport {
-                filename: "alpha.sql".into(),
+                path: "alpha.sql".into(),
                 sql: r#"
 BEGIN;
 --
@@ -419,7 +420,7 @@ CREATE TABLE "core_bar" (
                 violations: vec![],
             },
             CheckReport {
-                filename: "bravo.sql".into(),
+                path: "bravo.sql".into(),
                 sql: r#"
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
                 "#
@@ -469,7 +470,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
             .join("\n");
 
         let violations = vec![CheckReport {
-            filename: "large.sql".into(),
+            path: "large.sql".into(),
             sql: large_sql,
             violations: vec![ReportViolation {
                 file: "large.sql".into(),
@@ -504,7 +505,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
             .join("\n");
 
         let violations = vec![CheckReport {
-            filename: "massive.sql".into(),
+            path: "massive.sql".into(),
             sql: massive_sql,
             violations: vec![ReportViolation {
                 file: "massive.sql".into(),

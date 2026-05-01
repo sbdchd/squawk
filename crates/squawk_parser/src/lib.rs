@@ -221,7 +221,9 @@ impl<'t> Parser<'t> {
                         | SyntaxKind::NFKC_KW
                         | SyntaxKind::NFKD_KW
                 ) {
+                    let fm = self.start();
                     self.bump_any();
+                    fm.complete(self, SyntaxKind::UNICODE_NORMAL_FORM);
                 }
                 self.bump(SyntaxKind::NORMALIZED_KW);
                 m.complete(self, SyntaxKind::IS_NOT_NORMALIZED);
@@ -237,7 +239,9 @@ impl<'t> Parser<'t> {
                         | SyntaxKind::NFKC_KW
                         | SyntaxKind::NFKD_KW
                 ) {
+                    let fm = self.start();
                     self.bump_any();
+                    fm.complete(self, SyntaxKind::UNICODE_NORMAL_FORM);
                 }
                 self.bump(SyntaxKind::NORMALIZED_KW);
                 m.complete(self, SyntaxKind::IS_NORMALIZED);
@@ -742,17 +746,11 @@ impl<'t> Parser<'t> {
                             | SyntaxKind::NFKC_KW
                             | SyntaxKind::NFKD_KW
                     ) {
-                        if self.nth_at(3, SyntaxKind::NOT_KW)
-                            && self.nth_at(4, SyntaxKind::NORMALIZED_KW)
-                        {
+                        if self.nth_at(3, SyntaxKind::NORMALIZED_KW) {
                             return true;
                         }
-                    } else {
-                        if self.nth_at(2, SyntaxKind::NOT_KW)
-                            && self.nth_at(3, SyntaxKind::NORMALIZED_KW)
-                        {
-                            return true;
-                        }
+                    } else if self.nth_at(2, SyntaxKind::NORMALIZED_KW) {
+                        return true;
                     }
                 }
                 return false;

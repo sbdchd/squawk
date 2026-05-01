@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lsp_types::{Hover, HoverContents, HoverParams, LanguageString, MarkedString};
+use lsp_types::{Hover, HoverContents, HoverParams, MarkedString};
 use squawk_ide::db::line_index;
 use squawk_ide::hover::hover;
 
@@ -15,13 +15,10 @@ pub(crate) fn handle_hover(snapshot: &Snapshot, params: HoverParams) -> Result<O
     let line_index = line_index(db, file);
     let offset = lsp_utils::offset(&line_index, position).unwrap();
 
-    let type_info = hover(db, file, offset);
+    let hover_info = hover(db, file, offset);
 
-    Ok(type_info.map(|type_str| Hover {
-        contents: HoverContents::Scalar(MarkedString::LanguageString(LanguageString {
-            language: "sql".to_string(),
-            value: type_str,
-        })),
+    Ok(hover_info.map(|hover_info| Hover {
+        contents: HoverContents::Scalar(MarkedString::from_markdown(hover_info.markdown())),
         range: None,
     }))
 }

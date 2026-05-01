@@ -2094,6 +2094,10 @@ impl ArgList {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn args_(&self) -> AstChildren<Arg> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
@@ -2771,6 +2775,10 @@ impl CharType {
     #[inline]
     pub fn character_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CHARACTER_KW)
+    }
+    #[inline]
+    pub fn national_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NATIONAL_KW)
     }
     #[inline]
     pub fn nchar_token(&self) -> Option<SyntaxToken> {
@@ -5885,6 +5893,10 @@ impl Delete {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn for_portion_of(&self) -> Option<ForPortionOf> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn relation_name(&self) -> Option<RelationName> {
         support::child(&self.syntax)
     }
@@ -5970,6 +5982,10 @@ impl DestVertexTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn references_table(&self) -> Option<ReferencesTable> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -5984,10 +6000,6 @@ impl DestVertexTable {
     #[inline]
     pub fn key_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::KEY_KW)
-    }
-    #[inline]
-    pub fn references_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::REFERENCES_KW)
     }
 }
 
@@ -8808,6 +8820,49 @@ impl FilterClause {
     #[inline]
     pub fn where_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WHERE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ForPortionOf {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ForPortionOf {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn of_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OF_KW)
+    }
+    #[inline]
+    pub fn portion_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PORTION_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -12532,6 +12587,10 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn is_normalized(&self) -> Option<IsNormalized> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn is_not(&self) -> Option<IsNot> {
         support::child(&self.syntax)
     }
@@ -12557,6 +12616,10 @@ impl Op {
     }
     #[inline]
     pub fn is_not_json_value(&self) -> Option<IsNotJsonValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_normalized(&self) -> Option<IsNotNormalized> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12650,6 +12713,10 @@ impl Op {
     #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn isnull_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ISNULL_KW)
     }
     #[inline]
     pub fn like_token(&self) -> Option<SyntaxToken> {
@@ -13735,10 +13802,10 @@ impl Privileges {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PropertiesList {
+pub struct Properties {
     pub(crate) syntax: SyntaxNode,
 }
-impl PropertiesList {
+impl Properties {
     #[inline]
     pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
         support::child(&self.syntax)
@@ -13950,6 +14017,33 @@ impl ReferencesConstraint {
     }
     #[inline]
     pub fn table(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn references_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::REFERENCES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReferencesTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ReferencesTable {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16344,6 +16438,10 @@ impl SourceVertexTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn references_table(&self) -> Option<ReferencesTable> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -16354,10 +16452,6 @@ impl SourceVertexTable {
     #[inline]
     pub fn key_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::KEY_KW)
-    }
-    #[inline]
-    pub fn references_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::REFERENCES_KW)
     }
     #[inline]
     pub fn source_token(&self) -> Option<SyntaxToken> {
@@ -17037,6 +17131,10 @@ pub struct Update {
 impl Update {
     #[inline]
     pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn for_portion_of(&self) -> Option<ForPortionOf> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18499,7 +18597,7 @@ pub enum ElementTableLabelAndProperties {
 pub enum ElementTableProperties {
     AllProperties(AllProperties),
     NoProperties(NoProperties),
-    PropertiesList(PropertiesList),
+    Properties(Properties),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -23971,6 +24069,24 @@ impl AstNode for FilterClause {
         &self.syntax
     }
 }
+impl AstNode for ForPortionOf {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FOR_PORTION_OF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ForProvider {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -27859,10 +27975,10 @@ impl AstNode for Privileges {
         &self.syntax
     }
 }
-impl AstNode for PropertiesList {
+impl AstNode for Properties {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PROPERTIES_LIST
+        kind == SyntaxKind::PROPERTIES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -27989,6 +28105,24 @@ impl AstNode for ReferencesConstraint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::REFERENCES_CONSTRAINT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ReferencesTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::REFERENCES_TABLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -32831,7 +32965,7 @@ impl AstNode for ElementTableProperties {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            SyntaxKind::ALL_PROPERTIES | SyntaxKind::NO_PROPERTIES | SyntaxKind::PROPERTIES_LIST
+            SyntaxKind::ALL_PROPERTIES | SyntaxKind::NO_PROPERTIES | SyntaxKind::PROPERTIES
         )
     }
     #[inline]
@@ -32843,9 +32977,7 @@ impl AstNode for ElementTableProperties {
             SyntaxKind::NO_PROPERTIES => {
                 ElementTableProperties::NoProperties(NoProperties { syntax })
             }
-            SyntaxKind::PROPERTIES_LIST => {
-                ElementTableProperties::PropertiesList(PropertiesList { syntax })
-            }
+            SyntaxKind::PROPERTIES => ElementTableProperties::Properties(Properties { syntax }),
             _ => {
                 return None;
             }
@@ -32857,7 +32989,7 @@ impl AstNode for ElementTableProperties {
         match self {
             ElementTableProperties::AllProperties(it) => &it.syntax,
             ElementTableProperties::NoProperties(it) => &it.syntax,
-            ElementTableProperties::PropertiesList(it) => &it.syntax,
+            ElementTableProperties::Properties(it) => &it.syntax,
         }
     }
 }
@@ -32873,10 +33005,10 @@ impl From<NoProperties> for ElementTableProperties {
         ElementTableProperties::NoProperties(node)
     }
 }
-impl From<PropertiesList> for ElementTableProperties {
+impl From<Properties> for ElementTableProperties {
     #[inline]
-    fn from(node: PropertiesList) -> ElementTableProperties {
-        ElementTableProperties::PropertiesList(node)
+    fn from(node: Properties) -> ElementTableProperties {
+        ElementTableProperties::Properties(node)
     }
 }
 impl AstNode for ExplainStmt {

@@ -25,7 +25,7 @@ pub(crate) fn handle_goto_definition(
                 !location.range.contains(offset),
                 "Our target destination range must not include the source range otherwise go to def won't work in vscode."
             );
-            to_location(snapshot, &uri, location)
+            to_location(snapshot, location)
         })
         .collect();
 

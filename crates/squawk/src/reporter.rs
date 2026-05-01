@@ -4,6 +4,7 @@ use console::style;
 use line_index::LineIndex;
 use line_index::TextRange;
 use log::info;
+use rayon::prelude::*;
 use serde::Serialize;
 use squawk_linter::{Fix, Linter, Rule, Version};
 use squawk_syntax::SourceFile;
@@ -22,11 +23,12 @@ use crate::{
 fn check_sql(
     sql: &str,
     path: &str,
+    included_rules: &[Rule],
     excluded_rules: &[Rule],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> CheckReport {
-    let mut linter = Linter::without_rules(excluded_rules);
+    let mut linter = Linter::with_rules(included_rules, excluded_rules);
     if let Some(pg_version) = pg_version {
         linter.settings.pg_version = pg_version;
     }
@@ -59,7 +61,7 @@ fn check_sql(
             })
             .collect();
         return CheckReport {
-            filename: path.into(),
+            path: path.into(),
             sql: sql.into(),
             violations,
         };
@@ -90,7 +92,7 @@ fn check_sql(
         .collect();
 
     CheckReport {
-        filename: path.into(),
+        path: path.into(),
         sql: sql.into(),
         violations,
     }
@@ -142,6 +144,7 @@ fn render_lint_error<W: std::io::Write>(
 pub(crate) struct LintArgs {
     pub(crate) input: Input,
     pub(crate) excluded_rules: Vec<Rule>,
+    pub(crate) included_rules: Vec<Rule>,
     pub(crate) pg_version: Option<Version>,
     pub(crate) assume_in_transaction: bool,
     pub(crate) reporter: Reporter,
@@ -149,42 +152,45 @@ pub(crate) struct LintArgs {
 }
 
 pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
-    let mut violations = vec![];
     match &args.input {
         Input::Stdin(stdin) => {
             info!("reading content from stdin");
             let sql = sql_from_stdin()?;
-            // ignore stdin if it's empty.
             if sql.trim().is_empty() {
                 info!("ignoring empty stdin");
-            } else {
-                let path = stdin.path.clone().unwrap_or_else(|| "stdin".into());
-                let content = check_sql(
-                    &sql,
-                    &path,
-                    &args.excluded_rules,
-                    args.pg_version,
-                    args.assume_in_transaction,
-                );
-                violations.push(content);
+                return Ok(vec![]);
             }
+            let path = stdin.path.clone().unwrap_or_else(|| "stdin".into());
+            let content = check_sql(
+                &sql,
+                &path,
+                &args.included_rules,
+                &args.excluded_rules,
+                args.pg_version,
+                args.assume_in_transaction,
+            );
+            Ok(vec![content])
         }
         Input::Paths(path_bufs) => {
-            for path in path_bufs {
-                info!("checking file path: {}", path.display());
-                let sql = sql_from_path(path)?;
-                let content = check_sql(
-                    &sql,
-                    path.to_str().unwrap(),
-                    &args.excluded_rules,
-                    args.pg_version,
-                    args.assume_in_transaction,
-                );
-                violations.push(content);
-            }
+            let mut reports: Vec<CheckReport> = path_bufs
+                .par_iter()
+                .map(|path| {
+                    info!("checking file path: {}", path.display());
+                    let sql = sql_from_path(path)?;
+                    Ok(check_sql(
+                        &sql,
+                        path.to_str().unwrap(),
+                        &args.included_rules,
+                        &args.excluded_rules,
+                        args.pg_version,
+                        args.assume_in_transaction,
+                    ))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            reports.sort_by(|a, b| a.path.cmp(&b.path));
+            Ok(reports)
         }
     }
-    Ok(violations)
 }
 
 pub fn lint_and_report<W: io::Write>(f: &mut W, args: LintArgs) -> Result<ExitCode> {
@@ -333,7 +339,7 @@ pub fn fmt_tty<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
     let summary = Summary::from(reports);
     for report in reports {
         for violation in &report.violations {
-            fmt_tty_violation(f, violation, &report.filename, &report.sql)?;
+            fmt_tty_violation(f, violation, &report.path, &report.sql)?;
         }
     }
     print_summary(f, &summary)?;
@@ -456,7 +462,7 @@ fn fmt_gitlab<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> 
 
 #[derive(Debug)]
 pub struct CheckReport {
-    pub filename: String,
+    pub path: String,
     pub sql: String,
     pub violations: Vec<ReportViolation>,
 }
@@ -491,7 +497,7 @@ mod test_check_files {
 select \;
         ";
         let mut buff = Vec::new();
-        let res = check_sql(sql, "test.sql", &[], None, false);
+        let res = check_sql(sql, "test.sql", &[], &[], None, false);
         fmt_json(&mut buff, vec![res]).unwrap();
 
         let val: Value = serde_json::from_slice(&buff).unwrap();
@@ -502,7 +508,7 @@ select \;
     fn skip_lint_on_syntax_error() {
         let error_sql = "ALTER TABLE foo ALTER CONSTRAINT bar RENAME TO quux;";
         let mut buff = vec![];
-        let res = check_sql(error_sql, "test.sql", &[], None, false);
+        let res = check_sql(error_sql, "test.sql", &[], &[], None, false);
         fmt_json(&mut buff, vec![res]).unwrap();
         assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"test.sql","line":0,"column":36,"level":"Error","message":"missing comma","help":null,"rule_name":"syntax-error","column_end":36,"line_end":0}]"#);
     }
@@ -529,7 +535,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Gcc,
             false,
         );
@@ -562,7 +568,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Tty,
             true,
         );
@@ -584,7 +590,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Tty,
             false,
         );
@@ -600,7 +606,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, "main.sql", &[], None, false)],
+            vec![check_sql(sql, "main.sql", &[], &[], None, false)],
             &Reporter::Tty,
             false,
         );
@@ -622,7 +628,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Json,
             false,
         );
@@ -643,7 +649,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            vec![check_sql(sql, filename, &[], None, false)],
+            vec![check_sql(sql, filename, &[], &[], None, false)],
             &Reporter::Gitlab,
             false,
         );
@@ -662,6 +668,6 @@ ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
         let filename = "main.sql";
-        assert_debug_snapshot!(check_sql(sql, filename, &[], None, false));
+        assert_debug_snapshot!(check_sql(sql, filename, &[], &[], None, false));
     }
 }

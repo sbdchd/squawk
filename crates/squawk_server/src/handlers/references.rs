@@ -23,8 +23,16 @@ pub(crate) fn handle_references(
 
     let locations: Vec<Location> = refs
         .into_iter()
-        .filter(|loc| include_declaration || !loc.range.contains(offset))
-        .filter_map(|loc| to_location(snapshot, &uri, loc))
+        .filter(|loc| {
+            if include_declaration {
+                return true;
+            }
+            if loc.file == file && !loc.range.contains(offset) {
+                return true;
+            }
+            false
+        })
+        .filter_map(|loc| to_location(snapshot, loc))
         .collect();
 
     Ok(Some(locations))

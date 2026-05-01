@@ -938,6 +938,51 @@ SOURCE_FILE
               TRUE_KW "true"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- join after the where"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    WHITESPACE "\n"
+    ERROR
+      JOIN
+        JOIN_INNER
+          JOIN_KW "join"
+        WHITESPACE " "
+        FROM_ITEM
+          NAME_REF
+            IDENT "k"
+        WHITESPACE " "
+        ON_CLAUSE
+          ON_KW "on"
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- select end"
   WHITESPACE "\n"
   SELECT
@@ -1176,31 +1221,35 @@ error[syntax-error]: expected expression but got OR_KW
    ╭▸ 
 91 │ select from t join u on or true;
    ╰╴                        ━
+error[syntax-error]: JOINs must appear before WHERE
+   ╭▸ 
+96 │ join k on true;
+   ╰╴━
 error[syntax-error]: expected SEMICOLON
    ╭▸ 
-94 │   select
+99 │   select
    │ ┏━━━━━━━┛
-95 │ ┃ end;
-   ╰╴┗━┛
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-98 │   select
-   │ ┏━━━━━━━┛
-99 │ ┃ analyze;
+100│ ┃ end;
    ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
     ╭▸ 
-101 │   select
+103 │   select
     │ ┏━━━━━━━┛
-102 │ ┃ analyse;
+104 │ ┃ analyze;
     ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
     ╭▸ 
 106 │   select
     │ ┏━━━━━━━┛
-107 │ ┃ with t as (select 1)
+107 │ ┃ analyse;
+    ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+111 │   select
+    │ ┏━━━━━━━┛
+112 │ ┃ with t as (select 1)
     ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-111 │ select 1,
+116 │ select 1,
     ╰╴        ━

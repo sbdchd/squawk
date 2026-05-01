@@ -5,10 +5,15 @@ use lsp_types::{
     CodeActionKind, CodeActionOptions, CodeActionProviderCapability, CompletionOptions,
     DiagnosticOptions, DiagnosticServerCapabilities, FoldingRangeProviderCapability,
     HoverProviderCapability, InitializeParams, OneOf, SelectionRangeProviderCapability,
-    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions,
+    SemanticTokensFullOptions, SemanticTokensLegend, SemanticTokensOptions,
+    SemanticTokensServerCapabilities, ServerCapabilities, TextDocumentSyncCapability,
+    TextDocumentSyncKind, WorkDoneProgressOptions,
 };
 
-use crate::global_state::GlobalState;
+use crate::{
+    global_state::GlobalState,
+    semantic_tokens::{SUPPORTED_MODIFIERS, SUPPORTED_TYPES},
+};
 
 pub fn run() -> Result<()> {
     info!("Starting Squawk LSP server");
@@ -53,6 +58,19 @@ pub fn run() -> Result<()> {
             },
             completion_item: None,
         }),
+        semantic_tokens_provider: Some(SemanticTokensServerCapabilities::SemanticTokensOptions(
+            SemanticTokensOptions {
+                work_done_progress_options: WorkDoneProgressOptions {
+                    work_done_progress: None,
+                },
+                legend: SemanticTokensLegend {
+                    token_types: SUPPORTED_TYPES.to_vec(),
+                    token_modifiers: SUPPORTED_MODIFIERS.to_vec(),
+                },
+                range: Some(true),
+                full: Some(SemanticTokensFullOptions::Bool(true)),
+            },
+        )),
         ..Default::default()
     })
     .unwrap();

@@ -6,16 +6,17 @@ use ::line_index::{LineIndex, TextRange, TextSize};
 use log::warn;
 use lsp_types::{
     CodeAction, CodeActionKind, FoldingRange, FoldingRangeKind as LspFoldingRangeKind, Location,
-    Url, WorkspaceEdit,
+    SemanticToken, Url, WorkspaceEdit,
 };
-use squawk_ide::builtins::{builtins_line_index, builtins_url};
 use squawk_ide::code_actions::ActionKind;
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::{Fold, FoldKind};
+use squawk_ide::semantic_tokens::{SemanticTokenModifier, SemanticTokenType};
 
 use crate::global_state::Snapshot;
+use crate::semantic_tokens;
 
-fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
+pub(crate) fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
     let start = offset(index, range.start)?;
     let end = offset(index, range.end)?;
     if end >= start {
@@ -212,21 +213,110 @@ pub(crate) fn apply_incremental_changes(
 
 pub(crate) fn to_location(
     snapshot: &Snapshot,
-    uri: &Url,
-    loc: squawk_ide::goto_definition::Location,
+    loc: squawk_ide::location::Location,
 ) -> Option<Location> {
     let db = snapshot.db();
-    let file = snapshot.file(uri).unwrap();
-    let uri = match loc.file {
-        squawk_ide::goto_definition::FileId::Current => uri.clone(),
-        squawk_ide::goto_definition::FileId::Builtins => builtins_url(db)?,
-    };
-    let line_index = match loc.file {
-        squawk_ide::goto_definition::FileId::Current => &line_index(db, file),
-        squawk_ide::goto_definition::FileId::Builtins => &builtins_line_index(db),
-    };
-    let range = range(line_index, loc.range);
+    let uri = snapshot.uri(loc.file)?;
+
+    let line_index = line_index(db, loc.file);
+    let range = range(&line_index, loc.range);
     Some(Location { uri, range })
+}
+
+pub(crate) fn to_semantic_tokens(
+    text: &str,
+    line_index: LineIndex,
+    semantic_tokens: Vec<squawk_ide::semantic_tokens::SemanticToken>,
+) -> Vec<lsp_types::SemanticToken> {
+    let mut encoder = Encoder {
+        tokens: Vec::with_capacity(semantic_tokens.len()),
+        prev_line: 0,
+        prev_start: 0,
+    };
+
+    // Duplicated in squawk-wasm, fyi
+    for token in &*semantic_tokens {
+        // Taken from rust-analyzer, this solves the case where we have a multi
+        // line semantic token which isn't supported by the LSP spec.
+        // see: https://github.com/rust-lang/rust-analyzer/blob/2efc80078029894eec0699f62ec8d5c1a56af763/crates/rust-analyzer/src/lsp/to_proto.rs#L781C28-L781C28
+        for mut text_range in line_index.lines(token.range) {
+            if text[text_range].ends_with('\n') {
+                text_range =
+                    TextRange::new(text_range.start(), text_range.end() - TextSize::of('\n'));
+            }
+            let lsp_range = range(&line_index, text_range);
+            let len = lsp_range.end.character - lsp_range.start.character;
+            encoder.push_token_at(lsp_range.start, len, token.token_type, token.modifiers);
+        }
+    }
+
+    encoder.tokens
+}
+
+// Taken from Ty
+// see: https://github.com/charliermarsh/ruff/blob/5011b253c1aca2a1906762cf45414d0fda1a088a/crates/ty_server/src/server/api/semantic_tokens.rs#L23C25-L23C25
+struct Encoder {
+    tokens: Vec<SemanticToken>,
+    prev_line: u32,
+    prev_start: u32,
+}
+
+impl Encoder {
+    fn push_token_at(
+        &mut self,
+        start: lsp_types::Position,
+        length: u32,
+        ty: SemanticTokenType,
+        _modifiers: Option<SemanticTokenModifier>,
+    ) {
+        // LSP semantic tokens are encoded as deltas
+        let delta_line = start.line - self.prev_line;
+        let delta_start = if delta_line == 0 {
+            start.character - self.prev_start
+        } else {
+            start.character
+        };
+
+        let token_type = to_token_type(ty);
+
+        let token_index = semantic_tokens::type_index(token_type);
+
+        self.tokens.push(SemanticToken {
+            delta_line,
+            delta_start,
+            length,
+            token_type: token_index,
+            // TODO: once we get modifiers going, we'll need to update this
+            token_modifiers_bitset: 0,
+        });
+
+        self.prev_line = start.line;
+        self.prev_start = start.character;
+    }
+}
+
+fn to_token_type(ty: SemanticTokenType) -> lsp_types::SemanticTokenType {
+    match ty {
+        SemanticTokenType::Keyword => lsp_types::SemanticTokenType::KEYWORD,
+        SemanticTokenType::String => lsp_types::SemanticTokenType::STRING,
+        SemanticTokenType::Bool => lsp_types::SemanticTokenType::KEYWORD,
+        SemanticTokenType::Number => lsp_types::SemanticTokenType::NUMBER,
+        SemanticTokenType::Function => lsp_types::SemanticTokenType::FUNCTION,
+        SemanticTokenType::Operator => lsp_types::SemanticTokenType::OPERATOR,
+        SemanticTokenType::Punctuation => lsp_types::SemanticTokenType::OPERATOR,
+        SemanticTokenType::Name => lsp_types::SemanticTokenType::VARIABLE,
+        SemanticTokenType::NameRef => lsp_types::SemanticTokenType::VARIABLE,
+        SemanticTokenType::Comment => lsp_types::SemanticTokenType::COMMENT,
+        SemanticTokenType::Type => lsp_types::SemanticTokenType::TYPE,
+        SemanticTokenType::PositionalParam | SemanticTokenType::Parameter => {
+            lsp_types::SemanticTokenType::PARAMETER
+        }
+        SemanticTokenType::Column => lsp_types::SemanticTokenType::VARIABLE,
+        SemanticTokenType::PropertyGraph | SemanticTokenType::Table => {
+            lsp_types::SemanticTokenType::STRUCT
+        }
+        SemanticTokenType::Schema => lsp_types::SemanticTokenType::NAMESPACE,
+    }
 }
 
 #[cfg(test)]

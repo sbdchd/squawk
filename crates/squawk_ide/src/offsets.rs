@@ -1,11 +1,14 @@
+use crate::db::{File, parse};
 use rowan::TextSize;
-use squawk_syntax::{
-    SyntaxKind, SyntaxToken,
-    ast::{self, AstNode},
-};
+use salsa::Database as Db;
+use squawk_syntax::{SyntaxKind, SyntaxToken, ast::AstNode};
 
-pub(crate) fn token_from_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxToken> {
-    let mut token = file.syntax().token_at_offset(offset).right_biased()?;
+pub(crate) fn token_from_offset(db: &dyn Db, file: File, offset: TextSize) -> Option<SyntaxToken> {
+    let mut token = parse(db, file)
+        .tree()
+        .syntax()
+        .token_at_offset(offset)
+        .right_biased()?;
     // want to be lenient in case someone clicks:
     // - the trailing `;` of a line
     // - the `,` in a target list, like `select a, b, c`
@@ -26,5 +29,5 @@ pub(crate) fn token_from_offset(file: &ast::SourceFile, offset: TextSize) -> Opt
     ) {
         token = token.prev_token()?;
     }
-    return Some(token);
+    Some(token)
 }

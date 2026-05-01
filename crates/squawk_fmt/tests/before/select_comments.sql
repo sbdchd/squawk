@@ -1,0 +1,12 @@
+-- intentional new line follows, we should keep that
+
+/* bar */
+select/*a*/1/*b*/,/*c*/2/*d*/;
+
+select/*z*/;
+
+select/*a*/*;
+
+select/*a*/all/*b*/1;
+
+select/*a*/distinct/*b*/1;

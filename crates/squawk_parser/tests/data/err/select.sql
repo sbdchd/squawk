@@ -90,6 +90,11 @@ select having or c != 'b';
 select from t join u on and true;
 select from t join u on or true;
 
+-- join after the where
+select * from t
+where x > 1
+join k on true;
+
 -- select end
 select
 end;
