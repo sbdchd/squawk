@@ -54,11 +54,11 @@ use rules::renaming_column;
 use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
+use rules::require_concurrent_partition_detach;
 use rules::require_enum_value_ordering;
 use rules::require_table_schema;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
-use rules::require_concurrent_partition_detach;
 // xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, Sequence)]
@@ -455,7 +455,7 @@ impl Linter {
             identifier_too_long(self, file);
         }
         if self.rules.contains(&Rule::RequireConcurrentPartitionDetach) {
-            require_concurrent_partition_detach(self, &file);
+            require_concurrent_partition_detach(self, file);
         }
         // xtask:new-rule:rule-call
 
