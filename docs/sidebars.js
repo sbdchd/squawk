@@ -36,6 +36,7 @@ module.exports = {
       "ban-uncommitted-transaction",
       "require-enum-value-ordering",
       "require-table-schema",
+      "identifier-too-long",
       // xtask:new-rule:error-name
     ],
   },

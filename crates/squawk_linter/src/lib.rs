@@ -43,6 +43,7 @@ use rules::ban_uncommitted_transaction;
 use rules::changing_column_type;
 use rules::constraint_missing_not_valid;
 use rules::disallow_unique_constraint;
+use rules::identifier_too_long;
 use rules::prefer_bigint_over_int;
 use rules::prefer_bigint_over_smallint;
 use rules::prefer_identity;
@@ -94,6 +95,7 @@ pub enum Rule {
     BanUncommittedTransaction,
     RequireEnumValueOrdering,
     RequireTableSchema,
+    IdentifierTooLong,
     // xtask:new-rule:error-name
 }
 
@@ -146,6 +148,7 @@ impl TryFrom<&str> for Rule {
             "ban-uncommitted-transaction" => Ok(Rule::BanUncommittedTransaction),
             "require-enum-value-ordering" => Ok(Rule::RequireEnumValueOrdering),
             "require-table-schema" => Ok(Rule::RequireTableSchema),
+            "identifier-too-long" => Ok(Rule::IdentifierTooLong),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -210,6 +213,7 @@ impl fmt::Display for Rule {
             Rule::BanUncommittedTransaction => "ban-uncommitted-transaction",
             Rule::RequireEnumValueOrdering => "require-enum-value-ordering",
             Rule::RequireTableSchema => "require-table-schema",
+            Rule::IdentifierTooLong => "identifier-too-long",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -442,6 +446,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::RequireTableSchema) {
             require_table_schema(self, file);
+        }
+        if self.rules.contains(&Rule::IdentifierTooLong) {
+            identifier_too_long(self, file);
         }
         // xtask:new-rule:rule-call
 

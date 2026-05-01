@@ -25,9 +25,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 pub mod ast;
+mod generated;
 pub mod identifier;
 mod parsing;
 mod ptr;
+pub mod quote;
 pub mod syntax_error;
 mod syntax_node;
 mod token_text;

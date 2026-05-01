@@ -95,7 +95,8 @@ pub(crate) fn codegen() -> Result<()> {
         project_root().join("crates/squawk_parser/src/generated/syntax_kind.rs");
     std::fs::write(syntax_kinds_file, syntax_kinds).context("problem writing syntax kinds")?;
 
-    let ide_reserved_keywords = project_root().join("crates/squawk_ide/src/generated/keywords.rs");
+    let ide_reserved_keywords =
+        project_root().join("crates/squawk_syntax/src/generated/keywords.rs");
     let reserved_keywords = generate_reserved_keywords_array(&keyword_kinds.reserved_keywords)?;
     std::fs::write(ide_reserved_keywords, reserved_keywords)
         .context("problem writing reserved keywords")?;
