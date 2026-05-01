@@ -2,7 +2,7 @@ use smol_str::SmolStr;
 use squawk_syntax::ast::{self, AstNode};
 use std::fmt;
 
-use crate::quote::normalize_identifier;
+use squawk_syntax::quote::normalize_identifier;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) struct Name(pub(crate) SmolStr);

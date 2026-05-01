@@ -1,8 +1,7 @@
-use squawk_syntax::SyntaxNode;
-
+use crate::SyntaxNode;
 use crate::generated::keywords::RESERVED_KEYWORDS;
 
-pub(crate) fn quote_column_alias(text: &str) -> String {
+pub fn quote_column_alias(text: &str) -> String {
     if needs_quoting(text) {
         format!(r#""{}""#, text.replace('"', r#""""#))
     } else {
@@ -10,7 +9,7 @@ pub(crate) fn quote_column_alias(text: &str) -> String {
     }
 }
 
-pub(crate) fn unquote_ident(node: &SyntaxNode) -> Option<String> {
+pub fn unquote_ident(node: &SyntaxNode) -> Option<String> {
     let text = node.text().to_string();
 
     if !text.starts_with('"') || !text.ends_with('"') {
@@ -71,17 +70,17 @@ fn needs_quoting(text: &str) -> bool {
     false
 }
 
-pub(crate) fn is_reserved_word(text: &str) -> bool {
+pub fn is_reserved_word(text: &str) -> bool {
     RESERVED_KEYWORDS
         .binary_search(&text.to_lowercase().as_str())
         .is_ok()
 }
 
-pub(crate) fn normalize_identifier(text: &str) -> String {
+pub fn normalize_identifier(text: &str) -> String {
     // TODO: Cow/SmolStr/Salsa Interned?
     text.strip_prefix('"')
         .and_then(|t| t.strip_suffix('"'))
-        .map(|x| x.to_string())
+        .map(|x| x.replace(r#""""#, "\""))
         .unwrap_or_else(|| text.to_ascii_lowercase())
 }
 

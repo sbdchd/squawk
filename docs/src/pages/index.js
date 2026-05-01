@@ -212,6 +212,11 @@ const rules = [
     tags: ["schema"],
     description: "Require explicit schema in table DDL to avoid ambiguity.",
   },
+  {
+    name: "identifier-too-long",
+    tags: ["schema"],
+    description: "Warn about implicit truncation for identifiers that are too long.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
