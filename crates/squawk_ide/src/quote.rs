@@ -78,11 +78,11 @@ pub(crate) fn is_reserved_word(text: &str) -> bool {
 }
 
 pub(crate) fn normalize_identifier(text: &str) -> String {
-    if text.starts_with('"') && text.ends_with('"') && text.len() >= 2 {
-        text[1..text.len() - 1].to_string()
-    } else {
-        text.to_lowercase()
-    }
+    // TODO: Cow/SmolStr/Salsa Interned?
+    text.strip_prefix('"')
+        .and_then(|t| t.strip_suffix('"'))
+        .map(|x| x.to_string())
+        .unwrap_or_else(|| text.to_ascii_lowercase())
 }
 
 #[cfg(test)]

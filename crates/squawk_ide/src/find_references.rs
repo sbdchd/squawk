@@ -41,7 +41,7 @@ mod test {
     use crate::builtins::builtins_file;
     use crate::db::{Database, File};
     use crate::find_references::find_references;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use rowan::TextRange;
@@ -49,14 +49,16 @@ mod test {
 
     #[track_caller]
     fn find_refs(sql: &str) -> String {
-        let (mut offset, sql) = fixture(sql);
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
+        let fixture = Fixture::new(sql);
+        let marker = fixture.marker();
+        let offset = marker.offset_before();
+        let query_span = marker.range();
+        let sql = fixture.sql();
         let db = Database::default();
-        let current_file = File::new(&db, sql.clone().into());
+        let current_file = File::new(&db, sql.into());
         assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
 
         let references = find_references(&db, current_file, offset);
-        let offset_usize: usize = offset.into();
 
         let mut file_paths = FxHashMap::default();
         file_paths.insert(current_file, "current.sql");
@@ -72,15 +74,11 @@ mod test {
 
         let multi_file = refs_by_file.len() > 1 || !refs_by_file.contains_key(&current_file);
 
-        let mut snippet = Snippet::source(&sql).fold(true);
+        let mut snippet = Snippet::source(sql).fold(true);
         if multi_file {
             snippet = snippet.path(*file_paths.get(&current_file).unwrap());
         }
-        snippet = snippet.annotation(
-            AnnotationKind::Context
-                .span(offset_usize..offset_usize + 1)
-                .label("0. query"),
-        );
+        snippet = snippet.annotation(AnnotationKind::Context.span(query_span).label("0. query"));
         if let Some(current_refs) = refs_by_file.remove(&current_file) {
             snippet = annotate_refs(snippet, current_refs);
         }

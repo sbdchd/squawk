@@ -1519,7 +1519,7 @@ fn unqualified_star_in_arg_list_ptrs(
 mod test {
     use crate::db::{Database, File};
     use crate::hover::hover;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
 
@@ -1531,20 +1531,20 @@ mod test {
     #[track_caller]
     fn check_hover_(sql: &str) -> Option<String> {
         let db = Database::default();
-        let (mut offset, sql) = fixture(sql);
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let file = File::new(&db, sql.clone().into());
+        let fixture = Fixture::new(sql);
+        let marker = fixture.marker();
+        let offset = marker.offset_before();
+        let hover_span = marker.range();
+        let sql = fixture.sql();
+        let file = File::new(&db, sql.into());
         assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
         if let Some(type_info) = hover(&db, file, offset) {
-            let offset_usize: usize = offset.into();
             let title = format!("hover: {}", type_info.snippet);
             let group = Level::INFO.primary_title(&title).element(
-                Snippet::source(&sql).fold(true).annotation(
-                    AnnotationKind::Context
-                        .span(offset_usize..offset_usize + 1)
-                        .label("hover"),
-                ),
+                Snippet::source(sql)
+                    .fold(true)
+                    .annotation(AnnotationKind::Context.span(hover_span).label("hover")),
             );
             let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
             return Some(
@@ -1561,8 +1561,9 @@ mod test {
     #[track_caller]
     fn check_hover_info(sql: &str) -> super::Hover {
         let db = Database::default();
-        let (mut offset, sql) = fixture(sql);
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
+        let fixture = Fixture::new(sql);
+        let offset = fixture.marker().offset_before();
+        let sql = fixture.sql();
         let file = File::new(&db, sql.into());
         assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 

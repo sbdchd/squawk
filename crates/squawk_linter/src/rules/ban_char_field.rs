@@ -50,7 +50,7 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
             Rule::BanCharField,
             "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.".into(),
             path_type.syntax(),
-        ).fix(Some(fix)));
+        ).fix(fix));
     }
 }
 
@@ -61,7 +61,7 @@ fn check_char_type(ctx: &mut Linter, char_type: ast::CharType) {
             Rule::BanCharField,
             "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.".into(),
             char_type.syntax(),
-        ).fix(Some(fix)));
+        ).fix(fix));
     }
 }
 

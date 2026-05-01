@@ -4,7 +4,7 @@ use squawk_linter::Edit;
 use squawk_syntax::ast;
 
 use crate::db::{Database, File};
-use crate::test_utils::fixture;
+use crate::test_utils::Fixture;
 
 use super::{ActionKind, CodeAction};
 
@@ -12,12 +12,12 @@ pub(super) fn apply_code_action(
     f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
     sql: &str,
 ) -> String {
-    let (mut offset, sql) = fixture(sql);
+    let fixture = Fixture::new(sql);
+    let offset = fixture.marker().offset_before();
+    let sql = fixture.sql();
     let db = Database::default();
-    let file = File::new(&db, sql.clone().into());
+    let file = File::new(&db, sql.into());
     let parse_result = crate::db::parse(&db, file);
-
-    offset = offset.checked_sub(1.into()).unwrap_or_default();
 
     let mut actions = vec![];
     f(&db, file, &mut actions, offset);
@@ -38,7 +38,7 @@ pub(super) fn apply_code_action(
         }
     }
 
-    let mut result = sql.clone();
+    let mut result = sql.to_string();
 
     let mut edits = action.edits.clone();
     edits.sort_by_key(|e| e.text_range.start());
@@ -93,9 +93,11 @@ fn code_action_not_applicable_(
     sql: &str,
     allow_errors: bool,
 ) -> bool {
-    let (offset, sql) = fixture(sql);
+    let fixture = Fixture::new(sql);
+    let offset = fixture.marker().offset();
+    let sql = fixture.sql();
     let db = Database::default();
-    let file = File::new(&db, sql.clone().into());
+    let file = File::new(&db, sql.into());
     let parse_result = crate::db::parse(&db, file);
     if !allow_errors {
         assert_eq!(parse_result.errors(), vec![]);

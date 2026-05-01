@@ -310,8 +310,8 @@ impl Violation {
         }
     }
 
-    fn fix(mut self, fix: Option<Fix>) -> Violation {
-        self.fix = fix;
+    fn fix<F: Into<Option<Fix>>>(mut self, fix: F) -> Violation {
+        self.fix = fix.into();
         self
     }
     fn help(mut self, help: impl Into<String>) -> Violation {
