@@ -306,13 +306,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         }
         ast_nav::ParentSouce::ParenSelect(paren_select) => {
             // Qualified access like `t.a`
-            if let Some(table_name) = subquery_alias_name(&paren_select) {
-                let column_name = column_name_from_node(def_node)?;
-                return Some(Hover::snippet(ColumnHover::table_column(
-                    &table_name.to_string(),
-                    &column_name.to_string(),
-                )));
-            }
+            let table_name = subquery_alias_name(&paren_select);
 
             // Unqualified access like `a` from `select a from (select 1 a)`
             let column_name = column_name_from_node(def_node)?;
@@ -321,10 +315,18 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
                 .into_iter()
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty)?;
-            return Some(Hover::snippet(ColumnHover::anon_column_type(
-                &column_name.to_string(),
-                &ty.to_string(),
-            )));
+            if let Some(table_name) = table_name {
+                Some(Hover::snippet(ColumnHover::table_column_type(
+                    &table_name.to_string(),
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                )))
+            } else {
+                Some(Hover::snippet(ColumnHover::anon_column_type(
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                )))
+            }
         }
         // create view v(a) as select 1;
         // select a from v;
@@ -2567,8 +2569,8 @@ select t$0.a from (select 1 a) t;
     fn hover_on_subquery_qualified_column_ref() {
         assert_snapshot!(check_hover("
 select t.a$0 from (select 1 a) t;
-"), @r"
-        hover: column t.a
+"), @"
+        hover: column t.a integer
           ╭▸ 
         2 │ select t.a from (select 1 a) t;
           ╰╴         ─ hover
@@ -2580,7 +2582,7 @@ select t.a$0 from (select 1 a) t;
         assert_snapshot!(check_hover("
 select a$0 from (select 1 a) t;
 "), @"
-        hover: column t.a
+        hover: column t.a integer
           ╭▸ 
         2 │ select a from (select 1 a) t;
           ╰╴       ─ hover
@@ -3422,7 +3424,7 @@ select *$0 from (select 1) as sub;
     }
 
     #[test]
-    fn hover_on_view_inferred_column_anme() {
+    fn hover_on_view_inferred_column_name() {
         assert_snapshot!(check_hover(r#"
 create view v as select 1;
 select "?column?"$0 from v;
@@ -3477,7 +3479,7 @@ select "?column?"$0 from (select 1);
         assert_snapshot!(check_hover(r#"
 select sub."?column?"$0 from (select 1) sub;
 "#), @r#"
-        hover: column sub.?column?
+        hover: column sub.?column? integer
           ╭▸ 
         2 │ select sub."?column?" from (select 1) sub;
           ╰╴                    ─ hover
