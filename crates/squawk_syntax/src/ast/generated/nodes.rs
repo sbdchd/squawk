@@ -14181,6 +14181,10 @@ impl Reindex {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn concurrently_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
+    }
+    #[inline]
     pub fn database_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DATABASE_KW)
     }
