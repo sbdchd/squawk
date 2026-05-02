@@ -2289,7 +2289,11 @@ Cluster =
   'cluster'
   ('verbose' | OptionItemList)?
   Path?
-  UsingMethod?
+  (UsingMethod | OnPath)?
+
+OnPath =
+  'on'
+  Path
 
 Repack =
   'repack'

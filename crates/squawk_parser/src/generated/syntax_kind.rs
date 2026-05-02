@@ -1006,6 +1006,7 @@ pub enum SyntaxKind {
     ON_COMMIT,
     ON_CONFLICT_CLAUSE,
     ON_DELETE_ACTION,
+    ON_PATH,
     ON_TABLE,
     ON_UPDATE_ACTION,
     OP,

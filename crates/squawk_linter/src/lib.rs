@@ -47,6 +47,7 @@ use rules::identifier_too_long;
 use rules::prefer_bigint_over_int;
 use rules::prefer_bigint_over_smallint;
 use rules::prefer_identity;
+use rules::prefer_repack;
 use rules::prefer_robust_stmts;
 use rules::prefer_text_field;
 use rules::prefer_timestamptz;
@@ -79,6 +80,7 @@ pub enum Rule {
     PreferBigintOverInt,
     PreferBigintOverSmallint,
     PreferIdentity,
+    PreferRepack,
     PreferRobustStmts,
     PreferTextField,
     PreferTimestampTz,
@@ -131,6 +133,7 @@ impl TryFrom<&str> for Rule {
             "prefer-bigint-over-int" => Ok(Rule::PreferBigintOverInt),
             "prefer-bigint-over-smallint" => Ok(Rule::PreferBigintOverSmallint),
             "prefer-identity" => Ok(Rule::PreferIdentity),
+            "prefer-repack" => Ok(Rule::PreferRepack),
             "prefer-robust-stmts" => Ok(Rule::PreferRobustStmts),
             "prefer-text-field" => Ok(Rule::PreferTextField),
             // this is typo'd so we just support both
@@ -199,6 +202,7 @@ impl fmt::Display for Rule {
             Rule::PreferBigintOverInt => "prefer-bigint-over-int",
             Rule::PreferBigintOverSmallint => "prefer-bigint-over-smallint",
             Rule::PreferIdentity => "prefer-identity",
+            Rule::PreferRepack => "prefer-repack",
             Rule::PreferRobustStmts => "prefer-robust-stmts",
             Rule::PreferTextField => "prefer-text-field",
             Rule::PreferTimestampTz => "prefer-timestamp-tz",
@@ -332,7 +336,7 @@ impl Violation {
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct LinterSettings {
     pub pg_version: Version,
     pub assume_in_transaction: bool,
@@ -409,6 +413,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::PreferIdentity) {
             prefer_identity(self, file);
+        }
+        if self.rules.contains(&Rule::PreferRepack) {
+            prefer_repack(self, file);
         }
         if self.rules.contains(&Rule::PreferRobustStmts) {
             prefer_robust_stmts(self, file);

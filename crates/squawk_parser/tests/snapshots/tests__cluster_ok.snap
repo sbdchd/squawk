@@ -99,16 +99,17 @@ SOURCE_FILE
         NAME_REF
           IDENT "f"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
+    ON_PATH
+      ON_KW "on"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"

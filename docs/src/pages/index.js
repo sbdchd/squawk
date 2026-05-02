@@ -227,6 +227,11 @@ const rules = [
     tags: ["locking"],
     description: "Prevent blocking reads/writes to table while index is reindexed.",
   },
+  {
+    name: "prefer-repack",
+    tags: ["locking"],
+    description: "Prevent blocking reads/writes to table when rebuilding.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
