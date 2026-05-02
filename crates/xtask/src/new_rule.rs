@@ -126,7 +126,7 @@ fn update_lib(name: &str) -> Result<()> {
             "// xtask:new-rule:rule-call",
             format!(
                 r#"if self.rules.contains(&Rule::{name_pascal}) {{
-            {name_snake}(self, &file);
+            {name_snake}(self, file);
         }}
         "#
             ),
