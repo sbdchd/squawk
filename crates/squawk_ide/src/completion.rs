@@ -371,7 +371,8 @@ fn column_completions_from_clause(
                 }));
             }
             Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
-                let columns = collect::create_table_as_columns_with_types(&create_table_as);
+                let columns =
+                    collect::create_table_as_columns_with_types(db, file, &create_table_as);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
                     kind: CompletionItemKind::Column,
@@ -383,7 +384,7 @@ fn column_completions_from_clause(
                 }));
             }
             Some(ast_nav::ParentSouce::CreateView(create_view)) => {
-                let columns = collect::view_like_columns_with_types(&create_view);
+                let columns = collect::view_like_columns_with_types(db, file, &create_view);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
                     kind: CompletionItemKind::Column,
@@ -479,7 +480,7 @@ fn alias_base_columns_with_types(
                 .collect()
         }
         Some(ast_nav::ParentSouce::CreateView(create_view)) => {
-            collect::view_like_columns_with_types(&create_view)
+            collect::view_like_columns_with_types(db, file, &create_view)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
@@ -491,7 +492,7 @@ fn alias_base_columns_with_types(
                 .collect()
         }
         Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
-            collect::create_table_as_columns_with_types(&create_table_as)
+            collect::create_table_as_columns_with_types(db, file, &create_table_as)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
