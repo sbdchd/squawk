@@ -8464,11 +8464,21 @@ fn cluster(p: &mut Parser<'_>) -> CompletedMarker {
         opt_option_list(p);
     }
     let has_name = opt_path_name_ref(p).is_some();
-    if has_name && p.eat(ON_KW) {
-        path_name_ref(p);
+    if has_name {
+        opt_on_path(p);
     }
     opt_using_method(p);
     m.complete(p, CLUSTER)
+}
+
+fn opt_on_path(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.eat(ON_KW) {
+        path_name_ref(p);
+        m.complete(p, ON_PATH);
+    } else {
+        m.abandon(p);
+    }
 }
 
 fn repack(p: &mut Parser<'_>) -> CompletedMarker {
