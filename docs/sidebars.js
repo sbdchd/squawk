@@ -38,6 +38,7 @@ module.exports = {
       "require-table-schema",
       "identifier-too-long",
       "require-concurrent-partition-detach",
+      "require-concurrent-reindex",
       // xtask:new-rule:error-name
     ],
   },

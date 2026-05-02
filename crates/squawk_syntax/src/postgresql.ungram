@@ -2953,7 +2953,7 @@ SetTransaction =
   )
 
 Reindex =
-  'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? Path?
+  'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? 'concurrently'? Path?
 
 CreateView =
   'create' OrReplace? Persistence? 'recursive'? 'view' Path ColumnList?

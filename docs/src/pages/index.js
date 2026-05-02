@@ -222,6 +222,11 @@ const rules = [
     tags: ["schema", "locking"],
     description: "Prevent blocking reads/writes to table while partition is detached.",
   },
+  {
+    name: "require-concurrent-reindex",
+    tags: ["locking"],
+    description: "Prevent blocking reads/writes to table while index is reindexed.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 

@@ -55,6 +55,7 @@ use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::require_concurrent_partition_detach;
+use rules::require_concurrent_reindex;
 use rules::require_enum_value_ordering;
 use rules::require_table_schema;
 use rules::require_timeout_settings;
@@ -98,6 +99,7 @@ pub enum Rule {
     RequireTableSchema,
     IdentifierTooLong,
     RequireConcurrentPartitionDetach,
+    RequireConcurrentReindex,
     // xtask:new-rule:error-name
 }
 
@@ -152,6 +154,7 @@ impl TryFrom<&str> for Rule {
             "require-table-schema" => Ok(Rule::RequireTableSchema),
             "identifier-too-long" => Ok(Rule::IdentifierTooLong),
             "require-concurrent-partition-detach" => Ok(Rule::RequireConcurrentPartitionDetach),
+            "require-concurrent-reindex" => Ok(Rule::RequireConcurrentReindex),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -218,6 +221,7 @@ impl fmt::Display for Rule {
             Rule::RequireTableSchema => "require-table-schema",
             Rule::IdentifierTooLong => "identifier-too-long",
             Rule::RequireConcurrentPartitionDetach => "require-concurrent-partition-detach",
+            Rule::RequireConcurrentReindex => "require-concurrent-reindex",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -456,6 +460,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::RequireConcurrentPartitionDetach) {
             require_concurrent_partition_detach(self, file);
+        }
+        if self.rules.contains(&Rule::RequireConcurrentReindex) {
+            require_concurrent_reindex(self, file);
         }
         // xtask:new-rule:rule-call
 
