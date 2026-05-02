@@ -100,6 +100,7 @@ pub(crate) fn schema_name(path: &ast::Path) -> Option<Schema> {
         .map(|name_ref| Schema(Name::from_node(&name_ref)))
 }
 
+// TODO: doesn't handle CTEs/subqueries/aliases
 pub(crate) fn schema_and_table_from_from_item(
     from_item: &ast::FromItem,
 ) -> Option<(Option<Schema>, Name)> {

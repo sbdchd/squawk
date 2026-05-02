@@ -428,6 +428,49 @@ insert into u select 1, 2, 3;
     }
 
     #[test]
+    fn insert_table_inherits_builtin_values() {
+        assert_snapshot!(check_inlay_hints("
+create table t ()
+inherits (information_schema.sql_features);
+insert into t values (1, 2, 3, 4, 5, 6, 7);
+"), @"
+        inlay hints:
+          ╭▸ 
+        4 │ …values (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
+          ╰╴         ────────────   ──────────────   ────────────────   ──────────────────   ──────────────   ────────────────   ──────────
+        ");
+    }
+
+    #[test]
+    fn insert_table_inherits_create_table_as_values() {
+        assert_snapshot!(check_inlay_hints("
+create table parent as select 1 a, 'x'::text b;
+create table child (c int) inherits (parent);
+insert into child values (1, 2, 3);
+"), @"
+        inlay hints:
+          ╭▸ 
+        4 │ insert into child values (a: 1, b: 2, c: 3);
+          ╰╴                          ───   ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_table_inherits_create_table_as_select_star() {
+        assert_snapshot!(check_inlay_hints("
+create table base (a int, b text);
+create table parent as select * from base;
+create table child (c int) inherits (parent);
+insert into child values (1, 2, 3);
+"), @"
+        inlay hints:
+          ╭▸ 
+        5 │ insert into child values (a: 1, b: 2, c: 3);
+          ╰╴                          ───   ───   ───
+        ");
+    }
+
+    #[test]
     fn insert_table_like_select() {
         assert_snapshot!(check_inlay_hints("
 create table x (a int, b int);
@@ -451,6 +494,33 @@ insert into t select 1, 2;
           ╭▸ 
         3 │ insert into t select a: 1, b: 2;
           ╰╴                     ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_table_like_builtin_values() {
+        assert_snapshot!(check_inlay_hints("
+create table t (like information_schema.sql_features);
+insert into t values (1, 2, 3, 4, 5, 6, 7);
+"), @"
+        inlay hints:
+          ╭▸ 
+        3 │ …values (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
+          ╰╴         ────────────   ──────────────   ────────────────   ──────────────────   ──────────────   ────────────────   ──────────
+        ");
+    }
+
+    #[test]
+    fn insert_table_like_select_into_values() {
+        assert_snapshot!(check_inlay_hints("
+select 1 a, 'x'::text b into parent;
+create table child (like parent);
+insert into child values (1, 2);
+"), @"
+        inlay hints:
+          ╭▸ 
+        4 │ insert into child values (a: 1, b: 2);
+          ╰╴                          ───   ───
         ");
     }
 }

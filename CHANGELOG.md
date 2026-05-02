@@ -69,9 +69,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   We now check files in parallel using rayon, which gives a nice speed up of
   22-55%.
 
+## Fixed
+
 - lexer/ide: fix lexing of non-ascii + fix case folding in goto def (#1101)
 
-  Previously we case folding all of the characters in our unquoted identifiers
+  Previously we case folded all of the characters in our unquoted identifiers
   including unicode. This differed from Postgres behavior which only folded ascii.
 
   Now we correctly error instead of resolving in the following:
