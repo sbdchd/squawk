@@ -269,15 +269,10 @@ fn hover_column(db: &dyn Db, definitions: &[Location]) -> Option<Hover> {
 }
 
 fn column_name_from_node(column_name_node: &SyntaxNode) -> Option<Name> {
-    if column_name_node
-        .ancestors()
-        .any(|ancestor| ast::Values::can_cast(ancestor.kind()))
-    {
-        let row = column_name_node.ancestors().find_map(ast::Row::cast)?;
-        let idx = row
-            .exprs()
-            .position(|expr| expr.syntax() == column_name_node)?;
-        Some(Name::from_string(format!("column{}", idx + 1)))
+    if let Some(values) = column_name_node.ancestors().find_map(ast::Values::cast) {
+        ast_nav::iter_values_columns(&values)
+            .find(|(_, expr)| expr.syntax() == column_name_node)
+            .map(|(name, _)| name)
     } else if let Some(name) = ast::Name::cast(column_name_node.clone()) {
         Some(Name::from_node(&name))
     } else {
@@ -294,10 +289,20 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
             let cte_name = with_table.name()?;
             let column_name = column_name_from_node(def_node)?;
             let table_name = Name::from_node(&cte_name);
-            return Some(Hover::snippet(ColumnHover::table_column(
-                &table_name.to_string(),
-                &column_name.to_string(),
-            )));
+            let ty = collect::with_table_columns_with_types(db, def.file, with_table)
+                .into_iter()
+                .find(|(name, _)| *name == column_name)
+                .and_then(|(_, ty)| ty);
+            return Some(Hover::snippet(match ty {
+                Some(ty) => ColumnHover::table_column_type(
+                    &table_name.to_string(),
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                ),
+                None => {
+                    ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
+                }
+            }));
         }
         ast_nav::ParentSouce::ParenSelect(paren_select) => {
             // Qualified access like `t.a`
@@ -478,6 +483,7 @@ fn hover_qualified_star(db: &dyn Db, file: File, field_expr: ast::FieldExpr) -> 
 fn hover_unqualified_star(db: &dyn Db, file: File, target: ast::Target) -> Option<Hover> {
     let mut results = hover_unqualified_star_with_binder(db, file, &target);
 
+    // TODO: this needs to be updated when we support searching extensions
     if results.is_empty() && target_has_schema_qualified_from_item(&target) {
         results = hover_unqualified_star_with_binder(db, builtins_file(db), &target);
     }
@@ -1429,7 +1435,7 @@ fn qualified_star_table_ptr(
                 file,
                 name_ref.as_ref(),
                 &table_name,
-                &schema,
+                schema.as_ref(),
                 position,
             ) {
                 return Some(table_like_ptr);
@@ -1458,9 +1464,14 @@ fn table_or_view_or_cte_ptrs(
     let mut results = vec![];
     let name_ref = path.segment().and_then(|x| x.name_ref());
 
-    if let Some((table_like_ptr, _kind)) =
-        resolve::resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
-    {
+    if let Some((table_like_ptr, _kind)) = resolve::resolve_table_like(
+        db,
+        file,
+        name_ref.as_ref(),
+        &table_name,
+        schema.as_ref(),
+        position,
+    ) {
         results.push(table_like_ptr);
     }
 
@@ -3009,8 +3020,8 @@ select t$0 from t;
         assert_snapshot!(check_hover("
 with t as (select 1 a)
 select a$0 from t;
-"), @r"
-        hover: column t.a
+"), @"
+        hover: column t.a integer
           ╭▸ 
         3 │ select a from t;
           ╰╴       ─ hover
@@ -3022,8 +3033,8 @@ select a$0 from t;
         assert_snapshot!(check_hover("
 with t as (select 1 a, 2 b)
 select b$0 from t;
-"), @r"
-        hover: column t.b
+"), @"
+        hover: column t.b integer
           ╭▸ 
         3 │ select b from t;
           ╰╴       ─ hover
@@ -3035,8 +3046,8 @@ select b$0 from t;
         assert_snapshot!(check_hover("
 with t(a) as (select 1)
 select a$0 from t;
-"), @r"
-        hover: column t.a
+"), @"
+        hover: column t.a integer
           ╭▸ 
         3 │ select a from t;
           ╰╴       ─ hover
@@ -3091,8 +3102,8 @@ with t as (
     values (1, 2), (3, 4)
 )
 select column1$0, column2 from t;
-"), @r"
-        hover: column t.column1
+"), @"
+        hover: column t.column1 integer
           ╭▸ 
         5 │ select column1, column2 from t;
           ╰╴             ─ hover
@@ -3106,8 +3117,8 @@ with t as (
     values (1, 2), (3, 4)
 )
 select column1, column2$0 from t;
-"), @r"
-        hover: column t.column2
+"), @"
+        hover: column t.column2 integer
           ╭▸ 
         5 │ select column1, column2 from t;
           ╰╴                      ─ hover
@@ -3121,8 +3132,8 @@ with t as (
     values (1), (2), (3)
 )
 select column1$0 from t;
-"), @r"
-        hover: column t.column1
+"), @"
+        hover: column t.column1 integer
           ╭▸ 
         5 │ select column1 from t;
           ╰╴             ─ hover
@@ -3136,8 +3147,8 @@ with t as (
     values (1, 2), (3, 4)
 )
 select COLUMN1$0, COLUMN2 from t;
-"), @r"
-        hover: column t.column1
+"), @"
+        hover: column t.column1 integer
           ╭▸ 
         5 │ select COLUMN1, COLUMN2 from t;
           ╰╴             ─ hover
@@ -3359,9 +3370,9 @@ select *$0 from (select a from t);
         assert_snapshot!(check_hover("
 with t as (select 1 a, 2 b)
 select *$0 from (table t);
-"), @r"
-        hover: column a
-              column b
+"), @"
+        hover: column a integer
+              column b integer
           ╭▸ 
         3 │ select * from (table t);
           ╰╴       ─ hover
@@ -3429,7 +3440,7 @@ select "?column?"$0 from v;
 with x as (select 1)
 select "?column?"$0 from x;
 "#), @r#"
-        hover: column x.?column?
+        hover: column x.?column? integer
           ╭▸ 
         3 │ select "?column?" from x;
           ╰╴                ─ hover
@@ -3915,8 +3926,8 @@ with new_data as (
     select 1 as id, 'new@example.com' as email
 )
 update users set email = new_data.email$0 from new_data where users.id = new_data.id;
-"), @r"
-        hover: column new_data.email
+"), @"
+        hover: column new_data.email text
           ╭▸ 
         6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
           ╰╴                                      ─ hover
@@ -3931,8 +3942,8 @@ with new_data as (
     select 1 as id, 'new@example.com' as email
 )
 update users set email = new_data.email from new_data where new_data.id$0 = users.id;
-"), @r"
-        hover: column new_data.id
+"), @"
+        hover: column new_data.id integer
           ╭▸ 
         6 │ update users set email = new_data.email from new_data where new_data.id = users.id;
           ╰╴                                                                      ─ hover
@@ -4588,6 +4599,76 @@ select *$0 from u;
     }
 
     #[test]
+    fn hover_create_table_inherits_builtin_star() {
+        assert_snapshot!(check_hover_info("
+create table t ()
+inherits (information_schema.sql_features);
+select *$0 from t;
+").snippet, @"
+        column public.t.feature_id character_data
+        column public.t.feature_name character_data
+        column public.t.sub_feature_id character_data
+        column public.t.sub_feature_name character_data
+        column public.t.is_supported yes_or_no
+        column public.t.is_verified_by character_data
+        column public.t.comments character_data
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_like_builtin_star() {
+        assert_snapshot!(check_hover_info("
+create table t (like information_schema.sql_features);
+select *$0 from t;
+").snippet, @"
+        column public.t.feature_id character_data
+        column public.t.feature_name character_data
+        column public.t.sub_feature_id character_data
+        column public.t.sub_feature_name character_data
+        column public.t.is_supported yes_or_no
+        column public.t.is_verified_by character_data
+        column public.t.comments character_data
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_create_table_as_star() {
+        assert_snapshot!(check_hover_info("
+create table parent as select 1 a, 'x'::text b;
+create table child (c int) inherits (parent);
+select *$0 from child;
+").snippet, @"
+        column public.child.a integer
+        column public.child.b text
+        column public.child.c int
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_like_select_into_star() {
+        assert_snapshot!(check_hover_info("
+select 1 a, 'x'::text b into parent;
+create table child (like parent);
+select *$0 from child;
+").snippet, @"
+        column public.child.a integer
+        column public.child.b text
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_like_view_star() {
+        assert_snapshot!(check_hover_info("
+create view parent as select 1 a, 'x'::text b;
+create table child (like parent);
+select *$0 from child;
+").snippet, @"
+        column public.child.a integer
+        column public.child.b text
+        ");
+    }
+
+    #[test]
     fn hover_create_table_inherits_column() {
         assert_snapshot!(check_hover("
 create table t (
@@ -4602,6 +4683,20 @@ select a$0 from u;
           ╭▸ 
         8 │ select a from u;
           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_builtin_column() {
+        assert_snapshot!(check_hover("
+create table t ()
+inherits (information_schema.sql_features);
+select feature_name$0 from t;
+"), @"
+        hover: column information_schema.sql_features.feature_name information_schema.character_data
+          ╭▸ 
+        4 │ select feature_name from t;
+          ╰╴                  ─ hover
         ");
     }
 

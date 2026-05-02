@@ -50,7 +50,7 @@ impl Binder {
         name: &Name,
         kind: SymbolKind,
         position: TextSize,
-        schema: &Option<Schema>,
+        schema: Option<&Schema>,
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
 
@@ -75,7 +75,7 @@ impl Binder {
         name: &Name,
         kind: SymbolKind,
         position: TextSize,
-        schema: &Option<Schema>,
+        schema: Option<&Schema>,
         params: Option<&[Name]>,
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
@@ -107,7 +107,7 @@ impl Binder {
         name: &Name,
         kind: SymbolKind,
         position: TextSize,
-        schema: &Option<Schema>,
+        schema: Option<&Schema>,
         table: &Option<Name>,
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;

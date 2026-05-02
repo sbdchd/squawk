@@ -61,7 +61,7 @@ fn select_completions(
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
-    completions.extend(function_completions(db, file, &schema, position));
+    completions.extend(function_completions(db, file, schema.as_ref(), position));
 
     let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
     completions.extend(tables.into_iter().map(|name| CompletionItem {
@@ -270,7 +270,7 @@ fn limit_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<Comple
         sort_text: None,
     }];
 
-    completions.extend(function_completions(db, file, &schema, position));
+    completions.extend(function_completions(db, file, schema.as_ref(), position));
     completions
 }
 
@@ -278,7 +278,7 @@ fn offset_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<Compl
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
-    function_completions(db, file, &schema, position)
+    function_completions(db, file, schema.as_ref(), position)
 }
 
 fn select_expr_completions(
@@ -291,7 +291,7 @@ fn select_expr_completions(
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
-    completions.extend(function_completions(db, file, &schema, position));
+    completions.extend(function_completions(db, file, schema.as_ref(), position));
 
     if let Some(from_clause) = select.from_clause() {
         for from_item in from_clause.from_items() {
@@ -317,12 +317,12 @@ fn select_expr_completions(
 fn function_completions(
     db: &dyn Db,
     file: File,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Vec<CompletionItem> {
     let binder = bind(db, file);
     binder
-        .all_symbols_by_kind(SymbolKind::Function, schema.as_ref())
+        .all_symbols_by_kind(SymbolKind::Function, schema)
         .into_iter()
         .map(|name| CompletionItem {
             label: format!("{name}()"),
@@ -639,7 +639,7 @@ fn delete_expr_completions(
         completions.extend(functions.into_iter().map(|name| CompletionItem {
             label: name.to_string(),
             kind: CompletionItemKind::Function,
-            detail: function_detail(db, file, name, &schema, position),
+            detail: function_detail(db, file, name, schema.as_ref(), position),
             insert_text: None,
             insert_text_format: None,
             trigger_completion_after_insert: false,
@@ -650,7 +650,7 @@ fn delete_expr_completions(
         completions.extend(functions.into_iter().map(|name| CompletionItem {
             label: format!("{name}()"),
             kind: CompletionItemKind::Function,
-            detail: function_detail(db, file, name, &schema, position),
+            detail: function_detail(db, file, name, schema.as_ref(), position),
             insert_text: None,
             insert_text_format: None,
             trigger_completion_after_insert: false,
@@ -669,12 +669,15 @@ fn delete_expr_completions(
     }
 
     let schema = name::schema_name(&path);
-    if let Some(table_ptr) =
-        binder.lookup_with(&delete_table_name, SymbolKind::Table, position, &schema)
-        && let Some(create_table) = table_ptr
-            .to_node(source_file.syntax())
-            .ancestors()
-            .find_map(ast::CreateTableLike::cast)
+    if let Some(table_ptr) = binder.lookup_with(
+        &delete_table_name,
+        SymbolKind::Table,
+        position,
+        schema.as_ref(),
+    ) && let Some(create_table) = table_ptr
+        .to_node(source_file.syntax())
+        .ancestors()
+        .find_map(ast::CreateTableLike::cast)
     {
         let columns = collect::table_columns(db, file, &create_table);
         completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
@@ -836,7 +839,7 @@ fn function_detail(
     db: &dyn Db,
     file: File,
     function_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Option<String> {
     let binder = bind(db, file);
@@ -1133,6 +1136,77 @@ select $0 from t;
          pg_catalog         | Schema   |                         
          pg_temp            | Schema   |                         
          pg_toast           | Schema   |                         
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_create_table_inherits_builtin() {
+        assert_snapshot!(completions("
+create table t ()
+inherits (information_schema.sql_features);
+select $0 from t;
+"), @"
+         label              | kind     | detail         
+        --------------------+----------+----------------
+         comments           | Column   | character_data 
+         feature_id         | Column   | character_data 
+         feature_name       | Column   | character_data 
+         is_supported       | Column   | yes_or_no      
+         is_verified_by     | Column   | character_data 
+         sub_feature_id     | Column   | character_data 
+         sub_feature_name   | Column   | character_data 
+         t                  | Table    |                
+         *                  | Operator |                
+         public             | Schema   |                
+         pg_catalog         | Schema   |                
+         pg_temp            | Schema   |                
+         pg_toast           | Schema   |                
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_create_table_inherits_create_table_as() {
+        assert_snapshot!(completions("
+create table parent as select 1 a, 'x'::text b;
+create table child (c int) inherits (parent);
+select $0 from child;
+"), @"
+         label              | kind     | detail  
+        --------------------+----------+---------
+         a                  | Column   | integer 
+         b                  | Column   | text    
+         c                  | Column   | int     
+         child              | Table    |         
+         parent             | Table    |         
+         *                  | Operator |         
+         public             | Schema   |         
+         pg_catalog         | Schema   |         
+         pg_temp            | Schema   |         
+         pg_toast           | Schema   |         
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_create_table_like_select_into() {
+        assert_snapshot!(completions("
+select 1 a, 'x'::text b into parent;
+create table child (like parent);
+select $0 from child;
+"), @"
+         label              | kind     | detail  
+        --------------------+----------+---------
+         a                  | Column   | integer 
+         b                  | Column   | text    
+         child              | Table    |         
+         parent             | Table    |         
+         *                  | Operator |         
+         public             | Schema   |         
+         pg_catalog         | Schema   |         
+         pg_temp            | Schema   |         
+         pg_toast           | Schema   |         
          information_schema | Schema   |
         ");
     }

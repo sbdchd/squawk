@@ -2128,6 +2128,22 @@ create table t (
     }
 
     #[test]
+    fn goto_create_table_like_view() {
+        assert_snapshot!(goto("
+create view v as select 1 a, 2 b;
+create table t (like v);
+select a$0 from t;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 a, 2 b;
+          │                           ─ 2. destination
+        3 │ create table t (like v);
+        4 │ select a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_inherits() {
         assert_snapshot!(goto("
 create table bar(a int);
@@ -2140,6 +2156,26 @@ inherits (foo.bar, bar$0, buzz);
         3 │ create table t (a int)
         4 │ inherits (foo.bar, bar, buzz);
           ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_inherits_builtin() {
+        assert_snapshot!(goto("
+create table t ()
+inherits (information_schema.sql_features);
+select feature_name$0 from t;
+"), @"
+            ╭▸ current.sql:4:19
+            │
+          4 │ select feature_name from t;
+            │                   ─ 1. source
+            ╰╴
+
+            ╭▸ builtins.sql:437:3
+            │
+        437 │   feature_name information_schema.character_data,
+            ╰╴  ──────────── 2. destination
         ");
     }
 
@@ -2782,6 +2818,52 @@ select a$0 from t;
     }
 
     #[test]
+    fn goto_create_table_as_table() {
+        assert_snapshot!(goto("
+create table t(a bigint);
+create table u as table t;
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a bigint);
+          │                ─ 2. destination
+        3 │ create table u as table t;
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_select_star() {
+        assert_snapshot!(goto("
+create table t(a bigint);
+create table u as select * from t;
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a bigint);
+          │                ─ 2. destination
+        3 │ create table u as select * from t;
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_values() {
+        assert_snapshot!(goto("
+create table k as values (1, 2);
+select column1$0 from k;
+"), @"
+          ╭▸ 
+        2 │ create table k as values (1, 2);
+          │                           ─ 2. destination
+        3 │ select column1 from k;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_select_from_create_table_as() {
         assert_snapshot!(goto("
 create table t as select 1 a;
@@ -2792,6 +2874,20 @@ select a from t$0;
           │              ─ 2. destination
         3 │ select a from t;
           ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_like_view_definition() {
+        assert_snapshot!(goto("
+create view v as select 1 a;
+create table t (like v$0);
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 a;
+          │             ─ 2. destination
+        3 │ create table t (like v);
+          ╰╴                     ─ 1. source
         ");
     }
 
