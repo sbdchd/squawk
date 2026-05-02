@@ -18,12 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```sql
   -- instead of
   cluster foo;
-  -- or 
+  -- or
   vacuum full foo;
   -- use
   repack (concurrently) foo;
   ```
-
 
 - linter: new rule: require-concurrent-reindex (#1104)
 
@@ -39,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```sql
   -- instead of
   alter table t detach partition p;
-  -- use 
+  -- use
   alter table t detach partition p concurrently;
   ```
 
@@ -63,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     ╰╴
   ```
 
+  Thanks @subnix for coming up with this idea!
 
 - linter: parallel file checking (#1099)
 
@@ -267,7 +267,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.47.0 - 2026-04-13
 
-### added
+### Added
 
 - ide: semantic syntax highlighting (#1057, #1058, #1052)
 - ide: semantic syntax highlighting (#1048)
@@ -278,35 +278,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.46.0 - 2026-04-05
 
-### added
+### Added
 
 - ide: goto def support for dec & float(n) types (#1042)
 - vscode: vendor and improve postgres syntax highlighting grammar (#1043, #1041, #1039)
-- parser: sync pg regressions suite & support the new forportionof clause (#1038)
+- parser: sync pg regressions suite & support the new ForPortionOf clause (#1038)
 
-### fixed
+### Fixed
 
 - ide: fix column naming for dec & float(n) (#1040)
 
 ## v2.45.0 - 2026-04-01
 
-### added
+### Added
 
 - server: add multi threading (#1032, #1031, #1030, #1029, #1028, #1026, #1024, #1018)
 - parser: improve error recovery for expr_as_name_list (#1017)
 - parser: sql/pgq cleanup & more sql/pgq test cases (#1016)
 - parser: improve persistence parsing (#1013)
 
-### internal
+### Internal
 
 - internal: bump rust to 1.94 (#1015)
 
 ## v2.44.0 - 2026-03-19
 
-### added
+### Added
 
-- linter: add require-enum-value-ordering rule (#992). thanks @cabello!
-- linter: add cross-file validation for `not null` constraint pattern (#957). thanks @reteps!
+- linter: add require-enum-value-ordering rule (#992). Thanks @cabello!
+- linter: add cross-file validation for `NOT NULL` constraint pattern (#957). Thanks @reteps!
 - parser: support postgres 18 graph language (#1010)
 - parser: support new except table clause (#986)
 - parser: alter type ast improvements (#993)
@@ -315,19 +315,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: goto def window defs & over clauses (#994)
 - ide: goto def subquery compound selects (#988)
 
-### fixed
+### Fixed
 
 - server: handle errors from handlers by converting to a lsp err response (#1005)
 - parser: we weren't handling compound selects with extra parens (#989)
 
-### changed
+### Changed
 
 - server: pull based diagnostics (#1006)
 
-### internal
+### Internal
 
-- internal: replace lazy_static with std::sync::oncelock (#1009)
-- internal: hashmap -> fxhashmap, fxhashset (#1007)
+- internal: replace lazy_static with std::sync::OnceLock (#1009)
+- internal: HashMap -> FxHashMap, FxHashSet (#1007)
 - server: refactor notification handling to embrace types (#1004)
 - server: refactor request handling to embrace types (#1003)
 - server: refactor lib.rs into separate files (#1002)
@@ -338,7 +338,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.43.0 - 2026-02-28
 
-### added
+### Added
 
 - ide: quick action for `timestamp with out timezone` to `timestamptz` (#976)
 - ide: goto def for create aggregate params (#972)
@@ -346,7 +346,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: lateral joins, subqueries with table, hover aliases (#969)
 - ide: support table alias with column list (#968)
 
-### fixed
+### Fixed
 
 - linter: fix ignore comment not working with trailing content (#975)
 - ide: fix column name infer & related goto def (#977)
@@ -354,20 +354,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: fix builtin aggregates being defined as functions (#971)
 - ci: fix arm musl build (#966)
 
-### internal
+### Internal
 
 - ide: refactor hover to use goto def (#967)
 
 ## v2.42.0 - 2026-02-25
 
-### changed
+### Changed
 
 - linter: undo foreign key constraint check in create table (#962)
 
-  this was an incorrect change to add and isn't necessary since the new table
+  This was an incorrect change to add and isn't necessary since the new table
   doesn't have any rows.
 
-### added
+### Added
 
 - ci: build for alpine arm (#960)
 - ide: code action - rewrite between as binary expression (#953)
@@ -375,13 +375,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: goto def for column names in table function returns (#949)
 - ide: goto def with function in from item & cross join (#961)
 
-### fixed
+### Fixed
 
 - ide: fix col names for collation for, at time zone, overlaps (#951)
 
 ## v2.41.0 - 2026-02-20
 
-### added
+### Added
 
 - linter: warn about foreign key constraints in create table defs (#945)
 - parser: support on conflict do select & sync regression suite (#935)
@@ -391,21 +391,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: add quick fixes for leading `from` (#933)
 - ide: goto def for builtins (#932)
 
-### fixed
+### Fixed
 
-- linter: fix adding-not-nullable-field for pg >= 12 with validated check (#910). thanks @reteps!
+- linter: fix adding-not-nullable-field for pg >= 12 with validated CHECK (#910). Thanks @reteps!
 
-### changed
+### Changed
 
 - linter: don't report lint errors when syntax error found (#943)
 
 ## v2.40.1 - 2026-02-12
 
-### fixed
+### Fixed
 
-- github: fix commenting via rust_crypto features in jsonwebtoken (#929). thanks @lokiwins!
+- github: fix commenting via rust_crypto features in jsonwebtoken (#929). Thanks @lokiwins!
 
-### added
+### Added
 
 - parser: parse leading from clauses but warn they're not supported (#927)
 
@@ -416,14 +416,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   now gives:
 
   ```
-     error[syntax-error]: leading from clauses are not supported in postgres
+     error[syntax-error]: Leading from clauses are not supported in Postgres
     ╭▸ stdin:1:1
     │
   1 │ from t select c;
     ╰╴━━━━━━
   ```
 
-  we also check for solo from clauses:
+  We also check for solo from clauses:
 
   ```sql
   from t;
@@ -432,7 +432,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gives:
 
   ```
-    error[syntax-error]: missing select clause
+    error[syntax-error]: Missing select clause
     ╭▸ stdin:1:1
     │
   1 │ from t
@@ -455,25 +455,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     ╰╴                         ━
   ```
 
-  before it parsed `all` as a name reference.
+  Before it parsed `all` as a name reference.
 
 - ide: goto def func call in on conflict (#925)
 
 ## v2.40.0 - 2026-02-06
 
-### added
+### Added
 
 - parser: improve error recovery in `where`, `having`, & `join` `on` (#911, #912)
 - ide: goto def on conflict clause (#907)
 - ide: goto def func calls inside constraints/columns/indexes/partitions (#906)
 
-### fixed
+### Fixed
 
-- ide: goto def with recursive ctes (#909)
+- ide: goto def with recursive CTEs (#909)
 
 ## v2.39.0 - 2026-01-31
 
-### added
+### Added
 
 - vscode: add report issue command using the builtin issue reporter (#897)
 - ide: goto def on `comment on` stmts (#894)
@@ -481,18 +481,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: document symbols for create policy (#892)
 - ide: goto def with policy stmts (#886, #887, #888)
 
-### changed
+### Changed
 
 - linter: undo ignoring single stmts in prefer-robust-stmts (#902)
 
-### fixed
+### Fixed
 
 - ide: fix goto def for func call inside func (#901)
-- docs(readme): bump version of squawk in pre-commit demo v0.10.0 to v2.38.0 (#889). thanks @dzhalaevd!
+- docs(readme): bump version of squawk in pre-commit demo v0.10.0 to v2.38.0 (#889). Thanks @dzhalaevd!
 
 ## v2.38.0 - 2026-01-24
 
-### added
+### Added
 
 - parser: add more nodes for create policy/alter policy ast (#884)
 - parser: cte error handling improvements (#881)
@@ -506,11 +506,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: goto def on multiranges & timestamp timezones (#870)
 - ide: function signature in completion (#869)
 
-### changed
+### Changed
 
 - ide: update cast rewrites to support `select type 'foo'` (#868)
 
-### fixed
+### Fixed
 
 - ide: fix column name for real type (#874)
 - ide: fix goto def with cte & table of same name (#873)
@@ -520,7 +520,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.37.0 - 2026-01-18
 
-### added
+### Added
 
 - ide: cast function <-> cast operator code actions (#834)
 - ide: values <-> select code actions (#846, #847)
@@ -549,17 +549,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - parser: improve error handling for unfinished select stmt (#838)
 - playground: expand selection support (#829)
 
-### changed
+### Changed
 
 - parser: update role grammar to use refs like names (#853)
 
-### fixed
+### Fixed
 
 - ide: fix default search path to include pg_catalog (#864)
 
 ## v2.36.0 - 2026-01-06
 
-### added
+### Added
 
 - ide: goto def support for merge (#826),(#825)
 - ide: goto def truncate, lock, vacuum, alter table column, refresh (#823)
@@ -576,26 +576,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: mat view goto def/hover, agg/procedure/mat view doc symbols (#812)
 - ide: better goto def support for types (#811)
 - ide: composite field goto def & hover (#810)
-- ide: document symbol support for ctes (#806)
+- ide: document symbol support for CTEs (#806)
 - ide: hover for views (#804)
 - ide: goto def with create view (#802)
 - vscode: restart server command (#808)
 
-### fixed
+### Fixed
 
 - ide: fix column name for special cased functions (#824)
 - playground: fix dupe hover results in editor (#805)
 
 ## v2.35.0 - 2026-01-02
 
-### added
+### Added
 
 - ide: add goto def & hover support for types in casts (#799)
 - ide: add initial goto def support for types (#798)
 - ide: support ctes with update (#797)
 - ide: hover with update (#796)
 - ide: goto def with update (#795)
-- ide: goto def with insert/delete & cte (#794)
+- ide: goto def with insert/delete & CTE (#794)
 - ide: goto def for joins (#793)
 - ide: goto def & hover with procedures (#792)
 - ide: table alias goto def support (#791)
@@ -604,7 +604,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: cte improvements, subqueries, values, union select (#787)
 - ide: code action to remove redundant alias (#785)
 - ide: add hover to cte table & columns (#784)
-- ide: support more ctes in goto def (#783)
+- ide: support more CTEs in goto def (#783)
 - ide: goto def with cte & select (#782)
 - ide: code action for making inferred column alias explicit (#781)
 - playground: inlay hints, doc symbols, hover, goto def/refs, actions (#779)
@@ -627,39 +627,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ide: goto def on create/drop index (#762)
 - ide: add basic find refs support (#760)
 
-### fixed
+### Fixed
 
-- parser: fix parsing group by all in cte (#780)
+- parser: fix parsing group by all in CTE (#780)
 - ide: fix goto def with temp table (#761)
 
 ## v2.34.0 - 2025-12-22
 
-### added
+### Added
 
 - parser: add support for postgres 19's partition merge, partition split, and more. (#754)
 - parser: handle missing exprs in case expr (#749)
 - ide: goto def with `table` stmt (#748)
 - ide: support `set search_path` (#747)
 
-### internal
+### Internal
 
-- fix: removed deprecated cargo_bin() function in snapbox (#746). thanks @ranger-ross!
+- fix: Removed deprecated cargo_bin() function in snapbox (#746). Thanks @ranger-ross!
 
 ## v2.33.2 - 2025-12-16
 
-### fixed
+### Fixed
 
 - ci: try to fix npm trusted publishing (#742)
 
 ## v2.33.1 - 2025-12-16
 
-### fixed
+### Fixed
 
 - ci: npm trusted publishing (#741)
 
 ## v2.33.0 - 2025-12-16
 
-### added
+### Added
 
 - ide: goto def create temp table (#737)
 - ide: basic goto def for create table/drop table (#736)
@@ -670,29 +670,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - parser: update grammar & ast (#727)
 
-- use npm trusted publishing (#724). thanks @chdsbd!
+- use npm trusted publishing (#724). Thanks @chdsbd!
 
-### fixed
+### Fixed
 
 - linter: fix false positive with `create temp table t() on commit drop;` (#739)
 - parser: fix reindex parsing (#726)
 
 ## v2.32.0 - 2025-12-04
 
-### fixed
+### Fixed
 
 - parser: fixed issue parsing some `insert`'s with `select`s and `conflict` clauses (#720, #721, #722).
 
-### added
+### Added
 
 - parser: special case functions like `extract` are now properly typed in the ast (#719).
 
 ## v2.31.0 - 2025-11-24
 
-### added
+### Added
 
 - linter: adding_foreign_key_constraint: allow when create table in transaction (#713)
-- lsp: add code action for case else clause (#709). thanks @cr4ftx!
+- lsp: add code action for case else clause (#709). Thanks @cr4ftx!
 - lsp: go to def for case exprs (#708)
 - parser: fill out more ast nodes (#714)
 - parser: add slice expr node to syntax tree (#707)
@@ -700,18 +700,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - parser: improve option & role lists (#702)
 - parser: improve error recovery for update statements (#701)
 
-### fixed
+### Fixed
 
 - parser: fix nodes for casts so ast access works correctly (#711)
 - linter: fix autofix for int & smallint with array types (#710)
 
 ## v2.30.0 - 2025-10-30
 
-### added
+### Added
 
 - linter: new rule `ban-uncommitted-transaction`
 
-  squawk now warns about missing `commit` statements like:
+  Squawk now warns about missing `commit` statements like:
 
   ```sql
   begin;
@@ -719,28 +719,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
   ```
-  warning[ban-uncommitted-transaction]: transaction never committed or rolled back.
+  warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
     ╭▸ stdin:1:1
     │
   1 │ begin;
     │ ━━━━━
     │
-    ├ help: add a `commit` or `rollback` statement to complete the transaction.
+    ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
     ╭╴
   2 ±
-  3 + commit;
+  3 + COMMIT;
     ╰╴
   ```
 
 ## v2.29.0 - 2025-10-19
 
-### added
+### Added
 
 - parser: improve error recovery for option lists in `reindex`, `prepare`,
   `vacuum`, `copy`, `drop database`, `create type`, `create function`,
   `create table`, `create index` (#684)
 
-- parser: improved error recovery for ctes (#683)
+- parser: improved error recovery for CTEs (#683)
 
   ```sql
   with
@@ -767,7 +767,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - vscode: improved commenting behavior (#690)
 
-### fixed
+### Fixed
 
 - linter: fixed false positive with `constraint-missing-not-valid` (#694)
 
