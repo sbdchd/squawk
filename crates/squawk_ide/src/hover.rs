@@ -67,6 +67,10 @@ fn merge_hovers(hovers: Vec<Hover>) -> Option<Hover> {
         return None;
     }
 
+    if hovers.len() == 1 {
+        return Some(hovers[0].clone());
+    }
+
     Some(Hover::snippet(
         hovers
             .into_iter()
@@ -74,6 +78,25 @@ fn merge_hovers(hovers: Vec<Hover>) -> Option<Hover> {
             .collect::<Vec<_>>()
             .join("\n"),
     ))
+}
+
+fn hover_with_preceding_comment(snippet: impl Into<String>, node: &SyntaxNode) -> Hover {
+    let snippet = snippet.into();
+    if let Some(comment) = preceding_comment(node) {
+        return Hover::new(snippet, comment);
+    }
+    Hover::snippet(snippet)
+}
+
+fn hover_column_with_preceding_comment(snippet: impl Into<String>, def_node: &SyntaxNode) -> Hover {
+    let snippet = snippet.into();
+    if let Some(definition_node) = def_node
+        .ancestors()
+        .find_map(|node| ast::Column::cast(node.clone()))
+    {
+        return hover_with_preceding_comment(snippet, definition_node.syntax());
+    }
+    Hover::snippet(snippet)
 }
 
 #[salsa::tracked]
@@ -280,16 +303,19 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
                 .into_iter()
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty);
-            return Some(Hover::snippet(match ty {
-                Some(ty) => ColumnHover::table_column_type(
-                    &table_name.to_string(),
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ),
-                None => {
-                    ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
-                }
-            }));
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::table_column_type(
+                        &table_name.to_string(),
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => {
+                        ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
+                    }
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::ParenSelect(paren_select) => {
             // Qualified access like `t.a`
@@ -303,16 +329,19 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty)?;
             if let Some(table_name) = table_name {
-                Some(Hover::snippet(ColumnHover::table_column_type(
-                    &table_name.to_string(),
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                )))
+                Some(hover_column_with_preceding_comment(
+                    ColumnHover::table_column_type(
+                        &table_name.to_string(),
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    def_node,
+                ))
             } else {
-                Some(Hover::snippet(ColumnHover::anon_column_type(
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                )))
+                Some(hover_column_with_preceding_comment(
+                    ColumnHover::anon_column_type(&column_name.to_string(), &ty.to_string()),
+                    def_node,
+                ))
             }
         }
         // create view v(a) as select 1;
@@ -326,19 +355,22 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
                 .into_iter()
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty);
-            return Some(Hover::snippet(match ty {
-                Some(ty) => ColumnHover::schema_table_column_type(
-                    &schema.to_string(),
-                    &view_name,
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ),
-                None => ColumnHover::schema_table_column(
-                    &schema.to_string(),
-                    &view_name,
-                    &column_name.to_string(),
-                ),
-            }));
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::schema_table_column_type(
+                        &schema.to_string(),
+                        &view_name,
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => ColumnHover::schema_table_column(
+                        &schema.to_string(),
+                        &view_name,
+                        &column_name.to_string(),
+                    ),
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::Alias(alias) => {
             let alias_name = alias.name()?;
@@ -350,16 +382,19 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
                 .into_iter()
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty);
-            return Some(Hover::snippet(match ty {
-                Some(ty) => ColumnHover::table_column_type(
-                    &table_name.to_string(),
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ),
-                None => {
-                    ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
-                }
-            }));
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::table_column_type(
+                        &table_name.to_string(),
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => {
+                        ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
+                    }
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
             let column_name = collect::column_name_from_node(def_node)?;
@@ -369,19 +404,22 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
                 .into_iter()
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty);
-            return Some(Hover::snippet(match ty {
-                Some(ty) => ColumnHover::schema_table_column_type(
-                    &schema.to_string(),
-                    &table_name,
-                    &column_name.to_string(),
-                    &ty.to_string(),
-                ),
-                None => ColumnHover::schema_table_column(
-                    &schema.to_string(),
-                    &table_name,
-                    &column_name.to_string(),
-                ),
-            }));
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::schema_table_column_type(
+                        &schema.to_string(),
+                        &table_name,
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => ColumnHover::schema_table_column(
+                        &schema.to_string(),
+                        &table_name,
+                        &column_name.to_string(),
+                    ),
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::CreateTable(create_table) => {
             let column = def_node.ancestors().find_map(ast::Column::cast)?;
@@ -390,12 +428,15 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
             let path = create_table.path()?;
             let (schema, table_name) = resolve::resolve_table_info(db, def.file, &path)?;
 
-            return Some(Hover::snippet(ColumnHover::schema_table_column_type(
-                &schema.to_string(),
-                &table_name,
-                &Name::from_node(&column_name).to_string(),
-                &ty.syntax().text().to_string(),
-            )));
+            return Some(hover_column_with_preceding_comment(
+                ColumnHover::schema_table_column_type(
+                    &schema.to_string(),
+                    &table_name,
+                    &Name::from_node(&column_name).to_string(),
+                    &ty.syntax().text().to_string(),
+                ),
+                def_node,
+            ));
         }
     }
 }
@@ -412,13 +453,16 @@ fn hover_composite_type_field(db: &dyn Db, def: Location) -> Option<Hover> {
     let type_path = create_type.path()?;
     let (schema, type_name) = resolve::resolve_type_info(db, def.file, &type_path)?;
 
-    Some(Hover::snippet(format!(
-        "field {}.{}.{} {}",
-        schema,
-        type_name,
-        field_name,
-        ty.syntax().text()
-    )))
+    Some(hover_with_preceding_comment(
+        format!(
+            "field {}.{}.{} {}",
+            schema,
+            type_name,
+            field_name,
+            ty.syntax().text()
+        ),
+        column.syntax(),
+    ))
 }
 
 fn hover_column_definition(
@@ -432,12 +476,10 @@ fn hover_column_definition(
     let path = create_table.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
     let ty = ty.syntax().text().to_string();
-    Some(Hover::snippet(ColumnHover::schema_table_column_type(
-        &schema.to_string(),
-        &table_name,
-        &column_name,
-        &ty,
-    )))
+    Some(hover_with_preceding_comment(
+        ColumnHover::schema_table_column_type(&schema.to_string(), &table_name, &column_name, &ty),
+        column.syntax(),
+    ))
 }
 
 fn format_table_source(db: &dyn Db, file: File, source: ast_nav::ParentSouce) -> Option<Hover> {
@@ -1093,19 +1135,22 @@ fn format_view_column(
         .into_iter()
         .find(|(name, _)| *name == column_name)
         .and_then(|(_, ty)| ty);
-    Some(Hover::snippet(match ty {
-        Some(ty) => ColumnHover::schema_table_column_type(
-            &schema.to_string(),
-            &view_name,
-            &column_name.to_string(),
-            &ty.to_string(),
-        ),
-        None => ColumnHover::schema_table_column(
-            &schema.to_string(),
-            &view_name,
-            &column_name.to_string(),
-        ),
-    }))
+    Some(hover_column_with_preceding_comment(
+        match ty {
+            Some(ty) => ColumnHover::schema_table_column_type(
+                &schema.to_string(),
+                &view_name,
+                &column_name.to_string(),
+                &ty.to_string(),
+            ),
+            None => ColumnHover::schema_table_column(
+                &schema.to_string(),
+                &view_name,
+                &column_name.to_string(),
+            ),
+        },
+        def_node,
+    ))
 }
 
 fn format_with_table(with_table: ast::WithTable) -> Option<Hover> {
@@ -1235,31 +1280,20 @@ fn format_create_type(db: &dyn Db, file: File, create_type: ast::CreateType) -> 
     let path = create_type.path()?;
     let (schema, type_name) = resolve::resolve_type_info(db, file, &path)?;
 
-    if let Some(variant_list) = create_type.variant_list() {
+    let snippet = if let Some(variant_list) = create_type.variant_list() {
         let variants = variant_list.syntax().text().to_string();
-        return Some(Hover::snippet(format!(
-            "type {}.{} as enum {}",
-            schema, type_name, variants
-        )));
-    }
-
-    if let Some(column_list) = create_type.column_list() {
+        format!("type {}.{} as enum {}", schema, type_name, variants)
+    } else if let Some(column_list) = create_type.column_list() {
         let columns = column_list.syntax().text().to_string();
-        return Some(Hover::snippet(format!(
-            "type {}.{} as {}",
-            schema, type_name, columns
-        )));
-    }
-
-    if let Some(attribute_list) = create_type.attribute_list() {
+        format!("type {}.{} as {}", schema, type_name, columns)
+    } else if let Some(attribute_list) = create_type.attribute_list() {
         let attributes = attribute_list.syntax().text().to_string();
-        return Some(Hover::snippet(format!(
-            "type {}.{} {}",
-            schema, type_name, attributes
-        )));
-    }
+        format!("type {}.{} {}", schema, type_name, attributes)
+    } else {
+        format!("type {}.{}", schema, type_name)
+    };
 
-    Some(Hover::snippet(format!("type {}.{}", schema, type_name)))
+    Some(hover_with_preceding_comment(snippet, create_type.syntax()))
 }
 
 fn hover_schema(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -1370,11 +1404,10 @@ fn format_create_function(
         schema, function_name, params, return_type
     );
 
-    if let Some(comment) = preceding_comment(create_function.syntax()) {
-        return Some(Hover::new(snippet, comment));
-    }
-
-    Some(Hover::snippet(snippet))
+    Some(hover_with_preceding_comment(
+        snippet,
+        create_function.syntax(),
+    ))
 }
 
 fn hover_aggregate(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -2224,6 +2257,104 @@ select foo$0();
         ---
         this is a doc comment
         for foo
+        ");
+    }
+
+    #[test]
+    fn hover_type_extracts_preceding_comment() {
+        let hover = check_hover_info(
+            "
+-- this is a doc comment
+-- for foo
+create type foo as enum ('a', 'b');
+select 1::foo$0;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        type public.foo as enum ('a', 'b')
+        ```
+        ---
+        this is a doc comment
+        for foo
+        ");
+    }
+
+    #[test]
+    fn hover_bigint_extracts_preceding_comment_from_int8_definition() {
+        let hover = check_hover_info(
+            "
+-- 64-bit integer
+create type pg_catalog.int8;
+select 1::bigint$0;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        type pg_catalog.int8
+        ```
+        ---
+        64-bit integer
+        ");
+    }
+
+    #[test]
+    fn hover_text_type() {
+        let hover = check_hover_info(
+            "
+-- variable-length string, no limit specified
+--
+-- size: -1, align: 4
+create type pg_catalog.text;
+select '1'::text$0;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        type pg_catalog.text
+        ```
+        ---
+        variable-length string, no limit specified
+        size: -1, align: 4
+        ");
+    }
+
+    #[test]
+    fn hover_column_extracts_preceding_comment() {
+        let hover = check_hover_info(
+            "
+create table users(
+  -- email address
+  email text
+);
+select email$0 from users;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        column public.users.email text
+        ```
+        ---
+        email address
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_column_extracts_preceding_comment() {
+        let hover = check_hover_info(
+            "
+create table users(
+  -- email address
+  email$0 text
+);
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        column public.users.email text
+        ```
+        ---
+        email address
         ");
     }
 
