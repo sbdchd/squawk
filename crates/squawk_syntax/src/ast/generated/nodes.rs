@@ -8243,6 +8243,17 @@ impl ElseClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EmptyStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EmptyStmt {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnableAlwaysRule {
     pub(crate) syntax: SyntaxNode,
 }
@@ -18963,6 +18974,7 @@ pub enum Stmt {
     DropUser(DropUser),
     DropUserMapping(DropUserMapping),
     DropView(DropView),
+    EmptyStmt(EmptyStmt),
     Execute(Execute),
     Explain(Explain),
     Fetch(Fetch),
@@ -23592,6 +23604,24 @@ impl AstNode for ElseClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ELSE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EmptyStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EMPTY_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -34736,6 +34766,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::DROP_USER
                 | SyntaxKind::DROP_USER_MAPPING
                 | SyntaxKind::DROP_VIEW
+                | SyntaxKind::EMPTY_STMT
                 | SyntaxKind::EXECUTE
                 | SyntaxKind::EXPLAIN
                 | SyntaxKind::FETCH
@@ -34995,6 +35026,7 @@ impl AstNode for Stmt {
             SyntaxKind::DROP_USER => Stmt::DropUser(DropUser { syntax }),
             SyntaxKind::DROP_USER_MAPPING => Stmt::DropUserMapping(DropUserMapping { syntax }),
             SyntaxKind::DROP_VIEW => Stmt::DropView(DropView { syntax }),
+            SyntaxKind::EMPTY_STMT => Stmt::EmptyStmt(EmptyStmt { syntax }),
             SyntaxKind::EXECUTE => Stmt::Execute(Execute { syntax }),
             SyntaxKind::EXPLAIN => Stmt::Explain(Explain { syntax }),
             SyntaxKind::FETCH => Stmt::Fetch(Fetch { syntax }),
@@ -35192,6 +35224,7 @@ impl AstNode for Stmt {
             Stmt::DropUser(it) => &it.syntax,
             Stmt::DropUserMapping(it) => &it.syntax,
             Stmt::DropView(it) => &it.syntax,
+            Stmt::EmptyStmt(it) => &it.syntax,
             Stmt::Execute(it) => &it.syntax,
             Stmt::Explain(it) => &it.syntax,
             Stmt::Fetch(it) => &it.syntax,
@@ -36097,6 +36130,12 @@ impl From<DropView> for Stmt {
     #[inline]
     fn from(node: DropView) -> Stmt {
         Stmt::DropView(node)
+    }
+}
+impl From<EmptyStmt> for Stmt {
+    #[inline]
+    fn from(node: EmptyStmt) -> Stmt {
+        Stmt::EmptyStmt(node)
     }
 }
 impl From<Execute> for Stmt {

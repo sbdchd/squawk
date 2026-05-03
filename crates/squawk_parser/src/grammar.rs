@@ -5677,6 +5677,7 @@ struct StmtRestrictions {
 
 fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
     match (p.current(), p.nth(1)) {
+        (SEMICOLON, _) => Some(empty_stmt(p)),
         (ABORT_KW, _) => Some(rollback(p)),
         (ALTER_KW, AGGREGATE_KW) => Some(alter_aggregate(p)),
         (ALTER_KW, COLLATION_KW) => Some(alter_collation(p)),
@@ -5957,6 +5958,14 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             None
         }
     }
+}
+
+// handle things like: ;;;select 1
+fn empty_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(SEMICOLON));
+    let m = p.start();
+    p.bump(SEMICOLON);
+    m.complete(p, EMPTY_STMT)
 }
 
 // ALTER STATISTICS name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
@@ -15293,17 +15302,16 @@ fn set_data_type(p: &mut Parser<'_>) {
 pub(crate) fn entry_point(p: &mut Parser) {
     let m = p.start();
     while !p.at(EOF) {
-        // handle things like: ;;;select 1
-        if p.eat(SEMICOLON) {
-            continue;
-        }
         let parsed_stmt = stmt(
             p,
             &StmtRestrictions {
                 begin_end_allowed: true,
             },
         );
-        if !p.at(EOF) && parsed_stmt.is_some() {
+        if !p.at(EOF)
+            && let Some(marker) = parsed_stmt
+            && marker.kind() != EMPTY_STMT
+        {
             p.expect(SEMICOLON);
         }
     }
