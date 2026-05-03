@@ -41,6 +41,20 @@ pub(crate) fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
     None
 }
 
+/// ```sql
+/// squawk-ignore ban-drop-column -- we don't need to worry about this
+/// ```
+/// becomes
+/// ```sql
+/// squawk-ignore ban-drop-column
+/// ```
+pub(crate) fn trim_trailing_comment(text: &str) -> &str {
+    let trimmed = text.trim();
+    trimmed
+        .find("--")
+        .map_or(trimmed, |idx| trimmed[..idx].trim_end())
+}
+
 // TODO: maybe in a future version we can rename this to squawk-ignore-line
 pub const IGNORE_LINE_TEXT: &str = "squawk-ignore";
 pub const IGNORE_FILE_TEXT: &str = "squawk-ignore-file";
@@ -50,10 +64,7 @@ pub fn ignore_rule_info(token: &SyntaxToken) -> Option<(&str, TextRange, IgnoreK
         let without_start = comment_body.trim_start();
         let trim_start_size = comment_body.len() - without_start.len();
 
-        let without_end = without_start
-            .find("--")
-            .map_or(without_start, |idx| &without_start[..idx])
-            .trim_end();
+        let without_end = trim_trailing_comment(without_start);
         let trim_end_size = without_start.len() - without_end.len();
 
         for (prefix, kind) in [
@@ -137,11 +148,7 @@ pub fn has_disable_assume_in_transaction(file: &SyntaxNode) -> bool {
                 if token.kind() == SyntaxKind::COMMENT =>
             {
                 if let Some((body, _range)) = comment_body(&token) {
-                    let trimmed = body.trim();
-                    let trimmed = trimmed
-                        .find("--")
-                        .map_or(trimmed, |idx| trimmed[..idx].trim_end());
-                    if trimmed == DISABLE_ASSUME_IN_TRANSACTION {
+                    if trim_trailing_comment(body) == DISABLE_ASSUME_IN_TRANSACTION {
                         return true;
                     }
                 }

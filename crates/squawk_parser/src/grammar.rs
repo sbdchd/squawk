@@ -2757,7 +2757,7 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
     opt_having_clause(p);
     opt_window_clause(p);
     if p.at_ts(COMPOUND_SELECT_FIRST) {
-        let cm = m.complete(p, SELECT);
+        let cm = m.complete(p, out_kind);
         return Some(compound_select(p, cm));
     }
     if r.trailing_clauses {
