@@ -142,39 +142,33 @@ fn inlay_hint_insert(
             .collect()
     };
 
-    let Some(values) = insert.values() else {
-        // `insert into t select 1, 2;`
-        return inlay_hint_insert_select(hints, columns, insert.stmt()?);
-    };
-    // `insert into t values (1, 2);`
-    for row in values.row_list()?.rows() {
-        for ((column_name, target, file_id), expr) in columns.iter().zip(row.exprs()) {
-            let expr_start = expr.syntax().text_range().start();
-            hints.push(InlayHint {
-                position: expr_start,
-                label: format!("{}: ", column_name),
-                kind: InlayHintKind::Parameter,
-                target: *target,
-                file: *file_id,
-            });
-        }
-    }
-
-    Some(())
+    inlay_hint_insert_select(hints, columns, insert.select_variant()?)
 }
 
 fn inlay_hint_insert_select(
     hints: &mut Vec<InlayHint>,
     columns: Vec<(Name, Option<TextRange>, Option<File>)>,
-    stmt: ast::Stmt,
+    select_variant: ast::SelectVariant,
 ) -> Option<()> {
-    let target_list = match stmt {
-        ast::Stmt::Select(select) => select.select_clause()?.target_list(),
-        ast::Stmt::SelectInto(select_into) => select_into.select_clause()?.target_list(),
-        ast::Stmt::ParenSelect(paren_select) => paren_select.select()?.target_list(),
-        _ => None,
-    }?;
+    if let ast::SelectVariant::Values(values) = &select_variant {
+        // `insert into t values (1, 2);`
+        for row in values.row_list()?.rows() {
+            for ((column_name, target, file_id), expr) in columns.iter().zip(row.exprs()) {
+                let expr_start = expr.syntax().text_range().start();
+                hints.push(InlayHint {
+                    position: expr_start,
+                    label: format!("{}: ", column_name),
+                    kind: InlayHintKind::Parameter,
+                    target: *target,
+                    file: *file_id,
+                });
+            }
+        }
+        return Some(());
+    }
 
+    // `insert into t select 1, 2;`
+    let target_list = select_variant.target_list()?;
     for ((column_name, target, file_id), target_expr) in columns.iter().zip(target_list.targets()) {
         let expr = target_expr.expr()?;
         let expr_start = expr.syntax().text_range().start();

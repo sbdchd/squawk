@@ -4782,11 +4782,11 @@ impl CreateRule {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmt(&self) -> Option<Stmt> {
+    pub fn rule_stmt(&self) -> Option<RuleStmt> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmts(&self) -> AstChildren<Stmt> {
+    pub fn rule_stmts(&self) -> AstChildren<RuleStmt> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -9734,11 +9734,7 @@ impl Insert {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmt(&self) -> Option<Stmt> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn values(&self) -> Option<Values> {
+    pub fn select_variant(&self) -> Option<SelectVariant> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18800,6 +18796,15 @@ pub enum RefAction {
     Restrict(Restrict),
     SetDefaultColumns(SetDefaultColumns),
     SetNullColumns(SetNullColumns),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RuleStmt {
+    Delete(Delete),
+    Insert(Insert),
+    Notify(Notify),
+    Update(Update),
+    SelectVariant(SelectVariant),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -34422,6 +34427,65 @@ impl From<SetNullColumns> for RefAction {
     #[inline]
     fn from(node: SetNullColumns) -> RefAction {
         RefAction::SetNullColumns(node)
+    }
+}
+impl AstNode for RuleStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::DELETE | SyntaxKind::INSERT | SyntaxKind::NOTIFY | SyntaxKind::UPDATE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::DELETE => RuleStmt::Delete(Delete { syntax }),
+            SyntaxKind::INSERT => RuleStmt::Insert(Insert { syntax }),
+            SyntaxKind::NOTIFY => RuleStmt::Notify(Notify { syntax }),
+            SyntaxKind::UPDATE => RuleStmt::Update(Update { syntax }),
+            _ => {
+                if let Some(result) = SelectVariant::cast(syntax) {
+                    return Some(RuleStmt::SelectVariant(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            RuleStmt::Delete(it) => &it.syntax,
+            RuleStmt::Insert(it) => &it.syntax,
+            RuleStmt::Notify(it) => &it.syntax,
+            RuleStmt::Update(it) => &it.syntax,
+            RuleStmt::SelectVariant(it) => it.syntax(),
+        }
+    }
+}
+impl From<Delete> for RuleStmt {
+    #[inline]
+    fn from(node: Delete) -> RuleStmt {
+        RuleStmt::Delete(node)
+    }
+}
+impl From<Insert> for RuleStmt {
+    #[inline]
+    fn from(node: Insert) -> RuleStmt {
+        RuleStmt::Insert(node)
+    }
+}
+impl From<Notify> for RuleStmt {
+    #[inline]
+    fn from(node: Notify) -> RuleStmt {
+        RuleStmt::Notify(node)
+    }
+}
+impl From<Update> for RuleStmt {
+    #[inline]
+    fn from(node: Update) -> RuleStmt {
+        RuleStmt::Update(node)
     }
 }
 impl AstNode for SchemaElement {
