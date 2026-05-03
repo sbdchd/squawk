@@ -2861,6 +2861,10 @@ pub struct Cluster {
 }
 impl Cluster {
     #[inline]
+    pub fn on_path(&self) -> Option<OnPath> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn option_item_list(&self) -> Option<OptionItemList> {
         support::child(&self.syntax)
     }
@@ -4778,11 +4782,11 @@ impl CreateRule {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmt(&self) -> Option<Stmt> {
+    pub fn rule_stmt(&self) -> Option<RuleStmt> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmts(&self) -> AstChildren<Stmt> {
+    pub fn rule_stmts(&self) -> AstChildren<RuleStmt> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -8239,6 +8243,17 @@ impl ElseClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EmptyStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EmptyStmt {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnableAlwaysRule {
     pub(crate) syntax: SyntaxNode,
 }
@@ -9719,11 +9734,7 @@ impl Insert {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmt(&self) -> Option<Stmt> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn values(&self) -> Option<Values> {
+    pub fn select_variant(&self) -> Option<SelectVariant> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12500,6 +12511,21 @@ impl OnDeleteAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OnPath {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OnPath {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OnTable {
     pub(crate) syntax: SyntaxNode,
 }
@@ -14179,6 +14205,10 @@ impl Reindex {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn concurrently_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
     }
     #[inline]
     pub fn database_token(&self) -> Option<SyntaxToken> {
@@ -18769,6 +18799,15 @@ pub enum RefAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RuleStmt {
+    Delete(Delete),
+    Insert(Insert),
+    Notify(Notify),
+    Update(Update),
+    SelectVariant(SelectVariant),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SchemaElement {
     CreateIndex(CreateIndex),
     CreateSequence(CreateSequence),
@@ -18940,6 +18979,7 @@ pub enum Stmt {
     DropUser(DropUser),
     DropUserMapping(DropUserMapping),
     DropView(DropView),
+    EmptyStmt(EmptyStmt),
     Execute(Execute),
     Explain(Explain),
     Fetch(Fetch),
@@ -23583,6 +23623,24 @@ impl AstNode for ElseClause {
         &self.syntax
     }
 }
+impl AstNode for EmptyStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EMPTY_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for EnableAlwaysRule {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -26989,6 +27047,24 @@ impl AstNode for OnDeleteAction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ON_DELETE_ACTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OnPath {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ON_PATH
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -34353,6 +34429,65 @@ impl From<SetNullColumns> for RefAction {
         RefAction::SetNullColumns(node)
     }
 }
+impl AstNode for RuleStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::DELETE | SyntaxKind::INSERT | SyntaxKind::NOTIFY | SyntaxKind::UPDATE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::DELETE => RuleStmt::Delete(Delete { syntax }),
+            SyntaxKind::INSERT => RuleStmt::Insert(Insert { syntax }),
+            SyntaxKind::NOTIFY => RuleStmt::Notify(Notify { syntax }),
+            SyntaxKind::UPDATE => RuleStmt::Update(Update { syntax }),
+            _ => {
+                if let Some(result) = SelectVariant::cast(syntax) {
+                    return Some(RuleStmt::SelectVariant(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            RuleStmt::Delete(it) => &it.syntax,
+            RuleStmt::Insert(it) => &it.syntax,
+            RuleStmt::Notify(it) => &it.syntax,
+            RuleStmt::Update(it) => &it.syntax,
+            RuleStmt::SelectVariant(it) => it.syntax(),
+        }
+    }
+}
+impl From<Delete> for RuleStmt {
+    #[inline]
+    fn from(node: Delete) -> RuleStmt {
+        RuleStmt::Delete(node)
+    }
+}
+impl From<Insert> for RuleStmt {
+    #[inline]
+    fn from(node: Insert) -> RuleStmt {
+        RuleStmt::Insert(node)
+    }
+}
+impl From<Notify> for RuleStmt {
+    #[inline]
+    fn from(node: Notify) -> RuleStmt {
+        RuleStmt::Notify(node)
+    }
+}
+impl From<Update> for RuleStmt {
+    #[inline]
+    fn from(node: Update) -> RuleStmt {
+        RuleStmt::Update(node)
+    }
+}
 impl AstNode for SchemaElement {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -34695,6 +34830,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::DROP_USER
                 | SyntaxKind::DROP_USER_MAPPING
                 | SyntaxKind::DROP_VIEW
+                | SyntaxKind::EMPTY_STMT
                 | SyntaxKind::EXECUTE
                 | SyntaxKind::EXPLAIN
                 | SyntaxKind::FETCH
@@ -34954,6 +35090,7 @@ impl AstNode for Stmt {
             SyntaxKind::DROP_USER => Stmt::DropUser(DropUser { syntax }),
             SyntaxKind::DROP_USER_MAPPING => Stmt::DropUserMapping(DropUserMapping { syntax }),
             SyntaxKind::DROP_VIEW => Stmt::DropView(DropView { syntax }),
+            SyntaxKind::EMPTY_STMT => Stmt::EmptyStmt(EmptyStmt { syntax }),
             SyntaxKind::EXECUTE => Stmt::Execute(Execute { syntax }),
             SyntaxKind::EXPLAIN => Stmt::Explain(Explain { syntax }),
             SyntaxKind::FETCH => Stmt::Fetch(Fetch { syntax }),
@@ -35151,6 +35288,7 @@ impl AstNode for Stmt {
             Stmt::DropUser(it) => &it.syntax,
             Stmt::DropUserMapping(it) => &it.syntax,
             Stmt::DropView(it) => &it.syntax,
+            Stmt::EmptyStmt(it) => &it.syntax,
             Stmt::Execute(it) => &it.syntax,
             Stmt::Explain(it) => &it.syntax,
             Stmt::Fetch(it) => &it.syntax,
@@ -36056,6 +36194,12 @@ impl From<DropView> for Stmt {
     #[inline]
     fn from(node: DropView) -> Stmt {
         Stmt::DropView(node)
+    }
+}
+impl From<EmptyStmt> for Stmt {
+    #[inline]
+    fn from(node: EmptyStmt) -> Stmt {
+        Stmt::EmptyStmt(node)
     }
 }
 impl From<Execute> for Stmt {

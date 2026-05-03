@@ -184,6 +184,7 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::Delete(_)
         | ast::Stmt::Discard(_)
         | ast::Stmt::Do(_)
+        | ast::Stmt::EmptyStmt(_)
         | ast::Stmt::Execute(_)
         | ast::Stmt::Explain(_)
         | ast::Stmt::Fetch(_)

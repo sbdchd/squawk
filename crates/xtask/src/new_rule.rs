@@ -17,8 +17,7 @@ use squawk_syntax::{{
 use crate::{{Linter, Violation, Rule}};
 
 pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
-    let file = parse.tree();
-    for stmt in file.stmts() {{
+    for stmt in parse.tree().stmts() {{
         match stmt {{
             // TODO: update to the stmt you want to check
             ast::Stmt::CreateTable(create_table) => {{
@@ -127,7 +126,7 @@ fn update_lib(name: &str) -> Result<()> {
             "// xtask:new-rule:rule-call",
             format!(
                 r#"if self.rules.contains(&Rule::{name_pascal}) {{
-            {name_snake}(self, &file);
+            {name_snake}(self, file);
         }}
         "#
             ),

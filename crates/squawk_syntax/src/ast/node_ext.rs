@@ -415,6 +415,33 @@ impl ast::CharType {
     }
 }
 
+fn is_falsey_option(text: &str) -> bool {
+    text == "0" || text.eq_ignore_ascii_case("false") || text.eq_ignore_ascii_case("off")
+}
+
+impl ast::Vacuum {
+    pub fn is_full(&self) -> bool {
+        self.full_token().is_some()
+            // TODO: we need a better way of handling option lists
+            || self.vacuum_option_list().is_some_and(|opt_list| {
+                opt_list.vacuum_options().any(|opt| {
+                    let mut tokens = opt
+                        .syntax()
+                        .descendants_with_tokens()
+                        .filter_map(|child| child.into_token())
+                        .filter(|token| !token.kind().is_trivia());
+
+                    tokens
+                        .next()
+                        .is_some_and(|token| token.text().eq_ignore_ascii_case("full"))
+                        && tokens
+                            .next()
+                            .is_none_or(|token| !is_falsey_option(token.text()))
+                })
+            })
+    }
+}
+
 impl ast::OpSig {
     #[inline]
     pub fn lhs(&self) -> Option<ast::Type> {
@@ -766,4 +793,66 @@ fn cast_sig() {
     let rhs = cast_sig.rhs().unwrap();
     assert_snapshot!(lhs.syntax().text(), @"text");
     assert_snapshot!(rhs.syntax().text(), @"int");
+}
+
+#[cfg(test)]
+fn extract_vacuum(sql: &str) -> ast::Vacuum {
+    let parse = SourceFile::parse(sql);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    let stmt = file.stmts().next().unwrap();
+    let ast::Stmt::Vacuum(vacuum) = stmt else {
+        unreachable!()
+    };
+    vacuum
+}
+
+#[test]
+fn vacuum_full_is_full() {
+    assert!(extract_vacuum("VACUUM FULL foo;").is_full());
+}
+
+#[test]
+fn vacuum_option_list_full_is_full() {
+    assert!(extract_vacuum("VACUUM (FULL) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_true_is_full() {
+    assert!(extract_vacuum("VACUUM (FULL TRUE) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_on_is_full() {
+    assert!(extract_vacuum("VACUUM (FULL ON) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_1_is_full() {
+    assert!(extract_vacuum("VACUUM (FULL 1) foo;").is_full());
+}
+
+#[test]
+fn vacuum_no_full_is_not_full() {
+    assert!(!extract_vacuum("VACUUM foo;").is_full());
+}
+
+#[test]
+fn vacuum_other_option_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FREEZE) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_false_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL FALSE) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_off_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL OFF) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_0_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL 0) foo;").is_full());
 }

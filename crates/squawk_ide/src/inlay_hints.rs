@@ -142,39 +142,33 @@ fn inlay_hint_insert(
             .collect()
     };
 
-    let Some(values) = insert.values() else {
-        // `insert into t select 1, 2;`
-        return inlay_hint_insert_select(hints, columns, insert.stmt()?);
-    };
-    // `insert into t values (1, 2);`
-    for row in values.row_list()?.rows() {
-        for ((column_name, target, file_id), expr) in columns.iter().zip(row.exprs()) {
-            let expr_start = expr.syntax().text_range().start();
-            hints.push(InlayHint {
-                position: expr_start,
-                label: format!("{}: ", column_name),
-                kind: InlayHintKind::Parameter,
-                target: *target,
-                file: *file_id,
-            });
-        }
-    }
-
-    Some(())
+    inlay_hint_insert_select(hints, columns, insert.select_variant()?)
 }
 
 fn inlay_hint_insert_select(
     hints: &mut Vec<InlayHint>,
     columns: Vec<(Name, Option<TextRange>, Option<File>)>,
-    stmt: ast::Stmt,
+    select_variant: ast::SelectVariant,
 ) -> Option<()> {
-    let target_list = match stmt {
-        ast::Stmt::Select(select) => select.select_clause()?.target_list(),
-        ast::Stmt::SelectInto(select_into) => select_into.select_clause()?.target_list(),
-        ast::Stmt::ParenSelect(paren_select) => paren_select.select()?.target_list(),
-        _ => None,
-    }?;
+    if let ast::SelectVariant::Values(values) = &select_variant {
+        // `insert into t values (1, 2);`
+        for row in values.row_list()?.rows() {
+            for ((column_name, target, file_id), expr) in columns.iter().zip(row.exprs()) {
+                let expr_start = expr.syntax().text_range().start();
+                hints.push(InlayHint {
+                    position: expr_start,
+                    label: format!("{}: ", column_name),
+                    kind: InlayHintKind::Parameter,
+                    target: *target,
+                    file: *file_id,
+                });
+            }
+        }
+        return Some(());
+    }
 
+    // `insert into t select 1, 2;`
+    let target_list = select_variant.target_list()?;
     for ((column_name, target, file_id), target_expr) in columns.iter().zip(target_list.targets()) {
         let expr = target_expr.expr()?;
         let expr_start = expr.syntax().text_range().start();
@@ -428,6 +422,49 @@ insert into u select 1, 2, 3;
     }
 
     #[test]
+    fn insert_table_inherits_builtin_values() {
+        assert_snapshot!(check_inlay_hints("
+create table t ()
+inherits (information_schema.sql_features);
+insert into t values (1, 2, 3, 4, 5, 6, 7);
+"), @"
+        inlay hints:
+          ╭▸ 
+        4 │ …values (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
+          ╰╴         ────────────   ──────────────   ────────────────   ──────────────────   ──────────────   ────────────────   ──────────
+        ");
+    }
+
+    #[test]
+    fn insert_table_inherits_create_table_as_values() {
+        assert_snapshot!(check_inlay_hints("
+create table parent as select 1 a, 'x'::text b;
+create table child (c int) inherits (parent);
+insert into child values (1, 2, 3);
+"), @"
+        inlay hints:
+          ╭▸ 
+        4 │ insert into child values (a: 1, b: 2, c: 3);
+          ╰╴                          ───   ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_table_inherits_create_table_as_select_star() {
+        assert_snapshot!(check_inlay_hints("
+create table base (a int, b text);
+create table parent as select * from base;
+create table child (c int) inherits (parent);
+insert into child values (1, 2, 3);
+"), @"
+        inlay hints:
+          ╭▸ 
+        5 │ insert into child values (a: 1, b: 2, c: 3);
+          ╰╴                          ───   ───   ───
+        ");
+    }
+
+    #[test]
     fn insert_table_like_select() {
         assert_snapshot!(check_inlay_hints("
 create table x (a int, b int);
@@ -451,6 +488,33 @@ insert into t select 1, 2;
           ╭▸ 
         3 │ insert into t select a: 1, b: 2;
           ╰╴                     ───   ───
+        ");
+    }
+
+    #[test]
+    fn insert_table_like_builtin_values() {
+        assert_snapshot!(check_inlay_hints("
+create table t (like information_schema.sql_features);
+insert into t values (1, 2, 3, 4, 5, 6, 7);
+"), @"
+        inlay hints:
+          ╭▸ 
+        3 │ …values (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
+          ╰╴         ────────────   ──────────────   ────────────────   ──────────────────   ──────────────   ────────────────   ──────────
+        ");
+    }
+
+    #[test]
+    fn insert_table_like_select_into_values() {
+        assert_snapshot!(check_inlay_hints("
+select 1 a, 'x'::text b into parent;
+create table child (like parent);
+insert into child values (1, 2);
+"), @"
+        inlay hints:
+          ╭▸ 
+        4 │ insert into child values (a: 1, b: 2);
+          ╰╴                          ───   ───
         ");
     }
 }

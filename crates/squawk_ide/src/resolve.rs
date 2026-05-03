@@ -6,6 +6,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
+use crate::builtins::builtins_file;
 use crate::column_name::ColumnName;
 use crate::db::File;
 use crate::location::{Location, LocationKind};
@@ -50,7 +51,7 @@ pub(crate) fn resolve_name_ref(
                 )]);
             }
 
-            let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
+            let ptr = resolve_table_name_ptr(db, file, &table_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -61,7 +62,9 @@ pub(crate) fn resolve_name_ref(
             let (schema, relation_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
 
-            if let Some(ptr) = resolve_table_name_ptr(db, file, &relation_name, &schema, position) {
+            if let Some(ptr) =
+                resolve_table_name_ptr(db, file, &relation_name, schema.as_ref(), position)
+            {
                 return Some(smallvec![Location::new(
                     file,
                     ptr.text_range(),
@@ -69,7 +72,7 @@ pub(crate) fn resolve_name_ref(
                 )]);
             }
 
-            let ptr = resolve_view_name_ptr(db, file, &relation_name, &schema, position)?;
+            let ptr = resolve_view_name_ptr(db, file, &relation_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -91,12 +94,27 @@ pub(crate) fn resolve_name_ref(
 
             // TODO: this should be one lookup
             let function_ptr = binder
-                .lookup_with(&function_name, SymbolKind::Function, position, &schema)
+                .lookup_with(
+                    &function_name,
+                    SymbolKind::Function,
+                    position,
+                    schema.as_ref(),
+                )
                 .or_else(|| {
-                    binder.lookup_with(&function_name, SymbolKind::Procedure, position, &schema)
+                    binder.lookup_with(
+                        &function_name,
+                        SymbolKind::Procedure,
+                        position,
+                        schema.as_ref(),
+                    )
                 })
                 .or_else(|| {
-                    binder.lookup_with(&function_name, SymbolKind::Aggregate, position, &schema)
+                    binder.lookup_with(
+                        &function_name,
+                        SymbolKind::Aggregate,
+                        position,
+                        schema.as_ref(),
+                    )
                 })?;
 
             let param_ptr = find_param_in_func_def(db, file, function_ptr, &param_name)?;
@@ -138,15 +156,21 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::FromTable => {
             let (schema, table_name) = name::schema_and_name(name_ref);
             let position = name_ref.syntax().text_range().start();
-            let (ptr, kind) =
-                resolve_table_like(db, file, Some(name_ref), &table_name, &schema, position)?;
+            let (ptr, kind) = resolve_table_like(
+                db,
+                file,
+                Some(name_ref),
+                &table_name,
+                schema.as_ref(),
+                position,
+            )?;
             Some(smallvec![Location::new(file, ptr.text_range(), kind)])
         }
         NameRefClass::Index => {
             let position = name_ref.syntax().text_range().start();
             let index_name = Name::from_node(name_ref);
             let binder = bind(db, file);
-            let ptr = binder.lookup_with(&index_name, SymbolKind::Index, position, &None)?;
+            let ptr = binder.lookup_with(&index_name, SymbolKind::Index, position, None)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -157,7 +181,7 @@ pub(crate) fn resolve_name_ref(
             let (schema, type_name) = name::schema_and_table_name(name_ref)?;
             let type_name = resolve_float_precision(name_ref, type_name);
             let position = name_ref.syntax().text_range().start();
-            let ptr = resolve_type_name_ptr(db, file, &type_name, &schema, position)?;
+            let ptr = resolve_type_name_ptr(db, file, &type_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -167,7 +191,7 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::View => {
             let (schema, view_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
-            let ptr = resolve_view_name_ptr(db, file, &view_name, &schema, position)?;
+            let ptr = resolve_view_name_ptr(db, file, &view_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -194,8 +218,12 @@ pub(crate) fn resolve_name_ref(
             let (schema, sequence_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
-            let ptr =
-                binder.lookup_with(&sequence_name, SymbolKind::Sequence, position, &schema)?;
+            let ptr = binder.lookup_with(
+                &sequence_name,
+                SymbolKind::Sequence,
+                position,
+                schema.as_ref(),
+            )?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -222,7 +250,7 @@ pub(crate) fn resolve_name_ref(
                 &trigger_name,
                 SymbolKind::Trigger,
                 position,
-                &schema,
+                schema.as_ref(),
                 &Some(table_name),
             )?;
             Some(smallvec![Location::new(
@@ -248,7 +276,7 @@ pub(crate) fn resolve_name_ref(
                 &policy_name,
                 SymbolKind::Policy,
                 position,
-                &schema,
+                schema.as_ref(),
                 &Some(table_name),
             )?;
             Some(smallvec![Location::new(
@@ -276,7 +304,7 @@ pub(crate) fn resolve_name_ref(
                 &property_graph_name,
                 SymbolKind::PropertyGraph,
                 position,
-                &schema,
+                schema.as_ref(),
             )?;
             Some(smallvec![Location::new(
                 file,
@@ -344,7 +372,7 @@ pub(crate) fn resolve_name_ref(
             let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
             let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
-            let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
+            let ptr = resolve_table_name_ptr(db, file, &table_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -409,7 +437,7 @@ pub(crate) fn resolve_name_ref(
             })?;
             let (schema, table_name) = name::schema_and_name_path(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
-            let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
+            let ptr = resolve_table_name_ptr(db, file, &table_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -424,12 +452,25 @@ pub(crate) fn resolve_name_ref(
             let path = like_clause.path()?;
             let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
-            let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
-            Some(smallvec![Location::new(
-                file,
-                ptr.text_range(),
-                LocationKind::Table
-            )])
+            if let Some(ptr) =
+                resolve_table_name_ptr(db, file, &table_name, schema.as_ref(), position)
+            {
+                return Some(smallvec![Location::new(
+                    file,
+                    ptr.text_range(),
+                    LocationKind::Table
+                )]);
+            }
+            if let Some(ptr) =
+                resolve_view_name_ptr(db, file, &table_name, schema.as_ref(), position)
+            {
+                return Some(smallvec![Location::new(
+                    file,
+                    ptr.text_range(),
+                    LocationKind::View
+                )]);
+            }
+            None
         }
         NameRefClass::Function => {
             let function_sig = name_ref
@@ -444,7 +485,7 @@ pub(crate) fn resolve_name_ref(
                 db,
                 file,
                 &function_name,
-                &schema,
+                schema.as_ref(),
                 params.as_deref(),
                 position,
             )
@@ -462,7 +503,7 @@ pub(crate) fn resolve_name_ref(
                 db,
                 file,
                 &aggregate_name,
-                &schema,
+                schema.as_ref(),
                 params.as_deref(),
                 position,
             )
@@ -480,7 +521,7 @@ pub(crate) fn resolve_name_ref(
                 db,
                 file,
                 &procedure_name,
-                &schema,
+                schema.as_ref(),
                 params.as_deref(),
                 position,
             )
@@ -499,7 +540,7 @@ pub(crate) fn resolve_name_ref(
                 db,
                 file,
                 &routine_name,
-                &schema,
+                schema.as_ref(),
                 params.as_deref(),
                 position,
             ) {
@@ -510,7 +551,7 @@ pub(crate) fn resolve_name_ref(
                 db,
                 file,
                 &routine_name,
-                &schema,
+                schema.as_ref(),
                 params.as_deref(),
                 position,
             ) {
@@ -521,7 +562,7 @@ pub(crate) fn resolve_name_ref(
                 db,
                 file,
                 &routine_name,
-                &schema,
+                schema.as_ref(),
                 params.as_deref(),
                 position,
             )
@@ -531,7 +572,7 @@ pub(crate) fn resolve_name_ref(
             let path = call.path()?;
             let (schema, procedure_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
-            resolve_procedure(db, file, &procedure_name, &schema, None, position)
+            resolve_procedure(db, file, &procedure_name, schema.as_ref(), None, position)
         }
         NameRefClass::Schema => {
             let schema_name = Name::from_node(name_ref);
@@ -546,13 +587,13 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::FunctionCall => {
             let (schema, function_name) = name::schema_and_name(name_ref);
             let position = name_ref.syntax().text_range().start();
-            resolve_function(db, file, &function_name, &schema, None, position)
+            resolve_function(db, file, &function_name, schema.as_ref(), None, position)
         }
         NameRefClass::ProcedureCall => {
             let (schema, procedure_name) = name::schema_and_name(name_ref);
             let position = name_ref.syntax().text_range().start();
 
-            resolve_procedure(db, file, &procedure_name, &schema, None, position)
+            resolve_procedure(db, file, &procedure_name, schema.as_ref(), None, position)
         }
         NameRefClass::FunctionName => {
             let path_type = name_ref
@@ -562,7 +603,7 @@ pub(crate) fn resolve_name_ref(
             let path = path_type.path()?;
             let (schema, function_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
-            resolve_function(db, file, &function_name, &schema, None, position)
+            resolve_function(db, file, &function_name, schema.as_ref(), None, position)
         }
         NameRefClass::SelectFunctionCall => {
             let (schema, function_name) = name::schema_and_name(name_ref);
@@ -570,14 +611,14 @@ pub(crate) fn resolve_name_ref(
 
             // functions take precedence
             if let Some(results) =
-                resolve_function(db, file, &function_name, &schema, None, position)
+                resolve_function(db, file, &function_name, schema.as_ref(), None, position)
             {
                 return Some(results);
             }
 
             // aggregates take precedence over function-call-style column access
             if let Some(results) =
-                resolve_aggregate(db, file, &function_name, &schema, None, position)
+                resolve_aggregate(db, file, &function_name, schema.as_ref(), None, position)
             {
                 return Some(results);
             }
@@ -705,7 +746,7 @@ fn resolve_table_name_ptr(
     db: &dyn Db,
     file: File,
     table_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     let binder = bind(db, file);
@@ -716,7 +757,7 @@ fn resolve_type_name_ptr(
     db: &dyn Db,
     file: File,
     type_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     let binder = bind(db, file);
@@ -727,7 +768,7 @@ fn resolve_type_name_ptr(
     if schema.is_none()
         && let Some(fallback_name) = fallback_type_alias(type_name)
     {
-        return binder.lookup_with(&fallback_name, SymbolKind::Type, position, &None);
+        return binder.lookup_with(&fallback_name, SymbolKind::Type, position, None);
     }
 
     None
@@ -740,7 +781,7 @@ pub(crate) fn resolve_type_ptr_from_type(
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     let (schema, type_name) = name::schema_and_type_name(ty)?;
-    resolve_type_name_ptr(db, file, &type_name, &schema, position)
+    resolve_type_name_ptr(db, file, &type_name, schema.as_ref(), position)
 }
 
 fn fallback_type_alias(type_name: &Name) -> Option<Name> {
@@ -774,7 +815,7 @@ fn resolve_view_name_ptr(
     db: &dyn Db,
     file: File,
     view_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Option<SyntaxNodePtr> {
     let binder = bind(db, file);
@@ -786,7 +827,7 @@ pub(crate) fn resolve_table_like(
     file: File,
     name_ref: Option<&ast::NameRef>,
     table_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Option<(SyntaxNodePtr, LocationKind)> {
     if let Some(view_name_ptr) = resolve_view_name_ptr(db, file, table_name, schema, position) {
@@ -811,7 +852,7 @@ fn resolve_for_kind_with_params(
     db: &dyn Db,
     file: File,
     name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     params: Option<&[Name]>,
     position: TextSize,
     kind: SymbolKind,
@@ -838,14 +879,14 @@ fn resolve_special_keyword_as_function(
         })?;
     let function_name = Name::from_string(function_name);
     let position = name_ref.syntax().text_range().start();
-    resolve_function(db, file, &function_name, &None, None, position)
+    resolve_function(db, file, &function_name, None, None, position)
 }
 
 fn resolve_function(
     db: &dyn Db,
     file: File,
     function_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     params: Option<&[Name]>,
     position: TextSize,
 ) -> Option<SmallVec<[Location; 1]>> {
@@ -869,7 +910,7 @@ fn resolve_aggregate(
     db: &dyn Db,
     file: File,
     aggregate_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     params: Option<&[Name]>,
     position: TextSize,
 ) -> Option<SmallVec<[Location; 1]>> {
@@ -893,7 +934,7 @@ fn resolve_procedure(
     db: &dyn Db,
     file: File,
     procedure_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     params: Option<&[Name]>,
     position: TextSize,
 ) -> Option<SmallVec<[Location; 1]>> {
@@ -943,7 +984,7 @@ fn resolve_property_graph_column_ptr(
         if let Some(references_table) = ast::ReferencesTable::cast(column_list.syntax().parent()?) {
             let table_name = Name::from_node(&references_table.name_ref()?);
             let position = column_name_ref.syntax().text_range().start();
-            return resolve_column_for_table(db, file, &table_name, &None, &column_name, position);
+            return resolve_column_for_table(db, file, &table_name, None, &column_name, position);
         } else if let Some(edge_table_def) = column_list
             .syntax()
             .ancestors()
@@ -979,7 +1020,14 @@ fn resolve_column_for_path(
     let (schema, table_name) = name::schema_and_name_path(path)?;
     let position = path.syntax().text_range().start();
 
-    resolve_column_for_table(db, file, &table_name, &schema, &column_name, position)
+    resolve_column_for_table(
+        db,
+        file,
+        &table_name,
+        schema.as_ref(),
+        &column_name,
+        position,
+    )
 }
 
 fn resolve_select_qualified_column_table_name_ptr(
@@ -1029,7 +1077,14 @@ fn resolve_select_qualified_column_table_name_ptr(
         && function_schema == explicit_schema
     {
         let position = table_name_ref.syntax().text_range().start();
-        return resolve_function(db, file, &function_name, &function_schema, None, position);
+        return resolve_function(
+            db,
+            file,
+            &function_name,
+            function_schema.as_ref(),
+            None,
+            position,
+        );
     }
 
     let (schema, table_name) = if let Some(schema) = explicit_schema {
@@ -1043,7 +1098,7 @@ fn resolve_select_qualified_column_table_name_ptr(
         file,
         Some(table_name_ref),
         &table_name,
-        &schema,
+        schema.as_ref(),
         position,
     )?;
     Some(smallvec![Location::new(file, ptr.text_range(), kind)])
@@ -1248,18 +1303,25 @@ fn resolve_select_qualified_column_ptr(
         }
     }
 
-    resolve_column_for_table(db, file, &table_name, &schema, &column_name, position)
+    resolve_column_for_table(
+        db,
+        file,
+        &table_name,
+        schema.as_ref(),
+        &column_name,
+        position,
+    )
 }
 
 fn resolve_column_for_table(
     db: &dyn Db,
     file: File,
     table_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     column_name: &Name,
     position: TextSize,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let resolved = resolve_table_name(db, file, table_name, schema, position)?;
+    let (file, resolved) = resolve_table_name(db, file, table_name, schema, position)?;
     match resolved {
         ResolvedTableName::View(create_view) => {
             if let Some(ptr) = find_column_in_create_view_like(file, &create_view, column_name) {
@@ -1279,7 +1341,9 @@ fn resolve_column_for_table(
             return resolve_function(db, file, column_name, schema, None, position);
         }
         ResolvedTableName::TableAs(create_table_as) => {
-            if let Some(ptr) = find_column_in_create_table_as(file, &create_table_as, column_name) {
+            if let Some(ptr) =
+                find_column_in_create_table_as(db, file, &create_table_as, column_name)
+            {
                 return Some(ptr);
             }
             return resolve_function(db, file, column_name, schema, None, position);
@@ -1305,34 +1369,38 @@ pub(crate) fn resolve_table_name(
     db: &dyn Db,
     file: File,
     table_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
-) -> Option<ResolvedTableName> {
+) -> Option<(File, ResolvedTableName)> {
     use ResolvedTableName::*;
-    let (ptr, kind) = resolve_table_like(db, file, None, table_name, schema, position)?;
-    let tree = parse(db, file).tree();
-    let root = tree.syntax();
-    let node = ptr.to_node(root);
-
-    match kind {
-        LocationKind::Table => {
-            if let Some(create_table) = node.ancestors().find_map(ast::CreateTableLike::cast) {
-                return Some(Table(create_table));
+    for file in [file, builtins_file(db)] {
+        let Some((ptr, kind)) = resolve_table_like(db, file, None, table_name, schema, position)
+        else {
+            continue;
+        };
+        let tree = parse(db, file).tree();
+        let node = ptr.to_node(tree.syntax());
+        match kind {
+            LocationKind::Table => {
+                if let Some(create_table) = node.ancestors().find_map(ast::CreateTableLike::cast) {
+                    return Some((file, Table(create_table)));
+                }
+                if let Some(create_table_as) = node.ancestors().find_map(ast::CreateTableAs::cast) {
+                    return Some((file, TableAs(create_table_as)));
+                }
+                if let Some(select_into) = node.ancestors().find_map(ast::SelectInto::cast) {
+                    return Some((file, SelectInto(select_into)));
+                }
             }
-            if let Some(create_table_as) = node.ancestors().find_map(ast::CreateTableAs::cast) {
-                return Some(TableAs(create_table_as));
+            LocationKind::View => {
+                if let Some(view) = node.ancestors().find_map(ast::CreateViewLike::cast) {
+                    return Some((file, View(view)));
+                }
             }
-            if let Some(select_into) = node.ancestors().find_map(ast::SelectInto::cast) {
-                return Some(SelectInto(select_into));
-            }
-            None
+            _ => (),
         }
-        LocationKind::View => node
-            .ancestors()
-            .find_map(ast::CreateViewLike::cast)
-            .map(View),
-        _ => None,
     }
+    None
 }
 
 fn resolve_merge_alias(name_ref: &ast::NameRef, table_name: &Name) -> Option<Name> {
@@ -1450,7 +1518,7 @@ fn resolve_from_item_column_ptr(
         file,
         column_name_ref,
         &table_name,
-        &schema,
+        schema.as_ref(),
         &column_name,
     ) {
         return Some(ptr);
@@ -1474,7 +1542,7 @@ fn resolve_column_from_table_or_view_or_cte(
     file: File,
     name_ref: &ast::NameRef,
     table_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     column_name: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
     resolve_column_from_table_or_view_or_cte_impl(
@@ -1493,7 +1561,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
     file: File,
     name_ref: &ast::NameRef,
     table_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     column_name: &Name,
     depth: u32,
 ) -> Option<SmallVec<[Location; 1]>> {
@@ -1535,7 +1603,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                         file,
                         name_ref,
                         &parent_table_name,
-                        &parent_schema,
+                        parent_schema.as_ref(),
                         column_name,
                         depth + 1,
                     );
@@ -1557,7 +1625,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
 
             if let Some(create_table_as) = node.ancestors().find_map(ast::CreateTableAs::cast) {
                 if let Some(cols) =
-                    find_column_in_create_table_as(file, &create_table_as, column_name)
+                    find_column_in_create_table_as(db, file, &create_table_as, column_name)
                 {
                     return Some(cols);
                 }
@@ -1625,7 +1693,14 @@ fn resolve_from_item_for_cte_star(
         && table_name == *cte_name
     {
         let position = name_ref.syntax().text_range().start();
-        return resolve_column_for_table(db, file, &table_name, &schema, column_name, position);
+        return resolve_column_for_table(
+            db,
+            file,
+            &table_name,
+            schema.as_ref(),
+            column_name,
+            position,
+        );
     }
 
     resolve_from_item_column_ptr(db, file, from_item, name_ref)
@@ -1680,7 +1755,7 @@ fn resolve_fn_call_column(
                 file,
                 name_ref,
                 &table_name,
-                &schema,
+                schema.as_ref(),
                 &column_name,
             )
         {
@@ -1782,23 +1857,10 @@ fn find_column_in_create_table_impl(
             ast_nav::CreateTableArg::Inherits(path) => {
                 let (schema, table_name) = name::schema_and_name_path(&path)?;
                 let position = path.syntax().text_range().start();
-                if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position)
-                    && let Some(ptr) = match resolved {
-                        ResolvedTableName::Table(parent_table) => find_column_in_create_table_impl(
-                            db,
-                            file,
-                            &parent_table,
-                            column_name,
-                            depth + 1,
-                        ),
-                        ResolvedTableName::TableAs(create_table_as) => {
-                            find_column_in_create_table_as(file, &create_table_as, column_name)
-                        }
-                        ResolvedTableName::SelectInto(select_into) => {
-                            find_column_in_select_into(file, &select_into, column_name)
-                        }
-                        ResolvedTableName::View(_) => None,
-                    }
+                if let Some((lookup_file, resolved)) =
+                    resolve_table_name(db, file, &table_name, schema.as_ref(), position)
+                    && let Some(ptr) =
+                        find_column_in_resolved(db, lookup_file, resolved, column_name, depth + 1)
                 {
                     return Some(ptr);
                 }
@@ -1818,23 +1880,10 @@ fn find_column_in_create_table_impl(
                 let path = like_clause.path()?;
                 let (schema, table_name) = name::schema_and_name_path(&path)?;
                 let position = path.syntax().text_range().start();
-                if let Some(resolved) = resolve_table_name(db, file, &table_name, &schema, position)
-                    && let Some(ptr) = match resolved {
-                        ResolvedTableName::Table(source_table) => find_column_in_create_table_impl(
-                            db,
-                            file,
-                            &source_table,
-                            column_name,
-                            depth + 1,
-                        ),
-                        ResolvedTableName::TableAs(create_table_as) => {
-                            find_column_in_create_table_as(file, &create_table_as, column_name)
-                        }
-                        ResolvedTableName::SelectInto(select_into) => {
-                            find_column_in_select_into(file, &select_into, column_name)
-                        }
-                        ResolvedTableName::View(_) => None,
-                    }
+                if let Some((lookup_file, resolved)) =
+                    resolve_table_name(db, file, &table_name, schema.as_ref(), position)
+                    && let Some(ptr) =
+                        find_column_in_resolved(db, lookup_file, resolved, column_name, depth + 1)
                 {
                     return Some(ptr);
                 }
@@ -1844,6 +1893,29 @@ fn find_column_in_create_table_impl(
     }
 
     None
+}
+
+fn find_column_in_resolved(
+    db: &dyn Db,
+    file: File,
+    resolved: ResolvedTableName,
+    column_name: &Name,
+    depth: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    match resolved {
+        ResolvedTableName::Table(parent_table) => {
+            find_column_in_create_table_impl(db, file, &parent_table, column_name, depth)
+        }
+        ResolvedTableName::TableAs(create_table_as) => {
+            find_column_in_create_table_as(db, file, &create_table_as, column_name)
+        }
+        ResolvedTableName::SelectInto(select_into) => {
+            find_column_in_select_into(file, &select_into, column_name)
+        }
+        ResolvedTableName::View(create_view) => {
+            find_column_in_create_view_like(file, &create_view, column_name)
+        }
+    }
 }
 
 // TODO: this is similar to the CTE funcs, maybe we can simplify
@@ -1893,26 +1965,83 @@ fn find_column_in_create_view_like(
 }
 
 fn find_column_in_create_table_as(
+    db: &dyn Db,
     file: File,
     create_table_as: &ast::CreateTableAs,
     column_name: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let select = ast_nav::select_from_variant(create_table_as.query()?)?;
+    let query = create_table_as.query()?;
 
-    for target in select.select_clause()?.target_list()?.targets() {
-        if let Some((col_name, node)) = ColumnName::from_target(target.clone()) {
-            if let Some(col_name_str) = col_name.to_string()
-                && Name::from_string(col_name_str) == *column_name
-            {
+    if let ast::SelectVariant::Values(values) = &query {
+        for (col_name, expr) in ast_nav::iter_values_columns(values) {
+            if col_name == *column_name {
                 return Some(smallvec![Location::new(
                     file,
-                    node.text_range(),
+                    expr.syntax().text_range(),
                     LocationKind::Column
                 )]);
             }
         }
+        return None;
     }
 
+    if let ast::SelectVariant::Table(table) = &query {
+        let path = table.relation_name()?.path()?;
+        let (schema, table_name) = name::schema_and_name_path(&path)?;
+        let position = table.syntax().text_range().start();
+        let (lookup_file, resolved) =
+            resolve_table_name(db, file, &table_name, schema.as_ref(), position)?;
+        return find_column_in_resolved(db, lookup_file, resolved, column_name, 0);
+    }
+
+    let select = ast_nav::select_from_variant(query)?;
+    let target_list = select.select_clause()?.target_list()?;
+    let from_clause = select.from_clause();
+
+    for target in target_list.targets() {
+        if target.star_token().is_some() {
+            if let Some(from_clause) = &from_clause
+                && let Some(result) = find_column_in_from_clause(db, file, from_clause, column_name)
+            {
+                return Some(result);
+            }
+            continue;
+        }
+        if let Some((col_name, node)) = ColumnName::from_target(target.clone())
+            && let Some(col_name_str) = col_name.to_string()
+            && Name::from_string(col_name_str) == *column_name
+        {
+            return Some(smallvec![Location::new(
+                file,
+                node.text_range(),
+                LocationKind::Column
+            )]);
+        }
+    }
+
+    None
+}
+
+fn find_column_in_from_clause(
+    db: &dyn Db,
+    file: File,
+    from_clause: &ast::FromClause,
+    column_name: &Name,
+) -> Option<SmallVec<[Location; 1]>> {
+    for from_item in ast_nav::iter_from_clause(from_clause) {
+        let Some((schema, table_name)) = name::schema_and_table_from_from_item(&from_item) else {
+            continue;
+        };
+        let position = from_item.syntax().text_range().start();
+        let Some((lookup_file, resolved)) =
+            resolve_table_name(db, file, &table_name, schema.as_ref(), position)
+        else {
+            continue;
+        };
+        if let Some(result) = find_column_in_resolved(db, lookup_file, resolved, column_name, 0) {
+            return Some(result);
+        }
+    }
     None
 }
 
@@ -1945,14 +2074,14 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
 fn count_columns_for_path(db: &dyn Db, file: File, path: &ast::Path) -> Option<usize> {
     let (schema, table_name) = name::schema_and_name_path(path)?;
     let position = path.syntax().text_range().start();
-    count_columns_for_table_name(db, file, &table_name, &schema, position, None)
+    count_columns_for_table_name(db, file, &table_name, schema.as_ref(), position, None)
 }
 
 fn count_columns_for_table_name(
     db: &dyn Db,
     file: File,
     table_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
     name_ref: Option<&ast::NameRef>,
 ) -> Option<usize> {
@@ -2105,7 +2234,7 @@ fn resolve_cte_column(
             file,
             name_ref,
             &table_name,
-            &schema,
+            schema.as_ref(),
             column_name,
         );
     }
@@ -2289,7 +2418,7 @@ fn resolve_subquery_column_ptr(
             file,
             name_ref,
             &table_name,
-            &schema,
+            schema.as_ref(),
             column_name,
         );
     }
@@ -2413,9 +2542,14 @@ pub(crate) fn table_ptrs_from_clause(
 
         let name_ref = from_item.name_ref();
         let position = from_item.syntax().text_range().start();
-        if let Some((table_like_ptr, _kind)) =
-            resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
-        {
+        if let Some((table_like_ptr, _kind)) = resolve_table_like(
+            db,
+            file,
+            name_ref.as_ref(),
+            &table_name,
+            schema.as_ref(),
+            position,
+        ) {
             results.push(table_like_ptr);
         }
     }
@@ -2440,8 +2574,15 @@ pub(crate) fn table_ptr_from_from_item(
     let name_ref = from_item.name_ref();
     let position = from_item.syntax().text_range().start();
 
-    resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
-        .map(|(table_like_ptr, _kind)| table_like_ptr)
+    resolve_table_like(
+        db,
+        file,
+        name_ref.as_ref(),
+        &table_name,
+        schema.as_ref(),
+        position,
+    )
+    .map(|(table_like_ptr, _kind)| table_like_ptr)
 }
 
 fn table_ptr_from_paren_expr(
@@ -2506,7 +2647,14 @@ fn count_columns_for_from_item(
 ) -> Option<usize> {
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
     let position = name_ref.syntax().text_range().start();
-    count_columns_for_table_name(db, file, &table_name, &schema, position, Some(name_ref))
+    count_columns_for_table_name(
+        db,
+        file,
+        &table_name,
+        schema.as_ref(),
+        position,
+        Some(name_ref),
+    )
 }
 
 fn resolve_from_clause_for_cte_star(
@@ -2615,7 +2763,8 @@ fn resolve_column_from_call_expr_return_table(
 ) -> Option<SmallVec<[Location; 1]>> {
     let position = name_ref.syntax().text_range().start();
     let (schema, function_name) = name::schema_and_func_name(call_expr)?;
-    let function_locs = resolve_function(db, file, &function_name, &schema, None, position)?;
+    let function_locs =
+        resolve_function(db, file, &function_name, schema.as_ref(), None, position)?;
     let function_node = function_locs.first()?.to_node(db)?;
     let create_function = function_node
         .ancestors()
@@ -2764,7 +2913,7 @@ fn resolve_composite_type_field_ptr(
         .or_else(|| resolve_composite_type_from_cast_node(&column_node))?;
 
     let position = field_name_ref.syntax().text_range().start();
-    let type_name_ptr = resolve_type_name_ptr(db, file, &type_name, &schema, position)?;
+    let type_name_ptr = resolve_type_name_ptr(db, file, &type_name, schema.as_ref(), position)?;
     let type_node = type_name_ptr.to_node(root);
 
     let create_type = type_node.ancestors().find_map(ast::CreateType::cast)?;
@@ -2854,7 +3003,8 @@ fn resolve_table_in_returning_clause(
             LocationKind::Table
         )]),
         ReturningClauseMatch::PseudoTable => {
-            let ptr = resolve_table_name_ptr(db, file, &stmt_table_name, &schema, position)?;
+            let ptr =
+                resolve_table_name_ptr(db, file, &stmt_table_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -2862,7 +3012,7 @@ fn resolve_table_in_returning_clause(
             )])
         }
         ReturningClauseMatch::Table => {
-            let ptr = resolve_table_name_ptr(db, file, &table_name, &schema, position)?;
+            let ptr = resolve_table_name_ptr(db, file, &table_name, schema.as_ref(), position)?;
             Some(smallvec![Location::new(
                 file,
                 ptr.text_range(),
@@ -2891,14 +3041,8 @@ fn resolve_merge_table_name_ptr(
             let item_name = Name::from_node(&item_name_ref);
             if item_name == table_name {
                 let position = table_name_ref.syntax().text_range().start();
-                let (ptr, kind) = resolve_table_like(
-                    db,
-                    file,
-                    Some(table_name_ref),
-                    &item_name,
-                    &None,
-                    position,
-                )?;
+                let (ptr, kind) =
+                    resolve_table_like(db, file, Some(table_name_ref), &item_name, None, position)?;
                 return Some(smallvec![Location::new(file, ptr.text_range(), kind)]);
             }
         }

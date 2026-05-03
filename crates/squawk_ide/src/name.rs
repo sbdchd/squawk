@@ -2,7 +2,7 @@ use smol_str::SmolStr;
 use squawk_syntax::ast::{self, AstNode};
 use std::fmt;
 
-use crate::quote::normalize_identifier;
+use squawk_syntax::quote::normalize_identifier;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) struct Name(pub(crate) SmolStr);
@@ -100,6 +100,7 @@ pub(crate) fn schema_name(path: &ast::Path) -> Option<Schema> {
         .map(|name_ref| Schema(Name::from_node(&name_ref)))
 }
 
+// TODO: doesn't handle CTEs/subqueries/aliases
 pub(crate) fn schema_and_table_from_from_item(
     from_item: &ast::FromItem,
 ) -> Option<(Option<Schema>, Name)> {

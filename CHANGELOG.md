@@ -7,6 +7,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.50.0 - 2026-05-01
+
+### Added
+
+- linter: new rule: prefer-repack (#1105)
+
+  `repack` isn't out yet, coming in PG19, but when it's out:
+
+  ```sql
+  -- instead of
+  cluster foo;
+  -- or
+  vacuum full foo;
+  -- use
+  repack (concurrently) foo;
+  ```
+
+- linter: new rule: require-concurrent-reindex (#1104)
+
+  ```sql
+  -- instead of
+  reindex table foo;
+  -- use
+  reindex table concurrently foo;
+  ```
+
+- linter: new rule: require-concurrent-partition-detach (#1103)
+
+  ```sql
+  -- instead of
+  alter table t detach partition p;
+  -- use
+  alter table t detach partition p concurrently;
+  ```
+
+- linter: new rule: identifier-too-long (#1102)
+
+  Postgres truncates identifiers that are too long, we now warn about this.
+
+  ```sql
+  create table table_very_long_very_long_very_long_very_long_very_long_very_long (c bigint);
+  ```
+
+  ```
+  warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+    ╭▸ stdin:1:14
+    │
+  1 │ create table table_very_long_very_long_very_long_very_long_very_long_very_long (c bigint);
+    │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ╭╴
+  1 - create table table_very_long_very_long_very_long_very_long_very_long_very_long (c bigint);
+  1 + create table table_very_long_very_long_very_long_very_long_very_long_very_lo (c bigint);
+    ╰╴
+  ```
+
+  Thanks @subnix for coming up with this idea!
+
+- linter: parallel file checking (#1099)
+
+  We now check files in parallel using rayon, which gives a nice speed up of
+  22-55%.
+
+## Fixed
+
+- lexer/ide: fix lexing of non-ascii + fix case folding in goto def (#1101)
+
+  Previously we case folded all of the characters in our unquoted identifiers
+  including unicode. This differed from Postgres behavior which only folded ascii.
+
+  Now we correctly error instead of resolving in the following:
+
+  ```sql
+  with t as (select 1 Äpfel)
+  select äpfel from t;
+  --     ^ goto def no longer resolves
+  ```
+
+  Additionally fixed a bug in the lexer where we weren't lexing unicode identifiers.
+
+  For example, the following now lexes:
+
+  ```sql
+  with t as (select 1 🦀)
+  select 🦀 from t;
+  ```
+
 ## v2.49.0 - 2026-04-27
 
 ### Added

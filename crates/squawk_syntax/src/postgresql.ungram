@@ -861,6 +861,9 @@ Truncate =
   ('restart' 'identity' | 'continue' 'identity')?
   ('cascade' | 'restrict')?
 
+EmptyStmt =
+  ';'
+
 LikeOption =
   ('including' | 'excluding')
   ('comments'
@@ -1340,7 +1343,7 @@ Insert =
   WithClause?
   'insert' 'into' Path Alias? ColumnList?
   ('overriding' ('system' | 'user') 'value')?
-  ('default' 'values' | Values | Stmt)
+  ('default' 'values' | SelectVariant)
   OnConflictClause?
   ReturningClause?
 
@@ -2289,7 +2292,11 @@ Cluster =
   'cluster'
   ('verbose' | OptionItemList)?
   Path?
-  UsingMethod?
+  (UsingMethod | OnPath)?
+
+OnPath =
+  'on'
+  Path
 
 Repack =
   'repack'
@@ -2611,7 +2618,17 @@ CreateRole =
 CreateRule =
   'create' OrReplace? 'rule' Name 'as' 'on' ('#ident' | 'select' | 'insert' | 'update' | 'delete')
   'to' Path WhereClause?
-  'do' ('also' | 'instead')? ('nothing' | '(' (Stmt (',' Stmt)*) ')' | Stmt)
+  'do' ('also' | 'instead')?
+  ('nothing'
+  | '(' (RuleStmt (',' RuleStmt)*) ')' 
+  | RuleStmt)
+
+RuleStmt =
+  SelectVariant
+| Insert
+| Update
+| Delete
+| Notify
 
 CreateSequence =
   'create' Persistence? 'sequence' IfNotExists? Path
@@ -2953,7 +2970,7 @@ SetTransaction =
   )
 
 Reindex =
-  'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? Path?
+  'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? 'concurrently'? Path?
 
 CreateView =
   'create' OrReplace? Persistence? 'recursive'? 'view' Path ColumnList?
@@ -3614,7 +3631,7 @@ Stmt =
 | Vacuum
 | Values
 | ParenSelect
-| ';'
+| EmptyStmt
 
 
 SourceFile =

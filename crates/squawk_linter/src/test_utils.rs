@@ -54,8 +54,8 @@ pub(crate) fn lint_errors_with(sql: &str, settings: LinterSettings, rule: Rule) 
     format_violations(sql, &errors)
 }
 
-pub(crate) fn fix_sql(sql: &str, rule: Rule) -> String {
-    let errors = lint(sql, rule);
+pub(crate) fn fix_sql_with(sql: &str, settings: LinterSettings, rule: Rule) -> String {
+    let errors = lint_settings(sql, settings.clone(), rule);
     assert!(!errors.is_empty(), "Should start with linter errors");
 
     let fixes = errors.into_iter().flat_map(|x| x.fix).collect::<Vec<_>>();
@@ -80,6 +80,7 @@ pub(crate) fn fix_sql(sql: &str, rule: Rule) -> String {
         "Shouldn't introduce any syntax errors"
     );
     let mut linter = Linter::from([rule]);
+    linter.settings = settings;
     let errors = linter.lint(&file, &result);
     assert_eq!(
         errors.len(),
@@ -88,6 +89,10 @@ pub(crate) fn fix_sql(sql: &str, rule: Rule) -> String {
     );
 
     result
+}
+
+pub(crate) fn fix_sql(sql: &str, rule: Rule) -> String {
+    fix_sql_with(sql, LinterSettings::default(), rule)
 }
 
 fn format_violations(sql: &str, violations: &[Violation]) -> String {

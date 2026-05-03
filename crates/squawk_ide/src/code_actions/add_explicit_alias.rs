@@ -1,10 +1,9 @@
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::quote::quote_column_alias;
 
-use crate::{
-    column_name::ColumnName, db::File, offsets::token_from_offset, quote::quote_column_alias,
-};
+use crate::{column_name::ColumnName, db::File, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 

@@ -44,9 +44,11 @@ use rules::ban_uncommitted_transaction;
 use rules::changing_column_type;
 use rules::constraint_missing_not_valid;
 use rules::disallow_unique_constraint;
+use rules::identifier_too_long;
 use rules::prefer_bigint_over_int;
 use rules::prefer_bigint_over_smallint;
 use rules::prefer_identity;
+use rules::prefer_repack;
 use rules::prefer_robust_stmts;
 use rules::prefer_text_field;
 use rules::prefer_timestamptz;
@@ -54,6 +56,8 @@ use rules::renaming_column;
 use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
+use rules::require_concurrent_partition_detach;
+use rules::require_concurrent_reindex;
 use rules::require_enum_value_ordering;
 use rules::require_table_schema;
 use rules::require_timeout_settings;
@@ -77,6 +81,7 @@ pub enum Rule {
     PreferBigintOverInt,
     PreferBigintOverSmallint,
     PreferIdentity,
+    PreferRepack,
     PreferRobustStmts,
     PreferTextField,
     PreferTimestampTz,
@@ -95,6 +100,9 @@ pub enum Rule {
     BanUncommittedTransaction,
     RequireEnumValueOrdering,
     RequireTableSchema,
+    IdentifierTooLong,
+    RequireConcurrentPartitionDetach,
+    RequireConcurrentReindex,
     // xtask:new-rule:error-name
 }
 
@@ -126,6 +134,7 @@ impl TryFrom<&str> for Rule {
             "prefer-bigint-over-int" => Ok(Rule::PreferBigintOverInt),
             "prefer-bigint-over-smallint" => Ok(Rule::PreferBigintOverSmallint),
             "prefer-identity" => Ok(Rule::PreferIdentity),
+            "prefer-repack" => Ok(Rule::PreferRepack),
             "prefer-robust-stmts" => Ok(Rule::PreferRobustStmts),
             "prefer-text-field" => Ok(Rule::PreferTextField),
             // this is typo'd so we just support both
@@ -147,6 +156,9 @@ impl TryFrom<&str> for Rule {
             "ban-uncommitted-transaction" => Ok(Rule::BanUncommittedTransaction),
             "require-enum-value-ordering" => Ok(Rule::RequireEnumValueOrdering),
             "require-table-schema" => Ok(Rule::RequireTableSchema),
+            "identifier-too-long" => Ok(Rule::IdentifierTooLong),
+            "require-concurrent-partition-detach" => Ok(Rule::RequireConcurrentPartitionDetach),
+            "require-concurrent-reindex" => Ok(Rule::RequireConcurrentReindex),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -191,6 +203,7 @@ impl fmt::Display for Rule {
             Rule::PreferBigintOverInt => "prefer-bigint-over-int",
             Rule::PreferBigintOverSmallint => "prefer-bigint-over-smallint",
             Rule::PreferIdentity => "prefer-identity",
+            Rule::PreferRepack => "prefer-repack",
             Rule::PreferRobustStmts => "prefer-robust-stmts",
             Rule::PreferTextField => "prefer-text-field",
             Rule::PreferTimestampTz => "prefer-timestamp-tz",
@@ -211,6 +224,9 @@ impl fmt::Display for Rule {
             Rule::BanUncommittedTransaction => "ban-uncommitted-transaction",
             Rule::RequireEnumValueOrdering => "require-enum-value-ordering",
             Rule::RequireTableSchema => "require-table-schema",
+            Rule::IdentifierTooLong => "identifier-too-long",
+            Rule::RequireConcurrentPartitionDetach => "require-concurrent-partition-detach",
+            Rule::RequireConcurrentReindex => "require-concurrent-reindex",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -311,8 +327,8 @@ impl Violation {
         }
     }
 
-    fn fix(mut self, fix: Option<Fix>) -> Violation {
-        self.fix = fix;
+    fn fix<F: Into<Option<Fix>>>(mut self, fix: F) -> Violation {
+        self.fix = fix.into();
         self
     }
     fn help(mut self, help: impl Into<String>) -> Violation {
@@ -321,7 +337,7 @@ impl Violation {
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct LinterSettings {
     pub pg_version: Version,
     pub assume_in_transaction: bool,
@@ -403,6 +419,9 @@ impl Linter {
         if self.rules.contains(&Rule::PreferIdentity) {
             prefer_identity(self, file);
         }
+        if self.rules.contains(&Rule::PreferRepack) {
+            prefer_repack(self, file);
+        }
         if self.rules.contains(&Rule::PreferRobustStmts) {
             prefer_robust_stmts(self, file);
         }
@@ -447,6 +466,15 @@ impl Linter {
         }
         if self.rules.contains(&Rule::RequireTableSchema) {
             require_table_schema(self, file);
+        }
+        if self.rules.contains(&Rule::IdentifierTooLong) {
+            identifier_too_long(self, file);
+        }
+        if self.rules.contains(&Rule::RequireConcurrentPartitionDetach) {
+            require_concurrent_partition_detach(self, file);
+        }
+        if self.rules.contains(&Rule::RequireConcurrentReindex) {
+            require_concurrent_reindex(self, file);
         }
         // xtask:new-rule:rule-call
 

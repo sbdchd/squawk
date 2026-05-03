@@ -6,12 +6,12 @@ pub use token::{Base, LiteralKind, Token, TokenKind};
 // via: https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L346
 // ident_start		[A-Za-z\200-\377_]
 const fn is_ident_start(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '\u{80}'..='\u{FF}')
+    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '\u{80}'..)
 }
 
 // ident_cont		[A-Za-z\200-\377_0-9\$]
 const fn is_ident_cont(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '$' | '\u{80}'..='\u{FF}')
+    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '$' | '\u{80}'..)
 }
 
 // see:
@@ -762,6 +762,21 @@ U&"d!0061t!+000061" UESCAPE '!'
         assert_debug_snapshot!(lex("$$$$"), @r#"
         [
             "$$$$" @ Literal { kind: DollarQuotedString { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn ident_non_ascii_above_latin1() {
+        assert_debug_snapshot!(lex("ẞ Ā 漢字 𐐷"), @r#"
+        [
+            "ẞ" @ Ident,
+            " " @ Whitespace,
+            "Ā" @ Ident,
+            " " @ Whitespace,
+            "漢字" @ Ident,
+            " " @ Whitespace,
+            "𐐷" @ Ident,
         ]
         "#);
     }
