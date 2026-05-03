@@ -5,6 +5,7 @@ use enum_iterator::Sequence;
 use enum_iterator::all;
 pub use ignore::Ignore;
 use ignore::find_ignores;
+use ignore::has_disable_assume_in_transaction;
 use ignore_index::IgnoreIndex;
 use rowan::TextRange;
 use rowan::TextSize;
@@ -360,6 +361,10 @@ impl Linter {
 
     #[must_use]
     pub fn lint(&mut self, file: &Parse<SourceFile>, text: &str) -> Vec<Violation> {
+        if has_disable_assume_in_transaction(&file.syntax_node()) {
+            self.settings.assume_in_transaction = false;
+        }
+
         if self.rules.contains(&Rule::AddingFieldWithDefault) {
             adding_field_with_default(self, file);
         }

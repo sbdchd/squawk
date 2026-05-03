@@ -19,7 +19,7 @@ pub struct Ignore {
     pub kind: IgnoreKind,
 }
 
-fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
+pub(crate) fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
     let range = token.text_range();
     if token.kind() == SyntaxKind::COMMENT {
         let text = token.text();
@@ -126,6 +126,30 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
             _ => (),
         }
     }
+}
+
+const DISABLE_ASSUME_IN_TRANSACTION: &str = "squawk-disable-assume-in-transaction";
+
+pub fn has_disable_assume_in_transaction(file: &SyntaxNode) -> bool {
+    for event in file.preorder_with_tokens() {
+        match event {
+            rowan::WalkEvent::Enter(NodeOrToken::Token(token))
+                if token.kind() == SyntaxKind::COMMENT =>
+            {
+                if let Some((body, _range)) = comment_body(&token) {
+                    let trimmed = body.trim();
+                    let trimmed = trimmed
+                        .find("--")
+                        .map_or(trimmed, |idx| trimmed[..idx].trim_end());
+                    if trimmed == DISABLE_ASSUME_IN_TRANSACTION {
+                        return true;
+                    }
+                }
+            }
+            _ => (),
+        }
+    }
+    false
 }
 
 #[cfg(test)]
@@ -611,5 +635,37 @@ alter table t drop column c cascade;
             RequireTimeoutSettings,
         ]
         ");
+    }
+
+    #[test]
+    fn disable_assume_in_transaction() {
+        use super::has_disable_assume_in_transaction;
+        let sql = "-- squawk-disable-assume-in-transaction\nSELECT 1;";
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        assert!(has_disable_assume_in_transaction(&parse.syntax_node()));
+    }
+
+    #[test]
+    fn disable_assume_in_transaction_c_style_comment() {
+        use super::has_disable_assume_in_transaction;
+        let sql = "/* squawk-disable-assume-in-transaction */\nSELECT 1;";
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        assert!(has_disable_assume_in_transaction(&parse.syntax_node()));
+    }
+
+    #[test]
+    fn disable_assume_in_transaction_with_trailing_comment() {
+        use super::has_disable_assume_in_transaction;
+        let sql = "-- squawk-disable-assume-in-transaction -- not in a transaction\nSELECT 1;";
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        assert!(has_disable_assume_in_transaction(&parse.syntax_node()));
+    }
+
+    #[test]
+    fn transaction_override_none_when_absent() {
+        use super::has_disable_assume_in_transaction;
+        let sql = "SELECT 1;";
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        assert!(!has_disable_assume_in_transaction(&parse.syntax_node()));
     }
 }
