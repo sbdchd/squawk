@@ -303,7 +303,7 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
-    SELECT
+    TABLE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
@@ -586,5 +586,46 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  PAREN_SELECT
+    L_PAREN "("
+    COMPOUND_SELECT
+      SELECT_INTO
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AS_NAME
+                NAME
+                  IDENT "a"
+        WHITESPACE " "
+        INTO_CLAUSE
+          INTO_KW "into"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME
+                IDENT "t"
+      WHITESPACE " "
+      UNION_KW "union"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AS_NAME
+                NAME
+                  IDENT "b"
+    R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

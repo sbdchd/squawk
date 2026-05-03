@@ -62,7 +62,7 @@ pub(super) fn apply_code_action(
             assert_eq!(
                 reparse.errors(),
                 vec![],
-                "Code actions shouldn't cause syntax errors"
+                "Code actions shouldn't cause syntax errors.\nParsed:\n{result}"
             );
         }
     }

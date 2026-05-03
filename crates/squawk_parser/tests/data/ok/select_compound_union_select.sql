@@ -25,3 +25,5 @@ select * from (((((select 1))) union select 1));
 
 select * from (((select 1) union select 2) limit 1) as t;
 
+(select 1 a into t union select 1 b);
+
