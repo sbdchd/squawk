@@ -861,6 +861,9 @@ Truncate =
   ('restart' 'identity' | 'continue' 'identity')?
   ('cascade' | 'restrict')?
 
+EmptyStmt =
+  ';'
+
 LikeOption =
   ('including' | 'excluding')
   ('comments'
@@ -3618,7 +3621,7 @@ Stmt =
 | Vacuum
 | Values
 | ParenSelect
-| ';'
+| EmptyStmt
 
 
 SourceFile =

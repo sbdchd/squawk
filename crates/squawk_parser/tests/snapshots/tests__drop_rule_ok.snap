@@ -21,7 +21,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
   SEMICOLON ";"
-  SEMICOLON ";"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"

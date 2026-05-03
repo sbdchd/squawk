@@ -16,7 +16,8 @@ SOURCE_FILE
   WHITESPACE " "
   ERROR
     BOOLEAN_KW "boolean"
-  SEMICOLON ";"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- mismatch options"
   WHITESPACE "\n"
