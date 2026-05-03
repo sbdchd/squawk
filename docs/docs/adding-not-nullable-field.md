@@ -46,6 +46,14 @@ For each step, note that:
 
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
 
+### cross-migration suppression and constraint naming
+
+When the `ADD CONSTRAINT ... NOT VALID` lives in an earlier migration file, the rule looks for a `VALIDATE CONSTRAINT` paired with a `DROP CONSTRAINT` of the same name in the migration that runs `SET NOT NULL` to recognize the safe pattern.
+
+To get column-precise suppression (so an unrelated `SET NOT NULL` on the same table still warns), name the helper constraint `<column>_not_null` or `<table>_<column>_not_null` — for example `view_count_not_null` or `recipe_view_count_not_null`. With those names, the rule infers the exact column from the constraint name.
+
+If you use a different naming scheme, the rule falls back to a per-table count: each validate+drop pair on a table can suppress one `SET NOT NULL` on that table, paired in source order.
+
 
 ## solution for alembic and sqlalchemy
 
