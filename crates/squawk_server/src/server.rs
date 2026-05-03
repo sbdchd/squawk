@@ -11,6 +11,7 @@ use lsp_types::{
 };
 
 use crate::{
+    config::LintConfig,
     global_state::GlobalState,
     semantic_tokens::{SUPPORTED_MODIFIERS, SUPPORTED_TYPES},
 };
@@ -92,8 +93,15 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
 
     let init_params: InitializeParams = serde_json::from_value(params).unwrap_or_default();
     info!("Client process ID: {:?}", init_params.process_id);
-    let client_name = init_params.client_info.map(|x| x.name);
+    let client_name = init_params.client_info.as_ref().map(|x| x.name.clone());
     info!("Client name: {client_name:?}");
 
-    GlobalState::new(connection.sender).run(connection.receiver)
+    let config = LintConfig::from_init_params(&init_params);
+    info!("excluded rules: {:?}", config.excluded_rules);
+    info!("included rules: {:?}", config.included_rules);
+    info!("pg version: {:?}", config.pg_version);
+    info!("assume in transaction: {}", config.assume_in_transaction);
+    info!("excluded paths: {:?}", config.excluded_paths);
+
+    GlobalState::new(connection.sender, config).run(connection.receiver)
 }

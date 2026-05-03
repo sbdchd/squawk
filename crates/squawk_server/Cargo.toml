@@ -33,6 +33,7 @@ rustc-hash.workspace = true
 squawk-thread.workspace = true
 crossbeam-channel.workspace = true
 tracing.workspace = true
+glob.workspace = true
 
 [dev-dependencies]
 insta.workspace = true
