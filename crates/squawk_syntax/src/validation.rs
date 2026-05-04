@@ -22,6 +22,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::Literal(it) => validate_literal(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 ast::Select(it) => validate_select(it, errors),
+                ast::SelectInto(it) => validate_select_into(it, errors),
                 _ => (),
             }
         }
@@ -46,6 +47,38 @@ fn validate_select(it: ast::Select, acc: &mut Vec<SyntaxError>) {
             "Missing select clause",
             TextRange::empty(from_clause.syntax().text_range().start()),
         ));
+    }
+}
+
+fn validate_select_into(it: ast::SelectInto, acc: &mut Vec<SyntaxError>) {
+    for (child, ancestor) in it.syntax().ancestors().zip(it.syntax().ancestors().skip(1)) {
+        let kind = ancestor.kind();
+        if ast::ParenSelect::can_cast(kind) {
+            continue;
+        } else if let Some(compound_select) = ast::CompoundSelect::cast(ancestor) {
+            if compound_select
+                .lhs()
+                .is_some_and(|lhs| lhs.syntax() == &child)
+            {
+                continue;
+            }
+            acc.push(SyntaxError::new(
+                "INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT",
+                it.syntax().text_range(),
+            ));
+            return;
+        } else if ast::Explain::can_cast(kind)
+            || ast::Prepare::can_cast(kind)
+            || ast::SourceFile::can_cast(kind)
+        {
+            return;
+        }
+
+        acc.push(SyntaxError::new(
+            "SELECT ... INTO is not allowed here",
+            it.syntax().text_range(),
+        ));
+        return;
     }
 }
 
