@@ -85,6 +85,13 @@ const IGNORED_LINES: &[&str] = &[
     r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
     r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
     "copy (select * from test1) (t,id) to stdout;",
+    "copy (select t into temp test3 from test1 where id=3) to stdout;",
+    "DECLARE foo CURSOR FOR SELECT 1 INTO int4_tbl;",
+    "COPY (SELECT 1 INTO frak UNION SELECT 2) TO 'blob';",
+    "SELECT * FROM (SELECT 1 INTO f) bar;",
+    "CREATE VIEW foo AS SELECT 1 INTO int4_tbl;",
+    "INSERT INTO int4_tbl SELECT 1 INTO f;",
+    "REPACK (CONCURRENTLY) :toast_rel;",
 ];
 
 const VARIABLE_REPLACEMENTS: &[(&str, &str)] = &[
