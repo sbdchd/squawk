@@ -15,7 +15,7 @@ select * from t union table t;
 table t union table t;
 (select 1) union (table t);
 
-(select 2) union select a, b, c into t from t2;
+select a, b, c into t from t2 union (select 2);
 
 values (1), (2) union values (3), (4);
 

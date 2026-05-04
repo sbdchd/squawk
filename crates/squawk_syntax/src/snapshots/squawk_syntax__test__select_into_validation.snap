@@ -1,0 +1,692 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/select_into.sql
+---
+SOURCE_FILE@0..858
+  COMMENT@0..18 "-- okay, top level"
+  WHITESPACE@18..19 "\n"
+  SELECT_INTO@19..36
+    SELECT_CLAUSE@19..29
+      SELECT_KW@19..25 "select"
+      WHITESPACE@25..26 " "
+      TARGET_LIST@26..29
+        TARGET@26..29
+          LITERAL@26..27
+            INT_NUMBER@26..27 "1"
+          WHITESPACE@27..28 " "
+          AS_NAME@28..29
+            NAME@28..29
+              IDENT@28..29 "a"
+    WHITESPACE@29..30 " "
+    INTO_CLAUSE@30..36
+      INTO_KW@30..34 "into"
+      WHITESPACE@34..35 " "
+      PATH@35..36
+        PATH_SEGMENT@35..36
+          NAME@35..36
+            IDENT@35..36 "t"
+  SEMICOLON@36..37 ";"
+  WHITESPACE@37..38 "\n"
+  COMPOUND_SELECT@38..72
+    SELECT_INTO@38..55
+      SELECT_CLAUSE@38..48
+        SELECT_KW@38..44 "select"
+        WHITESPACE@44..45 " "
+        TARGET_LIST@45..48
+          TARGET@45..48
+            LITERAL@45..46
+              INT_NUMBER@45..46 "1"
+            WHITESPACE@46..47 " "
+            AS_NAME@47..48
+              NAME@47..48
+                IDENT@47..48 "a"
+      WHITESPACE@48..49 " "
+      INTO_CLAUSE@49..55
+        INTO_KW@49..53 "into"
+        WHITESPACE@53..54 " "
+        PATH@54..55
+          PATH_SEGMENT@54..55
+            NAME@54..55
+              IDENT@54..55 "t"
+    WHITESPACE@55..56 " "
+    UNION_KW@56..61 "union"
+    WHITESPACE@61..62 " "
+    SELECT@62..72
+      SELECT_CLAUSE@62..72
+        SELECT_KW@62..68 "select"
+        WHITESPACE@68..69 " "
+        TARGET_LIST@69..72
+          TARGET@69..72
+            LITERAL@69..70
+              INT_NUMBER@69..70 "2"
+            WHITESPACE@70..71 " "
+            AS_NAME@71..72
+              NAME@71..72
+                IDENT@71..72 "a"
+  SEMICOLON@72..73 ";"
+  WHITESPACE@73..74 "\n"
+  PAREN_SELECT@74..95
+    L_PAREN@74..75 "("
+    PAREN_SELECT@75..94
+      L_PAREN@75..76 "("
+      SELECT_INTO@76..93
+        SELECT_CLAUSE@76..86
+          SELECT_KW@76..82 "select"
+          WHITESPACE@82..83 " "
+          TARGET_LIST@83..86
+            TARGET@83..86
+              LITERAL@83..84
+                INT_NUMBER@83..84 "1"
+              WHITESPACE@84..85 " "
+              AS_NAME@85..86
+                NAME@85..86
+                  IDENT@85..86 "a"
+        WHITESPACE@86..87 " "
+        INTO_CLAUSE@87..93
+          INTO_KW@87..91 "into"
+          WHITESPACE@91..92 " "
+          PATH@92..93
+            PATH_SEGMENT@92..93
+              NAME@92..93
+                IDENT@92..93 "t"
+      R_PAREN@93..94 ")"
+    R_PAREN@94..95 ")"
+  SEMICOLON@95..96 ";"
+  WHITESPACE@96..97 "\n"
+  EXPLAIN@97..120
+    EXPLAIN_KW@97..104 "explain"
+    WHITESPACE@104..105 " "
+    SELECT_INTO@105..120
+      SELECT_CLAUSE@105..113
+        SELECT_KW@105..111 "select"
+        WHITESPACE@111..112 " "
+        TARGET_LIST@112..113
+          TARGET@112..113
+            LITERAL@112..113
+              INT_NUMBER@112..113 "1"
+      WHITESPACE@113..114 " "
+      INTO_CLAUSE@114..120
+        INTO_KW@114..118 "into"
+        WHITESPACE@118..119 " "
+        PATH@119..120
+          PATH_SEGMENT@119..120
+            NAME@119..120
+              IDENT@119..120 "x"
+  SEMICOLON@120..121 ";"
+  WHITESPACE@121..123 " \n"
+  PREPARE@123..151
+    PREPARE_KW@123..130 "prepare"
+    WHITESPACE@130..131 " "
+    NAME@131..132
+      IDENT@131..132 "p"
+    WHITESPACE@132..133 " "
+    AS_KW@133..135 "as"
+    WHITESPACE@135..136 " "
+    SELECT_INTO@136..151
+      SELECT_CLAUSE@136..144
+        SELECT_KW@136..142 "select"
+        WHITESPACE@142..143 " "
+        TARGET_LIST@143..144
+          TARGET@143..144
+            LITERAL@143..144
+              INT_NUMBER@143..144 "1"
+      WHITESPACE@144..145 " "
+      INTO_CLAUSE@145..151
+        INTO_KW@145..149 "into"
+        WHITESPACE@149..150 " "
+        PATH@150..151
+          PATH_SEGMENT@150..151
+            NAME@150..151
+              IDENT@150..151 "x"
+  SEMICOLON@151..152 ";"
+  WHITESPACE@152..154 "\n\n"
+  COMMENT@154..231 "-- error, only the le ..."
+  WHITESPACE@231..232 "\n"
+  COMPOUND_SELECT@232..283
+    SELECT@232..242
+      SELECT_CLAUSE@232..242
+        SELECT_KW@232..238 "select"
+        WHITESPACE@238..239 " "
+        TARGET_LIST@239..242
+          TARGET@239..242
+            LITERAL@239..240
+              INT_NUMBER@239..240 "1"
+            WHITESPACE@240..241 " "
+            AS_NAME@241..242
+              NAME@241..242
+                IDENT@241..242 "a"
+    WHITESPACE@242..243 " "
+    UNION_KW@243..248 "union"
+    WHITESPACE@248..249 " "
+    COMPOUND_SELECT@249..283
+      SELECT_INTO@249..266
+        SELECT_CLAUSE@249..259
+          SELECT_KW@249..255 "select"
+          WHITESPACE@255..256 " "
+          TARGET_LIST@256..259
+            TARGET@256..259
+              LITERAL@256..257
+                INT_NUMBER@256..257 "2"
+              WHITESPACE@257..258 " "
+              AS_NAME@258..259
+                NAME@258..259
+                  IDENT@258..259 "a"
+        WHITESPACE@259..260 " "
+        INTO_CLAUSE@260..266
+          INTO_KW@260..264 "into"
+          WHITESPACE@264..265 " "
+          PATH@265..266
+            PATH_SEGMENT@265..266
+              NAME@265..266
+                IDENT@265..266 "t"
+      WHITESPACE@266..267 " "
+      UNION_KW@267..272 "union"
+      WHITESPACE@272..273 " "
+      SELECT@273..283
+        SELECT_CLAUSE@273..283
+          SELECT_KW@273..279 "select"
+          WHITESPACE@279..280 " "
+          TARGET_LIST@280..283
+            TARGET@280..283
+              LITERAL@280..281
+                INT_NUMBER@280..281 "3"
+              WHITESPACE@281..282 " "
+              AS_NAME@282..283
+                NAME@282..283
+                  IDENT@282..283 "a"
+  SEMICOLON@283..284 ";"
+  WHITESPACE@284..285 "\n"
+  COMPOUND_SELECT@285..319
+    SELECT@285..295
+      SELECT_CLAUSE@285..295
+        SELECT_KW@285..291 "select"
+        WHITESPACE@291..292 " "
+        TARGET_LIST@292..295
+          TARGET@292..295
+            LITERAL@292..293
+              INT_NUMBER@292..293 "4"
+            WHITESPACE@293..294 " "
+            AS_NAME@294..295
+              NAME@294..295
+                IDENT@294..295 "a"
+    WHITESPACE@295..296 " "
+    UNION_KW@296..301 "union"
+    WHITESPACE@301..302 " "
+    SELECT_INTO@302..319
+      SELECT_CLAUSE@302..312
+        SELECT_KW@302..308 "select"
+        WHITESPACE@308..309 " "
+        TARGET_LIST@309..312
+          TARGET@309..312
+            LITERAL@309..310
+              INT_NUMBER@309..310 "5"
+            WHITESPACE@310..311 " "
+            AS_NAME@311..312
+              NAME@311..312
+                IDENT@311..312 "a"
+      WHITESPACE@312..313 " "
+      INTO_CLAUSE@313..319
+        INTO_KW@313..317 "into"
+        WHITESPACE@317..318 " "
+        PATH@318..319
+          PATH_SEGMENT@318..319
+            NAME@318..319
+              IDENT@318..319 "t"
+  SEMICOLON@319..320 ";"
+  WHITESPACE@320..321 "\n"
+  COMPOUND_SELECT@321..361
+    SELECT@321..331
+      SELECT_CLAUSE@321..331
+        SELECT_KW@321..327 "select"
+        WHITESPACE@327..328 " "
+        TARGET_LIST@328..331
+          TARGET@328..331
+            LITERAL@328..329
+              INT_NUMBER@328..329 "1"
+            WHITESPACE@329..330 " "
+            AS_NAME@330..331
+              NAME@330..331
+                IDENT@330..331 "a"
+    WHITESPACE@331..332 " "
+    UNION_KW@332..337 "union"
+    WHITESPACE@337..338 " "
+    PAREN_SELECT@338..361
+      L_PAREN@338..339 "("
+      PAREN_SELECT@339..360
+        L_PAREN@339..340 "("
+        PAREN_SELECT@340..359
+          L_PAREN@340..341 "("
+          SELECT_INTO@341..358
+            SELECT_CLAUSE@341..351
+              SELECT_KW@341..347 "select"
+              WHITESPACE@347..348 " "
+              TARGET_LIST@348..351
+                TARGET@348..351
+                  LITERAL@348..349
+                    INT_NUMBER@348..349 "2"
+                  WHITESPACE@349..350 " "
+                  AS_NAME@350..351
+                    NAME@350..351
+                      IDENT@350..351 "a"
+            WHITESPACE@351..352 " "
+            INTO_CLAUSE@352..358
+              INTO_KW@352..356 "into"
+              WHITESPACE@356..357 " "
+              PATH@357..358
+                PATH_SEGMENT@357..358
+                  NAME@357..358
+                    IDENT@357..358 "t"
+          R_PAREN@358..359 ")"
+        R_PAREN@359..360 ")"
+      R_PAREN@360..361 ")"
+  SEMICOLON@361..362 ";"
+  WHITESPACE@362..363 "\n"
+  COMPOUND_SELECT@363..412
+    SELECT@363..371
+      SELECT_CLAUSE@363..371
+        SELECT_KW@363..369 "select"
+        WHITESPACE@369..370 " "
+        TARGET_LIST@370..371
+          TARGET@370..371
+            LITERAL@370..371
+              INT_NUMBER@370..371 "1"
+    WHITESPACE@371..372 " "
+    UNION_KW@372..377 "union"
+    WHITESPACE@377..378 " "
+    PAREN_SELECT@378..412
+      L_PAREN@378..379 "("
+      COMPOUND_SELECT@379..411
+        PAREN_SELECT@379..396
+          L_PAREN@379..380 "("
+          SELECT_INTO@380..395
+            SELECT_CLAUSE@380..388
+              SELECT_KW@380..386 "select"
+              WHITESPACE@386..387 " "
+              TARGET_LIST@387..388
+                TARGET@387..388
+                  LITERAL@387..388
+                    INT_NUMBER@387..388 "2"
+            WHITESPACE@388..389 " "
+            INTO_CLAUSE@389..395
+              INTO_KW@389..393 "into"
+              WHITESPACE@393..394 " "
+              PATH@394..395
+                PATH_SEGMENT@394..395
+                  NAME@394..395
+                    IDENT@394..395 "x"
+          R_PAREN@395..396 ")"
+        WHITESPACE@396..397 " "
+        UNION_KW@397..402 "union"
+        WHITESPACE@402..403 " "
+        SELECT@403..411
+          SELECT_CLAUSE@403..411
+            SELECT_KW@403..409 "select"
+            WHITESPACE@409..410 " "
+            TARGET_LIST@410..411
+              TARGET@410..411
+                LITERAL@410..411
+                  INT_NUMBER@410..411 "3"
+      R_PAREN@411..412 ")"
+  SEMICOLON@412..413 ";"
+  WHITESPACE@413..415 "\n\n"
+  COMMENT@415..431 "-- error, nested"
+  WHITESPACE@431..432 "\n"
+  SELECT@432..477
+    WITH_CLAUSE@432..461
+      WITH_KW@432..436 "with"
+      WHITESPACE@436..437 " "
+      WITH_TABLE@437..461
+        NAME@437..438
+          IDENT@437..438 "t"
+        WHITESPACE@438..439 " "
+        AS_KW@439..441 "as"
+        WHITESPACE@441..442 " "
+        L_PAREN@442..443 "("
+        SELECT_INTO@443..460
+          SELECT_CLAUSE@443..453
+            SELECT_KW@443..449 "select"
+            WHITESPACE@449..450 " "
+            TARGET_LIST@450..453
+              TARGET@450..453
+                LITERAL@450..451
+                  INT_NUMBER@450..451 "1"
+                WHITESPACE@451..452 " "
+                AS_NAME@452..453
+                  NAME@452..453
+                    IDENT@452..453 "a"
+          WHITESPACE@453..454 " "
+          INTO_CLAUSE@454..460
+            INTO_KW@454..458 "into"
+            WHITESPACE@458..459 " "
+            PATH@459..460
+              PATH_SEGMENT@459..460
+                NAME@459..460
+                  IDENT@459..460 "t"
+        R_PAREN@460..461 ")"
+    WHITESPACE@461..462 " "
+    SELECT_CLAUSE@462..470
+      SELECT_KW@462..468 "select"
+      WHITESPACE@468..469 " "
+      TARGET_LIST@469..470
+        TARGET@469..470
+          STAR@469..470 "*"
+    WHITESPACE@470..471 " "
+    FROM_CLAUSE@471..477
+      FROM_KW@471..475 "from"
+      WHITESPACE@475..476 " "
+      FROM_ITEM@476..477
+        NAME_REF@476..477
+          IDENT@476..477 "t"
+  SEMICOLON@477..478 ";"
+  WHITESPACE@478..479 "\n"
+  SELECT@479..537
+    WITH_CLAUSE@479..521
+      WITH_KW@479..483 "with"
+      WHITESPACE@483..484 " "
+      WITH_TABLE@484..521
+        NAME@484..485
+          IDENT@484..485 "t"
+        WHITESPACE@485..486 " "
+        AS_KW@486..488 "as"
+        WHITESPACE@488..489 " "
+        L_PAREN@489..490 "("
+        COMPOUND_SELECT@490..520
+          SELECT_INTO@490..505
+            SELECT_CLAUSE@490..498
+              SELECT_KW@490..496 "select"
+              WHITESPACE@496..497 " "
+              TARGET_LIST@497..498
+                TARGET@497..498
+                  LITERAL@497..498
+                    INT_NUMBER@497..498 "1"
+            WHITESPACE@498..499 " "
+            INTO_CLAUSE@499..505
+              INTO_KW@499..503 "into"
+              WHITESPACE@503..504 " "
+              PATH@504..505
+                PATH_SEGMENT@504..505
+                  NAME@504..505
+                    IDENT@504..505 "x"
+          WHITESPACE@505..506 " "
+          UNION_KW@506..511 "union"
+          WHITESPACE@511..512 " "
+          SELECT@512..520
+            SELECT_CLAUSE@512..520
+              SELECT_KW@512..518 "select"
+              WHITESPACE@518..519 " "
+              TARGET_LIST@519..520
+                TARGET@519..520
+                  LITERAL@519..520
+                    INT_NUMBER@519..520 "2"
+        R_PAREN@520..521 ")"
+    WHITESPACE@521..522 " "
+    SELECT_CLAUSE@522..530
+      SELECT_KW@522..528 "select"
+      WHITESPACE@528..529 " "
+      TARGET_LIST@529..530
+        TARGET@529..530
+          STAR@529..530 "*"
+    WHITESPACE@530..531 " "
+    FROM_CLAUSE@531..537
+      FROM_KW@531..535 "from"
+      WHITESPACE@535..536 " "
+      FROM_ITEM@536..537
+        NAME_REF@536..537
+          IDENT@536..537 "t"
+  SEMICOLON@537..538 ";"
+  WHITESPACE@538..540 "\n\n"
+  COMMENT@540..556 "-- error, nested"
+  WHITESPACE@556..557 "\n"
+  SELECT@557..605
+    SELECT_CLAUSE@557..565
+      SELECT_KW@557..563 "select"
+      WHITESPACE@563..564 " "
+      TARGET_LIST@564..565
+        TARGET@564..565
+          STAR@564..565 "*"
+    WHITESPACE@565..566 " "
+    FROM_CLAUSE@566..572
+      FROM_KW@566..570 "from"
+      WHITESPACE@570..571 " "
+      FROM_ITEM@571..572
+        NAME_REF@571..572
+          IDENT@571..572 "u"
+    WHITESPACE@572..575 "\n  "
+    WHERE_CLAUSE@575..605
+      WHERE_KW@575..580 "where"
+      WHITESPACE@580..581 " "
+      BIN_EXPR@581..605
+        NAME_REF@581..582
+          IDENT@581..582 "a"
+        WHITESPACE@582..583 " "
+        IN_KW@583..585 "in"
+        WHITESPACE@585..586 " "
+        PAREN_EXPR@586..605
+          L_PAREN@586..587 "("
+          SELECT_INTO@587..604
+            SELECT_CLAUSE@587..597
+              SELECT_KW@587..593 "select"
+              WHITESPACE@593..594 " "
+              TARGET_LIST@594..597
+                TARGET@594..597
+                  LITERAL@594..595
+                    INT_NUMBER@594..595 "1"
+                  WHITESPACE@595..596 " "
+                  AS_NAME@596..597
+                    NAME@596..597
+                      IDENT@596..597 "a"
+            WHITESPACE@597..598 " "
+            INTO_CLAUSE@598..604
+              INTO_KW@598..602 "into"
+              WHITESPACE@602..603 " "
+              PATH@603..604
+                PATH_SEGMENT@603..604
+                  NAME@603..604
+                    IDENT@603..604 "t"
+          R_PAREN@604..605 ")"
+  SEMICOLON@605..606 ";"
+  WHITESPACE@606..607 "\n"
+  SELECT@607..646
+    SELECT_CLAUSE@607..646
+      SELECT_KW@607..613 "select"
+      WHITESPACE@613..614 " "
+      TARGET_LIST@614..646
+        TARGET@614..646
+          CALL_EXPR@614..646
+            JSON_ARRAY_FN@614..646
+              JSON_ARRAY_KW@614..624 "json_array"
+              L_PAREN@624..625 "("
+              SELECT_INTO@625..645
+                SELECT_CLAUSE@625..631
+                  SELECT_KW@625..631 "select"
+                WHITESPACE@631..632 " "
+                INTO_CLAUSE@632..638
+                  INTO_KW@632..636 "into"
+                  WHITESPACE@636..637 " "
+                  PATH@637..638
+                    PATH_SEGMENT@637..638
+                      NAME@637..638
+                        IDENT@637..638 "t"
+                WHITESPACE@638..639 " "
+                FROM_CLAUSE@639..645
+                  FROM_KW@639..643 "from"
+                  WHITESPACE@643..644 " "
+                  FROM_ITEM@644..645
+                    NAME_REF@644..645
+                      IDENT@644..645 "u"
+              R_PAREN@645..646 ")"
+  SEMICOLON@646..647 ";"
+  WHITESPACE@647..649 "\n\n"
+  COMMENT@649..665 "-- error, nested"
+  WHITESPACE@665..666 "\n"
+  INSERT@666..695
+    INSERT_KW@666..672 "insert"
+    WHITESPACE@672..673 " "
+    INTO_KW@673..677 "into"
+    WHITESPACE@677..678 " "
+    PATH@678..679
+      PATH_SEGMENT@678..679
+        NAME_REF@678..679
+          IDENT@678..679 "x"
+    WHITESPACE@679..680 " "
+    SELECT_INTO@680..695
+      SELECT_CLAUSE@680..688
+        SELECT_KW@680..686 "select"
+        WHITESPACE@686..687 " "
+        TARGET_LIST@687..688
+          TARGET@687..688
+            LITERAL@687..688
+              INT_NUMBER@687..688 "1"
+      WHITESPACE@688..689 " "
+      INTO_CLAUSE@689..695
+        INTO_KW@689..693 "into"
+        WHITESPACE@693..694 " "
+        PATH@694..695
+          PATH_SEGMENT@694..695
+            NAME@694..695
+              IDENT@694..695 "t"
+  SEMICOLON@695..696 ";"
+  WHITESPACE@696..698 "\n\n"
+  COMMENT@698..714 "-- error, nested"
+  WHITESPACE@714..715 "\n"
+  DECLARE@715..751
+    DECLARE_KW@715..722 "declare"
+    WHITESPACE@722..723 " "
+    NAME@723..724
+      IDENT@723..724 "c"
+    WHITESPACE@724..725 " "
+    CURSOR_KW@725..731 "cursor"
+    WHITESPACE@731..732 " "
+    FOR_KW@732..735 "for"
+    WHITESPACE@735..736 " "
+    SELECT_INTO@736..751
+      SELECT_CLAUSE@736..744
+        SELECT_KW@736..742 "select"
+        WHITESPACE@742..743 " "
+        TARGET_LIST@743..744
+          TARGET@743..744
+            LITERAL@743..744
+              INT_NUMBER@743..744 "1"
+      WHITESPACE@744..745 " "
+      INTO_CLAUSE@745..751
+        INTO_KW@745..749 "into"
+        WHITESPACE@749..750 " "
+        PATH@750..751
+          PATH_SEGMENT@750..751
+            NAME@750..751
+              IDENT@750..751 "t"
+  SEMICOLON@751..752 ";"
+  WHITESPACE@752..754 "\n\n"
+  COMMENT@754..770 "-- error, nested"
+  WHITESPACE@770..771 "\n"
+  CREATE_TABLE_AS@771..804
+    CREATE_KW@771..777 "create"
+    WHITESPACE@777..778 " "
+    TABLE_KW@778..783 "table"
+    WHITESPACE@783..784 " "
+    PATH@784..785
+      PATH_SEGMENT@784..785
+        NAME@784..785
+          IDENT@784..785 "k"
+    WHITESPACE@785..786 " "
+    AS_KW@786..788 "as"
+    WHITESPACE@788..789 " "
+    SELECT_INTO@789..804
+      SELECT_CLAUSE@789..797
+        SELECT_KW@789..795 "select"
+        WHITESPACE@795..796 " "
+        TARGET_LIST@796..797
+          TARGET@796..797
+            LITERAL@796..797
+              INT_NUMBER@796..797 "1"
+      WHITESPACE@797..798 " "
+      INTO_CLAUSE@798..804
+        INTO_KW@798..802 "into"
+        WHITESPACE@802..803 " "
+        PATH@803..804
+          PATH_SEGMENT@803..804
+            NAME@803..804
+              IDENT@803..804 "t"
+  SEMICOLON@804..805 ";"
+  WHITESPACE@805..807 "\n\n"
+  COMMENT@807..823 "-- error, nested"
+  WHITESPACE@823..824 "\n"
+  CREATE_VIEW@824..856
+    CREATE_KW@824..830 "create"
+    WHITESPACE@830..831 " "
+    VIEW_KW@831..835 "view"
+    WHITESPACE@835..836 " "
+    PATH@836..837
+      PATH_SEGMENT@836..837
+        NAME@836..837
+          IDENT@836..837 "k"
+    WHITESPACE@837..838 " "
+    AS_KW@838..840 "as"
+    WHITESPACE@840..841 " "
+    SELECT_INTO@841..856
+      SELECT_CLAUSE@841..849
+        SELECT_KW@841..847 "select"
+        WHITESPACE@847..848 " "
+        TARGET_LIST@848..849
+          TARGET@848..849
+            LITERAL@848..849
+              INT_NUMBER@848..849 "1"
+      WHITESPACE@849..850 " "
+      INTO_CLAUSE@850..856
+        INTO_KW@850..854 "into"
+        WHITESPACE@854..855 " "
+        PATH@855..856
+          PATH_SEGMENT@855..856
+            NAME@855..856
+              IDENT@855..856 "t"
+  SEMICOLON@856..857 ";"
+  WHITESPACE@857..858 "\n"
+
+error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+  ╭▸ 
+9 │ select 1 a union select 2 a into t union select 3 a;
+  ╰╴                 ━━━━━━━━━━━━━━━━━
+error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+   ╭▸ 
+10 │ select 4 a union select 5 a into t;
+   ╰╴                 ━━━━━━━━━━━━━━━━━
+error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+   ╭▸ 
+11 │ select 1 a union (((select 2 a into t)));
+   ╰╴                    ━━━━━━━━━━━━━━━━━
+error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT
+   ╭▸ 
+12 │ select 1 union ((select 2 into x) union select 3);
+   ╰╴                 ━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+15 │ with t as (select 1 a into t) select * from t;
+   ╰╴           ━━━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+16 │ with t as (select 1 into x union select 2) select * from t;
+   ╰╴           ━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+20 │   where a in (select 1 a into t);
+   ╰╴              ━━━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+21 │ select json_array(select into t from u);
+   ╰╴                  ━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+24 │ insert into x select 1 into t;
+   ╰╴              ━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+27 │ declare c cursor for select 1 into t;
+   ╰╴                     ━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+30 │ create table k as select 1 into t;
+   ╰╴                  ━━━━━━━━━━━━━━━
+error[syntax-error]: SELECT ... INTO is not allowed here
+   ╭▸ 
+33 │ create view k as select 1 into t;
+   ╰╴                 ━━━━━━━━━━━━━━━

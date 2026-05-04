@@ -353,20 +353,6 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
-    PAREN_SELECT
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "2"
-      R_PAREN ")"
-    WHITESPACE " "
-    UNION_KW "union"
-    WHITESPACE " "
     SELECT_INTO
       SELECT_CLAUSE
         SELECT_KW "select"
@@ -400,6 +386,20 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t2"
+    WHITESPACE " "
+    UNION_KW "union"
+    WHITESPACE " "
+    PAREN_SELECT
+      L_PAREN "("
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "2"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT

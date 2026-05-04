@@ -106,6 +106,7 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::CreateStatistics(_)
         | ast::Stmt::CreateSubscription(_)
         | ast::Stmt::CreateTableAs(_)
+        | ast::Stmt::SelectInto(_)
         | ast::Stmt::CreateTablespace(_)
         | ast::Stmt::CreateTextSearchConfiguration(_)
         | ast::Stmt::CreateTextSearchDictionary(_)
@@ -206,7 +207,6 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::Savepoint(_)
         | ast::Stmt::SecurityLabel(_)
         | ast::Stmt::Select(_)
-        | ast::Stmt::SelectInto(_)
         | ast::Stmt::Set(_)
         | ast::Stmt::SetConstraints(_)
         | ast::Stmt::SetRole(_)
@@ -229,6 +229,14 @@ mod tests {
     #[test]
     fn alter_table() {
         let sql = "ALTER TABLE users ADD COLUMN email TEXT;";
+        let file = SourceFile::parse(sql);
+        let stmts = file.tree().stmts().next().unwrap();
+        assert!(possibly_slow_stmt(&stmts));
+    }
+
+    #[test]
+    fn select_into() {
+        let sql = "select 1 a into t;";
         let file = SourceFile::parse(sql);
         let stmts = file.tree().stmts().next().unwrap();
         assert!(possibly_slow_stmt(&stmts));

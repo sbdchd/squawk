@@ -2145,37 +2145,6 @@ SOURCE_FILE
                       IDENT "t"
               R_PAREN ")"
   SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            JSON_ARRAY_FN
-              JSON_ARRAY_KW "json_array"
-              L_PAREN "("
-              SELECT_INTO
-                SELECT_CLAUSE
-                  SELECT_KW "select"
-                WHITESPACE " "
-                INTO_CLAUSE
-                  INTO_KW "into"
-                  WHITESPACE " "
-                  PATH
-                    PATH_SEGMENT
-                      NAME
-                        IDENT "t"
-                WHITESPACE " "
-                FROM_CLAUSE
-                  FROM_KW "from"
-                  WHITESPACE " "
-                  FROM_ITEM
-                    NAME_REF
-                      IDENT "u"
-              R_PAREN ")"
-  SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- query_expression"
   WHITESPACE "\n"
