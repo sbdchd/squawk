@@ -540,6 +540,16 @@ select * from x;
 -- LINE 6:     select * from x;
 ```
 
+Note: this should only error if the with query name is used. So we need tracking
+of used / unused.
+
+The following is okay:
+
+```sql
+with t as (delete from k)
+select 1;
+```
+
 ### Rule: dialect: now() to dest
 
 should support various fixes so people can write in one dialect of SQL and have it easily convert to the other one

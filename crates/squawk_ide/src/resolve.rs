@@ -638,6 +638,12 @@ pub(crate) fn resolve_name_ref(
         }
         NameRefClass::CreateIndexColumn => resolve_create_index_column_ptr(db, file, name_ref),
         NameRefClass::SelectColumn => resolve_select_column_ptr(db, file, name_ref),
+        NameRefClass::SelectGroupByAliasOrColumn => {
+            resolve_select_group_by_alias_or_column_ptr(db, file, name_ref)
+        }
+        NameRefClass::SelectOrderByAliasOrColumn => {
+            resolve_select_order_by_alias_or_column_ptr(db, file, name_ref)
+        }
         NameRefClass::SelectQualifiedColumnTable => {
             resolve_select_qualified_column_table_name_ptr(db, file, name_ref)
         }
@@ -1725,6 +1731,52 @@ fn resolve_select_column_ptr(
         }
     }
 
+    None
+}
+
+fn resolve_select_group_by_alias_or_column_ptr(
+    db: &dyn Db,
+    file: File,
+    column_name_ref: &ast::NameRef,
+) -> Option<SmallVec<[Location; 1]>> {
+    if let Some(ptr) = resolve_select_column_ptr(db, file, column_name_ref) {
+        return Some(ptr);
+    }
+    resolve_select_target_alias_ptr(file, column_name_ref)
+}
+
+fn resolve_select_order_by_alias_or_column_ptr(
+    db: &dyn Db,
+    file: File,
+    column_name_ref: &ast::NameRef,
+) -> Option<SmallVec<[Location; 1]>> {
+    if let Some(ptr) = resolve_select_target_alias_ptr(file, column_name_ref) {
+        return Some(ptr);
+    }
+    resolve_select_column_ptr(db, file, column_name_ref)
+}
+
+fn resolve_select_target_alias_ptr(
+    file: File,
+    column_name_ref: &ast::NameRef,
+) -> Option<SmallVec<[Location; 1]>> {
+    let select = column_name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::Select::cast)?;
+    let column_name = Name::from_node(column_name_ref);
+    let target_list = select.select_clause()?.target_list()?;
+    for target in target_list.targets() {
+        if let Some(alias_name) = target.as_name().and_then(|a| a.name())
+            && Name::from_node(&alias_name) == column_name
+        {
+            return Some(smallvec![Location::new(
+                file,
+                alias_name.syntax().text_range(),
+                LocationKind::Column,
+            )]);
+        }
+    }
     None
 }
 

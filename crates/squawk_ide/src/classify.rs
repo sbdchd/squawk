@@ -48,6 +48,8 @@ pub(crate) enum NameRefClass {
     Schema,
     SelectColumn,
     SelectFunctionCall,
+    SelectGroupByAliasOrColumn,
+    SelectOrderByAliasOrColumn,
     SelectQualifiedColumn,
     SelectQualifiedColumnTable,
     Sequence,
@@ -114,6 +116,8 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
     let mut in_when_clause = false;
     let mut in_special_sql_fn = false;
     let mut in_conflict_target = false;
+    let mut in_group_by_clause = false;
+    let mut in_order_by_clause = false;
 
     // TODO: can we combine this if and the one that follows?
     if let Some(parent) = node.parent()
@@ -663,6 +667,12 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         if ast::FromClause::can_cast(ancestor.kind()) {
             in_from_clause = true;
         }
+        if ast::GroupByClause::can_cast(ancestor.kind()) {
+            in_group_by_clause = true;
+        }
+        if ast::OrderByClause::can_cast(ancestor.kind()) {
+            in_order_by_clause = true;
+        }
         if ast::Select::can_cast(ancestor.kind()) {
             if in_function_name && !in_special_sql_fn {
                 return Some(NameRefClass::SelectFunctionCall);
@@ -673,7 +683,19 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
                 }
                 return Some(NameRefClass::FromTable);
             }
-            // Classify as SelectColumn for target list, WHERE, ORDER BY, GROUP BY, etc.
+            if in_group_by_clause
+                && let Some(parent) = node.parent()
+                && ast::GroupingExpr::can_cast(parent.kind())
+            {
+                return Some(NameRefClass::SelectGroupByAliasOrColumn);
+            }
+            if in_order_by_clause
+                && let Some(parent) = node.parent()
+                && ast::SortBy::can_cast(parent.kind())
+            {
+                return Some(NameRefClass::SelectOrderByAliasOrColumn);
+            }
+            // Classify as SelectColumn for target list, WHERE, etc.
             // (anything in SELECT except FROM clause)
             return Some(NameRefClass::SelectColumn);
         }

@@ -142,6 +142,7 @@ mod test {
     use rowan::TextRange;
     use rustc_hash::FxHashMap;
 
+    #[must_use]
     #[track_caller]
     fn goto(sql: &str) -> String {
         goto_(sql).expect("should always find a definition")
@@ -4749,6 +4750,95 @@ select * from t group by t.b$0;
           │                 ─ 2. destination
         4 │ select * from t group by t.b;
           ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_order_by_column_name_conflict() {
+        // If an ORDER BY expression is a simple name that matches both an
+        // output column name and an input column name, ORDER BY will interpret
+        // it as the output column name.
+        assert_snapshot!(goto("
+with t as (select 2 a)
+select 1 a from t
+order by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 1 a from t
+          │          ─ 2. destination
+        4 │ order by a;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_group_by_column_name_conflict() {
+        // If a GROUP BY expression is a simple name that matches both output
+        // column name and an input column name, GROUP BY will interpret it as
+        // the input column name.
+        assert_snapshot!(goto("
+with t as (select 2 a)
+select 1 a from t
+group by a$0;
+"), @"
+          ╭▸ 
+        2 │ with t as (select 2 a)
+          │                     ─ 2. destination
+        3 │ select 1 a from t
+        4 │ group by a;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_in_group_by_with_cte() {
+        assert_snapshot!(goto("
+with t as (select 2 b)
+select 1 a from t
+group by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 1 a from t
+          │          ─ 2. destination
+        4 │ group by a;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_expr_in_order_by_not_found() {
+        goto_not_found(
+            "
+with t as (select 2 b)
+select 1 a from t
+order by a$0 + 1
+",
+        );
+    }
+
+    #[test]
+    fn goto_select_alias_expr_in_group_by_expr_not_found() {
+        goto_not_found(
+            "
+with t as (select 2 b)
+select 1 a from t
+group by a$0 + 1
+",
+        );
+    }
+
+    #[test]
+    fn goto_select_alias_in_order_by_with_cte() {
+        assert_snapshot!(goto("
+with t as (select 2 b)
+select 1 a from t
+order by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 1 a from t
+          │          ─ 2. destination
+        4 │ order by a;
+          ╰╴         ─ 1. source
         ");
     }
 
