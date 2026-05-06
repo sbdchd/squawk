@@ -304,7 +304,7 @@ pub(crate) fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Re
             }
         }
 
-        let line_lower = line.to_lowercase();
+        let line_lower = line.to_ascii_lowercase();
         if (line_lower.starts_with("copy ") || line_lower.starts_with("\\copy"))
             && (line_lower.contains("from stdin") || line_lower.contains("from stdout"))
         {

@@ -89,6 +89,7 @@ mod test {
     use crate::Rule;
     use crate::test_utils::{fix_sql, lint_errors, lint_ok};
 
+    #[must_use]
     fn fix(sql: &str) -> String {
         fix_sql(sql, Rule::PreferTimestampTz)
     }

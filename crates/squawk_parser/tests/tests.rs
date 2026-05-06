@@ -109,6 +109,7 @@ fn regression_suite(fixture: Fixture<&str>) {
     }
 }
 
+#[must_use]
 fn parse_text(text: &str) -> (String, Option<String>) {
     let lexed = LexedStr::new(text);
     let input = lexed.to_input();

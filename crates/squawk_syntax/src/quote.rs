@@ -72,7 +72,7 @@ fn needs_quoting(text: &str) -> bool {
 
 pub fn is_reserved_word(text: &str) -> bool {
     RESERVED_KEYWORDS
-        .binary_search(&text.to_lowercase().as_str())
+        .binary_search(&text.to_ascii_lowercase().as_str())
         .is_ok()
 }
 

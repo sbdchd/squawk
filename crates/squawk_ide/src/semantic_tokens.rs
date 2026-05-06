@@ -354,6 +354,7 @@ mod test {
     use insta::assert_snapshot;
     use std::fmt::Write;
 
+    #[must_use]
     fn semantic_tokens(sql: &str) -> String {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());

@@ -1606,6 +1606,7 @@ mod test {
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
 
+    #[must_use]
     #[track_caller]
     fn check_hover(sql: &str) -> String {
         check_hover_(sql).expect("should find hover information")
@@ -1641,6 +1642,7 @@ mod test {
         None
     }
 
+    #[must_use]
     #[track_caller]
     fn check_hover_info(sql: &str) -> super::Hover {
         let db = Database::default();

@@ -156,6 +156,7 @@ mod test {
         crate::test_utils::lint_ok_with(sql, settings, Rule::ConstraintMissingNotValid);
     }
 
+    #[must_use]
     fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
         crate::test_utils::lint_errors_with(sql, settings, Rule::ConstraintMissingNotValid)
     }

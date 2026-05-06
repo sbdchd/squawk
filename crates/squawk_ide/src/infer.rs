@@ -85,6 +85,7 @@ mod tests {
     use super::*;
     use insta::assert_snapshot;
 
+    #[must_use]
     fn infer(sql: &str) -> String {
         let parse = ast::SourceFile::parse(sql);
         for stmt in parse.tree().stmts() {

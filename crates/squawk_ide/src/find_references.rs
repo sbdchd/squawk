@@ -47,6 +47,7 @@ mod test {
     use rowan::TextRange;
     use rustc_hash::FxHashMap;
 
+    #[must_use]
     #[track_caller]
     fn find_refs(sql: &str) -> String {
         let fixture = Fixture::new(sql);

@@ -226,10 +226,12 @@ mod test {
 
     use crate::{LinterSettings, Rule};
 
+    #[must_use]
     fn fix(sql: &str) -> String {
         crate::test_utils::fix_sql(sql, Rule::PreferRobustStmts)
     }
 
+    #[must_use]
     fn lint_errors(sql: &str) -> String {
         crate::test_utils::lint_errors(sql, Rule::PreferRobustStmts)
     }

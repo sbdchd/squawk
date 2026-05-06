@@ -55,6 +55,7 @@ mod test {
         );
     }
 
+    #[must_use]
     fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
         crate::test_utils::lint_errors_with(
             sql,

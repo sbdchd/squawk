@@ -1,3 +1,5 @@
+use crate::quote::normalize_identifier;
+
 /// Postgres Identifiers are case insensitive unless they're quoted.
 ///
 /// This type handles the casing rules for us to make comparisions easier.
@@ -8,11 +10,7 @@ impl Identifier {
     // TODO: we need to handle more advanced identifiers like:
     // U&"d!0061t!+000061" UESCAPE '!'
     pub fn new(s: &str) -> Self {
-        let normalized = if s.starts_with('"') && s.ends_with('"') {
-            s[1..s.len() - 1].to_string()
-        } else {
-            s.to_lowercase()
-        };
+        let normalized = normalize_identifier(s);
         Identifier(normalized)
     }
 }

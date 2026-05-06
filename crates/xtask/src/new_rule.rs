@@ -21,12 +21,14 @@ pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
         match stmt {{
             // TODO: update to the stmt you want to check
             ast::Stmt::CreateTable(create_table) => {{
-                ctx.report(Violation::for_node(
-                    Rule::{rule_name_pascal},
-                    "todo".to_string(),
-                    create_table.syntax(),
-                    "todo or none".to_string(),
-                ));
+                ctx.report(
+                    Violation::for_node(
+                        Rule::{rule_name_pascal},
+                        "todo".to_string(),
+                        create_table.syntax(),
+                    )
+                    .help("todo or none"),
+                );
                 todo!();
             }}
             _ => (),
@@ -36,21 +38,21 @@ pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
 
 #[cfg(test)]
 mod test {{
-    use insta::assert_debug_snapshot;
+    use insta::assert_snapshot;
 
-    use crate::{{Linter, Rule}};
-    use squawk_syntax::SourceFile;
+    use crate::{{
+        Rule,
+        test_utils::{{lint_errors, lint_ok}},
+    }};
 
     #[test]
     fn err() {{
         let sql = r#"
         -- TODO: err sql
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::{rule_name_pascal}]);
-        let errors = linter.lint(file, sql);
-        assert_ne!(errors.len(), 0);
-        assert_debug_snapshot!(errors);
+        assert_snapshot!(lint_errors(sql, Rule::{rule_name_pascal}), @r"
+TODO
+");
     }}
 
     #[test]
@@ -58,10 +60,7 @@ mod test {{
         let sql = r#"
         -- TODO: ok sql
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::{rule_name_pascal}]);
-        let errors = linter.lint(file, sql);
-        assert_eq!(errors.len(), 0);
+        lint_ok(sql, Rule::{rule_name_pascal});
     }}
 }}
 "###

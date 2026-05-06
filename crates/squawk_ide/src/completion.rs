@@ -941,6 +941,7 @@ mod tests {
     use tabled::builder::Builder;
     use tabled::settings::Style;
 
+    #[must_use]
     fn completions(sql: &str) -> String {
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset();

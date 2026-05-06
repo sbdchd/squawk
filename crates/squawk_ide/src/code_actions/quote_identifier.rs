@@ -1,6 +1,9 @@
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::{
+    ast::{self, AstNode},
+    quote::normalize_identifier,
+};
 
 use crate::{db::File, offsets::token_from_offset};
 
@@ -29,7 +32,7 @@ pub(super) fn quote_identifier(
         return None;
     }
 
-    let quoted = format!(r#""{}""#, text.to_lowercase());
+    let quoted = format!(r#""{}""#, normalize_identifier(&text));
 
     actions.push(CodeAction {
         title: "Quote identifier".to_owned(),
@@ -55,6 +58,14 @@ mod test {
             "select x$0 from t;"),
             @r#"select "x" from t;"#
         );
+    }
+
+    #[test]
+    fn quote_doesnt_show_up_for_already_quoted_ident() {
+        assert!(code_action_not_applicable(
+            quote_identifier,
+            r#"create table T("X"$0 int);"#
+        ));
     }
 
     #[test]

@@ -57,6 +57,7 @@ mod test {
         crate::test_utils::lint_ok_with(sql, settings, Rule::RequireConcurrentIndexCreation);
     }
 
+    #[must_use]
     fn fix(sql: &str) -> String {
         fix_sql(sql, Rule::RequireConcurrentIndexCreation)
     }

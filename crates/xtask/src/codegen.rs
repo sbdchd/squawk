@@ -236,7 +236,7 @@ const PRELUDE: &str = "\
 fn generate_reserved_keywords_array(reserved_keywords: &[String]) -> Result<String> {
     let mut reserved_keywords = reserved_keywords
         .iter()
-        .map(|x| x.to_lowercase())
+        .map(|x| x.to_ascii_lowercase())
         .collect::<Vec<_>>();
     reserved_keywords.sort();
 
@@ -986,7 +986,10 @@ fn operator_match() -> String {
 }
 
 fn keywords_match(all_keywords: &[String]) -> String {
-    let mut keywords: Vec<String> = all_keywords.iter().map(|k| k.to_lowercase()).collect();
+    let mut keywords: Vec<String> = all_keywords
+        .iter()
+        .map(|k| k.to_ascii_lowercase())
+        .collect();
     keywords.sort();
     let keywords_joined = keywords.join("|");
     format!("(?xi)\\b({keywords_joined})\\b")

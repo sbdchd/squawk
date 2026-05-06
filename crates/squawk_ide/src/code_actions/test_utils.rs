@@ -8,6 +8,7 @@ use crate::test_utils::Fixture;
 
 use super::{ActionKind, CodeAction};
 
+#[must_use]
 pub(super) fn apply_code_action(
     f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
     sql: &str,
@@ -108,6 +109,7 @@ fn code_action_not_applicable_(
     actions.is_empty()
 }
 
+#[must_use]
 pub(super) fn code_action_not_applicable(
     f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
     sql: &str,
@@ -115,6 +117,7 @@ pub(super) fn code_action_not_applicable(
     code_action_not_applicable_(f, sql, false)
 }
 
+#[must_use]
 pub(super) fn code_action_not_applicable_with_errors(
     f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
     sql: &str,

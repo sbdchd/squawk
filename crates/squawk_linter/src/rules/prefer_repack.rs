@@ -196,6 +196,7 @@ mod test {
         lint_ok_with(sql, pg19(), Rule::PreferRepack);
     }
 
+    #[must_use]
     fn fix(sql: &str) -> String {
         fix_sql_with(sql, pg19(), Rule::PreferRepack)
     }

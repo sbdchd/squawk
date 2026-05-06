@@ -191,6 +191,7 @@ mod test {
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
 
+    #[must_use]
     #[track_caller]
     fn check_inlay_hints(sql: &str) -> String {
         let db = Database::default();

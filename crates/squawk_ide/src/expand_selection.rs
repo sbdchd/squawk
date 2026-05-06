@@ -294,6 +294,7 @@ mod tests {
     use insta::assert_debug_snapshot;
     use squawk_syntax::{SourceFile, ast::AstNode};
 
+    #[must_use]
     fn expand(sql: &str) -> Vec<String> {
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset();

@@ -54,6 +54,7 @@ pub(crate) fn lint_errors_with(sql: &str, settings: LinterSettings, rule: Rule) 
     format_violations(sql, &errors)
 }
 
+#[must_use]
 pub(crate) fn fix_sql_with(sql: &str, settings: LinterSettings, rule: Rule) -> String {
     let errors = lint_settings(sql, settings.clone(), rule);
     assert!(!errors.is_empty(), "Should start with linter errors");
@@ -91,6 +92,7 @@ pub(crate) fn fix_sql_with(sql: &str, settings: LinterSettings, rule: Rule) -> S
     result
 }
 
+#[must_use]
 pub(crate) fn fix_sql(sql: &str, rule: Rule) -> String {
     fix_sql_with(sql, LinterSettings::default(), rule)
 }

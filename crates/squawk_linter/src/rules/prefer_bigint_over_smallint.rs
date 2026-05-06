@@ -1,6 +1,7 @@
 use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast::AstNode;
+use squawk_syntax::quote::normalize_identifier;
 use squawk_syntax::{Parse, SourceFile, ast, identifier::Identifier};
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
@@ -23,7 +24,7 @@ fn small_int_types() -> &'static FxHashSet<Identifier> {
 }
 
 fn smallint_to_bigint(smallint_type: &str) -> &'static str {
-    match smallint_type.to_lowercase().as_str() {
+    match normalize_identifier(smallint_type).as_str() {
         "smallint" => "bigint",
         "int2" => "int8",
         "smallserial" => "bigserial",
@@ -74,6 +75,7 @@ mod test {
         test_utils::{fix_sql, lint_errors, lint_ok},
     };
 
+    #[must_use]
     fn fix(sql: &str) -> String {
         fix_sql(sql, Rule::PreferBigintOverSmallint)
     }

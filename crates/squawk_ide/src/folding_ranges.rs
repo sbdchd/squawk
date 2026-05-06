@@ -235,6 +235,7 @@ mod tests {
         }
     }
 
+    #[must_use]
     fn check(sql: &str) -> String {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());
