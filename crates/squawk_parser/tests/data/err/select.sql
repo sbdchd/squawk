@@ -95,6 +95,13 @@ select * from t
 where x > 1
 join k on true;
 
+-- having after order by instead of before
+with t as (select 2 b)
+select 1 a from t
+group by a
+order by a
+having a > 10;
+
 -- select end
 select
 end;

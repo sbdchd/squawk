@@ -1767,12 +1767,13 @@ fn resolve_select_target_alias_ptr(
     let column_name = Name::from_node(column_name_ref);
     let target_list = select.select_clause()?.target_list()?;
     for target in target_list.targets() {
-        if let Some(alias_name) = target.as_name().and_then(|a| a.name())
-            && Name::from_node(&alias_name) == column_name
+        if let Some((target_name, node)) = ColumnName::from_target(target)
+            && let Some(target_name) = target_name.to_string()
+            && Name::from_string(target_name) == column_name
         {
             return Some(smallvec![Location::new(
                 file,
-                alias_name.syntax().text_range(),
+                node.text_range(),
                 LocationKind::Column,
             )]);
         }

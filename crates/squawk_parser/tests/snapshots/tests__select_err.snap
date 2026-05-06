@@ -983,6 +983,86 @@ SOURCE_FILE
             TRUE_KW "true"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- having after order by instead of before"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+                WHITESPACE " "
+                AS_NAME
+                  NAME
+                    IDENT "b"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_NAME
+            NAME
+              IDENT "a"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "a"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+    WHITESPACE "\n"
+    ERROR
+      HAVING_CLAUSE
+        HAVING_KW "having"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- select end"
   WHITESPACE "\n"
   SELECT
@@ -1225,31 +1305,35 @@ error[syntax-error]: JOINs must appear before WHERE
    ╭▸ 
 96 │ join k on true;
    ╰╴━
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-99 │   select
-   │ ┏━━━━━━━┛
-100│ ┃ end;
-   ╰╴┗━┛
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: HAVING must appear before ORDER BY
     ╭▸ 
-103 │   select
-    │ ┏━━━━━━━┛
-104 │ ┃ analyze;
-    ╰╴┗━┛
+103 │ having a > 10;
+    ╰╴━
 error[syntax-error]: expected SEMICOLON
     ╭▸ 
 106 │   select
     │ ┏━━━━━━━┛
-107 │ ┃ analyse;
+107 │ ┃ end;
     ╰╴┗━┛
 error[syntax-error]: expected SEMICOLON
     ╭▸ 
-111 │   select
+110 │   select
     │ ┏━━━━━━━┛
-112 │ ┃ with t as (select 1)
+111 │ ┃ analyze;
+    ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+113 │   select
+    │ ┏━━━━━━━┛
+114 │ ┃ analyse;
+    ╰╴┗━┛
+error[syntax-error]: expected SEMICOLON
+    ╭▸ 
+118 │   select
+    │ ┏━━━━━━━┛
+119 │ ┃ with t as (select 1)
     ╰╴┗━┛
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-116 │ select 1,
+123 │ select 1,
     ╰╴        ━

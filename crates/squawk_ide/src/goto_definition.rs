@@ -4772,6 +4772,52 @@ order by a$0;
     }
 
     #[test]
+    fn goto_select_alias_not_picked_window_order_by() {
+        assert_snapshot!(goto("
+with t as (select 4 a union select 2 a)
+-- should go to the column def, not the alias
+select 2 a, a, row_number() over (order by a$0) from t;
+"), @"
+          ╭▸ 
+        2 │ with t as (select 4 a union select 2 a)
+          │                     ─ 2. destination
+        3 │ -- should go to the column def, not the alias
+        4 │ select 2 a, a, row_number() over (order by a) from t;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_group_by_alias_func() {
+        assert_snapshot!(goto("
+with t as (select 'x'::text as name)
+select lower(name) from t
+group by lower$0;
+"), @"
+          ╭▸ 
+        3 │ select lower(name) from t
+          │        ───── 2. destination
+        4 │ group by lower;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_order_by_alias_func() {
+        assert_snapshot!(goto("
+with t as (select 'x'::text as name)
+select lower(name) from t
+order by lower$0;
+"), @"
+          ╭▸ 
+        3 │ select lower(name) from t
+          │        ───── 2. destination
+        4 │ order by lower;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_select_alias_group_by_column_name_conflict() {
         // If a GROUP BY expression is a simple name that matches both output
         // column name and an input column name, GROUP BY will interpret it as

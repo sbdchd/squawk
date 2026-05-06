@@ -2775,6 +2775,7 @@ fn opt_select_trailing_clauses(p: &mut Parser<'_>) -> bool {
     }
 
     opt_order_by_clause(p);
+    opt_misplaced_having_clause(p);
     let mut has_locking_clause = false;
     while p.at(FOR_KW) {
         if opt_locking_clause(p).is_some() {
@@ -3472,6 +3473,15 @@ fn opt_misplaced_joins(p: &mut Parser<'_>) {
         let m = p.start();
         p.error("JOINs must appear before WHERE");
         join(p);
+        m.complete(p, ERROR);
+    }
+}
+
+fn opt_misplaced_having_clause(p: &mut Parser<'_>) {
+    if p.at(HAVING_KW) {
+        let m = p.start();
+        p.error("HAVING must appear before ORDER BY");
+        opt_having_clause(p);
         m.complete(p, ERROR);
     }
 }
