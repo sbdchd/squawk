@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.51.0 - 2026-05-06
+
+### Added
+
+- linter: add file-level override to disable `assume_in_transaction` (#996). Thanks @reteps!
+
+  When using `assume-in-transaction`, you can disable it on a per file basis using a comment:
+
+  ```sql
+  -- squawk-disable-assume-in-transaction
+  ```
+
+- syntax: add validation for `select into` (#1116)
+
+  Warn about invalid usages, such as:
+  - `select 4 a union select 5 a into t;`
+  - `with t as (select 1 a into t) select * from t;`
+  - `select * from t where a in (select 1 a into t);`
+
+  and more!
+
+- parser: add empty statement to ast (#1111)
+
+  ```sql
+  ;
+  ;
+  ;
+  ```
+
+  now gives:
+
+  ```
+  SOURCE_FILE@0..5
+    EMPTY_STMT@0..1
+      SEMICOLON@0..1 ";"
+    WHITESPACE@1..2 "\n"
+    EMPTY_STMT@2..3
+      SEMICOLON@2..3 ";"
+    WHITESPACE@3..4 "\n"
+    EMPTY_STMT@4..5
+      SEMICOLON@4..5 ";"
+  ```
+
+- ide: code actions create table as <-> select into + parser fix (#1113)
+
+  Create table and select into are roughly interchangable, so this code action
+  supports switching between.
+
+- ide: show comments for types and columns (#1110)
+- ide: hover infer more types for columns (#1109, #1108)
+
+### Changed
+
+- parser: cleanup insert & create rule ast grammar to be more strict (#1112)
+
+### Fixed
+
+- vscode: fix text mate grammar for multiple stmts on a line (#1115)
+- ide: fix infer column name w/ column aliases and goto def (#1118)
+- ide: fix output column alias resolution in group by / order by (#1117)
+- ide: fix inherit/like resolution + cte fixes (#1107)
+
 ## v2.50.0 - 2026-05-01
 
 ### Added
