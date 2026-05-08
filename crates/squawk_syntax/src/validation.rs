@@ -8,7 +8,7 @@ use std::fmt;
 use std::ops::RangeInclusive;
 
 use crate::ast::AstNode;
-use crate::{SyntaxNode, ast, match_ast, syntax_error::SyntaxError};
+use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
 use squawk_parser::SyntaxKind::*;
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
@@ -28,6 +28,14 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::SelectInto(it) => validate_select_into(it, errors),
                 _ => (),
             }
+        }
+    }
+    for element in root.descendants_with_tokens() {
+        if let Some(token) = element.into_token()
+            && token.kind() == IDENT
+            && let Some(err) = validate_unicode_esc_ident(&token)
+        {
+            errors.push(err);
         }
     }
 }
@@ -184,15 +192,7 @@ fn validate_unicode_esc_string(lit: &ast::Literal) -> Option<SyntaxError> {
             UNICODE_ESC_STRING => unicode_esc = Some(token),
             UESCAPE_KW => seen_uescape = true,
             STRING if seen_uescape => {
-                let text = token.text();
-                let inner = text
-                    .strip_prefix('\'')
-                    .and_then(|s| s.strip_suffix('\''))
-                    .unwrap_or("");
-                let mut chars = inner.chars();
-                if let (Some(c), None) = (chars.next(), chars.next()) {
-                    escape_char = c;
-                }
+                escape_char = uescape_char(&token).unwrap_or(escape_char);
                 break;
             }
             _ => (),
@@ -206,6 +206,45 @@ fn validate_unicode_esc_string(lit: &ast::Literal) -> Option<SyntaxError> {
         .and_then(|s| s.strip_suffix('\''))?;
     let err = check_unicode_esc_str(inside, escape_char)?;
     Some(SyntaxError::new(err.to_string(), token.text_range()))
+}
+
+fn validate_unicode_esc_ident(token: &SyntaxToken) -> Option<SyntaxError> {
+    let text = token.text();
+    let inside = text
+        .strip_prefix("U&\"")
+        .or_else(|| text.strip_prefix("u&\""))
+        .and_then(|s| s.strip_suffix('"'))?;
+
+    let mut escape_char = '\\';
+    let mut seen_uescape = false;
+    let mut next = token.next_sibling_or_token();
+    while let Some(element) = next {
+        match element.kind() {
+            WHITESPACE | COMMENT => (),
+            UESCAPE_KW => seen_uescape = true,
+            STRING if seen_uescape => {
+                if let Some(string_token) = element.as_token() {
+                    escape_char = uescape_char(string_token).unwrap_or(escape_char);
+                }
+                break;
+            }
+            _ => break,
+        }
+        next = element.next_sibling_or_token();
+    }
+
+    let err = check_unicode_esc_str(inside, escape_char)?;
+    Some(SyntaxError::new(err.to_string(), token.text_range()))
+}
+
+fn uescape_char(string_token: &SyntaxToken) -> Option<char> {
+    let text = string_token.text();
+    let inner = text.strip_prefix('\'')?.strip_suffix('\'')?;
+    let mut chars = inner.chars();
+    match (chars.next(), chars.next()) {
+        (Some(c), None) => Some(c),
+        _ => None,
+    }
 }
 
 enum UnicodeEscapeKind {
