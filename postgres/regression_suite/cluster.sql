@@ -409,7 +409,7 @@ CREATE TABLE repack_conc_toast (t text);
 SELECT reltoastrelid::regclass AS toast_rel
 FROM pg_class WHERE oid = 'repack_conc_toast'::regclass /* \gset */;
 -- \set VERBOSITY sqlstate
--- REPACK (CONCURRENTLY) 'toast_rel';
+-- REPACK (CONCURRENTLY) :toast_rel;
 -- \set VERBOSITY default
 DROP TABLE repack_conc_toast;
 

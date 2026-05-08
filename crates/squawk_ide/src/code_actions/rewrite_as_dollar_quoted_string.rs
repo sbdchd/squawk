@@ -117,7 +117,7 @@ mod test {
     fn rewrite_prefix_string_not_applicable() {
         assert!(code_action_not_applicable(
             rewrite_as_dollar_quoted_string,
-            "select b'foo$0';"
+            "select b'010$0';"
         ));
     }
 }

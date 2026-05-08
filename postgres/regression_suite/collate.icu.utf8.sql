@@ -612,6 +612,109 @@ CREATE UNIQUE INDEX ON test3cs (x);  -- ok
 SELECT string_to_array('ABC,DEF,GHI' COLLATE case_sensitive, ',', 'abc');
 SELECT string_to_array('ABCDEFGHI' COLLATE case_sensitive, NULL, 'b');
 
+--
+-- A unique index under one collation does not prove uniqueness under
+-- another, so the planner must not use such a proof for any optimization.
+--
+
+-- Ensure that we do not use inner-unique join execution
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT * FROM test1cs t1, test3cs t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+SELECT * FROM test1cs t1, test3cs t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+-- Ensure that left-join is not removed
+EXPLAIN (COSTS OFF)
+SELECT t1.* FROM test3cs t1
+       LEFT JOIN test3cs t2 ON t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1;
+
+SELECT t1.* FROM test3cs t1
+       LEFT JOIN test3cs t2 ON t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1;
+
+-- Ensure that self-join is not removed
+EXPLAIN (COSTS OFF)
+SELECT * FROM test3cs t1, test3cs t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+SELECT * FROM test3cs t1, test3cs t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+-- Ensure that semijoin is not reduced to innerjoin
+EXPLAIN (COSTS OFF)
+SELECT * FROM test3cs t1
+  WHERE EXISTS (SELECT 1 FROM test3cs t2 WHERE t1.x = t2.x COLLATE case_insensitive)
+ORDER BY 1;
+
+SELECT * FROM test3cs t1
+  WHERE EXISTS (SELECT 1 FROM test3cs t2 WHERE t1.x = t2.x COLLATE case_insensitive)
+ORDER BY 1;
+
+--
+-- A DISTINCT / GROUP BY / set-op on a subquery does not prove uniqueness
+-- under a different collation, so the planner must not use such a proof for
+-- any optimization.
+--
+
+-- Ensure that we do not use inner-unique join execution
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT * FROM test1cs t1, (SELECT DISTINCT x FROM test3cs) t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+SELECT * FROM test1cs t1, (SELECT DISTINCT x FROM test3cs) t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+-- Same with GROUP BY
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT * FROM test1cs t1, (SELECT x FROM test3cs GROUP BY x) t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+SELECT * FROM test1cs t1, (SELECT x FROM test3cs GROUP BY x) t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+-- Same with set-op
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT * FROM test1cs t1, (SELECT x FROM test3cs UNION SELECT x FROM test3cs) t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+SELECT * FROM test1cs t1, (SELECT x FROM test3cs UNION SELECT x FROM test3cs) t2
+WHERE t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1, 2;
+
+-- Ensure that left-join is not removed
+EXPLAIN (COSTS OFF)
+SELECT t1.* FROM test3cs t1
+       LEFT JOIN (SELECT DISTINCT x FROM test3cs) t2 ON t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1;
+
+SELECT t1.* FROM test3cs t1
+       LEFT JOIN (SELECT DISTINCT x FROM test3cs) t2 ON t1.x = t2.x COLLATE case_insensitive
+ORDER BY 1;
+
+-- Ensure that semijoin is not reduced to innerjoin
+EXPLAIN (COSTS OFF)
+SELECT * FROM test3cs t1
+  WHERE EXISTS (SELECT 1 FROM (SELECT DISTINCT x FROM test3cs) t2
+                WHERE t1.x = t2.x COLLATE case_insensitive)
+ORDER BY 1;
+
+SELECT * FROM test3cs t1
+  WHERE EXISTS (SELECT 1 FROM (SELECT DISTINCT x FROM test3cs) t2
+                WHERE t1.x = t2.x COLLATE case_insensitive)
+ORDER BY 1;
+
 CREATE TABLE test1ci (x text COLLATE case_insensitive);
 CREATE TABLE test2ci (x text COLLATE case_insensitive);
 CREATE TABLE test3ci (x text COLLATE case_insensitive);
@@ -693,6 +796,21 @@ SELECT x, count(*) FROM test3ci GROUP BY x HAVING x = 'abc' COLLATE case_sensiti
 EXPLAIN (COSTS OFF)
 SELECT x, count(*) FROM test3ci GROUP BY x HAVING ROW(x, 1) < ROW('ABC' COLLATE case_sensitive, 1) ORDER BY 1;
 SELECT x, count(*) FROM test3ci GROUP BY x HAVING ROW(x, 1) < ROW('ABC' COLLATE case_sensitive, 1) ORDER BY 1;
+
+-- Negative: simple-CASE form with conflicting WHEN comparison collation
+EXPLAIN (COSTS OFF)
+SELECT x, count(*) FROM test3ci GROUP BY x HAVING (CASE x WHEN 'abc' COLLATE case_sensitive THEN true ELSE false END);
+SELECT x, count(*) FROM test3ci GROUP BY x HAVING (CASE x WHEN 'abc' COLLATE case_sensitive THEN true ELSE false END);
+
+-- Positive: simple-CASE form with matching collation, safe to push
+EXPLAIN (COSTS OFF)
+SELECT x, count(*) FROM test3ci GROUP BY x HAVING (CASE x WHEN 'abc' COLLATE case_insensitive THEN true ELSE false END);
+SELECT x, count(*) FROM test3ci GROUP BY x HAVING (CASE x WHEN 'abc' COLLATE case_insensitive THEN true ELSE false END);
+
+-- Negative: nested CASE with collation conflict
+EXPLAIN (COSTS OFF)
+SELECT x, count(*) FROM test3ci GROUP BY x HAVING (CASE WHEN (CASE x WHEN 'abc' COLLATE case_sensitive THEN 1 ELSE 0 END) = 1 THEN true ELSE false END);
+SELECT x, count(*) FROM test3ci GROUP BY x HAVING (CASE WHEN (CASE x WHEN 'abc' COLLATE case_sensitive THEN 1 ELSE 0 END) = 1 THEN true ELSE false END);
 
 -- Positive: conflicting collation but no grouping expression reference
 EXPLAIN (COSTS OFF)
@@ -1100,6 +1218,26 @@ GROUP BY t1.id, t1.val;
 
 DROP TABLE eager_agg_t1;
 DROP TABLE eager_agg_t2;
+
+--
+-- A unique index can prove functional dependency for GROUP BY column
+-- removal only if its per-column collation agrees on equality with
+-- the GROUP BY column's collation.  An index built under a different
+-- (deterministic) collation would otherwise let remove_useless_groupby_columns
+-- drop other columns whose values still differ within a nondeterministic
+-- group.
+--
+CREATE TABLE groupby_collation_t (a text COLLATE case_insensitive NOT NULL, b text);
+INSERT INTO groupby_collation_t VALUES ('foo', 'X'), ('FOO', 'Y');
+CREATE UNIQUE INDEX ON groupby_collation_t (a COLLATE "C");
+
+-- Column b must NOT be dropped: under case_insensitive on a, 'foo' and
+-- 'FOO' would merge, but they have distinct b values.
+EXPLAIN (COSTS OFF)
+SELECT a, b FROM groupby_collation_t GROUP BY a, b ORDER BY a, b;
+SELECT a, b FROM groupby_collation_t GROUP BY a, b ORDER BY a, b;
+
+DROP TABLE groupby_collation_t;
 
 -- virtual generated columns
 CREATE TABLE t5 (

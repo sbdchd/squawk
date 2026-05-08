@@ -1,0 +1,136 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/unicode_escape_string.sql
+---
+SOURCE_FILE@0..241
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..30
+    SELECT_CLAUSE@6..30
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..30
+        TARGET@13..30
+          LITERAL@13..30
+            UNICODE_ESC_STRING@13..30 "U&'\\0061\\+000061'"
+  SEMICOLON@30..31 ";"
+  WHITESPACE@31..32 "\n"
+  SELECT@32..45
+    SELECT_CLAUSE@32..45
+      SELECT_KW@32..38 "select"
+      WHITESPACE@38..39 " "
+      TARGET_LIST@39..45
+        TARGET@39..45
+          LITERAL@39..45
+            UNICODE_ESC_STRING@39..45 "U&'\\\\'"
+  SEMICOLON@45..46 ";"
+  WHITESPACE@46..47 "\n"
+  SELECT@47..79
+    SELECT_CLAUSE@47..79
+      SELECT_KW@47..53 "select"
+      WHITESPACE@53..54 " "
+      TARGET_LIST@54..79
+        TARGET@54..79
+          LITERAL@54..79
+            UNICODE_ESC_STRING@54..67 "U&'ok: !0061'"
+            WHITESPACE@67..68 " "
+            UESCAPE_KW@68..75 "UESCAPE"
+            WHITESPACE@75..76 " "
+            STRING@76..79 "'!'"
+  SEMICOLON@79..80 ";"
+  WHITESPACE@80..81 "\n"
+  SELECT@81..106
+    SELECT_CLAUSE@81..106
+      SELECT_KW@81..87 "select"
+      WHITESPACE@87..88 " "
+      TARGET_LIST@88..106
+        TARGET@88..106
+          LITERAL@88..106
+            UNICODE_ESC_STRING@88..94 "U&' \\'"
+            WHITESPACE@94..95 " "
+            UESCAPE_KW@95..102 "UESCAPE"
+            WHITESPACE@102..103 " "
+            STRING@103..106 "'!'"
+  SEMICOLON@106..107 ";"
+  WHITESPACE@107..109 "\n\n"
+  COMMENT@109..118 "-- errors"
+  WHITESPACE@118..119 "\n"
+  SELECT@119..134
+    SELECT_CLAUSE@119..134
+      SELECT_KW@119..125 "select"
+      WHITESPACE@125..126 " "
+      TARGET_LIST@126..134
+        TARGET@126..134
+          LITERAL@126..134
+            UNICODE_ESC_STRING@126..134 "U&'\\006'"
+  SEMICOLON@134..135 ";"
+  WHITESPACE@135..136 "\n"
+  SELECT@136..153
+    SELECT_CLAUSE@136..153
+      SELECT_KW@136..142 "select"
+      WHITESPACE@142..143 " "
+      TARGET_LIST@143..153
+        TARGET@143..153
+          LITERAL@143..153
+            UNICODE_ESC_STRING@143..153 "U&'\\+0061'"
+  SEMICOLON@153..154 ";"
+  WHITESPACE@154..155 "\n"
+  SELECT@155..188
+    SELECT_CLAUSE@155..188
+      SELECT_KW@155..161 "select"
+      WHITESPACE@161..162 " "
+      TARGET_LIST@162..188
+        TARGET@162..188
+          LITERAL@162..188
+            UNICODE_ESC_STRING@162..176 "U&'wrong: \\06'"
+            WHITESPACE@176..177 " "
+            UESCAPE_KW@177..184 "UESCAPE"
+            WHITESPACE@184..185 " "
+            STRING@185..188 "'\\'"
+  SEMICOLON@188..189 ";"
+  WHITESPACE@189..190 "\n"
+  SELECT@190..224
+    SELECT_CLAUSE@190..224
+      SELECT_KW@190..196 "select"
+      WHITESPACE@196..197 " "
+      TARGET_LIST@197..224
+        TARGET@197..224
+          LITERAL@197..224
+            UNICODE_ESC_STRING@197..212 "U&'wrong: !061'"
+            WHITESPACE@212..213 " "
+            UESCAPE_KW@213..220 "UESCAPE"
+            WHITESPACE@220..221 " "
+            STRING@221..224 "'!'"
+  SEMICOLON@224..225 ";"
+  WHITESPACE@225..226 "\n"
+  SELECT@226..239
+    SELECT_CLAUSE@226..239
+      SELECT_KW@226..232 "select"
+      WHITESPACE@232..233 " "
+      TARGET_LIST@233..239
+        TARGET@233..239
+          LITERAL@233..239
+            UNICODE_ESC_STRING@233..239 "U&' \\'"
+  SEMICOLON@239..240 ";"
+  WHITESPACE@240..241 "\n"
+
+error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+  ╭▸ 
+8 │ select U&'\006';
+  ╰╴       ━━━━━━━━
+error[syntax-error]: Unicode escape requires 6 hex digits: \+XXXXXX
+  ╭▸ 
+9 │ select U&'\+0061';
+  ╰╴       ━━━━━━━━━━
+error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+   ╭▸ 
+10 │ select U&'wrong: \06' UESCAPE '\';
+   ╰╴       ━━━━━━━━━━━━━━
+error[syntax-error]: Unicode escape requires 4 hex digits: !XXXX
+   ╭▸ 
+11 │ select U&'wrong: !061' UESCAPE '!';
+   ╰╴       ━━━━━━━━━━━━━━━
+error[syntax-error]: Invalid Unicode escape sequence
+   ╭▸ 
+12 │ select U&' \';
+   ╰╴       ━━━━━━

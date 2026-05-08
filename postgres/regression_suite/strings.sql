@@ -39,8 +39,8 @@ SELECT U&'wrong: \+2FFFFF';
 -- while we're here, check the same cases in E-style literals
 SELECT E'd\u0061t\U00000061' AS "data";
 SELECT E'a\\b' AS "a\b";
-SELECT E'wrong: \u061';
-SELECT E'wrong: \U0061';
+-- SELECT E'wrong: \u061';
+-- SELECT E'wrong: \U0061';
 SELECT E'wrong: \udb99';
 SELECT E'wrong: \udb99xy';
 SELECT E'wrong: \udb99\\';

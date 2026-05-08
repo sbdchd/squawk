@@ -95,6 +95,7 @@ impl<T> Parse<T> {
             vec![]
         };
         validation::validate(&self.syntax_node(), &mut errors);
+        errors.sort_by_key(|error| error.range().start());
         errors
     }
 }

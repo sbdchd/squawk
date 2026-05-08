@@ -215,7 +215,7 @@ CREATE PROPERTY GRAPH g1
     VERTEX TABLES (
         v1
             LABEL vl1 PROPERTIES (vname, vprop1)
-            LABEL l1 PROPERTIES (vname AS elname), -- label shared by vertexes as well as edges
+            LABEL l1 PROPERTIES (vname AS elname), -- label shared by vertices as well as edges
         v2 KEY (id1, id2)
             LABEL vl2 PROPERTIES (vname, vprop2, 'vl2_prop'::varchar(10) AS lprop1)
             LABEL vl3 PROPERTIES (vname, vprop1, 'vl2_prop'::varchar(10) AS lprop1)
@@ -519,7 +519,7 @@ CREATE PROPERTY GRAPH g4
             DESTINATION KEY (dest) REFERENCES ptnv(id)
     );
 SELECT * FROM GRAPH_TABLE (g4 MATCH (s IS ptnv)-[e IS ptne]->(d IS ptnv) COLUMNS (s.val, e.val, d.val)) ORDER BY 1, 2, 3;
--- edges from the same vertex in both directions connecting to other vertexes in the same table
+-- edges from the same vertex in both directions connecting to other vertices in the same table
 SELECT * FROM GRAPH_TABLE (g4 MATCH (s)-[e]-(d) WHERE s.id = 3 COLUMNS (s.val, e.val, d.val)) ORDER BY 1, 2, 3;
 SELECT * FROM GRAPH_TABLE (g4 MATCH (s WHERE s.id = 3)-[e]-(d) COLUMNS (s.val, e.val, d.val)) ORDER BY 1, 2, 3;
 
@@ -589,5 +589,11 @@ SELECT * FROM customers co WHERE co.customer_id = (SELECT customer_id FROM GRAPH
 -- query within graph table
 SELECT sname, dname FROM GRAPH_TABLE (g1 MATCH (src)->(dest) WHERE src.vprop1 > (SELECT max(v1.vprop1) FROM v1) COLUMNS(src.vname AS sname, dest.vname AS dname));
 SELECT sname, dname FROM GRAPH_TABLE (g1 MATCH (src)->(dest) WHERE out_degree(src.vname) > (SELECT max(out_degree(nname)) FROM GRAPH_TABLE (g1 MATCH (node) COLUMNS (node.vname AS nname))) COLUMNS(src.vname AS sname, dest.vname AS dname));
+
+-- GRAPH_TABLE subquery in HAVING clause (tests expression mutator)
+SELECT src.vname, count(*) FROM v1 AS src
+  GROUP BY src.vname
+  HAVING count(*) >= (SELECT count(*) FROM GRAPH_TABLE (g1 MATCH (a IS vl1 | vl2) COLUMNS (a.vname AS n)) WHERE n = src.vname)
+  ORDER BY vname;
 
 -- leave the objects behind for pg_upgrade/pg_dump tests
