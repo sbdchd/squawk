@@ -27,7 +27,7 @@ SELECT 'tricky' AS U&"\" UESCAPE '!';
 -- SELECT U&'wrong: \061';
 -- SELECT U&'wrong: \+0061';
 -- SELECT U&'wrong: +0061' UESCAPE +;
-SELECT U&'wrong: +0061' UESCAPE '+';
+-- SELECT U&'wrong: +0061' UESCAPE '+';
 
 -- SELECT U&'wrong: \db99';
 -- SELECT U&'wrong: \db99xy';

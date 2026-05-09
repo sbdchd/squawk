@@ -51,6 +51,7 @@ const IGNORED_LINES: &[&str] = &[
     "CREATE SUBSCRIPTION regress_testsub CONNECTION 'foo';",
     "CREATE SUBSCRIPTION regress_testsub PUBLICATION foo;",
     "SELECT U&'wrong: +0061' UESCAPE +;",
+    "SELECT U&'wrong: +0061' UESCAPE '+';",
     "CREATE STATISTICS tst;",
     "CREATE STATISTICS tst ON a, b;",
     "CREATE STATISTICS tst ON a FROM (VALUES (x)) AS foo;",
