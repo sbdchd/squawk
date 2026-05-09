@@ -37,7 +37,7 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if p.eat(UNICODE_ESC_STRING) {
         if p.eat(UESCAPE_KW) {
-            p.eat(STRING);
+            p.expect(STRING);
         }
     }
     // E021-03 string continuation syntax
@@ -1678,7 +1678,9 @@ fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
         // skip
     } else if p.at_ts(COL_LABEL_FIRST) {
         let m = p.start();
-        p.bump_any();
+        if !opt_ident(p) {
+            p.bump_any();
+        }
         let kind = if p.at(DOT) { NAME_REF } else { kind };
         m.complete(p, kind);
     } else {
@@ -2250,7 +2252,9 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 fn name_ref_or_index(p: &mut Parser<'_>) {
     assert!(p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at_ts(ALL_KEYWORDS) || p.at(INT_NUMBER));
     let m = p.start();
-    p.bump_any();
+    if !opt_ident(p) {
+        p.bump_any();
+    }
     m.complete(p, NAME_REF);
 }
 
@@ -14267,6 +14271,8 @@ fn create_extension(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn opt_ident(p: &mut Parser<'_>) -> bool {
+    // handle cases like:
+    // U&"!0069!006E!0074!0038" UESCAPE '!'
     if p.eat(IDENT) {
         if p.eat(UESCAPE_KW) {
             p.expect(STRING);
