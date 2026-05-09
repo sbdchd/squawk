@@ -6277,6 +6277,65 @@ SOURCE_FILE
             STRING "'!'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- select with uescape cast"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "U&\"!0069!006E!0074!0038\""
+                    WHITESPACE " "
+                    UESCAPE_KW "UESCAPE"
+                    WHITESPACE " "
+                    STRING "'!'"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select with uescape on qualified field"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "U&\"!0061\""
+              WHITESPACE " "
+              UESCAPE_KW "UESCAPE"
+              WHITESPACE " "
+              STRING "'!'"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- select_from_user_table"
   WHITESPACE "\n"
   SELECT
