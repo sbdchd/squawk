@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/unicode_escape_string.sql
 ---
-SOURCE_FILE@0..241
+SOURCE_FILE@0..423
   COMMENT@0..5 "-- ok"
   WHITESPACE@5..6 "\n"
   SELECT@6..30
@@ -113,6 +113,90 @@ SOURCE_FILE@0..241
             UNICODE_ESC_STRING@233..239 "U&' \\'"
   SEMICOLON@239..240 ";"
   WHITESPACE@240..241 "\n"
+  SELECT@241..268
+    SELECT_CLAUSE@241..268
+      SELECT_KW@241..247 "select"
+      WHITESPACE@247..248 " "
+      TARGET_LIST@248..268
+        TARGET@248..268
+          LITERAL@248..268
+            UNICODE_ESC_STRING@248..257 "U&'error'"
+            WHITESPACE@257..258 " "
+            UESCAPE_KW@258..265 "UESCAPE"
+            WHITESPACE@265..266 " "
+            STRING@266..268 "''"
+  SEMICOLON@268..269 ";"
+  WHITESPACE@269..270 "\n"
+  SELECT@270..298
+    SELECT_CLAUSE@270..298
+      SELECT_KW@270..276 "select"
+      WHITESPACE@276..277 " "
+      TARGET_LIST@277..298
+        TARGET@277..298
+          LITERAL@277..298
+            UNICODE_ESC_STRING@277..286 "U&'error'"
+            WHITESPACE@286..287 " "
+            UESCAPE_KW@287..294 "UESCAPE"
+            WHITESPACE@294..295 " "
+            STRING@295..298 "' '"
+  SEMICOLON@298..299 ";"
+  WHITESPACE@299..300 "\n"
+  SELECT@300..328
+    SELECT_CLAUSE@300..328
+      SELECT_KW@300..306 "select"
+      WHITESPACE@306..307 " "
+      TARGET_LIST@307..328
+        TARGET@307..328
+          LITERAL@307..328
+            UNICODE_ESC_STRING@307..316 "U&'error'"
+            WHITESPACE@316..317 " "
+            UESCAPE_KW@317..324 "UESCAPE"
+            WHITESPACE@324..325 " "
+            STRING@325..328 "'+'"
+  SEMICOLON@328..329 ";"
+  WHITESPACE@329..330 "\n"
+  SELECT@330..358
+    SELECT_CLAUSE@330..358
+      SELECT_KW@330..336 "select"
+      WHITESPACE@336..337 " "
+      TARGET_LIST@337..358
+        TARGET@337..358
+          LITERAL@337..358
+            UNICODE_ESC_STRING@337..346 "U&'error'"
+            WHITESPACE@346..347 " "
+            UESCAPE_KW@347..354 "UESCAPE"
+            WHITESPACE@354..355 " "
+            STRING@355..358 "'A'"
+  SEMICOLON@358..359 ";"
+  WHITESPACE@359..360 "\n"
+  SELECT@360..389
+    SELECT_CLAUSE@360..389
+      SELECT_KW@360..366 "select"
+      WHITESPACE@366..367 " "
+      TARGET_LIST@367..389
+        TARGET@367..389
+          LITERAL@367..389
+            UNICODE_ESC_STRING@367..376 "U&'error'"
+            WHITESPACE@376..377 " "
+            UESCAPE_KW@377..384 "UESCAPE"
+            WHITESPACE@384..385 " "
+            STRING@385..389 "'é'"
+  SEMICOLON@389..390 ";"
+  WHITESPACE@390..391 "\n"
+  SELECT@391..421
+    SELECT_CLAUSE@391..421
+      SELECT_KW@391..397 "select"
+      WHITESPACE@397..398 " "
+      TARGET_LIST@398..421
+        TARGET@398..421
+          LITERAL@398..421
+            UNICODE_ESC_STRING@398..407 "U&'error'"
+            WHITESPACE@407..408 " "
+            UESCAPE_KW@408..415 "UESCAPE"
+            WHITESPACE@415..416 " "
+            STRING@416..421 "'foo'"
+  SEMICOLON@421..422 ";"
+  WHITESPACE@422..423 "\n"
 
 error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
   ╭▸ 
@@ -134,3 +218,27 @@ error[syntax-error]: Invalid Unicode escape sequence
    ╭▸ 
 12 │ select U&' \';
    ╰╴       ━━━━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+13 │ select U&'error' UESCAPE '';
+   ╰╴                         ━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+14 │ select U&'error' UESCAPE ' ';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+15 │ select U&'error' UESCAPE '+';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+16 │ select U&'error' UESCAPE 'A';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+17 │ select U&'error' UESCAPE 'é';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+18 │ select U&'error' UESCAPE 'foo';
+   ╰╴                         ━━━━━

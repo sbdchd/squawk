@@ -192,7 +192,15 @@ fn validate_unicode_esc_string(lit: &ast::Literal) -> Option<SyntaxError> {
             UNICODE_ESC_STRING => unicode_esc = Some(token),
             UESCAPE_KW => seen_uescape = true,
             STRING if seen_uescape => {
-                escape_char = uescape_char(&token).unwrap_or(escape_char);
+                escape_char = match uescape_char(&token) {
+                    Some(ch) => ch,
+                    None => {
+                        return Some(SyntaxError::new(
+                            "Invalid unicode escape character",
+                            token.text_range(),
+                        ));
+                    }
+                };
                 break;
             }
             _ => (),
@@ -224,7 +232,15 @@ fn validate_unicode_esc_ident(token: &SyntaxToken) -> Option<SyntaxError> {
             UESCAPE_KW => seen_uescape = true,
             STRING if seen_uescape => {
                 if let Some(string_token) = element.as_token() {
-                    escape_char = uescape_char(string_token).unwrap_or(escape_char);
+                    escape_char = match uescape_char(string_token) {
+                        Some(ch) => ch,
+                        None => {
+                            return Some(SyntaxError::new(
+                                "Invalid unicode escape character",
+                                string_token.text_range(),
+                            ));
+                        }
+                    };
                 }
                 break;
             }
@@ -237,14 +253,25 @@ fn validate_unicode_esc_ident(token: &SyntaxToken) -> Option<SyntaxError> {
     Some(SyntaxError::new(err.to_string(), token.text_range()))
 }
 
+// https://github.com/postgres/postgres/blob/228a1f9542792c6533ef74c2e7aefad0da1d9a7a/src/backend/parser/parser.c#L350
+const fn is_valid_uescape_char(byte: u8) -> bool {
+    !byte.is_ascii_hexdigit()
+        && byte != b'+'
+        && byte != b'\''
+        && byte != b'"'
+        && !matches!(
+            byte,
+            b' ' | b'\t' | b'\n' | b'\r' | /* b'\v' */ 0x0B | /* b'\f' */ 0x0C
+        )
+}
+
 fn uescape_char(string_token: &SyntaxToken) -> Option<char> {
     let text = string_token.text();
     let inner = text.strip_prefix('\'')?.strip_suffix('\'')?;
-    let mut chars = inner.chars();
-    match (chars.next(), chars.next()) {
-        (Some(c), None) => Some(c),
-        _ => None,
-    }
+    let &[byte] = inner.as_bytes() else {
+        return None;
+    };
+    is_valid_uescape_char(byte).then(|| char::from(byte))
 }
 
 enum UnicodeEscapeKind {
