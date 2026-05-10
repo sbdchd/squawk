@@ -5,7 +5,7 @@
 //! A failed validation emits a diagnostic.
 
 use std::fmt;
-use std::ops::RangeInclusive;
+use std::ops::{Range, RangeInclusive};
 
 use crate::ast::AstNode;
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
@@ -33,9 +33,8 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for element in root.descendants_with_tokens() {
         if let Some(token) = element.into_token()
             && token.kind() == IDENT
-            && let Some(err) = validate_unicode_esc_ident(&token)
         {
-            errors.push(err);
+            validate_unicode_esc_ident(&token, errors);
         }
     }
 }
@@ -175,12 +174,10 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
         }
     }
 
-    if let Some(err) = validate_unicode_esc_string(&lit) {
-        acc.push(err);
-    }
+    validate_unicode_esc_string(&lit, acc);
 }
 
-fn validate_unicode_esc_string(lit: &ast::Literal) -> Option<SyntaxError> {
+fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
     let mut unicode_esc = None;
     let mut seen_uescape = false;
     let mut escape_char = '\\';
@@ -195,10 +192,11 @@ fn validate_unicode_esc_string(lit: &ast::Literal) -> Option<SyntaxError> {
                 escape_char = match uescape_char(&token) {
                     Some(ch) => ch,
                     None => {
-                        return Some(SyntaxError::new(
+                        acc.push(SyntaxError::new(
                             "Invalid unicode escape character",
                             token.text_range(),
                         ));
+                        return;
                     }
                 };
                 break;
@@ -206,22 +204,35 @@ fn validate_unicode_esc_string(lit: &ast::Literal) -> Option<SyntaxError> {
             _ => (),
         }
     }
-    let token = unicode_esc?;
+    let Some(token) = unicode_esc else {
+        return;
+    };
     let text = token.text();
-    let inside = text
+    let Some(inside) = text
         .strip_prefix("U&'")
         .or_else(|| text.strip_prefix("u&'"))
-        .and_then(|s| s.strip_suffix('\''))?;
-    let err = check_unicode_esc_str(inside, escape_char)?;
-    Some(SyntaxError::new(err.to_string(), token.text_range()))
+        .and_then(|s| s.strip_suffix('\''))
+    else {
+        return;
+    };
+    let inside_start = token.text_range().start() + TextSize::new(3);
+    check_unicode_esc_str(inside, escape_char, |range, err| {
+        acc.push(SyntaxError::new(
+            err.to_string(),
+            offset_range(inside_start, range),
+        ));
+    });
 }
 
-fn validate_unicode_esc_ident(token: &SyntaxToken) -> Option<SyntaxError> {
+fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
     let text = token.text();
-    let inside = text
+    let Some(inside) = text
         .strip_prefix("U&\"")
         .or_else(|| text.strip_prefix("u&\""))
-        .and_then(|s| s.strip_suffix('"'))?;
+        .and_then(|s| s.strip_suffix('"'))
+    else {
+        return;
+    };
 
     let mut escape_char = '\\';
     let mut seen_uescape = false;
@@ -235,10 +246,11 @@ fn validate_unicode_esc_ident(token: &SyntaxToken) -> Option<SyntaxError> {
                     escape_char = match uescape_char(string_token) {
                         Some(ch) => ch,
                         None => {
-                            return Some(SyntaxError::new(
+                            acc.push(SyntaxError::new(
                                 "Invalid unicode escape character",
                                 string_token.text_range(),
                             ));
+                            return;
                         }
                     };
                 }
@@ -249,8 +261,19 @@ fn validate_unicode_esc_ident(token: &SyntaxToken) -> Option<SyntaxError> {
         next = element.next_sibling_or_token();
     }
 
-    let err = check_unicode_esc_str(inside, escape_char)?;
-    Some(SyntaxError::new(err.to_string(), token.text_range()))
+    let inside_start = token.text_range().start() + TextSize::new(3);
+    check_unicode_esc_str(inside, escape_char, |range, err| {
+        acc.push(SyntaxError::new(
+            err.to_string(),
+            offset_range(inside_start, range),
+        ));
+    });
+}
+
+fn offset_range(start: TextSize, range: Range<usize>) -> TextRange {
+    let begin = start + TextSize::new(range.start as u32);
+    let end = start + TextSize::new(range.end as u32);
+    TextRange::new(begin, end)
 }
 
 // https://github.com/postgres/postgres/blob/228a1f9542792c6533ef74c2e7aefad0da1d9a7a/src/backend/parser/parser.c#L350
@@ -320,53 +343,91 @@ impl fmt::Display for UnicodeEscError {
     }
 }
 
-fn check_unicode_esc_str(text: &str, escape_char: char) -> Option<UnicodeEscError> {
+fn check_unicode_esc_str<F>(text: &str, escape_char: char, mut callback: F)
+where
+    F: FnMut(Range<usize>, UnicodeEscError),
+{
     const HIGH_SURROGATE: RangeInclusive<u32> = 0xD800..=0xDBFF;
     const LOW_SURROGATE: RangeInclusive<u32> = 0xDC00..=0xDFFF;
     const MAX_CODEPOINT: u32 = 0x10FFFF;
 
-    let mut chars = text.chars().peekable();
-    let mut high_surrogate: Option<u32> = None;
+    let mut chars = text.char_indices().peekable();
+    let mut high_surrogate: Option<Range<usize>> = None;
 
-    while let Some(c) = chars.next() {
+    while let Some((escape_start, c)) = chars.next() {
         if c != escape_char {
             continue;
         }
         let kind = match chars.peek() {
-            Some(&c) if c == escape_char => {
+            Some(&(_, c)) if c == escape_char => {
                 chars.next();
-                high_surrogate = None;
+                if let Some(hi_range) = high_surrogate.take() {
+                    callback(hi_range, UnicodeEscError::InvalidSurrogatePair);
+                }
                 continue;
             }
-            Some('+') => {
+            Some(&(_, '+')) => {
                 chars.next();
                 UnicodeEscapeKind::Extended
             }
-            Some(c) if c.is_ascii_hexdigit() => UnicodeEscapeKind::Short,
-            _ => return Some(UnicodeEscError::InvalidEscape),
+            Some(&(_, c)) if c.is_ascii_hexdigit() => UnicodeEscapeKind::Short,
+            _ => {
+                let end = chars
+                    .peek()
+                    .map(|&(i, c)| i + c.len_utf8())
+                    .unwrap_or(text.len());
+                callback(escape_start..end, UnicodeEscError::InvalidEscape);
+                continue;
+            }
         };
         let mut codepoint: u32 = 0;
+        let mut got_all = true;
+        let mut last_end = chars.peek().map(|&(i, _)| i).unwrap_or(text.len());
         for _ in 0..kind.count() {
             let radix = 16;
-            let Some(d) = chars.peek().and_then(|c| c.to_digit(radix)) else {
-                return Some(UnicodeEscError::RequiresHexDigits { kind, escape_char });
+            let Some(&(i, ch)) = chars.peek() else {
+                got_all = false;
+                break;
+            };
+            let Some(d) = ch.to_digit(radix) else {
+                got_all = false;
+                break;
             };
             chars.next();
             codepoint = codepoint * radix + d;
+            last_end = i + ch.len_utf8();
         }
-        if high_surrogate.take().is_some() {
-            if !LOW_SURROGATE.contains(&codepoint) {
-                return Some(UnicodeEscError::InvalidSurrogatePair);
+        if !got_all {
+            callback(
+                escape_start..last_end,
+                UnicodeEscError::RequiresHexDigits { kind, escape_char },
+            );
+            high_surrogate = None;
+            continue;
+        }
+        if let Some(hi_range) = high_surrogate.take() {
+            if LOW_SURROGATE.contains(&codepoint) {
+                continue;
             }
-        } else if codepoint > MAX_CODEPOINT {
-            return Some(UnicodeEscError::OutOfRange);
+            callback(
+                hi_range.start..last_end,
+                UnicodeEscError::InvalidSurrogatePair,
+            );
+        }
+        if codepoint > MAX_CODEPOINT {
+            callback(escape_start..last_end, UnicodeEscError::OutOfRange);
         } else if HIGH_SURROGATE.contains(&codepoint) {
-            high_surrogate = Some(codepoint);
+            high_surrogate = Some(escape_start..last_end);
         } else if LOW_SURROGATE.contains(&codepoint) {
-            return Some(UnicodeEscError::InvalidSurrogatePair);
+            callback(
+                escape_start..last_end,
+                UnicodeEscError::InvalidSurrogatePair,
+            );
         }
     }
-    high_surrogate.map(|_| UnicodeEscError::InvalidSurrogatePair)
+    if let Some(range) = high_surrogate {
+        callback(range, UnicodeEscError::InvalidSurrogatePair);
+    }
 }
 
 fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {

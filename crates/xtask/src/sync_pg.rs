@@ -102,6 +102,7 @@ const IGNORED_LINES: &[&str] = &[
     r#"SELECT U&'wrong: \db99\0061';"#,
     r#"SELECT U&'wrong: \+00db99\+000061';"#,
     r#"SELECT U&'wrong: \+2FFFFF';"#,
+    r#"SELECT U&'wrong: \db99\\';"#,
     r#"SELECT x'0 ';"#,
     r#"SELECT x' 0';"#,
     r#"SELECT b' 0';"#,

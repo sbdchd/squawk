@@ -31,7 +31,7 @@ SELECT 'tricky' AS U&"\" UESCAPE '!';
 
 -- SELECT U&'wrong: \db99';
 -- SELECT U&'wrong: \db99xy';
-SELECT U&'wrong: \db99\\';
+-- SELECT U&'wrong: \db99\\';
 -- SELECT U&'wrong: \db99\0061';
 -- SELECT U&'wrong: \+00db99\+000061';
 -- SELECT U&'wrong: \+2FFFFF';
