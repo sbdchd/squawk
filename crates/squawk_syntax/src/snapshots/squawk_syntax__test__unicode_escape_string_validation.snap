@@ -264,6 +264,10 @@ error[syntax-error]: Invalid Unicode surrogate pair
    ╭▸ 
 14 │ select U&'\D800\D801\DC00';
    ╰╴          ━━━━━━━━━━
+error[syntax-error]: Invalid Unicode surrogate pair
+   ╭▸ 
+14 │ select U&'\D800\D801\DC00';
+   ╰╴                    ━━━━━
 error[syntax-error]: Invalid Unicode escape sequence
    ╭▸ 
 15 │ select U&' \';

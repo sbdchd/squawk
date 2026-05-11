@@ -33,6 +33,7 @@ pub mod quote;
 pub mod syntax_error;
 mod syntax_node;
 mod token_text;
+mod unescape;
 mod validation;
 
 #[cfg(test)]

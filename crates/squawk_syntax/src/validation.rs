@@ -4,10 +4,10 @@
 //!
 //! A failed validation emits a diagnostic.
 
-use std::fmt;
-use std::ops::{Range, RangeInclusive};
+use std::ops::Range;
 
 use crate::ast::AstNode;
+use crate::unescape::escape_unicode_esc_str;
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
 use squawk_parser::SyntaxKind::*;
@@ -216,11 +216,13 @@ fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
         return;
     };
     let inside_start = token.text_range().start() + TextSize::new(3);
-    check_unicode_esc_str(inside, escape_char, |range, err| {
-        acc.push(SyntaxError::new(
-            err.to_string(),
-            offset_range(inside_start, range),
-        ));
+    escape_unicode_esc_str(inside, escape_char, |range, result| {
+        if let Err(err) = result {
+            acc.push(SyntaxError::new(
+                err.to_string(),
+                offset_range(inside_start, range),
+            ));
+        }
     });
 }
 
@@ -262,11 +264,13 @@ fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
     }
 
     let inside_start = token.text_range().start() + TextSize::new(3);
-    check_unicode_esc_str(inside, escape_char, |range, err| {
-        acc.push(SyntaxError::new(
-            err.to_string(),
-            offset_range(inside_start, range),
-        ));
+    escape_unicode_esc_str(inside, escape_char, |range, result| {
+        if let Err(err) = result {
+            acc.push(SyntaxError::new(
+                err.to_string(),
+                offset_range(inside_start, range),
+            ));
+        }
     });
 }
 
@@ -295,139 +299,6 @@ fn uescape_char(string_token: &SyntaxToken) -> Option<char> {
         return None;
     };
     is_valid_uescape_char(byte).then(|| char::from(byte))
-}
-
-enum UnicodeEscapeKind {
-    Short,
-    Extended,
-}
-
-impl UnicodeEscapeKind {
-    fn count(&self) -> u32 {
-        match self {
-            UnicodeEscapeKind::Short => 4,
-            UnicodeEscapeKind::Extended => 6,
-        }
-    }
-}
-
-enum UnicodeEscError {
-    InvalidEscape,
-    InvalidSurrogatePair,
-    OutOfRange,
-    RequiresHexDigits {
-        kind: UnicodeEscapeKind,
-        escape_char: char,
-    },
-}
-
-impl fmt::Display for UnicodeEscError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::InvalidEscape => f.write_str("Invalid Unicode escape sequence"),
-            Self::InvalidSurrogatePair => f.write_str("Invalid Unicode surrogate pair"),
-            Self::OutOfRange => f.write_str("Unicode escape value out of range"),
-            Self::RequiresHexDigits { kind, escape_char } => {
-                let required = kind.count();
-                let plus = match kind {
-                    UnicodeEscapeKind::Short => "",
-                    UnicodeEscapeKind::Extended => "+",
-                };
-                let xs = "X".repeat(required as usize);
-                write!(
-                    f,
-                    "Unicode escape requires {required} hex digits: {escape_char}{plus}{xs}"
-                )
-            }
-        }
-    }
-}
-
-fn check_unicode_esc_str<F>(text: &str, escape_char: char, mut callback: F)
-where
-    F: FnMut(Range<usize>, UnicodeEscError),
-{
-    const HIGH_SURROGATE: RangeInclusive<u32> = 0xD800..=0xDBFF;
-    const LOW_SURROGATE: RangeInclusive<u32> = 0xDC00..=0xDFFF;
-    const MAX_CODEPOINT: u32 = 0x10FFFF;
-
-    let mut chars = text.char_indices().peekable();
-    let mut high_surrogate: Option<Range<usize>> = None;
-
-    while let Some((escape_start, c)) = chars.next() {
-        if c != escape_char {
-            continue;
-        }
-        let kind = match chars.peek() {
-            Some(&(_, c)) if c == escape_char => {
-                chars.next();
-                if let Some(hi_range) = high_surrogate.take() {
-                    callback(hi_range, UnicodeEscError::InvalidSurrogatePair);
-                }
-                continue;
-            }
-            Some(&(_, '+')) => {
-                chars.next();
-                UnicodeEscapeKind::Extended
-            }
-            Some(&(_, c)) if c.is_ascii_hexdigit() => UnicodeEscapeKind::Short,
-            _ => {
-                let end = chars
-                    .peek()
-                    .map(|&(i, c)| i + c.len_utf8())
-                    .unwrap_or(text.len());
-                callback(escape_start..end, UnicodeEscError::InvalidEscape);
-                continue;
-            }
-        };
-        let mut codepoint: u32 = 0;
-        let mut got_all = true;
-        let mut last_end = chars.peek().map(|&(i, _)| i).unwrap_or(text.len());
-        for _ in 0..kind.count() {
-            let radix = 16;
-            let Some(&(i, ch)) = chars.peek() else {
-                got_all = false;
-                break;
-            };
-            let Some(d) = ch.to_digit(radix) else {
-                got_all = false;
-                break;
-            };
-            chars.next();
-            codepoint = codepoint * radix + d;
-            last_end = i + ch.len_utf8();
-        }
-        if !got_all {
-            callback(
-                escape_start..last_end,
-                UnicodeEscError::RequiresHexDigits { kind, escape_char },
-            );
-            high_surrogate = None;
-            continue;
-        }
-        if let Some(hi_range) = high_surrogate.take() {
-            if LOW_SURROGATE.contains(&codepoint) {
-                continue;
-            }
-            callback(
-                hi_range.start..last_end,
-                UnicodeEscError::InvalidSurrogatePair,
-            );
-        }
-        if codepoint > MAX_CODEPOINT {
-            callback(escape_start..last_end, UnicodeEscError::OutOfRange);
-        } else if HIGH_SURROGATE.contains(&codepoint) {
-            high_surrogate = Some(escape_start..last_end);
-        } else if LOW_SURROGATE.contains(&codepoint) {
-            callback(
-                escape_start..last_end,
-                UnicodeEscError::InvalidSurrogatePair,
-            );
-        }
-    }
-    if let Some(range) = high_surrogate {
-        callback(range, UnicodeEscError::InvalidSurrogatePair);
-    }
 }
 
 fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
