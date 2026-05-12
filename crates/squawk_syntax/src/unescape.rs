@@ -173,6 +173,23 @@ mod tests {
     }
 
     #[test]
+    fn ok() {
+        assert_snapshot!(unicode_escape_events(r"hello world", '\\'), @"
+        0..1 ok 'h'
+        1..2 ok 'e'
+        2..3 ok 'l'
+        3..4 ok 'l'
+        4..5 ok 'o'
+        5..6 ok ' '
+        6..7 ok 'w'
+        7..8 ok 'o'
+        8..9 ok 'r'
+        9..10 ok 'l'
+        10..11 ok 'd'
+        ");
+    }
+
+    #[test]
     fn incomplete_unicode_escape_breaks_surrogate_pairing() {
         assert_snapshot!(unicode_escape_events(r"\D800\006\DC00", '\\'), @r"
         0..5 err Invalid Unicode surrogate pair

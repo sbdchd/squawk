@@ -35,15 +35,15 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    if p.eat(UNICODE_ESC_STRING) {
-        if p.eat(UESCAPE_KW) {
-            p.expect(STRING);
-        }
-    }
     // E021-03 string continuation syntax
     // If two string literals are next to each other, and don't have a comment
     // between them, then they are automatically combined.
-    else if p.eat(STRING) {
+    if p.eat(UNICODE_ESC_STRING) {
+        while !p.at(EOF) && p.eat(STRING) {}
+        if p.eat(UESCAPE_KW) {
+            p.expect(STRING);
+        }
+    } else if p.eat(STRING) || p.eat(ESC_STRING) || p.eat(BIT_STRING) || p.eat(BYTE_STRING) {
         while !p.at(EOF) && p.eat(STRING) {}
     } else {
         p.bump_any();
