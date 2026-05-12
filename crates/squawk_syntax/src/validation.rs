@@ -138,7 +138,10 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
             rowan::NodeOrToken::Token(token) => {
                 match state {
                     LookingFor::OpenString => {
-                        if token.kind() == STRING {
+                        if matches!(
+                            token.kind(),
+                            STRING | ESC_STRING | BIT_STRING | BYTE_STRING | UNICODE_ESC_STRING
+                        ) {
                             state = LookingFor::CloseString(token.text_range().end(), false);
                         }
                     }
