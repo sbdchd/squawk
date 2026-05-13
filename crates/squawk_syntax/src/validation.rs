@@ -263,14 +263,11 @@ fn validate_byte_string_content(inner: &str, inner_start: TextSize, acc: &mut Ve
 }
 
 fn prefixed_str_inner(token: &SyntaxToken, prefix: [char; 2]) -> Option<(&str, TextSize)> {
-    let Some(inner) = token
+    let inner = token
         .text()
         .strip_prefix(prefix)
         .and_then(|s| s.strip_prefix('\''))
-        .and_then(|s| s.strip_suffix('\''))
-    else {
-        return None;
-    };
+        .and_then(|s| s.strip_suffix('\''))?;
     let inner_start = token.text_range().start() + TextSize::new(2);
     Some((inner, inner_start))
 }
