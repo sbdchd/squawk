@@ -540,6 +540,10 @@ error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 27 │ select e'foo' 'bar' 'buzz';
    ╰╴                   ━
+error[syntax-error]: Unicode escape requires 4 hex digits: \uXXXX
+   ╭▸ 
+29 │ '\u00';
+   ╰╴ ━━━━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 32 │ select u&'foo' 'bar';
@@ -568,6 +572,10 @@ error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 37 │ select u&'foo' 'bar' 'buzz';
    ╰╴                    ━
+error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+   ╭▸ 
+39 │ '\010';
+   ╰╴ ━━━━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 42 │ select b'01' '10';
@@ -596,6 +604,10 @@ error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 47 │ select b'10' '10' '11';
    ╰╴                 ━
+error[syntax-error]: "2" is not a valid binary digit
+   ╭▸ 
+49 │ '20';
+   ╰╴ ━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 52 │ select x'0F' '10';
@@ -624,3 +636,7 @@ error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 57 │ select x'1F' 'F0' '11';
    ╰╴                 ━
+error[syntax-error]: "G" is not a valid hexadecimal digit
+   ╭▸ 
+59 │ 'G0';
+   ╰╴ ━
