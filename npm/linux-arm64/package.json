@@ -1,6 +1,6 @@
 {
   "name": "@squawk-cli/linux-arm64",
-  "version": "0.0.0",
+  "version": "2.52.0",
   "description": "squawk-cli binary for linux-arm64",
   "repository": "git@github.com:sbdchd/squawk.git",
   "license": "(Apache-2.0 OR MIT)",

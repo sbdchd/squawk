@@ -7,6 +7,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.52.0 - 2026-05-12
+
+### Added
+
+- parser: validation for bit, byte, and escape string types (#1132)
+
+  ```sql
+  select b'01' '10';
+  select x'0F' '10';
+  select e'foo' 'bar';
+  ```
+
+  now gives:
+
+  ```sql
+  error[syntax-error]: Expected new line or comma between string literals
+    ╭▸ stdin:1:13
+    │
+  1 │ select b'01' '10';
+    ╰╴            ━
+  error[syntax-error]: Expected new line or comma between string literals
+    ╭▸ stdin:2:13
+    │
+  2 │ select x'0F' '10';
+    ╰╴            ━
+  error[syntax-error]: Expected new line or comma between string literals
+    ╭▸ stdin:3:14
+    │
+  3 │ select e'foo' 'bar';
+    ╰╴             ━
+  ```
+
+- parser: validation for escape sequences (#1125, #1123, #1122, #1128, #1129)
+
+  ```sql
+  select U&'wrong: !061' UESCAPE '!';
+  select U&"wrong: \06" UESCAPE '\';
+  ```
+
+  now gives:
+
+  ```sql
+  error[syntax-error]: Unicode escape requires 4 hex digits: !XXXX
+    ╭▸ stdin:1:20
+    │
+  1 │   select U&'wrong: !061' UESCAPE '!';
+    ╰╴                   ━━━━
+  error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+    ╭▸ stdin:2:20
+    │
+  2 │   select U&"wrong: \06" UESCAPE '\';
+    ╰╴                   ━━━
+  ```
+
+### Changed
+
+- ci: update npm based install method (#1133)
+
+  Instead of fetching the binary via an install script we use an optional
+  peer dependency, mirroring ESBuild and Sentry.
+
+### Fixed
+
+- cli: fix missing binary exit code (#1130)
+
+  Before if the install script didn't run the NPM JS shim would exit without
+  erroring. Thanks @nwalters512!
+
+- parser: parsing unicode escape idents in cast position (#1127)
+
+  ```sql
+  select 2::U&"!0069!006E!0074!0038" UESCAPE '!' from t;
+  ```
+
+  now parses without error
+
 ## v2.51.0 - 2026-05-06
 
 ### Added
