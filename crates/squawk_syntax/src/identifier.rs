@@ -13,6 +13,10 @@ impl Identifier {
         let normalized = normalize_identifier(s);
         Identifier(normalized)
     }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
 }
 
 #[cfg(test)]
