@@ -1,0 +1,108 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/bit_string.sql
+---
+SOURCE_FILE@0..120
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..18
+    SELECT_CLAUSE@6..18
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..18
+        TARGET@13..18
+          LITERAL@13..18
+            BIT_STRING@13..18 "b'01'"
+  SEMICOLON@18..19 ";"
+  WHITESPACE@19..20 "\n"
+  SELECT@20..34
+    SELECT_CLAUSE@20..34
+      SELECT_KW@20..26 "select"
+      WHITESPACE@26..27 " "
+      TARGET_LIST@27..34
+        TARGET@27..34
+          LITERAL@27..34
+            BIT_STRING@27..34 "B'1010'"
+  SEMICOLON@34..35 ";"
+  WHITESPACE@35..36 "\n"
+  SELECT@36..46
+    SELECT_CLAUSE@36..46
+      SELECT_KW@36..42 "select"
+      WHITESPACE@42..43 " "
+      TARGET_LIST@43..46
+        TARGET@43..46
+          LITERAL@43..46
+            BIT_STRING@43..46 "b''"
+  SEMICOLON@46..47 ";"
+  WHITESPACE@47..49 "\n\n"
+  COMMENT@49..58 "-- errors"
+  WHITESPACE@58..59 "\n"
+  SELECT@59..72
+    SELECT_CLAUSE@59..72
+      SELECT_KW@59..65 "select"
+      WHITESPACE@65..66 " "
+      TARGET_LIST@66..72
+        TARGET@66..72
+          LITERAL@66..72
+            BIT_STRING@66..72 "b'012'"
+  SEMICOLON@72..73 ";"
+  WHITESPACE@73..74 "\n"
+  SELECT@74..87
+    SELECT_CLAUSE@74..87
+      SELECT_KW@74..80 "select"
+      WHITESPACE@80..81 " "
+      TARGET_LIST@81..87
+        TARGET@81..87
+          LITERAL@81..87
+            BIT_STRING@81..87 "b'01A'"
+  SEMICOLON@87..88 ";"
+  WHITESPACE@88..89 "\n"
+  SELECT@89..102
+    SELECT_CLAUSE@89..102
+      SELECT_KW@89..95 "select"
+      WHITESPACE@95..96 " "
+      TARGET_LIST@96..102
+        TARGET@96..102
+          LITERAL@96..102
+            BIT_STRING@96..102 "b'0 1'"
+  SEMICOLON@102..103 ";"
+  WHITESPACE@103..104 "\n"
+  SELECT@104..118
+    SELECT_CLAUSE@104..118
+      SELECT_KW@104..110 "select"
+      WHITESPACE@110..111 " "
+      TARGET_LIST@111..118
+        TARGET@111..118
+          LITERAL@111..118
+            BIT_STRING@111..118 "B'2345'"
+  SEMICOLON@118..119 ";"
+  WHITESPACE@119..120 "\n"
+
+error[syntax-error]: "2" is not a valid binary digit
+  ╭▸ 
+7 │ select b'012';
+  ╰╴           ━
+error[syntax-error]: "A" is not a valid binary digit
+  ╭▸ 
+8 │ select b'01A';
+  ╰╴           ━
+error[syntax-error]: " " is not a valid binary digit
+  ╭▸ 
+9 │ select b'0 1';
+  ╰╴          ━
+error[syntax-error]: "2" is not a valid binary digit
+   ╭▸ 
+10 │ select B'2345';
+   ╰╴         ━
+error[syntax-error]: "3" is not a valid binary digit
+   ╭▸ 
+10 │ select B'2345';
+   ╰╴          ━
+error[syntax-error]: "4" is not a valid binary digit
+   ╭▸ 
+10 │ select B'2345';
+   ╰╴           ━
+error[syntax-error]: "5" is not a valid binary digit
+   ╭▸ 
+10 │ select B'2345';
+   ╰╴            ━

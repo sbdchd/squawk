@@ -1,0 +1,82 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/escape_string.sql
+---
+SOURCE_FILE@0..148
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..27
+    SELECT_CLAUSE@6..27
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..27
+        TARGET@13..27
+          LITERAL@13..27
+            ESC_STRING@13..27 "e'a\\U00000062'"
+  SEMICOLON@27..28 ";"
+  WHITESPACE@28..29 "\n"
+  SELECT@29..44
+    SELECT_CLAUSE@29..44
+      SELECT_KW@29..35 "select"
+      WHITESPACE@35..36 " "
+      TARGET_LIST@36..44
+        TARGET@36..44
+          LITERAL@36..44
+            ESC_STRING@36..44 "e'\\\\u00'"
+  SEMICOLON@44..45 ";"
+  WHITESPACE@45..46 "\n"
+  SELECT@46..71
+    SELECT_CLAUSE@46..71
+      SELECT_KW@46..52 "select"
+      WHITESPACE@52..53 " "
+      TARGET_LIST@53..71
+        TARGET@53..71
+          LITERAL@53..71
+            ESC_STRING@53..71 "e'no escapes here'"
+  SEMICOLON@71..72 ";"
+  WHITESPACE@72..74 "\n\n"
+  COMMENT@74..83 "-- errors"
+  WHITESPACE@83..84 "\n"
+  SELECT@84..98
+    SELECT_CLAUSE@84..98
+      SELECT_KW@84..90 "select"
+      WHITESPACE@90..91 " "
+      TARGET_LIST@91..98
+        TARGET@91..98
+          LITERAL@91..98
+            ESC_STRING@91..98 "E'\\u00'"
+  SEMICOLON@98..99 ";"
+  WHITESPACE@99..100 "\n"
+  SELECT@100..116
+    SELECT_CLAUSE@100..116
+      SELECT_KW@100..106 "select"
+      WHITESPACE@106..107 " "
+      TARGET_LIST@107..116
+        TARGET@107..116
+          LITERAL@107..116
+            ESC_STRING@107..116 "E'\\UFFFF'"
+  SEMICOLON@116..117 ";"
+  WHITESPACE@117..118 "\n"
+  SELECT@118..146
+    SELECT_CLAUSE@118..146
+      SELECT_KW@118..124 "select"
+      WHITESPACE@124..125 " "
+      TARGET_LIST@125..146
+        TARGET@125..146
+          LITERAL@125..146
+            ESC_STRING@125..146 "E'hello \\UFGFF world'"
+  SEMICOLON@146..147 ";"
+  WHITESPACE@147..148 "\n"
+
+error[syntax-error]: Unicode escape requires 4 hex digits: \uXXXX
+  ╭▸ 
+7 │ select E'\u00';
+  ╰╴         ━━━━
+error[syntax-error]: Unicode escape requires 8 hex digits: \UXXXXXXXX
+  ╭▸ 
+8 │ select E'\UFFFF';
+  ╰╴         ━━━━━━
+error[syntax-error]: Unicode escape requires 8 hex digits: \UXXXXXXXX
+  ╭▸ 
+9 │ select E'hello \UFGFF world';
+  ╰╴               ━━━

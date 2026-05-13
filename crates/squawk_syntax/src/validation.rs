@@ -178,6 +178,108 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
     }
 
     validate_unicode_esc_string(&lit, acc);
+    validate_prefixed_strings(&lit, acc);
+}
+
+fn validate_prefixed_strings(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
+    for e in lit.syntax().children_with_tokens() {
+        let Some(token) = e.into_token() else {
+            continue;
+        };
+        match token.kind() {
+            ESC_STRING => validate_escape_string_token(&token, acc),
+            BIT_STRING => validate_bit_string_token(&token, acc),
+            BYTE_STRING => validate_byte_string_token(&token, acc),
+            _ => (),
+        }
+    }
+}
+
+fn validate_bit_string_token(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
+    let text = token.text();
+    let Some(inside) = text
+        .strip_prefix("b'")
+        .or_else(|| text.strip_prefix("B'"))
+        .and_then(|s| s.strip_suffix('\''))
+    else {
+        return;
+    };
+    let inside_start = token.text_range().start() + TextSize::new(2);
+    for (i, c) in inside.char_indices() {
+        if c != '0' && c != '1' {
+            acc.push(SyntaxError::new(
+                format!("\"{c}\" is not a valid binary digit"),
+                offset_range(inside_start, i..i + c.len_utf8()),
+            ));
+        }
+    }
+}
+
+fn validate_byte_string_token(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
+    let text = token.text();
+    let Some(inside) = text
+        .strip_prefix("x'")
+        .or_else(|| text.strip_prefix("X'"))
+        .and_then(|s| s.strip_suffix('\''))
+    else {
+        return;
+    };
+    let inside_start = token.text_range().start() + TextSize::new(2);
+    for (i, c) in inside.char_indices() {
+        if !c.is_ascii_hexdigit() {
+            acc.push(SyntaxError::new(
+                format!("\"{c}\" is not a valid hexadecimal digit"),
+                offset_range(inside_start, i..i + c.len_utf8()),
+            ));
+        }
+    }
+}
+
+fn validate_escape_string_token(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
+    let text = token.text();
+    let Some(inside) = text
+        .strip_prefix("e'")
+        .or_else(|| text.strip_prefix("E'"))
+        .and_then(|s| s.strip_suffix('\''))
+    else {
+        return;
+    };
+    let inside_start = token.text_range().start() + TextSize::new(2);
+
+    let mut chars = inside.char_indices().peekable();
+    while let Some((esc_start, c)) = chars.next() {
+        if c != '\\' {
+            continue;
+        }
+        let Some((next_pos, next_c)) = chars.next() else {
+            return;
+        };
+        let (required, example) = match next_c {
+            'u' => (4usize, r"\uXXXX"),
+            'U' => (8usize, r"\UXXXXXXXX"),
+            _ => continue,
+        };
+        let mut end = next_pos + next_c.len_utf8();
+        let mut got_all = true;
+        for _ in 0..required {
+            match chars.peek() {
+                Some(&(i, ch)) if ch.is_ascii_hexdigit() => {
+                    end = i + ch.len_utf8();
+                    chars.next();
+                }
+                _ => {
+                    got_all = false;
+                    break;
+                }
+            }
+        }
+        if !got_all {
+            acc.push(SyntaxError::new(
+                format!("Unicode escape requires {required} hex digits: {example}"),
+                offset_range(inside_start, esc_start..end),
+            ));
+        }
+    }
 }
 
 fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {

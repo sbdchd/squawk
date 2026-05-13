@@ -1,0 +1,112 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/byte_string.sql
+---
+SOURCE_FILE@0..124
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..18
+    SELECT_CLAUSE@6..18
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..18
+        TARGET@13..18
+          LITERAL@13..18
+            BYTE_STRING@13..18 "x'1F'"
+  SEMICOLON@18..19 ";"
+  WHITESPACE@19..20 "\n"
+  SELECT@20..38
+    SELECT_CLAUSE@20..38
+      SELECT_KW@20..26 "select"
+      WHITESPACE@26..27 " "
+      TARGET_LIST@27..38
+        TARGET@27..38
+          LITERAL@27..38
+            BYTE_STRING@27..38 "X'deadBEEF'"
+  SEMICOLON@38..39 ";"
+  WHITESPACE@39..40 "\n"
+  SELECT@40..50
+    SELECT_CLAUSE@40..50
+      SELECT_KW@40..46 "select"
+      WHITESPACE@46..47 " "
+      TARGET_LIST@47..50
+        TARGET@47..50
+          LITERAL@47..50
+            BYTE_STRING@47..50 "x''"
+  SEMICOLON@50..51 ";"
+  WHITESPACE@51..53 "\n\n"
+  COMMENT@53..62 "-- errors"
+  WHITESPACE@62..63 "\n"
+  SELECT@63..76
+    SELECT_CLAUSE@63..76
+      SELECT_KW@63..69 "select"
+      WHITESPACE@69..70 " "
+      TARGET_LIST@70..76
+        TARGET@70..76
+          LITERAL@70..76
+            BYTE_STRING@70..76 "x'1FZ'"
+  SEMICOLON@76..77 ";"
+  WHITESPACE@77..78 "\n"
+  SELECT@78..90
+    SELECT_CLAUSE@78..90
+      SELECT_KW@78..84 "select"
+      WHITESPACE@84..85 " "
+      TARGET_LIST@85..90
+        TARGET@85..90
+          LITERAL@85..90
+            BYTE_STRING@85..90 "x'1G'"
+  SEMICOLON@90..91 ";"
+  WHITESPACE@91..92 "\n"
+  SELECT@92..106
+    SELECT_CLAUSE@92..106
+      SELECT_KW@92..98 "select"
+      WHITESPACE@98..99 " "
+      TARGET_LIST@99..106
+        TARGET@99..106
+          LITERAL@99..106
+            BYTE_STRING@99..106 "x'1G2H'"
+  SEMICOLON@106..107 ";"
+  WHITESPACE@107..108 "\n"
+  SELECT@108..122
+    SELECT_CLAUSE@108..122
+      SELECT_KW@108..114 "select"
+      WHITESPACE@114..115 " "
+      TARGET_LIST@115..122
+        TARGET@115..122
+          LITERAL@115..122
+            BYTE_STRING@115..122 "X'GHIJ'"
+  SEMICOLON@122..123 ";"
+  WHITESPACE@123..124 "\n"
+
+error[syntax-error]: "Z" is not a valid hexadecimal digit
+  ╭▸ 
+7 │ select x'1FZ';
+  ╰╴           ━
+error[syntax-error]: "G" is not a valid hexadecimal digit
+  ╭▸ 
+8 │ select x'1G';
+  ╰╴          ━
+error[syntax-error]: "G" is not a valid hexadecimal digit
+  ╭▸ 
+9 │ select x'1G2H';
+  ╰╴          ━
+error[syntax-error]: "H" is not a valid hexadecimal digit
+  ╭▸ 
+9 │ select x'1G2H';
+  ╰╴            ━
+error[syntax-error]: "G" is not a valid hexadecimal digit
+   ╭▸ 
+10 │ select X'GHIJ';
+   ╰╴         ━
+error[syntax-error]: "H" is not a valid hexadecimal digit
+   ╭▸ 
+10 │ select X'GHIJ';
+   ╰╴          ━
+error[syntax-error]: "I" is not a valid hexadecimal digit
+   ╭▸ 
+10 │ select X'GHIJ';
+   ╰╴           ━
+error[syntax-error]: "J" is not a valid hexadecimal digit
+   ╭▸ 
+10 │ select X'GHIJ';
+   ╰╴            ━

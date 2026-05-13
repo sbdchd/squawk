@@ -255,12 +255,8 @@ impl<'a> Converter<'a> {
                         "Missing trailing `'` symbol to terminate the hex bit string literal"
                             .into(),
                     );
-                } else {
-                    let inside = &token_text[2..token_text.len() - 1];
-                    if let Some(c) = inside.chars().find(|c| !c.is_ascii_hexdigit()) {
-                        err = Some(format!("\"{c}\" is not a valid hexadecimal digit"));
-                    }
                 }
+                // digit validation in squawk_syntax
                 SyntaxKind::BYTE_STRING
             }
             squawk_lexer::LiteralKind::BitStr { terminated } => {
@@ -268,12 +264,8 @@ impl<'a> Converter<'a> {
                     err = Some(
                         "Missing trailing `'` symbol to terminate the bit string literal".into(),
                     );
-                } else {
-                    let inside = &token_text[2..token_text.len() - 1];
-                    if let Some(c) = inside.chars().find(|&c| c != '0' && c != '1') {
-                        err = Some(format!("\"{c}\" is not a valid binary digit"));
-                    }
                 }
+                // digit validation in squawk_syntax
                 SyntaxKind::BIT_STRING
             }
             squawk_lexer::LiteralKind::DollarQuotedString { terminated } => {
@@ -298,41 +290,14 @@ impl<'a> Converter<'a> {
                     err = Some(
                         "Missing trailing `'` symbol to terminate the escape string literal".into(),
                     );
-                } else {
-                    err = validate_escape_string_unicode_escapes(token_text);
                 }
+                // unicode escape sequences validated in squawk_syntax
                 SyntaxKind::ESC_STRING
             }
         };
 
         self.push(syntax_kind, token_text.len(), err.as_deref());
     }
-}
-
-fn validate_escape_string_unicode_escapes(token_text: &str) -> Option<String> {
-    let mut chars = token_text[2..token_text.len() - 1].chars();
-
-    while let Some(c) = chars.next() {
-        if c != '\\' {
-            continue;
-        }
-
-        let (required, example) = match chars.next() {
-            Some('u') => (4, r"\uXXXX"),
-            Some('U') => (8, r"\UXXXXXXXX"),
-            _ => continue,
-        };
-
-        for _ in 0..required {
-            if !chars.next().is_some_and(|c| c.is_ascii_hexdigit()) {
-                return Some(format!(
-                    "Unicode escape requires {required} hex digits: {example}"
-                ));
-            }
-        }
-    }
-
-    None
 }
 
 #[cfg(test)]
@@ -391,16 +356,6 @@ mod tests {
     }
 
     #[test]
-    fn hex_invalid_digit() {
-        assert_snapshot!(lex("select X'1FZ';"), @r#"
-        error: "Z" is not a valid hexadecimal digit
-          ╭▸ 
-        1 │ select X'1FZ';
-          ╰╴       ━━━━━━
-        "#);
-    }
-
-    #[test]
     fn unterminated_hex_bit_string_error() {
         assert_snapshot!(lex("select X'1F;"), @"
         error: Missing trailing `'` symbol to terminate the hex bit string literal
@@ -418,16 +373,6 @@ mod tests {
         1 │ select B'101;
           ╰╴       ━━━━━━
         ");
-    }
-
-    #[test]
-    fn invalid_binary_digit_error() {
-        assert_snapshot!(lex("select b'0 ';"), @r#"
-        error: " " is not a valid binary digit
-          ╭▸ 
-        1 │ select b'0 ';
-          ╰╴       ━━━━━
-        "#);
     }
 
     #[test]
@@ -457,26 +402,6 @@ mod tests {
           ╭▸ 
         1 │ select E'hello;
           ╰╴       ━━━━━━━━
-        ");
-    }
-
-    #[test]
-    fn invalid_unicode_escape_4_digits_error() {
-        assert_snapshot!(lex(r"select E'\u00';"), @r"
-        error: Unicode escape requires 4 hex digits: \uXXXX
-          ╭▸ 
-        1 │ select E'\u00';
-          ╰╴       ━━━━━━━
-        ");
-    }
-
-    #[test]
-    fn invalid_unicode_escape_8_digits_error() {
-        assert_snapshot!(lex(r"select E'\UFFFF';"), @r"
-        error: Unicode escape requires 8 hex digits: \UXXXXXXXX
-          ╭▸ 
-        1 │ select E'\UFFFF';
-          ╰╴       ━━━━━━━━━
         ");
     }
 }
