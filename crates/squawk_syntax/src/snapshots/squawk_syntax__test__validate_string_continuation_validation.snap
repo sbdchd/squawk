@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/validate_string_continuation.sql
 ---
-SOURCE_FILE@0..1140
+SOURCE_FILE@0..1228
   COMMENT@0..28 "-- ok strings with ne ..."
   WHITESPACE@28..29 "\n"
   SELECT@29..48
@@ -212,259 +212,277 @@ SOURCE_FILE@0..1140
             WHITESPACE@534..535 " "
             STRING@535..541 "'buzz'"
   SEMICOLON@541..542 ";"
-  WHITESPACE@542..544 "\n\n"
-  COMMENT@544..574 "-- error unicode esca ..."
-  WHITESPACE@574..575 "\n"
-  SELECT@575..594
-    SELECT_CLAUSE@575..594
-      SELECT_KW@575..581 "select"
-      WHITESPACE@581..582 " "
-      TARGET_LIST@582..594
-        TARGET@582..594
-          CAST_EXPR@582..594
-            PATH_TYPE@582..583
-              PATH@582..583
-                PATH_SEGMENT@582..583
-                  NAME_REF@582..583
-                    IDENT@582..583 "u"
-            LITERAL@583..594
-              STRING@583..588 "'foo'"
-              WHITESPACE@588..589 " "
-              STRING@589..594 "'bar'"
-  SEMICOLON@594..595 ";"
-  WHITESPACE@595..596 "\n"
-  SELECT@596..629
-    SELECT_CLAUSE@596..629
-      SELECT_KW@596..602 "select"
-      WHITESPACE@602..603 " "
-      TARGET_LIST@603..629
-        TARGET@603..629
-          CAST_EXPR@603..629
-            PATH_TYPE@603..604
-              PATH@603..604
-                PATH_SEGMENT@603..604
-                  NAME_REF@603..604
-                    IDENT@603..604 "u"
-            LITERAL@604..629
-              STRING@604..609 "'foo'"
-              WHITESPACE@609..610 " "
-              COMMENT@610..623 "/* comment */"
-              WHITESPACE@623..624 " "
-              STRING@624..629 "'bar'"
-  SEMICOLON@629..630 ";"
-  WHITESPACE@630..631 "\n"
-  SELECT@631..697
-    SELECT_CLAUSE@631..697
-      SELECT_KW@631..637 "select"
-      WHITESPACE@637..638 " "
-      TARGET_LIST@638..697
-        TARGET@638..697
-          CAST_EXPR@638..697
-            PATH_TYPE@638..639
-              PATH@638..639
-                PATH_SEGMENT@638..639
-                  NAME_REF@638..639
-                    IDENT@638..639 "u"
-            LITERAL@639..697
-              STRING@639..646 "'hello'"
-              WHITESPACE@646..647 " "
-              COMMENT@647..660 "/* comment */"
-              WHITESPACE@660..661 " "
-              STRING@661..666 "'bar'"
-              WHITESPACE@666..667 " "
-              COMMENT@667..688 "/* another comment */"
-              WHITESPACE@688..689 " "
-              STRING@689..697 "' world'"
-  SEMICOLON@697..698 ";"
-  WHITESPACE@698..699 "\n"
-  SELECT@699..733
-    SELECT_CLAUSE@699..733
-      SELECT_KW@699..705 "select"
-      WHITESPACE@705..706 " "
-      TARGET_LIST@706..733
-        TARGET@706..733
-          CAST_EXPR@706..733
-            PATH_TYPE@706..707
-              PATH@706..707
-                PATH_SEGMENT@706..707
-                  NAME_REF@706..707
-                    IDENT@706..707 "u"
-            LITERAL@707..733
-              STRING@707..714 "'hello'"
-              WHITESPACE@714..715 " "
-              COMMENT@715..725 "-- comment"
-              WHITESPACE@725..726 "\n"
-              STRING@726..733 "'world'"
-  SEMICOLON@733..734 ";"
-  WHITESPACE@734..735 "\n"
-  SELECT@735..761
-    SELECT_CLAUSE@735..761
-      SELECT_KW@735..741 "select"
-      WHITESPACE@741..742 " "
-      TARGET_LIST@742..761
-        TARGET@742..761
-          CAST_EXPR@742..761
-            PATH_TYPE@742..743
-              PATH@742..743
-                PATH_SEGMENT@742..743
-                  NAME_REF@742..743
-                    IDENT@742..743 "u"
-            LITERAL@743..761
-              STRING@743..748 "'foo'"
-              WHITESPACE@748..749 " "
-              STRING@749..754 "'bar'"
-              WHITESPACE@754..755 " "
-              STRING@755..761 "'buzz'"
-  SEMICOLON@761..762 ";"
-  WHITESPACE@762..764 "\n\n"
-  COMMENT@764..783 "-- error bit string"
-  WHITESPACE@783..784 "\n"
-  SELECT@784..801
-    SELECT_CLAUSE@784..801
-      SELECT_KW@784..790 "select"
-      WHITESPACE@790..791 " "
-      TARGET_LIST@791..801
-        TARGET@791..801
-          LITERAL@791..801
-            BIT_STRING@791..796 "b'01'"
-            WHITESPACE@796..797 " "
-            STRING@797..801 "'10'"
-  SEMICOLON@801..802 ";"
-  WHITESPACE@802..803 "\n"
-  SELECT@803..834
-    SELECT_CLAUSE@803..834
-      SELECT_KW@803..809 "select"
-      WHITESPACE@809..810 " "
-      TARGET_LIST@810..834
-        TARGET@810..834
-          LITERAL@810..834
-            BIT_STRING@810..815 "b'01'"
-            WHITESPACE@815..816 " "
-            COMMENT@816..829 "/* comment */"
-            WHITESPACE@829..830 " "
-            STRING@830..834 "'11'"
-  SEMICOLON@834..835 ";"
-  WHITESPACE@835..836 "\n"
-  SELECT@836..894
-    SELECT_CLAUSE@836..894
-      SELECT_KW@836..842 "select"
-      WHITESPACE@842..843 " "
-      TARGET_LIST@843..894
-        TARGET@843..894
-          LITERAL@843..894
-            BIT_STRING@843..848 "b'01'"
-            WHITESPACE@848..849 " "
-            COMMENT@849..862 "/* comment */"
-            WHITESPACE@862..863 " "
-            STRING@863..867 "'11'"
-            WHITESPACE@867..868 " "
-            COMMENT@868..889 "/* another comment */"
-            WHITESPACE@889..890 " "
-            STRING@890..894 "'10'"
-  SEMICOLON@894..895 ";"
-  WHITESPACE@895..896 "\n"
-  SELECT@896..925
-    SELECT_CLAUSE@896..925
-      SELECT_KW@896..902 "select"
-      WHITESPACE@902..903 " "
-      TARGET_LIST@903..925
-        TARGET@903..925
-          LITERAL@903..925
-            BIT_STRING@903..909 "b'111'"
-            WHITESPACE@909..910 " "
-            COMMENT@910..920 "-- comment"
-            WHITESPACE@920..921 "\n"
-            STRING@921..925 "'10'"
-  SEMICOLON@925..926 ";"
-  WHITESPACE@926..927 "\n"
-  SELECT@927..949
-    SELECT_CLAUSE@927..949
-      SELECT_KW@927..933 "select"
-      WHITESPACE@933..934 " "
-      TARGET_LIST@934..949
-        TARGET@934..949
-          LITERAL@934..949
-            BIT_STRING@934..939 "b'10'"
+  WHITESPACE@542..543 "\n"
+  SELECT@543..563
+    SELECT_CLAUSE@543..563
+      SELECT_KW@543..549 "select"
+      WHITESPACE@549..550 " "
+      TARGET_LIST@550..563
+        TARGET@550..563
+          LITERAL@550..563
+            ESC_STRING@550..556 "e'foo'"
+            WHITESPACE@556..557 "\n"
+            STRING@557..563 "'\\u00'"
+  SEMICOLON@563..564 ";"
+  WHITESPACE@564..566 "\n\n"
+  COMMENT@566..596 "-- error unicode esca ..."
+  WHITESPACE@596..597 "\n"
+  SELECT@597..617
+    SELECT_CLAUSE@597..617
+      SELECT_KW@597..603 "select"
+      WHITESPACE@603..604 " "
+      TARGET_LIST@604..617
+        TARGET@604..617
+          LITERAL@604..617
+            UNICODE_ESC_STRING@604..611 "u&'foo'"
+            WHITESPACE@611..612 " "
+            STRING@612..617 "'bar'"
+  SEMICOLON@617..618 ";"
+  WHITESPACE@618..619 "\n"
+  SELECT@619..653
+    SELECT_CLAUSE@619..653
+      SELECT_KW@619..625 "select"
+      WHITESPACE@625..626 " "
+      TARGET_LIST@626..653
+        TARGET@626..653
+          LITERAL@626..653
+            UNICODE_ESC_STRING@626..633 "u&'foo'"
+            WHITESPACE@633..634 " "
+            COMMENT@634..647 "/* comment */"
+            WHITESPACE@647..648 " "
+            STRING@648..653 "'bar'"
+  SEMICOLON@653..654 ";"
+  WHITESPACE@654..655 "\n"
+  SELECT@655..722
+    SELECT_CLAUSE@655..722
+      SELECT_KW@655..661 "select"
+      WHITESPACE@661..662 " "
+      TARGET_LIST@662..722
+        TARGET@662..722
+          LITERAL@662..722
+            UNICODE_ESC_STRING@662..671 "u&'hello'"
+            WHITESPACE@671..672 " "
+            COMMENT@672..685 "/* comment */"
+            WHITESPACE@685..686 " "
+            STRING@686..691 "'bar'"
+            WHITESPACE@691..692 " "
+            COMMENT@692..713 "/* another comment */"
+            WHITESPACE@713..714 " "
+            STRING@714..722 "' world'"
+  SEMICOLON@722..723 ";"
+  WHITESPACE@723..724 "\n"
+  SELECT@724..759
+    SELECT_CLAUSE@724..759
+      SELECT_KW@724..730 "select"
+      WHITESPACE@730..731 " "
+      TARGET_LIST@731..759
+        TARGET@731..759
+          LITERAL@731..759
+            UNICODE_ESC_STRING@731..740 "u&'hello'"
+            WHITESPACE@740..741 " "
+            COMMENT@741..751 "-- comment"
+            WHITESPACE@751..752 "\n"
+            STRING@752..759 "'world'"
+  SEMICOLON@759..760 ";"
+  WHITESPACE@760..761 "\n"
+  SELECT@761..788
+    SELECT_CLAUSE@761..788
+      SELECT_KW@761..767 "select"
+      WHITESPACE@767..768 " "
+      TARGET_LIST@768..788
+        TARGET@768..788
+          LITERAL@768..788
+            UNICODE_ESC_STRING@768..775 "u&'foo'"
+            WHITESPACE@775..776 " "
+            STRING@776..781 "'bar'"
+            WHITESPACE@781..782 " "
+            STRING@782..788 "'buzz'"
+  SEMICOLON@788..789 ";"
+  WHITESPACE@789..790 "\n"
+  SELECT@790..811
+    SELECT_CLAUSE@790..811
+      SELECT_KW@790..796 "select"
+      WHITESPACE@796..797 " "
+      TARGET_LIST@797..811
+        TARGET@797..811
+          LITERAL@797..811
+            UNICODE_ESC_STRING@797..804 "u&'foo'"
+            WHITESPACE@804..805 "\n"
+            STRING@805..811 "'\\010'"
+  SEMICOLON@811..812 ";"
+  WHITESPACE@812..814 "\n\n"
+  COMMENT@814..833 "-- error bit string"
+  WHITESPACE@833..834 "\n"
+  SELECT@834..851
+    SELECT_CLAUSE@834..851
+      SELECT_KW@834..840 "select"
+      WHITESPACE@840..841 " "
+      TARGET_LIST@841..851
+        TARGET@841..851
+          LITERAL@841..851
+            BIT_STRING@841..846 "b'01'"
+            WHITESPACE@846..847 " "
+            STRING@847..851 "'10'"
+  SEMICOLON@851..852 ";"
+  WHITESPACE@852..853 "\n"
+  SELECT@853..884
+    SELECT_CLAUSE@853..884
+      SELECT_KW@853..859 "select"
+      WHITESPACE@859..860 " "
+      TARGET_LIST@860..884
+        TARGET@860..884
+          LITERAL@860..884
+            BIT_STRING@860..865 "b'01'"
+            WHITESPACE@865..866 " "
+            COMMENT@866..879 "/* comment */"
+            WHITESPACE@879..880 " "
+            STRING@880..884 "'11'"
+  SEMICOLON@884..885 ";"
+  WHITESPACE@885..886 "\n"
+  SELECT@886..944
+    SELECT_CLAUSE@886..944
+      SELECT_KW@886..892 "select"
+      WHITESPACE@892..893 " "
+      TARGET_LIST@893..944
+        TARGET@893..944
+          LITERAL@893..944
+            BIT_STRING@893..898 "b'01'"
+            WHITESPACE@898..899 " "
+            COMMENT@899..912 "/* comment */"
+            WHITESPACE@912..913 " "
+            STRING@913..917 "'11'"
+            WHITESPACE@917..918 " "
+            COMMENT@918..939 "/* another comment */"
             WHITESPACE@939..940 " "
             STRING@940..944 "'10'"
-            WHITESPACE@944..945 " "
-            STRING@945..949 "'11'"
-  SEMICOLON@949..950 ";"
-  WHITESPACE@950..952 "\n\n"
-  COMMENT@952..972 "-- error byte string"
-  WHITESPACE@972..973 "\n"
-  SELECT@973..990
-    SELECT_CLAUSE@973..990
-      SELECT_KW@973..979 "select"
-      WHITESPACE@979..980 " "
-      TARGET_LIST@980..990
-        TARGET@980..990
-          LITERAL@980..990
-            BYTE_STRING@980..985 "x'0F'"
-            WHITESPACE@985..986 " "
-            STRING@986..990 "'10'"
-  SEMICOLON@990..991 ";"
-  WHITESPACE@991..992 "\n"
-  SELECT@992..1023
-    SELECT_CLAUSE@992..1023
-      SELECT_KW@992..998 "select"
-      WHITESPACE@998..999 " "
-      TARGET_LIST@999..1023
-        TARGET@999..1023
-          LITERAL@999..1023
-            BYTE_STRING@999..1004 "x'01'"
-            WHITESPACE@1004..1005 " "
-            COMMENT@1005..1018 "/* comment */"
-            WHITESPACE@1018..1019 " "
-            STRING@1019..1023 "'1F'"
-  SEMICOLON@1023..1024 ";"
-  WHITESPACE@1024..1025 "\n"
-  SELECT@1025..1083
-    SELECT_CLAUSE@1025..1083
-      SELECT_KW@1025..1031 "select"
-      WHITESPACE@1031..1032 " "
-      TARGET_LIST@1032..1083
-        TARGET@1032..1083
-          LITERAL@1032..1083
-            BYTE_STRING@1032..1037 "x'01'"
-            WHITESPACE@1037..1038 " "
-            COMMENT@1038..1051 "/* comment */"
-            WHITESPACE@1051..1052 " "
-            STRING@1052..1056 "'1F'"
-            WHITESPACE@1056..1057 " "
-            COMMENT@1057..1078 "/* another comment */"
-            WHITESPACE@1078..1079 " "
-            STRING@1079..1083 "'10'"
-  SEMICOLON@1083..1084 ";"
-  WHITESPACE@1084..1085 "\n"
-  SELECT@1085..1114
-    SELECT_CLAUSE@1085..1114
-      SELECT_KW@1085..1091 "select"
-      WHITESPACE@1091..1092 " "
-      TARGET_LIST@1092..1114
-        TARGET@1092..1114
-          LITERAL@1092..1114
-            BYTE_STRING@1092..1098 "x'1F1'"
-            WHITESPACE@1098..1099 " "
-            COMMENT@1099..1109 "-- comment"
-            WHITESPACE@1109..1110 "\n"
-            STRING@1110..1114 "'10'"
-  SEMICOLON@1114..1115 ";"
-  WHITESPACE@1115..1116 "\n"
-  SELECT@1116..1138
-    SELECT_CLAUSE@1116..1138
-      SELECT_KW@1116..1122 "select"
-      WHITESPACE@1122..1123 " "
-      TARGET_LIST@1123..1138
-        TARGET@1123..1138
-          LITERAL@1123..1138
-            BYTE_STRING@1123..1128 "x'1F'"
-            WHITESPACE@1128..1129 " "
-            STRING@1129..1133 "'F0'"
-            WHITESPACE@1133..1134 " "
-            STRING@1134..1138 "'11'"
-  SEMICOLON@1138..1139 ";"
-  WHITESPACE@1139..1140 "\n"
+  SEMICOLON@944..945 ";"
+  WHITESPACE@945..946 "\n"
+  SELECT@946..975
+    SELECT_CLAUSE@946..975
+      SELECT_KW@946..952 "select"
+      WHITESPACE@952..953 " "
+      TARGET_LIST@953..975
+        TARGET@953..975
+          LITERAL@953..975
+            BIT_STRING@953..959 "b'111'"
+            WHITESPACE@959..960 " "
+            COMMENT@960..970 "-- comment"
+            WHITESPACE@970..971 "\n"
+            STRING@971..975 "'10'"
+  SEMICOLON@975..976 ";"
+  WHITESPACE@976..977 "\n"
+  SELECT@977..999
+    SELECT_CLAUSE@977..999
+      SELECT_KW@977..983 "select"
+      WHITESPACE@983..984 " "
+      TARGET_LIST@984..999
+        TARGET@984..999
+          LITERAL@984..999
+            BIT_STRING@984..989 "b'10'"
+            WHITESPACE@989..990 " "
+            STRING@990..994 "'10'"
+            WHITESPACE@994..995 " "
+            STRING@995..999 "'11'"
+  SEMICOLON@999..1000 ";"
+  WHITESPACE@1000..1001 "\n"
+  SELECT@1001..1018
+    SELECT_CLAUSE@1001..1018
+      SELECT_KW@1001..1007 "select"
+      WHITESPACE@1007..1008 " "
+      TARGET_LIST@1008..1018
+        TARGET@1008..1018
+          LITERAL@1008..1018
+            BIT_STRING@1008..1013 "b'10'"
+            WHITESPACE@1013..1014 "\n"
+            STRING@1014..1018 "'20'"
+  SEMICOLON@1018..1019 ";"
+  WHITESPACE@1019..1021 "\n\n"
+  COMMENT@1021..1041 "-- error byte string"
+  WHITESPACE@1041..1042 "\n"
+  SELECT@1042..1059
+    SELECT_CLAUSE@1042..1059
+      SELECT_KW@1042..1048 "select"
+      WHITESPACE@1048..1049 " "
+      TARGET_LIST@1049..1059
+        TARGET@1049..1059
+          LITERAL@1049..1059
+            BYTE_STRING@1049..1054 "x'0F'"
+            WHITESPACE@1054..1055 " "
+            STRING@1055..1059 "'10'"
+  SEMICOLON@1059..1060 ";"
+  WHITESPACE@1060..1061 "\n"
+  SELECT@1061..1092
+    SELECT_CLAUSE@1061..1092
+      SELECT_KW@1061..1067 "select"
+      WHITESPACE@1067..1068 " "
+      TARGET_LIST@1068..1092
+        TARGET@1068..1092
+          LITERAL@1068..1092
+            BYTE_STRING@1068..1073 "x'01'"
+            WHITESPACE@1073..1074 " "
+            COMMENT@1074..1087 "/* comment */"
+            WHITESPACE@1087..1088 " "
+            STRING@1088..1092 "'1F'"
+  SEMICOLON@1092..1093 ";"
+  WHITESPACE@1093..1094 "\n"
+  SELECT@1094..1152
+    SELECT_CLAUSE@1094..1152
+      SELECT_KW@1094..1100 "select"
+      WHITESPACE@1100..1101 " "
+      TARGET_LIST@1101..1152
+        TARGET@1101..1152
+          LITERAL@1101..1152
+            BYTE_STRING@1101..1106 "x'01'"
+            WHITESPACE@1106..1107 " "
+            COMMENT@1107..1120 "/* comment */"
+            WHITESPACE@1120..1121 " "
+            STRING@1121..1125 "'1F'"
+            WHITESPACE@1125..1126 " "
+            COMMENT@1126..1147 "/* another comment */"
+            WHITESPACE@1147..1148 " "
+            STRING@1148..1152 "'10'"
+  SEMICOLON@1152..1153 ";"
+  WHITESPACE@1153..1154 "\n"
+  SELECT@1154..1183
+    SELECT_CLAUSE@1154..1183
+      SELECT_KW@1154..1160 "select"
+      WHITESPACE@1160..1161 " "
+      TARGET_LIST@1161..1183
+        TARGET@1161..1183
+          LITERAL@1161..1183
+            BYTE_STRING@1161..1167 "x'1F1'"
+            WHITESPACE@1167..1168 " "
+            COMMENT@1168..1178 "-- comment"
+            WHITESPACE@1178..1179 "\n"
+            STRING@1179..1183 "'10'"
+  SEMICOLON@1183..1184 ";"
+  WHITESPACE@1184..1185 "\n"
+  SELECT@1185..1207
+    SELECT_CLAUSE@1185..1207
+      SELECT_KW@1185..1191 "select"
+      WHITESPACE@1191..1192 " "
+      TARGET_LIST@1192..1207
+        TARGET@1192..1207
+          LITERAL@1192..1207
+            BYTE_STRING@1192..1197 "x'1F'"
+            WHITESPACE@1197..1198 " "
+            STRING@1198..1202 "'F0'"
+            WHITESPACE@1202..1203 " "
+            STRING@1203..1207 "'11'"
+  SEMICOLON@1207..1208 ";"
+  WHITESPACE@1208..1209 "\n"
+  SELECT@1209..1226
+    SELECT_CLAUSE@1209..1226
+      SELECT_KW@1209..1215 "select"
+      WHITESPACE@1215..1216 " "
+      TARGET_LIST@1216..1226
+        TARGET@1216..1226
+          LITERAL@1216..1226
+            BYTE_STRING@1216..1221 "x'1F'"
+            WHITESPACE@1221..1222 "\n"
+            STRING@1222..1226 "'G0'"
+  SEMICOLON@1226..1227 ";"
+  WHITESPACE@1227..1228 "\n"
 
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
@@ -522,107 +540,87 @@ error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
 27 │ select e'foo' 'bar' 'buzz';
    ╰╴                   ━
-error[syntax-error]: unknown literal prefix
-   ╭▸ 
-30 │ select u'foo' 'bar';
-   ╰╴       ━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-30 │ select u'foo' 'bar';
-   ╰╴             ━
-error[syntax-error]: unknown literal prefix
-   ╭▸ 
-31 │ select u'foo' /* comment */ 'bar';
-   ╰╴       ━
+32 │ select u&'foo' 'bar';
+   ╰╴              ━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-31 │ select u'foo' /* comment */ 'bar';
-   ╰╴              ━━━━━━━━━━━━━
-error[syntax-error]: unknown literal prefix
-   ╭▸ 
-32 │ select u'hello' /* comment */ 'bar' /* another comment */ ' world';
-   ╰╴       ━
+33 │ select u&'foo' /* comment */ 'bar';
+   ╰╴               ━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-32 │ select u'hello' /* comment */ 'bar' /* another comment */ ' world';
-   ╰╴                ━━━━━━━━━━━━━
+34 │ select u&'hello' /* comment */ 'bar' /* another comment */ ' world';
+   ╰╴                 ━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-32 │ select u'hello' /* comment */ 'bar' /* another comment */ ' world';
-   ╰╴                                    ━━━━━━━━━━━━━━━━━━━━━
-error[syntax-error]: unknown literal prefix
-   ╭▸ 
-33 │ select u'hello' -- comment
-   ╰╴       ━
+34 │ select u&'hello' /* comment */ 'bar' /* another comment */ ' world';
+   ╰╴                                     ━━━━━━━━━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-33 │ select u'hello' -- comment
-   ╰╴                ━━━━━━━━━━
-error[syntax-error]: unknown literal prefix
-   ╭▸ 
-35 │ select u'foo' 'bar' 'buzz';
-   ╰╴       ━
+35 │ select u&'hello' -- comment
+   ╰╴                 ━━━━━━━━━━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-35 │ select u'foo' 'bar' 'buzz';
-   ╰╴             ━
+37 │ select u&'foo' 'bar' 'buzz';
+   ╰╴              ━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-35 │ select u'foo' 'bar' 'buzz';
-   ╰╴                   ━
+37 │ select u&'foo' 'bar' 'buzz';
+   ╰╴                    ━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-38 │ select b'01' '10';
+42 │ select b'01' '10';
    ╰╴            ━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-39 │ select b'01' /* comment */ '11';
+43 │ select b'01' /* comment */ '11';
    ╰╴             ━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-40 │ select b'01' /* comment */ '11' /* another comment */ '10';
+44 │ select b'01' /* comment */ '11' /* another comment */ '10';
    ╰╴             ━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-40 │ select b'01' /* comment */ '11' /* another comment */ '10';
+44 │ select b'01' /* comment */ '11' /* another comment */ '10';
    ╰╴                                ━━━━━━━━━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-41 │ select b'111' -- comment
+45 │ select b'111' -- comment
    ╰╴              ━━━━━━━━━━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-43 │ select b'10' '10' '11';
+47 │ select b'10' '10' '11';
    ╰╴            ━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-43 │ select b'10' '10' '11';
+47 │ select b'10' '10' '11';
    ╰╴                 ━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-46 │ select x'0F' '10';
+52 │ select x'0F' '10';
    ╰╴            ━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-47 │ select x'01' /* comment */ '1F';
+53 │ select x'01' /* comment */ '1F';
    ╰╴             ━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-48 │ select x'01' /* comment */ '1F' /* another comment */ '10';
+54 │ select x'01' /* comment */ '1F' /* another comment */ '10';
    ╰╴             ━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-48 │ select x'01' /* comment */ '1F' /* another comment */ '10';
+54 │ select x'01' /* comment */ '1F' /* another comment */ '10';
    ╰╴                                ━━━━━━━━━━━━━━━━━━━━━
 error[syntax-error]: Comments between string literals are not allowed.
    ╭▸ 
-49 │ select x'1F1' -- comment
+55 │ select x'1F1' -- comment
    ╰╴              ━━━━━━━━━━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-51 │ select x'1F' 'F0' '11';
+57 │ select x'1F' 'F0' '11';
    ╰╴            ━
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 
-51 │ select x'1F' 'F0' '11';
+57 │ select x'1F' 'F0' '11';
    ╰╴                 ━
