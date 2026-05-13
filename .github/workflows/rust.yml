@@ -208,8 +208,35 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          registry-url: "https://registry.npmjs.org"
       - run: npm --version
-      - run: npm publish
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: release-squawk-*
+
+      - name: Stage platform binaries
+        run: |
+          set -euo pipefail
+          mkdir -p npm/darwin-x64/bin npm/darwin-arm64/bin npm/linux-x64/bin npm/linux-arm64/bin npm/win32-x64/bin
+          cp artifacts/release-squawk-darwin-x64/squawk-darwin-x64 npm/darwin-x64/bin/squawk
+          cp artifacts/release-squawk-darwin-arm64/squawk-darwin-arm64 npm/darwin-arm64/bin/squawk
+          cp artifacts/release-squawk-linux-x64/squawk-linux-x64 npm/linux-x64/bin/squawk
+          cp artifacts/release-squawk-linux-arm64/squawk-linux-arm64 npm/linux-arm64/bin/squawk
+          cp artifacts/release-squawk-windows-x64.exe/squawk-windows-x64.exe npm/win32-x64/bin/squawk.exe
+          chmod +x npm/darwin-x64/bin/squawk npm/darwin-arm64/bin/squawk npm/linux-x64/bin/squawk npm/linux-arm64/bin/squawk
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          for pkg in darwin-x64 darwin-arm64 linux-x64 linux-arm64 win32-x64; do
+            (cd "npm/$pkg" && npm publish --access public)
+          done
+          npm publish --access public
 
   publish-docker:
     if: startsWith(github.ref, 'refs/tags/')

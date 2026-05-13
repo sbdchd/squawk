@@ -1,0 +1,19 @@
+{
+  "name": "@squawk-cli/darwin-arm64",
+  "version": "0.0.0",
+  "description": "squawk-cli binary for darwin-arm64",
+  "repository": "git@github.com:sbdchd/squawk.git",
+  "license": "(Apache-2.0 OR MIT)",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "bin": {
+    "squawk": "bin/squawk"
+  },
+  "files": [
+    "bin/squawk"
+  ]
+}

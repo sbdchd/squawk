@@ -1,0 +1,19 @@
+{
+  "name": "@squawk-cli/win32-x64",
+  "version": "0.0.0",
+  "description": "squawk-cli binary for win32-x64",
+  "repository": "git@github.com:sbdchd/squawk.git",
+  "license": "(Apache-2.0 OR MIT)",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "bin": {
+    "squawk": "bin/squawk.exe"
+  },
+  "files": [
+    "bin/squawk.exe"
+  ]
+}
