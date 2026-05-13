@@ -132,6 +132,11 @@ mod tests {
     }
 
     #[test]
+    fn unicode_escape_string() {
+        assert_snapshot!(infer("select U&' \' UESCAPE '!'"), @"text");
+    }
+
+    #[test]
     fn boolean_true() {
         assert_snapshot!(infer("select true"), @"boolean");
     }
@@ -159,6 +164,11 @@ mod tests {
     #[test]
     fn bit_string() {
         assert_snapshot!(infer("select b'100'"), @"bit");
+    }
+
+    #[test]
+    fn byte_string() {
+        assert_snapshot!(infer("select x'FF'"), @"bit");
     }
 
     #[test]
