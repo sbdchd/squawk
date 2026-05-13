@@ -19,13 +19,6 @@
     "js/bin/squawk",
     "js/index.js"
   ],
-  "optionalDependencies": {
-    "@squawk-cli/darwin-x64": "2.51.0",
-    "@squawk-cli/darwin-arm64": "2.51.0",
-    "@squawk-cli/linux-x64": "2.51.0",
-    "@squawk-cli/linux-arm64": "2.51.0",
-    "@squawk-cli/win32-x64": "2.51.0"
-  },
   "devDependencies": {
     "@types/node": "^14.0.13",
     "@typescript-eslint/eslint-plugin": "^3.3.0",

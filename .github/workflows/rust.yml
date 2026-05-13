@@ -227,6 +227,14 @@ jobs:
           cp artifacts/release-squawk-windows-x64.exe/squawk-windows-x64.exe npm/win32-x64/bin/squawk.exe
           chmod +x npm/darwin-x64/bin/squawk npm/darwin-arm64/bin/squawk npm/linux-x64/bin/squawk npm/linux-arm64/bin/squawk
 
+      - name: Inject optionalDependencies into root package.json
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p 'require("./package.json").version')
+          for tgt in darwin-x64 darwin-arm64 linux-x64 linux-arm64 win32-x64; do
+            npm pkg set "optionalDependencies.@squawk-cli/${tgt}=${VERSION}"
+          done
+
       - name: Publish packages
         run: |
           set -euo pipefail
