@@ -10,9 +10,6 @@
   "cpu": [
     "x64"
   ],
-  "bin": {
-    "squawk": "bin/squawk"
-  },
   "files": [
     "bin/squawk"
   ]
