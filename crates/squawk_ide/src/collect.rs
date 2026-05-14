@@ -1,7 +1,6 @@
 use crate::ast_nav;
-use crate::builtins::builtins_file;
 use crate::column_name::ColumnName;
-use crate::db::{File, parse};
+use crate::db::{File, list_files, parse};
 use crate::goto_definition::goto_definition;
 use crate::infer::{Type, infer_type_from_expr, infer_type_from_ty};
 use crate::location::{Location, LocationKind};
@@ -216,7 +215,7 @@ pub(crate) fn create_table_as_columns_with_types(
     file: File,
     create_table_as: &ast::CreateTableAs,
 ) -> Vec<(Name, Option<Type>)> {
-    for file in [file, builtins_file(db)] {
+    for file in list_files(db, file) {
         let columns = select_columns_with_types(db, file, &create_table_as.query());
         if !columns.is_empty() {
             return columns;
@@ -426,7 +425,7 @@ pub(crate) fn view_like_columns_with_types(
         .collect();
 
     let mut base_columns = vec![];
-    for file in [file, builtins_file(db)] {
+    for file in list_files(db, file) {
         base_columns = select_columns_with_types(db, file, &create_view.query());
         if !base_columns.is_empty() {
             break;
@@ -464,7 +463,7 @@ pub(crate) fn with_table_columns_with_types(
         .collect();
 
     let mut base_columns = vec![];
-    for file in [file, builtins_file(db)] {
+    for file in list_files(db, file) {
         base_columns = with_table_query_columns_with_types(db, file, with_table.clone());
         if !base_columns.is_empty() {
             break;
@@ -686,7 +685,7 @@ fn columns_for_star_from_table_ptr(
             columns_for_star_from_alias(db, file, &from_item, &alias)
         }
         Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            for f in [file, builtins_file(db)] {
+            for f in list_files(db, file) {
                 let columns = with_table_columns_with_types(db, f, with_table.clone());
                 if !columns.is_empty() {
                     return columns;
@@ -826,7 +825,7 @@ pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodeP
             .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
             .collect(),
         Some(ast_nav::ParentSouce::WithTable(with_table)) => {
-            for file in [file, builtins_file(db)] {
+            for file in list_files(db, file) {
                 let columns: Vec<_> = with_table_columns_with_types(db, file, with_table.clone())
                     .into_iter()
                     .map(|(name, _)| name)

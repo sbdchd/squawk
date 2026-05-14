@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 use crate::binder;
 use crate::binder::Binder;
+use crate::builtins::builtins_file;
 
 #[salsa::input]
 pub struct File {
@@ -21,6 +22,11 @@ pub fn parse(db: &dyn Db, file: File) -> Parse<SourceFile> {
 #[salsa::tracked]
 pub fn line_index(db: &dyn Db, file: File) -> LineIndex {
     LineIndex::new(file.content(db))
+}
+
+#[inline]
+pub(crate) fn list_files(db: &dyn Db, file: File) -> impl Iterator<Item = File> {
+    [file, builtins_file(db)].into_iter()
 }
 
 #[salsa::tracked]

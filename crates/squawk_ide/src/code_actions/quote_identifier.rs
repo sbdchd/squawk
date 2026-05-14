@@ -1,9 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_syntax::{
-    ast::{self, AstNode},
-    quote::normalize_identifier,
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{db::File, offsets::token_from_offset};
 
@@ -18,25 +15,27 @@ pub(super) fn quote_identifier(
     let token = token_from_offset(db, file, offset)?;
     let parent = token.parent()?;
 
-    let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
-        name.syntax().clone()
-    } else if let Some(name_ref) = ast::NameRef::cast(parent) {
-        name_ref.syntax().clone()
+    let (is_quoted, text, text_range) = if let Some(name) = ast::Name::cast(parent.clone()) {
+        (name.is_quoted(), name.text(), name.syntax().text_range())
+    } else if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
+        (
+            name_ref.is_quoted(),
+            name_ref.text(),
+            name_ref.syntax().text_range(),
+        )
     } else {
         return None;
     };
 
-    let text = name_node.text().to_string();
-
-    if text.starts_with('"') {
+    if is_quoted {
         return None;
     }
 
-    let quoted = format!(r#""{}""#, normalize_identifier(&text));
+    let quoted = format!(r#""{text}""#);
 
     actions.push(CodeAction {
         title: "Quote identifier".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(name_node.text_range(), quoted)],
+        edits: vec![squawk_linter::Edit::replace(text_range, quoted)],
         kind: ActionKind::RefactorRewrite,
     });
 

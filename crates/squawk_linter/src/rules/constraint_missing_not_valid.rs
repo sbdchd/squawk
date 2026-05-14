@@ -3,7 +3,6 @@ use rustc_hash::FxHashSet;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Linter, Rule, Violation};
@@ -11,7 +10,7 @@ use crate::{Linter, Rule, Violation};
 pub fn tables_created_in_transaction(
     assume_in_transaction: bool,
     file: &ast::SourceFile,
-) -> FxHashSet<Identifier> {
+) -> FxHashSet<String> {
     let mut created_table_names = FxHashSet::default();
     let mut inside_transaction = assume_in_transaction;
     for stmt in file.stmts() {
@@ -30,7 +29,7 @@ pub fn tables_created_in_transaction(
                 else {
                     continue;
                 };
-                created_table_names.insert(Identifier::new(&table_name.text()));
+                created_table_names.insert(table_name.text());
             }
             _ => (),
         }
@@ -44,7 +43,7 @@ fn not_valid_validate_in_transaction(
     file: &ast::SourceFile,
 ) {
     let mut inside_transaction = assume_in_transaction;
-    let mut not_valid_names: FxHashSet<Identifier> = FxHashSet::default();
+    let mut not_valid_names: FxHashSet<String> = FxHashSet::default();
     for stmt in file.stmts() {
         match stmt {
             ast::Stmt::AlterTable(alter_table) => {
@@ -52,10 +51,9 @@ fn not_valid_validate_in_transaction(
                     match action {
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
                             if let Some(constraint_name) =
-                                validate_constraint.name_ref().map(|x| x.text().to_string())
+                                validate_constraint.name_ref().map(|x| x.text())
                             {
-                                if inside_transaction
-                                    && not_valid_names.contains(&Identifier::new(&constraint_name))
+                                if inside_transaction && not_valid_names.contains(&constraint_name)
                                 {
                                     ctx.report(
                                         Violation::for_node(
@@ -72,7 +70,7 @@ fn not_valid_validate_in_transaction(
                                 && let Some(constraint_name) =
                                     constraint.constraint_name().and_then(|c| c.name())
                             {
-                                not_valid_names.insert(Identifier::new(&constraint_name.text()));
+                                not_valid_names.insert(constraint_name.text());
                             }
                         }
                         _ => (),
@@ -109,14 +107,13 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                 .and_then(|x| x.path())
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
-                .map(|x| x.text().to_string())
+                .map(|x| x.text())
             else {
                 continue;
             };
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddConstraint(add_constraint) = action {
-                    if !tables_created.contains(&Identifier::new(&table_name))
-                        && add_constraint.not_valid().is_none()
+                    if !tables_created.contains(&table_name) && add_constraint.not_valid().is_none()
                     {
                         if let Some(ast::Constraint::UniqueConstraint(uc)) =
                             add_constraint.constraint()

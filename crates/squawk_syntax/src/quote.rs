@@ -44,7 +44,7 @@ pub fn unquote_ident(node: &SyntaxNode) -> Option<String> {
     Some(text.to_string())
 }
 
-fn needs_quoting(text: &str) -> bool {
+pub fn needs_quoting(text: &str) -> bool {
     if text.is_empty() {
         return true;
     }
@@ -74,14 +74,6 @@ pub fn is_reserved_word(text: &str) -> bool {
     RESERVED_KEYWORDS
         .binary_search(&text.to_ascii_lowercase().as_str())
         .is_ok()
-}
-
-pub fn normalize_identifier(text: &str) -> String {
-    // TODO: Cow/SmolStr/Salsa Interned?
-    text.strip_prefix('"')
-        .and_then(|t| t.strip_suffix('"'))
-        .map(|x| x.replace(r#""""#, "\""))
-        .unwrap_or_else(|| text.to_ascii_lowercase())
 }
 
 #[cfg(test)]

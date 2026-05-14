@@ -1,9 +1,8 @@
 use crate::ast_nav;
-use crate::builtins::builtins_file;
 use crate::collect;
 use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
-use crate::db::{File, bind, parse};
+use crate::db::{File, bind, list_files, parse};
 use crate::infer::infer_type_from_expr;
 use crate::location::{Location, LocationKind};
 use crate::name;
@@ -548,7 +547,7 @@ fn hover_qualified_star(db: &dyn Db, file: File, field_expr: ast::FieldExpr) -> 
 
 fn hover_unqualified_star(db: &dyn Db, file: File, target: ast::Target) -> Option<Hover> {
     let mut results = vec![];
-    for file in [file, builtins_file(db)] {
+    for file in list_files(db, file) {
         results = hover_unqualified_star_with_binder(db, file, &target);
         if results.is_empty() && target_has_schema_qualified_from_item(&target) {
             continue;

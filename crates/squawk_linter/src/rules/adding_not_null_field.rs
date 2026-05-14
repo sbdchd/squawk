@@ -3,18 +3,17 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Linter, Rule, Version, Violation};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct TableColumn {
-    table: Identifier,
-    column: Identifier,
+    table: String,
+    column: String,
 }
 
-fn is_not_null_check(expr: &ast::Expr) -> Option<Identifier> {
+fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
     let ast::Expr::BinExpr(bin_expr) = expr else {
         return None;
     };
@@ -30,18 +29,18 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<Identifier> {
     }
 
     match bin_expr.lhs()? {
-        ast::Expr::NameRef(name_ref) => Some(Identifier::new(&name_ref.text())),
+        ast::Expr::NameRef(name_ref) => Some(name_ref.text()),
         _ => None,
     }
 }
 
-fn get_table_name(alter_table: &ast::AlterTable) -> Option<Identifier> {
+fn get_table_name(alter_table: &ast::AlterTable) -> Option<String> {
     alter_table
         .relation_name()?
         .path()?
         .segment()?
         .name_ref()
-        .map(|x| Identifier::new(&x.text()))
+        .map(|x| x.text())
 }
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
@@ -49,12 +48,11 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
     let is_pg12_plus = ctx.settings.pg_version >= Version::new(12, None, None);
 
-    let mut not_null_constraints: FxHashMap<Identifier, TableColumn> = FxHashMap::default();
+    let mut not_null_constraints: FxHashMap<String, TableColumn> = FxHashMap::default();
     let mut validated_not_null_columns: FxHashSet<TableColumn> = FxHashSet::default();
     // Tables where VALIDATE CONSTRAINT was seen without a matching ADD CONSTRAINT
     // in the same file (cross-migration pattern).
-    let mut tables_with_external_validated_constraints: FxHashSet<Identifier> =
-        FxHashSet::default();
+    let mut tables_with_external_validated_constraints: FxHashSet<String> = FxHashSet::default();
 
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
@@ -76,7 +74,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             && let Some(column) = is_not_null_check(&expr)
                         {
                             not_null_constraints.insert(
-                                Identifier::new(&constraint_name.text()),
+                                constraint_name.text(),
                                 TableColumn {
                                     table: table.clone(),
                                     column,
@@ -88,9 +86,8 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                     ast::AlterTableAction::ValidateConstraint(validate_constraint)
                         if is_pg12_plus =>
                     {
-                        if let Some(constraint_name) = validate_constraint
-                            .name_ref()
-                            .map(|x| Identifier::new(&x.text()))
+                        if let Some(constraint_name) =
+                            validate_constraint.name_ref().map(|x| x.text())
                         {
                             if let Some(table_column) = not_null_constraints.get(&constraint_name)
                                 && table_column.table == table
@@ -113,8 +110,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         };
 
                         if is_pg12_plus
-                            && let Some(column) =
-                                alter_column.name_ref().map(|x| Identifier::new(&x.text()))
+                            && let Some(column) = alter_column.name_ref().map(|x| x.text())
                         {
                             let table_column = TableColumn {
                                 table: table.clone(),

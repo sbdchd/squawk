@@ -1,7 +1,6 @@
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
@@ -27,7 +26,7 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
                 .and_then(|x| x.name_ref())
             {
                 if create_index.concurrently_token().is_none()
-                    && !tables_created.contains(&Identifier::new(&table_name.text()))
+                    && !tables_created.contains(&table_name.text())
                 {
                     let fix = concurrently_fix(&create_index);
 

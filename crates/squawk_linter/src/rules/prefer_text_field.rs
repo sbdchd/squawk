@@ -1,7 +1,6 @@
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
@@ -23,17 +22,15 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
                 .path()
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
-                .map(|x| x.text().to_string())
+                .map(|x| x.text())
             else {
                 return false;
             };
             // if we don't have any args, then it's the same as `text`
-            Identifier::new(ty_name.as_str()) == Identifier::new("varchar")
-                && path_type.arg_list().is_some()
+            ty_name == "varchar" && path_type.arg_list().is_some()
         }
         ast::Type::CharType(char_type) => {
-            Identifier::new(&char_type.text()) == Identifier::new("varchar")
-                && char_type.arg_list().is_some()
+            char_type.text().eq_ignore_ascii_case("varchar") && char_type.arg_list().is_some()
         }
         ast::Type::BitType(_) => false,
         ast::Type::DoubleType(_) => false,

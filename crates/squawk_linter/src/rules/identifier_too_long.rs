@@ -3,7 +3,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use squawk_syntax::quote::normalize_identifier;
+use squawk_syntax::quote::needs_quoting;
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
@@ -22,13 +22,12 @@ pub(crate) fn identifier_too_long(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 }
 
 fn check_name(ctx: &mut Linter, name_like: &impl ast::NameLike) {
-    let text = name_like.syntax().text().to_string();
-    let ident = normalize_identifier(&text);
+    let ident = name_like.text();
     if ident.len() <= MAX_IDENT_BYTES {
         return;
     }
 
-    let fix = truncate(&text).map(|truncated| {
+    let fix = truncate(name_like).map(|truncated| {
         Fix::new(
             format!("Rename to `{truncated}`"),
             vec![Edit::replace(name_like.syntax().text_range(), truncated)],
@@ -45,15 +44,16 @@ fn check_name(ctx: &mut Linter, name_like: &impl ast::NameLike) {
     );
 }
 
-fn truncate(text: &str) -> Option<String> {
-    if has_escaped_quotes(text) {
+fn truncate(name_like: &impl ast::NameLike) -> Option<String> {
+    let raw = name_like.syntax().text().to_string();
+    if has_escaped_quotes(&raw) {
         return None;
     }
 
-    let unquoted = normalize_identifier(text);
-    let truncated = &unquoted[..unquoted.floor_char_boundary(MAX_IDENT_BYTES)];
+    let ident = name_like.text();
+    let truncated = &ident[..ident.floor_char_boundary(MAX_IDENT_BYTES)];
 
-    Some(if text.starts_with('"') {
+    Some(if raw.starts_with('"') || needs_quoting(truncated) {
         format!("\"{truncated}\"")
     } else {
         truncated.to_owned()

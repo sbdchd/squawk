@@ -7,7 +7,7 @@
 use std::ops::Range;
 
 use crate::ast::AstNode;
-use crate::unescape::escape_unicode_esc_str;
+use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
 use squawk_parser::SyntaxKind::*;
@@ -322,7 +322,7 @@ fn validate_unicode_esc_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
             UNICODE_ESC_STRING => unicode_esc = Some(token),
             UESCAPE_KW => seen_uescape = true,
             STRING if seen_uescape => {
-                escape_char = match uescape_char(&token) {
+                escape_char = match uescape_char(token.text()) {
                     Some(ch) => ch,
                     None => {
                         acc.push(SyntaxError::new(
@@ -397,7 +397,7 @@ fn validate_unicode_esc_ident(token: &SyntaxToken, acc: &mut Vec<SyntaxError>) {
             UESCAPE_KW => seen_uescape = true,
             STRING if seen_uescape => {
                 if let Some(string_token) = element.as_token() {
-                    escape_char = match uescape_char(string_token) {
+                    escape_char = match uescape_char(string_token.text()) {
                         Some(ch) => ch,
                         None => {
                             acc.push(SyntaxError::new(
@@ -430,26 +430,6 @@ fn offset_range(start: TextSize, range: Range<usize>) -> TextRange {
     let begin = start + TextSize::new(range.start as u32);
     let end = start + TextSize::new(range.end as u32);
     TextRange::new(begin, end)
-}
-
-// https://github.com/postgres/postgres/blob/228a1f9542792c6533ef74c2e7aefad0da1d9a7a/src/backend/parser/parser.c#L350
-const fn is_valid_uescape_char(byte: u8) -> bool {
-    !byte.is_ascii_hexdigit()
-        && byte != b'+'
-        && byte != b'\''
-        && byte != b'"'
-        && !matches!(
-            byte,
-            b' ' | b'\t' | b'\n' | b'\r' | /* b'\v' */ 0x0B | /* b'\f' */ 0x0C
-        )
-}
-
-fn uescape_char(string_token: &SyntaxToken) -> Option<char> {
-    let inner = string_token.text().strip_prefix('\'')?.strip_suffix('\'')?;
-    let &[byte] = inner.as_bytes() else {
-        return None;
-    };
-    is_valid_uescape_char(byte).then(|| char::from(byte))
 }
 
 fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {

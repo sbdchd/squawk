@@ -2,9 +2,8 @@ use rustc_hash::FxHashSet;
 
 use rowan::TextRange;
 use squawk_syntax::{
-    Parse, SourceFile, TokenText,
+    Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::visitors::check_not_allowed_types;
@@ -12,19 +11,13 @@ use crate::{Edit, Fix, Linter, Rule, Violation};
 
 use std::sync::OnceLock;
 
-fn char_types() -> &'static FxHashSet<Identifier> {
-    static CHAR_TYPES: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
-    CHAR_TYPES.get_or_init(|| {
-        FxHashSet::from_iter([
-            Identifier::new("char"),
-            Identifier::new("character"),
-            Identifier::new("bpchar"),
-        ])
-    })
+fn char_types() -> &'static FxHashSet<&'static str> {
+    static CHAR_TYPES: OnceLock<FxHashSet<&'static str>> = OnceLock::new();
+    CHAR_TYPES.get_or_init(|| FxHashSet::from_iter(["char", "character", "bpchar"]))
 }
 
-fn is_char_type(x: TokenText<'_>) -> bool {
-    char_types().contains(&Identifier::new(x.as_ref()))
+fn is_char_type(x: &str) -> bool {
+    char_types().contains(x.to_ascii_lowercase().as_str())
 }
 
 fn create_fix(range: TextRange, args: Option<ast::ArgList>) -> Fix {
@@ -43,7 +36,7 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
         .path()
         .and_then(|x| x.segment())
         .and_then(|x| x.name_ref())
-        && is_char_type(name_ref.text())
+        && is_char_type(&name_ref.text())
     {
         let fix = create_fix(name_ref.syntax().text_range(), path_type.arg_list());
         ctx.report(Violation::for_node(
@@ -55,7 +48,7 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
 }
 
 fn check_char_type(ctx: &mut Linter, char_type: ast::CharType) {
-    if is_char_type(char_type.text()) {
+    if is_char_type(&char_type.text()) {
         let fix = create_fix(char_type.syntax().text_range(), char_type.arg_list());
         ctx.report(Violation::for_node(
             Rule::BanCharField,

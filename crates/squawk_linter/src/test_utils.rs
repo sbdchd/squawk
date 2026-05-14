@@ -83,11 +83,7 @@ pub(crate) fn fix_sql_with(sql: &str, settings: LinterSettings, rule: Rule) -> S
     let mut linter = Linter::from([rule]);
     linter.settings = settings;
     let errors = linter.lint(&file, &result);
-    assert_eq!(
-        errors.len(),
-        0,
-        "Fixes should remove all the linter errors."
-    );
+    assert_eq!(errors, vec![], "Fixes should remove all the linter errors.");
 
     result
 }

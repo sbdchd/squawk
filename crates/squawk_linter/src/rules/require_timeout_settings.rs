@@ -2,7 +2,6 @@ use rowan::TextSize;
 use squawk_syntax::{
     Parse, SourceFile, SyntaxKind,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Edit, Fix, Linter, Rule, Violation, analyze};
@@ -62,10 +61,10 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                     if let Some(segment) = path.segment()
                         && let Some(name_ref) = segment.name_ref()
                     {
-                        let name_ident = Identifier::new(name_ref.text().as_str());
-                        if name_ident == Identifier::new("lock_timeout") {
+                        let name = name_ref.text();
+                        if name == "lock_timeout" {
                             lock_timeout = ReportOnce::Present;
-                        } else if name_ident == Identifier::new("statement_timeout") {
+                        } else if name == "statement_timeout" {
                             stmt_timeout = ReportOnce::Present;
                         }
                     }

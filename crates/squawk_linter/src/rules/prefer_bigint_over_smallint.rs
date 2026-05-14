@@ -1,8 +1,7 @@
 use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::quote::normalize_identifier;
-use squawk_syntax::{Parse, SourceFile, ast, identifier::Identifier};
+use squawk_syntax::{Parse, SourceFile, ast};
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
@@ -11,20 +10,14 @@ use crate::visitors::is_not_valid_int_type;
 
 use std::sync::OnceLock;
 
-fn small_int_types() -> &'static FxHashSet<Identifier> {
-    static SMALL_INT_TYPES: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
-    SMALL_INT_TYPES.get_or_init(|| {
-        FxHashSet::from_iter([
-            Identifier::new("smallint"),
-            Identifier::new("int2"),
-            Identifier::new("smallserial"),
-            Identifier::new("serial2"),
-        ])
-    })
+fn small_int_types() -> &'static FxHashSet<&'static str> {
+    static SMALL_INT_TYPES: OnceLock<FxHashSet<&'static str>> = OnceLock::new();
+    SMALL_INT_TYPES
+        .get_or_init(|| FxHashSet::from_iter(["smallint", "int2", "smallserial", "serial2"]))
 }
 
 fn smallint_to_bigint(smallint_type: &str) -> &'static str {
-    match normalize_identifier(smallint_type).as_str() {
+    match smallint_type {
         "smallint" => "bigint",
         "int2" => "int8",
         "smallserial" => "bigserial",
@@ -34,9 +27,19 @@ fn smallint_to_bigint(smallint_type: &str) -> &'static str {
 }
 
 fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
-    let type_name = ty.syntax().first_token()?;
-    let i64 = smallint_to_bigint(type_name.text());
-    let edit = Edit::replace(type_name.text_range(), i64);
+    let name = match ty {
+        ast::Type::ArrayType(array_type) => return create_bigint_fix(&array_type.ty()?),
+        ast::Type::PathType(path_type) => path_type.path()?.segment()?.name_ref()?,
+        ast::Type::BitType(_)
+        | ast::Type::CharType(_)
+        | ast::Type::DoubleType(_)
+        | ast::Type::ExprType(_)
+        | ast::Type::PercentType(_)
+        | ast::Type::TimeType(_)
+        | ast::Type::IntervalType(_) => return None,
+    };
+    let i64 = smallint_to_bigint(&name.text());
+    let edit = Edit::replace(name.syntax().text_range(), i64);
     Some(Fix::new(
         format!("Replace with a 64-bit integer type: `{i64}`"),
         vec![edit],
