@@ -28,7 +28,7 @@ impl Name {
         let text = text
             .strip_prefix('"')
             .and_then(|t| t.strip_suffix('"'))
-            .map(|x| x.replace(r#""""#, "\"").into())
+            .map(|x| x.replace(r#""""#, "\""))
             .unwrap_or(text.to_ascii_lowercase());
         Name(text.into())
     }

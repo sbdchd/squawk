@@ -403,7 +403,7 @@ impl ast::NameRef {
 
     #[inline]
     pub fn is_quoted(&self) -> bool {
-        is_quoted(&self.syntax())
+        is_quoted(self.syntax())
     }
 }
 
@@ -415,17 +415,18 @@ impl ast::Name {
 
     #[inline]
     pub fn is_quoted(&self) -> bool {
-        is_quoted(&self.syntax())
+        is_quoted(self.syntax())
     }
 }
 
 fn is_quoted(node: &SyntaxNode) -> bool {
     let text = node.text();
-    match (text.char_at(0.into()), text.char_at(1.into())) {
-        (Some('u' | 'U'), Some('"')) => true,
-        (Some('"'), Some(_)) => true,
-        _ => false,
-    }
+    let first = text.char_at(0.into());
+    let second = text.char_at(1.into());
+    matches!(
+        (first, second),
+        (Some('u' | 'U'), Some('"')) | (Some('"'), Some(_))
+    )
 }
 
 // TODO: return a NewType wrapper around String?
