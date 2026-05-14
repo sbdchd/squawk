@@ -1,5 +1,6 @@
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{column_name::ColumnName, db::File, offsets::token_from_offset, symbols::Name};
@@ -30,9 +31,7 @@ pub(super) fn remove_redundant_alias(
 
     actions.push(CodeAction {
         title: "Remove redundant alias".to_owned(),
-        edits: vec![squawk_linter::Edit::delete(TextRange::new(
-            expr_end, alias_end,
-        ))],
+        edits: vec![Edit::delete(TextRange::new(expr_end, alias_end))],
         kind: ActionKind::QuickFix,
     });
 

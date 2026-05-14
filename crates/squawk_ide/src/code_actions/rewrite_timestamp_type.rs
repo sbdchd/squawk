@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{db::File, offsets::token_from_offset};
@@ -34,10 +35,7 @@ pub(super) fn rewrite_timestamp_type(
 
     actions.push(CodeAction {
         title: format!("Rewrite as `{replacement}`"),
-        edits: vec![squawk_linter::Edit::replace(
-            time_type.syntax().text_range(),
-            replacement,
-        )],
+        edits: vec![Edit::replace(time_type.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 

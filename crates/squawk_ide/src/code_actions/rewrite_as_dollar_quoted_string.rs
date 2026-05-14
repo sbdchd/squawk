@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::{SyntaxKind, ast::AstNode};
 
 use crate::db::{File, parse};
@@ -21,10 +22,7 @@ pub(super) fn rewrite_as_dollar_quoted_string(
     let replacement = string_to_dollar_quoted(string.text())?;
     actions.push(CodeAction {
         title: "Rewrite as dollar-quoted string".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            string.text_range(),
-            replacement,
-        )],
+        edits: vec![Edit::replace(string.text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 

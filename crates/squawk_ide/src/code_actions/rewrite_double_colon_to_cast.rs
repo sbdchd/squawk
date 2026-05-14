@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{db::File, offsets::token_from_offset};
@@ -29,10 +30,7 @@ pub(super) fn rewrite_double_colon_to_cast(
 
     actions.push(CodeAction {
         title: "Rewrite as cast function `cast()`".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            cast_expr.syntax().text_range(),
-            replacement,
-        )],
+        edits: vec![Edit::replace(cast_expr.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 

@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{db::File, offsets::token_from_offset};
@@ -21,10 +22,7 @@ pub(super) fn rewrite_table_as_select(
 
     actions.push(CodeAction {
         title: "Rewrite as `select`".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            table.syntax().text_range(),
-            replacement,
-        )],
+        edits: vec![Edit::replace(table.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 

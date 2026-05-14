@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 use squawk_syntax::quote::quote_column_alias;
 
@@ -35,7 +36,7 @@ pub(super) fn add_explicit_alias(
 
     actions.push(CodeAction {
         title: "Add explicit alias".to_owned(),
-        edits: vec![squawk_linter::Edit::insert(replacement, expr_end)],
+        edits: vec![Edit::insert(replacement, expr_end)],
         kind: ActionKind::RefactorRewrite,
     });
 

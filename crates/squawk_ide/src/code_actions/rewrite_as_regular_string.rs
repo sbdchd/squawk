@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::{SyntaxKind, ast::AstNode};
 
 use crate::db::{File, parse};
@@ -21,10 +22,7 @@ pub(super) fn rewrite_as_regular_string(
     let replacement = dollar_quoted_to_string(dollar_string.text())?;
     actions.push(CodeAction {
         title: "Rewrite as regular string".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            dollar_string.text_range(),
-            replacement,
-        )],
+        edits: vec![Edit::replace(dollar_string.text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 

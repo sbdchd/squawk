@@ -1,5 +1,6 @@
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{
@@ -61,7 +62,7 @@ pub(super) fn rewrite_select_as_values(
 
     actions.push(CodeAction {
         title: "Rewrite as `values`".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(select_range, values_stmt)],
+        edits: vec![Edit::replace(select_range, values_stmt)],
         kind: ActionKind::RefactorRewrite,
     });
 

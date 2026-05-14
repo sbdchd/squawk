@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{db::File, offsets::token_from_offset};
@@ -35,7 +36,7 @@ pub(super) fn quote_identifier(
 
     actions.push(CodeAction {
         title: "Quote identifier".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(text_range, quoted)],
+        edits: vec![Edit::replace(text_range, quoted)],
         kind: ActionKind::RefactorRewrite,
     });
 

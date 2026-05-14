@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{db::File, offsets::token_from_offset};
@@ -23,7 +24,7 @@ pub(super) fn rewrite_from(
 
     actions.push(CodeAction {
         title: "Insert leading `select *`".to_owned(),
-        edits: vec![squawk_linter::Edit::insert(
+        edits: vec![Edit::insert(
             "select * ".to_owned(),
             select.syntax().text_range().start(),
         )],

@@ -1,5 +1,6 @@
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
@@ -38,8 +39,8 @@ pub(super) fn rewrite_leading_from(
     actions.push(CodeAction {
         title: "Swap `from` and `select` clauses".to_owned(),
         edits: vec![
-            squawk_linter::Edit::delete(select_with_ws),
-            squawk_linter::Edit::insert(
+            Edit::delete(select_with_ws),
+            Edit::insert(
                 format!("{} ", select_text),
                 from_clause.syntax().text_range().start(),
             ),

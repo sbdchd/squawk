@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{db::File, offsets::token_from_offset};
@@ -23,10 +24,7 @@ pub(super) fn rewrite_not_equals_operator(
 
     actions.push(CodeAction {
         title: title.to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            op_token.text_range(),
-            replacement.to_owned(),
-        )],
+        edits: vec![Edit::replace(op_token.text_range(), replacement.to_owned())],
         kind: ActionKind::RefactorRewrite,
     });
 

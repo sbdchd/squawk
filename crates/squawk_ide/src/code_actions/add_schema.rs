@@ -1,5 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use super::{ActionKind, CodeAction};
@@ -45,7 +46,7 @@ pub(super) fn add_schema(
 
     actions.push(CodeAction {
         title: "Add schema".to_owned(),
-        edits: vec![squawk_linter::Edit::insert(replacement, position)],
+        edits: vec![Edit::insert(replacement, position)],
         kind: ActionKind::RefactorRewrite,
     });
 

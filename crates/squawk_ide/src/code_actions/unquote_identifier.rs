@@ -2,6 +2,7 @@ use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 
+use squawk_linter::Edit;
 use squawk_syntax::quote::unquote_ident;
 
 use crate::{db::File, offsets::token_from_offset};
@@ -29,10 +30,7 @@ pub(super) fn unquote_identifier(
 
     actions.push(CodeAction {
         title: "Unquote identifier".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            name_node.text_range(),
-            unquoted,
-        )],
+        edits: vec![Edit::replace(name_node.text_range(), unquoted)],
         kind: ActionKind::RefactorRewrite,
     });
 
