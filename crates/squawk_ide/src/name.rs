@@ -2,8 +2,6 @@ use smol_str::SmolStr;
 use squawk_syntax::ast::{self, AstNode};
 use std::fmt;
 
-use squawk_syntax::quote::normalize_identifier;
-
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) struct Name(pub(crate) SmolStr);
 
@@ -23,15 +21,20 @@ impl fmt::Display for Schema {
 }
 
 impl Name {
+    // TODO: we should get rid of this and update the ast methods to return
+    // normalized idents.
     pub(crate) fn from_string(text: impl Into<SmolStr>) -> Self {
         let text = text.into();
-        let normalized = normalize_identifier(&text);
-        Name(normalized.into())
+        let text = text
+            .strip_prefix('"')
+            .and_then(|t| t.strip_suffix('"'))
+            .map(|x| x.replace(r#""""#, "\""))
+            .unwrap_or(text.to_ascii_lowercase());
+        Name(text.into())
     }
     pub(crate) fn from_node(node: &impl ast::NameLike) -> Self {
-        let text = node.syntax().text().to_string();
-        let normalized = normalize_identifier(&text);
-        Name(normalized.into())
+        let text = node.text();
+        Name(text.into())
     }
 }
 
@@ -198,7 +201,7 @@ mod test {
     use super::*;
     #[test]
     fn name_case_insensitive_compare() {
-        assert_eq!(Name::from_string("foo"), Name::from_string("FOO"));
+        assert_eq!(Name::from_string("foo"), Name::from_string(r#""foo""#));
     }
 
     #[test]

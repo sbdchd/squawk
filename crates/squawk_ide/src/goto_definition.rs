@@ -1,5 +1,4 @@
-use crate::builtins::builtins_file;
-use crate::db::{File, parse};
+use crate::db::{File, list_files, parse};
 use crate::location::{Location, LocationKind};
 use crate::offsets::token_from_offset;
 use crate::resolve;
@@ -66,7 +65,7 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for definition_file in [file, builtins_file(db)] {
+        for definition_file in list_files(db, file) {
             if let Some(locations) = resolve::resolve_name_ref(db, definition_file, &name_ref) {
                 return locations;
             }
@@ -82,7 +81,7 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
         }
     });
     if let Some(ty) = type_node {
-        for definition_file in [file, builtins_file(db)] {
+        for definition_file in list_files(db, file) {
             let position = token.text_range().start();
             if let Some(ptr) =
                 resolve::resolve_type_ptr_from_type(db, definition_file, &ty, position)

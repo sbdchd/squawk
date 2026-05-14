@@ -1,7 +1,6 @@
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Linter, Rule, Violation};
@@ -20,7 +19,7 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                 .and_then(|x| x.path())
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
-                .map(|x| x.text().to_string())
+                .map(|x| x.text())
             else {
                 continue;
             };
@@ -31,7 +30,7 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                             add_constraint.constraint()
                         {
                             if unique_constraint.using_index().is_none()
-                                && !tables_created.contains(&Identifier::new(&table_name))
+                                && !tables_created.contains(&table_name)
                             {
                                 ctx.report(
                                     Violation::for_node(

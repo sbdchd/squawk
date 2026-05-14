@@ -36,6 +36,7 @@ use rowan::Direction;
 
 use crate::ast;
 use crate::ast::AstNode;
+use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxKind, SyntaxNode, SyntaxToken, TokenText};
 
 use super::support;
@@ -396,16 +397,79 @@ impl ast::CompoundSelect {
 
 impl ast::NameRef {
     #[inline]
-    pub fn text(&self) -> TokenText<'_> {
-        text_of_first_token(self.syntax())
+    pub fn text(&self) -> String {
+        normalize_name_node(self.syntax())
+    }
+
+    #[inline]
+    pub fn is_quoted(&self) -> bool {
+        is_quoted(self.syntax())
     }
 }
 
 impl ast::Name {
     #[inline]
-    pub fn text(&self) -> TokenText<'_> {
-        text_of_first_token(self.syntax())
+    pub fn text(&self) -> String {
+        normalize_name_node(self.syntax())
     }
+
+    #[inline]
+    pub fn is_quoted(&self) -> bool {
+        is_quoted(self.syntax())
+    }
+}
+
+fn is_quoted(node: &SyntaxNode) -> bool {
+    let text = node.text();
+    let first = text.char_at(0.into());
+    let second = text.char_at(1.into());
+    matches!(
+        (first, second),
+        (Some('u' | 'U'), Some('"')) | (Some('"'), Some(_))
+    )
+}
+
+// TODO: return a NewType wrapper around String?
+fn normalize_name_node(node: &SyntaxNode) -> String {
+    let mut tokens = node
+        .children_with_tokens()
+        .filter_map(|el| el.into_token())
+        .filter(|t| !t.kind().is_trivia());
+
+    let Some(ident_token) = tokens.next() else {
+        return String::new();
+    };
+    let raw = ident_token.text();
+
+    let unicode_inner = raw
+        .strip_prefix(['u', 'U'])
+        .and_then(|s| s.strip_prefix("&\""))
+        .and_then(|s| s.strip_suffix('"'));
+
+    if let Some(inner) = unicode_inner {
+        let mut escape_char = '\\';
+        if let Some(uesc) = tokens.next()
+            && uesc.kind() == SyntaxKind::UESCAPE_KW
+            && let Some(token) = tokens.next()
+            && let Some(ch) = uescape_char(token.text())
+        {
+            escape_char = ch;
+        }
+
+        let inner = inner.replace(r#""""#, "\"");
+        let mut result = String::with_capacity(inner.len());
+        escape_unicode_esc_str(&inner, escape_char, |_range, r| {
+            if let Ok(ch) = r {
+                result.push(ch);
+            }
+        });
+        return result;
+    }
+
+    raw.strip_prefix('"')
+        .and_then(|t| t.strip_suffix('"'))
+        .map(|x| x.replace(r#""""#, "\""))
+        .unwrap_or_else(|| raw.to_ascii_lowercase())
 }
 
 impl ast::CharType {
@@ -509,8 +573,18 @@ impl ast::SelectVariant {
 impl ast::HasParamList for ast::FunctionSig {}
 impl ast::HasParamList for ast::Aggregate {}
 
-impl ast::NameLike for ast::Name {}
-impl ast::NameLike for ast::NameRef {}
+impl ast::NameLike for ast::Name {
+    #[inline]
+    fn text(&self) -> String {
+        self.text()
+    }
+}
+impl ast::NameLike for ast::NameRef {
+    #[inline]
+    fn text(&self) -> String {
+        self.text()
+    }
+}
 
 impl ast::HasWithClause for ast::Select {}
 impl ast::HasWithClause for ast::SelectInto {}
@@ -523,14 +597,77 @@ impl ast::HasCreateTable for ast::CreateForeignTable {}
 impl ast::HasCreateTable for ast::CreateTableLike {}
 
 #[test]
+fn name() {
+    assert_snapshot!(extract_name("select 1 foo"), @"foo");
+    assert_snapshot!(extract_name("select 1 FOO"), @"foo");
+    assert_snapshot!(extract_name(r#"select 1 "foo""#), @"foo");
+    assert_snapshot!(extract_name(r#"select 1 "Foo""#), @"Foo");
+    assert_snapshot!(extract_name(r#"select 1 "FOO""#), @"FOO");
+    assert_snapshot!(extract_name(r#"select 1 U&"\0066\006f\006f""#), @"foo");
+    assert_snapshot!(extract_name(r#"select 1 U&"@0066@006f@006f" uescape '@'"#), @"foo");
+
+    fn extract_name(source_code: &str) -> String {
+        let parse = SourceFile::parse(source_code);
+        assert!(parse.errors().is_empty());
+        let stmt = parse.tree().stmts().next().unwrap();
+        let ast::Stmt::Select(select) = stmt else {
+            unreachable!()
+        };
+        let name = select
+            .select_clause()
+            .unwrap()
+            .target_list()
+            .unwrap()
+            .targets()
+            .next()
+            .unwrap()
+            .as_name()
+            .unwrap()
+            .name()
+            .unwrap();
+        name.text().to_string()
+    }
+}
+
+#[test]
+fn name_ref() {
+    assert_snapshot!(extract_name_ref("select foo"), @"foo");
+    assert_snapshot!(extract_name_ref("select FOO"), @"foo");
+    assert_snapshot!(extract_name_ref(r#"select "foo""#), @"foo");
+    assert_snapshot!(extract_name_ref(r#"select "Foo""#), @"Foo");
+    assert_snapshot!(extract_name_ref(r#"select "FOO""#), @"FOO");
+    assert_snapshot!(extract_name_ref(r#"select U&"\0066\006f\006f""#), @"foo");
+    assert_snapshot!(extract_name_ref(r#"select U&"@0066@006f@006f" uescape '@'"#), @"foo");
+
+    fn extract_name_ref(source_code: &str) -> String {
+        let parse = SourceFile::parse(source_code);
+        assert!(parse.errors().is_empty());
+        let stmt = parse.tree().stmts().next().unwrap();
+        let ast::Stmt::Select(select) = stmt else {
+            unreachable!()
+        };
+        let select_clause = select.select_clause().unwrap();
+        let target = select_clause
+            .target_list()
+            .unwrap()
+            .targets()
+            .next()
+            .unwrap();
+        let ast::Expr::NameRef(name_ref) = target.expr().unwrap() else {
+            unreachable!()
+        };
+        name_ref.text().to_string()
+    }
+}
+
+#[test]
 fn index_expr() {
     let source_code = "
         select foo[bar];
     ";
     let parse = SourceFile::parse(source_code);
     assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    let stmt = file.stmts().next().unwrap();
+    let stmt = parse.tree().stmts().next().unwrap();
     let ast::Stmt::Select(select) = stmt else {
         unreachable!()
     };
@@ -558,8 +695,7 @@ fn slice_expr() {
     ";
     let parse = SourceFile::parse(source_code);
     assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    let stmt = file.stmts().next().unwrap();
+    let stmt = parse.tree().stmts().next().unwrap();
     let ast::Stmt::Select(select) = stmt else {
         unreachable!()
     };
@@ -606,8 +742,7 @@ fn field_expr() {
     ";
     let parse = SourceFile::parse(source_code);
     assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    let stmt = file.stmts().next().unwrap();
+    let stmt = parse.tree().stmts().next().unwrap();
     let ast::Stmt::Select(select) = stmt else {
         unreachable!()
     };
@@ -634,8 +769,7 @@ fn between_expr() {
     ";
     let parse = SourceFile::parse(source_code);
     assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    let stmt = file.stmts().next().unwrap();
+    let stmt = parse.tree().stmts().next().unwrap();
     let ast::Stmt::Select(select) = stmt else {
         unreachable!()
     };
@@ -730,8 +864,8 @@ fn cast_expr() {
     fn extract_expr(sql: &str) -> ast::CastExpr {
         let parse = SourceFile::parse(sql);
         assert!(parse.errors().is_empty());
-        let file: SourceFile = parse.tree();
-        let node = file
+        let node = parse
+            .tree()
             .stmts()
             .map(|x| match x {
                 ast::Stmt::Select(select) => select
@@ -764,8 +898,7 @@ fn op_sig() {
     ";
     let parse = SourceFile::parse(source_code);
     assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    let stmt = file.stmts().next().unwrap();
+    let stmt = parse.tree().stmts().next().unwrap();
     let ast::Stmt::AlterOperator(alter_op) = stmt else {
         unreachable!()
     };
@@ -783,8 +916,7 @@ fn cast_sig() {
     ";
     let parse = SourceFile::parse(source_code);
     assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    let stmt = file.stmts().next().unwrap();
+    let stmt = parse.tree().stmts().next().unwrap();
     let ast::Stmt::DropCast(alter_op) = stmt else {
         unreachable!()
     };
@@ -799,8 +931,7 @@ fn cast_sig() {
 fn extract_vacuum(sql: &str) -> ast::Vacuum {
     let parse = SourceFile::parse(sql);
     assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    let stmt = file.stmts().next().unwrap();
+    let stmt = parse.tree().stmts().next().unwrap();
     let ast::Stmt::Vacuum(vacuum) = stmt else {
         unreachable!()
     };

@@ -152,6 +152,26 @@ where
     }
 }
 
+// https://github.com/postgres/postgres/blob/228a1f9542792c6533ef74c2e7aefad0da1d9a7a/src/backend/parser/parser.c#L350
+const fn is_valid_uescape_char(byte: u8) -> bool {
+    !byte.is_ascii_hexdigit()
+        && byte != b'+'
+        && byte != b'\''
+        && byte != b'"'
+        && !matches!(
+            byte,
+            b' ' | b'\t' | b'\n' | b'\r' | /* b'\v' */ 0x0B | /* b'\f' */ 0x0C
+        )
+}
+
+pub(crate) fn uescape_char(text: &str) -> Option<char> {
+    let inner = text.strip_prefix('\'')?.strip_suffix('\'')?;
+    let &[byte] = inner.as_bytes() else {
+        return None;
+    };
+    is_valid_uescape_char(byte).then(|| char::from(byte))
+}
+
 #[cfg(test)]
 mod tests {
     use insta::assert_snapshot;

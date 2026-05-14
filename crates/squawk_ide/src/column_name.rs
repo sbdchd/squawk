@@ -3,8 +3,6 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use squawk_syntax::quote::normalize_identifier;
-
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum ColumnName {
     Column(String),
@@ -29,9 +27,10 @@ impl ColumnName {
         if let Some(as_name) = target.as_name()
             && let Some(name_node) = as_name.name()
         {
-            let text = name_node.text();
-            let normalized = normalize_identifier(&text);
-            return Some((ColumnName::Column(normalized), name_node.syntax().clone()));
+            return Some((
+                ColumnName::Column(name_node.text()),
+                name_node.syntax().clone(),
+            ));
         }
         Self::inferred_from_target(target)
     }
@@ -133,7 +132,7 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 name.push_str("tz");
             };
             return Some((
-                ColumnName::new(name.to_string(), unknown_column),
+                ColumnName::new(name, unknown_column),
                 time_type.syntax().clone(),
             ));
         }
@@ -228,9 +227,10 @@ fn name_from_name_ref(
             }
         }
     }
-    let text = name_ref.text();
-    let normalized = normalize_identifier(&text);
-    return Some((ColumnName::Column(normalized), name_ref.syntax().clone()));
+    return Some((
+        ColumnName::Column(name_ref.text()),
+        name_ref.syntax().clone(),
+    ));
 }
 
 /*

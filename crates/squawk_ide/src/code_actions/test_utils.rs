@@ -95,7 +95,7 @@ fn code_action_not_applicable_(
     allow_errors: bool,
 ) -> bool {
     let fixture = Fixture::new(sql);
-    let offset = fixture.marker().offset();
+    let offset = fixture.marker().offset_before();
     let sql = fixture.sql();
     let db = Database::default();
     let file = File::new(&db, sql.into());

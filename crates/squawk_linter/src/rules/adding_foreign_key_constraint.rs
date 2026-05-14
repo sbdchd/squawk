@@ -1,7 +1,6 @@
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{
@@ -27,7 +26,7 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                         match action {
                             ast::AlterTableAction::AddConstraint(add_constraint) => {
                                 if add_constraint.not_valid().is_some()
-                                    || tables_created.contains(&Identifier::new(&table_name.text()))
+                                    || tables_created.contains(&table_name.text())
                                 {
                                     // Adding foreign key is okay when:
                                     // - NOT VALID is specified.

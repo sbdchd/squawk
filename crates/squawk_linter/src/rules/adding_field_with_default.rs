@@ -2,20 +2,19 @@ use std::sync::OnceLock;
 
 use rustc_hash::FxHashSet;
 
+use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, SyntaxKind};
-use squawk_syntax::{ast, identifier::Identifier};
 
 use crate::{Linter, Rule, Version, Violation};
 
-fn non_volatile_funcs() -> &'static FxHashSet<Identifier> {
-    static NON_VOLATILE_FUNCS: OnceLock<FxHashSet<Identifier>> = OnceLock::new();
+fn non_volatile_funcs() -> &'static FxHashSet<&'static str> {
+    static NON_VOLATILE_FUNCS: OnceLock<FxHashSet<&'static str>> = OnceLock::new();
     NON_VOLATILE_FUNCS.get_or_init(|| {
         NON_VOLATILE_BUILT_IN_FUNCTIONS
             .split('\n')
             .map(|x| x.trim())
             .filter(|x| !x.is_empty())
-            .map(Identifier::new)
             .collect()
     })
 }
@@ -41,8 +40,7 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
                     return false;
                 };
 
-                let non_volatile_name =
-                    non_volatile_funcs().contains(&Identifier::new(name_ref.text().as_str()));
+                let non_volatile_name = non_volatile_funcs().contains(name_ref.text().as_str());
 
                 no_args && non_volatile_name
             } else {

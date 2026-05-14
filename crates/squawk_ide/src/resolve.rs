@@ -1,4 +1,4 @@
-use crate::ast_nav;
+use crate::{ast_nav, db::list_files};
 use rowan::TextSize;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
@@ -6,7 +6,6 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::builtins::builtins_file;
 use crate::column_name::ColumnName;
 use crate::db::File;
 use crate::location::{Location, LocationKind};
@@ -1379,7 +1378,7 @@ pub(crate) fn resolve_table_name(
     position: TextSize,
 ) -> Option<(File, ResolvedTableName)> {
     use ResolvedTableName::*;
-    for file in [file, builtins_file(db)] {
+    for file in list_files(db, file) {
         let Some((ptr, kind)) = resolve_table_like(db, file, None, table_name, schema, position)
         else {
             continue;

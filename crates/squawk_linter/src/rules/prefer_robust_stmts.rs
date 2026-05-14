@@ -3,7 +3,6 @@ use rustc_hash::FxHashMap;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
@@ -17,7 +16,7 @@ enum Constraint {
 pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     let mut inside_transaction = ctx.settings.assume_in_transaction;
-    let mut constraint_names: FxHashMap<Identifier, Constraint> = FxHashMap::default();
+    let mut constraint_names: FxHashMap<String, Constraint> = FxHashMap::default();
 
     enum ActionErrorMessage {
         IfExists,
@@ -38,10 +37,8 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     let (message_type, fix) = match &action {
                         ast::AlterTableAction::DropConstraint(drop_constraint) => {
                             if let Some(constraint_name) = drop_constraint.name_ref() {
-                                constraint_names.insert(
-                                    Identifier::new(constraint_name.text().as_str()),
-                                    Constraint::Dropped,
-                                );
+                                constraint_names
+                                    .insert(constraint_name.text(), Constraint::Dropped);
                             }
                             if drop_constraint.if_exists().is_some() {
                                 continue;
@@ -68,12 +65,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                             (ActionErrorMessage::IfNotExists, fix)
                         }
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
-                            if let Some(constraint_name) = validate_constraint.name_ref() {
-                                if constraint_names
-                                    .contains_key(&Identifier::new(constraint_name.text().as_str()))
-                                {
-                                    continue;
-                                }
+                            if let Some(constraint_name) = validate_constraint.name_ref()
+                                && constraint_names.contains_key(&constraint_name.text())
+                            {
+                                continue;
                             }
                             (ActionErrorMessage::None, None)
                         }
@@ -82,8 +77,8 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                             if let Some(constraint_name) = constraint
                                 .and_then(|x| x.constraint_name())
                                 .and_then(|x| x.name())
-                                && let Some(constraint) = constraint_names
-                                    .get_mut(&Identifier::new(constraint_name.text().as_str()))
+                                && let Some(constraint) =
+                                    constraint_names.get_mut(&constraint_name.text())
                                 && *constraint == Constraint::Dropped
                             {
                                 *constraint = Constraint::Added;
