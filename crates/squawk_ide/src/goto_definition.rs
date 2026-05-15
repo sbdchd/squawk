@@ -137,7 +137,6 @@ mod test {
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
-    use log::info;
     use rowan::TextRange;
     use rustc_hash::FxHashMap;
 
