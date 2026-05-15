@@ -3,16 +3,18 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::{SyntaxKind, ast::AstNode};
 
-use crate::db::{File, parse};
+use crate::db::parse;
+use crate::file::InFile;
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_as_dollar_quoted_string(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
+    let file = position.file_id;
+    let offset = position.value;
     let string = parse(db, file)
         .tree()
         .syntax()

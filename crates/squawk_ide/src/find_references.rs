@@ -1,13 +1,14 @@
-use crate::db::{File, parse};
+use crate::db::parse;
+use crate::file::InFile;
 use crate::goto_definition;
 use crate::location::Location;
 use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 
-#[salsa::tracked]
-pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Location> {
-    let targets = goto_definition::goto_definition(db, file, offset);
+pub fn find_references(db: &dyn Db, position: InFile<TextSize>) -> Vec<Location> {
+    let file = position.file_id;
+    let targets = goto_definition::goto_definition(db, position);
     let Some(first) = targets.first() else {
         return vec![];
     };
@@ -21,7 +22,7 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
         .filter(|x| ast::NameRef::can_cast(x.kind()))
     {
         let range = node.text_range();
-        let matches = goto_definition::goto_definition(db, file, range.start())
+        let matches = goto_definition::goto_definition(db, InFile::new(file, range.start()))
             .into_iter()
             .any(|location| targets.contains(&location));
         if matches {
@@ -40,6 +41,7 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
 mod test {
     use crate::builtins::builtins_file;
     use crate::db::File;
+    use crate::file::InFile;
     use crate::find_references::find_references;
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -57,7 +59,7 @@ mod test {
         let db = fixture.db();
         let current_file = fixture.file();
 
-        let references = find_references(db, current_file, offset);
+        let references = find_references(db, InFile::new(current_file, offset));
 
         let mut file_paths = FxHashMap::default();
         file_paths.insert(current_file, "current.sql");

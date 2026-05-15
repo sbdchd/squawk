@@ -4,18 +4,16 @@ use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use super::{ActionKind, CodeAction};
-use crate::{
-    db::{File, bind},
-    offsets::token_from_offset,
-};
+use crate::{db::bind, file::InFile, offsets::token_from_offset};
 
 pub(super) fn add_schema(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let file = position.file_id;
+    let offset = position.value;
+    let token = token_from_offset(db, position)?;
     let range = token.parent_ancestors().find_map(|node| {
         if let Some(path) = ast::Path::cast(node.clone()) {
             if path.qualifier().is_some() {
@@ -40,13 +38,16 @@ pub(super) fn add_schema(
         return None;
     }
 
-    let position = token.text_range().start();
-    let schema = bind(db, file).search_path_at(position).first()?.to_string();
+    let token_start = token.text_range().start();
+    let schema = bind(db, file)
+        .search_path_at(token_start)
+        .first()?
+        .to_string();
     let replacement = format!("{}.", schema);
 
     actions.push(CodeAction {
         title: "Add schema".to_owned(),
-        edits: vec![Edit::insert(replacement, position)],
+        edits: vec![Edit::insert(replacement, token_start)],
         kind: ActionKind::RefactorRewrite,
     });
 

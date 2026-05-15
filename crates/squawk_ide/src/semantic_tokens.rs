@@ -6,6 +6,7 @@ use squawk_syntax::{
 };
 
 use crate::db::{File, parse};
+use crate::file::InFile;
 use crate::goto_definition::goto_definition;
 use crate::location::LocationKind;
 
@@ -215,9 +216,11 @@ impl TryFrom<LocationKind> for SemanticTokenType {
     }
 }
 
-fn token_type_for_node<T: AstNode>(db: &dyn Db, file: File, node: &T) -> Option<SemanticTokenType> {
-    let offset = node.syntax().text_range().start();
-    let location = goto_definition(db, file, offset).into_iter().next()?;
+fn token_type_for_node<T: AstNode>(db: &dyn Db, node: InFile<&T>) -> Option<SemanticTokenType> {
+    let offset = node.value.syntax().text_range().start();
+    let location = goto_definition(db, InFile::new(node.file_id, offset))
+        .into_iter()
+        .next()?;
 
     SemanticTokenType::try_from(location.kind).ok()
 }
@@ -295,13 +298,13 @@ pub fn semantic_tokens(
         match event {
             Enter(NodeOrToken::Node(node)) => {
                 if let Some(name) = ast::Name::cast(node.clone())
-                    && let Some(token_type) = token_type_for_node(db, file, &name)
+                    && let Some(token_type) = token_type_for_node(db, InFile::new(file, &name))
                 {
                     out.push_token(name.syntax().clone().into(), token_type);
                 }
 
                 if let Some(name_ref) = ast::NameRef::cast(node.clone())
-                    && let Some(token_type) = token_type_for_node(db, file, &name_ref)
+                    && let Some(token_type) = token_type_for_node(db, InFile::new(file, &name_ref))
                 {
                     out.push_token(name_ref.syntax().clone().into(), token_type);
                 }

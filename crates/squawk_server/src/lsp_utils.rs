@@ -8,8 +8,10 @@ use lsp_types::{
     CodeAction, CodeActionKind, FoldingRange, FoldingRangeKind as LspFoldingRangeKind, Location,
     SemanticToken, Url, WorkspaceEdit,
 };
+use salsa::Database as Db;
 use squawk_ide::code_actions::ActionKind;
-use squawk_ide::db::line_index;
+use squawk_ide::db::{File, line_index};
+use squawk_ide::file::InFile;
 use squawk_ide::folding_ranges::{Fold, FoldKind};
 use squawk_ide::semantic_tokens::{SemanticTokenModifier, SemanticTokenType};
 
@@ -17,8 +19,8 @@ use crate::global_state::Snapshot;
 use crate::semantic_tokens;
 
 pub(crate) fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
-    let start = offset(index, range.start)?;
-    let end = offset(index, range.end)?;
+    let start = text_size(index, range.start)?;
+    let end = text_size(index, range.end)?;
     if end >= start {
         Some(TextRange::new(start, end))
     } else {
@@ -31,7 +33,7 @@ pub(crate) fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<T
     }
 }
 
-pub(crate) fn offset(index: &LineIndex, position: lsp_types::Position) -> Option<TextSize> {
+fn text_size(index: &LineIndex, position: lsp_types::Position) -> Option<TextSize> {
     let line_range = index.line(position.line)?;
 
     let col = TextSize::from(position.character);
@@ -47,6 +49,16 @@ pub(crate) fn offset(index: &LineIndex, position: lsp_types::Position) -> Option
     }
 
     Some(line_range.start() + clamped_len)
+}
+
+pub(crate) fn offset(
+    db: &dyn Db,
+    file: File,
+    position: lsp_types::Position,
+) -> Option<InFile<TextSize>> {
+    let line_index = line_index(db, file);
+    let offset = text_size(&line_index, position)?;
+    Some(InFile::new(file, offset))
 }
 
 pub(crate) fn code_action(

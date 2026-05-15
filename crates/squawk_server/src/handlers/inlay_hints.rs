@@ -26,26 +26,19 @@ pub(crate) fn handle_inlay_hints(
             let line_col = current_line_index.line_col(hint.position);
             let position = lsp_types::Position::new(line_col.line, line_col.col);
 
-            let target_file = hint.file;
-            let uri = match target_file {
-                Some(target_file) => snapshot.uri(target_file)?,
-                None => uri.clone(),
-            };
-
-            let target_line_index = target_file.map(|target_file| line_index(db, target_file));
-            let line_index = target_line_index.as_ref().unwrap_or(&current_line_index);
-
             let kind: InlayHintKind = match hint.kind {
                 squawk_ide::inlay_hints::InlayHintKind::Parameter => InlayHintKind::PARAMETER,
                 squawk_ide::inlay_hints::InlayHintKind::Type => InlayHintKind::TYPE,
             };
 
-            let label = if let Some(target_range) = hint.target {
+            let label = if let Some(target) = hint.target {
+                let target_uri = snapshot.uri(target.file_id)?;
+                let target_line_index = line_index(db, target.file_id);
                 InlayHintLabel::LabelParts(vec![InlayHintLabelPart {
                     value: hint.label,
                     location: Some(Location {
-                        uri: uri.clone(),
-                        range: lsp_utils::range(line_index, target_range),
+                        uri: target_uri,
+                        range: lsp_utils::range(&target_line_index, target.value),
                     }),
                     tooltip: None,
                     command: None,

@@ -1,5 +1,6 @@
 use crate::collect;
 use crate::db::{File, parse};
+use crate::file::InFile;
 use crate::goto_definition;
 use crate::resolve;
 use crate::symbols::Name;
@@ -19,12 +20,9 @@ pub struct InlayHint {
     pub position: TextSize,
     pub label: String,
     pub kind: InlayHintKind,
-    // Need this to be an Option because we can still inlay hints when we don't
-    // have the destination.
-    // For example: `insert into t(a, b) values (1, 2)`
-    pub target: Option<TextRange>,
-    // TODO: combine with the target range above
-    pub file: Option<File>,
+    // Optional because we can still emit hints without a destination,
+    // e.g. `insert into t(a, b) values (1, 2)` with no matching table.
+    pub target: Option<InFile<TextRange>>,
 }
 
 #[salsa::tracked]
@@ -55,10 +53,12 @@ fn inlay_hint_call_expr(
         ast::FieldExpr::cast(expr.syntax().clone())?.field()?
     };
 
-    let location =
-        goto_definition::goto_definition(db, file_id, name_ref.syntax().text_range().start())
-            .into_iter()
-            .next()?;
+    let location = goto_definition::goto_definition(
+        db,
+        InFile::new(file_id, name_ref.syntax().text_range().start()),
+    )
+    .into_iter()
+    .next()?;
 
     let def_file = parse(db, location.file).tree();
 
@@ -72,13 +72,12 @@ fn inlay_hint_call_expr(
         for (param, arg) in param_list.params().zip(arg_list.args()) {
             if let Some(param_name) = param.name() {
                 let arg_start = arg.syntax().text_range().start();
-                let target = Some(param_name.syntax().text_range());
+                let target = Some(InFile::new(location.file, param_name.syntax().text_range()));
                 hints.push(InlayHint {
                     position: arg_start,
                     label: format!("{}: ", param_name.syntax().text()),
                     kind: InlayHintKind::Parameter,
                     target,
-                    file: Some(location.file),
                 });
             }
         }
@@ -102,7 +101,7 @@ fn inlay_hint_insert(
         .start();
     // We need to support the table definition not being found since we can
     // still provide inlay hints when a column list is provided
-    let location = goto_definition::goto_definition(db, file_id, name_start)
+    let location = goto_definition::goto_definition(db, InFile::new(file_id, name_start))
         .into_iter()
         .next();
 
@@ -117,50 +116,56 @@ fn inlay_hint_insert(
             .find_map(ast::CreateTableLike::cast)
     });
 
-    let columns = if let Some(column_list) = insert.column_list() {
-        // `insert into t(a, b, c) values (1, 2, 3)`
-        column_list
-            .columns()
-            .filter_map(|col| {
-                let col_name = col.name_ref().map(|x| Name::from_node(&x))?;
-                let target = create_table
-                    .as_ref()
-                    .and_then(|x| resolve::find_column_in_create_table(db, def_file, x, &col_name))
-                    .and_then(|x| x.into_iter().next())
-                    .map(|x| x.range);
-                Some((col_name, target, location.as_ref().map(|x| x.file)))
-            })
-            .collect()
-    } else {
-        // `insert into t values (1, 2, 3)`
-        collect::columns_from_create_table(db, def_file, &create_table?)
-            .into_iter()
-            .map(|(col_name, ptr)| {
-                let target = ptr.map(|p| p.text_range());
-                (col_name, target, location.as_ref().map(|x| x.file))
-            })
-            .collect()
-    };
+    let columns: Vec<(Name, Option<InFile<TextRange>>)> =
+        if let Some(column_list) = insert.column_list() {
+            // `insert into t(a, b, c) values (1, 2, 3)`
+            column_list
+                .columns()
+                .filter_map(|col| {
+                    let col_name = col.name_ref().map(|x| Name::from_node(&x))?;
+                    let target = create_table
+                        .as_ref()
+                        .and_then(|x| {
+                            resolve::find_column_in_create_table(
+                                db,
+                                InFile::new(def_file, x),
+                                &col_name,
+                            )
+                        })
+                        .and_then(|x| x.into_iter().next())
+                        .map(|x| InFile::new(x.file, x.range));
+                    Some((col_name, target))
+                })
+                .collect()
+        } else {
+            // `insert into t values (1, 2, 3)`
+            collect::columns_from_create_table(db, def_file, &create_table?)
+                .into_iter()
+                .map(|(col_name, ptr)| {
+                    let target = ptr.map(|ptr| InFile::new(ptr.file_id, ptr.value.text_range()));
+                    (col_name, target)
+                })
+                .collect()
+        };
 
     inlay_hint_insert_select(hints, columns, insert.select_variant()?)
 }
 
 fn inlay_hint_insert_select(
     hints: &mut Vec<InlayHint>,
-    columns: Vec<(Name, Option<TextRange>, Option<File>)>,
+    columns: Vec<(Name, Option<InFile<TextRange>>)>,
     select_variant: ast::SelectVariant,
 ) -> Option<()> {
     if let ast::SelectVariant::Values(values) = &select_variant {
         // `insert into t values (1, 2);`
         for row in values.row_list()?.rows() {
-            for ((column_name, target, file_id), expr) in columns.iter().zip(row.exprs()) {
+            for ((column_name, target), expr) in columns.iter().zip(row.exprs()) {
                 let expr_start = expr.syntax().text_range().start();
                 hints.push(InlayHint {
                     position: expr_start,
                     label: format!("{}: ", column_name),
                     kind: InlayHintKind::Parameter,
                     target: *target,
-                    file: *file_id,
                 });
             }
         }
@@ -169,7 +174,7 @@ fn inlay_hint_insert_select(
 
     // `insert into t select 1, 2;`
     let target_list = select_variant.target_list()?;
-    for ((column_name, target, file_id), target_expr) in columns.iter().zip(target_list.targets()) {
+    for ((column_name, target), target_expr) in columns.iter().zip(target_list.targets()) {
         let expr = target_expr.expr()?;
         let expr_start = expr.syntax().text_range().start();
         hints.push(InlayHint {
@@ -177,7 +182,6 @@ fn inlay_hint_insert_select(
             label: format!("{}: ", column_name),
             kind: InlayHintKind::Parameter,
             target: *target,
-            file: *file_id,
         });
     }
 

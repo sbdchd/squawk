@@ -5,6 +5,7 @@ use salsa::Setter;
 use serde::{Deserialize, Serialize};
 use squawk_ide::builtins::builtins_file;
 use squawk_ide::db::{self, Database, File};
+use squawk_ide::file::InFile;
 use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
 use squawk_ide::semantic_tokens::{SemanticTokenType, semantic_tokens};
 use squawk_syntax::ast::AstNode;
@@ -272,9 +273,8 @@ impl SquawkDatabase {
 
     pub fn goto_definition(&self, line: u32, col: u32) -> Result<JsValue, Error> {
         let file = self.file()?;
-        let current_line_index = db::line_index(&self.db, file);
-        let offset = position_to_offset(&current_line_index, line, col)?;
-        let result = squawk_ide::goto_definition::goto_definition(&self.db, file, offset);
+        let position = position_to_offset(&self.db, file, line, col)?;
+        let result = squawk_ide::goto_definition::goto_definition(&self.db, position);
 
         let response: Vec<LocationRange> = result
             .into_iter()
@@ -306,9 +306,8 @@ impl SquawkDatabase {
 
     pub fn hover(&self, line: u32, col: u32) -> Result<JsValue, Error> {
         let file = self.file()?;
-        let line_index = db::line_index(&self.db, file);
-        let offset = position_to_offset(&line_index, line, col)?;
-        let result = squawk_ide::hover::hover(&self.db, file, offset);
+        let position = position_to_offset(&self.db, file, line, col)?;
+        let result = squawk_ide::hover::hover(&self.db, position);
 
         let converted = result.map(|hover| WasmHover {
             snippet: hover.snippet,
@@ -320,9 +319,8 @@ impl SquawkDatabase {
 
     pub fn find_references(&self, line: u32, col: u32) -> Result<JsValue, Error> {
         let file = self.file()?;
-        let line_index = db::line_index(&self.db, file);
-        let offset = position_to_offset(&line_index, line, col)?;
-        let references = squawk_ide::find_references::find_references(&self.db, file, offset);
+        let position = position_to_offset(&self.db, file, line, col)?;
+        let references = squawk_ide::find_references::find_references(&self.db, position);
         let locations: Vec<LocationRange> = references
             .iter()
             .map(|loc| {
@@ -366,8 +364,8 @@ impl SquawkDatabase {
     pub fn code_actions(&self, line: u32, col: u32) -> Result<JsValue, Error> {
         let file = self.file()?;
         let line_index = db::line_index(&self.db, file);
-        let offset = position_to_offset(&line_index, line, col)?;
-        let actions = squawk_ide::code_actions::code_actions(&self.db, file, offset);
+        let position = position_to_offset(&self.db, file, line, col)?;
+        let actions = squawk_ide::code_actions::code_actions(&self.db, position);
 
         let converted = actions.map(|actions| {
             actions
@@ -486,7 +484,7 @@ impl SquawkDatabase {
 
         for pos in positions {
             let pos: Position = serde_wasm_bindgen::from_value(pos).map_err(into_error)?;
-            let offset = position_to_offset(&line_index, pos.line, pos.column)?;
+            let offset = position_to_offset(&self.db, file, pos.line, pos.column)?.value;
 
             let mut ranges = vec![];
             let mut range = TextRange::new(offset, offset);
@@ -573,9 +571,8 @@ impl SquawkDatabase {
 
     pub fn completion(&self, line: u32, col: u32) -> Result<JsValue, Error> {
         let file = self.file()?;
-        let line_index = db::line_index(&self.db, file);
-        let offset = position_to_offset(&line_index, line, col)?;
-        let items = squawk_ide::completion::completion(&self.db, file, offset);
+        let position = position_to_offset(&self.db, file, line, col)?;
+        let items = squawk_ide::completion::completion(&self.db, position);
 
         let converted: Vec<WasmCompletionItem> = items
             .into_iter()
@@ -625,19 +622,22 @@ fn into_error<E: std::fmt::Display>(err: E) -> Error {
 }
 
 fn position_to_offset(
-    line_index: &LineIndex,
+    db: &Database,
+    file: File,
     line: u32,
     col: u32,
-) -> Result<rowan::TextSize, Error> {
+) -> Result<InFile<rowan::TextSize>, Error> {
+    let line_index = db::line_index(db, file);
     let wide_pos = line_index::WideLineCol { line, col };
 
     let pos = line_index
         .to_utf8(line_index::WideEncoding::Utf16, wide_pos)
         .ok_or_else(|| Error::new("Invalid position"))?;
 
-    line_index
+    let offset = line_index
         .offset(pos)
-        .ok_or_else(|| Error::new("Invalid position offset"))
+        .ok_or_else(|| Error::new("Invalid position offset"))?;
+    Ok(InFile::new(file, offset))
 }
 
 fn convert_document_symbol(

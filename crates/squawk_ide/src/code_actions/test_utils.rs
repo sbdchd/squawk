@@ -3,14 +3,14 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast;
 
-use crate::db::File;
+use crate::file::InFile;
 use crate::test_utils::Fixture;
 
 use super::{ActionKind, CodeAction};
 
 #[must_use]
 pub(super) fn apply_code_action(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
 ) -> String {
     apply_code_action_(f, sql, false)
@@ -18,14 +18,14 @@ pub(super) fn apply_code_action(
 
 #[must_use]
 pub(super) fn apply_code_action_with_errors(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
 ) -> String {
     apply_code_action_(f, sql, true)
 }
 
 fn apply_code_action_(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
     allow_errors: bool,
 ) -> String {
@@ -39,7 +39,7 @@ fn apply_code_action_(
     let file = fixture.file();
 
     let mut actions = vec![];
-    f(db, file, &mut actions, offset);
+    f(db, InFile::new(file, offset), &mut actions);
 
     assert!(
         !actions.is_empty(),
@@ -99,7 +99,7 @@ fn check_overlap(edits: &[Edit]) {
 }
 
 fn code_action_not_applicable_(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
     allow_errors: bool,
 ) -> bool {
@@ -113,13 +113,13 @@ fn code_action_not_applicable_(
     let file = fixture.file();
 
     let mut actions = vec![];
-    f(db, file, &mut actions, offset);
+    f(db, InFile::new(file, offset), &mut actions);
     actions.is_empty()
 }
 
 #[must_use]
 pub(super) fn code_action_not_applicable(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
 ) -> bool {
     code_action_not_applicable_(f, sql, false)
@@ -127,7 +127,7 @@ pub(super) fn code_action_not_applicable(
 
 #[must_use]
 pub(super) fn code_action_not_applicable_with_errors(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
 ) -> bool {
     code_action_not_applicable_(f, sql, true)

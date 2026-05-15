@@ -21,9 +21,10 @@ pub(crate) fn handle_selection_range(
     let mut selection_ranges = vec![];
 
     for position in params.positions {
-        let Some(offset) = lsp_utils::offset(&line_index, position) else {
+        let Some(position) = lsp_utils::offset(db, file, position) else {
             continue;
         };
+        let offset = position.value;
 
         let mut ranges = vec![];
         {

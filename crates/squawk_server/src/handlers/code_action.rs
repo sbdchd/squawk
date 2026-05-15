@@ -22,9 +22,9 @@ pub(crate) fn handle_code_action(
     let db = snapshot.db();
     let file = snapshot.file(&uri).unwrap();
     let line_index = line_index(db, file);
-    let offset = lsp_utils::offset(&line_index, params.range.start).unwrap();
+    let position = lsp_utils::offset(db, file, params.range.start).unwrap();
 
-    let ide_actions = code_actions(db, file, offset).unwrap_or_default();
+    let ide_actions = code_actions(db, position).unwrap_or_default();
 
     for action in ide_actions {
         let lsp_action = lsp_utils::code_action(&line_index, uri.clone(), action);

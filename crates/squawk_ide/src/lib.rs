@@ -10,7 +10,7 @@ pub mod completion;
 pub mod db;
 pub mod document_symbols;
 pub mod expand_selection;
-mod file;
+pub mod file;
 pub mod find_references;
 pub mod folding_ranges;
 pub mod goto_definition;

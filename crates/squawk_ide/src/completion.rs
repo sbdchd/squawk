@@ -7,6 +7,7 @@ use crate::ast_nav;
 use crate::binder;
 use crate::collect;
 use crate::db::{File, bind, parse};
+use crate::file::InFile;
 use crate::name::{self, Name, Schema};
 use crate::resolve;
 use crate::symbols::SymbolKind;
@@ -14,7 +15,9 @@ use crate::tokens::is_string_or_comment;
 
 const COMPLETION_MARKER: &str = "squawkCompletionMarker";
 
-pub fn completion(db: &dyn Db, file: File, offset: TextSize) -> Vec<CompletionItem> {
+pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem> {
+    let file = position.file_id;
+    let offset = position.value;
     let parse = parse(db, file);
     let source_file = parse.tree();
 
@@ -343,7 +346,7 @@ fn column_completions_from_clause(
 ) -> Vec<CompletionItem> {
     let mut completions = vec![];
     let syntax_root = from_clause.syntax().ancestors().last().unwrap();
-    for table_ptr in resolve::table_ptrs_from_clause(db, file, from_clause) {
+    for table_ptr in resolve::table_ptrs_from_clause(db, InFile::new(file, from_clause)) {
         let table_node = table_ptr.to_node(&syntax_root);
         match ast_nav::parent_source(&table_node) {
             Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
@@ -460,7 +463,8 @@ fn alias_base_columns_with_types(
     let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
         return vec![];
     };
-    let Some(table_ptr) = resolve::table_ptr_from_from_item(db, file, &from_item) else {
+    let Some(table_ptr) = resolve::table_ptr_from_from_item(db, InFile::new(file, &from_item))
+    else {
         return vec![];
     };
 
@@ -851,7 +855,7 @@ fn function_detail(
         .ancestors()
         .find_map(ast::CreateFunction::cast)?;
     let path = create_function.path()?;
-    let (schema, function_name) = resolve::resolve_function_info(db, file, &path)?;
+    let (schema, function_name) = resolve::resolve_function_info(db, InFile::new(file, &path))?;
 
     let param_list = create_function.param_list()?;
     let params = param_list.syntax().text().to_string();
@@ -935,6 +939,7 @@ pub struct CompletionItem {
 #[cfg(test)]
 mod tests {
     use super::completion;
+    use crate::file::InFile;
     use crate::test_utils::Fixture;
     use insta::assert_snapshot;
     use tabled::builder::Builder;
@@ -944,7 +949,7 @@ mod tests {
     fn completions(sql: &str) -> String {
         let fixture = Fixture::new_allow_errors(sql);
         let offset = fixture.marker().offset();
-        let items = completion(fixture.db(), fixture.file(), offset);
+        let items = completion(fixture.db(), InFile::new(fixture.file(), offset));
         assert!(
             !items.is_empty(),
             "No completions found. If this was intended, use `completions_not_found` instead."
@@ -955,7 +960,7 @@ mod tests {
     fn completions_not_found(sql: &str) {
         let fixture = Fixture::new_allow_errors(sql);
         let offset = fixture.marker().offset();
-        let items = completion(fixture.db(), fixture.file(), offset);
+        let items = completion(fixture.db(), InFile::new(fixture.file(), offset));
         assert_eq!(
             items,
             vec![],

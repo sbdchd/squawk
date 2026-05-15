@@ -6,16 +6,18 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::db::{File, parse};
+use crate::db::parse;
+use crate::file::InFile;
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn remove_else_clause(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
+    let file = position.file_id;
+    let offset = position.value;
     let source_file = parse(db, file).tree();
 
     let else_token = source_file

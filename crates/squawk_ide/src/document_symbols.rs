@@ -4,6 +4,7 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder::extract_string_literal;
 use crate::db::{File, parse};
+use crate::file::InFile;
 use crate::resolve::{
     resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_sequence_info,
     resolve_table_info, resolve_type_info, resolve_view_info,
@@ -64,32 +65,40 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateTable(create_table) => {
-                if let Some(symbol) = create_table_symbol(db, file, create_table) {
+                if let Some(symbol) = create_table_symbol(db, InFile::new(file, create_table)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateTableAs(create_table_as) => {
-                if let Some(symbol) = create_table_as_symbol(db, file, create_table_as) {
+                if let Some(symbol) = create_table_as_symbol(db, InFile::new(file, create_table_as))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateForeignTable(create_foreign_table) => {
-                if let Some(symbol) = create_table_symbol(db, file, create_foreign_table) {
+                if let Some(symbol) =
+                    create_table_symbol(db, InFile::new(file, create_foreign_table))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateFunction(create_function) => {
-                if let Some(symbol) = create_function_symbol(db, file, create_function) {
+                if let Some(symbol) = create_function_symbol(db, InFile::new(file, create_function))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateAggregate(create_aggregate) => {
-                if let Some(symbol) = create_aggregate_symbol(db, file, create_aggregate) {
+                if let Some(symbol) =
+                    create_aggregate_symbol(db, InFile::new(file, create_aggregate))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateProcedure(create_procedure) => {
-                if let Some(symbol) = create_procedure_symbol(db, file, create_procedure) {
+                if let Some(symbol) =
+                    create_procedure_symbol(db, InFile::new(file, create_procedure))
+                {
                     symbols.push(symbol);
                 }
             }
@@ -99,12 +108,13 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateDomain(create_domain) => {
-                if let Some(symbol) = create_domain_symbol(db, file, create_domain) {
+                if let Some(symbol) = create_domain_symbol(db, InFile::new(file, create_domain)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateSequence(create_sequence) => {
-                if let Some(symbol) = create_sequence_symbol(db, file, create_sequence) {
+                if let Some(symbol) = create_sequence_symbol(db, InFile::new(file, create_sequence))
+                {
                     symbols.push(symbol);
                 }
             }
@@ -154,17 +164,19 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateType(create_type) => {
-                if let Some(symbol) = create_type_symbol(db, file, create_type) {
+                if let Some(symbol) = create_type_symbol(db, InFile::new(file, create_type)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateView(create_view) => {
-                if let Some(symbol) = create_view_symbol(db, file, create_view) {
+                if let Some(symbol) = create_view_symbol(db, InFile::new(file, create_view)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateMaterializedView(create_view) => {
-                if let Some(symbol) = create_materialized_view_symbol(db, file, create_view) {
+                if let Some(symbol) =
+                    create_materialized_view_symbol(db, InFile::new(file, create_view))
+                {
                     symbols.push(symbol);
                 }
             }
@@ -269,13 +281,14 @@ fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymb
 
 fn create_table_symbol(
     db: &dyn Db,
-    file: File,
-    create_table: impl ast::HasCreateTable,
+    create_table: InFile<impl ast::HasCreateTable>,
 ) -> Option<DocumentSymbol> {
+    let file = create_table.file_id;
+    let create_table = create_table.value;
     let path = create_table.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, table_name) = resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, table_name);
 
     let full_range = create_table.syntax().text_range();
@@ -302,13 +315,14 @@ fn create_table_symbol(
 
 fn create_table_as_symbol(
     db: &dyn Db,
-    file: File,
-    create_table_as: ast::CreateTableAs,
+    create_table_as: InFile<ast::CreateTableAs>,
 ) -> Option<DocumentSymbol> {
+    let file = create_table_as.file_id;
+    let create_table_as = create_table_as.value;
     let path = create_table_as.path()?;
     let name_node = path.segment()?.name()?.syntax().clone();
 
-    let (schema, table_name) = resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, table_name);
 
     let full_range = create_table_as.syntax().text_range();
@@ -326,15 +340,13 @@ fn create_table_as_symbol(
     })
 }
 
-fn create_view_symbol(
-    db: &dyn Db,
-    file: File,
-    create_view: ast::CreateView,
-) -> Option<DocumentSymbol> {
+fn create_view_symbol(db: &dyn Db, create_view: InFile<ast::CreateView>) -> Option<DocumentSymbol> {
+    let file = create_view.file_id;
+    let create_view = create_view.value;
     let path = create_view.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, view_name) = resolve_view_info(db, file, &path)?;
+    let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, view_name);
 
     let full_range = create_view.syntax().text_range();
@@ -378,13 +390,14 @@ fn symbols_from_column_list(
 // TODO: combine with create_view_symbol
 fn create_materialized_view_symbol(
     db: &dyn Db,
-    file: File,
-    create_view: ast::CreateMaterializedView,
+    create_view: InFile<ast::CreateMaterializedView>,
 ) -> Option<DocumentSymbol> {
+    let file = create_view.file_id;
+    let create_view = create_view.value;
     let path = create_view.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, view_name) = resolve_view_info(db, file, &path)?;
+    let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, view_name);
 
     let full_range = create_view.syntax().text_range();
@@ -401,13 +414,14 @@ fn create_materialized_view_symbol(
 
 fn create_function_symbol(
     db: &dyn Db,
-    file: File,
-    create_function: ast::CreateFunction,
+    create_function: InFile<ast::CreateFunction>,
 ) -> Option<DocumentSymbol> {
+    let file = create_function.file_id;
+    let create_function = create_function.value;
     let path = create_function.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, function_name) = resolve_function_info(db, file, &path)?;
+    let (schema, function_name) = resolve_function_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, function_name);
 
     let full_range = create_function.syntax().text_range();
@@ -425,13 +439,14 @@ fn create_function_symbol(
 
 fn create_aggregate_symbol(
     db: &dyn Db,
-    file: File,
-    create_aggregate: ast::CreateAggregate,
+    create_aggregate: InFile<ast::CreateAggregate>,
 ) -> Option<DocumentSymbol> {
+    let file = create_aggregate.file_id;
+    let create_aggregate = create_aggregate.value;
     let path = create_aggregate.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, aggregate_name) = resolve_aggregate_info(db, file, &path)?;
+    let (schema, aggregate_name) = resolve_aggregate_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, aggregate_name);
 
     let full_range = create_aggregate.syntax().text_range();
@@ -449,13 +464,14 @@ fn create_aggregate_symbol(
 
 fn create_procedure_symbol(
     db: &dyn Db,
-    file: File,
-    create_procedure: ast::CreateProcedure,
+    create_procedure: InFile<ast::CreateProcedure>,
 ) -> Option<DocumentSymbol> {
+    let file = create_procedure.file_id;
+    let create_procedure = create_procedure.value;
     let path = create_procedure.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, procedure_name) = resolve_procedure_info(db, file, &path)?;
+    let (schema, procedure_name) = resolve_procedure_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, procedure_name);
 
     let full_range = create_procedure.syntax().text_range();
@@ -490,13 +506,14 @@ fn create_index_symbol(create_index: ast::CreateIndex) -> Option<DocumentSymbol>
 
 fn create_domain_symbol(
     db: &dyn Db,
-    file: File,
-    create_domain: ast::CreateDomain,
+    create_domain: InFile<ast::CreateDomain>,
 ) -> Option<DocumentSymbol> {
+    let file = create_domain.file_id;
+    let create_domain = create_domain.value;
     let path = create_domain.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, domain_name) = resolve_type_info(db, file, &path)?;
+    let (schema, domain_name) = resolve_type_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, domain_name);
 
     let full_range = create_domain.syntax().text_range();
@@ -514,13 +531,14 @@ fn create_domain_symbol(
 
 fn create_sequence_symbol(
     db: &dyn Db,
-    file: File,
-    create_sequence: ast::CreateSequence,
+    create_sequence: InFile<ast::CreateSequence>,
 ) -> Option<DocumentSymbol> {
+    let file = create_sequence.file_id;
+    let create_sequence = create_sequence.value;
     let path = create_sequence.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, sequence_name) = resolve_sequence_info(db, file, &path)?;
+    let (schema, sequence_name) = resolve_sequence_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, sequence_name);
 
     let full_range = create_sequence.syntax().text_range();
@@ -695,15 +713,13 @@ fn create_property_graph_symbol(
     })
 }
 
-fn create_type_symbol(
-    db: &dyn Db,
-    file: File,
-    create_type: ast::CreateType,
-) -> Option<DocumentSymbol> {
+fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Option<DocumentSymbol> {
+    let file = create_type.file_id;
+    let create_type = create_type.value;
     let path = create_type.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, type_name) = resolve_type_info(db, file, &path)?;
+    let (schema, type_name) = resolve_type_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, type_name);
 
     let full_range = create_type.syntax().text_range();

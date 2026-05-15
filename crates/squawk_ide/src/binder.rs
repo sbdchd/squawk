@@ -54,6 +54,8 @@ impl Binder {
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
 
+        // TODO: we should just require Schema, rather than doing the lookup in
+        // here. Having to thread position is annoying.
         let search_paths = match schema {
             Some(s) => std::slice::from_ref(s),
             None => self.search_path_at(position),

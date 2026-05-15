@@ -3,17 +3,16 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{column_name::ColumnName, db::File, offsets::token_from_offset, symbols::Name};
+use crate::{column_name::ColumnName, file::InFile, offsets::token_from_offset, symbols::Name};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn remove_redundant_alias(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let target = token.parent_ancestors().find_map(ast::Target::cast)?;
 
     let as_name = target.as_name()?;
