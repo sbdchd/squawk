@@ -292,16 +292,15 @@ mod tests {
     use super::*;
     use crate::test_utils::Fixture;
     use insta::assert_debug_snapshot;
-    use squawk_syntax::{SourceFile, ast::AstNode};
+    use squawk_syntax::ast::AstNode;
 
     #[must_use]
     fn expand(sql: &str) -> Vec<String> {
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset();
-        let sql = fixture.sql();
-        let parse = SourceFile::parse(sql);
-        let file = parse.tree();
-        let root = file.syntax();
+        let sql = fixture.file().content(fixture.db()).clone();
+        let tree = crate::db::parse(fixture.db(), fixture.file()).tree();
+        let root = tree.syntax();
 
         let mut range = TextRange::empty(offset);
         let mut results = vec![];
@@ -346,15 +345,15 @@ select 'some stret$0ched out words in a string'
     #[test]
     fn string() {
         assert_debug_snapshot!(expand(r"
-select b'foo$0 bar'
+select e'foo$0 bar'
 'buzz';
 "), @r#"
         [
             "foo",
-            "b'foo bar'",
-            "b'foo bar'\n'buzz'",
-            "select b'foo bar'\n'buzz'",
-            "\nselect b'foo bar'\n'buzz';\n",
+            "e'foo bar'",
+            "e'foo bar'\n'buzz'",
+            "select e'foo bar'\n'buzz'",
+            "\nselect e'foo bar'\n'buzz';\n",
         ]
         "#);
     }

@@ -3,7 +3,7 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast;
 
-use crate::db::{Database, File};
+use crate::db::File;
 use crate::test_utils::Fixture;
 
 use super::{ActionKind, CodeAction};
@@ -13,15 +13,33 @@ pub(super) fn apply_code_action(
     f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
     sql: &str,
 ) -> String {
-    let fixture = Fixture::new(sql);
+    apply_code_action_(f, sql, false)
+}
+
+#[must_use]
+pub(super) fn apply_code_action_with_errors(
+    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    sql: &str,
+) -> String {
+    apply_code_action_(f, sql, true)
+}
+
+fn apply_code_action_(
+    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    sql: &str,
+    allow_errors: bool,
+) -> String {
+    let fixture = if allow_errors {
+        Fixture::new_allow_errors(sql)
+    } else {
+        Fixture::new(sql)
+    };
     let offset = fixture.marker().offset_before();
-    let sql = fixture.sql();
-    let db = Database::default();
-    let file = File::new(&db, sql.into());
-    let parse_result = crate::db::parse(&db, file);
+    let db = fixture.db();
+    let file = fixture.file();
 
     let mut actions = vec![];
-    f(&db, file, &mut actions, offset);
+    f(db, file, &mut actions, offset);
 
     assert!(
         !actions.is_empty(),
@@ -30,16 +48,7 @@ pub(super) fn apply_code_action(
 
     let action = &actions[0];
 
-    match action.kind {
-        ActionKind::QuickFix => {
-            // Quickfixes can fix syntax errors so we don't assert
-        }
-        ActionKind::RefactorRewrite => {
-            assert_eq!(parse_result.errors(), vec![]);
-        }
-    }
-
-    let mut result = sql.to_string();
+    let mut result = file.content(db).to_string();
 
     let mut edits = action.edits.clone();
     edits.sort_by_key(|e| e.text_range.start());
@@ -94,18 +103,17 @@ fn code_action_not_applicable_(
     sql: &str,
     allow_errors: bool,
 ) -> bool {
-    let fixture = Fixture::new(sql);
+    let fixture = if allow_errors {
+        Fixture::new_allow_errors(sql)
+    } else {
+        Fixture::new(sql)
+    };
     let offset = fixture.marker().offset_before();
-    let sql = fixture.sql();
-    let db = Database::default();
-    let file = File::new(&db, sql.into());
-    let parse_result = crate::db::parse(&db, file);
-    if !allow_errors {
-        assert_eq!(parse_result.errors(), vec![]);
-    }
+    let db = fixture.db();
+    let file = fixture.file();
 
     let mut actions = vec![];
-    f(&db, file, &mut actions, offset);
+    f(db, file, &mut actions, offset);
     actions.is_empty()
 }
 

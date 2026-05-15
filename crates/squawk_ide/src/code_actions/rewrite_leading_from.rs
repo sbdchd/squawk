@@ -55,13 +55,15 @@ pub(super) fn rewrite_leading_from(
 mod test {
     use insta::assert_snapshot;
 
-    use crate::code_actions::test_utils::{apply_code_action, code_action_not_applicable};
+    use crate::code_actions::test_utils::{
+        apply_code_action_with_errors, code_action_not_applicable,
+    };
 
     use super::rewrite_leading_from;
 
     #[test]
     fn rewrite_leading_from_simple() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from$0 t select c;"),
             @"select c from t;"
@@ -70,7 +72,7 @@ mod test {
 
     #[test]
     fn rewrite_leading_from_multiple_cols() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from$0 t select a, b;"),
             @"select a, b from t;"
@@ -79,7 +81,7 @@ mod test {
 
     #[test]
     fn rewrite_leading_from_with_where() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from$0 t select c where x = 1;"),
             @"select c from t where x = 1;"
@@ -88,7 +90,7 @@ mod test {
 
     #[test]
     fn rewrite_leading_from_on_select() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from t sel$0ect c;"),
             @"select c from t;"

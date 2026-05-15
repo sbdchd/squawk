@@ -1599,7 +1599,6 @@ fn unqualified_star_in_arg_list_ptrs(
 
 #[cfg(test)]
 mod test {
-    use crate::db::{Database, File};
     use crate::hover::hover;
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -1613,19 +1612,17 @@ mod test {
 
     #[track_caller]
     fn check_hover_(sql: &str) -> Option<String> {
-        let db = Database::default();
         let fixture = Fixture::new(sql);
         let marker = fixture.marker();
         let offset = marker.offset_before();
         let hover_span = marker.range();
-        let sql = fixture.sql();
-        let file = File::new(&db, sql.into());
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
+        let db = fixture.db();
+        let file = fixture.file();
 
-        if let Some(type_info) = hover(&db, file, offset) {
+        if let Some(type_info) = hover(db, file, offset) {
             let title = format!("hover: {}", type_info.snippet);
             let group = Level::INFO.primary_title(&title).element(
-                Snippet::source(sql)
+                Snippet::source(file.content(db).as_ref())
                     .fold(true)
                     .annotation(AnnotationKind::Context.span(hover_span).label("hover")),
             );
@@ -1644,14 +1641,10 @@ mod test {
     #[must_use]
     #[track_caller]
     fn check_hover_info(sql: &str) -> super::Hover {
-        let db = Database::default();
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset_before();
-        let sql = fixture.sql();
-        let file = File::new(&db, sql.into());
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
 
-        hover(&db, file, offset).expect("should find hover information")
+        hover(fixture.db(), fixture.file(), offset).expect("should find hover information")
     }
 
     #[test]

@@ -132,7 +132,7 @@ fn find_following_commit_or_rollback(
 #[cfg(test)]
 mod test {
     use crate::builtins::builtins_file;
-    use crate::db::{Database, File};
+    use crate::db::File;
     use crate::goto_definition::goto_definition;
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -149,25 +149,23 @@ mod test {
 
     #[track_caller]
     fn goto_(sql: &str) -> Option<String> {
-        info!("starting");
         let fixture = Fixture::new(sql);
         // For go to def we want the previous character since we usually put the
         // marker after the item we're trying to go to def on.
         let marker = fixture.marker();
         let offset = marker.offset_before();
         let source_span = marker.range();
-        let sql = fixture.sql();
-        let db = Database::default();
-        let current_file = File::new(&db, sql.into());
-        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
-        let results = goto_definition(&db, current_file, offset);
+        let db = fixture.db();
+        let current_file = fixture.file();
+
+        let results = goto_definition(db, current_file, offset);
         if results.is_empty() {
             return None;
         }
 
         let mut file_paths = FxHashMap::default();
         file_paths.insert(current_file, "current.sql");
-        file_paths.insert(builtins_file(&db), "builtins.sql");
+        file_paths.insert(builtins_file(db), "builtins.sql");
 
         let mut dests_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in results.iter().enumerate() {
@@ -179,7 +177,7 @@ mod test {
 
         let multi_file = dests_by_file.len() > 1 || !dests_by_file.contains_key(&current_file);
 
-        let mut snippet = Snippet::source(current_file.content(&db).as_ref()).fold(true);
+        let mut snippet = Snippet::source(current_file.content(db).as_ref()).fold(true);
         if multi_file {
             snippet = snippet.path(*file_paths.get(&current_file).unwrap());
         }
@@ -192,7 +190,7 @@ mod test {
 
         for (dest_file, dests) in dests_by_file {
             let path = file_paths.get(&dest_file).unwrap();
-            let other_snippet = Snippet::source(dest_file.content(&db).as_ref())
+            let other_snippet = Snippet::source(dest_file.content(db).as_ref())
                 .path(*path)
                 .fold(true);
             let other_snippet = annotate_destinations(other_snippet, dests);

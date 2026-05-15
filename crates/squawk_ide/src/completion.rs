@@ -935,7 +935,6 @@ pub struct CompletionItem {
 #[cfg(test)]
 mod tests {
     use super::completion;
-    use crate::db::{Database, File};
     use crate::test_utils::Fixture;
     use insta::assert_snapshot;
     use tabled::builder::Builder;
@@ -943,12 +942,9 @@ mod tests {
 
     #[must_use]
     fn completions(sql: &str) -> String {
-        let fixture = Fixture::new(sql);
+        let fixture = Fixture::new_allow_errors(sql);
         let offset = fixture.marker().offset();
-        let sql = fixture.sql();
-        let db = Database::default();
-        let file = File::new(&db, sql.into());
-        let items = completion(&db, file, offset);
+        let items = completion(fixture.db(), fixture.file(), offset);
         assert!(
             !items.is_empty(),
             "No completions found. If this was intended, use `completions_not_found` instead."
@@ -957,12 +953,9 @@ mod tests {
     }
 
     fn completions_not_found(sql: &str) {
-        let fixture = Fixture::new(sql);
+        let fixture = Fixture::new_allow_errors(sql);
         let offset = fixture.marker().offset();
-        let sql = fixture.sql();
-        let db = Database::default();
-        let file = File::new(&db, sql.into());
-        let items = completion(&db, file, offset);
+        let items = completion(fixture.db(), fixture.file(), offset);
         assert_eq!(
             items,
             vec![],

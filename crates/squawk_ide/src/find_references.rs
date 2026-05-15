@@ -39,7 +39,7 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
 #[cfg(test)]
 mod test {
     use crate::builtins::builtins_file;
-    use crate::db::{Database, File};
+    use crate::db::File;
     use crate::find_references::find_references;
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -54,16 +54,14 @@ mod test {
         let marker = fixture.marker();
         let offset = marker.offset_before();
         let query_span = marker.range();
-        let sql = fixture.sql();
-        let db = Database::default();
-        let current_file = File::new(&db, sql.into());
-        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
+        let db = fixture.db();
+        let current_file = fixture.file();
 
-        let references = find_references(&db, current_file, offset);
+        let references = find_references(db, current_file, offset);
 
         let mut file_paths = FxHashMap::default();
         file_paths.insert(current_file, "current.sql");
-        file_paths.insert(builtins_file(&db), "builtins.sql");
+        file_paths.insert(builtins_file(db), "builtins.sql");
 
         let mut refs_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in references.iter().enumerate() {
@@ -75,7 +73,7 @@ mod test {
 
         let multi_file = refs_by_file.len() > 1 || !refs_by_file.contains_key(&current_file);
 
-        let mut snippet = Snippet::source(sql).fold(true);
+        let mut snippet = Snippet::source(current_file.content(db).as_ref()).fold(true);
         if multi_file {
             snippet = snippet.path(*file_paths.get(&current_file).unwrap());
         }
@@ -88,7 +86,7 @@ mod test {
 
         for (ref_file, refs) in refs_by_file {
             let path = file_paths.get(&ref_file).unwrap();
-            let other_snippet = Snippet::source(ref_file.content(&db).as_ref())
+            let other_snippet = Snippet::source(ref_file.content(db).as_ref())
                 .path(*path)
                 .fold(true);
             let other_snippet = annotate_refs(other_snippet, refs);

@@ -1,5 +1,6 @@
 use std::ops::Range;
 
+use crate::db::{Database, File};
 use rowan::TextSize;
 
 // TODO: we should probably use something else since `$0` is valid syntax, maybe `%0`?
@@ -8,6 +9,8 @@ const MARKER: &str = "$0";
 pub(crate) struct Fixture {
     marker_offset: TextSize,
     sql: String,
+    db: Database,
+    file: File,
 }
 
 pub(crate) struct Marker {
@@ -19,10 +22,22 @@ pub(crate) struct Marker {
 impl Fixture {
     #[track_caller]
     pub(crate) fn new(sql: &str) -> Self {
+        let fixture = Self::new_allow_errors(sql);
+        assert_eq!(crate::db::parse(&fixture.db, fixture.file).errors(), vec![]);
+        fixture
+    }
+
+    #[track_caller]
+    pub(crate) fn new_allow_errors(sql: &str) -> Self {
         if let Some(pos) = sql.find(MARKER) {
+            let sql = sql.replace(MARKER, "");
+            let db = Database::default();
+            let file = File::new(&db, sql.as_str().into());
             return Self {
                 marker_offset: TextSize::new(pos as u32),
-                sql: sql.replace(MARKER, ""),
+                sql,
+                db,
+                file,
             };
         }
         panic!("No marker found in SQL. Did you forget to add a marker `$0`?");
@@ -57,8 +72,11 @@ impl Fixture {
         start..start + len
     }
 
-    pub(crate) fn sql(&self) -> &str {
-        &self.sql
+    pub(crate) fn db(&self) -> &Database {
+        &self.db
+    }
+    pub(crate) fn file(&self) -> File {
+        self.file
     }
 }
 

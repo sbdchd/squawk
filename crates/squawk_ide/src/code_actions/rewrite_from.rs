@@ -39,14 +39,15 @@ mod test {
     use insta::assert_snapshot;
 
     use crate::code_actions::test_utils::{
-        apply_code_action, code_action_not_applicable, code_action_not_applicable_with_errors,
+        apply_code_action_with_errors, code_action_not_applicable,
+        code_action_not_applicable_with_errors,
     };
 
     use super::rewrite_from;
 
     #[test]
     fn rewrite_from_simple() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_from,
             "from$0 t;"),
             @"select * from t;"
@@ -55,7 +56,7 @@ mod test {
 
     #[test]
     fn rewrite_from_qualified() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_from,
             "from$0 s.t;"),
             @"select * from s.t;"
@@ -64,7 +65,7 @@ mod test {
 
     #[test]
     fn rewrite_from_on_name() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_from,
             "from t$0;"),
             @"select * from t;"
