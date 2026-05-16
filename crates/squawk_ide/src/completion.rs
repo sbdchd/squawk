@@ -939,7 +939,7 @@ pub struct CompletionItem {
 #[cfg(test)]
 mod tests {
     use super::completion;
-    use crate::file::InFile;
+
     use crate::test_utils::Fixture;
     use insta::assert_snapshot;
     use tabled::builder::Builder;
@@ -949,7 +949,7 @@ mod tests {
     fn completions(sql: &str) -> String {
         let fixture = Fixture::new_allow_errors(sql);
         let offset = fixture.marker().offset();
-        let items = completion(fixture.db(), InFile::new(fixture.file(), offset));
+        let items = completion(fixture.db(), offset);
         assert!(
             !items.is_empty(),
             "No completions found. If this was intended, use `completions_not_found` instead."
@@ -960,7 +960,7 @@ mod tests {
     fn completions_not_found(sql: &str) {
         let fixture = Fixture::new_allow_errors(sql);
         let offset = fixture.marker().offset();
-        let items = completion(fixture.db(), InFile::new(fixture.file(), offset));
+        let items = completion(fixture.db(), offset);
         assert_eq!(
             items,
             vec![],
@@ -1143,6 +1143,7 @@ select $0 from t;
     #[test]
     fn completion_after_select_create_table_inherits_builtin() {
         assert_snapshot!(completions("
+-- include-builtins
 create table t ()
 inherits (information_schema.sql_features);
 select $0 from t;

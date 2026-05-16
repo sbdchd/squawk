@@ -41,7 +41,7 @@ pub fn find_references(db: &dyn Db, position: InFile<TextSize>) -> Vec<Location>
 mod test {
     use crate::builtins::builtins_file;
     use crate::db::File;
-    use crate::file::InFile;
+
     use crate::find_references::find_references;
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -57,9 +57,9 @@ mod test {
         let offset = marker.offset_before();
         let query_span = marker.range();
         let db = fixture.db();
-        let current_file = fixture.file();
+        let current_file = offset.file_id;
 
-        let references = find_references(db, InFile::new(current_file, offset));
+        let references = find_references(db, offset);
 
         let mut file_paths = FxHashMap::default();
         file_paths.insert(current_file, "current.sql");
@@ -380,17 +380,18 @@ drop table foo_bar;
     #[test]
     fn builtin_function_references() {
         assert_snapshot!(find_refs("
+-- include-builtins
 select now$0();
 select now();
 "), @"
-              ╭▸ current.sql:2:8
+              ╭▸ current.sql:3:8
               │
-            2 │ select now();
+            3 │ select now();
               │        ┬─┬
               │        │ │
               │        │ 0. query
               │        1. reference
-            3 │ select now();
+            4 │ select now();
               │        ─── 2. reference
               ╰╴
 

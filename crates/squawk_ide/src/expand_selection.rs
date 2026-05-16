@@ -298,11 +298,11 @@ mod tests {
     fn expand(sql: &str) -> Vec<String> {
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset();
-        let sql = fixture.file().content(fixture.db()).clone();
-        let tree = crate::db::parse(fixture.db(), fixture.file()).tree();
+        let sql = offset.file_id.content(fixture.db()).clone();
+        let tree = crate::db::parse(fixture.db(), offset.file_id).tree();
         let root = tree.syntax();
 
-        let mut range = TextRange::empty(offset);
+        let mut range = TextRange::empty(offset.value);
         let mut results = vec![];
 
         for _ in 0..20 {

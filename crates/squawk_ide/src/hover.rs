@@ -1638,7 +1638,7 @@ fn unqualified_star_in_arg_list_ptrs(
 
 #[cfg(test)]
 mod test {
-    use crate::file::InFile;
+
     use crate::hover::hover;
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -1655,16 +1655,13 @@ mod test {
         let fixture = Fixture::new(sql);
         let marker = fixture.marker();
         let offset = marker.offset_before();
-        let hover_span = marker.range();
         let db = fixture.db();
-        let file = fixture.file();
-
-        if let Some(type_info) = hover(db, InFile::new(file, offset)) {
+        if let Some(type_info) = hover(db, offset) {
             let title = format!("hover: {}", type_info.snippet);
             let group = Level::INFO.primary_title(&title).element(
-                Snippet::source(file.content(db).as_ref())
+                Snippet::source(offset.file_id.content(db).as_ref())
                     .fold(true)
-                    .annotation(AnnotationKind::Context.span(hover_span).label("hover")),
+                    .annotation(AnnotationKind::Context.span(marker.range()).label("hover")),
             );
             let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
             return Some(
@@ -1684,8 +1681,7 @@ mod test {
         let fixture = Fixture::new(sql);
         let offset = fixture.marker().offset_before();
 
-        hover(fixture.db(), InFile::new(fixture.file(), offset))
-            .expect("should find hover information")
+        hover(fixture.db(), offset).expect("should find hover information")
     }
 
     #[test]
@@ -2571,11 +2567,12 @@ select add$0(1, 2);
     #[test]
     fn hover_on_builtin_function_call() {
         assert_snapshot!(check_hover("
+-- include-builtins
 select now$0();
-"), @r"
+"), @"
         hover: function pg_catalog.now() returns timestamp with time zone
           ╭▸ 
-        2 │ select now();
+        3 │ select now();
           ╰╴         ─ hover
         ");
     }
@@ -3495,6 +3492,7 @@ select *$0 from t u(x, y);
     #[test]
     fn hover_on_cte_table_alias_with_partial_column_list_star_from_information_schema() {
         assert_snapshot!(check_hover("
+-- include-builtins
 with t as (select * from information_schema.sql_features)
 select *$0 from t u(x);
 "), @"
@@ -3506,7 +3504,7 @@ select *$0 from t u(x);
               column u.is_verified_by character_data
               column u.comments character_data
           ╭▸ 
-        3 │ select * from t u(x);
+        4 │ select * from t u(x);
           ╰╴       ─ hover
         ");
     }
@@ -3514,6 +3512,7 @@ select *$0 from t u(x);
     #[test]
     fn hover_cte_builtin_information_schema() {
         assert_snapshot!(check_hover("
+-- include-builtins
 with t as (select * from information_schema.sql_features) 
 select *$0 from t;
 "), @"
@@ -3525,7 +3524,7 @@ select *$0 from t;
               column t.is_verified_by character_data
               column t.comments character_data
           ╭▸ 
-        3 │ select * from t;
+        4 │ select * from t;
           ╰╴       ─ hover
         ");
     }
@@ -3606,6 +3605,7 @@ select *$0 from (table t);
     #[test]
     fn hover_on_star_from_information_schema_table() {
         assert_snapshot!(check_hover("
+-- include-builtins
 select *$0 from information_schema.sql_features;
 "), @"
         hover: column information_schema.sql_features.feature_id character_data
@@ -3616,7 +3616,7 @@ select *$0 from information_schema.sql_features;
               column information_schema.sql_features.is_verified_by character_data
               column information_schema.sql_features.comments character_data
           ╭▸ 
-        2 │ select * from information_schema.sql_features;
+        3 │ select * from information_schema.sql_features;
           ╰╴       ─ hover
         ");
     }
@@ -4891,6 +4891,7 @@ select *$0 from u;
     #[test]
     fn hover_create_table_inherits_builtin_star() {
         assert_snapshot!(check_hover_info("
+-- include-builtins
 create table t ()
 inherits (information_schema.sql_features);
 select *$0 from t;
@@ -4908,6 +4909,7 @@ select *$0 from t;
     #[test]
     fn hover_create_table_like_builtin_star() {
         assert_snapshot!(check_hover_info("
+-- include-builtins
 create table t (like information_schema.sql_features);
 select *$0 from t;
 ").snippet, @"
@@ -4979,13 +4981,14 @@ select a$0 from u;
     #[test]
     fn hover_create_table_inherits_builtin_column() {
         assert_snapshot!(check_hover("
+-- include-builtins
 create table t ()
 inherits (information_schema.sql_features);
 select feature_name$0 from t;
 "), @"
         hover: column information_schema.sql_features.feature_name information_schema.character_data
           ╭▸ 
-        4 │ select feature_name from t;
+        5 │ select feature_name from t;
           ╰╴                  ─ hover
         ");
     }

@@ -1,6 +1,7 @@
 use std::ops::Range;
 
-use crate::db::{Database, File};
+use crate::db::{Database, File, set_include_builtins};
+use crate::file::InFile;
 use rowan::TextSize;
 
 // TODO: we should probably use something else since `$0` is valid syntax, maybe `%0`?
@@ -14,6 +15,7 @@ pub(crate) struct Fixture {
 }
 
 pub(crate) struct Marker {
+    file: File,
     offset: TextSize,
     offset_before: TextSize,
     range: Range<usize>,
@@ -31,7 +33,10 @@ impl Fixture {
     pub(crate) fn new_allow_errors(sql: &str) -> Self {
         if let Some(pos) = sql.find(MARKER) {
             let sql = sql.replace(MARKER, "");
-            let db = Database::default();
+            let mut db = Database::default();
+            if !sql.trim_start().starts_with("-- include-builtins") {
+                set_include_builtins(&mut db, false);
+            }
             let file = File::new(&db, sql.as_str().into());
             return Self {
                 marker_offset: TextSize::new(pos as u32),
@@ -46,6 +51,7 @@ impl Fixture {
     pub(crate) fn marker(&self) -> Marker {
         let offset_before = self.offset_before_marker();
         Marker {
+            file: self.file,
             offset: self.marker_offset,
             offset_before,
             range: self.char_span_at(offset_before),
@@ -75,18 +81,15 @@ impl Fixture {
     pub(crate) fn db(&self) -> &Database {
         &self.db
     }
-    pub(crate) fn file(&self) -> File {
-        self.file
-    }
 }
 
 impl Marker {
-    pub(crate) fn offset(&self) -> TextSize {
-        self.offset
+    pub(crate) fn offset(&self) -> InFile<TextSize> {
+        InFile::new(self.file, self.offset)
     }
 
-    pub(crate) fn offset_before(&self) -> TextSize {
-        self.offset_before
+    pub(crate) fn offset_before(&self) -> InFile<TextSize> {
+        InFile::new(self.file, self.offset_before)
     }
 
     pub(crate) fn range(&self) -> Range<usize> {
@@ -103,8 +106,11 @@ mod tests {
         let fixture = Fixture::new("select 🦀$0");
         let marker = fixture.marker();
 
-        assert_eq!(usize::from(marker.offset()), "select 🦀".len());
-        assert_eq!(marker.offset_before(), ("select ".len() as u32).into());
+        assert_eq!(usize::from(marker.offset().value), "select 🦀".len());
+        assert_eq!(
+            marker.offset_before().value,
+            ("select ".len() as u32).into()
+        );
         assert_eq!(marker.range(), "select ".len().."select 🦀".len());
     }
 }

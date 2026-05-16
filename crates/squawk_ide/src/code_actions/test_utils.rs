@@ -36,10 +36,10 @@ fn apply_code_action_(
     };
     let offset = fixture.marker().offset_before();
     let db = fixture.db();
-    let file = fixture.file();
+    let file = offset.file_id;
 
     let mut actions = vec![];
-    f(db, InFile::new(file, offset), &mut actions);
+    f(db, offset, &mut actions);
 
     assert!(
         !actions.is_empty(),
@@ -110,10 +110,9 @@ fn code_action_not_applicable_(
     };
     let offset = fixture.marker().offset_before();
     let db = fixture.db();
-    let file = fixture.file();
 
     let mut actions = vec![];
-    f(db, InFile::new(file, offset), &mut actions);
+    f(db, offset, &mut actions);
     actions.is_empty()
 }
 

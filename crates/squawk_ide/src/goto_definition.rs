@@ -135,7 +135,7 @@ fn find_following_commit_or_rollback(db: &dyn Db, position: InFile<TextSize>) ->
 mod test {
     use crate::builtins::builtins_file;
     use crate::db::File;
-    use crate::file::InFile;
+
     use crate::goto_definition::goto_definition;
     use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
@@ -158,9 +158,9 @@ mod test {
         let offset = marker.offset_before();
         let source_span = marker.range();
         let db = fixture.db();
-        let current_file = fixture.file();
+        let current_file = offset.file_id;
 
-        let results = goto_definition(db, InFile::new(current_file, offset));
+        let results = goto_definition(db, offset);
         if results.is_empty() {
             return None;
         }
@@ -866,11 +866,12 @@ alter policy p on t
     #[test]
     fn goto_builtin_now() {
         assert_snapshot!(goto("
+-- include-builtins
 select now$0();
 "), @"
-              ╭▸ current.sql:2:10
+              ╭▸ current.sql:3:10
               │
-            2 │ select now();
+            3 │ select now();
               │          ─ 1. source
               ╰╴
 
@@ -884,11 +885,12 @@ select now$0();
     #[test]
     fn goto_current_timestamp() {
         assert_snapshot!(goto("
+-- include-builtins
 select current_timestamp$0;
 "), @"
-              ╭▸ current.sql:2:24
+              ╭▸ current.sql:3:24
               │
-            2 │ select current_timestamp;
+            3 │ select current_timestamp;
               │                        ─ 1. source
               ╰╴
 
@@ -1010,12 +1012,13 @@ select current_timestamp$0 from t;
     #[test]
     fn goto_current_timestamp_in_where() {
         assert_snapshot!(goto("
+-- include-builtins
 create table t(created_at timestamptz);
 select * from t where current_timestamp$0 > t.created_at;
 "), @"
-              ╭▸ current.sql:3:39
+              ╭▸ current.sql:4:39
               │
-            3 │ select * from t where current_timestamp > t.created_at;
+            4 │ select * from t where current_timestamp > t.created_at;
               │                                       ─ 1. source
               ╰╴
 
@@ -2162,13 +2165,14 @@ inherits (foo.bar, bar$0, buzz);
     #[test]
     fn goto_create_table_inherits_builtin() {
         assert_snapshot!(goto("
+-- include-builtins
 create table t ()
 inherits (information_schema.sql_features);
 select feature_name$0 from t;
 "), @"
-            ╭▸ current.sql:4:19
+            ╭▸ current.sql:5:19
             │
-          4 │ select feature_name from t;
+          5 │ select feature_name from t;
             │                   ─ 1. source
             ╰╴
 
