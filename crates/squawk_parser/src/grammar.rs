@@ -10033,6 +10033,31 @@ fn create_rule(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(RULE_KW);
     name(p);
     p.expect(AS_KW);
+    rule_on(p);
+    rule_do(p);
+    p.eat(SEMICOLON);
+    m.complete(p, CREATE_RULE)
+}
+
+fn rule_do(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(DO_KW);
+    let _ = p.eat(ALSO_KW) || p.eat(INSTEAD_KW);
+    if p.at(L_PAREN) {
+        rule_stmt_list(p);
+    } else if p.at(NOTHING_KW) {
+        let m = p.start();
+        p.bump(NOTHING_KW);
+        m.complete(p, NOTHING);
+        // pass
+    } else {
+        select_insert_delete_update_or_notify(p, false);
+    }
+    m.complete(p, RULE_DO);
+}
+
+fn rule_on(p: &mut Parser<'_>) {
+    let m = p.start();
     p.expect(ON_KW);
     if p.at(SELECT_KW) || p.at(INSERT_KW) || p.at(UPDATE_KW) || p.at(DELETE_KW) {
         p.bump_any();
@@ -10042,22 +10067,20 @@ fn create_rule(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(TO_KW);
     path_name_ref(p);
     opt_where_clause(p);
-    p.expect(DO_KW);
-    let _ = p.eat(ALSO_KW) || p.eat(INSTEAD_KW);
-    if p.eat(L_PAREN) {
-        // TODO: use delimited
-        // ( command ; command ... )
-        while !p.at(EOF) && !p.at(R_PAREN) {
-            select_insert_delete_update_or_notify(p, true);
-        }
-        p.expect(R_PAREN);
-    } else if p.eat(NOTHING_KW) {
-        // pass
-    } else {
-        select_insert_delete_update_or_notify(p, false);
+    m.complete(p, RULE_ON);
+}
+
+fn rule_stmt_list(p: &mut Parser<'_>) {
+    assert!(p.at(L_PAREN));
+    let m = p.start();
+    p.expect(L_PAREN);
+    // TODO: use delimited
+    // ( command ; command ... )
+    while !p.at(EOF) && !p.at(R_PAREN) {
+        select_insert_delete_update_or_notify(p, true);
     }
-    p.eat(SEMICOLON);
-    m.complete(p, CREATE_RULE)
+    p.expect(R_PAREN);
+    m.complete(p, RULE_STMT_LIST);
 }
 
 // CREATE [ { TEMPORARY | TEMP } | UNLOGGED ] SEQUENCE [ IF NOT EXISTS ] name
