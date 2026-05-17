@@ -17,6 +17,7 @@ use squawk_syntax::{Parse, SourceFile};
 pub use version::Version;
 
 pub mod analyze;
+pub mod config;
 pub mod ignore;
 mod ignore_index;
 mod version;

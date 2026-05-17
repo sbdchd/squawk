@@ -1,5 +1,6 @@
 ---
-source: crates/squawk/src/config.rs
+source: crates/squawk_linter/src/config.rs
+assertion_line: 118
 expression: "ConfigFile::parse(Some(squawk_toml.path().to_path_buf()))"
 ---
 Ok(
@@ -8,10 +9,16 @@ Ok(
             excluded_paths: [],
             excluded_rules: [],
             included_rules: [],
-            pg_version: None,
-            assume_in_transaction: Some(
-                false,
+            pg_version: Some(
+                Version {
+                    major: 19,
+                    minor: Some(
+                        1,
+                    ),
+                    patch: None,
+                },
             ),
+            assume_in_transaction: None,
             upload_to_github: UploadToGitHubConfig {
                 fail_on_violations: None,
             },

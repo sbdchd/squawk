@@ -1,3 +1,4 @@
+mod config;
 mod diagnostic;
 mod dispatch;
 mod global_state;

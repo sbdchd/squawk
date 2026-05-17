@@ -2524,14 +2524,18 @@ name = "squawk-linter"
 version = "2.52.1"
 dependencies = [
  "annotate-snippets",
+ "anyhow",
  "enum-iterator",
  "insta",
  "line-index",
+ "log",
  "rowan",
  "rustc-hash 2.1.1",
  "serde",
  "serde_plain",
  "squawk-syntax",
+ "tempfile",
+ "toml",
 ]
 
 [[package]]
@@ -2554,6 +2558,7 @@ dependencies = [
  "anyhow",
  "crossbeam-channel",
  "etcetera",
+ "glob",
  "insta",
  "line-index",
  "log",

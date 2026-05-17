@@ -2,9 +2,10 @@ use ::line_index::LineIndex;
 use lsp_types::{CodeDescription, Diagnostic, DiagnosticSeverity, Position, Range, TextEdit, Url};
 use salsa::Database as Db;
 use squawk_ide::db::{File, line_index as file_line_index, parse};
-use squawk_linter::{Edit, Linter};
+use squawk_linter::Edit;
 
 use crate::{
+    config::LintConfig,
     diagnostic::{AssociatedDiagnosticData, DIAGNOSTIC_NAME},
     ignore::{ignore_file_edit, ignore_line_edit},
 };
@@ -19,12 +20,11 @@ fn to_text_edit(edit: Edit, line_index: &LineIndex) -> Option<TextEdit> {
     Some(TextEdit::new(range, edit.text.unwrap_or_default()))
 }
 
-#[salsa::tracked]
-pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
+pub(crate) fn lint(db: &dyn Db, file: File, config: &LintConfig) -> Vec<Diagnostic> {
     let parse = parse(db, file);
     let content = file.content(db);
     let parse_errors = parse.errors();
-    let mut linter = Linter::with_default_rules();
+    let mut linter = config.new_linter();
     let violations = linter.lint(&parse, content);
     let line_index = file_line_index(db, file);
 
