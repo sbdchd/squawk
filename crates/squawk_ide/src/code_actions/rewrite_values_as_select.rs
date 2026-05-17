@@ -44,7 +44,7 @@ pub(super) fn rewrite_values_as_select(
         if row_targets.is_empty() {
             return None;
         }
-        select_parts.push(format!("union all\nselect {}", row_targets));
+        select_parts.push(format!("union all\nselect {row_targets}"));
     }
 
     let mut select_stmt = select_parts.join("\n");

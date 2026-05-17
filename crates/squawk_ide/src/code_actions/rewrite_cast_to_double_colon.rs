@@ -25,7 +25,7 @@ pub(super) fn rewrite_cast_to_double_colon(
     let expr_text = expr.syntax().text();
     let type_text = ty.syntax().text();
 
-    let replacement = format!("{}::{}", expr_text, type_text);
+    let replacement = format!("{expr_text}::{type_text}");
 
     actions.push(CodeAction {
         title: "Rewrite as cast operator `::`".to_owned(),

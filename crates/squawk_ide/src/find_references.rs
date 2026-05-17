@@ -114,7 +114,7 @@ mod test {
             snippet = snippet.annotation(
                 AnnotationKind::Context
                     .span(range.into())
-                    .label(format!("{}. reference", label_index)),
+                    .label(format!("{label_index}. reference")),
             );
         }
         snippet

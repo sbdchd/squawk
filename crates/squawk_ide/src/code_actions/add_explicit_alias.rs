@@ -31,7 +31,7 @@ pub(super) fn add_explicit_alias(
     let expr_end = target.expr().map(|e| e.syntax().text_range().end())?;
 
     let quoted_alias = quote_column_alias(&alias);
-    let replacement = format!(" as {}", quoted_alias);
+    let replacement = format!(" as {quoted_alias}");
 
     actions.push(CodeAction {
         title: "Add explicit alias".to_owned(),

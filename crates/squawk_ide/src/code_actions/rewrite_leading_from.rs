@@ -40,7 +40,7 @@ pub(super) fn rewrite_leading_from(
         edits: vec![
             Edit::delete(select_with_ws),
             Edit::insert(
-                format!("{} ", select_text),
+                format!("{select_text} "),
                 from_clause.syntax().text_range().start(),
             ),
         ],

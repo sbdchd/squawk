@@ -163,7 +163,7 @@ fn inlay_hint_insert_select(
                 let expr_start = expr.syntax().text_range().start();
                 hints.push(InlayHint {
                     position: expr_start,
-                    label: format!("{}: ", column_name),
+                    label: format!("{column_name}: "),
                     kind: InlayHintKind::Parameter,
                     target: *target,
                 });
@@ -179,7 +179,7 @@ fn inlay_hint_insert_select(
         let expr_start = expr.syntax().text_range().start();
         hints.push(InlayHint {
             position: expr_start,
-            label: format!("{}: ", column_name),
+            label: format!("{column_name}: "),
             kind: InlayHintKind::Parameter,
             target: *target,
         });

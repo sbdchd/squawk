@@ -863,10 +863,7 @@ fn function_detail(
     let ret_type = create_function.ret_type()?;
     let return_type = ret_type.syntax().text().to_string();
 
-    Some(format!(
-        "{}.{}{} {}",
-        schema, function_name, params, return_type
-    ))
+    Some(format!("{schema}.{function_name}{params} {return_type}"))
 }
 
 fn default_completions() -> Vec<CompletionItem> {

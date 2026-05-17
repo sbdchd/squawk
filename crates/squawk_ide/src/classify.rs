@@ -903,12 +903,11 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
 fn special_function() {
     for kind in (0..SyntaxKind::__LAST as u16)
         .map(SyntaxKind::from)
-        .filter(|kind| format!("{:?}", kind).ends_with("_FN"))
+        .filter(|kind| format!("{kind:?}").ends_with("_FN"))
     {
         assert!(
             is_special_fn(kind),
-            "unhandled special function kind: {:?}. Please update is_special_fn",
-            kind
+            "unhandled special function kind: {kind:?}. Please update is_special_fn"
         )
     }
 }

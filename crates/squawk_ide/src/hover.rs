@@ -279,10 +279,10 @@ impl ColumnHover {
     }
 
     fn anon_column(col_name: &str) -> String {
-        format!("column {}", col_name)
+        format!("column {col_name}")
     }
     fn anon_column_type(col_name: &str, ty: &str) -> String {
-        format!("column {} {}", col_name, ty)
+        format!("column {col_name} {ty}")
     }
 }
 
@@ -550,7 +550,7 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::Alias>) -> Opti
         .map(|column| column.to_string())
         .collect::<Vec<_>>()
         .join(", ");
-    Some(Hover::snippet(format!("table {}({})", name, columns)))
+    Some(Hover::snippet(format!("table {name}({columns})")))
 }
 
 fn hover_qualified_star(db: &dyn Db, field_expr: InFile<ast::FieldExpr>) -> Option<Hover> {
@@ -623,7 +623,7 @@ fn hover_unqualified_star_in_arg_list(
 fn format_subquery_table(name: Name, paren_select: ast::ParenSelect) -> Option<Hover> {
     let name = name.to_string();
     let query = paren_select.syntax().text().to_string();
-    Some(Hover::snippet(format!("subquery {} as {}", name, query)))
+    Some(Hover::snippet(format!("subquery {name} as {query}")))
 }
 
 fn hover_qualified_star_columns(
@@ -1112,8 +1112,7 @@ fn format_create_table_as(
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let query = create_table_as.query()?.syntax().text().to_string();
     Some(Hover::snippet(format!(
-        "table {}.{} as {}",
-        schema, table_name, query
+        "table {schema}.{table_name} as {query}"
     )))
 }
 
@@ -1184,12 +1183,12 @@ fn format_view_column(
 fn format_with_table(with_table: ast::WithTable) -> Option<Hover> {
     let name = with_table.name()?.syntax().text().to_string();
     let query = with_table.query()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("with {} as ({})", name, query)))
+    Some(Hover::snippet(format!("with {name} as ({query})")))
 }
 
 fn format_paren_select(paren_select: ast::ParenSelect) -> Option<Hover> {
     let query = paren_select.select()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("({})", query)))
+    Some(Hover::snippet(format!("({query})")))
 }
 
 fn format_create_index(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> Option<Hover> {
@@ -1206,8 +1205,7 @@ fn format_create_index(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> O
     let columns = partition_item_list.syntax().text().to_string();
 
     Some(Hover::snippet(format!(
-        "index {}.{} on {}.{}{}",
-        index_schema, index_name, table_schema, table_name, columns
+        "index {index_schema}.{index_name} on {table_schema}.{table_name}{columns}"
     )))
 }
 
@@ -1220,10 +1218,7 @@ fn format_create_sequence(
     let path = create_sequence.path()?;
     let (schema, sequence_name) = resolve::resolve_sequence_info(db, InFile::new(file, &path))?;
 
-    Some(Hover::snippet(format!(
-        "sequence {}.{}",
-        schema, sequence_name
-    )))
+    Some(Hover::snippet(format!("sequence {schema}.{sequence_name}")))
 }
 
 fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>) -> Option<Hover> {
@@ -1234,8 +1229,7 @@ fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>
 
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
-        "trigger {}.{} on {}.{}",
-        schema, trigger_name, schema, table_name
+        "trigger {schema}.{trigger_name} on {schema}.{table_name}"
     )))
 }
 
@@ -1247,8 +1241,7 @@ fn format_create_policy(db: &dyn Db, create_policy: InFile<ast::CreatePolicy>) -
 
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
-        "policy {}.{} on {}.{}",
-        schema, policy_name, schema, table_name
+        "policy {schema}.{policy_name} on {schema}.{table_name}"
     )))
 }
 
@@ -1260,40 +1253,37 @@ fn format_create_property_graph(
     let create_property_graph = create_property_graph.value;
     let path = create_property_graph.path()?;
     let (schema, name) = resolve::resolve_property_graph_info(db, InFile::new(file, &path))?;
-    Some(Hover::snippet(format!(
-        "property graph {}.{}",
-        schema, name
-    )))
+    Some(Hover::snippet(format!("property graph {schema}.{name}")))
 }
 
 fn format_create_event_trigger(create_event_trigger: ast::CreateEventTrigger) -> Option<Hover> {
     let name = create_event_trigger.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("event trigger {}", name)))
+    Some(Hover::snippet(format!("event trigger {name}")))
 }
 
 fn format_create_tablespace(create_tablespace: ast::CreateTablespace) -> Option<Hover> {
     let name = create_tablespace.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("tablespace {}", name)))
+    Some(Hover::snippet(format!("tablespace {name}")))
 }
 
 fn format_create_database(create_database: ast::CreateDatabase) -> Option<Hover> {
     let name = create_database.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("database {}", name)))
+    Some(Hover::snippet(format!("database {name}")))
 }
 
 fn format_create_server(create_server: ast::CreateServer) -> Option<Hover> {
     let name = create_server.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("server {}", name)))
+    Some(Hover::snippet(format!("server {name}")))
 }
 
 fn format_create_extension(create_extension: ast::CreateExtension) -> Option<Hover> {
     let name = create_extension.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("extension {}", name)))
+    Some(Hover::snippet(format!("extension {name}")))
 }
 
 fn format_create_role(create_role: ast::CreateRole) -> Option<Hover> {
     let name = create_role.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("role {}", name)))
+    Some(Hover::snippet(format!("role {name}")))
 }
 
 fn index_schema(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> Option<String> {
@@ -1312,15 +1302,15 @@ fn format_create_type(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
 
     let snippet = if let Some(variant_list) = create_type.variant_list() {
         let variants = variant_list.syntax().text().to_string();
-        format!("type {}.{} as enum {}", schema, type_name, variants)
+        format!("type {schema}.{type_name} as enum {variants}")
     } else if let Some(column_list) = create_type.column_list() {
         let columns = column_list.syntax().text().to_string();
-        format!("type {}.{} as {}", schema, type_name, columns)
+        format!("type {schema}.{type_name} as {columns}")
     } else if let Some(attribute_list) = create_type.attribute_list() {
         let attributes = attribute_list.syntax().text().to_string();
-        format!("type {}.{} {}", schema, type_name, attributes)
+        format!("type {schema}.{type_name} {attributes}")
     } else {
-        format!("type {}.{}", schema, type_name)
+        format!("type {schema}.{type_name}")
     };
 
     Some(hover_with_preceding_comment(snippet, create_type.syntax()))
@@ -1347,7 +1337,7 @@ fn create_schema_name(create_schema: ast::CreateSchema) -> Option<String> {
 
 fn format_create_schema(create_schema: ast::CreateSchema) -> Option<Hover> {
     let schema_name = create_schema_name(create_schema)?;
-    Some(Hover::snippet(format!("schema {}", schema_name)))
+    Some(Hover::snippet(format!("schema {schema_name}")))
 }
 
 fn hover_function(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -1411,15 +1401,11 @@ fn format_param_hover(
 ) -> Hover {
     if let Some(param_type) = param_type {
         return Hover::snippet(format!(
-            "parameter {}.{}.{} {}",
-            schema, routine_name, param_name, param_type
+            "parameter {schema}.{routine_name}.{param_name} {param_type}"
         ));
     }
 
-    Hover::snippet(format!(
-        "parameter {}.{}.{}",
-        schema, routine_name, param_name
-    ))
+    Hover::snippet(format!("parameter {schema}.{routine_name}.{param_name}"))
 }
 
 fn format_create_function(
@@ -1433,10 +1419,7 @@ fn format_create_function(
 
     let params = create_function.param_list()?.syntax().text().to_string();
     let return_type = create_function.ret_type()?.syntax().text().to_string();
-    let snippet = format!(
-        "function {}.{}{} {}",
-        schema, function_name, params, return_type
-    );
+    let snippet = format!("function {schema}.{function_name}{params} {return_type}");
 
     Some(hover_with_preceding_comment(
         snippet,
@@ -1465,8 +1448,7 @@ fn format_create_aggregate(
     let params = param_list.syntax().text().to_string();
 
     Some(Hover::snippet(format!(
-        "aggregate {}.{}{}",
-        schema, aggregate_name, params
+        "aggregate {schema}.{aggregate_name}{params}"
     )))
 }
 
@@ -1491,8 +1473,7 @@ fn format_create_procedure(
     let params = param_list.syntax().text().to_string();
 
     Some(Hover::snippet(format!(
-        "procedure {}.{}{}",
-        schema, procedure_name, params
+        "procedure {schema}.{procedure_name}{params}"
     )))
 }
 
