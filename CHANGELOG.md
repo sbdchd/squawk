@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.53.0 - 2026-05-17
+
+### Added
+
+- parser: validate string continuations (#1137)
+- parser: improve create rule ast (#1147)
+
+### Changed
+
+- parser: update ast nodes to include their trailing semicolons (#1145, #1148)
+
+### Fixed
+
+- install: fix windows npx install bug (#1140)
+
 ## v2.52.1 - 2026-05-12
 
 ### Changed
