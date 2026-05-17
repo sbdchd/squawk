@@ -1,0 +1,168 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/begin_atomic_stmts.sql
+---
+SOURCE_FILE@0..239
+  CREATE_FUNCTION@0..118
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    FUNCTION_KW@7..15 "function"
+    WHITESPACE@15..16 " "
+    PATH@16..17
+      PATH_SEGMENT@16..17
+        NAME@16..17
+          IDENT@16..17 "f"
+    PARAM_LIST@17..19
+      L_PAREN@17..18 "("
+      R_PAREN@18..19 ")"
+    WHITESPACE@19..20 "\n"
+    RET_TYPE@20..32
+      RETURNS_KW@20..27 "returns"
+      WHITESPACE@27..28 " "
+      PATH_TYPE@28..32
+        PATH@28..32
+          PATH_SEGMENT@28..32
+            NAME_REF@28..32
+              IDENT@28..32 "void"
+    WHITESPACE@32..33 "\n"
+    FUNC_OPTION_LIST@33..117
+      LANGUAGE_FUNC_OPTION@33..45
+        LANGUAGE_KW@33..41 "language"
+        WHITESPACE@41..42 " "
+        SQL_KW@42..45 "sql"
+      WHITESPACE@45..46 "\n"
+      BEGIN_FUNC_OPTION_LIST@46..117
+        BEGIN_KW@46..51 "begin"
+        WHITESPACE@51..52 " "
+        ATOMIC_KW@52..58 "atomic"
+        WHITESPACE@58..61 "\n  "
+        INSERT@61..86
+          INSERT_KW@61..67 "insert"
+          WHITESPACE@67..68 " "
+          INTO_KW@68..72 "into"
+          WHITESPACE@72..73 " "
+          PATH@73..74
+            PATH_SEGMENT@73..74
+              NAME_REF@73..74
+                IDENT@73..74 "t"
+          WHITESPACE@74..75 " "
+          VALUES@75..85
+            VALUES_KW@75..81 "values"
+            WHITESPACE@81..82 " "
+            ROW_LIST@82..85
+              ROW@82..85
+                L_PAREN@82..83 "("
+                LITERAL@83..84
+                  INT_NUMBER@83..84 "1"
+                R_PAREN@84..85 ")"
+          SEMICOLON@85..86 ";"
+        WHITESPACE@86..89 "\n  "
+        INSERT@89..113
+          INSERT_KW@89..95 "insert"
+          WHITESPACE@95..96 " "
+          INTO_KW@96..100 "into"
+          WHITESPACE@100..101 " "
+          PATH@101..102
+            PATH_SEGMENT@101..102
+              NAME_REF@101..102
+                IDENT@101..102 "t"
+          WHITESPACE@102..103 " "
+          VALUES@103..113
+            VALUES_KW@103..109 "values"
+            WHITESPACE@109..110 " "
+            ROW_LIST@110..113
+              ROW@110..113
+                L_PAREN@110..111 "("
+                LITERAL@111..112
+                  INT_NUMBER@111..112 "2"
+                R_PAREN@112..113 ")"
+        WHITESPACE@113..114 "\n"
+        END_KW@114..117 "end"
+    SEMICOLON@117..118 ";"
+  WHITESPACE@118..120 "\n\n"
+  CREATE_FUNCTION@120..238
+    CREATE_KW@120..126 "create"
+    WHITESPACE@126..127 " "
+    FUNCTION_KW@127..135 "function"
+    WHITESPACE@135..136 " "
+    PATH@136..137
+      PATH_SEGMENT@136..137
+        NAME@136..137
+          IDENT@136..137 "g"
+    PARAM_LIST@137..139
+      L_PAREN@137..138 "("
+      R_PAREN@138..139 ")"
+    WHITESPACE@139..140 "\n"
+    RET_TYPE@140..152
+      RETURNS_KW@140..147 "returns"
+      WHITESPACE@147..148 " "
+      PATH_TYPE@148..152
+        PATH@148..152
+          PATH_SEGMENT@148..152
+            NAME_REF@148..152
+              IDENT@148..152 "void"
+    WHITESPACE@152..153 "\n"
+    FUNC_OPTION_LIST@153..237
+      LANGUAGE_FUNC_OPTION@153..165
+        LANGUAGE_KW@153..161 "language"
+        WHITESPACE@161..162 " "
+        SQL_KW@162..165 "sql"
+      WHITESPACE@165..166 "\n"
+      BEGIN_FUNC_OPTION_LIST@166..237
+        BEGIN_KW@166..171 "begin"
+        WHITESPACE@171..172 " "
+        ATOMIC_KW@172..178 "atomic"
+        WHITESPACE@178..181 "\n  "
+        INSERT@181..205
+          INSERT_KW@181..187 "insert"
+          WHITESPACE@187..188 " "
+          INTO_KW@188..192 "into"
+          WHITESPACE@192..193 " "
+          PATH@193..194
+            PATH_SEGMENT@193..194
+              NAME_REF@193..194
+                IDENT@193..194 "t"
+          WHITESPACE@194..195 " "
+          VALUES@195..205
+            VALUES_KW@195..201 "values"
+            WHITESPACE@201..202 " "
+            ROW_LIST@202..205
+              ROW@202..205
+                L_PAREN@202..203 "("
+                LITERAL@203..204
+                  INT_NUMBER@203..204 "1"
+                R_PAREN@204..205 ")"
+        WHITESPACE@205..208 "\n  "
+        INSERT@208..233
+          INSERT_KW@208..214 "insert"
+          WHITESPACE@214..215 " "
+          INTO_KW@215..219 "into"
+          WHITESPACE@219..220 " "
+          PATH@220..221
+            PATH_SEGMENT@220..221
+              NAME_REF@220..221
+                IDENT@220..221 "t"
+          WHITESPACE@221..222 " "
+          VALUES@222..232
+            VALUES_KW@222..228 "values"
+            WHITESPACE@228..229 " "
+            ROW_LIST@229..232
+              ROW@229..232
+                L_PAREN@229..230 "("
+                LITERAL@230..231
+                  INT_NUMBER@230..231 "2"
+                R_PAREN@231..232 ")"
+          SEMICOLON@232..233 ";"
+        WHITESPACE@233..234 "\n"
+        END_KW@234..237 "end"
+    SEMICOLON@237..238 ";"
+  WHITESPACE@238..239 "\n"
+
+error[syntax-error]: Missing semicolon after statement
+  ╭▸ 
+6 │   insert into t values (2)
+  ╰╴                          ━
+error[syntax-error]: Missing semicolon after statement
+   ╭▸ 
+13 │   insert into t values (1)
+   ╰╴                          ━

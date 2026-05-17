@@ -16,6 +16,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
         match_ast! {
             match node {
                 ast::AlterAggregate(it) => validate_aggregate_params(it.aggregate().and_then(|x| x.param_list()), errors),
+                ast::BeginFuncOptionList(it) => validate_begin_func_option_list(it, errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
@@ -24,6 +25,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
+                ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
                 ast::Select(it) => validate_select(it, errors),
                 ast::SelectInto(it) => validate_select_into(it, errors),
                 ast::SourceFile(it) => validate_source_file(it, errors),
@@ -37,6 +39,46 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
         {
             validate_unicode_esc_ident(&token, errors);
         }
+    }
+}
+
+fn validate_begin_func_option_list(it: ast::BeginFuncOptionList, acc: &mut Vec<SyntaxError>) {
+    for option in it.begin_func_options() {
+        let ast::BeginFuncOption::Stmt(stmt) = option else {
+            continue;
+        };
+        let syntax = stmt.syntax();
+        if syntax.kind() == EMPTY_STMT {
+            continue;
+        }
+        let ends_with_semi = syntax.last_token().is_some_and(|t| t.kind() == SEMICOLON);
+        if ends_with_semi {
+            continue;
+        }
+        let end = syntax.text_range().end();
+        acc.push(SyntaxError::new(
+            "Missing semicolon after statement",
+            TextRange::empty(end),
+        ));
+    }
+}
+
+fn validate_rule_stmt_list(it: ast::RuleStmtList, acc: &mut Vec<SyntaxError>) {
+    let mut stmts = it.rule_stmts().peekable();
+    while let Some(stmt) = stmts.next() {
+        let syntax = stmt.syntax();
+        if stmts.peek().is_none() {
+            continue;
+        }
+        let ends_with_semi = syntax.last_token().is_some_and(|t| t.kind() == SEMICOLON);
+        if ends_with_semi {
+            continue;
+        }
+        let end = syntax.text_range().end();
+        acc.push(SyntaxError::new(
+            "Missing semicolon between statements",
+            TextRange::empty(end),
+        ));
     }
 }
 

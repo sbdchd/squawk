@@ -21,6 +21,7 @@ pub enum DocumentSymbolKind {
     Procedure,
     EventTrigger,
     Role,
+    Rule,
     Policy,
     PropertyGraph,
     Type,
@@ -150,6 +151,11 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateRole(create_role) => {
                 if let Some(symbol) = create_role_symbol(create_role) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateRule(create_rule) => {
+                if let Some(symbol) = create_rule_symbol(create_rule) {
                     symbols.push(symbol);
                 }
             }
@@ -675,6 +681,23 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
     })
 }
 
+fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
+    let name_node = create_rule.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_rule.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Rule,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymbol> {
     let name_node = create_policy.name()?;
     let name = name_node.syntax().text().to_string();
@@ -924,6 +947,7 @@ mod tests {
             DocumentSymbolKind::Procedure => "procedure",
             DocumentSymbolKind::EventTrigger => "event trigger",
             DocumentSymbolKind::Role => "role",
+            DocumentSymbolKind::Rule => "rule",
             DocumentSymbolKind::Policy => "policy",
             DocumentSymbolKind::PropertyGraph => "property graph",
             DocumentSymbolKind::Type => "type",
@@ -1333,6 +1357,36 @@ create role reader;
           │ ┬───────────┯━━━━━─
           │ │           │
           │ │           focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_rule() {
+        assert_snapshot!(symbols("
+create rule r as on select to t do nothing;
+"), @"
+        info: rule: r
+          ╭▸ 
+        2 │ create rule r as on select to t do nothing;
+          │ ┬───────────┯──────────────────────────────
+          │ │           │
+          │ │           focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_rule_or_replace() {
+        assert_snapshot!(symbols("
+create or replace rule notify_me as on update to mytable do also notify mytable;
+"), @"
+        info: rule: notify_me
+          ╭▸ 
+        2 │ create or replace rule notify_me as on update to mytable do also notify mytable;
+          │ ┬──────────────────────┯━━━━━━━━────────────────────────────────────────────────
+          │ │                      │
+          │ │                      focus range
           ╰╴full range
         ");
     }

@@ -1,0 +1,84 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/rule_stmts.sql
+---
+SOURCE_FILE@0..103
+  CREATE_RULE@0..102
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    RULE_KW@7..11 "rule"
+    WHITESPACE@11..12 " "
+    NAME@12..13
+      IDENT@12..13 "r"
+    WHITESPACE@13..14 " "
+    AS_KW@14..16 "as"
+    WHITESPACE@16..17 " "
+    RULE_ON@17..31
+      ON_KW@17..19 "on"
+      WHITESPACE@19..20 " "
+      UPDATE_KW@20..26 "update"
+      WHITESPACE@26..27 " "
+      TO_KW@27..29 "to"
+      WHITESPACE@29..30 " "
+      PATH@30..31
+        PATH_SEGMENT@30..31
+          NAME_REF@30..31
+            IDENT@30..31 "t"
+    WHITESPACE@31..32 " "
+    RULE_DO@32..101
+      DO_KW@32..34 "do"
+      WHITESPACE@34..35 " "
+      INSTEAD_KW@35..42 "instead"
+      WHITESPACE@42..43 " "
+      RULE_STMT_LIST@43..101
+        L_PAREN@43..44 "("
+        WHITESPACE@44..47 "\n  "
+        INSERT@47..71
+          INSERT_KW@47..53 "insert"
+          WHITESPACE@53..54 " "
+          INTO_KW@54..58 "into"
+          WHITESPACE@58..59 " "
+          PATH@59..60
+            PATH_SEGMENT@59..60
+              NAME_REF@59..60
+                IDENT@59..60 "t"
+          WHITESPACE@60..61 " "
+          VALUES@61..71
+            VALUES_KW@61..67 "values"
+            WHITESPACE@67..68 " "
+            ROW_LIST@68..71
+              ROW@68..71
+                L_PAREN@68..69 "("
+                LITERAL@69..70
+                  INT_NUMBER@69..70 "1"
+                R_PAREN@70..71 ")"
+        WHITESPACE@71..74 "\n  "
+        INSERT@74..99
+          INSERT_KW@74..80 "insert"
+          WHITESPACE@80..81 " "
+          INTO_KW@81..85 "into"
+          WHITESPACE@85..86 " "
+          PATH@86..87
+            PATH_SEGMENT@86..87
+              NAME_REF@86..87
+                IDENT@86..87 "t"
+          WHITESPACE@87..88 " "
+          VALUES@88..98
+            VALUES_KW@88..94 "values"
+            WHITESPACE@94..95 " "
+            ROW_LIST@95..98
+              ROW@95..98
+                L_PAREN@95..96 "("
+                LITERAL@96..97
+                  INT_NUMBER@96..97 "2"
+                R_PAREN@97..98 ")"
+          SEMICOLON@98..99 ";"
+        WHITESPACE@99..100 "\n"
+        R_PAREN@100..101 ")"
+    SEMICOLON@101..102 ";"
+  WHITESPACE@102..103 "\n"
+
+error[syntax-error]: Missing semicolon between statements
+  ╭▸ 
+2 │   insert into t values (1)
+  ╰╴                          ━

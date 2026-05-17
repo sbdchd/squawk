@@ -2639,7 +2639,7 @@ RuleAction =
 | RuleStmt
 
 RuleStmtList =
-  '(' (RuleStmt (',' RuleStmt)*) ')'
+  '(' (RuleStmt (';' RuleStmt)*) ')'
 
 RuleStmt =
   SelectVariant
