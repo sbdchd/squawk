@@ -674,15 +674,12 @@ fn delete_expr_completions(
     }
 
     let schema = name::schema_name(&path);
-    if let Some(table_ptr) = binder.lookup_with(
-        &delete_table_name,
-        SymbolKind::Table,
-        position,
-        schema.as_ref(),
-    ) && let Some(create_table) = table_ptr
-        .to_node(source_file.syntax())
-        .ancestors()
-        .find_map(ast::CreateTableLike::cast)
+    let schemas = binder.resolved_schemas(position, schema.as_ref());
+    if let Some(table_ptr) = binder.lookup_with(&delete_table_name, SymbolKind::Table, &schemas)
+        && let Some(create_table) = table_ptr
+            .to_node(source_file.syntax())
+            .ancestors()
+            .find_map(ast::CreateTableLike::cast)
     {
         let columns = collect::table_columns(db, file, &create_table);
         completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
@@ -849,8 +846,9 @@ fn function_detail(
 ) -> Option<String> {
     let binder = bind(db, file);
     let source_file = parse(db, file).tree();
+    let schemas = binder.resolved_schemas(position, schema);
     let create_function = binder
-        .lookup_with(function_name, SymbolKind::Function, position, schema)?
+        .lookup_with(function_name, SymbolKind::Function, &schemas)?
         .to_node(source_file.syntax())
         .ancestors()
         .find_map(ast::CreateFunction::cast)?;

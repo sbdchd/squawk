@@ -1520,13 +1520,10 @@ fn qualified_star_table_ptr(
             let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
 
             let name_ref = from_item.name_ref();
-            if let Some((table_like_ptr, _kind)) = resolve::resolve_table_like(
-                db,
-                name_ref.as_ref(),
-                &table_name,
-                schema.as_ref(),
-                InFile::new(file, position),
-            ) {
+            let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+            if let Some((table_like_ptr, _kind)) =
+                resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
+            {
                 return Some(table_like_ptr);
             }
 
@@ -1553,14 +1550,11 @@ fn table_or_view_or_cte_ptrs(
     let (schema, table_name) = name::schema_and_name_path(path)?;
     let mut results = vec![];
     let name_ref = path.segment().and_then(|x| x.name_ref());
+    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
 
-    if let Some((table_like_ptr, _kind)) = resolve::resolve_table_like(
-        db,
-        name_ref.as_ref(),
-        &table_name,
-        schema.as_ref(),
-        InFile::new(file, position),
-    ) {
+    if let Some((table_like_ptr, _kind)) =
+        resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
+    {
         results.push(table_like_ptr);
     }
 
