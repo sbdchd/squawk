@@ -5,7 +5,7 @@ expression: "lint_errors(sql, Rule::RequireConcurrentIndexCreation)"
 warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
   ╭▸ 
 3 │ CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
-  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
   ├ help: Use `concurrently` to avoid blocking writes.
   ╭╴

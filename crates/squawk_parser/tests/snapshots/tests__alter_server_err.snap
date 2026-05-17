@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected ALTER SERVER option

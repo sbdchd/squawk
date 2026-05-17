@@ -26,7 +26,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       INT_NUMBER "42"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_VIEW
     ALTER_KW "alter"
@@ -56,7 +56,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       CURRENT_TIMESTAMP_KW "current_timestamp"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column_drop_default"
   WHITESPACE "\n"
@@ -80,7 +80,7 @@ SOURCE_FILE
     DROP_KW "drop"
     WHITESPACE " "
     DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
@@ -102,7 +102,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_current_role"
   WHITESPACE "\n"
@@ -133,7 +133,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_ROLE_KW "current_role"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_current_user"
   WHITESPACE "\n"
@@ -154,7 +154,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_session_user"
   WHITESPACE "\n"
@@ -175,7 +175,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         SESSION_USER_KW "session_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_to"
   WHITESPACE "\n"
@@ -196,7 +196,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"
   WHITESPACE "\n"
@@ -221,7 +221,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_VIEW
     ALTER_KW "alter"
@@ -242,7 +242,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
@@ -263,7 +263,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_options"
   WHITESPACE "\n"
@@ -319,7 +319,7 @@ SOURCE_FILE
             LITERAL
               TRUE_KW "true"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_options"
   WHITESPACE "\n"
@@ -352,5 +352,5 @@ SOURCE_FILE
           NAME
             IDENT "c"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -21,7 +21,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from_full"
   WHITESPACE "\n"
@@ -58,7 +58,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_options"
   WHITESPACE "\n"
@@ -167,5 +167,5 @@ SOURCE_FILE
             STRING "'100'"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

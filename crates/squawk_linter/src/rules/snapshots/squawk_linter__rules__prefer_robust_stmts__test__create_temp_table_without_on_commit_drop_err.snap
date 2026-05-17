@@ -5,7 +5,7 @@ expression: "lint_errors(r#\"\nselect 1; -- so we don't skip checking\nCREATE TE
 warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ CREATE TEMP TABLE test_table (id int);
-  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ╭╴
 3 │ CREATE TEMP TABLE if not exists test_table (id int);
   ╰╴                  +++++++++++++

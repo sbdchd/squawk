@@ -29,7 +29,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -63,7 +63,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DECLARE
     DECLARE_KW "declare"
@@ -93,7 +93,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DECLARE
     DECLARE_KW "declare"
@@ -113,5 +113,5 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

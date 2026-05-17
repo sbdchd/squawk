@@ -40,7 +40,7 @@ SOURCE_FILE
         LITERAL
           STRING "'three'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- union_with_select"
   WHITESPACE "\n"
@@ -107,7 +107,7 @@ SOURCE_FILE
             TARGET
               LITERAL
                 STRING "'three'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n\n\n"
   COMMENT "-- insert_values"
   WHITESPACE "\n"
@@ -177,7 +177,7 @@ SOURCE_FILE
           LITERAL
             DEFAULT_KW "DEFAULT"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- in_select_from_position"
   WHITESPACE "\n"
@@ -290,7 +290,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "kind"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- update_from"
   WHITESPACE "\n"
@@ -429,7 +429,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               TARGET_KW "target"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_from_in"
   WHITESPACE "\n"
@@ -491,7 +491,7 @@ SOURCE_FILE
                   STRING "'192.168.1.43'"
                 R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- union"
   WHITESPACE "\n"
@@ -525,7 +525,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "4"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- union_select_values"
   WHITESPACE "\n"
@@ -563,7 +563,7 @@ SOURCE_FILE
             TARGET
               LITERAL
                 INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -601,5 +601,5 @@ SOURCE_FILE
                     TARGET
                       LITERAL
                         INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

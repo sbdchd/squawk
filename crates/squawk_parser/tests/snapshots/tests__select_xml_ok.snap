@@ -199,5 +199,5 @@ SOURCE_FILE
                 NULL_KW "null"
         WHITESPACE "\n"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

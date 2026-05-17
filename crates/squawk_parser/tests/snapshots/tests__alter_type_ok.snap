@@ -23,7 +23,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -42,7 +42,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -63,7 +63,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -84,7 +84,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_attribute"
   WHITESPACE "\n"
@@ -110,7 +110,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_attribute_cascade"
   WHITESPACE "\n"
@@ -143,7 +143,7 @@ SOURCE_FILE
         IDENT "b"
       WHITESPACE " "
       CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -174,7 +174,7 @@ SOURCE_FILE
         IDENT "b"
       WHITESPACE " "
       RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_value"
   WHITESPACE "\n"
@@ -195,7 +195,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'v'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_value_full"
   WHITESPACE "\n"
@@ -234,7 +234,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'w'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -271,7 +271,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'w'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_value"
   WHITESPACE "\n"
@@ -297,7 +297,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'w'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_property"
   WHITESPACE "\n"
@@ -326,7 +326,7 @@ SOURCE_FILE
             LITERAL
               STRING "'v'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -364,7 +364,7 @@ SOURCE_FILE
             LITERAL
               STRING "'w'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute"
   WHITESPACE "\n"
@@ -391,7 +391,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute_collate"
   WHITESPACE "\n"
@@ -426,7 +426,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute_cascade"
   WHITESPACE "\n"
@@ -455,7 +455,7 @@ SOURCE_FILE
               TEXT_KW "text"
       WHITESPACE " "
       CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -485,7 +485,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE " "
       RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_attribute"
   WHITESPACE "\n"
@@ -506,7 +506,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "a"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -532,7 +532,7 @@ SOURCE_FILE
         IDENT "a"
       WHITESPACE " "
       CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -558,7 +558,7 @@ SOURCE_FILE
         IDENT "a"
       WHITESPACE " "
       RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_attribute"
   WHITESPACE "\n"
@@ -587,7 +587,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_attribute_set_data"
   WHITESPACE "\n"
@@ -638,7 +638,7 @@ SOURCE_FILE
               IDENT "c"
       WHITESPACE " "
       CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
     ALTER_KW "alter"
@@ -667,7 +667,7 @@ SOURCE_FILE
               IDENT "t"
       WHITESPACE " "
       RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
   WHITESPACE "\n"
@@ -703,5 +703,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

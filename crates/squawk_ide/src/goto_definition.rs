@@ -295,10 +295,10 @@ begin;
 select 1;
 rollback$0;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
-          │ ───── 2. destination
+          │ ────── 2. destination
         3 │ select 1;
         4 │ rollback;
           ╰╴       ─ 1. source
@@ -3484,13 +3484,13 @@ select 1;
 rollback;
 commit;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
           │     ─ 1. source
         3 │ select 1;
         4 │ rollback;
-          ╰╴──────── 2. destination
+          ╰╴───────── 2. destination
         ");
     }
 
@@ -3502,10 +3502,10 @@ begin;
 select 1;
 commit$0;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
-          │ ───── 2. destination
+          │ ────── 2. destination
         3 │ select 1;
         4 │ commit;
           ╰╴     ─ 1. source
@@ -3520,13 +3520,13 @@ begin$0;
 select 1;
 commit;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
           │     ─ 1. source
         3 │ select 1;
         4 │ commit;
-          ╰╴────── 2. destination
+          ╰╴─────── 2. destination
         ");
     }
 
@@ -3538,10 +3538,10 @@ start transaction;
 select 1;
 commit$0;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ start transaction;
-          │ ───────────────── 2. destination
+          │ ────────────────── 2. destination
         3 │ select 1;
         4 │ commit;
           ╰╴     ─ 1. source
@@ -3556,13 +3556,13 @@ start$0 transaction;
 select 1;
 commit;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ start transaction;
           │     ─ 1. source
         3 │ select 1;
         4 │ commit;
-          ╰╴────── 2. destination
+          ╰╴─────── 2. destination
         ");
     }
 

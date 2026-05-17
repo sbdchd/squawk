@@ -20,7 +20,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             INT_KW "int"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -86,5 +86,5 @@ SOURCE_FILE
     WHITESPACE "\n  "
     NULL_CONSTRAINT
       NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'paul'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE
     SET_KW "SET"
@@ -20,7 +20,7 @@ SOURCE_FILE
     ROLE_KW "ROLE"
     WHITESPACE " "
     NONE_KW "NONE"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE
     SET_KW "SET"
@@ -30,7 +30,7 @@ SOURCE_FILE
     ROLE_KW "ROLE"
     WHITESPACE " "
     NONE_KW "NONE"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE
     SET_KW "SET"
@@ -42,7 +42,7 @@ SOURCE_FILE
     ROLE_REF
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE
     SET_KW "set"
@@ -51,11 +51,11 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'fooo'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE
     RESET_KW "RESET"
     WHITESPACE " "
     ROLE_KW "ROLE"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

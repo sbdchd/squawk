@@ -39,7 +39,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'2002-01-01'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- more_schema"
   WHITESPACE "\n"
@@ -76,5 +76,5 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

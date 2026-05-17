@@ -5,7 +5,7 @@ input_file: crates/squawk_syntax/test_data/validation/validate_string_continuati
 SOURCE_FILE@0..1228
   COMMENT@0..28 "-- ok strings with ne ..."
   WHITESPACE@28..29 "\n"
-  SELECT@29..48
+  SELECT@29..49
     SELECT_CLAUSE@29..48
       SELECT_KW@29..35 "select"
       WHITESPACE@35..36 " "
@@ -15,9 +15,9 @@ SOURCE_FILE@0..1228
             STRING@36..41 "'foo'"
             WHITESPACE@41..43 " \n"
             STRING@43..48 "'bar'"
-  SEMICOLON@48..49 ";"
+    SEMICOLON@48..49 ";"
   WHITESPACE@49..50 "\n"
-  SELECT@50..69
+  SELECT@50..70
     SELECT_CLAUSE@50..69
       SELECT_KW@50..56 "select"
       WHITESPACE@56..57 " "
@@ -27,9 +27,9 @@ SOURCE_FILE@0..1228
             ESC_STRING@57..63 "e'foo'"
             WHITESPACE@63..64 "\n"
             STRING@64..69 "'bar'"
-  SEMICOLON@69..70 ";"
+    SEMICOLON@69..70 ";"
   WHITESPACE@70..71 "\n"
-  SELECT@71..91
+  SELECT@71..92
     SELECT_CLAUSE@71..91
       SELECT_KW@71..77 "select"
       WHITESPACE@77..78 " "
@@ -39,9 +39,9 @@ SOURCE_FILE@0..1228
             UNICODE_ESC_STRING@78..85 "u&'foo'"
             WHITESPACE@85..86 "\n"
             STRING@86..91 "'bar'"
-  SEMICOLON@91..92 ";"
+    SEMICOLON@91..92 ";"
   WHITESPACE@92..93 "\n"
-  SELECT@93..110
+  SELECT@93..111
     SELECT_CLAUSE@93..110
       SELECT_KW@93..99 "select"
       WHITESPACE@99..100 " "
@@ -51,9 +51,9 @@ SOURCE_FILE@0..1228
             BIT_STRING@100..105 "b'01'"
             WHITESPACE@105..106 "\n"
             STRING@106..110 "'10'"
-  SEMICOLON@110..111 ";"
+    SEMICOLON@110..111 ";"
   WHITESPACE@111..112 "\n"
-  SELECT@112..129
+  SELECT@112..130
     SELECT_CLAUSE@112..129
       SELECT_KW@112..118 "select"
       WHITESPACE@118..119 " "
@@ -63,11 +63,11 @@ SOURCE_FILE@0..1228
             BYTE_STRING@119..124 "x'1F'"
             WHITESPACE@124..125 "\n"
             STRING@125..129 "'10'"
-  SEMICOLON@129..130 ";"
+    SEMICOLON@129..130 ";"
   WHITESPACE@130..132 "\n\n"
   COMMENT@132..147 "-- error string"
   WHITESPACE@147..148 "\n"
-  SELECT@148..166
+  SELECT@148..167
     SELECT_CLAUSE@148..166
       SELECT_KW@148..154 "select"
       WHITESPACE@154..155 " "
@@ -77,9 +77,9 @@ SOURCE_FILE@0..1228
             STRING@155..160 "'foo'"
             WHITESPACE@160..161 " "
             STRING@161..166 "'bar'"
-  SEMICOLON@166..167 ";"
+    SEMICOLON@166..167 ";"
   WHITESPACE@167..168 "\n"
-  SELECT@168..200
+  SELECT@168..201
     SELECT_CLAUSE@168..200
       SELECT_KW@168..174 "select"
       WHITESPACE@174..175 " "
@@ -91,9 +91,9 @@ SOURCE_FILE@0..1228
             COMMENT@181..194 "/* comment */"
             WHITESPACE@194..195 " "
             STRING@195..200 "'bar'"
-  SEMICOLON@200..201 ";"
+    SEMICOLON@200..201 ";"
   WHITESPACE@201..202 "\n"
-  SELECT@202..267
+  SELECT@202..268
     SELECT_CLAUSE@202..267
       SELECT_KW@202..208 "select"
       WHITESPACE@208..209 " "
@@ -109,9 +109,9 @@ SOURCE_FILE@0..1228
             COMMENT@237..258 "/* another comment */"
             WHITESPACE@258..259 " "
             STRING@259..267 "' world'"
-  SEMICOLON@267..268 ";"
+    SEMICOLON@267..268 ";"
   WHITESPACE@268..269 "\n"
-  SELECT@269..302
+  SELECT@269..303
     SELECT_CLAUSE@269..302
       SELECT_KW@269..275 "select"
       WHITESPACE@275..276 " "
@@ -123,9 +123,9 @@ SOURCE_FILE@0..1228
             COMMENT@284..294 "-- comment"
             WHITESPACE@294..295 "\n"
             STRING@295..302 "'world'"
-  SEMICOLON@302..303 ";"
+    SEMICOLON@302..303 ";"
   WHITESPACE@303..304 "\n"
-  SELECT@304..329
+  SELECT@304..330
     SELECT_CLAUSE@304..329
       SELECT_KW@304..310 "select"
       WHITESPACE@310..311 " "
@@ -137,11 +137,11 @@ SOURCE_FILE@0..1228
             STRING@317..322 "'bar'"
             WHITESPACE@322..323 " "
             STRING@323..329 "'buzz'"
-  SEMICOLON@329..330 ";"
+    SEMICOLON@329..330 ";"
   WHITESPACE@330..332 "\n\n"
   COMMENT@332..354 "-- error escape string"
   WHITESPACE@354..355 "\n"
-  SELECT@355..374
+  SELECT@355..375
     SELECT_CLAUSE@355..374
       SELECT_KW@355..361 "select"
       WHITESPACE@361..362 " "
@@ -151,9 +151,9 @@ SOURCE_FILE@0..1228
             ESC_STRING@362..368 "e'foo'"
             WHITESPACE@368..369 " "
             STRING@369..374 "'bar'"
-  SEMICOLON@374..375 ";"
+    SEMICOLON@374..375 ";"
   WHITESPACE@375..376 "\n"
-  SELECT@376..409
+  SELECT@376..410
     SELECT_CLAUSE@376..409
       SELECT_KW@376..382 "select"
       WHITESPACE@382..383 " "
@@ -165,9 +165,9 @@ SOURCE_FILE@0..1228
             COMMENT@390..403 "/* comment */"
             WHITESPACE@403..404 " "
             STRING@404..409 "'bar'"
-  SEMICOLON@409..410 ";"
+    SEMICOLON@409..410 ";"
   WHITESPACE@410..411 "\n"
-  SELECT@411..477
+  SELECT@411..478
     SELECT_CLAUSE@411..477
       SELECT_KW@411..417 "select"
       WHITESPACE@417..418 " "
@@ -183,9 +183,9 @@ SOURCE_FILE@0..1228
             COMMENT@447..468 "/* another comment */"
             WHITESPACE@468..469 " "
             STRING@469..477 "' world'"
-  SEMICOLON@477..478 ";"
+    SEMICOLON@477..478 ";"
   WHITESPACE@478..479 "\n"
-  SELECT@479..513
+  SELECT@479..514
     SELECT_CLAUSE@479..513
       SELECT_KW@479..485 "select"
       WHITESPACE@485..486 " "
@@ -197,9 +197,9 @@ SOURCE_FILE@0..1228
             COMMENT@495..505 "-- comment"
             WHITESPACE@505..506 "\n"
             STRING@506..513 "'world'"
-  SEMICOLON@513..514 ";"
+    SEMICOLON@513..514 ";"
   WHITESPACE@514..515 "\n"
-  SELECT@515..541
+  SELECT@515..542
     SELECT_CLAUSE@515..541
       SELECT_KW@515..521 "select"
       WHITESPACE@521..522 " "
@@ -211,9 +211,9 @@ SOURCE_FILE@0..1228
             STRING@529..534 "'bar'"
             WHITESPACE@534..535 " "
             STRING@535..541 "'buzz'"
-  SEMICOLON@541..542 ";"
+    SEMICOLON@541..542 ";"
   WHITESPACE@542..543 "\n"
-  SELECT@543..563
+  SELECT@543..564
     SELECT_CLAUSE@543..563
       SELECT_KW@543..549 "select"
       WHITESPACE@549..550 " "
@@ -223,11 +223,11 @@ SOURCE_FILE@0..1228
             ESC_STRING@550..556 "e'foo'"
             WHITESPACE@556..557 "\n"
             STRING@557..563 "'\\u00'"
-  SEMICOLON@563..564 ";"
+    SEMICOLON@563..564 ";"
   WHITESPACE@564..566 "\n\n"
   COMMENT@566..596 "-- error unicode esca ..."
   WHITESPACE@596..597 "\n"
-  SELECT@597..617
+  SELECT@597..618
     SELECT_CLAUSE@597..617
       SELECT_KW@597..603 "select"
       WHITESPACE@603..604 " "
@@ -237,9 +237,9 @@ SOURCE_FILE@0..1228
             UNICODE_ESC_STRING@604..611 "u&'foo'"
             WHITESPACE@611..612 " "
             STRING@612..617 "'bar'"
-  SEMICOLON@617..618 ";"
+    SEMICOLON@617..618 ";"
   WHITESPACE@618..619 "\n"
-  SELECT@619..653
+  SELECT@619..654
     SELECT_CLAUSE@619..653
       SELECT_KW@619..625 "select"
       WHITESPACE@625..626 " "
@@ -251,9 +251,9 @@ SOURCE_FILE@0..1228
             COMMENT@634..647 "/* comment */"
             WHITESPACE@647..648 " "
             STRING@648..653 "'bar'"
-  SEMICOLON@653..654 ";"
+    SEMICOLON@653..654 ";"
   WHITESPACE@654..655 "\n"
-  SELECT@655..722
+  SELECT@655..723
     SELECT_CLAUSE@655..722
       SELECT_KW@655..661 "select"
       WHITESPACE@661..662 " "
@@ -269,9 +269,9 @@ SOURCE_FILE@0..1228
             COMMENT@692..713 "/* another comment */"
             WHITESPACE@713..714 " "
             STRING@714..722 "' world'"
-  SEMICOLON@722..723 ";"
+    SEMICOLON@722..723 ";"
   WHITESPACE@723..724 "\n"
-  SELECT@724..759
+  SELECT@724..760
     SELECT_CLAUSE@724..759
       SELECT_KW@724..730 "select"
       WHITESPACE@730..731 " "
@@ -283,9 +283,9 @@ SOURCE_FILE@0..1228
             COMMENT@741..751 "-- comment"
             WHITESPACE@751..752 "\n"
             STRING@752..759 "'world'"
-  SEMICOLON@759..760 ";"
+    SEMICOLON@759..760 ";"
   WHITESPACE@760..761 "\n"
-  SELECT@761..788
+  SELECT@761..789
     SELECT_CLAUSE@761..788
       SELECT_KW@761..767 "select"
       WHITESPACE@767..768 " "
@@ -297,9 +297,9 @@ SOURCE_FILE@0..1228
             STRING@776..781 "'bar'"
             WHITESPACE@781..782 " "
             STRING@782..788 "'buzz'"
-  SEMICOLON@788..789 ";"
+    SEMICOLON@788..789 ";"
   WHITESPACE@789..790 "\n"
-  SELECT@790..811
+  SELECT@790..812
     SELECT_CLAUSE@790..811
       SELECT_KW@790..796 "select"
       WHITESPACE@796..797 " "
@@ -309,11 +309,11 @@ SOURCE_FILE@0..1228
             UNICODE_ESC_STRING@797..804 "u&'foo'"
             WHITESPACE@804..805 "\n"
             STRING@805..811 "'\\010'"
-  SEMICOLON@811..812 ";"
+    SEMICOLON@811..812 ";"
   WHITESPACE@812..814 "\n\n"
   COMMENT@814..833 "-- error bit string"
   WHITESPACE@833..834 "\n"
-  SELECT@834..851
+  SELECT@834..852
     SELECT_CLAUSE@834..851
       SELECT_KW@834..840 "select"
       WHITESPACE@840..841 " "
@@ -323,9 +323,9 @@ SOURCE_FILE@0..1228
             BIT_STRING@841..846 "b'01'"
             WHITESPACE@846..847 " "
             STRING@847..851 "'10'"
-  SEMICOLON@851..852 ";"
+    SEMICOLON@851..852 ";"
   WHITESPACE@852..853 "\n"
-  SELECT@853..884
+  SELECT@853..885
     SELECT_CLAUSE@853..884
       SELECT_KW@853..859 "select"
       WHITESPACE@859..860 " "
@@ -337,9 +337,9 @@ SOURCE_FILE@0..1228
             COMMENT@866..879 "/* comment */"
             WHITESPACE@879..880 " "
             STRING@880..884 "'11'"
-  SEMICOLON@884..885 ";"
+    SEMICOLON@884..885 ";"
   WHITESPACE@885..886 "\n"
-  SELECT@886..944
+  SELECT@886..945
     SELECT_CLAUSE@886..944
       SELECT_KW@886..892 "select"
       WHITESPACE@892..893 " "
@@ -355,9 +355,9 @@ SOURCE_FILE@0..1228
             COMMENT@918..939 "/* another comment */"
             WHITESPACE@939..940 " "
             STRING@940..944 "'10'"
-  SEMICOLON@944..945 ";"
+    SEMICOLON@944..945 ";"
   WHITESPACE@945..946 "\n"
-  SELECT@946..975
+  SELECT@946..976
     SELECT_CLAUSE@946..975
       SELECT_KW@946..952 "select"
       WHITESPACE@952..953 " "
@@ -369,9 +369,9 @@ SOURCE_FILE@0..1228
             COMMENT@960..970 "-- comment"
             WHITESPACE@970..971 "\n"
             STRING@971..975 "'10'"
-  SEMICOLON@975..976 ";"
+    SEMICOLON@975..976 ";"
   WHITESPACE@976..977 "\n"
-  SELECT@977..999
+  SELECT@977..1000
     SELECT_CLAUSE@977..999
       SELECT_KW@977..983 "select"
       WHITESPACE@983..984 " "
@@ -383,9 +383,9 @@ SOURCE_FILE@0..1228
             STRING@990..994 "'10'"
             WHITESPACE@994..995 " "
             STRING@995..999 "'11'"
-  SEMICOLON@999..1000 ";"
+    SEMICOLON@999..1000 ";"
   WHITESPACE@1000..1001 "\n"
-  SELECT@1001..1018
+  SELECT@1001..1019
     SELECT_CLAUSE@1001..1018
       SELECT_KW@1001..1007 "select"
       WHITESPACE@1007..1008 " "
@@ -395,11 +395,11 @@ SOURCE_FILE@0..1228
             BIT_STRING@1008..1013 "b'10'"
             WHITESPACE@1013..1014 "\n"
             STRING@1014..1018 "'20'"
-  SEMICOLON@1018..1019 ";"
+    SEMICOLON@1018..1019 ";"
   WHITESPACE@1019..1021 "\n\n"
   COMMENT@1021..1041 "-- error byte string"
   WHITESPACE@1041..1042 "\n"
-  SELECT@1042..1059
+  SELECT@1042..1060
     SELECT_CLAUSE@1042..1059
       SELECT_KW@1042..1048 "select"
       WHITESPACE@1048..1049 " "
@@ -409,9 +409,9 @@ SOURCE_FILE@0..1228
             BYTE_STRING@1049..1054 "x'0F'"
             WHITESPACE@1054..1055 " "
             STRING@1055..1059 "'10'"
-  SEMICOLON@1059..1060 ";"
+    SEMICOLON@1059..1060 ";"
   WHITESPACE@1060..1061 "\n"
-  SELECT@1061..1092
+  SELECT@1061..1093
     SELECT_CLAUSE@1061..1092
       SELECT_KW@1061..1067 "select"
       WHITESPACE@1067..1068 " "
@@ -423,9 +423,9 @@ SOURCE_FILE@0..1228
             COMMENT@1074..1087 "/* comment */"
             WHITESPACE@1087..1088 " "
             STRING@1088..1092 "'1F'"
-  SEMICOLON@1092..1093 ";"
+    SEMICOLON@1092..1093 ";"
   WHITESPACE@1093..1094 "\n"
-  SELECT@1094..1152
+  SELECT@1094..1153
     SELECT_CLAUSE@1094..1152
       SELECT_KW@1094..1100 "select"
       WHITESPACE@1100..1101 " "
@@ -441,9 +441,9 @@ SOURCE_FILE@0..1228
             COMMENT@1126..1147 "/* another comment */"
             WHITESPACE@1147..1148 " "
             STRING@1148..1152 "'10'"
-  SEMICOLON@1152..1153 ";"
+    SEMICOLON@1152..1153 ";"
   WHITESPACE@1153..1154 "\n"
-  SELECT@1154..1183
+  SELECT@1154..1184
     SELECT_CLAUSE@1154..1183
       SELECT_KW@1154..1160 "select"
       WHITESPACE@1160..1161 " "
@@ -455,9 +455,9 @@ SOURCE_FILE@0..1228
             COMMENT@1168..1178 "-- comment"
             WHITESPACE@1178..1179 "\n"
             STRING@1179..1183 "'10'"
-  SEMICOLON@1183..1184 ";"
+    SEMICOLON@1183..1184 ";"
   WHITESPACE@1184..1185 "\n"
-  SELECT@1185..1207
+  SELECT@1185..1208
     SELECT_CLAUSE@1185..1207
       SELECT_KW@1185..1191 "select"
       WHITESPACE@1191..1192 " "
@@ -469,9 +469,9 @@ SOURCE_FILE@0..1228
             STRING@1198..1202 "'F0'"
             WHITESPACE@1202..1203 " "
             STRING@1203..1207 "'11'"
-  SEMICOLON@1207..1208 ";"
+    SEMICOLON@1207..1208 ";"
   WHITESPACE@1208..1209 "\n"
-  SELECT@1209..1226
+  SELECT@1209..1227
     SELECT_CLAUSE@1209..1226
       SELECT_KW@1209..1215 "select"
       WHITESPACE@1215..1216 " "
@@ -481,7 +481,7 @@ SOURCE_FILE@0..1228
             BYTE_STRING@1216..1221 "x'1F'"
             WHITESPACE@1221..1222 "\n"
             STRING@1222..1226 "'G0'"
-  SEMICOLON@1226..1227 ";"
+    SEMICOLON@1226..1227 ";"
   WHITESPACE@1227..1228 "\n"
 
 error[syntax-error]: Expected new line or comma between string literals

@@ -13,7 +13,7 @@ SOURCE_FILE
     ALL_KW "all"
     WHITESPACE " "
     DEFERRED_KW "deferred"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_CONSTRAINTS
     SET_KW "set"
@@ -23,7 +23,7 @@ SOURCE_FILE
     ALL_KW "all"
     WHITESPACE " "
     IMMEDIATE_KW "immediate"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_CONSTRAINTS
     SET_KW "set"
@@ -53,7 +53,7 @@ SOURCE_FILE
           IDENT "b"
     WHITESPACE " "
     IMMEDIATE_KW "immediate"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_CONSTRAINTS
     SET_KW "set"
@@ -66,5 +66,5 @@ SOURCE_FILE
           IDENT "bar"
     WHITESPACE " "
     IMMEDIATE_KW "immediate"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

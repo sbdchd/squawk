@@ -25,7 +25,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -238,7 +238,7 @@ SOURCE_FILE
         LITERAL
           STRING "'d'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_simple"
   WHITESPACE "\n"
@@ -271,7 +271,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned"
   WHITESPACE "\n"
@@ -397,7 +397,7 @@ SOURCE_FILE
         LITERAL
           STRING "'d'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_in"
   WHITESPACE "\n"
@@ -460,7 +460,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_from"
   WHITESPACE "\n"
@@ -542,7 +542,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_with"
   WHITESPACE "\n"
@@ -605,7 +605,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with schema"
   WHITESPACE "\n"
@@ -660,7 +660,7 @@ SOURCE_FILE
           STRING "'event-types'"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- like clause is >=pg18"
   WHITESPACE "\n"
@@ -694,7 +694,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- like clause is >=pg18"
   WHITESPACE "\n"
@@ -753,5 +753,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "remote_server"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

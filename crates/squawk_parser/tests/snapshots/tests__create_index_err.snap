@@ -41,7 +41,7 @@ SOURCE_FILE
           WHITESPACE " "
           FIRST_KW "first"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA

@@ -14,7 +14,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'00000003-0000001B-1'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_TRANSACTION
     SET_KW "SET"
@@ -42,7 +42,7 @@ SOURCE_FILE
         READ_KW "read"
         WHITESPACE " "
         WRITE_KW "write"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_TRANSACTION
     SET_KW "SET"
@@ -68,7 +68,7 @@ SOURCE_FILE
         NOT_KW "NOT"
         WHITESPACE " "
         DEFERRABLE_KW "DEFERRABLE"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- no commas is postgres historical according to gram.y"
   WHITESPACE "\n"
@@ -94,5 +94,5 @@ SOURCE_FILE
         NOT_KW "NOT"
         WHITESPACE " "
         DEFERRABLE_KW "DEFERRABLE"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

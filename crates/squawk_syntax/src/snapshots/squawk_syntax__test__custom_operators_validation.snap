@@ -5,7 +5,7 @@ input_file: crates/squawk_syntax/test_data/validation/custom_operators.sql
 SOURCE_FILE@0..108
   COMMENT@0..30 "-- disallowed prefix  ..."
   WHITESPACE@30..31 "\n"
-  SELECT@31..40
+  SELECT@31..41
     SELECT_CLAUSE@31..40
       SELECT_KW@31..37 "select"
       WHITESPACE@37..38 " "
@@ -15,9 +15,9 @@ SOURCE_FILE@0..108
         TARGET@39..40
           NAME_REF@39..40
             IDENT@39..40 "c"
-  SEMICOLON@40..41 ";"
+    SEMICOLON@40..41 ";"
   WHITESPACE@41..42 "\n"
-  SELECT@42..51
+  SELECT@42..52
     SELECT_CLAUSE@42..51
       SELECT_KW@42..48 "select"
       WHITESPACE@48..49 " "
@@ -28,9 +28,9 @@ SOURCE_FILE@0..108
               SLASH@49..50 "/"
             NAME_REF@50..51
               IDENT@50..51 "d"
-  SEMICOLON@51..52 ";"
+    SEMICOLON@51..52 ";"
   WHITESPACE@52..53 "\n"
-  SELECT@53..62
+  SELECT@53..63
     SELECT_CLAUSE@53..62
       SELECT_KW@53..59 "select"
       WHITESPACE@59..60 " "
@@ -41,9 +41,9 @@ SOURCE_FILE@0..108
               L_ANGLE@60..61 "<"
             NAME_REF@61..62
               IDENT@61..62 "e"
-  SEMICOLON@62..63 ";"
+    SEMICOLON@62..63 ";"
   WHITESPACE@63..64 "\n"
-  SELECT@64..73
+  SELECT@64..74
     SELECT_CLAUSE@64..73
       SELECT_KW@64..70 "select"
       WHITESPACE@70..71 " "
@@ -54,9 +54,9 @@ SOURCE_FILE@0..108
               R_ANGLE@71..72 ">"
             NAME_REF@72..73
               IDENT@72..73 "f"
-  SEMICOLON@73..74 ";"
+    SEMICOLON@73..74 ";"
   WHITESPACE@74..75 "\n"
-  SELECT@75..84
+  SELECT@75..85
     SELECT_CLAUSE@75..84
       SELECT_KW@75..81 "select"
       WHITESPACE@81..82 " "
@@ -67,9 +67,9 @@ SOURCE_FILE@0..108
               EQ@82..83 "="
             NAME_REF@83..84
               IDENT@83..84 "g"
-  SEMICOLON@84..85 ";"
+    SEMICOLON@84..85 ";"
   WHITESPACE@85..86 "\n"
-  SELECT@86..95
+  SELECT@86..96
     SELECT_CLAUSE@86..95
       SELECT_KW@86..92 "select"
       WHITESPACE@92..93 " "
@@ -80,9 +80,9 @@ SOURCE_FILE@0..108
               PERCENT@93..94 "%"
             NAME_REF@94..95
               IDENT@94..95 "l"
-  SEMICOLON@95..96 ";"
+    SEMICOLON@95..96 ";"
   WHITESPACE@96..97 "\n"
-  SELECT@97..106
+  SELECT@97..107
     SELECT_CLAUSE@97..106
       SELECT_KW@97..103 "select"
       WHITESPACE@103..104 " "
@@ -93,7 +93,7 @@ SOURCE_FILE@0..108
               CARET@104..105 "^"
             NAME_REF@105..106
               IDENT@105..106 "m"
-  SEMICOLON@106..107 ";"
+    SEMICOLON@106..107 ";"
   WHITESPACE@107..108 "\n"
 
 error[syntax-error]: missing comma

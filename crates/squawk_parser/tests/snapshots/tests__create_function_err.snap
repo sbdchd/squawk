@@ -57,7 +57,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         SQL_KW "sql"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
     CREATE_KW "create"
@@ -122,7 +122,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         SQL_KW "sql"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression partial definition"
   WHITESPACE "\n"

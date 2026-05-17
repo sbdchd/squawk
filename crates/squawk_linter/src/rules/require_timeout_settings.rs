@@ -122,11 +122,11 @@ mod test {
         let sql = r#"
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
         warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `lock_timeout` before this statement.
           ╭╴
@@ -135,7 +135,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `statement_timeout` before this statement
           ╭╴
@@ -150,11 +150,11 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 SET statement_timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
         warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow operations
           ╭▸ 
         3 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `lock_timeout` before this statement.
           ╭╴
@@ -169,11 +169,11 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 SET lock_timeout = '1s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
         warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         3 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `statement_timeout` before this statement
           ╭╴
@@ -217,11 +217,11 @@ SET foo.lock_timeout = '1s';
 SET foo.statement_timeout = '5s';
 ALTER TABLE t ADD COLUMN c BOOLEAN;
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
         warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow operations
           ╭▸ 
         4 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `lock_timeout` before this statement.
           ╭╴
@@ -230,7 +230,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         4 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `statement_timeout` before this statement
           ╭╴
@@ -245,11 +245,11 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
 SET lock_timeout = '1s';
 SET statement_timeout = '5s';
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
         warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `lock_timeout` before this statement.
           ╭╴
@@ -258,7 +258,7 @@ SET statement_timeout = '5s';
         warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ ALTER TABLE t ADD COLUMN c BOOLEAN;
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `statement_timeout` before this statement
           ╭╴
@@ -272,11 +272,11 @@ SET statement_timeout = '5s';
         let sql = r#"
 CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @r"
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings), @"
         warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow operations
           ╭▸ 
         2 │ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `lock_timeout` before this statement.
           ╭╴
@@ -285,7 +285,7 @@ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
         warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
           ╭▸ 
         2 │ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
-          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Configure a `statement_timeout` before this statement
           ╭╴

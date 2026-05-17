@@ -49,7 +49,7 @@ SOURCE_FILE
         INITIALLY_KW "initially"
         WHITESPACE " "
         DEFERRED_KW "deferred"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -77,8 +77,8 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "b"
-  WHITESPACE " "
-  SEMICOLON ";"
+    WHITESPACE " "
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--                     ^ missing comma"
   WHITESPACE "\n\n"
@@ -121,7 +121,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         VALID_KW "valid"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing comma"
   WHITESPACE "\n"
@@ -163,7 +163,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extra comma"
   WHITESPACE "\n"
@@ -209,7 +209,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected command, found ADD_KW

@@ -5,7 +5,7 @@ input_file: crates/squawk_syntax/test_data/validation/join_clauses.sql
 SOURCE_FILE@0..523
   COMMENT@0..7 "-- errs"
   WHITESPACE@7..8 "\n"
-  SELECT@8..30
+  SELECT@8..31
     SELECT_CLAUSE@8..16
       SELECT_KW@8..14 "select"
       WHITESPACE@14..15 " "
@@ -28,9 +28,9 @@ SOURCE_FILE@0..523
           FROM_ITEM@29..30
             NAME_REF@29..30
               IDENT@29..30 "u"
-  SEMICOLON@30..31 ";"
+    SEMICOLON@30..31 ";"
   WHITESPACE@31..33 "\n\n"
-  SELECT@33..60
+  SELECT@33..61
     SELECT_CLAUSE@33..41
       SELECT_KW@33..39 "select"
       WHITESPACE@39..40 " "
@@ -55,9 +55,9 @@ SOURCE_FILE@0..523
           FROM_ITEM@59..60
             NAME_REF@59..60
               IDENT@59..60 "u"
-  SEMICOLON@60..61 ";"
+    SEMICOLON@60..61 ";"
   WHITESPACE@61..63 "\n\n"
-  SELECT@63..91
+  SELECT@63..92
     SELECT_CLAUSE@63..71
       SELECT_KW@63..69 "select"
       WHITESPACE@69..70 " "
@@ -82,9 +82,9 @@ SOURCE_FILE@0..523
           FROM_ITEM@90..91
             NAME_REF@90..91
               IDENT@90..91 "u"
-  SEMICOLON@91..92 ";"
+    SEMICOLON@91..92 ";"
   WHITESPACE@92..94 "\n\n"
-  SELECT@94..121
+  SELECT@94..122
     SELECT_CLAUSE@94..102
       SELECT_KW@94..100 "select"
       WHITESPACE@100..101 " "
@@ -109,11 +109,11 @@ SOURCE_FILE@0..523
           FROM_ITEM@120..121
             NAME_REF@120..121
               IDENT@120..121 "u"
-  SEMICOLON@121..122 ";"
+    SEMICOLON@121..122 ";"
   WHITESPACE@122..125 "\n\n\n"
   COMMENT@125..171 "-- err, can't use con ..."
   WHITESPACE@171..172 "\n"
-  SELECT@172..213
+  SELECT@172..214
     SELECT_CLAUSE@172..180
       SELECT_KW@172..178 "select"
       WHITESPACE@178..179 " "
@@ -148,11 +148,11 @@ SOURCE_FILE@0..523
                 NAME_REF@210..212
                   IDENT@210..212 "id"
               R_PAREN@212..213 ")"
-  SEMICOLON@213..214 ";"
+    SEMICOLON@213..214 ";"
   WHITESPACE@214..216 "\n\n"
   COMMENT@216..261 "-- err, can't use con ..."
   WHITESPACE@261..262 "\n"
-  SELECT@262..301
+  SELECT@262..302
     SELECT_CLAUSE@262..270
       SELECT_KW@262..268 "select"
       WHITESPACE@268..269 " "
@@ -187,11 +187,11 @@ SOURCE_FILE@0..523
                 NAME_REF@298..300
                   IDENT@298..300 "id"
               R_PAREN@300..301 ")"
-  SEMICOLON@301..302 ";"
+    SEMICOLON@301..302 ";"
   WHITESPACE@302..304 "\n\n"
   COMMENT@304..309 "-- ok"
   WHITESPACE@309..310 "\n"
-  SELECT@310..340
+  SELECT@310..341
     SELECT_CLAUSE@310..318
       SELECT_KW@310..316 "select"
       WHITESPACE@316..317 " "
@@ -216,9 +216,9 @@ SOURCE_FILE@0..523
           FROM_ITEM@339..340
             NAME_REF@339..340
               IDENT@339..340 "u"
-  SEMICOLON@340..341 ";"
+    SEMICOLON@340..341 ";"
   WHITESPACE@341..343 "\n\n"
-  SELECT@343..391
+  SELECT@343..392
     SELECT_CLAUSE@343..351
       SELECT_KW@343..349 "select"
       WHITESPACE@349..350 " "
@@ -266,9 +266,9 @@ SOURCE_FILE@0..523
                 NAME_REF@388..390
                   IDENT@388..390 "id"
               R_PAREN@390..391 ")"
-  SEMICOLON@391..392 ";"
+    SEMICOLON@391..392 ";"
   WHITESPACE@392..394 "\n\n"
-  SELECT@394..431
+  SELECT@394..432
     SELECT_CLAUSE@394..402
       SELECT_KW@394..400 "select"
       WHITESPACE@400..401 " "
@@ -311,9 +311,9 @@ SOURCE_FILE@0..523
                 DOT@428..429 "."
                 NAME_REF@429..431
                   IDENT@429..431 "id"
-  SEMICOLON@431..432 ";"
+    SEMICOLON@431..432 ";"
   WHITESPACE@432..433 "\n"
-  SELECT@433..463
+  SELECT@433..464
     SELECT_CLAUSE@433..441
       SELECT_KW@433..439 "select"
       WHITESPACE@439..440 " "
@@ -342,9 +342,9 @@ SOURCE_FILE@0..523
             WHITESPACE@458..459 " "
             LITERAL@459..463
               TRUE_KW@459..463 "true"
-  SEMICOLON@463..464 ";"
+    SEMICOLON@463..464 ";"
   WHITESPACE@464..466 "\n\n"
-  SELECT@466..521
+  SELECT@466..522
     SELECT_CLAUSE@466..474
       SELECT_KW@466..472 "select"
       WHITESPACE@472..473 " "
@@ -396,7 +396,7 @@ SOURCE_FILE@0..523
                 NAME_REF@518..520
                   IDENT@518..520 "id"
               R_PAREN@520..521 ")"
-  SEMICOLON@521..522 ";"
+    SEMICOLON@521..522 ";"
   WHITESPACE@522..523 "\n"
 
 error[syntax-error]: Join missing condition.

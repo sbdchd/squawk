@@ -23,7 +23,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "q"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
     ALTER_KW "alter"
@@ -65,7 +65,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "q"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -88,7 +88,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
     ALTER_KW "alter"
@@ -108,7 +108,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
@@ -130,7 +130,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- security"
   WHITESPACE "\n"
@@ -171,7 +171,7 @@ SOURCE_FILE
         DEFINER_KW "definer"
     WHITESPACE " \n  "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- actions"
   WHITESPACE "\n"
@@ -233,7 +233,7 @@ SOURCE_FILE
         ALL_KW "all"
     WHITESPACE "\n  "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_param"
   WHITESPACE "\n"
@@ -262,7 +262,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "v"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
     ALTER_KW "alter"
@@ -289,7 +289,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "v"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
     ALTER_KW "alter"
@@ -315,7 +315,7 @@ SOURCE_FILE
           EQ "="
           WHITESPACE " "
           DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
     ALTER_KW "alter"
@@ -341,7 +341,7 @@ SOURCE_FILE
           FROM_KW "from"
           WHITESPACE " "
           CURRENT_KW "current"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_param"
   WHITESPACE "\n"
@@ -364,7 +364,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
     ALTER_KW "alter"
@@ -382,7 +382,7 @@ SOURCE_FILE
         RESET_KW "reset"
         WHITESPACE " "
         ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
   WHITESPACE "\n"
@@ -407,7 +407,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
     ALTER_KW "alter"
@@ -432,5 +432,5 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

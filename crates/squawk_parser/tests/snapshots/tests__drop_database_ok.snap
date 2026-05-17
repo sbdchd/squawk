@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_DATABASE
     DROP_KW "drop"
@@ -26,7 +26,7 @@ SOURCE_FILE
     WHITESPACE " "
     FORCE_KW "force"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_DATABASE
     DROP_KW "drop"
@@ -46,7 +46,7 @@ SOURCE_FILE
     FORCE_KW "force"
     WHITESPACE " "
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_DATABASE
     DROP_KW "drop"
@@ -55,7 +55,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "\"table_name\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_DATABASE
     DROP_KW "drop"
@@ -69,7 +69,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "\"table_name\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_DATABASE
     DROP_KW "drop"

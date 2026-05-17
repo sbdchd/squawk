@@ -4178,7 +4178,7 @@ update users set email = new_data.email from new_data where new_data.id$0 = user
     fn hover_on_create_view_definition() {
         assert_snapshot!(check_hover("
 create view v$0 as select 1;
-"), @r"
+"), @"
         hover: view public.v as select 1
           ╭▸ 
         2 │ create view v as select 1;
@@ -4190,7 +4190,7 @@ create view v$0 as select 1;
     fn hover_on_create_view_definition_with_schema() {
         assert_snapshot!(check_hover("
 create view myschema.v$0 as select 1;
-"), @r"
+"), @"
         hover: view myschema.v as select 1
           ╭▸ 
         2 │ create view myschema.v as select 1;
@@ -4202,7 +4202,7 @@ create view myschema.v$0 as select 1;
     fn hover_on_create_temp_view_definition() {
         assert_snapshot!(check_hover("
 create temp view v$0 as select 1;
-"), @r"
+"), @"
         hover: view pg_temp.v as select 1
           ╭▸ 
         2 │ create temp view v as select 1;
@@ -4242,7 +4242,7 @@ select a$0 from v;
         assert_snapshot!(check_hover("
 create view v as select 1;
 select * from v$0;
-"), @r"
+"), @"
         hover: view public.v as select 1
           ╭▸ 
         3 │ select * from v;
@@ -4320,7 +4320,7 @@ select a from t$0;
         assert_snapshot!(check_hover("
 create view myschema.v as select 1;
 select * from myschema.v$0;
-"), @r"
+"), @"
         hover: view myschema.v as select 1
           ╭▸ 
         3 │ select * from myschema.v;
@@ -4333,7 +4333,7 @@ select * from myschema.v$0;
         assert_snapshot!(check_hover("
 create view v as select 1;
 drop view v$0;
-"), @r"
+"), @"
         hover: view public.v as select 1
           ╭▸ 
         3 │ drop view v;
@@ -4513,7 +4513,7 @@ alter table users alter email$0 set not null;
         assert_snapshot!(check_hover("
 create materialized view mv as select 1;
 refresh materialized view mv$0;
-"), @r"
+"), @"
         hover: materialized view public.mv as select 1
           ╭▸ 
         3 │ refresh materialized view mv;
@@ -5158,7 +5158,7 @@ create tablespace t owner read$0er location 'foo';
         assert_snapshot!(check_hover("
 declare c scroll cursor for select * from t;
 fetch forward 5 from c$0;
-"), @r"
+"), @"
         hover: cursor c for select * from t
           ╭▸ 
         3 │ fetch forward 5 from c;
@@ -5171,7 +5171,7 @@ fetch forward 5 from c$0;
         assert_snapshot!(check_hover("
 declare c scroll cursor for select * from t;
 close c$0;
-"), @r"
+"), @"
         hover: cursor c for select * from t
           ╭▸ 
         3 │ close c;
@@ -5184,7 +5184,7 @@ close c$0;
         assert_snapshot!(check_hover("
 declare c scroll cursor for select * from t;
 move forward 10 from c$0;
-"), @r"
+"), @"
         hover: cursor c for select * from t
           ╭▸ 
         3 │ move forward 10 from c;
@@ -5196,7 +5196,7 @@ move forward 10 from c$0;
     fn hover_on_prepare_statement() {
         assert_snapshot!(check_hover("
 prepare stmt$0 as select 1;
-"), @r"
+"), @"
         hover: prepare stmt as select 1
           ╭▸ 
         2 │ prepare stmt as select 1;
@@ -5209,7 +5209,7 @@ prepare stmt$0 as select 1;
         assert_snapshot!(check_hover("
 prepare stmt as select 1;
 execute stmt$0;
-"), @r"
+"), @"
         hover: prepare stmt as select 1
           ╭▸ 
         3 │ execute stmt;
@@ -5222,7 +5222,7 @@ execute stmt$0;
         assert_snapshot!(check_hover("
 prepare stmt as select 1;
 deallocate stmt$0;
-"), @r"
+"), @"
         hover: prepare stmt as select 1
           ╭▸ 
         3 │ deallocate stmt;

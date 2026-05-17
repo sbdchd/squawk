@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "l"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -68,5 +68,5 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "y"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

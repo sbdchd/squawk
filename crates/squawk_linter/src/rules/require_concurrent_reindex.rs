@@ -61,7 +61,7 @@ mod test {
         warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
           ╭▸ 
         1 │ REINDEX TABLE foo;
-          │ ━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━
           │
           ├ help: Use `concurrently` to avoid blocking reads and writes.
           ╭╴
@@ -77,7 +77,7 @@ mod test {
         warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
           ╭▸ 
         1 │ REINDEX INDEX foo;
-          │ ━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━
           │
           ├ help: Use `concurrently` to avoid blocking reads and writes.
           ╭╴
@@ -93,7 +93,7 @@ mod test {
         warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
           ╭▸ 
         1 │ REINDEX SCHEMA foo;
-          │ ━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Use `concurrently` to avoid blocking reads and writes.
           ╭╴
@@ -109,7 +109,7 @@ mod test {
         warning[require-concurrent-reindex]: Reindexing a table or index without `concurrently` blocks reads and writes.
           ╭▸ 
         1 │ REINDEX DATABASE foo;
-          │ ━━━━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━━━━
           │
           ├ help: Use `concurrently` to avoid blocking reads and writes.
           ╭╴

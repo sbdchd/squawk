@@ -21,7 +21,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -47,5 +47,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "some_server_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

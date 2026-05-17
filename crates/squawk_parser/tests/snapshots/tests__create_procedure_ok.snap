@@ -23,7 +23,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         SQL_KW "sql"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -226,7 +226,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_select_body"
   WHITESPACE "\n"
@@ -259,28 +259,26 @@ SOURCE_FILE
         WHITESPACE " "
         ATOMIC_KW "atomic"
         WHITESPACE "\n  "
-        BEGIN_FUNC_OPTION
-          SELECT
-            SELECT_CLAUSE
-              SELECT_KW "select"
-              WHITESPACE " "
-              TARGET_LIST
-                TARGET
-                  LITERAL
-                    INT_NUMBER "1"
-        SEMICOLON ";"
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+          SEMICOLON ";"
         WHITESPACE "\n  "
-        BEGIN_FUNC_OPTION
-          SELECT
-            SELECT_CLAUSE
-              SELECT_KW "select"
-              WHITESPACE " "
-              TARGET_LIST
-                TARGET
-                  LITERAL
-                    INT_NUMBER "2"
-        SEMICOLON ";"
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+          SEMICOLON ";"
         WHITESPACE "\n"
         END_KW "end"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

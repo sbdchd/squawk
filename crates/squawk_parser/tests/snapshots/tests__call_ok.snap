@@ -15,7 +15,7 @@ SOURCE_FILE
     ARG_LIST
       L_PAREN "("
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_schema"
   WHITESPACE "\n"
@@ -36,7 +36,7 @@ SOURCE_FILE
       LITERAL
         STRING "'partman_test.time_taptest_table'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_named_args"
   WHITESPACE "\n"
@@ -72,5 +72,5 @@ SOURCE_FILE
         LITERAL
           STRING "'d'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

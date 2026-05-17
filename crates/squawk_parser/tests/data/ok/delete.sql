@@ -82,6 +82,9 @@ with t2 as (
 )
 delete from t using t2;
 
+with t as (delete from k)
+select 1;
+
 -- pg_docs
 DELETE FROM films USING producers
   WHERE producer_id = producers.id AND producers.name = 'foo';

@@ -28,7 +28,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple_args"
   WHITESPACE "\n"
@@ -60,7 +60,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complex_args"
   WHITESPACE "\n"
@@ -109,7 +109,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_order_by"
   WHITESPACE "\n"
@@ -152,7 +152,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- qualified_names"
   WHITESPACE "\n"
@@ -200,5 +200,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "new_schema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

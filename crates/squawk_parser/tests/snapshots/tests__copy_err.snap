@@ -43,7 +43,7 @@ SOURCE_FILE
         WHITESPACE " "
         VERBOSE_KW "verbose"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA

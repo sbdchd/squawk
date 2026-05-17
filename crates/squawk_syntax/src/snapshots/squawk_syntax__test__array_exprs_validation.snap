@@ -3,7 +3,7 @@ source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/array_exprs.sql
 ---
 SOURCE_FILE@0..42
-  SELECT@0..22
+  SELECT@0..23
     SELECT_CLAUSE@0..22
       SELECT_KW@0..6 "select"
       WHITESPACE@6..7 " "
@@ -22,9 +22,9 @@ SOURCE_FILE@0..42
             LITERAL@18..21
               STRING@18..21 "'c'"
             R_BRACK@21..22 "]"
-  SEMICOLON@22..23 ";"
+    SEMICOLON@22..23 ";"
   WHITESPACE@23..25 "\n\n"
-  SELECT@25..40
+  SELECT@25..41
     SELECT_CLAUSE@25..40
       SELECT_KW@25..31 "select"
       WHITESPACE@31..32 " "
@@ -42,7 +42,7 @@ SOURCE_FILE@0..42
                 INT_NUMBER@37..38 "2"
               R_BRACK@38..39 "]"
             R_BRACK@39..40 "]"
-  SEMICOLON@40..41 ";"
+    SEMICOLON@40..41 ";"
   WHITESPACE@41..42 "\n"
 
 error[syntax-error]: Array missing ARRAY keyword.

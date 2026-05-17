@@ -26,7 +26,7 @@ SOURCE_FILE
             NAME_REF
               INT_KW "int"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -58,7 +58,7 @@ SOURCE_FILE
       R_PAREN ")"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_CAST
     DROP_KW "drop"
@@ -98,5 +98,5 @@ SOURCE_FILE
       R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

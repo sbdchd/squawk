@@ -25,7 +25,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "h"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_handler"
   WHITESPACE "\n"
@@ -46,7 +46,7 @@ SOURCE_FILE
         NO_KW "no"
         WHITESPACE " "
         HANDLER_KW "handler"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- validator"
   WHITESPACE "\n"
@@ -70,7 +70,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "v"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_validator"
   WHITESPACE "\n"
@@ -91,7 +91,7 @@ SOURCE_FILE
         NO_KW "no"
         WHITESPACE " "
         VALIDATOR_KW "validator"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
   WHITESPACE "\n"
@@ -139,7 +139,7 @@ SOURCE_FILE
             NAME
               IDENT "o"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
   WHITESPACE "\n"
@@ -223,7 +223,7 @@ SOURCE_FILE
             NAME
               IDENT "d"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -247,7 +247,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -270,5 +270,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

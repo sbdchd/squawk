@@ -17,7 +17,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'5s'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
@@ -31,7 +31,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'1s'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "--"
@@ -89,7 +89,7 @@ SOURCE_FILE
                 NUMERIC_KW "numeric"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -136,7 +136,7 @@ SOURCE_FILE
           VARCHAR_KW "varchar"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -178,7 +178,7 @@ SOURCE_FILE
                 IDENT "date"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -268,7 +268,7 @@ SOURCE_FILE
                 INTEGER_KW "integer"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -347,7 +347,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "CREATE"
@@ -435,7 +435,7 @@ SOURCE_FILE
             IDENT "orders"
       WHITESPACE "\n    "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- get list of customers active today"
   WHITESPACE "\n"
@@ -536,7 +536,7 @@ SOURCE_FILE
                 IDENT "customer_name"
             R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- get list of customers active today"
   WHITESPACE "\n"
@@ -613,7 +613,7 @@ SOURCE_FILE
         WHITESPACE " "
         NAME_REF
           CURRENT_DATE_KW "current_date"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explicit version that doesn't require primary & foreign keys"
   WHITESPACE "\n"
@@ -824,7 +824,7 @@ SOURCE_FILE
               R_PAREN ")"
       WHITESPACE "\n    "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "CREATE"
@@ -947,7 +947,7 @@ SOURCE_FILE
               IDENT "has_placed"
       WHITESPACE "\n    "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1046,7 +1046,7 @@ SOURCE_FILE
                 IDENT "customer_name"
             R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1159,7 +1159,7 @@ SOURCE_FILE
                 IDENT "account_number"
             R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "--"
@@ -1225,7 +1225,7 @@ SOURCE_FILE
                 IDENT "Companies"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -1266,7 +1266,7 @@ SOURCE_FILE
                 TEXT_KW "text"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -1345,7 +1345,7 @@ SOURCE_FILE
                 IDENT "Companies"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -1435,7 +1435,7 @@ SOURCE_FILE
                 BIGINT_KW "bigint"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "CREATE"
@@ -1798,7 +1798,7 @@ SOURCE_FILE
           PROPERTIES_KW "PROPERTIES"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE

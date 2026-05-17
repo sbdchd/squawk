@@ -99,12 +99,12 @@ mod test {
         warning[prefer-repack]: `cluster` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
           ╭▸ 
         1 │ CLUSTER foo;
-          │ ━━━━━━━━━━━
+          │ ━━━━━━━━━━━━
           │
           ├ help: Use `repack` to rewrite the table without blocking reads and writes.
           ╭╴
         1 - CLUSTER foo;
-        1 + repack (concurrently) foo;
+        1 + repack (concurrently) foo
           ╰╴
         ");
     }
@@ -116,12 +116,12 @@ mod test {
         warning[prefer-repack]: `cluster` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
           ╭▸ 
         1 │ CLUSTER;
-          │ ━━━━━━━
+          │ ━━━━━━━━
           │
           ├ help: Use `repack` to rewrite the table without blocking reads and writes.
           ╭╴
         1 - CLUSTER;
-        1 + repack (concurrently);
+        1 + repack (concurrently)
           ╰╴
         ");
     }
@@ -133,12 +133,12 @@ mod test {
         warning[prefer-repack]: `vacuum full` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
           ╭▸ 
         1 │ VACUUM FULL foo;
-          │ ━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━
           │
           ├ help: Use `repack` to rewrite the table without blocking reads and writes.
           ╭╴
         1 - VACUUM FULL foo;
-        1 + repack (concurrently) foo;
+        1 + repack (concurrently) foo
           ╰╴
         ");
     }
@@ -150,12 +150,12 @@ mod test {
         warning[prefer-repack]: `vacuum full` requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table.
           ╭▸ 
         1 │ VACUUM (FULL) foo;
-          │ ━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━
           │
           ├ help: Use `repack` to rewrite the table without blocking reads and writes.
           ╭╴
         1 - VACUUM (FULL) foo;
-        1 + repack (concurrently) foo;
+        1 + repack (concurrently) foo
           ╰╴
         ");
     }
@@ -203,36 +203,36 @@ mod test {
 
     #[test]
     fn fix_vacuum_full() {
-        assert_snapshot!(fix("VACUUM FULL foo;"), @"repack (concurrently) foo;");
+        assert_snapshot!(fix("VACUUM FULL foo;"), @"repack (concurrently) foo");
     }
 
     #[test]
     fn fix_vacuum_full_option_list() {
-        assert_snapshot!(fix("VACUUM (FULL) foo;"), @"repack (concurrently) foo;");
+        assert_snapshot!(fix("VACUUM (FULL) foo;"), @"repack (concurrently) foo");
     }
 
     #[test]
     fn fix_vacuum_full_multiple_tables() {
-        assert_snapshot!(fix("VACUUM FULL foo, bar;"), @"repack (concurrently) foo, bar;");
+        assert_snapshot!(fix("VACUUM FULL foo, bar;"), @"repack (concurrently) foo, bar");
     }
 
     #[test]
     fn fix_cluster_no_index() {
-        assert_snapshot!(fix("CLUSTER foo;"), @"repack (concurrently) foo;");
+        assert_snapshot!(fix("CLUSTER foo;"), @"repack (concurrently) foo");
     }
 
     #[test]
     fn fix_cluster_with_index() {
-        assert_snapshot!(fix("CLUSTER foo USING foo_pkey;"), @"repack (concurrently) foo using index foo_pkey;");
+        assert_snapshot!(fix("CLUSTER foo USING foo_pkey;"), @"repack (concurrently) foo using index foo_pkey");
     }
 
     #[test]
     fn fix_cluster_legacy_on_syntax() {
-        assert_snapshot!(fix("CLUSTER verbose foo_pkey ON foo;"), @"repack (concurrently) foo using index foo_pkey;");
+        assert_snapshot!(fix("CLUSTER verbose foo_pkey ON foo;"), @"repack (concurrently) foo using index foo_pkey");
     }
 
     #[test]
     fn fix_cluster_no_path() {
-        assert_snapshot!(fix("CLUSTER;"), @"repack (concurrently);");
+        assert_snapshot!(fix("CLUSTER;"), @"repack (concurrently)");
     }
 }

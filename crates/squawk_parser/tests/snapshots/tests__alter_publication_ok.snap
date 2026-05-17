@@ -22,7 +22,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
     ALTER_KW "alter"
@@ -96,7 +96,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_tables_in_schema"
   WHITESPACE "\n"
@@ -119,7 +119,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
     ALTER_KW "alter"
@@ -139,7 +139,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       CURRENT_SCHEMA_KW "current_schema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_table"
   WHITESPACE "\n"
@@ -160,7 +160,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
     ALTER_KW "alter"
@@ -234,7 +234,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_parameters"
   WHITESPACE "\n"
@@ -269,7 +269,7 @@ SOURCE_FILE
                   NAME_REF
                     VALUE_KW "value"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_table"
   WHITESPACE "\n"
@@ -290,7 +290,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
     ALTER_KW "alter"
@@ -364,7 +364,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
@@ -384,7 +384,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
     ALTER_KW "alter"
@@ -401,7 +401,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -420,5 +420,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "q"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

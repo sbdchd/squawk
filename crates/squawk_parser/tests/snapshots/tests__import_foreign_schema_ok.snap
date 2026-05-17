@@ -28,7 +28,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- except"
   WHITESPACE "\n"
@@ -67,7 +67,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "local_schema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
   WHITESPACE "\n"
@@ -106,7 +106,7 @@ SOURCE_FILE
         LITERAL
           STRING "'bar'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options_multi"
   WHITESPACE "\n"
@@ -153,7 +153,7 @@ SOURCE_FILE
         LITERAL
           STRING "'b'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
   WHITESPACE "\n"
@@ -180,7 +180,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "films"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
   WHITESPACE "\n"
@@ -221,5 +221,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "films"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

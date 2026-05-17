@@ -10,7 +10,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   NOTIFY
     NOTIFY_KW "NOTIFY"
@@ -21,5 +21,5 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'This is the payload'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

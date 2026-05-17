@@ -5,7 +5,7 @@ input_file: crates/squawk_syntax/test_data/validation/alter_table_ok.sql
 SOURCE_FILE@0..470
   COMMENT@0..66 "-- regression test fo ..."
   WHITESPACE@66..67 "\n"
-  ALTER_TABLE@67..243
+  ALTER_TABLE@67..244
     ALTER_KW@67..72 "alter"
     WHITESPACE@72..73 " "
     TABLE_KW@73..78 "table"
@@ -72,7 +72,7 @@ SOURCE_FILE@0..470
         NOT_KW@234..237 "not"
         WHITESPACE@237..238 " "
         VALID_KW@238..243 "valid"
-  SEMICOLON@243..244 ";"
+    SEMICOLON@243..244 ";"
   WHITESPACE@244..246 "\n\n"
   ALTER_TABLE@246..469
     ALTER_KW@246..251 "alter"

@@ -34,7 +34,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -90,7 +90,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_mapping"
   WHITESPACE "\n"
@@ -123,7 +123,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -164,7 +164,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_mapping_replace"
   WHITESPACE "\n"
@@ -199,7 +199,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -247,7 +247,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_mapping_for_replace"
   WHITESPACE "\n"
@@ -287,7 +287,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -340,7 +340,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_mapping"
   WHITESPACE "\n"
@@ -366,7 +366,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -404,7 +404,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -429,7 +429,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "m"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -457,7 +457,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "m"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
@@ -483,7 +483,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -511,7 +511,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
@@ -536,7 +536,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
     ALTER_KW "alter"
@@ -564,5 +564,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

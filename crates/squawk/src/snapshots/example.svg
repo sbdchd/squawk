@@ -94,7 +94,7 @@
 </tspan>
     <tspan x="10px" y="658px"><tspan class="fg-bright-blue bold">10</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> CREATE INDEX "field_name_idx" ON "table_name" ("field_name");</tspan>
 </tspan>
-    <tspan x="10px" y="676px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="10px" y="676px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
 </tspan>
     <tspan x="10px" y="694px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
@@ -114,7 +114,7 @@
 </tspan>
     <tspan x="10px" y="838px"><tspan class="fg-bright-blue bold">10</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> CREATE INDEX "field_name_idx" ON "table_name" ("field_name");</tspan>
 </tspan>
-    <tspan x="10px" y="856px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="10px" y="856px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
 </tspan>
     <tspan x="10px" y="874px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
@@ -134,7 +134,7 @@
 </tspan>
     <tspan x="10px" y="1018px"><tspan class="fg-bright-blue bold">10</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> CREATE INDEX "field_name_idx" ON "table_name" ("field_name");</tspan>
 </tspan>
-    <tspan x="10px" y="1036px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="10px" y="1036px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
 </tspan>
     <tspan x="10px" y="1054px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>

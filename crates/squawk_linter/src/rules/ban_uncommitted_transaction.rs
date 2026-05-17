@@ -52,11 +52,11 @@ mod test {
 BEGIN;
 CREATE TABLE users (id bigint);
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @"
         warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         2 │ BEGIN;
-          │ ━━━━━
+          │ ━━━━━━
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴
@@ -104,11 +104,11 @@ COMMIT;
 BEGIN;
 CREATE TABLE posts (id bigint);
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @"
         warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         6 │ BEGIN;
-          │ ━━━━━
+          │ ━━━━━━
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴
@@ -124,11 +124,11 @@ CREATE TABLE posts (id bigint);
 START TRANSACTION;
 CREATE TABLE users (id bigint);
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @"
         warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         2 │ START TRANSACTION;
-          │ ━━━━━━━━━━━━━━━━━
+          │ ━━━━━━━━━━━━━━━━━━
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴
@@ -154,11 +154,11 @@ COMMIT;
 BEGIN WORK;
 CREATE TABLE users (id bigint);
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @r"
+        assert_snapshot!(lint_errors(sql, Rule::BanUncommittedTransaction), @"
         warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
           ╭▸ 
         2 │ BEGIN WORK;
-          │ ━━━━━━━━━━
+          │ ━━━━━━━━━━━
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴

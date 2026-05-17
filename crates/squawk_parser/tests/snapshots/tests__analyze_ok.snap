@@ -7,11 +7,11 @@ SOURCE_FILE
   WHITESPACE "\n"
   ANALYZE
     ANALYZE_KW "analyze"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ANALYZE
     ANALYSE_KW "analyse"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -69,7 +69,7 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full_parens"
   WHITESPACE "\n"
@@ -124,5 +124,5 @@ SOURCE_FILE
             NAME_REF
               IDENT "c"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

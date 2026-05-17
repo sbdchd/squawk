@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -28,5 +28,5 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

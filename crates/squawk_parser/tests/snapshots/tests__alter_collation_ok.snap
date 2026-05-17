@@ -19,7 +19,7 @@ SOURCE_FILE
       REFRESH_KW "refresh"
       WHITESPACE " "
       VERSION_KW "version"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -40,7 +40,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -62,7 +62,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_COLLATION
     ALTER_KW "alter"
@@ -86,7 +86,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_ROLE_KW "current_role"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
@@ -107,5 +107,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

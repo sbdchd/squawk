@@ -17,7 +17,8 @@ SOURCE_FILE
     ROLE_OPTION_LIST
       ROLE_OPTION
         IDENT "superuser"
-  SEMICOLON ";"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -109,7 +110,8 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'2025-01-01'"
-  SEMICOLON ";"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_user"
   WHITESPACE "\n"
@@ -129,7 +131,8 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "v"
-  SEMICOLON ";"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set"
   WHITESPACE "\n"
@@ -154,7 +157,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'value'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
     ALTER_KW "alter"
@@ -177,7 +180,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'value'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
     ALTER_KW "alter"
@@ -199,7 +202,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_USER
     ALTER_KW "alter"
@@ -229,7 +232,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'value'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
     ALTER_KW "alter"
@@ -251,7 +254,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       CURRENT_KW "current"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset"
   WHITESPACE "\n"
@@ -268,7 +271,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
     ALTER_KW "alter"
@@ -282,7 +285,7 @@ SOURCE_FILE
     RESET_KW "reset"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
     ALTER_KW "alter"
@@ -304,5 +307,5 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

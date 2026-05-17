@@ -5,7 +5,7 @@ input_file: crates/squawk_syntax/test_data/validation/select_into.sql
 SOURCE_FILE@0..858
   COMMENT@0..18 "-- okay, top level"
   WHITESPACE@18..19 "\n"
-  SELECT_INTO@19..36
+  SELECT_INTO@19..37
     SELECT_CLAUSE@19..29
       SELECT_KW@19..25 "select"
       WHITESPACE@25..26 " "
@@ -25,9 +25,9 @@ SOURCE_FILE@0..858
         PATH_SEGMENT@35..36
           NAME@35..36
             IDENT@35..36 "t"
-  SEMICOLON@36..37 ";"
+    SEMICOLON@36..37 ";"
   WHITESPACE@37..38 "\n"
-  COMPOUND_SELECT@38..72
+  COMPOUND_SELECT@38..73
     SELECT_INTO@38..55
       SELECT_CLAUSE@38..48
         SELECT_KW@38..44 "select"
@@ -63,9 +63,9 @@ SOURCE_FILE@0..858
             AS_NAME@71..72
               NAME@71..72
                 IDENT@71..72 "a"
-  SEMICOLON@72..73 ";"
+    SEMICOLON@72..73 ";"
   WHITESPACE@73..74 "\n"
-  PAREN_SELECT@74..95
+  PAREN_SELECT@74..96
     L_PAREN@74..75 "("
     PAREN_SELECT@75..94
       L_PAREN@75..76 "("
@@ -91,9 +91,9 @@ SOURCE_FILE@0..858
                 IDENT@92..93 "t"
       R_PAREN@93..94 ")"
     R_PAREN@94..95 ")"
-  SEMICOLON@95..96 ";"
+    SEMICOLON@95..96 ";"
   WHITESPACE@96..97 "\n"
-  EXPLAIN@97..120
+  EXPLAIN@97..121
     EXPLAIN_KW@97..104 "explain"
     WHITESPACE@104..105 " "
     SELECT_INTO@105..120
@@ -112,9 +112,9 @@ SOURCE_FILE@0..858
           PATH_SEGMENT@119..120
             NAME@119..120
               IDENT@119..120 "x"
-  SEMICOLON@120..121 ";"
+    SEMICOLON@120..121 ";"
   WHITESPACE@121..123 " \n"
-  PREPARE@123..151
+  PREPARE@123..152
     PREPARE_KW@123..130 "prepare"
     WHITESPACE@130..131 " "
     NAME@131..132
@@ -138,11 +138,11 @@ SOURCE_FILE@0..858
           PATH_SEGMENT@150..151
             NAME@150..151
               IDENT@150..151 "x"
-  SEMICOLON@151..152 ";"
+    SEMICOLON@151..152 ";"
   WHITESPACE@152..154 "\n\n"
   COMMENT@154..231 "-- error, only the le ..."
   WHITESPACE@231..232 "\n"
-  COMPOUND_SELECT@232..283
+  COMPOUND_SELECT@232..284
     SELECT@232..242
       SELECT_CLAUSE@232..242
         SELECT_KW@232..238 "select"
@@ -194,9 +194,9 @@ SOURCE_FILE@0..858
               AS_NAME@282..283
                 NAME@282..283
                   IDENT@282..283 "a"
-  SEMICOLON@283..284 ";"
+    SEMICOLON@283..284 ";"
   WHITESPACE@284..285 "\n"
-  COMPOUND_SELECT@285..319
+  COMPOUND_SELECT@285..320
     SELECT@285..295
       SELECT_CLAUSE@285..295
         SELECT_KW@285..291 "select"
@@ -232,9 +232,9 @@ SOURCE_FILE@0..858
           PATH_SEGMENT@318..319
             NAME@318..319
               IDENT@318..319 "t"
-  SEMICOLON@319..320 ";"
+    SEMICOLON@319..320 ";"
   WHITESPACE@320..321 "\n"
-  COMPOUND_SELECT@321..361
+  COMPOUND_SELECT@321..362
     SELECT@321..331
       SELECT_CLAUSE@321..331
         SELECT_KW@321..327 "select"
@@ -279,9 +279,9 @@ SOURCE_FILE@0..858
           R_PAREN@358..359 ")"
         R_PAREN@359..360 ")"
       R_PAREN@360..361 ")"
-  SEMICOLON@361..362 ";"
+    SEMICOLON@361..362 ";"
   WHITESPACE@362..363 "\n"
-  COMPOUND_SELECT@363..412
+  COMPOUND_SELECT@363..413
     SELECT@363..371
       SELECT_CLAUSE@363..371
         SELECT_KW@363..369 "select"
@@ -327,11 +327,11 @@ SOURCE_FILE@0..858
                 LITERAL@410..411
                   INT_NUMBER@410..411 "3"
       R_PAREN@411..412 ")"
-  SEMICOLON@412..413 ";"
+    SEMICOLON@412..413 ";"
   WHITESPACE@413..415 "\n\n"
   COMMENT@415..431 "-- error, nested"
   WHITESPACE@431..432 "\n"
-  SELECT@432..477
+  SELECT@432..478
     WITH_CLAUSE@432..461
       WITH_KW@432..436 "with"
       WHITESPACE@436..437 " "
@@ -377,9 +377,9 @@ SOURCE_FILE@0..858
       FROM_ITEM@476..477
         NAME_REF@476..477
           IDENT@476..477 "t"
-  SEMICOLON@477..478 ";"
+    SEMICOLON@477..478 ";"
   WHITESPACE@478..479 "\n"
-  SELECT@479..537
+  SELECT@479..538
     WITH_CLAUSE@479..521
       WITH_KW@479..483 "with"
       WHITESPACE@483..484 " "
@@ -433,11 +433,11 @@ SOURCE_FILE@0..858
       FROM_ITEM@536..537
         NAME_REF@536..537
           IDENT@536..537 "t"
-  SEMICOLON@537..538 ";"
+    SEMICOLON@537..538 ";"
   WHITESPACE@538..540 "\n\n"
   COMMENT@540..556 "-- error, nested"
   WHITESPACE@556..557 "\n"
-  SELECT@557..605
+  SELECT@557..606
     SELECT_CLAUSE@557..565
       SELECT_KW@557..563 "select"
       WHITESPACE@563..564 " "
@@ -484,9 +484,9 @@ SOURCE_FILE@0..858
                   NAME@603..604
                     IDENT@603..604 "t"
           R_PAREN@604..605 ")"
-  SEMICOLON@605..606 ";"
+    SEMICOLON@605..606 ";"
   WHITESPACE@606..607 "\n"
-  SELECT@607..646
+  SELECT@607..647
     SELECT_CLAUSE@607..646
       SELECT_KW@607..613 "select"
       WHITESPACE@613..614 " "
@@ -515,11 +515,11 @@ SOURCE_FILE@0..858
                     NAME_REF@644..645
                       IDENT@644..645 "u"
               R_PAREN@645..646 ")"
-  SEMICOLON@646..647 ";"
+    SEMICOLON@646..647 ";"
   WHITESPACE@647..649 "\n\n"
   COMMENT@649..665 "-- error, nested"
   WHITESPACE@665..666 "\n"
-  INSERT@666..695
+  INSERT@666..696
     INSERT_KW@666..672 "insert"
     WHITESPACE@672..673 " "
     INTO_KW@673..677 "into"
@@ -545,11 +545,11 @@ SOURCE_FILE@0..858
           PATH_SEGMENT@694..695
             NAME@694..695
               IDENT@694..695 "t"
-  SEMICOLON@695..696 ";"
+    SEMICOLON@695..696 ";"
   WHITESPACE@696..698 "\n\n"
   COMMENT@698..714 "-- error, nested"
   WHITESPACE@714..715 "\n"
-  DECLARE@715..751
+  DECLARE@715..752
     DECLARE_KW@715..722 "declare"
     WHITESPACE@722..723 " "
     NAME@723..724
@@ -575,11 +575,11 @@ SOURCE_FILE@0..858
           PATH_SEGMENT@750..751
             NAME@750..751
               IDENT@750..751 "t"
-  SEMICOLON@751..752 ";"
+    SEMICOLON@751..752 ";"
   WHITESPACE@752..754 "\n\n"
   COMMENT@754..770 "-- error, nested"
   WHITESPACE@770..771 "\n"
-  CREATE_TABLE_AS@771..804
+  CREATE_TABLE_AS@771..805
     CREATE_KW@771..777 "create"
     WHITESPACE@777..778 " "
     TABLE_KW@778..783 "table"
@@ -607,11 +607,11 @@ SOURCE_FILE@0..858
           PATH_SEGMENT@803..804
             NAME@803..804
               IDENT@803..804 "t"
-  SEMICOLON@804..805 ";"
+    SEMICOLON@804..805 ";"
   WHITESPACE@805..807 "\n\n"
   COMMENT@807..823 "-- error, nested"
   WHITESPACE@823..824 "\n"
-  CREATE_VIEW@824..856
+  CREATE_VIEW@824..857
     CREATE_KW@824..830 "create"
     WHITESPACE@830..831 " "
     VIEW_KW@831..835 "view"
@@ -639,7 +639,7 @@ SOURCE_FILE@0..858
           PATH_SEGMENT@855..856
             NAME@855..856
               IDENT@855..856 "t"
-  SEMICOLON@856..857 ";"
+    SEMICOLON@856..857 ";"
   WHITESPACE@857..858 "\n"
 
 error[syntax-error]: INTO is only allowed on first SELECT of UNION/INTERSECT/EXCEPT

@@ -22,7 +22,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "j"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -51,7 +51,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "j"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"
   WHITESPACE "\n"
@@ -74,7 +74,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -105,7 +105,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_params"
   WHITESPACE "\n"
@@ -128,7 +128,7 @@ SOURCE_FILE
           NAME
             IDENT "a"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -172,7 +172,7 @@ SOURCE_FILE
             LITERAL
               STRING "'v'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_params"
   WHITESPACE "\n"
@@ -195,7 +195,7 @@ SOURCE_FILE
           NAME
             IDENT "a"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -231,7 +231,7 @@ SOURCE_FILE
           NAME
             IDENT "b"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- attach"
   WHITESPACE "\n"
@@ -254,7 +254,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -285,7 +285,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
   WHITESPACE "\n"
@@ -312,7 +312,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -340,7 +340,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_column"
   WHITESPACE "\n"
@@ -366,7 +366,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "100"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -402,7 +402,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "100"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_tablespace"
   WHITESPACE "\n"
@@ -428,7 +428,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
     ALTER_KW "alter"
@@ -468,5 +468,5 @@ SOURCE_FILE
       IDENT "n"
     WHITESPACE "\n  "
     NOWAIT_KW "nowait"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

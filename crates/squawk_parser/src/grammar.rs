@@ -58,7 +58,7 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
         p.expect(L_PAREN);
-        select(p, None, &SelectRestrictions::default());
+        select(p, None, &SelectRestrictions::default(), false);
         p.expect(R_PAREN);
     } else {
         // `[` or `(`
@@ -89,7 +89,11 @@ impl Default for SelectRestrictions {
     }
 }
 
-fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
+fn opt_paren_select(
+    p: &mut Parser<'_>,
+    m: Option<Marker>,
+    semi_allowed: bool,
+) -> Option<CompletedMarker> {
     let m = m.unwrap_or_else(|| p.start());
     if !p.eat(L_PAREN) {
         m.abandon(p);
@@ -100,13 +104,13 @@ fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMa
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
         if p.at_ts(SELECT_FIRST)
-            && (select(p, None, &SelectRestrictions::default()).is_none()
+            && (select(p, None, &SelectRestrictions::default(), semi_allowed).is_none()
                 || p.at(EOF)
                 || p.at(R_PAREN))
         {
             break;
         }
-        if opt_paren_select(p, None).is_none() {
+        if opt_paren_select(p, None, semi_allowed).is_none() {
             break;
         }
         if !p.at(R_PAREN) {
@@ -116,9 +120,12 @@ fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMa
     p.expect(R_PAREN);
     if p.at_ts(COMPOUND_SELECT_FIRST) {
         let cm = m.complete(p, PAREN_SELECT);
-        Some(compound_select(p, cm))
+        Some(compound_select(p, cm, semi_allowed))
     } else {
         opt_select_trailing_clauses(p);
+        if semi_allowed {
+            p.eat(SEMICOLON);
+        }
         Some(m.complete(p, PAREN_SELECT))
     }
 }
@@ -142,7 +149,7 @@ fn tuple_expr(p: &mut Parser<'_>) -> CompletedMarker {
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
         if p.at_ts(SELECT_FIRST)
-            && (select(p, None, &SelectRestrictions::default()).is_none()
+            && (select(p, None, &SelectRestrictions::default(), false).is_none()
                 || p.at(EOF)
                 || p.at(R_PAREN))
         {
@@ -167,7 +174,7 @@ fn tuple_expr(p: &mut Parser<'_>) -> CompletedMarker {
     );
     // TODO: needs to be reworked
     if p.at_ts(COMPOUND_SELECT_FIRST) {
-        return compound_select(p, cm);
+        return compound_select(p, cm, false);
     }
     cm
 }
@@ -701,7 +708,7 @@ fn opt_json_array_fn_arg_list(p: &mut Parser<'_>) {
     // 1, 2, 3, 4
     while !p.at(EOF) && !p.at(R_PAREN) && !p.at(RETURNING_KW) {
         if p.at_ts(SELECT_FIRST) {
-            if select(p, None, &SelectRestrictions::default()).is_none()
+            if select(p, None, &SelectRestrictions::default(), false).is_none()
                 || p.at(EOF)
                 || p.at(R_PAREN)
             {
@@ -751,7 +758,7 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     // args
     p.expect(L_PAREN);
     if p.at_ts(SELECT_FIRST) {
-        select(p, None, &SelectRestrictions::default());
+        select(p, None, &SelectRestrictions::default(), false);
     } else {
         if expr(p).is_none() {
             p.error("expected expression or select");
@@ -854,7 +861,7 @@ fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(EXISTS_KW);
     p.expect(L_PAREN);
     if p.at_ts(SELECT_FIRST) {
-        select(p, None, &SelectRestrictions::default());
+        select(p, None, &SelectRestrictions::default(), false);
     } else {
         p.error("expected select");
     }
@@ -2686,7 +2693,7 @@ fn select_clause(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, SELECT_CLAUSE)
 }
 
-fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
+fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker, semi_allowed: bool) -> CompletedMarker {
     assert!(p.at_ts(COMPOUND_SELECT_FIRST));
     let m = cm.precede(p);
     p.bump_any();
@@ -2694,7 +2701,7 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
         p.eat(DISTINCT_KW);
     }
     if p.at(L_PAREN) {
-        opt_paren_select(p, None);
+        opt_paren_select(p, None, false);
     } else {
         if p.at_ts(SELECT_FIRST) {
             select(
@@ -2703,12 +2710,16 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
                 &SelectRestrictions {
                     trailing_clauses: false,
                 },
+                false,
             );
         } else {
             p.error("expected start of a select statement")
         }
     }
     opt_select_trailing_clauses(p);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, COMPOUND_SELECT)
 }
 
@@ -2721,7 +2732,12 @@ fn opt_select_clause(p: &mut Parser<'_>) {
 // error recovery:
 // - <https://youtu.be/0HlrqwLjCxA?feature=shared&t=2172>
 /// <https://www.postgresql.org/docs/17/sql-select.html>
-fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<CompletedMarker> {
+fn select(
+    p: &mut Parser,
+    m: Option<Marker>,
+    r: &SelectRestrictions,
+    semi_allowed: bool,
+) -> Option<CompletedMarker> {
     assert!(p.at_ts(SELECT_FIRST));
     let m = m.unwrap_or_else(|| p.start());
 
@@ -2730,12 +2746,12 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
     if p.at(WITH_KW) {
-        return with(p, Some(m));
+        return with(p, Some(m), semi_allowed);
     }
     if p.at(VALUES_KW) {
-        let cm = values(p, Some(m));
+        let cm = values(p, Some(m), semi_allowed);
         if p.at_ts(COMPOUND_SELECT_FIRST) {
-            return Some(compound_select(p, cm));
+            return Some(compound_select(p, cm, semi_allowed));
         } else {
             return Some(cm);
         }
@@ -2762,10 +2778,13 @@ fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<C
     opt_window_clause(p);
     if p.at_ts(COMPOUND_SELECT_FIRST) {
         let cm = m.complete(p, out_kind);
-        return Some(compound_select(p, cm));
+        return Some(compound_select(p, cm, semi_allowed));
     }
     if r.trailing_clauses {
         opt_select_trailing_clauses(p);
+    }
+    if semi_allowed {
+        p.eat(SEMICOLON);
     }
     Some(m.complete(p, out_kind))
 }
@@ -3353,7 +3372,7 @@ fn opt_xml_namespace(p: &mut Parser<'_>) -> bool {
 fn paren_data_source(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     assert!(p.at(L_PAREN));
     if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
-        return opt_paren_select(p, None);
+        return opt_paren_select(p, None, false);
     }
     let m = p.start();
     p.bump(L_PAREN);
@@ -3361,7 +3380,7 @@ fn paren_data_source(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if opt_from_item(p) {
         if p.at_ts(COMPOUND_SELECT_FIRST) {
             let cm = m.complete(p, PAREN_SELECT);
-            let cm = compound_select(p, cm);
+            let cm = compound_select(p, cm, false);
             p.expect(R_PAREN);
             return Some(cm.precede(p).complete(p, PAREN_SELECT));
         }
@@ -5098,6 +5117,7 @@ fn drop_table(p: &mut Parser<'_>) -> CompletedMarker {
         |p| opt_path_name_ref(p).is_some(),
     );
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TABLE)
 }
 
@@ -5315,8 +5335,10 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
 
         opt_with_data(p);
 
+        p.eat(SEMICOLON);
         return m.complete(p, CREATE_TABLE_AS);
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TABLE)
 }
 
@@ -5505,6 +5527,7 @@ fn commit(p: &mut Parser<'_>) -> CompletedMarker {
             p.expect(CHAIN_KW);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, COMMIT)
 }
 
@@ -5586,6 +5609,7 @@ fn begin(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(TRANSACTION_KW);
         opt_transaction_mode_list(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, BEGIN)
 }
 
@@ -5629,6 +5653,7 @@ fn prepare_transaction(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(PREPARE_KW);
     p.expect(TRANSACTION_KW);
     string_literal(p);
+    p.eat(SEMICOLON);
     m.complete(p, PREPARE_TRANSACTION)
 }
 
@@ -5640,6 +5665,7 @@ fn savepoint(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(SAVEPOINT_KW);
     name(p);
+    p.eat(SEMICOLON);
     m.complete(p, SAVEPOINT)
 }
 
@@ -5652,6 +5678,7 @@ fn release(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(RELEASE_KW);
     p.eat(SAVEPOINT_KW);
     name_ref(p);
+    p.eat(SEMICOLON);
     m.complete(p, RELEASE_SAVEPOINT)
 }
 
@@ -5671,6 +5698,7 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump_any();
     if p.eat(PREPARED_KW) {
         string_literal(p);
+        p.eat(SEMICOLON);
         return m.complete(p, ROLLBACK);
     }
     let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
@@ -5681,12 +5709,14 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
         p.eat(NO_KW);
         p.expect(CHAIN_KW);
     }
+    p.eat(SEMICOLON);
     m.complete(p, ROLLBACK)
 }
 
 #[derive(Default)]
 struct StmtRestrictions {
     begin_end_allowed: bool,
+    semi_allowed: bool,
 }
 
 fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
@@ -5841,7 +5871,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (CREATE_KW, CONSTRAINT_KW | TRIGGER_KW) => Some(create_trigger(p)),
         (DEALLOCATE_KW, _) => Some(deallocate(p)),
         (DECLARE_KW, _) => Some(declare(p)),
-        (DELETE_KW, _) => Some(delete(p, None)),
+        (DELETE_KW, _) => Some(delete(p, None, r.semi_allowed)),
         (DISCARD_KW, _) => Some(discard(p)),
         (DO_KW, _) => Some(do_(p)),
         (DROP_KW, ACCESS_KW) => Some(drop_access_method(p)),
@@ -5913,15 +5943,15 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (FETCH_KW, _) => Some(fetch(p)),
         (GRANT_KW, _) => Some(grant(p)),
         (IMPORT_KW, FOREIGN_KW) => Some(import_foreign_schema(p)),
-        (INSERT_KW, _) => Some(insert(p, None)),
+        (INSERT_KW, _) => Some(insert(p, None, r.semi_allowed)),
         (L_PAREN, _) if p.nth_at_ts(1, PAREN_SELECT_FIRST) => {
             // can have select nested in parens, i.e., ((select 1));
-            opt_paren_select(p, None)
+            opt_paren_select(p, None, r.semi_allowed)
         }
         (LISTEN_KW, _) => Some(listen(p)),
         (LOAD_KW, _) => Some(load(p)),
         (LOCK_KW, _) => Some(lock(p)),
-        (MERGE_KW, _) => Some(merge(p, None)),
+        (MERGE_KW, _) => Some(merge(p, None, r.semi_allowed)),
         (MOVE_KW, _) => Some(move_(p)),
         (NOTIFY_KW, _) => Some(notify(p)),
         (PREPARE_KW, TRANSACTION_KW) => Some(prepare_transaction(p)),
@@ -5939,7 +5969,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (SAVEPOINT_KW, _) => Some(savepoint(p)),
         (SECURITY_KW, LABEL_KW) => Some(security_label(p)),
         (SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW, _) => {
-            select(p, None, &SelectRestrictions::default())
+            select(p, None, &SelectRestrictions::default(), r.semi_allowed)
         }
         (SET_KW, CONSTRAINTS_KW) => Some(set_constraints(p)),
         (SET_KW, LOCAL_KW) => match p.nth(2) {
@@ -5960,9 +5990,9 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (START_KW, TRANSACTION_KW) => Some(begin(p)),
         (TRUNCATE_KW, _) => Some(truncate(p)),
         (UNLISTEN_KW, _) => Some(unlisten(p)),
-        (UPDATE_KW, _) => Some(update(p, None)),
+        (UPDATE_KW, _) => Some(update(p, None, r.semi_allowed)),
         (VACUUM_KW, _) => Some(vacuum(p)),
-        (WITH_KW, _) => with(p, None),
+        (WITH_KW, _) => with(p, None, r.semi_allowed),
         (command, _) => {
             // commands are outlined in:
             // https://www.postgresql.org/docs/17/sql-commands.html
@@ -6018,6 +6048,7 @@ fn alter_statistics(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected OWNER, RENAME, or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_STATISTICS)
 }
 
@@ -6050,6 +6081,7 @@ fn alter_server(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_SERVER)
 }
 
@@ -6101,6 +6133,7 @@ fn alter_sequence(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_SEQUENCE)
 }
 
@@ -6123,6 +6156,7 @@ fn alter_schema(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME or OWNER");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_SCHEMA)
 }
 
@@ -6135,6 +6169,7 @@ fn alter_rule(p: &mut Parser<'_>) -> CompletedMarker {
     name_ref(p);
     on_table(p);
     rename_to(p);
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_RULE)
 }
 
@@ -6183,6 +6218,7 @@ fn alter_routine(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.eat(RESTRICT_KW);
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_ROUTINE)
 }
 
@@ -6237,6 +6273,7 @@ fn alter_role(p: &mut Parser<'_>) -> CompletedMarker {
             opt_role_option_list(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_ROLE)
 }
 
@@ -6291,6 +6328,7 @@ fn alter_publication(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, SET, DROP, OWNER, or RENAME");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_PUBLICATION)
 }
 
@@ -6339,6 +6377,7 @@ fn alter_procedure(p: &mut Parser<'_>) -> CompletedMarker {
             p.eat(RESTRICT_KW);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_PROCEDURE)
 }
 
@@ -6363,6 +6402,7 @@ fn alter_policy(p: &mut Parser<'_>) -> CompletedMarker {
         opt_using_expr_clause(p);
         opt_with_check_expr_clause(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_POLICY)
 }
 
@@ -6443,6 +6483,7 @@ fn alter_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, DROP, RENAME, OWNER, or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_OPERATOR_FAMILY)
 }
 
@@ -6494,6 +6535,7 @@ fn alter_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME, OWNER, or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_OPERATOR_CLASS)
 }
 
@@ -6529,6 +6571,7 @@ fn alter_operator(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected OWNER or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_OPERATOR)
 }
 
@@ -6603,6 +6646,7 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_MATERIALIZED_VIEW)
 }
 
@@ -6649,6 +6693,7 @@ fn alter_large_object(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(OWNER_KW);
     p.expect(TO_KW);
     role_ref(p);
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_LARGE_OBJECT)
 }
 
@@ -6672,6 +6717,7 @@ fn alter_language(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME or OWNER");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_LANGUAGE)
 }
 
@@ -6765,6 +6811,7 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_INDEX)
 }
 
@@ -6795,6 +6842,7 @@ fn alter_group(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, DROP, or RENAME");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_GROUP)
 }
 
@@ -6849,6 +6897,7 @@ fn alter_function(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.eat(RESTRICT_KW);
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_FUNCTION)
 }
 
@@ -6913,6 +6962,7 @@ fn alter_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
             opt_alter_table_action_list(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_FOREIGN_TABLE)
 }
 
@@ -6949,6 +6999,7 @@ fn alter_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
     if !found_option {
         p.error("Missing alter foreign data wrapper option or action.")
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_FOREIGN_DATA_WRAPPER)
 }
 
@@ -6981,6 +7032,7 @@ fn alter_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected DISABLE, ENABLE, OWNER, or RENAME");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_EVENT_TRIGGER)
 }
 
@@ -7163,6 +7215,7 @@ fn alter_extension(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected UPDATE, SET, ADD, or DROP");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_EXTENSION)
 }
 
@@ -7195,6 +7248,7 @@ fn alter_domain(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DOMAIN_KW);
     path_name_ref(p);
     alter_domain_action(p);
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_DOMAIN)
 }
 
@@ -7434,6 +7488,7 @@ fn alter_default_privileges(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected GRANT or REVOKE");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_DEFAULT_PRIVILEGES)
 }
 
@@ -7508,6 +7563,7 @@ fn alter_database(p: &mut Parser<'_>) -> CompletedMarker {
             opt_create_database_option_list(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_DATABASE)
 }
 
@@ -7554,6 +7610,7 @@ fn alter_conversion(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME, OWNER, or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_CONVERSION)
 }
 
@@ -7584,6 +7641,7 @@ fn alter_collation(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected REFRESH, RENAME, OWNER, or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_COLLATION)
 }
 
@@ -7633,6 +7691,7 @@ fn alter_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME, OWNER, or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_AGGREGATE)
 }
 
@@ -7701,6 +7760,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
         );
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_SUBSCRIPTION)
 }
 
@@ -7734,6 +7794,7 @@ fn alter_system(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected SET or RESET after ALTER SYSTEM");
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_SYSTEM)
 }
 
@@ -7758,6 +7819,7 @@ fn alter_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected RENAME, OWNER, SET, or RESET after tablespace name");
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TABLESPACE)
 }
 
@@ -7796,6 +7858,7 @@ fn alter_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected RENAME TO or SET SCHEMA");
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TEXT_SEARCH_PARSER)
 }
 
@@ -7829,6 +7892,7 @@ fn alter_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected '(', RENAME, OWNER, or SET");
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TEXT_SEARCH_DICTIONARY)
 }
 
@@ -7916,6 +7980,7 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, ALTER, DROP, RENAME, OWNER, or SET");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TEXT_SEARCH_CONFIGURATION)
 }
 
@@ -7955,6 +8020,7 @@ fn alter_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected RENAME TO or SET SCHEMA");
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TEXT_SEARCH_TEMPLATE)
 }
 
@@ -7976,6 +8042,7 @@ fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
             p.error(format!("expected NO or DEPENDS, found {:?}", p.current()));
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TRIGGER)
 }
 
@@ -8078,6 +8145,7 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => p.error("expected ALTER TYPE option"),
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TYPE)
 }
 
@@ -8153,6 +8221,7 @@ fn alter_user(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => p.error("expected SET or RESET"),
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_USER)
 }
 
@@ -8171,6 +8240,7 @@ fn alter_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     if !opt_alter_option_list(p) {
         p.error("expected options");
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_USER_MAPPING)
 }
 
@@ -8262,6 +8332,7 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => p.error("expected ALTER, OWNER, RENAME, or SET"),
     }
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_VIEW)
 }
 
@@ -8280,6 +8351,7 @@ fn analyze(p: &mut Parser<'_>) -> CompletedMarker {
         opt_option_list(p);
     }
     opt_table_and_columns_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, ANALYZE)
 }
 
@@ -8471,6 +8543,7 @@ fn comment(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(NULL_KW) && opt_string_literal(p).is_none() {
         p.error("expected string literal or NULL");
     }
+    p.eat(SEMICOLON);
     m.complete(p, COMMENT_ON)
 }
 
@@ -8491,6 +8564,7 @@ fn cluster(p: &mut Parser<'_>) -> CompletedMarker {
         opt_on_path(p);
     }
     opt_using_method(p);
+    p.eat(SEMICOLON);
     m.complete(p, CLUSTER)
 }
 
@@ -8513,6 +8587,7 @@ fn repack(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(USING_KW) {
         using_index(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, REPACK)
 }
 
@@ -8526,6 +8601,7 @@ fn create_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
     path_name(p);
     opt_vertex_tables(p);
     opt_edge_tables(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_PROPERTY_GRAPH)
 }
 
@@ -8710,6 +8786,7 @@ fn alter_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     alter_property_graph_action(p);
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_PROPERTY_GRAPH)
 }
 
@@ -8849,6 +8926,7 @@ fn drop_property_graph(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_PROPERTY_GRAPH)
 }
 
@@ -9048,6 +9126,7 @@ fn create_access_method(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("expected TABLE or INDEX");
     }
     handler_clause(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_ACCESS_METHOD)
 }
 
@@ -9130,6 +9209,7 @@ fn create_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
         aggregate_arg_list(p);
     }
     attribute_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_AGGREGATE)
 }
 
@@ -9165,6 +9245,7 @@ fn create_cast(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ASSIGNMENT or IMPLICIT");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_CAST)
 }
 
@@ -9190,6 +9271,7 @@ fn create_collation(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         attribute_list(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_COLLATION)
 }
 
@@ -9208,6 +9290,7 @@ fn create_conversion(p: &mut Parser<'_>) -> CompletedMarker {
     string_literal(p);
     p.expect(FROM_KW);
     path_name(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_CONVERSION)
 }
 
@@ -9278,6 +9361,7 @@ fn create_database(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DATABASE_KW);
     name(p);
     opt_create_database_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_DATABASE)
 }
 
@@ -9298,6 +9382,7 @@ fn create_domain(p: &mut Parser<'_>) -> CompletedMarker {
     type_name(p);
     opt_collate(p);
     opt_column_constraint_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_DOMAIN)
 }
 
@@ -9335,6 +9420,7 @@ fn create_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     }
     // TODO: add validation to prevent passing arguments here
     call_expr(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_EVENT_TRIGGER)
 }
 
@@ -9411,6 +9497,7 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     }
     server_name(p);
     opt_alter_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_FOREIGN_TABLE)
 }
 
@@ -9439,6 +9526,7 @@ fn create_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
     name(p);
     opt_fdw_option_list(p);
     opt_alter_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_FOREIGN_DATA_WRAPPER)
 }
 
@@ -9515,6 +9603,7 @@ fn create_group(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(GROUP_KW);
     name(p);
     opt_role_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_GROUP)
 }
 
@@ -9538,6 +9627,7 @@ fn create_language(p: &mut Parser<'_>) -> CompletedMarker {
             path_name_ref(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_LANGUAGE)
 }
 
@@ -9575,6 +9665,7 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_with_data(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_MATERIALIZED_VIEW)
 }
 
@@ -9592,6 +9683,7 @@ fn create_operator(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(OPERATOR_KW);
     operator(p);
     attribute_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_OPERATOR)
 }
 
@@ -9619,6 +9711,7 @@ fn create_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.expect(AS_KW);
     operator_class_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_OPERATOR_CLASS)
 }
 
@@ -9700,6 +9793,7 @@ fn create_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     path_name(p);
     p.expect(USING_KW);
     name_ref(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_OPERATOR_FAMILY)
 }
 
@@ -9729,6 +9823,7 @@ fn create_policy(p: &mut Parser<'_>) -> CompletedMarker {
     }
     opt_using_expr_clause(p);
     opt_with_check_expr_clause(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_POLICY)
 }
 
@@ -9775,6 +9870,7 @@ fn create_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     path_name(p);
     param_list(p, ParamKind::All);
     func_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_PROCEDURE)
 }
 
@@ -9837,6 +9933,7 @@ fn create_publication(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_with_params(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_PUBLICATION)
 }
 
@@ -9895,13 +9992,20 @@ fn create_role(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ROLE_KW);
     name(p);
     opt_role_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_ROLE)
 }
 
-fn select_insert_delete_update_or_notify(p: &mut Parser<'_>) {
+fn select_insert_delete_update_or_notify(p: &mut Parser<'_>, semi_allowed: bool) {
     // statement
     // Any SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement.
-    let statement = stmt(p, &StmtRestrictions::default());
+    let statement = stmt(
+        p,
+        &StmtRestrictions {
+            semi_allowed,
+            ..StmtRestrictions::default()
+        },
+    );
     if let Some(statement) = statement {
         match statement.kind() {
             SELECT | VALUES | INSERT | UPDATE | DELETE | NOTIFY => (),
@@ -9944,17 +10048,15 @@ fn create_rule(p: &mut Parser<'_>) -> CompletedMarker {
         // TODO: use delimited
         // ( command ; command ... )
         while !p.at(EOF) && !p.at(R_PAREN) {
-            select_insert_delete_update_or_notify(p);
-            if !p.eat(SEMICOLON) {
-                break;
-            }
+            select_insert_delete_update_or_notify(p, true);
         }
         p.expect(R_PAREN);
     } else if p.eat(NOTHING_KW) {
         // pass
     } else {
-        select_insert_delete_update_or_notify(p);
+        select_insert_delete_update_or_notify(p, false);
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_RULE)
 }
 
@@ -9979,6 +10081,7 @@ fn create_sequence(p: &mut Parser<'_>) -> CompletedMarker {
             break;
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_SEQUENCE)
 }
 
@@ -10003,6 +10106,7 @@ fn create_server(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(WRAPPER_KW);
     name_ref(p);
     opt_alter_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_SERVER)
 }
 
@@ -10030,6 +10134,7 @@ fn create_statistics(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     from_table(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_STATISTICS)
 }
 
@@ -10062,6 +10167,7 @@ fn create_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(PUBLICATION_KW);
     name_ref_list(p);
     opt_with_params(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_SUBSCRIPTION)
 }
 
@@ -10082,6 +10188,7 @@ fn create_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     string_literal(p);
     // TODO: we could have a validator to check these params
     opt_with_params(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TABLESPACE)
 }
 
@@ -10101,6 +10208,7 @@ fn create_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(PARSER_KW);
     path_name(p);
     attribute_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
@@ -10117,6 +10225,7 @@ fn create_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DICTIONARY_KW);
     path_name(p);
     attribute_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TEXT_SEARCH_DICTIONARY)
 }
 
@@ -10133,6 +10242,7 @@ fn create_text_search_config(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CONFIGURATION_KW);
     path_name(p);
     attribute_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TEXT_SEARCH_CONFIGURATION)
 }
 
@@ -10149,6 +10259,7 @@ fn create_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(TEMPLATE_KW);
     path_name(p);
     attribute_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TEXT_SEARCH_TEMPLATE)
 }
 
@@ -10171,6 +10282,7 @@ fn create_transform(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(COMMA);
     transform_to_func(p);
     p.expect(R_PAREN);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TRANSFORM)
 }
 
@@ -10211,6 +10323,7 @@ fn create_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     }
     server_name(p);
     opt_alter_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_USER_MAPPING)
 }
 
@@ -10328,6 +10441,7 @@ fn create_user(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(USER_KW);
     name(p);
     opt_role_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_USER)
 }
 
@@ -10353,6 +10467,7 @@ fn drop_language(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_LANGUAGE)
 }
 
@@ -10364,6 +10479,7 @@ fn drop_group(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(GROUP_KW);
     opt_if_exists(p);
     name_ref_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_GROUP)
 }
 
@@ -10377,6 +10493,7 @@ fn drop_function(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     function_sig_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_FUNCTION)
 }
 
@@ -10410,6 +10527,7 @@ fn drop_foreign_data(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_FOREIGN_DATA_WRAPPER)
 }
 
@@ -10423,6 +10541,7 @@ fn drop_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_FOREIGN_TABLE)
 }
 
@@ -10436,6 +10555,7 @@ fn drop_access_method(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_ACCESS_METHOD)
 }
 
@@ -10462,6 +10582,7 @@ fn drop_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
         aggregate(p);
     }
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_AGGREGATE)
 }
 
@@ -10484,6 +10605,7 @@ fn drop_cast(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     cast_sig(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_CAST)
 }
 
@@ -10496,6 +10618,7 @@ fn drop_collation(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_COLLATION)
 }
 
@@ -10508,6 +10631,7 @@ fn drop_conversion(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_CONVERSION)
 }
 
@@ -10520,6 +10644,7 @@ fn drop_domain(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_DOMAIN)
 }
 
@@ -10533,6 +10658,7 @@ fn drop_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_EVENT_TRIGGER)
 }
 
@@ -10545,6 +10671,7 @@ fn drop_extension(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_EXTENSION)
 }
 
@@ -10558,6 +10685,7 @@ fn drop_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_MATERIALIZED_VIEW)
 }
 
@@ -10573,6 +10701,7 @@ fn drop_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(USING_KW);
     name_ref(p); // index_method
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_OPERATOR_FAMILY)
 }
 
@@ -10585,6 +10714,7 @@ fn drop_operator(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     op_sig_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_OPERATOR)
 }
 
@@ -10623,6 +10753,7 @@ fn drop_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(USING_KW);
     name_ref(p); // index_method
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_OPERATOR_CLASS)
 }
 
@@ -10635,6 +10766,7 @@ fn drop_owned(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(BY_KW);
     role_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_OWNED)
 }
 
@@ -10648,6 +10780,7 @@ fn drop_policy(p: &mut Parser<'_>) -> CompletedMarker {
     name_ref(p);
     on_table(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_POLICY)
 }
 
@@ -10661,6 +10794,7 @@ fn drop_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     function_sig_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_PROCEDURE)
 }
 
@@ -10673,6 +10807,7 @@ fn drop_publication(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_PUBLICATION)
 }
 
@@ -10684,6 +10819,7 @@ fn drop_role(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ROLE_KW);
     opt_if_exists(p);
     name_ref_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_ROLE)
 }
 
@@ -10697,6 +10833,7 @@ fn drop_routine(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     function_sig_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_ROUTINE)
 }
 
@@ -10710,6 +10847,7 @@ fn drop_rule(p: &mut Parser<'_>) -> CompletedMarker {
     name_ref(p);
     on_table(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_RULE)
 }
 
@@ -10722,6 +10860,7 @@ fn drop_sequence(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_SEQUENCE)
 }
 
@@ -10734,6 +10873,7 @@ fn drop_server(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_SERVER)
 }
 
@@ -10746,6 +10886,7 @@ fn drop_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_STATISTICS)
 }
 
@@ -10758,6 +10899,7 @@ fn drop_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_SUBSCRIPTION)
 }
 
@@ -10774,6 +10916,7 @@ fn drop_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(TABLESPACE_KW);
     opt_if_exists(p);
     name_ref(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TABLESPACE)
 }
 
@@ -10790,6 +10933,7 @@ fn drop_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TEXT_SEARCH_PARSER)
 }
 
@@ -10809,6 +10953,7 @@ fn drop_text_search_config(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TEXT_SEARCH_CONFIG)
 }
 
@@ -10828,6 +10973,7 @@ fn drop_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TEXT_SEARCH_DICT)
 }
 
@@ -10844,6 +10990,7 @@ fn drop_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TEXT_SEARCH_TEMPLATE)
 }
 
@@ -10859,6 +11006,7 @@ fn drop_transform(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(LANGUAGE_KW);
     name_ref(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TRANSFORM)
 }
 
@@ -10870,6 +11018,7 @@ fn drop_user(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(USER_KW);
     opt_if_exists(p);
     name_ref_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_USER)
 }
 
@@ -10887,6 +11036,7 @@ fn drop_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
         role_ref(p);
     }
     server_name(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_USER_MAPPING)
 }
 
@@ -10928,6 +11078,7 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS");
     }
+    p.eat(SEMICOLON);
     m.complete(p, EXPLAIN)
 }
 
@@ -11042,6 +11193,7 @@ fn import_foreign_schema(p: &mut Parser<'_>) -> CompletedMarker {
     server_name(p);
     into_schema(p);
     opt_alter_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, IMPORT_FOREIGN_SCHEMA)
 }
 
@@ -11103,6 +11255,7 @@ fn lock(p: &mut Parser<'_>) -> CompletedMarker {
     }
     // [ NOWAIT ]
     p.eat(NOWAIT_KW);
+    p.eat(SEMICOLON);
     m.complete(p, LOCK)
 }
 
@@ -11143,7 +11296,7 @@ fn table_list(p: &mut Parser<'_>) {
 //
 // and merge_delete is:
 // DELETE
-fn merge(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn merge(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> CompletedMarker {
     assert!(p.at(MERGE_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(MERGE_KW);
@@ -11160,6 +11313,9 @@ fn merge(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     }
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, MERGE)
 }
 
@@ -11254,7 +11410,7 @@ fn merge_action(p: &mut Parser<'_>) {
             }
             // { VALUES ( { expression | DEFAULT } [, ...] ) | DEFAULT VALUES }
             if p.at(VALUES_KW) {
-                values(p, None);
+                values(p, None, false);
             } else if p.eat(DEFAULT_KW) {
                 p.expect(VALUES_KW);
             } else {
@@ -11287,6 +11443,7 @@ fn reassign(p: &mut Parser<'_>) -> CompletedMarker {
     role_list(p);
     p.expect(TO_KW);
     role_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, REASSIGN)
 }
 
@@ -11301,6 +11458,7 @@ fn refresh(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(CONCURRENTLY_KW);
     path_name_ref(p);
     opt_with_data(p);
+    p.eat(SEMICOLON);
     m.complete(p, REFRESH)
 }
 
@@ -11352,6 +11510,7 @@ fn grant(p: &mut Parser<'_>) -> CompletedMarker {
         grant_role_option_list(p);
     }
     opt_granted_by(p);
+    p.eat(SEMICOLON);
     m.complete(p, GRANT)
 }
 
@@ -11516,6 +11675,7 @@ fn revoke(p: &mut Parser<'_>) -> CompletedMarker {
     // [ GRANTED BY role_specification ]
     opt_granted_by(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, REVOKE)
 }
 
@@ -11712,6 +11872,7 @@ fn security_label(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(NULL_KW) {
         string_literal(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, SECURITY_LABEL)
 }
 
@@ -11793,6 +11954,7 @@ fn set_constraints(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(DEFERRED_KW) && !p.eat(IMMEDIATE_KW) {
         p.error("expected DEFERRED or IMMEDIATE");
     }
+    p.eat(SEMICOLON);
     m.complete(p, SET_CONSTRAINTS)
 }
 
@@ -11812,6 +11974,7 @@ fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
             role_ref(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, SET_ROLE)
 }
 
@@ -11828,6 +11991,7 @@ fn set_session_auth(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(DEFAULT_KW) && opt_string_literal(p).is_none() {
         role_ref(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, SET_SESSION_AUTH)
 }
 
@@ -11838,6 +12002,7 @@ fn reset_session_auth(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(RESET_KW);
     p.expect(SESSION_KW);
     p.expect(AUTHORIZATION_KW);
+    p.eat(SEMICOLON);
     m.complete(p, RESET_SESSION_AUTH)
 }
 fn opt_transaction_mode_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -11883,6 +12048,7 @@ fn set_transaction(p: &mut Parser<'_>) -> CompletedMarker {
             opt_transaction_mode_list(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, SET_TRANSACTION)
 }
 
@@ -11891,7 +12057,7 @@ fn set_transaction(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ LIMIT { count | ALL } ]
 //     [ OFFSET start [ ROW | ROWS ] ]
 //     [ FETCH { FIRST | NEXT } [ count ] { ROW | ROWS } ONLY ]
-fn values(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn values(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(VALUES_KW);
     row_list(p);
@@ -11899,6 +12065,9 @@ fn values(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     opt_limit_clause(p);
     opt_offset_clause(p);
     opt_fetch_clause(p);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, VALUES)
 }
 
@@ -11996,6 +12165,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
     if opt_path_name_ref(p).is_none() && name_required {
         p.error("expected name");
     }
+    p.eat(SEMICOLON);
     m.complete(p, REINDEX)
 }
 
@@ -12009,6 +12179,7 @@ fn drop_view(p: &mut Parser<'_>) -> CompletedMarker {
     // name [, ...]
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_VIEW)
 }
 
@@ -12044,6 +12215,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(CHECK_KW);
         p.expect(OPTION_KW);
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_VIEW)
 }
 
@@ -12057,6 +12229,7 @@ fn execute(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(L_PAREN) {
         arg_list(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, EXECUTE)
 }
 
@@ -12069,6 +12242,7 @@ fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
     opt_param_list(p, ParamKind::TypeOnly);
     p.expect(AS_KW);
     preparable_stmt(p);
+    p.eat(SEMICOLON);
     m.complete(p, PREPARE)
 }
 
@@ -12080,6 +12254,7 @@ fn unlisten(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(STAR) {
         name_ref(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, UNLISTEN)
 }
 
@@ -12088,6 +12263,7 @@ fn checkpoint(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CHECKPOINT_KW));
     let m = p.start();
     p.bump(CHECKPOINT_KW);
+    p.eat(SEMICOLON);
     m.complete(p, CHECKPOINT)
 }
 
@@ -12100,6 +12276,7 @@ fn deallocate(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(ALL_KW) {
         name_ref(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, DEALLOCATE)
 }
 
@@ -12109,6 +12286,7 @@ fn load(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(LOAD_KW);
     string_literal(p);
+    p.eat(SEMICOLON);
     m.complete(p, LOAD)
 }
 
@@ -12118,6 +12296,7 @@ fn listen(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(LISTEN_KW);
     name(p);
+    p.eat(SEMICOLON);
     m.complete(p, LISTEN)
 }
 
@@ -12131,6 +12310,7 @@ fn notify(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(COMMA) {
         string_literal(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, NOTIFY)
 }
 
@@ -12159,6 +12339,7 @@ fn reset(p: &mut Parser<'_>) -> CompletedMarker {
             path_name_ref(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, RESET)
 }
 
@@ -12168,6 +12349,7 @@ fn discard(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(DISCARD_KW);
     let _ = p.eat(ALL_KW) || p.eat(PLANS_KW) || p.eat(SEQUENCES_KW) || opt_temp(p);
+    p.eat(SEMICOLON);
     m.complete(p, DISCARD)
 }
 
@@ -12193,6 +12375,7 @@ fn do_(p: &mut Parser<'_>) -> CompletedMarker {
     opt_language(p);
     string_literal(p);
     opt_language(p);
+    p.eat(SEMICOLON);
     m.complete(p, DO)
 }
 
@@ -12232,6 +12415,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected SELECT, TABLE, or VALUES statement");
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, DECLARE)
 }
 
@@ -12287,6 +12471,7 @@ fn move_(p: &mut Parser<'_>) -> CompletedMarker {
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
     name_ref(p);
+    p.eat(SEMICOLON);
     m.complete(p, MOVE)
 }
 
@@ -12314,6 +12499,7 @@ fn fetch(p: &mut Parser<'_>) -> CompletedMarker {
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
     name_ref(p);
+    p.eat(SEMICOLON);
     m.complete(p, FETCH)
 }
 
@@ -12325,6 +12511,7 @@ fn close(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(ALL_KW) {
         name_ref(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, CLOSE)
 }
 
@@ -12343,6 +12530,7 @@ fn truncate(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(IDENTITY_KW);
     }
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, TRUNCATE)
 }
 
@@ -12384,6 +12572,7 @@ fn vacuum(p: &mut Parser<'_>) -> CompletedMarker {
     let _ = p.eat(ANALYZE_KW) || p.eat(ANALYSE_KW);
     opt_vacuum_option_list(p);
     opt_table_and_columns_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, VACUUM)
 }
 
@@ -12678,6 +12867,7 @@ fn copy(p: &mut Parser<'_>) -> CompletedMarker {
         while !p.at(EOF) && opt_copy_option_item(p) {}
     }
     opt_where_clause(p);
+    p.eat(SEMICOLON);
     m.complete(p, COPY)
 }
 
@@ -12712,6 +12902,7 @@ fn call(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected L_PAREN");
     }
+    p.eat(SEMICOLON);
     m.complete(p, CALL)
 }
 
@@ -12762,6 +12953,7 @@ fn create_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     }
     // function_name ( arguments )
     call_expr(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TRIGGER)
 }
 
@@ -12884,6 +13076,7 @@ fn drop_schema(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_SCHEMA)
 }
 
@@ -12993,6 +13186,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
         //                                                             ^
         (true, true) => {
             role(p);
+            p.eat(SEMICOLON);
             m.complete(p, CREATE_SCHEMA)
         }
         // CREATE SCHEMA IF NOT EXISTS schema_name [ AUTHORIZATION role_specification ]
@@ -13002,6 +13196,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
             if p.eat(AUTHORIZATION_KW) {
                 role_ref(p);
             }
+            p.eat(SEMICOLON);
             m.complete(p, CREATE_SCHEMA)
         }
         // CREATE SCHEMA AUTHORIZATION role_specification [ schema_element [ ... ] ]
@@ -13009,6 +13204,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
         (false, true) => {
             role(p);
             opt_schema_elements(p);
+            p.eat(SEMICOLON);
             m.complete(p, CREATE_SCHEMA)
         }
         // CREATE SCHEMA schema_name [ AUTHORIZATION role_specification ] [ schema_element [ ... ] ]
@@ -13019,6 +13215,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
                 role_ref(p);
             }
             opt_schema_elements(p);
+            p.eat(SEMICOLON);
             m.complete(p, CREATE_SCHEMA)
         }
     }
@@ -13026,8 +13223,8 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
-    if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default()).is_none())
-        && opt_paren_select(p, None).is_none()
+    if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default(), false).is_none())
+        && opt_paren_select(p, None, false).is_none()
     {
         p.error("expected select stmt")
     }
@@ -13052,7 +13249,7 @@ fn query(p: &mut Parser<'_>) {
 //                     ( column_name [, ...] ) = ( sub-SELECT )
 //                   } [, ...]
 //               [ WHERE condition ]
-fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn insert(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> CompletedMarker {
     assert!(p.at(INSERT_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(INSERT_KW);
@@ -13070,13 +13267,16 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     if p.eat(DEFAULT_KW) {
         p.expect(VALUES_KW);
     } else if p.at(VALUES_KW) {
-        values(p, None);
+        values(p, None, false);
     } else {
         query(p);
     }
     opt_on_conflict_clause(p);
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, INSERT)
 }
 
@@ -13231,7 +13431,7 @@ fn set_expr_list_or_paren_select(p: &mut Parser<'_>) {
     p.eat(ROW_KW);
     if p.at(L_PAREN) {
         if p.nth_at(1, SELECT_KW) {
-            if opt_paren_select(p, Some(m)).is_none() {
+            if opt_paren_select(p, Some(m), false).is_none() {
                 p.error("expected sub-SELECT");
             }
         } else {
@@ -13314,7 +13514,7 @@ fn opt_as_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 //     [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
 //
 // https://www.postgresql.org/docs/17/sql-update.html
-fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn update(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> CompletedMarker {
     assert!(p.at(UPDATE_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(UPDATE_KW);
@@ -13333,6 +13533,9 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     opt_where_or_current_of(p);
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, UPDATE)
 }
 
@@ -13375,22 +13578,22 @@ fn opt_where_or_current_of(p: &mut Parser<'_>) {
     }
 }
 
-fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
+fn with(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Option<CompletedMarker> {
     let m = m.unwrap_or_else(|| p.start());
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
     with_query_clause(p);
     match p.current() {
-        DELETE_KW => Some(delete(p, Some(m))),
+        DELETE_KW => Some(delete(p, Some(m), semi_allowed)),
         SELECT_KW | TABLE_KW | VALUES_KW | FROM_KW => {
-            select(p, Some(m), &SelectRestrictions::default())
+            select(p, Some(m), &SelectRestrictions::default(), semi_allowed)
         }
-        INSERT_KW => Some(insert(p, Some(m))),
-        UPDATE_KW => Some(update(p, Some(m))),
-        MERGE_KW => Some(merge(p, Some(m))),
+        INSERT_KW => Some(insert(p, Some(m), semi_allowed)),
+        UPDATE_KW => Some(update(p, Some(m), semi_allowed)),
+        MERGE_KW => Some(merge(p, Some(m), semi_allowed)),
         L_PAREN if p.nth_at_ts(1, PAREN_SELECT_FIRST) => {
             // can have select nested in parens, i.e., ((select 1));
-            opt_paren_select(p, Some(m))
+            opt_paren_select(p, Some(m), semi_allowed)
         }
         _ => {
             m.abandon(p);
@@ -13408,7 +13611,7 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
 //     [ USING from_item [, ...] ]
 //     [ WHERE condition | WHERE CURRENT OF cursor_name ]
 //     [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
-fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn delete(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> CompletedMarker {
     assert!(p.at(DELETE_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(DELETE_KW);
@@ -13422,6 +13625,9 @@ fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     // [ WHERE condition | WHERE CURRENT OF cursor_name ]
     opt_where_or_current_of(p);
     opt_returning_clause(p);
+    if semi_allowed {
+        p.eat(SEMICOLON);
+    }
     m.complete(p, DELETE)
 }
 
@@ -13507,6 +13713,7 @@ fn drop_type(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TYPE)
 }
 
@@ -13523,6 +13730,7 @@ fn drop_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     path_name_ref(p);
     on_table(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_TRIGGER)
 }
 
@@ -13550,6 +13758,7 @@ fn drop_index(p: &mut Parser<'_>) -> CompletedMarker {
     // name [, ...]
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
+    p.eat(SEMICOLON);
     m.complete(p, DROP_INDEX)
 }
 
@@ -13580,6 +13789,7 @@ fn drop_database(p: &mut Parser<'_>) -> CompletedMarker {
             |p| p.eat(FORCE_KW),
         );
     }
+    p.eat(SEMICOLON);
     m.complete(p, DROP_DATABASE)
 }
 
@@ -13634,6 +13844,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
     opt_with_params(p);
     opt_tablespace(p);
     opt_where_clause(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_INDEX)
 }
 
@@ -13982,13 +14193,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
             p.bump(BEGIN_KW);
             p.expect(ATOMIC_KW);
             while !p.at(EOF) && !p.at(END_KW) {
-                if p.eat(SEMICOLON) {
-                    continue;
-                }
                 begin_func_option(p);
-                if p.at(END_KW) {
-                    p.expect(SEMICOLON);
-                }
             }
             p.expect(END_KW);
             BEGIN_FUNC_OPTION_LIST
@@ -14003,18 +14208,23 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
 }
 
 fn begin_func_option(p: &mut Parser<'_>) {
-    let m = p.start();
     if p.at(RETURN_KW) {
         let m = p.start();
         p.bump(RETURN_KW);
         if expr(p).is_none() {
             p.error("expected expr")
         }
+        p.expect(SEMICOLON);
         m.complete(p, RETURN_FUNC_OPTION);
     } else {
-        stmt(p, &StmtRestrictions::default());
+        stmt(
+            p,
+            &StmtRestrictions {
+                semi_allowed: true,
+                ..StmtRestrictions::default()
+            },
+        );
     }
-    m.complete(p, BEGIN_FUNC_OPTION);
 }
 
 // SET configuration_parameter { TO | = } { value | DEFAULT }
@@ -14141,6 +14351,7 @@ fn create_function(p: &mut Parser<'_>) -> CompletedMarker {
     param_list(p, ParamKind::All);
     opt_ret_type(p);
     func_option_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_FUNCTION)
 }
 
@@ -14217,6 +14428,7 @@ fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
     } else if p.at(L_PAREN) {
         attribute_list(p);
     }
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_TYPE)
 }
 
@@ -14267,6 +14479,7 @@ fn create_extension(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.eat(CASCADE_KW);
+    p.eat(SEMICOLON);
     m.complete(p, CREATE_EXTENSION)
 }
 
@@ -14351,6 +14564,7 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, SET)
 }
 
@@ -14383,6 +14597,7 @@ fn show(p: &mut Parser<'_>) -> CompletedMarker {
             path_name_ref(p);
         }
     }
+    p.eat(SEMICOLON);
     m.complete(p, SHOW)
 }
 
@@ -14520,6 +14735,7 @@ fn alter_table(p: &mut Parser<'_>) -> CompletedMarker {
         opt_owned_by_roles(p);
     }
     opt_alter_table_action_list(p);
+    p.eat(SEMICOLON);
     m.complete(p, ALTER_TABLE)
 }
 
@@ -15318,18 +15534,13 @@ fn set_data_type(p: &mut Parser<'_>) {
 pub(crate) fn entry_point(p: &mut Parser) {
     let m = p.start();
     while !p.at(EOF) {
-        let parsed_stmt = stmt(
+        stmt(
             p,
             &StmtRestrictions {
+                semi_allowed: true,
                 begin_end_allowed: true,
             },
         );
-        if !p.at(EOF)
-            && let Some(marker) = parsed_stmt
-            && marker.kind() != EMPTY_STMT
-        {
-            p.expect(SEMICOLON);
-        }
     }
     m.complete(p, SOURCE_FILE);
 }

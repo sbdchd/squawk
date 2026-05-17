@@ -644,7 +644,6 @@ pub enum SyntaxKind {
     AT_TIME_ZONE,
     BEFORE_VALUE,
     BEGIN,
-    BEGIN_FUNC_OPTION,
     BEGIN_FUNC_OPTION_LIST,
     BETWEEN_EXPR,
     BIN_EXPR,

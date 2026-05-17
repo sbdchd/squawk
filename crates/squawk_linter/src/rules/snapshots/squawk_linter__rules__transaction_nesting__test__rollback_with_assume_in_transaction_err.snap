@@ -5,6 +5,6 @@ expression: "lint_errors_with(sql, settings)"
 warning[transaction-nesting]: Attempting to end the transaction that is managed by your migration tool
   ╭▸ 
 4 │ ROLLBACK;
-  │ ━━━━━━━━
+  │ ━━━━━━━━━
   │
   ╰ help: Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.
