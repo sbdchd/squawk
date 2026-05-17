@@ -2617,12 +2617,29 @@ CreateRole =
   'create' 'role' Name RoleOptionList ';'?
 
 CreateRule =
-  'create' OrReplace? 'rule' Name 'as' 'on' ('#ident' | 'select' | 'insert' | 'update' | 'delete')
+  'create' OrReplace? 'rule' Name 'as'
+  RuleOn
+  RuleDo
+  ';'?
+
+RuleOn =
+  'on' ('#ident' | 'select' | 'insert' | 'update' | 'delete')
   'to' Path WhereClause?
+
+RuleDo =
   'do' ('also' | 'instead')?
-  ('nothing'
-  | '(' (RuleStmt (',' RuleStmt)*) ')'
-  | RuleStmt) ';'?
+   RuleAction
+
+Nothing =
+  'nothing'
+
+RuleAction =
+  Nothing
+| RuleStmtList
+| RuleStmt
+
+RuleStmtList =
+  '(' (RuleStmt (',' RuleStmt)*) ')'
 
 RuleStmt =
   SelectVariant

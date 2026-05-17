@@ -5067,36 +5067,16 @@ impl CreateRule {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn rule_do(&self) -> Option<RuleDo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rule_stmt(&self) -> Option<RuleStmt> {
+    pub fn rule_on(&self) -> Option<RuleOn> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn rule_stmts(&self) -> AstChildren<RuleStmt> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn where_clause(&self) -> Option<WhereClause> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
-    }
-    #[inline]
-    pub fn also_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALSO_KW)
     }
     #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
@@ -5107,48 +5087,8 @@ impl CreateRule {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
     #[inline]
-    pub fn delete_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DELETE_KW)
-    }
-    #[inline]
-    pub fn do_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DO_KW)
-    }
-    #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
-    }
-    #[inline]
-    pub fn insert_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INSERT_KW)
-    }
-    #[inline]
-    pub fn instead_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INSTEAD_KW)
-    }
-    #[inline]
-    pub fn nothing_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NOTHING_KW)
-    }
-    #[inline]
-    pub fn on_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ON_KW)
-    }
-    #[inline]
     pub fn rule_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RULE_KW)
-    }
-    #[inline]
-    pub fn select_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SELECT_KW)
-    }
-    #[inline]
-    pub fn to_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TO_KW)
-    }
-    #[inline]
-    pub fn update_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UPDATE_KW)
     }
 }
 
@@ -12896,6 +12836,17 @@ impl NotValid {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Nothing {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Nothing {
+    #[inline]
+    pub fn nothing_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOTHING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Notify {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15770,6 +15721,91 @@ impl RowsFuncOption {
     #[inline]
     pub fn rows_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ROWS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RuleDo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RuleDo {
+    #[inline]
+    pub fn rule_action(&self) -> Option<RuleAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn also_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALSO_KW)
+    }
+    #[inline]
+    pub fn do_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DO_KW)
+    }
+    #[inline]
+    pub fn instead_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INSTEAD_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RuleOn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RuleOn {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn delete_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DELETE_KW)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
+    pub fn insert_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INSERT_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+    #[inline]
+    pub fn select_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SELECT_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn update_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UPDATE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RuleStmtList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RuleStmtList {
+    #[inline]
+    pub fn rule_stmts(&self) -> AstChildren<RuleStmt> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -19527,6 +19563,13 @@ pub enum RefAction {
     Restrict(Restrict),
     SetDefaultColumns(SetDefaultColumns),
     SetNullColumns(SetNullColumns),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RuleAction {
+    Nothing(Nothing),
+    RuleStmtList(RuleStmtList),
+    RuleStmt(RuleStmt),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -27558,6 +27601,24 @@ impl AstNode for NotValid {
         &self.syntax
     }
 }
+impl AstNode for Nothing {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NOTHING
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Notify {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -29668,6 +29729,60 @@ impl AstNode for RowsFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ROWS_FUNC_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RuleDo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RULE_DO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RuleOn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RULE_ON
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RuleStmtList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RULE_STMT_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -35174,6 +35289,46 @@ impl From<SetNullColumns> for RefAction {
     #[inline]
     fn from(node: SetNullColumns) -> RefAction {
         RefAction::SetNullColumns(node)
+    }
+}
+impl AstNode for RuleAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::NOTHING | SyntaxKind::RULE_STMT_LIST)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::NOTHING => RuleAction::Nothing(Nothing { syntax }),
+            SyntaxKind::RULE_STMT_LIST => RuleAction::RuleStmtList(RuleStmtList { syntax }),
+            _ => {
+                if let Some(result) = RuleStmt::cast(syntax) {
+                    return Some(RuleAction::RuleStmt(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            RuleAction::Nothing(it) => &it.syntax,
+            RuleAction::RuleStmtList(it) => &it.syntax,
+            RuleAction::RuleStmt(it) => it.syntax(),
+        }
+    }
+}
+impl From<Nothing> for RuleAction {
+    #[inline]
+    fn from(node: Nothing) -> RuleAction {
+        RuleAction::Nothing(node)
+    }
+}
+impl From<RuleStmtList> for RuleAction {
+    #[inline]
+    fn from(node: RuleStmtList) -> RuleAction {
+        RuleAction::RuleStmtList(node)
     }
 }
 impl AstNode for RuleStmt {

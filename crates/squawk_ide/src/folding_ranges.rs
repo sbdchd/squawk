@@ -144,6 +144,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::ROLE_OPTION_LIST
         | SyntaxKind::ROLE_REF_LIST
         | SyntaxKind::ROW_LIST
+        | SyntaxKind::RULE_STMT_LIST
         | SyntaxKind::SEQUENCE_OPTION_LIST
         | SyntaxKind::SET_COLUMN_LIST
         | SyntaxKind::SET_EXPR_LIST
