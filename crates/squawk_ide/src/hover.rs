@@ -1218,9 +1218,7 @@ fn format_create_sequence(
     let path = create_sequence.path()?;
     let (schema, sequence_name) = resolve::resolve_sequence_info(db, InFile::new(file, &path))?;
 
-    Some(Hover::snippet(format!(
-        "sequence {schema}.{sequence_name}"
-    )))
+    Some(Hover::snippet(format!("sequence {schema}.{sequence_name}")))
 }
 
 fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>) -> Option<Hover> {
@@ -1255,9 +1253,7 @@ fn format_create_property_graph(
     let create_property_graph = create_property_graph.value;
     let path = create_property_graph.path()?;
     let (schema, name) = resolve::resolve_property_graph_info(db, InFile::new(file, &path))?;
-    Some(Hover::snippet(format!(
-        "property graph {schema}.{name}"
-    )))
+    Some(Hover::snippet(format!("property graph {schema}.{name}")))
 }
 
 fn format_create_event_trigger(create_event_trigger: ast::CreateEventTrigger) -> Option<Hover> {
@@ -1409,9 +1405,7 @@ fn format_param_hover(
         ));
     }
 
-    Hover::snippet(format!(
-        "parameter {schema}.{routine_name}.{param_name}"
-    ))
+    Hover::snippet(format!("parameter {schema}.{routine_name}.{param_name}"))
 }
 
 fn format_create_function(
@@ -1425,9 +1419,7 @@ fn format_create_function(
 
     let params = create_function.param_list()?.syntax().text().to_string();
     let return_type = create_function.ret_type()?.syntax().text().to_string();
-    let snippet = format!(
-        "function {schema}.{function_name}{params} {return_type}"
-    );
+    let snippet = format!("function {schema}.{function_name}{params} {return_type}");
 
     Some(hover_with_preceding_comment(
         snippet,

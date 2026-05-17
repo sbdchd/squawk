@@ -453,7 +453,7 @@ fn leading_comments_token<'a>(node: &SyntaxToken) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
         match next {
-            rowan::NodeOrToken::Node(node) => {
+            rowan::NodeOrToken::Node(_node) => {
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
@@ -476,7 +476,7 @@ fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
         match next {
-            rowan::NodeOrToken::Node(node) => {
+            rowan::NodeOrToken::Node(_node) => {
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
@@ -504,7 +504,7 @@ fn trailing_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Next).skip(1) {
         match next {
-            rowan::NodeOrToken::Node(node) => {
+            rowan::NodeOrToken::Node(_node) => {
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
