@@ -677,6 +677,7 @@ fn convert_document_symbol(
             squawk_ide::document_symbols::DocumentSymbolKind::Procedure => "procedure",
             squawk_ide::document_symbols::DocumentSymbolKind::EventTrigger => "event_trigger",
             squawk_ide::document_symbols::DocumentSymbolKind::Role => "role",
+            squawk_ide::document_symbols::DocumentSymbolKind::Rule => "rule",
             squawk_ide::document_symbols::DocumentSymbolKind::Policy => "policy",
             squawk_ide::document_symbols::DocumentSymbolKind::PropertyGraph => "property_graph",
             squawk_ide::document_symbols::DocumentSymbolKind::Type => "type",
