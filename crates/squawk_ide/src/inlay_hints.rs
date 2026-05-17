@@ -190,10 +190,13 @@ fn inlay_hint_insert_select(
 
 #[cfg(test)]
 mod test {
+    use crate::builtins::builtins_file;
     use crate::db::{Database, File};
-    use crate::inlay_hints::inlay_hints;
+    use crate::inlay_hints::{InlayHint, inlay_hints};
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
+    use rustc_hash::FxHashMap;
+    use std::ops::Range;
 
     #[must_use]
     #[track_caller]
@@ -210,43 +213,77 @@ mod test {
         }
 
         let mut modified_sql = sql.to_string();
-        let mut insertions: Vec<(usize, String)> = hints
-            .iter()
-            .map(|hint| {
-                let offset: usize = hint.position.into();
-                (offset, hint.label.clone())
+        let mut indexed: Vec<(usize, &InlayHint)> = hints.iter().enumerate().collect();
+        indexed.sort_by_key(|(_, h)| h.position);
+
+        let mut label_annotations: Vec<Range<usize>> = vec![0..0; hints.len()];
+        let mut cumulative = 0;
+        for (i, hint) in &indexed {
+            let pos: usize = hint.position.into();
+            let new_pos = pos + cumulative;
+            modified_sql.insert_str(new_pos, &hint.label);
+            label_annotations[*i] = new_pos..new_pos + hint.label.len();
+            cumulative += hint.label.len();
+        }
+
+        let mut targets_by_file: FxHashMap<File, Vec<(usize, Range<usize>)>> = FxHashMap::default();
+        for (i, hint) in hints.iter().enumerate() {
+            if let Some(target) = &hint.target {
+                let start: usize = target.value.start().into();
+                let end: usize = target.value.end().into();
+                targets_by_file
+                    .entry(target.file_id)
+                    .or_default()
+                    .push((i + 1, start..end));
+            }
+        }
+
+        let mut file_paths: FxHashMap<File, &'static str> = FxHashMap::default();
+        file_paths.insert(file, "current.sql");
+        file_paths.insert(builtins_file(&db), "builtins.sql");
+
+        let mut labels_snippet = Snippet::source(&modified_sql).fold(true);
+        for (i, range) in label_annotations.into_iter().enumerate() {
+            labels_snippet = labels_snippet.annotation(
+                AnnotationKind::Context
+                    .span(range)
+                    .label(format!("{}. label", i + 1)),
+            );
+        }
+
+        let mut groups = vec![Level::INFO.primary_title("labels").element(labels_snippet)];
+
+        let mut target_entries = targets_by_file.into_iter().collect::<Vec<_>>();
+        target_entries.sort_by_key(|(_, targets)| {
+            targets.iter().map(|(i, _)| *i).min().unwrap_or(usize::MAX)
+        });
+
+        let target_contents = target_entries
+            .into_iter()
+            .map(|(f, targets)| {
+                let path = *file_paths.get(&f).unwrap();
+                (f.content(&db).clone(), path, targets)
             })
-            .collect();
+            .collect::<Vec<_>>();
 
-        insertions.sort_by(|a, b| b.0.cmp(&a.0));
-
-        for (offset, label) in &insertions {
-            modified_sql.insert_str(*offset, label);
+        for (content, path, targets) in &target_contents {
+            let mut snippet = Snippet::source(content.as_ref()).fold(true).path(*path);
+            for (i, range) in targets {
+                snippet = snippet.annotation(
+                    AnnotationKind::Context
+                        .span(range.clone())
+                        .label(format!("{i}. target")),
+                );
+            }
+            groups.push(Level::INFO.primary_title("targets").element(snippet));
         }
-
-        let mut annotations = vec![];
-        let mut cumulative_offset = 0;
-
-        insertions.reverse();
-        for (original_offset, label) in insertions {
-            let new_offset = original_offset + cumulative_offset;
-            annotations.push((new_offset, label.len()));
-            cumulative_offset += label.len();
-        }
-
-        let mut snippet = Snippet::source(&modified_sql).fold(true);
-
-        for (offset, len) in annotations {
-            snippet = snippet.annotation(AnnotationKind::Context.span(offset..offset + len));
-        }
-
-        let group = Level::INFO.primary_title("inlay hints").element(snippet);
 
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
         renderer
-            .render(&[group])
+            .render(&groups)
             .to_string()
-            .replace("info: inlay hints", "inlay hints:")
+            .replace("info: labels", "labels:")
+            .replace("info: targets", "targets:")
     }
 
     #[test]
@@ -254,11 +291,17 @@ mod test {
         assert_snapshot!(check_inlay_hints("
 create function foo(a int) returns int as 'select $$1' language sql;
 select foo(1);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ select foo(a: 1);
-          ╰╴           ───
+          │            ─── 1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:21
+          │
+        2 │ create function foo(a int) returns int as 'select $$1' language sql;
+          ╰╴                    ─ 1. target
         ");
     }
 
@@ -267,11 +310,21 @@ select foo(1);
         assert_snapshot!(check_inlay_hints("
 create function add(a int, b int) returns int as 'select $$1 + $$2' language sql;
 select add(1, 2);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ select add(a: 1, b: 2);
-          ╰╴           ───   ───
+          │            ┬──   ─── 2. label
+          │            │
+          │            1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:21
+          │
+        2 │ create function add(a int, b int) returns int as 'select $$1 + $$2' language sql;
+          │                     ┬      ─ 2. target
+          │                     │
+          ╰╴                    1. target
         ");
     }
 
@@ -288,11 +341,17 @@ select foo();
         assert_snapshot!(check_inlay_hints("
 create function public.foo(x int) returns int as 'select $$1' language sql;
 select public.foo(42);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ select public.foo(x: 42);
-          ╰╴                  ───
+          │                   ─── 1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:28
+          │
+        2 │ create function public.foo(x int) returns int as 'select $$1' language sql;
+          ╰╴                           ─ 1. target
         ");
     }
 
@@ -302,11 +361,17 @@ select public.foo(42);
 set search_path to myschema;
 create function foo(val int) returns int as 'select $$1' language sql;
 select foo(100);
-"#), @r"
-        inlay hints:
+"#), @"
+        labels:
           ╭▸ 
         4 │ select foo(val: 100);
-          ╰╴           ─────
+          │            ───── 1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:3:21
+          │
+        3 │ create function foo(val int) returns int as 'select $$1' language sql;
+          ╰╴                    ─── 1. target
         ");
     }
 
@@ -315,11 +380,22 @@ select foo(100);
         assert_snapshot!(check_inlay_hints("
 create function inc(n int) returns int as 'select $$1 + 1' language sql;
 select inc(1), inc(2);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ select inc(n: 1), inc(n: 2);
-          ╰╴           ───        ───
+          │            ┬──        ─── 2. label
+          │            │
+          │            1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:21
+          │
+        2 │ create function inc(n int) returns int as 'select $$1 + 1' language sql;
+          │                     ┬
+          │                     │
+          │                     1. target
+          ╰╴                    2. target
         ");
     }
 
@@ -328,11 +404,17 @@ select inc(1), inc(2);
         assert_snapshot!(check_inlay_hints("
 create function foo(a int) returns int as 'select $$1' language sql;
 select foo(1, 2);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ select foo(a: 1, 2);
-          ╰╴           ───
+          │            ─── 1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:21
+          │
+        2 │ create function foo(a int) returns int as 'select $$1' language sql;
+          ╰╴                    ─ 1. target
         ");
     }
 
@@ -340,11 +422,19 @@ select foo(1, 2);
     fn builtin_function() {
         assert_snapshot!(check_inlay_hints("
 select json_strip_nulls('[1, null]', true);
-"), @r"
-        inlay hints:
-          ╭▸ 
-        2 │ select json_strip_nulls(target: '[1, null]', strip_in_arrays: true);
-          ╰╴                        ────────             ─────────────────
+"), @"
+        labels:
+             ╭▸ 
+           2 │ select json_strip_nulls(target: '[1, null]', strip_in_arrays: true);
+             │                         ──────── 1. label    ───────────────── 2. label
+             ╰╴
+        targets:
+             ╭▸ builtins.sql:9239:45
+             │
+        9239 │ create function pg_catalog.json_strip_nulls(target json, strip_in_arrays boolean DEFAULT false) returns json
+             │                                             ┬─────       ─────────────── 2. target
+             │                                             │
+             ╰╴                                            1. target
         ");
     }
 
@@ -353,11 +443,19 @@ select json_strip_nulls('[1, null]', true);
         assert_snapshot!(check_inlay_hints("
 create table t (column_a int, column_b int, column_c text);
 insert into t (column_a, column_c) values (1, 'foo');
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ insert into t (column_a, column_c) values (column_a: 1, column_c: 'foo');
-          ╰╴                                           ──────────   ──────────
+          │                                            ┬─────────   ────────── 2. label
+          │                                            │
+          │                                            1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:17
+          │
+        2 │ create table t (column_a int, column_b int, column_c text);
+          ╰╴                ──────── 1. target          ──────── 2. target
         ");
     }
 
@@ -366,11 +464,23 @@ insert into t (column_a, column_c) values (1, 'foo');
         assert_snapshot!(check_inlay_hints("
 create table t (column_a int, column_b int, column_c text);
 insert into t values (1, 2, 'foo');
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ insert into t values (column_a: 1, column_b: 2, column_c: 'foo');
-          ╰╴                      ──────────   ──────────   ──────────
+          │                       ┬─────────   ┬─────────   ────────── 3. label
+          │                       │            │
+          │                       │            2. label
+          │                       1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:17
+          │
+        2 │ create table t (column_a int, column_b int, column_c text);
+          │                 ┬───────      ┬───────      ──────── 3. target
+          │                 │             │
+          │                 │             2. target
+          ╰╴                1. target
         ");
     }
 
@@ -379,11 +489,26 @@ insert into t values (1, 2, 'foo');
         assert_snapshot!(check_inlay_hints("
 create table t (x int, y int);
 insert into t values (1, 2), (3, 4);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ insert into t values (x: 1, y: 2), (x: 3, y: 4);
-          ╰╴                      ───   ───     ───   ───
+          │                       ┬──   ┬──     ┬──   ─── 4. label
+          │                       │     │       │
+          │                       │     │       3. label
+          │                       │     2. label
+          │                       1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:17
+          │
+        2 │ create table t (x int, y int);
+          │                 ┬      ┬
+          │                 │      │
+          │                 │      2. target
+          │                 │      4. target
+          │                 1. target
+          ╰╴                3. target
         ");
     }
 
@@ -391,11 +516,13 @@ insert into t values (1, 2), (3, 4);
     fn insert_no_create_table() {
         assert_snapshot!(check_inlay_hints("
 insert into t (a, b) values (1, 2);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         2 │ insert into t (a, b) values (a: 1, b: 2);
-          ╰╴                             ───   ───
+          │                              ┬──   ─── 2. label
+          │                              │
+          ╰╴                             1. label
         ");
     }
 
@@ -404,11 +531,21 @@ insert into t (a, b) values (1, 2);
         assert_snapshot!(check_inlay_hints("
 create table t (a int, b int);
 insert into t values (1, 2, 3);
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ insert into t values (a: 1, b: 2, 3);
-          ╰╴                      ───   ───
+          │                       ┬──   ─── 2. label
+          │                       │
+          │                       1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:17
+          │
+        2 │ create table t (a int, b int);
+          │                 ┬      ─ 2. target
+          │                 │
+          ╰╴                1. target
         ");
     }
 
@@ -419,10 +556,23 @@ create table t (a int, b int);
 create table u (c int) inherits (t);
 insert into u select 1, 2, 3;
 "), @"
-        inlay hints:
+        labels:
           ╭▸ 
         4 │ insert into u select a: 1, b: 2, c: 3;
-          ╰╴                     ───   ───   ───
+          │                      ┬──   ┬──   ─── 3. label
+          │                      │     │
+          │                      │     2. label
+          │                      1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:17
+          │
+        2 │ create table t (a int, b int);
+          │                 ┬      ─ 2. target
+          │                 │
+          │                 1. target
+        3 │ create table u (c int) inherits (t);
+          ╰╴                ─ 3. target
         ");
     }
 
@@ -433,10 +583,35 @@ create table t ()
 inherits (information_schema.sql_features);
 insert into t values (1, 2, 3, 4, 5, 6, 7);
 "), @"
-        inlay hints:
-          ╭▸ 
-        4 │ …values (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
-          ╰╴         ────────────   ──────────────   ────────────────   ──────────────────   ──────────────   ────────────────   ──────────
+        labels:
+            ╭▸ 
+          4 │ …ues (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
+            │       ┬───────────   ┬─────────────   ┬───────────────   ┬─────────────────   ┬─────────────   ┬───────────────   ────────── 7. label
+            │       │              │                │                  │                    │                │
+            │       │              │                │                  │                    │                6. label
+            │       │              │                │                  │                    5. label
+            │       │              │                │                  4. label
+            │       │              │                3. label
+            │       │              2. label
+            │       1. label
+            ╰╴
+        targets:
+            ╭▸ builtins.sql:436:3
+            │
+        436 │   feature_id information_schema.character_data,
+            │   ────────── 1. target
+        437 │   feature_name information_schema.character_data,
+            │   ──────────── 2. target
+        438 │   sub_feature_id information_schema.character_data,
+            │   ────────────── 3. target
+        439 │   sub_feature_name information_schema.character_data,
+            │   ──────────────── 4. target
+        440 │   is_supported information_schema.yes_or_no,
+            │   ──────────── 5. target
+        441 │   is_verified_by information_schema.character_data,
+            │   ────────────── 6. target
+        442 │   comments information_schema.character_data
+            ╰╴  ──────── 7. target
         ");
     }
 
@@ -447,10 +622,19 @@ create table parent as select 1 a, 'x'::text b;
 create table child (c int) inherits (parent);
 insert into child values (1, 2, 3);
 "), @"
-        inlay hints:
+        labels:
           ╭▸ 
         4 │ insert into child values (a: 1, b: 2, c: 3);
-          ╰╴                          ───   ───   ───
+          │                           ┬──   ┬──   ─── 3. label
+          │                           │     │
+          │                           │     2. label
+          │                           1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:3:21
+          │
+        3 │ create table child (c int) inherits (parent);
+          ╰╴                    ─ 3. target
         ");
     }
 
@@ -462,10 +646,19 @@ create table parent as select * from base;
 create table child (c int) inherits (parent);
 insert into child values (1, 2, 3);
 "), @"
-        inlay hints:
+        labels:
           ╭▸ 
         5 │ insert into child values (a: 1, b: 2, c: 3);
-          ╰╴                          ───   ───   ───
+          │                           ┬──   ┬──   ─── 3. label
+          │                           │     │
+          │                           │     2. label
+          │                           1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:4:21
+          │
+        4 │ create table child (c int) inherits (parent);
+          ╰╴                    ─ 3. target
         ");
     }
 
@@ -475,11 +668,24 @@ insert into child values (1, 2, 3);
 create table x (a int, b int);
 create table y (c int, like x);
 insert into y select 1, 2, 3;
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         4 │ insert into y select c: 1, a: 2, b: 3;
-          ╰╴                     ───   ───   ───
+          │                      ┬──   ┬──   ─── 3. label
+          │                      │     │
+          │                      │     2. label
+          │                      1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:17
+          │
+        2 │ create table x (a int, b int);
+          │                 ┬      ─ 3. target
+          │                 │
+          │                 2. target
+        3 │ create table y (c int, like x);
+          ╰╴                ─ 1. target
         ");
     }
 
@@ -488,11 +694,21 @@ insert into y select 1, 2, 3;
         assert_snapshot!(check_inlay_hints("
 create table t (a int, b int);
 insert into t select 1, 2;
-"), @r"
-        inlay hints:
+"), @"
+        labels:
           ╭▸ 
         3 │ insert into t select a: 1, b: 2;
-          ╰╴                     ───   ───
+          │                      ┬──   ─── 2. label
+          │                      │
+          │                      1. label
+          ╰╴
+        targets:
+          ╭▸ current.sql:2:17
+          │
+        2 │ create table t (a int, b int);
+          │                 ┬      ─ 2. target
+          │                 │
+          ╰╴                1. target
         ");
     }
 
@@ -502,10 +718,35 @@ insert into t select 1, 2;
 create table t (like information_schema.sql_features);
 insert into t values (1, 2, 3, 4, 5, 6, 7);
 "), @"
-        inlay hints:
-          ╭▸ 
-        3 │ …values (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
-          ╰╴         ────────────   ──────────────   ────────────────   ──────────────────   ──────────────   ────────────────   ──────────
+        labels:
+            ╭▸ 
+          3 │ …ues (feature_id: 1, feature_name: 2, sub_feature_id: 3, sub_feature_name: 4, is_supported: 5, is_verified_by: 6, comments: 7);
+            │       ┬───────────   ┬─────────────   ┬───────────────   ┬─────────────────   ┬─────────────   ┬───────────────   ────────── 7. label
+            │       │              │                │                  │                    │                │
+            │       │              │                │                  │                    │                6. label
+            │       │              │                │                  │                    5. label
+            │       │              │                │                  4. label
+            │       │              │                3. label
+            │       │              2. label
+            │       1. label
+            ╰╴
+        targets:
+            ╭▸ builtins.sql:436:3
+            │
+        436 │   feature_id information_schema.character_data,
+            │   ────────── 1. target
+        437 │   feature_name information_schema.character_data,
+            │   ──────────── 2. target
+        438 │   sub_feature_id information_schema.character_data,
+            │   ────────────── 3. target
+        439 │   sub_feature_name information_schema.character_data,
+            │   ──────────────── 4. target
+        440 │   is_supported information_schema.yes_or_no,
+            │   ──────────── 5. target
+        441 │   is_verified_by information_schema.character_data,
+            │   ────────────── 6. target
+        442 │   comments information_schema.character_data
+            ╰╴  ──────── 7. target
         ");
     }
 
@@ -516,10 +757,12 @@ select 1 a, 'x'::text b into parent;
 create table child (like parent);
 insert into child values (1, 2);
 "), @"
-        inlay hints:
+        labels:
           ╭▸ 
         4 │ insert into child values (a: 1, b: 2);
-          ╰╴                          ───   ───
+          │                           ┬──   ─── 2. label
+          │                           │
+          ╰╴                          1. label
         ");
     }
 }
