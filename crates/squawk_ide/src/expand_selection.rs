@@ -564,7 +564,7 @@ $0
         let unhandled_list_kinds = (0..SyntaxKind::__LAST as u16)
             .map(SyntaxKind::from)
             .filter(|kind| {
-                format!("{:?}", kind).ends_with("_LIST") && !delimited_ws_list_kinds.contains(kind)
+                format!("{kind:?}").ends_with("_LIST") && !delimited_ws_list_kinds.contains(kind)
             })
             .filter(|kind| !DELIMITED_LIST_KINDS.contains(kind))
             .collect::<Vec<_>>();

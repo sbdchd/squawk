@@ -34,7 +34,7 @@ pub(super) fn rewrite_as_dollar_quoted_string(
 fn string_to_dollar_quoted(text: &str) -> Option<String> {
     let normalized = normalize_single_quoted_string(text)?;
     let delimiter = dollar_delimiter(&normalized)?;
-    let boundary = format!("${}$", delimiter);
+    let boundary = format!("${delimiter}$");
     Some(format!("{boundary}{normalized}{boundary}"))
 }
 
@@ -53,7 +53,7 @@ fn dollar_delimiter(content: &str) -> Option<String> {
     let mut delim = "q".to_owned();
     // don't want to just loop forever
     for idx in 0..10 {
-        if !content.contains(&format!("${}$", delim)) {
+        if !content.contains(&format!("${delim}$")) {
             return Some(delim);
         }
         delim.push_str(&idx.to_string());

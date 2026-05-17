@@ -225,7 +225,7 @@ mod test {
             snippet = snippet.annotation(
                 AnnotationKind::Context
                     .span(range.into())
-                    .label(format!("{}. destination", label_index)),
+                    .label(format!("{label_index}. destination")),
             );
         }
 

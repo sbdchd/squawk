@@ -34,7 +34,7 @@ pub(super) fn rewrite_as_regular_string(
 fn dollar_quoted_to_string(text: &str) -> Option<String> {
     debug_assert!(text.starts_with('$'));
     let (delimiter, content) = split_dollar_quoted(text)?;
-    let boundary = format!("${}$", delimiter);
+    let boundary = format!("${delimiter}$");
 
     if !text.starts_with(&boundary) || !text.ends_with(&boundary) {
         return None;
@@ -42,7 +42,7 @@ fn dollar_quoted_to_string(text: &str) -> Option<String> {
 
     // quotes are escaped by using two of them in Postgres
     let escaped = content.replace('\'', "''");
-    Some(format!("'{}'", escaped))
+    Some(format!("'{escaped}'"))
 }
 
 fn split_dollar_quoted(text: &str) -> Option<(String, &str)> {
@@ -50,7 +50,7 @@ fn split_dollar_quoted(text: &str) -> Option<(String, &str)> {
     let second_dollar = text[1..].find('$')?;
     // the `foo` in `select $foo$bar$foo$`
     let delimiter = &text[1..=second_dollar];
-    let boundary = format!("${}$", delimiter);
+    let boundary = format!("${delimiter}$");
 
     if !text.ends_with(&boundary) {
         return None;

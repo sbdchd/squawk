@@ -25,7 +25,7 @@ pub(super) fn rewrite_double_colon_to_cast(
     let expr_text = expr.syntax().text();
     let type_text = ty.syntax().text();
 
-    let replacement = format!("cast({} as {})", expr_text, type_text);
+    let replacement = format!("cast({expr_text} as {type_text})");
 
     actions.push(CodeAction {
         title: "Rewrite as cast function `cast()`".to_owned(),

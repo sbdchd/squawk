@@ -452,14 +452,11 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
 fn leading_comments_token<'a>(node: &SyntaxToken) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
-        println!("prev");
         match next {
             rowan::NodeOrToken::Node(node) => {
-                println!("before node {:?}", node);
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
-                println!("before token {:?}", token);
                 if token.kind() == SyntaxKind::COMMENT {
                     doc = doc
                         .append(Doc::text(token.text().to_string()))
@@ -478,14 +475,11 @@ fn leading_comments_token<'a>(node: &SyntaxToken) -> Doc<'a> {
 fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
-        println!("prev");
         match next {
             rowan::NodeOrToken::Node(node) => {
-                println!("before node {:?}", node);
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
-                println!("before token {:?}", token);
                 if token.kind() == SyntaxKind::COMMENT {
                     let is_block = token.text().starts_with("--");
                     doc = doc
@@ -509,14 +503,11 @@ fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
 fn trailing_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Next).skip(1) {
-        println!("after");
         match next {
             rowan::NodeOrToken::Node(node) => {
-                println!("after node {:?}", node);
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
-                println!("after token {:?}", token);
                 if token.kind() == SyntaxKind::COMMENT {
                     doc = doc
                         .append(Doc::space())
@@ -562,7 +553,7 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
 pub fn fmt(text: &str) -> String {
     let parse = ast::SourceFile::parse(text);
     let file = parse.tree();
-    println!("{}", text);
+    println!("{text}");
     println!("---");
     println!("{:#?}", file.syntax());
     println!("---");

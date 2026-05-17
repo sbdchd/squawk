@@ -546,7 +546,7 @@ values
     fn list_variants() {
         let unhandled_list_kinds: Vec<SyntaxKind> = (0..SyntaxKind::__LAST as u16)
             .map(SyntaxKind::from)
-            .filter(|kind| format!("{:?}", kind).ends_with("_LIST"))
+            .filter(|kind| format!("{kind:?}").ends_with("_LIST"))
             .filter(|kind| fold_kind(*kind).is_none())
             .collect();
 

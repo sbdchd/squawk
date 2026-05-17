@@ -97,6 +97,7 @@ manual_let_else = "deny"
 explicit_iter_loop = "deny"
 too_many_arguments = "allow"
 disallowed_types = "deny"
+uninlined_format_args = "deny"
 
 [profile.dev]
 debug = 0

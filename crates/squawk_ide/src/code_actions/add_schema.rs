@@ -43,7 +43,7 @@ pub(super) fn add_schema(
         .search_path_at(token_start)
         .first()?
         .to_string();
-    let replacement = format!("{}.", schema);
+    let replacement = format!("{schema}.");
 
     actions.push(CodeAction {
         title: "Add schema".to_owned(),

@@ -864,8 +864,7 @@ fn function_detail(
     let return_type = ret_type.syntax().text().to_string();
 
     Some(format!(
-        "{}.{}{} {}",
-        schema, function_name, params, return_type
+        "{schema}.{function_name}{params} {return_type}"
     ))
 }
 
