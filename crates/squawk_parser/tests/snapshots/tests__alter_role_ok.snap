@@ -19,7 +19,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_OPTION
         IDENT "superuser"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_options"
   WHITESPACE "\n"
@@ -114,7 +114,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'2042-02-22'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -134,7 +134,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "newname"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_config"
   WHITESPACE "\n"
@@ -159,7 +159,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'value'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_ROLE
     ALTER_KW "alter"
@@ -182,7 +182,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'value'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_ROLE
     ALTER_KW "alter"
@@ -204,7 +204,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_config_from_current"
   WHITESPACE "\n"
@@ -228,7 +228,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       CURRENT_KW "current"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_config"
   WHITESPACE "\n"
@@ -247,7 +247,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "param"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_all"
   WHITESPACE "\n"
@@ -263,7 +263,7 @@ SOURCE_FILE
     RESET_KW "reset"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- in_database"
   WHITESPACE "\n"
@@ -295,7 +295,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'value'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using_current_user"
   WHITESPACE "\n"
@@ -312,7 +312,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_OPTION
         IDENT "nologin"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- for_all_roles"
   WHITESPACE "\n"
@@ -326,5 +326,5 @@ SOURCE_FILE
     RESET_KW "reset"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

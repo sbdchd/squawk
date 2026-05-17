@@ -16,7 +16,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "order_summary"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REFRESH
     REFRESH_KW "REFRESH"
@@ -36,7 +36,7 @@ SOURCE_FILE
       NO_KW "NO"
       WHITESPACE " "
       DATA_KW "DATA"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REFRESH
     REFRESH_KW "refresh"
@@ -56,5 +56,5 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       DATA_KW "data"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

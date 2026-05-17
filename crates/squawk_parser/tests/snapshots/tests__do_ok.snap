@@ -10,7 +10,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       DOLLAR_QUOTED_STRING "$$DECLARE r record;\nBEGIN\n    FOR r IN SELECT table_schema, table_name FROM information_schema.tables\n             WHERE table_type = 'VIEW' AND table_schema = 'public'\n    LOOP\n        EXECUTE 'GRANT ALL ON ' || quote_ident(r.table_schema) || '.' || quote_ident(r.table_name) || ' TO webuser';\n    END LOOP;\nEND$$"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- do_with_language"
   WHITESPACE "\n"
@@ -23,5 +23,5 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'select 1'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

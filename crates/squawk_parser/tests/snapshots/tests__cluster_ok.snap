@@ -7,7 +7,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   CLUSTER
     CLUSTER_KW "cluster"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -38,7 +38,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "idx"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options_only"
   WHITESPACE "\n"
@@ -53,7 +53,7 @@ SOURCE_FILE
         LITERAL
           FALSE_KW "false"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_14"
   WHITESPACE "\n"
@@ -77,7 +77,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "idx"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_17"
   WHITESPACE "\n"
@@ -85,7 +85,7 @@ SOURCE_FILE
     CLUSTER_KW "cluster"
     WHITESPACE " "
     VERBOSE_KW "verbose"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_8_3"
   WHITESPACE "\n"
@@ -111,5 +111,5 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -11,18 +11,18 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -45,7 +45,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge left"
   WHITESPACE "\n"
@@ -138,7 +138,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -180,7 +180,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge right"
   WHITESPACE "\n"
@@ -273,7 +273,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -315,7 +315,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge any"
   WHITESPACE "\n"
@@ -393,7 +393,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -434,7 +434,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- paren graph pattern"
   WHITESPACE "\n"
@@ -498,7 +498,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -570,7 +570,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -617,7 +617,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- graph pattern qualifier"
   WHITESPACE "\n"
@@ -667,7 +667,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -717,7 +717,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -765,7 +765,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple path factors"
   WHITESPACE "\n"
@@ -833,7 +833,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -946,7 +946,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complicated"
   WHITESPACE "\n\n"
@@ -1170,7 +1170,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1353,7 +1353,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1540,7 +1540,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1744,7 +1744,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1916,7 +1916,7 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -2119,5 +2119,5 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

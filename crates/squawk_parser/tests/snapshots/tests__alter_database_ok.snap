@@ -20,7 +20,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -40,7 +40,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
     ALTER_KW "alter"
@@ -57,7 +57,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
@@ -76,7 +76,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
   WHITESPACE "\n"
@@ -94,7 +94,7 @@ SOURCE_FILE
       COLLATION_KW "collation"
       WHITESPACE " "
       VERSION_KW "version"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_param"
   WHITESPACE "\n"
@@ -118,7 +118,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "v"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
     ALTER_KW "alter"
@@ -140,7 +140,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "v"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
     ALTER_KW "alter"
@@ -161,7 +161,7 @@ SOURCE_FILE
       EQ "="
       WHITESPACE " "
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
     ALTER_KW "alter"
@@ -182,7 +182,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       CURRENT_KW "current"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset"
   WHITESPACE "\n"
@@ -201,7 +201,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
     ALTER_KW "alter"
@@ -215,7 +215,7 @@ SOURCE_FILE
       RESET_KW "reset"
       WHITESPACE " "
       ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_option"
   WHITESPACE "\n"
@@ -235,7 +235,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option_connection_limit"
   WHITESPACE "\n"
@@ -255,7 +255,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option_is_template"
   WHITESPACE "\n"
@@ -273,7 +273,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_multiple_options"
   WHITESPACE "\n"
@@ -307,5 +307,5 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -10,14 +10,14 @@ CheckReport {
             file: "main.sql",
             line: 2,
             column: 3,
-            range: 5..64,
+            range: 5..65,
             level: Warning,
             message: "Missing `set lock_timeout` before potentially slow operations",
             help: Some(
                 "Configure a `lock_timeout` before this statement.",
             ),
             rule_name: "require-timeout-settings",
-            column_end: 62,
+            column_end: 63,
             line_end: 2,
             fix: Some(
                 Fix {
@@ -37,14 +37,14 @@ CheckReport {
             file: "main.sql",
             line: 2,
             column: 3,
-            range: 5..64,
+            range: 5..65,
             level: Warning,
             message: "Missing `set statement_timeout` before potentially slow operations",
             help: Some(
                 "Configure a `statement_timeout` before this statement",
             ),
             rule_name: "require-timeout-settings",
-            column_end: 62,
+            column_end: 63,
             line_end: 2,
             fix: Some(
                 Fix {

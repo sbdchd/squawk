@@ -29,7 +29,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               TEXT_KW "text"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- change column data type"
   WHITESPACE "\n"
@@ -71,7 +71,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "2"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- alter_constraint"
   WHITESPACE "\n"
@@ -93,7 +93,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -116,7 +116,7 @@ SOURCE_FILE
       WHITESPACE " "
       DEFERRABLE_CONSTRAINT_OPTION
         DEFERRABLE_KW "deferrable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -141,7 +141,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         DEFERRABLE_KW "deferrable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -171,7 +171,7 @@ SOURCE_FILE
         INITIALLY_KW "initially"
         WHITESPACE " "
         IMMEDIATE_KW "immediate"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- validate_constraint"
   WHITESPACE "\n"
@@ -193,7 +193,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- change column default"
   WHITESPACE "\n"
@@ -223,7 +223,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           FLOAT_NUMBER "7.77"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column default"
   WHITESPACE "\n"
@@ -250,7 +250,7 @@ SOURCE_FILE
         DROP_KW "drop"
         WHITESPACE " "
         DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- alter_column"
   WHITESPACE "\n"
@@ -302,7 +302,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -329,7 +329,7 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 INT_KW "int"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -361,7 +361,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -384,7 +384,7 @@ SOURCE_FILE
         DROP_KW "drop"
         WHITESPACE " "
         DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -409,7 +409,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -434,7 +434,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -457,7 +457,7 @@ SOURCE_FILE
         DROP_KW "drop"
         WHITESPACE " "
         EXPRESSION_KW "expression"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -485,7 +485,7 @@ SOURCE_FILE
           IF_KW "if"
           WHITESPACE " "
           EXISTS_KW "exists"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -516,7 +516,7 @@ SOURCE_FILE
         AS_KW "as"
         WHITESPACE " "
         IDENTITY_KW "identity"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -545,7 +545,7 @@ SOURCE_FILE
         AS_KW "as"
         WHITESPACE " "
         IDENTITY_KW "identity"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -590,7 +590,7 @@ SOURCE_FILE
             CYCLE_KW "cycle"
           WHITESPACE " "
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -633,7 +633,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " \n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -678,7 +678,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " \n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -701,7 +701,7 @@ SOURCE_FILE
         DROP_KW "drop"
         WHITESPACE " "
         IDENTITY_KW "identity"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -729,7 +729,7 @@ SOURCE_FILE
           IF_KW "if"
           WHITESPACE " "
           EXISTS_KW "exists"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -755,7 +755,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -808,7 +808,7 @@ SOURCE_FILE
                       IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -848,7 +848,7 @@ SOURCE_FILE
               IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -891,7 +891,7 @@ SOURCE_FILE
               IDENT "b"
           WHITESPACE " "
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -967,7 +967,7 @@ SOURCE_FILE
               CONSTRAINT_KW "constraint"
           WHITESPACE " "
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -992,7 +992,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         IDENT "plain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1017,7 +1017,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         EXTERNAL_KW "external"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1042,7 +1042,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         IDENT "extended"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1067,7 +1067,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         IDENT "main"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1092,7 +1092,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1117,7 +1117,7 @@ SOURCE_FILE
         COMPRESSION_KW "compression"
         WHITESPACE " "
         DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1142,7 +1142,7 @@ SOURCE_FILE
         COMPRESSION_KW "compression"
         WHITESPACE " "
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1164,7 +1164,7 @@ SOURCE_FILE
       SET_GENERATED_OPTIONS
         RESTART
           RESTART_KW "restart"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- inherit"
   WHITESPACE "\n"
@@ -1186,7 +1186,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1208,7 +1208,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove constraint"
   WHITESPACE "\n"
@@ -1230,7 +1230,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "some_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column not null constraint"
   WHITESPACE "\n"
@@ -1259,7 +1259,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove constraint if exists"
   WHITESPACE "\n"
@@ -1286,7 +1286,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "some_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1313,7 +1313,7 @@ SOURCE_FILE
         IDENT "c"
       WHITESPACE " "
       RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1340,7 +1340,7 @@ SOURCE_FILE
         IDENT "c"
       WHITESPACE " "
       CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- disable_trigger"
   WHITESPACE "\n"
@@ -1362,7 +1362,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1381,7 +1381,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1400,7 +1400,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       USER_KW "user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable_trigger"
   WHITESPACE "\n"
@@ -1422,7 +1422,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1441,7 +1441,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1460,7 +1460,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       USER_KW "user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1482,7 +1482,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1504,7 +1504,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- replica_identity"
   WHITESPACE "\n"
@@ -1525,7 +1525,7 @@ SOURCE_FILE
       IDENTITY_KW "identity"
       WHITESPACE " "
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1549,7 +1549,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1568,7 +1568,7 @@ SOURCE_FILE
       IDENTITY_KW "identity"
       WHITESPACE " "
       FULL_KW "full"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1587,7 +1587,7 @@ SOURCE_FILE
       IDENTITY_KW "identity"
       WHITESPACE " "
       NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rule_enable_disable"
   WHITESPACE "\n"
@@ -1609,7 +1609,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "r"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1629,7 +1629,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "r"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1651,7 +1651,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "r"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1673,7 +1673,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "r"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- row_level_security"
   WHITESPACE "\n"
@@ -1696,7 +1696,7 @@ SOURCE_FILE
       LEVEL_KW "level"
       WHITESPACE " "
       SECURITY_KW "security"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1717,7 +1717,7 @@ SOURCE_FILE
       LEVEL_KW "level"
       WHITESPACE " "
       SECURITY_KW "security"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1738,7 +1738,7 @@ SOURCE_FILE
       LEVEL_KW "level"
       WHITESPACE " "
       SECURITY_KW "security"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1761,7 +1761,7 @@ SOURCE_FILE
       LEVEL_KW "level"
       WHITESPACE " "
       SECURITY_KW "security"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- cluster"
   WHITESPACE "\n"
@@ -1783,7 +1783,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1802,7 +1802,7 @@ SOURCE_FILE
       WITHOUT_KW "without"
       WHITESPACE " "
       CLUSTER_KW "cluster"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1821,7 +1821,7 @@ SOURCE_FILE
       WITHOUT_KW "without"
       WHITESPACE " "
       OIDS_KW "oids"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- access_method"
   WHITESPACE "\n"
@@ -1845,7 +1845,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1862,7 +1862,7 @@ SOURCE_FILE
       SET_KW "set"
       WHITESPACE " "
       LOGGED_KW "logged"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1879,7 +1879,7 @@ SOURCE_FILE
       SET_KW "set"
       WHITESPACE " "
       UNLOGGED_KW "unlogged"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- of_type"
   WHITESPACE "\n"
@@ -1902,7 +1902,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "int8"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -1919,7 +1919,7 @@ SOURCE_FILE
       NOT_KW "not"
       WHITESPACE " "
       OF_KW "of"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column constraint"
   WHITESPACE "\n"
@@ -1961,7 +1961,7 @@ SOURCE_FILE
           LITERAL
             STRING "''"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add column not null constraint"
   WHITESPACE "\n"
@@ -1990,7 +1990,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi constraints"
   WHITESPACE "\n"
@@ -2037,7 +2037,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2080,7 +2080,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'UTC'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove_column"
   WHITESPACE "\n"
@@ -2104,7 +2104,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "description"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column cascade"
   WHITESPACE "\n"
@@ -2128,7 +2128,7 @@ SOURCE_FILE
         IDENT "description"
       WHITESPACE " "
       CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column restrict"
   WHITESPACE "\n"
@@ -2152,7 +2152,7 @@ SOURCE_FILE
         IDENT "c"
       WHITESPACE " "
       RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column concise"
   WHITESPACE "\n"
@@ -2172,7 +2172,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "description"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column if exists"
   WHITESPACE "\n"
@@ -2199,7 +2199,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "description"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- add table_constraint"
   WHITESPACE "\n"
@@ -2230,7 +2230,7 @@ SOURCE_FILE
           LITERAL
             STRING "''"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2261,7 +2261,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "product_no"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2330,7 +2330,7 @@ SOURCE_FILE
                 LITERAL
                   TRUE_KW "true"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2362,7 +2362,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "b"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2430,7 +2430,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2484,7 +2484,7 @@ SOURCE_FILE
                 AMP "&"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2558,7 +2558,7 @@ SOURCE_FILE
             LITERAL
               STRING "'active'"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2597,7 +2597,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2641,7 +2641,7 @@ SOURCE_FILE
           MATCH_KW "match"
           WHITESPACE " "
           FULL_KW "full"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2685,7 +2685,7 @@ SOURCE_FILE
           MATCH_KW "match"
           WHITESPACE " "
           SIMPLE_KW "simple"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2760,7 +2760,7 @@ SOURCE_FILE
             SET_KW "set"
             WHITESPACE " "
             NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2804,7 +2804,7 @@ SOURCE_FILE
             NO_KW "no"
             WHITESPACE " "
             ACTION_KW "action"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2845,7 +2845,7 @@ SOURCE_FILE
           DELETE_KW "delete"
           WHITESPACE " "
           RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2886,7 +2886,7 @@ SOURCE_FILE
           DELETE_KW "delete"
           WHITESPACE " "
           CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2930,7 +2930,7 @@ SOURCE_FILE
             SET_KW "set"
             WHITESPACE " "
             NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -2986,7 +2986,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3030,7 +3030,7 @@ SOURCE_FILE
             SET_KW "set"
             WHITESPACE " "
             DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3086,7 +3086,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3120,7 +3120,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "product_groups"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_constraint_using_index"
   WHITESPACE "\n"
@@ -3148,7 +3148,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3176,7 +3176,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3208,7 +3208,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3242,7 +3242,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not valid check"
   WHITESPACE "\n"
@@ -3287,7 +3287,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         VALID_KW "valid"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- rename column"
   WHITESPACE "\n"
@@ -3314,7 +3314,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "product_number"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3346,7 +3346,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3373,7 +3373,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename table"
   WHITESPACE "\n"
@@ -3395,7 +3395,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "items"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3419,7 +3419,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename constraint"
   WHITESPACE "\n"
@@ -3446,7 +3446,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
@@ -3468,7 +3468,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set tablespace"
   WHITESPACE "\n"
@@ -3496,7 +3496,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set tablespace all"
   WHITESPACE "\n"
@@ -3546,7 +3546,7 @@ SOURCE_FILE
         IDENT "bar"
       WHITESPACE " "
       NOWAIT_KW "nowait"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set tablespace owned by"
   WHITESPACE "\n"
@@ -3584,7 +3584,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "buz"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3604,7 +3604,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_table_owner"
   WHITESPACE "\n"
@@ -3627,7 +3627,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "new_owner"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- default"
   WHITESPACE "\n"
@@ -3654,7 +3654,7 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_DEFAULT
         DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partition spec"
   WHITESPACE "\n"
@@ -3694,7 +3694,7 @@ SOURCE_FILE
         LITERAL
           STRING "'buzz'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
   WHITESPACE "\n"
@@ -3731,7 +3731,7 @@ SOURCE_FILE
       SET_KW "set"
       WHITESPACE " "
       UNLOGGED_KW "unlogged"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from pg docs"
   WHITESPACE "\n"
@@ -3785,7 +3785,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'current'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple"
   WHITESPACE "\n"
@@ -3809,7 +3809,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- concurrently"
   WHITESPACE "\n"
@@ -3835,7 +3835,7 @@ SOURCE_FILE
             IDENT "f"
       WHITESPACE " "
       CONCURRENTLY_KW "concurrently"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- finalize"
   WHITESPACE "\n"
@@ -3861,7 +3861,7 @@ SOURCE_FILE
             IDENT "f"
       WHITESPACE " "
       FINALIZE_KW "finalize"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- references on update on delete"
   WHITESPACE "\n"
@@ -3924,7 +3924,7 @@ SOURCE_FILE
           DELETE_KW "delete"
           WHITESPACE " "
           CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3962,7 +3962,7 @@ SOURCE_FILE
             IDENT "b"
         WHITESPACE " "
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -3983,7 +3983,7 @@ SOURCE_FILE
       METHOD_KW "method"
       WHITESPACE " "
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
     ALTER_KW "alter"
@@ -4027,5 +4027,5 @@ SOURCE_FILE
           MATCH_KW "match"
           WHITESPACE " "
           PARTIAL_KW "partial"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

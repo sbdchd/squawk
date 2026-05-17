@@ -75,7 +75,7 @@ SOURCE_FILE
             LITERAL
               POSITIONAL_PARAM "$4"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA

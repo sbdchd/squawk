@@ -10,11 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CLOSE
     CLOSE_KW "close"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

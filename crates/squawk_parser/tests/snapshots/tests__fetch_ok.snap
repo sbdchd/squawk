@@ -14,7 +14,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "fetch"
@@ -25,7 +25,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "fetch"
@@ -36,7 +36,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "fetch"
@@ -45,7 +45,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   FETCH
     FETCH_KW "FETCH"
@@ -56,7 +56,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -67,7 +67,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -78,7 +78,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -89,7 +89,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -103,7 +103,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -117,7 +117,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -129,7 +129,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -140,7 +140,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -151,7 +151,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -165,7 +165,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -178,7 +178,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -189,7 +189,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -203,7 +203,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   FETCH
     FETCH_KW "FETCH"
@@ -216,5 +216,5 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -16,7 +16,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "w"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -89,5 +89,5 @@ SOURCE_FILE
             LITERAL
               STRING "'bar'"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -64,7 +64,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_table"
   WHITESPACE "\n"
@@ -119,7 +119,7 @@ SOURCE_FILE
     ROLE_REF
       NAME_REF
         IDENT "public"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -147,7 +147,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -168,7 +168,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_all_tables"
   WHITESPACE "\n"
@@ -207,7 +207,7 @@ SOURCE_FILE
     GRANT_KW "grant"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- columns"
   WHITESPACE "\n"
@@ -246,7 +246,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -285,7 +285,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -324,7 +324,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -361,7 +361,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -388,7 +388,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -413,7 +413,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
   WHITESPACE "\n"
@@ -438,7 +438,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -466,7 +466,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -503,7 +503,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -528,7 +528,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -553,7 +553,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -588,7 +588,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- database"
   WHITESPACE "\n"
@@ -625,7 +625,7 @@ SOURCE_FILE
     GRANT_KW "grant"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -664,7 +664,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -683,7 +683,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- domain"
   WHITESPACE "\n"
@@ -728,7 +728,7 @@ SOURCE_FILE
     GRANT_KW "grant"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -751,7 +751,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -779,7 +779,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data"
   WHITESPACE "\n"
@@ -822,7 +822,7 @@ SOURCE_FILE
     GRANT_KW "grant"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -847,7 +847,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_server"
   WHITESPACE "\n"
@@ -888,7 +888,7 @@ SOURCE_FILE
     GRANT_KW "grant"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -911,7 +911,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function"
   WHITESPACE "\n"
@@ -953,7 +953,7 @@ SOURCE_FILE
     GRANT_KW "grant"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1043,7 +1043,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1066,7 +1066,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1099,7 +1099,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1124,7 +1124,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1149,7 +1149,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1218,7 +1218,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- language"
   WHITESPACE "\n"
@@ -1251,7 +1251,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1278,7 +1278,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1307,7 +1307,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
   WHITESPACE "\n"
@@ -1342,7 +1342,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1369,7 +1369,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- param"
   WHITESPACE "\n"
@@ -1414,7 +1414,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1439,7 +1439,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1460,7 +1460,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge_case"
   WHITESPACE "\n"
@@ -1497,7 +1497,7 @@ SOURCE_FILE
       SET_KW "set"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " \n\n"
   GRANT
     GRANT_KW "grant"
@@ -1525,7 +1525,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " \n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -1548,7 +1548,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1603,7 +1603,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         SESSION_USER_KW "session_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1630,7 +1630,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
@@ -1661,7 +1661,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1688,7 +1688,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type_"
   WHITESPACE "\n"
@@ -1730,7 +1730,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1752,7 +1752,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1779,7 +1779,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option"
   WHITESPACE "\n"
@@ -1804,7 +1804,7 @@ SOURCE_FILE
       ADMIN_KW "admin"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1827,7 +1827,7 @@ SOURCE_FILE
       INHERIT_KW "inherit"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1850,7 +1850,7 @@ SOURCE_FILE
       INHERIT_KW "inherit"
     WHITESPACE " "
     TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1873,7 +1873,7 @@ SOURCE_FILE
       SET_KW "set"
     WHITESPACE " "
     FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1913,7 +1913,7 @@ SOURCE_FILE
       SET_KW "set"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   GRANT
     GRANT_KW "grant"
@@ -1929,5 +1929,5 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

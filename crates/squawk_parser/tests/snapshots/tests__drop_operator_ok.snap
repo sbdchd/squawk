@@ -29,7 +29,7 @@ SOURCE_FILE
               NAME_REF
                 INTEGER_KW "integer"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -79,7 +79,7 @@ SOURCE_FILE
               NAME_REF
                 SMALLINT_KW "smallint"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unary"
   WHITESPACE "\n"
@@ -101,7 +101,7 @@ SOURCE_FILE
         BIT_TYPE
           BIT_KW "bit"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
   WHITESPACE "\n"
@@ -143,7 +143,7 @@ SOURCE_FILE
               NAME_REF
                 INTEGER_KW "integer"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -214,7 +214,7 @@ SOURCE_FILE
         R_PAREN ")"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_OPERATOR
     DROP_KW "drop"
@@ -248,7 +248,7 @@ SOURCE_FILE
         R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- non_default_operator"
   WHITESPACE "\n"
@@ -302,7 +302,7 @@ SOURCE_FILE
         R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_OPERATOR
     DROP_KW "drop"
@@ -359,5 +359,5 @@ SOURCE_FILE
         R_PAREN ")"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

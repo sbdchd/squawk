@@ -29,7 +29,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no where"
   WHITESPACE "\n"
@@ -43,7 +43,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "products"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only"
   WHITESPACE "\n"
@@ -59,7 +59,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- *"
   WHITESPACE "\n"
@@ -75,7 +75,7 @@ SOURCE_FILE
             IDENT "t"
       WHITESPACE " "
       STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alias"
   WHITESPACE "\n"
@@ -95,7 +95,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "a"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DELETE
     DELETE_KW "delete"
@@ -111,7 +111,7 @@ SOURCE_FILE
     ALIAS
       NAME
         IDENT "a"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using, where, return"
   WHITESPACE "\n"
@@ -164,7 +164,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using"
   WHITESPACE "\n"
@@ -198,7 +198,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "a"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     DELETE_KW "delete"
@@ -256,7 +256,7 @@ SOURCE_FILE
                 DOT "."
                 NAME_REF
                   IDENT "id"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     DELETE_KW "delete"
@@ -335,7 +335,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "lh"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- where return"
   WHITESPACE "\n"
@@ -368,7 +368,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning"
   WHITESPACE "\n"
@@ -462,7 +462,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "department_id"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cursor"
   WHITESPACE "\n"
@@ -486,7 +486,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "invoice_cursor"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning"
   WHITESPACE "\n"
@@ -526,7 +526,7 @@ SOURCE_FILE
               IDENT "foo"
             DOT "."
             STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- with"
   WHITESPACE "\n"
@@ -601,7 +601,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "id"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     WITH_CLAUSE
@@ -676,7 +676,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "id"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested"
   WHITESPACE "\n"
@@ -747,7 +747,39 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t2"
-  SEMICOLON ";"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        DELETE
+          DELETE_KW "delete"
+          WHITESPACE " "
+          FROM_KW "from"
+          WHITESPACE " "
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "k"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
@@ -800,7 +832,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'foo'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     DELETE_KW "DELETE"
@@ -852,7 +884,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'foo'"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     DELETE_KW "DELETE"
@@ -876,7 +908,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'Musical'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     DELETE_KW "DELETE"
@@ -888,7 +920,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "films"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     DELETE_KW "DELETE"
@@ -919,7 +951,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     DELETE_KW "DELETE"
@@ -941,7 +973,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c_tasks"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
     WITH_CLAUSE
@@ -1072,5 +1104,5 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "ctid"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -26,6 +26,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 ast::Select(it) => validate_select(it, errors),
                 ast::SelectInto(it) => validate_select_into(it, errors),
+                ast::SourceFile(it) => validate_source_file(it, errors),
                 _ => (),
             }
         }
@@ -36,6 +37,28 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
         {
             validate_unicode_esc_ident(&token, errors);
         }
+    }
+}
+
+fn validate_source_file(it: ast::SourceFile, acc: &mut Vec<SyntaxError>) {
+    let mut stmts = it.stmts().peekable();
+    while let Some(stmt) = stmts.next() {
+        let syntax = stmt.syntax();
+        if syntax.kind() == EMPTY_STMT {
+            continue;
+        }
+        let Some(next) = stmts.peek() else {
+            continue;
+        };
+        let ends_with_semi = syntax.last_token().is_some_and(|t| t.kind() == SEMICOLON);
+        if ends_with_semi || next.syntax().kind() == EMPTY_STMT {
+            continue;
+        }
+        let end = syntax.text_range().end();
+        acc.push(SyntaxError::new(
+            "Missing semicolon between statements",
+            TextRange::empty(end),
+        ));
     }
 }
 

@@ -22,7 +22,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'v'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_equals"
   WHITESPACE "\n"
@@ -43,7 +43,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'v'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -69,7 +69,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'v'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SYSTEM
     ALTER_KW "alter"
@@ -87,7 +87,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_multiple"
   WHITESPACE "\n"
@@ -116,7 +116,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         STRING "'v3'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_default"
   WHITESPACE "\n"
@@ -136,7 +136,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_param"
   WHITESPACE "\n"
@@ -151,7 +151,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_all"
   WHITESPACE "\n"
@@ -163,5 +163,5 @@ SOURCE_FILE
     RESET_KW "reset"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

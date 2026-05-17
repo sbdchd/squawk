@@ -23,7 +23,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "1"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extra comma, aka missing tuple"
   WHITESPACE "\n"
@@ -45,7 +45,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "2"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected trailing comma

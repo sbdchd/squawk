@@ -25,7 +25,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'b'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -53,7 +53,7 @@ SOURCE_FILE
               NAME_REF
                 NFC_KW "nfc"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -73,7 +73,7 @@ SOURCE_FILE
               NAME_REF
                 NFD_KW "nfd"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -93,7 +93,7 @@ SOURCE_FILE
               NAME_REF
                 NFKC_KW "nfkc"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -113,7 +113,7 @@ SOURCE_FILE
               NAME_REF
                 NFKD_KW "nfkd"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nullif"
   WHITESPACE "\n"
@@ -135,7 +135,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- coalesce"
   WHITESPACE "\n"
@@ -157,7 +157,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -189,7 +189,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'foo'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- greater"
   WHITESPACE "\n"
@@ -211,7 +211,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -243,7 +243,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "0"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- least"
   WHITESPACE "\n"
@@ -265,7 +265,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -297,7 +297,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "0"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_action"
   WHITESPACE "\n"
@@ -313,7 +313,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n\n"
   COMMENT "-- overlay"
   WHITESPACE "\n"
@@ -345,7 +345,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "d"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -370,7 +370,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "c"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -383,7 +383,7 @@ SOURCE_FILE
               OVERLAY_KW "overlay"
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -416,7 +416,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "4"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- position"
   WHITESPACE "\n"
@@ -438,7 +438,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'bar'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -474,7 +474,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "' '"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -494,7 +494,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trim"
   WHITESPACE "\n"
@@ -518,7 +518,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -537,7 +537,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -554,7 +554,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -571,7 +571,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -588,7 +588,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -603,7 +603,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- substring_fn"
   WHITESPACE "\n"
@@ -630,7 +630,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "c"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -655,7 +655,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "c"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -675,7 +675,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -695,7 +695,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -721,7 +721,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "c"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -764,7 +764,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -787,7 +787,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "5"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlconcat"
   WHITESPACE "\n"
@@ -809,7 +809,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlelement"
   WHITESPACE "\n"
@@ -828,7 +828,7 @@ SOURCE_FILE
               NAME
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -864,7 +864,7 @@ SOURCE_FILE
                     IDENT "b"
                 R_PAREN ")"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -893,7 +893,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "g"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -937,7 +937,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "g"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlexists"
   WHITESPACE "\n"
@@ -960,7 +960,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'bar'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -986,7 +986,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   REF_KW "ref"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1012,7 +1012,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "bar"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1043,7 +1043,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   VALUE_KW "value"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlforest"
   WHITESPACE "\n"
@@ -1072,7 +1072,7 @@ SOURCE_FILE
                   NAME_REF
                     IDENT "buzz"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlparse"
   WHITESPACE "\n"
@@ -1095,7 +1095,7 @@ SOURCE_FILE
               WHITESPACE " "
               WHITESPACE_KW "whitespace"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1116,7 +1116,7 @@ SOURCE_FILE
               WHITESPACE " "
               WHITESPACE_KW "whitespace"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xmlpi"
   WHITESPACE "\n"
@@ -1135,7 +1135,7 @@ SOURCE_FILE
               NAME
                 IDENT "foo"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1156,7 +1156,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xml_root"
   WHITESPACE "\n"
@@ -1179,7 +1179,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "foo"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1201,7 +1201,7 @@ SOURCE_FILE
               WHITESPACE " "
               VALUE_KW "value"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1227,7 +1227,7 @@ SOURCE_FILE
               WHITESPACE " "
               YES_KW "yes"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1253,7 +1253,7 @@ SOURCE_FILE
               WHITESPACE " "
               NO_KW "no"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1281,7 +1281,7 @@ SOURCE_FILE
               WHITESPACE " "
               VALUE_KW "value"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- xml_serialize"
   WHITESPACE "\n"
@@ -1310,7 +1310,7 @@ SOURCE_FILE
               WHITESPACE " "
               INDENT_KW "indent"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1339,7 +1339,7 @@ SOURCE_FILE
               WHITESPACE " "
               INDENT_KW "indent"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_object"
   WHITESPACE "\n"
@@ -1354,7 +1354,7 @@ SOURCE_FILE
               JSON_OBJECT_KW "json_object"
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1369,7 +1369,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'{a, 1, b, \"def\", c, 3.5}'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1388,7 +1388,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'{bar}'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1423,7 +1423,7 @@ SOURCE_FILE
                   STRING "'bar'"
                 R_BRACK "]"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1454,7 +1454,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'b'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1483,7 +1483,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'b'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1513,7 +1513,7 @@ SOURCE_FILE
                   NAME_REF
                     IDENT "utf8"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1538,7 +1538,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1565,7 +1565,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 NULL_KW "null"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1592,7 +1592,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 NULL_KW "null"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1636,7 +1636,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'c'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1670,7 +1670,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 KEYS_KW "keys"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1702,7 +1702,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 UNIQUE_KW "unique"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1736,7 +1736,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 KEYS_KW "keys"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1768,7 +1768,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 UNIQUE_KW "unique"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1797,7 +1797,7 @@ SOURCE_FILE
                       NAME_REF
                         IDENT "foo"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1831,7 +1831,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_array"
   WHITESPACE "\n"
@@ -1850,7 +1850,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1877,7 +1877,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "4"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1898,7 +1898,7 @@ SOURCE_FILE
                   R_PAREN ")"
                 R_PAREN ")"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1923,7 +1923,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "utf8"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1943,7 +1943,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1970,7 +1970,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 NULL_KW "null"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1999,7 +1999,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2021,7 +2021,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 NULL_KW "null"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2057,7 +2057,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2087,7 +2087,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'{\"a\":null}'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2119,7 +2119,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "4"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- regression test"
   WHITESPACE "\n"
@@ -2144,7 +2144,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "t"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- query_expression"
   WHITESPACE "\n"
@@ -2167,7 +2167,7 @@ SOURCE_FILE
                       LITERAL
                         INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2193,7 +2193,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2233,7 +2233,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2268,7 +2268,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2295,7 +2295,7 @@ SOURCE_FILE
                   R_PAREN ")"
                 R_PAREN ")"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2316,7 +2316,7 @@ SOURCE_FILE
                       NAME_REF
                         TEXT_KW "text"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2342,7 +2342,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_scalar"
   WHITESPACE "\n"
@@ -2359,7 +2359,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- exists"
   WHITESPACE "\n"
@@ -2401,7 +2401,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -2448,7 +2448,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "t"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- exists_values"
   WHITESPACE "\n"
@@ -2472,7 +2472,7 @@ SOURCE_FILE
                       INT_NUMBER "1"
                     R_PAREN ")"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- exists_where"
   WHITESPACE "\n"
@@ -2507,7 +2507,7 @@ SOURCE_FILE
                   LITERAL
                     NULL_KW "null"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not_exists"
   WHITESPACE "\n"
@@ -2533,7 +2533,7 @@ SOURCE_FILE
                         LITERAL
                           INT_NUMBER "1"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function_call"
   WHITESPACE "\n"
@@ -2557,7 +2557,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'y'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- named notation"
   WHITESPACE "\n"
@@ -2591,7 +2591,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'bar'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- mixed notation"
   WHITESPACE "\n"
@@ -2623,7 +2623,7 @@ SOURCE_FILE
                 LITERAL
                   TRUE_KW "true"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- colon equals"
   WHITESPACE "\n"
@@ -2651,7 +2651,7 @@ SOURCE_FILE
                 LITERAL
                   TRUE_KW "true"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract"
   WHITESPACE "\n"
@@ -2680,7 +2680,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'buzz'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2699,7 +2699,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2718,7 +2718,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2737,7 +2737,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2756,7 +2756,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2775,7 +2775,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2794,7 +2794,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2813,7 +2813,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2839,7 +2839,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2013-07-01 12:00:00'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2862,7 +2862,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2000-12-16 12:21:13'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2885,7 +2885,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2001-02-18 20:38:40'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2911,7 +2911,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2006-01-01'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2937,7 +2937,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2006-01-01'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2960,7 +2960,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'17:12:28.5'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2983,7 +2983,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2001-02-16 20:38:40'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3006,7 +3006,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2001-02-16 20:38:40'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3020,7 +3020,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3034,7 +3034,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3048,7 +3048,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3062,7 +3062,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3076,7 +3076,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3092,7 +3092,7 @@ SOURCE_FILE
               LITERAL
                 FLOAT_NUMBER "1.5"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3108,7 +3108,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'5 minutes'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3124,7 +3124,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'tomorrow 03:00'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- aggs"
   WHITESPACE "\n"
@@ -3164,7 +3164,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "vals"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 2"
   WHITESPACE "\n"
@@ -3203,7 +3203,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "vals"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 2 const"
   WHITESPACE "\n"
@@ -3242,7 +3242,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 1"
   WHITESPACE "\n"
@@ -3282,7 +3282,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "\"table\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- within group"
   WHITESPACE "\n"
@@ -3324,7 +3324,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- filter expr simple"
   WHITESPACE "\n"
@@ -3364,7 +3364,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- filter expr"
   WHITESPACE "\n"
@@ -3448,7 +3448,7 @@ SOURCE_FILE
               NAME
                 IDENT "i"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3466,7 +3466,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "c"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3484,7 +3484,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- variadic_func_calls"
   WHITESPACE "\n"
@@ -3506,7 +3506,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "foo"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3536,7 +3536,7 @@ SOURCE_FILE
                   INT_NUMBER "3"
                 R_BRACK "]"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- array"
   WHITESPACE "\n"
@@ -3570,7 +3570,7 @@ SOURCE_FILE
                   L_BRACK "["
                   R_BRACK "]"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- named"
   WHITESPACE "\n"
@@ -3608,7 +3608,7 @@ SOURCE_FILE
                     INT_NUMBER "3"
                   R_BRACK "]"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- last param"
   WHITESPACE "\n"
@@ -3652,7 +3652,7 @@ SOURCE_FILE
                   INT_NUMBER "3"
                 R_BRACK "]"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- window_func_calls"
   WHITESPACE "\n"
@@ -3698,7 +3698,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- window name"
   WHITESPACE "\n"
@@ -3729,7 +3729,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- window clause"
   WHITESPACE "\n"
@@ -3789,7 +3789,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "b"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--                     ^^^^^ make sure we allow using keywords"
   WHITESPACE "\n\n\n"
@@ -3908,7 +3908,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "jt"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_table_nested_path"
   WHITESPACE "\n"
@@ -4057,7 +4057,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "jt"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_table_without_filter"
   WHITESPACE "\n"
@@ -4194,7 +4194,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "jt"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_table_union"
   WHITESPACE "\n"
@@ -4370,7 +4370,7 @@ SOURCE_FILE
                 R_PAREN ")"
             R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json"
   WHITESPACE "\n"
@@ -4392,7 +4392,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4419,7 +4419,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 KEYS_KW "keys"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4444,7 +4444,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 UNIQUE_KW "unique"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4471,7 +4471,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 KEYS_KW "keys"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4496,7 +4496,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 UNIQUE_KW "unique"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_serialize"
   WHITESPACE "\n"
@@ -4513,7 +4513,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "a"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4533,7 +4533,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4557,7 +4557,7 @@ SOURCE_FILE
                       NAME_REF
                         IDENT "foo"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4591,7 +4591,7 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_query"
   WHITESPACE "\n"
@@ -4617,7 +4617,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 WRAPPER_KW "wrapper"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4717,7 +4717,7 @@ SOURCE_FILE
                 ERROR_KW "error"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- json_exists"
   WHITESPACE "\n"
@@ -4738,7 +4738,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4787,7 +4787,7 @@ SOURCE_FILE
                 ERROR_KW "error"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc examples"
   WHITESPACE "\n"
@@ -4827,7 +4827,7 @@ SOURCE_FILE
                   NAME
                     IDENT "x"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4861,7 +4861,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 ERROR_KW "ERROR"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4895,7 +4895,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 ERROR_KW "ERROR"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_value"
   WHITESPACE "\n"
@@ -4916,7 +4916,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4987,5 +4987,5 @@ SOURCE_FILE
                 ERROR_KW "error"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

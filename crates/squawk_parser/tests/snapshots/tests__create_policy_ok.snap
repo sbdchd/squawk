@@ -20,7 +20,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- as_"
   WHITESPACE "\n"
@@ -44,7 +44,7 @@ SOURCE_FILE
       AS_KW "as"
       WHITESPACE " "
       IDENT "permissive"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
     CREATE_KW "create"
@@ -66,7 +66,7 @@ SOURCE_FILE
       AS_KW "as"
       WHITESPACE " "
       IDENT "restrictive"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -161,7 +161,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "1"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- for_"
   WHITESPACE "\n"
@@ -184,7 +184,7 @@ SOURCE_FILE
     FOR_KW "for"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
     CREATE_KW "create"
@@ -205,7 +205,7 @@ SOURCE_FILE
     FOR_KW "for"
     WHITESPACE " "
     SELECT_KW "select"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
     CREATE_KW "create"
@@ -226,7 +226,7 @@ SOURCE_FILE
     FOR_KW "for"
     WHITESPACE " "
     INSERT_KW "insert"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
     CREATE_KW "create"
@@ -247,7 +247,7 @@ SOURCE_FILE
     FOR_KW "for"
     WHITESPACE " "
     UPDATE_KW "update"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_POLICY
     CREATE_KW "create"
@@ -268,5 +268,5 @@ SOURCE_FILE
     FOR_KW "for"
     WHITESPACE " "
     DELETE_KW "delete"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

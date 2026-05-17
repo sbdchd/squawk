@@ -5,7 +5,7 @@ expression: "lint_errors(r#\"\nselect 1; -- so we don't skip checking\nCREATE IN
 warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
-  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
   ├ help: Use an explicit name for a concurrently created index
   ╭╴

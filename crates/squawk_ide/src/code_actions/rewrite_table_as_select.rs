@@ -17,7 +17,10 @@ pub(super) fn rewrite_table_as_select(
 
     let table_name = table.relation_name()?.syntax().text();
 
-    let replacement = format!("select * from {}", table_name);
+    let mut replacement = format!("select * from {table_name}");
+    if table.semicolon_token().is_some() {
+        replacement.push(';');
+    };
 
     actions.push(CodeAction {
         title: "Rewrite as `select`".to_owned(),

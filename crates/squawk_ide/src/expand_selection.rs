@@ -353,6 +353,7 @@ select e'foo$0 bar'
             "e'foo bar'",
             "e'foo bar'\n'buzz'",
             "select e'foo bar'\n'buzz'",
+            "select e'foo bar'\n'buzz';",
             "\nselect e'foo bar'\n'buzz';\n",
         ]
         "#);
@@ -367,6 +368,7 @@ select $$foo$0 bar$$;
             "foo",
             "$$foo bar$$",
             "select $$foo bar$$",
+            "select $$foo bar$$;",
             "\nselect $$foo bar$$;\n",
         ]
         "#);
@@ -426,7 +428,7 @@ create table t(
             "x int",
             "x int,",
             "(\n  x int,\n  y text\n)",
-            "-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n)",
+            "-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n);",
             "\n-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n);\n",
         ]
         "#);
@@ -471,7 +473,7 @@ select 1;
 
 $0    select 2;"#), @r#"
         [
-            "    select 2",
+            "    select 2;",
             "    \nselect 1;\n\n    select 2;",
         ]
         "#);

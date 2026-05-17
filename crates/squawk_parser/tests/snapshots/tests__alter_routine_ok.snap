@@ -19,7 +19,7 @@ SOURCE_FILE
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION
         STABLE_KW "stable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -41,7 +41,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -63,7 +63,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -85,7 +85,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
   WHITESPACE "\n"
@@ -109,7 +109,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_ROUTINE
     ALTER_KW "alter"
@@ -133,7 +133,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_depends"
   WHITESPACE "\n"
@@ -159,7 +159,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_params"
   WHITESPACE "\n"
@@ -208,7 +208,7 @@ SOURCE_FILE
         PARALLEL_KW "parallel"
         WHITESPACE " "
         IDENT "safe"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_actions"
   WHITESPACE "\n"
@@ -347,5 +347,5 @@ SOURCE_FILE
         ALL_KW "all"
     WHITESPACE "\n  "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

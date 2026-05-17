@@ -5,6 +5,6 @@ expression: "lint_errors(sql, Rule::TransactionNesting)"
 warning[transaction-nesting]: There is no transaction to `COMMIT` or `ROLLBACK`.
   ╭▸ 
 5 │ COMMIT;
-  │ ━━━━━━
+  │ ━━━━━━━
   │
   ╰ help: `BEGIN` a transaction at an earlier point in the migration or remove this statement.

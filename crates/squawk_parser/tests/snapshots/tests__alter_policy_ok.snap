@@ -28,7 +28,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "q"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_role"
   WHITESPACE "\n"
@@ -54,7 +54,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "r"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_multiple_roles"
   WHITESPACE "\n"
@@ -89,7 +89,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using_expr"
   WHITESPACE "\n"
@@ -122,7 +122,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "b"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_check"
   WHITESPACE "\n"
@@ -157,7 +157,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "d"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -218,5 +218,5 @@ SOURCE_FILE
         NAME_REF
           IDENT "d"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

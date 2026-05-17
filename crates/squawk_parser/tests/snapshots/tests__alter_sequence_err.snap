@@ -14,7 +14,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected ALTER SEQUENCE option

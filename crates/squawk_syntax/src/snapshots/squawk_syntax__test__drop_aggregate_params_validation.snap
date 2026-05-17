@@ -6,7 +6,7 @@ SOURCE_FILE@0..389
   WHITESPACE@0..1 "\n"
   COMMENT@1..8 "-- full"
   WHITESPACE@8..9 "\n"
-  DROP_AGGREGATE@9..167
+  DROP_AGGREGATE@9..168
     DROP_KW@9..13 "drop"
     WHITESPACE@13..14 " "
     AGGREGATE_KW@14..23 "aggregate"
@@ -105,11 +105,11 @@ SOURCE_FILE@0..389
         R_PAREN@156..157 ")"
     WHITESPACE@157..160 "\n  "
     CASCADE_KW@160..167 "cascade"
-  SEMICOLON@167..168 ";"
+    SEMICOLON@167..168 ";"
   WHITESPACE@168..170 "\n\n"
   COMMENT@170..182 "-- aggregate"
   WHITESPACE@182..183 "\n"
-  DROP_AGGREGATE@183..299
+  DROP_AGGREGATE@183..300
     DROP_KW@183..187 "drop"
     WHITESPACE@187..188 " "
     AGGREGATE_KW@188..197 "aggregate"
@@ -184,9 +184,9 @@ SOURCE_FILE@0..389
         R_PAREN@289..290 ")"
     WHITESPACE@290..291 " "
     RESTRICT_KW@291..299 "restrict"
-  SEMICOLON@299..300 ";"
+    SEMICOLON@299..300 ";"
   WHITESPACE@300..302 "\n\n"
-  DROP_AGGREGATE@302..386
+  DROP_AGGREGATE@302..387
     DROP_KW@302..306 "drop"
     WHITESPACE@306..307 " "
     AGGREGATE_KW@307..316 "aggregate"
@@ -241,7 +241,7 @@ SOURCE_FILE@0..389
                   TEXT_KW@380..384 "text"
         WHITESPACE@384..385 "\n"
         R_PAREN@385..386 ")"
-  SEMICOLON@386..387 ";"
+    SEMICOLON@386..387 ";"
   WHITESPACE@387..389 "\n\n"
 
 error[syntax-error]: Out params are not allowed with aggregates.

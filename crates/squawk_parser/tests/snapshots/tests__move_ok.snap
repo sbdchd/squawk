@@ -14,7 +14,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -25,7 +25,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -36,7 +36,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -45,7 +45,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   MOVE
     MOVE_KW "move"
@@ -56,7 +56,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -67,7 +67,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -78,7 +78,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -89,7 +89,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -103,7 +103,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -117,7 +117,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -129,7 +129,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -140,7 +140,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -151,7 +151,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -165,7 +165,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -178,7 +178,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -189,7 +189,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -203,7 +203,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
     MOVE_KW "move"
@@ -216,5 +216,5 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -1010,7 +1010,7 @@ mod tests {
 create table users (
   id int,
   email citext
-);"), @r"
+);"), @"
         info: table: public.users
           ╭▸ 
         2 │   create table users (
@@ -1020,7 +1020,7 @@ create table users (
         3 │ │   id int,
         4 │ │   email citext
         5 │ │ );
-          │ └─┘ full range
+          │ └──┘ full range
           │
           ⸬  
         3 │     id int,
@@ -1040,11 +1040,11 @@ create table users (
     fn create_table_as() {
         assert_snapshot!(symbols("
 create table t as select 1 a;
-"), @r"
+"), @"
         info: table: public.t
           ╭▸ 
         2 │ create table t as select 1 a;
-          │ ┬────────────┯──────────────
+          │ ┬────────────┯───────────────
           │ │            │
           │ │            focus range
           ╰╴full range
@@ -1055,11 +1055,11 @@ create table t as select 1 a;
     fn create_schema() {
         assert_snapshot!(symbols("
 create schema foo;
-"), @r"
+"), @"
         info: schema: foo
           ╭▸ 
         2 │ create schema foo;
-          │ ┬─────────────┯━━
+          │ ┬─────────────┯━━─
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1070,11 +1070,11 @@ create schema foo;
     fn create_schema_authorization() {
         assert_snapshot!(symbols("
 create schema authorization foo;
-"), @r"
+"), @"
         info: schema: foo
           ╭▸ 
         2 │ create schema authorization foo;
-          │ ┬───────────────────────────┯━━
+          │ ┬───────────────────────────┯━━─
           │ │                           │
           │ │                           focus range
           ╰╴full range
@@ -1088,11 +1088,11 @@ listen updates;
 notify updates;
 unlisten updates;
 unlisten *;
-"), @r"
+"), @"
         info: channel: updates listen
           ╭▸ 
         2 │ listen updates;
-          │ ┬──────┯━━━━━━
+          │ ┬──────┯━━━━━━─
           │ │      │
           │ │      focus range
           │ full range
@@ -1100,14 +1100,14 @@ unlisten *;
         info: channel: updates notify
           ╭▸ 
         3 │ notify updates;
-          │ ┬──────┯━━━━━━
+          │ ┬──────┯━━━━━━─
           │ │      │
           │ │      focus range
           ╰╴full range
         info: channel: updates unlisten
           ╭▸ 
         4 │ unlisten updates;
-          │ ┬────────┯━━━━━━
+          │ ┬────────┯━━━━━━─
           │ │        │
           │ │        focus range
           ╰╴full range
@@ -1118,11 +1118,11 @@ unlisten *;
     fn create_function() {
         assert_snapshot!(
             symbols("create function hello() returns void as $$ select 1; $$ language sql;"),
-            @r"
+            @"
         info: function: public.hello
           ╭▸ 
         1 │ create function hello() returns void as $$ select 1; $$ language sql;
-          │ ┬───────────────┯━━━━───────────────────────────────────────────────
+          │ ┬───────────────┯━━━━────────────────────────────────────────────────
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1134,11 +1134,11 @@ unlisten *;
     fn create_materialized_view() {
         assert_snapshot!(
             symbols("create materialized view reports as select 1;"),
-            @r"
+            @"
         info: materialized view: public.reports
           ╭▸ 
         1 │ create materialized view reports as select 1;
-          │ ┬────────────────────────┯━━━━━━────────────
+          │ ┬────────────────────────┯━━━━━━─────────────
           │ │                        │
           │ │                        focus range
           ╰╴full range
@@ -1150,11 +1150,11 @@ unlisten *;
     fn create_aggregate() {
         assert_snapshot!(
             symbols("create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);"),
-            @r"
+            @"
         info: aggregate: public.myavg
           ╭▸ 
         1 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-          │ ┬────────────────┯━━━━─────────────────────────────────────────────
+          │ ┬────────────────┯━━━━──────────────────────────────────────────────
           │ │                │
           │ │                focus range
           ╰╴full range
@@ -1166,11 +1166,11 @@ unlisten *;
     fn create_procedure() {
         assert_snapshot!(
             symbols("create procedure hello() language sql as $$ select 1; $$;"),
-            @r"
+            @"
         info: procedure: public.hello
           ╭▸ 
         1 │ create procedure hello() language sql as $$ select 1; $$;
-          │ ┬────────────────┯━━━━──────────────────────────────────
+          │ ┬────────────────┯━━━━───────────────────────────────────
           │ │                │
           │ │                focus range
           ╰╴full range
@@ -1182,11 +1182,11 @@ unlisten *;
     fn create_index() {
         assert_snapshot!(symbols("
 create index idx_users_email on users (email);
-"), @r"
+"), @"
         info: index: idx_users_email
           ╭▸ 
         2 │ create index idx_users_email on users (email);
-          │ ┬────────────┯━━━━━━━━━━━━━━─────────────────
+          │ ┬────────────┯━━━━━━━━━━━━━━──────────────────
           │ │            │
           │ │            focus range
           ╰╴full range
@@ -1197,11 +1197,11 @@ create index idx_users_email on users (email);
     fn create_domain() {
         assert_snapshot!(
             symbols("create domain email_addr as text;"),
-            @r"
+            @"
         info: domain: public.email_addr
           ╭▸ 
         1 │ create domain email_addr as text;
-          │ ┬─────────────┯━━━━━━━━━────────
+          │ ┬─────────────┯━━━━━━━━━─────────
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1213,11 +1213,11 @@ create index idx_users_email on users (email);
     fn create_sequence() {
         assert_snapshot!(
             symbols("create sequence user_id_seq;"),
-            @r"
+            @"
         info: sequence: public.user_id_seq
           ╭▸ 
         1 │ create sequence user_id_seq;
-          │ ┬───────────────┯━━━━━━━━━━
+          │ ┬───────────────┯━━━━━━━━━━─
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1231,7 +1231,7 @@ create index idx_users_email on users (email);
 create trigger update_timestamp
   before update on users
   execute function update_modified_column();
-"), @r"
+"), @"
         info: trigger: update_timestamp
           ╭▸ 
         2 │   create trigger update_timestamp
@@ -1240,7 +1240,7 @@ create trigger update_timestamp
           │ │
         3 │ │   before update on users
         4 │ │   execute function update_modified_column();
-          ╰╴└───────────────────────────────────────────┘ full range
+          ╰╴└────────────────────────────────────────────┘ full range
         ");
     }
 
@@ -1248,11 +1248,11 @@ create trigger update_timestamp
     fn create_event_trigger() {
         assert_snapshot!(
             symbols("create event trigger et on ddl_command_start execute function f();"),
-            @r"
+            @"
         info: event trigger: et
           ╭▸ 
         1 │ create event trigger et on ddl_command_start execute function f();
-          │ ┬────────────────────┯━──────────────────────────────────────────
+          │ ┬────────────────────┯━───────────────────────────────────────────
           │ │                    │
           │ │                    focus range
           ╰╴full range
@@ -1264,11 +1264,11 @@ create trigger update_timestamp
     fn create_tablespace() {
         assert_snapshot!(symbols("
 create tablespace dbspace location '/data/dbs';
-"), @r"
+"), @"
         info: tablespace: dbspace
           ╭▸ 
         2 │ create tablespace dbspace location '/data/dbs';
-          │ ┬─────────────────┯━━━━━━─────────────────────
+          │ ┬─────────────────┯━━━━━━──────────────────────
           │ │                 │
           │ │                 focus range
           ╰╴full range
@@ -1279,11 +1279,11 @@ create tablespace dbspace location '/data/dbs';
     fn create_database() {
         assert_snapshot!(
             symbols("create database mydb;"),
-            @r"
+            @"
         info: database: mydb
           ╭▸ 
         1 │ create database mydb;
-          │ ┬───────────────┯━━━
+          │ ┬───────────────┯━━━─
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1295,11 +1295,11 @@ create tablespace dbspace location '/data/dbs';
     fn create_server() {
         assert_snapshot!(symbols("
 create server myserver foreign data wrapper postgres_fdw;
-"), @r"
+"), @"
         info: server: myserver
           ╭▸ 
         2 │ create server myserver foreign data wrapper postgres_fdw;
-          │ ┬─────────────┯━━━━━━━──────────────────────────────────
+          │ ┬─────────────┯━━━━━━━───────────────────────────────────
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1310,11 +1310,11 @@ create server myserver foreign data wrapper postgres_fdw;
     fn create_extension() {
         assert_snapshot!(
             symbols("create extension pgcrypto;"),
-            @r"
+            @"
         info: extension: pgcrypto
           ╭▸ 
         1 │ create extension pgcrypto;
-          │ ┬────────────────┯━━━━━━━
+          │ ┬────────────────┯━━━━━━━─
           │ │                │
           │ │                focus range
           ╰╴full range
@@ -1326,11 +1326,11 @@ create server myserver foreign data wrapper postgres_fdw;
     fn create_role() {
         assert_snapshot!(symbols("
 create role reader;
-"), @r"
+"), @"
         info: role: reader
           ╭▸ 
         2 │ create role reader;
-          │ ┬───────────┯━━━━━
+          │ ┬───────────┯━━━━━─
           │ │           │
           │ │           focus range
           ╰╴full range
@@ -1341,11 +1341,11 @@ create role reader;
     fn create_policy() {
         assert_snapshot!(symbols("
 create policy allow_read on t;
-"), @r"
+"), @"
         info: policy: allow_read
           ╭▸ 
         2 │ create policy allow_read on t;
-          │ ┬─────────────┯━━━━━━━━━─────
+          │ ┬─────────────┯━━━━━━━━━──────
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1358,11 +1358,11 @@ create policy allow_read on t;
 create table users (id int);
 create table posts (id int);
 create function get_user(user_id int) returns void as $$ select 1; $$ language sql;
-"), @r"
+"), @"
         info: table: public.users
           ╭▸ 
         2 │ create table users (id int);
-          │ ┬────────────┯━━━━─────────
+          │ ┬────────────┯━━━━──────────
           │ │            │
           │ │            focus range
           │ full range
@@ -1377,7 +1377,7 @@ create function get_user(user_id int) returns void as $$ select 1; $$ language s
         info: table: public.posts
           ╭▸ 
         3 │ create table posts (id int);
-          │ ┬────────────┯━━━━─────────
+          │ ┬────────────┯━━━━──────────
           │ │            │
           │ │            focus range
           │ full range
@@ -1391,7 +1391,7 @@ create function get_user(user_id int) returns void as $$ select 1; $$ language s
         info: function: public.get_user
           ╭▸ 
         4 │ create function get_user(user_id int) returns void as $$ select 1; $$ language sql;
-          │ ┬───────────────┯━━━━━━━──────────────────────────────────────────────────────────
+          │ ┬───────────────┯━━━━━━━───────────────────────────────────────────────────────────
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1403,11 +1403,11 @@ create function get_user(user_id int) returns void as $$ select 1; $$ language s
         assert_snapshot!(symbols("
 create table public.users (id int);
 create function my_schema.hello() returns void as $$ select 1; $$ language sql;
-"), @r"
+"), @"
         info: table: public.users
           ╭▸ 
         2 │ create table public.users (id int);
-          │ ┬───────────────────┯━━━━─────────
+          │ ┬───────────────────┯━━━━──────────
           │ │                   │
           │ │                   focus range
           │ full range
@@ -1422,7 +1422,7 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
         info: function: my_schema.hello
           ╭▸ 
         3 │ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
-          │ ┬─────────────────────────┯━━━━───────────────────────────────────────────────
+          │ ┬─────────────────────────┯━━━━────────────────────────────────────────────────
           │ │                         │
           │ │                         focus range
           ╰╴full range
@@ -1442,7 +1442,7 @@ create property graph foo.bar
           │ ┌─┘
           │ │
         3 │ │   vertex tables (t key (a) no properties);
-          ╰╴└─────────────────────────────────────────┘ full range
+          ╰╴└──────────────────────────────────────────┘ full range
         ");
     }
 
@@ -1450,11 +1450,11 @@ create property graph foo.bar
     fn create_type() {
         assert_snapshot!(
             symbols("create type status as enum ('active', 'inactive');"),
-            @r"
+            @"
         info: enum: public.status
           ╭▸ 
         1 │ create type status as enum ('active', 'inactive');
-          │ ┬───────────┯━━━━━───────────────────────────────
+          │ ┬───────────┯━━━━━────────────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1475,11 +1475,11 @@ create property graph foo.bar
     fn create_type_composite() {
         assert_snapshot!(
             symbols("create type person as (name text, age int);"),
-            @r"
+            @"
         info: type: public.person
           ╭▸ 
         1 │ create type person as (name text, age int);
-          │ ┬───────────┯━━━━━────────────────────────
+          │ ┬───────────┯━━━━━─────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1500,11 +1500,11 @@ create property graph foo.bar
     fn create_type_composite_multiple_columns() {
         assert_snapshot!(
             symbols("create type address as (street text, city text, zip varchar(10));"),
-            @r"
+            @"
         info: type: public.address
           ╭▸ 
         1 │ create type address as (street text, city text, zip varchar(10));
-          │ ┬───────────┯━━━━━━─────────────────────────────────────────────
+          │ ┬───────────┯━━━━━━──────────────────────────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1527,11 +1527,11 @@ create property graph foo.bar
     fn create_type_with_schema() {
         assert_snapshot!(
             symbols("create type myschema.status as enum ('active', 'inactive');"),
-            @r"
+            @"
         info: enum: myschema.status
           ╭▸ 
         1 │ create type myschema.status as enum ('active', 'inactive');
-          │ ┬────────────────────┯━━━━━───────────────────────────────
+          │ ┬────────────────────┯━━━━━────────────────────────────────
           │ │                    │
           │ │                    focus range
           │ full range
@@ -1552,11 +1552,11 @@ create property graph foo.bar
     fn create_type_enum_multiple_variants() {
         assert_snapshot!(
             symbols("create type priority as enum ('low', 'medium', 'high', 'urgent');"),
-            @r"
+            @"
         info: enum: public.priority
           ╭▸ 
         1 │ create type priority as enum ('low', 'medium', 'high', 'urgent');
-          │ ┬───────────┯━━━━━━━────────────────────────────────────────────
+          │ ┬───────────┯━━━━━━━─────────────────────────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1581,11 +1581,11 @@ create property graph foo.bar
     fn declare_cursor() {
         assert_snapshot!(symbols("
 declare c scroll cursor for select * from t;
-"), @r"
+"), @"
         info: cursor: c
           ╭▸ 
         2 │ declare c scroll cursor for select * from t;
-          │ ┬───────┯──────────────────────────────────
+          │ ┬───────┯───────────────────────────────────
           │ │       │
           │ │       focus range
           ╰╴full range
@@ -1596,11 +1596,11 @@ declare c scroll cursor for select * from t;
     fn prepare_statement() {
         assert_snapshot!(symbols("
 prepare stmt as select 1;
-"), @r"
+"), @"
         info: prepared statement: stmt
           ╭▸ 
         2 │ prepare stmt as select 1;
-          │ ┬───────┯━━━────────────
+          │ ┬───────┯━━━─────────────
           │ │       │
           │ │       focus range
           ╰╴full range
@@ -1684,7 +1684,7 @@ create foreign table films (
   code char(5),
   title varchar(40)
 ) server film_server;
-"), @r"
+"), @"
         info: table: public.films
           ╭▸ 
         2 │   create foreign table films (
@@ -1694,7 +1694,7 @@ create foreign table films (
         3 │ │   code char(5),
         4 │ │   title varchar(40)
         5 │ │ ) server film_server;
-          │ └────────────────────┘ full range
+          │ └─────────────────────┘ full range
           │
           ⸬  
         3 │     code char(5),

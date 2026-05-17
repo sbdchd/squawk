@@ -9,19 +9,19 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
     WORK_KW "work"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
@@ -29,7 +29,7 @@ SOURCE_FILE
     AND_KW "and"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
@@ -39,7 +39,7 @@ SOURCE_FILE
     NO_KW "no"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "commit"
@@ -48,25 +48,25 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'bar'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- https://www.postgresql.org/docs/17/sql-begin.html"
   WHITESPACE "\n"
   BEGIN
     BEGIN_KW "begin"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   BEGIN
     BEGIN_KW "begin"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   BEGIN
     BEGIN_KW "begin"
     WHITESPACE " "
     WORK_KW "work"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   BEGIN
     BEGIN_KW "begin"
@@ -98,7 +98,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         DEFERRABLE_KW "deferrable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   BEGIN
     BEGIN_KW "begin"
@@ -162,7 +162,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         DEFERRABLE_KW "deferrable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   BEGIN
     START_KW "start"
@@ -196,7 +196,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         DEFERRABLE_KW "deferrable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   BEGIN
     START_KW "start"
@@ -262,7 +262,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         DEFERRABLE_KW "deferrable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   PREPARE_TRANSACTION
     PREPARE_KW "prepare"
@@ -271,14 +271,14 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'f'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SAVEPOINT
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     NAME
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   RELEASE_SAVEPOINT
     RELEASE_KW "release"
@@ -287,14 +287,14 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   RELEASE_SAVEPOINT
     RELEASE_KW "release"
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -305,7 +305,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -318,7 +318,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -331,7 +331,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -340,7 +340,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -351,7 +351,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -362,23 +362,23 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMIT
     END_KW "end"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
     WHITESPACE " "
     WORK_KW "work"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
@@ -386,7 +386,7 @@ SOURCE_FILE
     AND_KW "and"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
@@ -396,23 +396,23 @@ SOURCE_FILE
     NO_KW "no"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
     ABORT_KW "abort"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
     WORK_KW "work"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
@@ -420,7 +420,7 @@ SOURCE_FILE
     AND_KW "and"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ABORT_KW "abort"
@@ -430,23 +430,23 @@ SOURCE_FILE
     NO_KW "no"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     WORK_KW "work"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -454,7 +454,7 @@ SOURCE_FILE
     AND_KW "and"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -464,7 +464,7 @@ SOURCE_FILE
     NO_KW "no"
     WHITESPACE " "
     CHAIN_KW "chain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
     ROLLBACK_KW "rollback"
@@ -473,5 +473,5 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'foo'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

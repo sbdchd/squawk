@@ -9,7 +9,7 @@ SOURCE_FILE
     TIME_KW "time"
     WHITESPACE " "
     ZONE_KW "zone"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
@@ -19,7 +19,7 @@ SOURCE_FILE
     ISOLATION_KW "isolation"
     WHITESPACE " "
     LEVEL_KW "level"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
@@ -27,13 +27,13 @@ SOURCE_FILE
     SESSION_KW "session"
     WHITESPACE " "
     AUTHORIZATION_KW "authorization"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SHOW
     SHOW_KW "show"
@@ -42,7 +42,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "v"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
@@ -56,7 +56,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
@@ -80,5 +80,5 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

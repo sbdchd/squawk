@@ -17,7 +17,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'host=localhost port=5432'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_publication"
   WHITESPACE "\n"
@@ -35,7 +35,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
     ALTER_KW "alter"
@@ -79,7 +79,7 @@ SOURCE_FILE
           LITERAL
             TRUE_KW "true"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_publication"
   WHITESPACE "\n"
@@ -97,7 +97,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
     ALTER_KW "alter"
@@ -141,7 +141,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_publication"
   WHITESPACE "\n"
@@ -159,7 +159,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
     ALTER_KW "alter"
@@ -203,7 +203,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
   WHITESPACE "\n"
@@ -233,7 +233,7 @@ SOURCE_FILE
           LITERAL
             FALSE_KW "false"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable"
   WHITESPACE "\n"
@@ -246,7 +246,7 @@ SOURCE_FILE
       IDENT "s"
     WHITESPACE " "
     ENABLE_KW "enable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- disable"
   WHITESPACE "\n"
@@ -259,7 +259,7 @@ SOURCE_FILE
       IDENT "s"
     WHITESPACE " "
     DISABLE_KW "disable"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_parameters"
   WHITESPACE "\n"
@@ -297,7 +297,7 @@ SOURCE_FILE
             LITERAL
               STRING "'off'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- skip"
   WHITESPACE "\n"
@@ -323,7 +323,7 @@ SOURCE_FILE
           LITERAL
             STRING "'0/12345678'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -343,7 +343,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
     ALTER_KW "alter"
@@ -360,7 +360,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -379,5 +379,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

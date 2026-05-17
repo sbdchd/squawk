@@ -12,13 +12,13 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "some_config_param"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   RESET
     RESET_KW "reset"
     WHITESPACE " "
     ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   RESET
     RESET_KW "reset"
@@ -37,7 +37,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "buzz"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   RESET
     RESET_KW "reset"
@@ -45,7 +45,7 @@ SOURCE_FILE
     TIME_KW "time"
     WHITESPACE " "
     ZONE_KW "zone"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   RESET
     RESET_KW "reset"
@@ -55,7 +55,7 @@ SOURCE_FILE
     ISOLATION_KW "isolation"
     WHITESPACE " "
     LEVEL_KW "level"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   RESET_SESSION_AUTH
     RESET_KW "reset"
@@ -63,5 +63,5 @@ SOURCE_FILE
     SESSION_KW "session"
     WHITESPACE " "
     AUTHORIZATION_KW "authorization"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

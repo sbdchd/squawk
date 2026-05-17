@@ -41,7 +41,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "2"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--             ^ missing comma"
   WHITESPACE "\n\n"
@@ -79,7 +79,7 @@ SOURCE_FILE
           SET_EXPR
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--                ^ missing comma"
   WHITESPACE "\n"

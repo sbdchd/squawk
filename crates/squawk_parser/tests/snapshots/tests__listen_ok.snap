@@ -10,12 +10,12 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   LISTEN
     LISTEN_KW "LISTEN"
     WHITESPACE " "
     NAME
       VIRTUAL_KW "virtual"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

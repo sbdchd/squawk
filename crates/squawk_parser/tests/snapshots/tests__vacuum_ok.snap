@@ -7,7 +7,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   VACUUM
     VACUUM_KW "vacuum"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
@@ -31,7 +31,7 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "onek"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -232,7 +232,7 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "t1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_pg_9_syntax"
   WHITESPACE "\n"
@@ -281,5 +281,5 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

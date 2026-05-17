@@ -137,7 +137,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- version without parentheses."
   WHITESPACE "\n"
@@ -272,7 +272,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
     SELECT
@@ -300,7 +300,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
     TABLE
@@ -322,7 +322,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
     PAREN_SELECT
@@ -350,7 +350,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "t"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
     SELECT_INTO
@@ -400,7 +400,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "2"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
     VALUES
@@ -438,7 +438,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "4"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   PAREN_SELECT
     L_PAREN "("
@@ -475,7 +475,7 @@ SOURCE_FILE
                   INT_NUMBER "1"
       R_PAREN ")"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -529,7 +529,7 @@ SOURCE_FILE
                           INT_NUMBER "1"
               R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -586,7 +586,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   PAREN_SELECT
     L_PAREN "("
@@ -627,5 +627,5 @@ SOURCE_FILE
                 NAME
                   IDENT "b"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

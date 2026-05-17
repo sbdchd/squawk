@@ -10,11 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       VIRTUAL_KW "virtual"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UNLISTEN
     UNLISTEN_KW "unlisten"
     WHITESPACE " "
     STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

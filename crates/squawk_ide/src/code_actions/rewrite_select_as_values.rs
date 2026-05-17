@@ -51,7 +51,15 @@ pub(super) fn rewrite_select_as_values(
         rows.push(format!("({})", exprs.join(", ")));
     }
 
-    let values_stmt = format!("values {}", rows.join(", "));
+    let had_semicolon = match &parent {
+        SelectContext::Compound(compound) => compound.semicolon_token().is_some(),
+        SelectContext::Single(select) => select.semicolon_token().is_some(),
+    };
+
+    let mut values_stmt = format!("values {}", rows.join(", "));
+    if had_semicolon {
+        values_stmt.push(';');
+    }
 
     let select_end = match &parent {
         SelectContext::Compound(compound) => compound.syntax().text_range().end(),

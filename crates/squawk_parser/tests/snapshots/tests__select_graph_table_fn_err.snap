@@ -48,7 +48,7 @@ SOURCE_FILE
           COMMENT "--                      ^ comma missing"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA

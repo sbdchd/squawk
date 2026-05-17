@@ -10,5 +10,5 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'foo'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

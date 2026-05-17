@@ -21,7 +21,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -78,7 +78,7 @@ SOURCE_FILE
         LITERAL
           STRING "'b'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_1"
   WHITESPACE "\n"
@@ -126,5 +126,5 @@ SOURCE_FILE
         LITERAL
           STRING "'5432'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

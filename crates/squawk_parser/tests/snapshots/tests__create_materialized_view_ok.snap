@@ -27,7 +27,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -143,7 +143,7 @@ SOURCE_FILE
       NO_KW "no"
       WHITESPACE " "
       DATA_KW "data"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
@@ -169,7 +169,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"
   WHITESPACE "\n"
@@ -207,7 +207,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "2"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- https://github.com/sbdchd/squawk/issues/646"
   WHITESPACE "\n"
@@ -297,5 +297,5 @@ SOURCE_FILE
               NULL_KW "NULL"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

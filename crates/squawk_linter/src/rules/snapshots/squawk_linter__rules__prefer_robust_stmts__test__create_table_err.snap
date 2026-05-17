@@ -5,7 +5,7 @@ expression: "lint_errors(r#\"\nselect 1; -- so we don't skip checking\nCREATE TA
 warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
-  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ╭╴
 3 │ CREATE TABLE if not exists "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
   ╰╴             +++++++++++++

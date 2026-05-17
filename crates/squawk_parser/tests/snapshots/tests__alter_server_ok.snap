@@ -17,7 +17,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'v1'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -54,7 +54,7 @@ SOURCE_FILE
         NAME
           IDENT "p"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -74,7 +74,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SERVER
     ALTER_KW "alter"
@@ -91,7 +91,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -110,5 +110,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

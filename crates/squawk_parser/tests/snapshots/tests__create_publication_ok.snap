@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_tables"
   WHITESPACE "\n"
@@ -53,7 +53,7 @@ SOURCE_FILE
           NAME
             IDENT "bar"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
@@ -199,7 +199,7 @@ SOURCE_FILE
           NAME
             IDENT "bar"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_in_schema"
   WHITESPACE "\n"
@@ -240,7 +240,7 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_OBJECT
       CURRENT_SCHEMA_KW "current_schema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple tables"
   WHITESPACE "\n"
@@ -268,5 +268,5 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "users"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

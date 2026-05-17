@@ -65,7 +65,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_table"
   WHITESPACE "\n"
@@ -123,7 +123,7 @@ SOURCE_FILE
         IDENT "public"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -172,7 +172,7 @@ SOURCE_FILE
         IDENT "public"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -200,7 +200,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -244,7 +244,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- on_all_tables"
   WHITESPACE "\n"
@@ -286,7 +286,7 @@ SOURCE_FILE
         CURRENT_ROLE_KW "current_role"
     WHITESPACE "\n  "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- columns"
   WHITESPACE "\n"
@@ -326,7 +326,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -366,7 +366,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -406,7 +406,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -444,7 +444,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -472,7 +472,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -498,7 +498,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
   WHITESPACE "\n"
@@ -524,7 +524,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -562,7 +562,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -588,7 +588,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -614,7 +614,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -650,7 +650,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- database"
   WHITESPACE "\n"
@@ -688,7 +688,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -728,7 +728,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -748,7 +748,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- domain"
   WHITESPACE "\n"
@@ -794,7 +794,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -818,7 +818,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data"
   WHITESPACE "\n"
@@ -862,7 +862,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -888,7 +888,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_server"
   WHITESPACE "\n"
@@ -930,7 +930,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -954,7 +954,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function"
   WHITESPACE "\n"
@@ -997,7 +997,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1088,7 +1088,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1112,7 +1112,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1146,7 +1146,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1172,7 +1172,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1198,7 +1198,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1268,7 +1268,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- language"
   WHITESPACE "\n"
@@ -1302,7 +1302,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1330,7 +1330,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1360,7 +1360,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
   WHITESPACE "\n"
@@ -1396,7 +1396,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1424,7 +1424,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- param"
   WHITESPACE "\n"
@@ -1470,7 +1470,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1496,7 +1496,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1518,7 +1518,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge_case"
   WHITESPACE "\n"
@@ -1555,7 +1555,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " \n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1584,7 +1584,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " \n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -1608,7 +1608,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1644,7 +1644,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1672,7 +1672,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
@@ -1704,7 +1704,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1732,7 +1732,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type_"
   WHITESPACE "\n"
@@ -1775,7 +1775,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1798,7 +1798,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1826,7 +1826,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- option"
   WHITESPACE "\n"
@@ -1851,7 +1851,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1874,7 +1874,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1897,7 +1897,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REVOKE
     REVOKE_KW "revoke"
@@ -1914,5 +1914,5 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -20,7 +20,7 @@ SOURCE_FILE
     COLUMN_LIST
       L_PAREN "("
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TYPE
     CREATE_KW "create"
@@ -56,7 +56,7 @@ SOURCE_FILE
                 IDENT "\"fr_FR\""
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TYPE
     CREATE_KW "create"
@@ -114,7 +114,7 @@ SOURCE_FILE
                 TEXT_KW "text"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_type_as_enum"
   WHITESPACE "\n"
@@ -135,7 +135,7 @@ SOURCE_FILE
     VARIANT_LIST
       L_PAREN "("
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TYPE
     CREATE_KW "create"
@@ -157,7 +157,7 @@ SOURCE_FILE
         LITERAL
           STRING "'a'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TYPE
     CREATE_KW "create"
@@ -189,7 +189,7 @@ SOURCE_FILE
         LITERAL
           STRING "'c'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_type_as_range"
   WHITESPACE "\n"
@@ -224,7 +224,7 @@ SOURCE_FILE
                   BIGINT_KW "bigint"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -242,7 +242,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TYPE
     CREATE_KW "create"
@@ -268,7 +268,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "d"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_type_name"
   WHITESPACE "\n"
@@ -281,7 +281,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TYPE
     CREATE_KW "create"
@@ -334,7 +334,7 @@ SOURCE_FILE
                   IDENT "func_name"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TYPE
     CREATE_KW "create"
@@ -601,5 +601,5 @@ SOURCE_FILE
             TRUE_KW "true"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"

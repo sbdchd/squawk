@@ -34,7 +34,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "r"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set owner"
   WHITESPACE "\n"
@@ -68,7 +68,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set schema"
   WHITESPACE "\n"
@@ -101,7 +101,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add vertex/edge tables"
   WHITESPACE "\n"
@@ -319,7 +319,7 @@ SOURCE_FILE
                   R_PAREN ")"
         WHITESPACE "\n  "
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add vertex/edge tables part 2"
   WHITESPACE "\n"
@@ -454,5 +454,5 @@ SOURCE_FILE
                 R_PAREN ")"
         WHITESPACE "\n  "
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

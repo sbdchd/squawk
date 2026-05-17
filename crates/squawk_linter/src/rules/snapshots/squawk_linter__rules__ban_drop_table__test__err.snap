@@ -5,11 +5,11 @@ expression: "lint_errors(sql, Rule::BanDropTable)"
 warning[ban-drop-table]: Dropping a table may break existing clients.
   ╭▸ 
 2 │ DROP TABLE "table_name";
-  ╰╴━━━━━━━━━━━━━━━━━━━━━━━
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━
 warning[ban-drop-table]: Dropping a table may break existing clients.
   ╭▸ 
 3 │ DROP TABLE IF EXISTS "table_name";
-  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╰╴━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 warning[ban-drop-table]: Dropping a table may break existing clients.
   ╭▸ 
 4 │ DROP TABLE IF EXISTS "table_name"

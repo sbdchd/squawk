@@ -29,7 +29,7 @@ SOURCE_FILE
     DO_KW "do"
     WHITESPACE " "
     NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -116,7 +116,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "1"
-    SEMICOLON ";"
+      SEMICOLON ";"
     WHITESPACE "\n    "
     INSERT
       INSERT_KW "insert"
@@ -141,7 +141,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "2"
             R_PAREN ")"
-    SEMICOLON ";"
+      SEMICOLON ";"
     WHITESPACE "\n    "
     DELETE
       DELETE_KW "delete"
@@ -153,7 +153,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-    SEMICOLON ";"
+      SEMICOLON ";"
     WHITESPACE "\n    "
     VALUES
       VALUES_KW "values"
@@ -168,7 +168,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "2"
           R_PAREN ")"
-    SEMICOLON ";"
+      SEMICOLON ";"
     WHITESPACE "\n    "
     UPDATE
       UPDATE_KW "update"
@@ -193,17 +193,17 @@ SOURCE_FILE
             SET_EXPR
               LITERAL
                 INT_NUMBER "1"
-    SEMICOLON ";"
+      SEMICOLON ";"
     WHITESPACE "\n    "
     NOTIFY
       NOTIFY_KW "notify"
       WHITESPACE " "
       NAME_REF
         IDENT "f"
-    SEMICOLON ";"
+      SEMICOLON ";"
     WHITESPACE "\n  "
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_1"
   WHITESPACE "\n"
@@ -246,7 +246,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_RULE
     CREATE_KW "CREATE"
@@ -287,7 +287,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -303,7 +303,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_2"
   WHITESPACE "\n"
@@ -337,7 +337,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "mytable"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -374,5 +374,5 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "42"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

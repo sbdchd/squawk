@@ -27,7 +27,7 @@ SOURCE_FILE
           IDENT "buzz"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing name"
   WHITESPACE "\n"
@@ -51,7 +51,7 @@ SOURCE_FILE
           IDENT "buzz"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA

@@ -133,7 +133,7 @@ SOURCE_FILE
       BY_KW "by"
       WHITESPACE " "
       NONE_KW "none"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_logged"
   WHITESPACE "\n"
@@ -150,7 +150,7 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     LOGGED_KW "logged"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_SEQUENCE
     ALTER_KW "alter"
@@ -165,7 +165,7 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     UNLOGGED_KW "unlogged"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
@@ -187,7 +187,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_SEQUENCE
     ALTER_KW "alter"
@@ -206,7 +206,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -227,7 +227,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -248,5 +248,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "x"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

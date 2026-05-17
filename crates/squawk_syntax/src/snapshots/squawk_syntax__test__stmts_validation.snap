@@ -1,0 +1,90 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/stmts.sql
+---
+SOURCE_FILE@0..97
+  CREATE_TABLE@0..17
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    TABLE_KW@7..12 "table"
+    WHITESPACE@12..13 " "
+    PATH@13..14
+      PATH_SEGMENT@13..14
+        NAME@13..14
+          IDENT@13..14 "t"
+    WHITESPACE@14..15 " "
+    TABLE_ARG_LIST@15..17
+      L_PAREN@15..16 "("
+      R_PAREN@16..17 ")"
+  WHITESPACE@17..18 "\n"
+  CREATE_TABLE@18..36
+    CREATE_KW@18..24 "create"
+    WHITESPACE@24..25 " "
+    TABLE_KW@25..30 "table"
+    WHITESPACE@30..31 " "
+    PATH@31..32
+      PATH_SEGMENT@31..32
+        NAME@31..32
+          IDENT@31..32 "t"
+    WHITESPACE@32..33 " "
+    TABLE_ARG_LIST@33..35
+      L_PAREN@33..34 "("
+      R_PAREN@34..35 ")"
+    SEMICOLON@35..36 ";"
+  WHITESPACE@36..38 "\n\n"
+  CREATE_TABLE@38..56
+    CREATE_KW@38..44 "create"
+    WHITESPACE@44..45 " "
+    TABLE_KW@45..50 "table"
+    WHITESPACE@50..51 " "
+    PATH@51..52
+      PATH_SEGMENT@51..52
+        NAME@51..52
+          IDENT@51..52 "u"
+    WHITESPACE@52..53 " "
+    TABLE_ARG_LIST@53..55
+      L_PAREN@53..54 "("
+      R_PAREN@54..55 ")"
+    SEMICOLON@55..56 ";"
+  WHITESPACE@56..57 "\n"
+  CREATE_TABLE@57..75
+    CREATE_KW@57..63 "create"
+    WHITESPACE@63..64 " "
+    TABLE_KW@64..69 "table"
+    WHITESPACE@69..70 " "
+    PATH@70..71
+      PATH_SEGMENT@70..71
+        NAME@70..71
+          IDENT@70..71 "v"
+    WHITESPACE@71..72 " "
+    TABLE_ARG_LIST@72..74
+      L_PAREN@72..73 "("
+      R_PAREN@73..74 ")"
+    SEMICOLON@74..75 ";"
+  WHITESPACE@75..77 "\n\n"
+  SELECT@77..86
+    SELECT_CLAUSE@77..85
+      SELECT_KW@77..83 "select"
+      WHITESPACE@83..84 " "
+      TARGET_LIST@84..85
+        TARGET@84..85
+          LITERAL@84..85
+            INT_NUMBER@84..85 "1"
+    SEMICOLON@85..86 ";"
+  EMPTY_STMT@86..87
+    SEMICOLON@86..87 ";"
+  SELECT@87..96
+    SELECT_CLAUSE@87..95
+      SELECT_KW@87..93 "select"
+      WHITESPACE@93..94 " "
+      TARGET_LIST@94..95
+        TARGET@94..95
+          LITERAL@94..95
+            INT_NUMBER@94..95 "2"
+    SEMICOLON@95..96 ";"
+  WHITESPACE@96..97 "\n"
+
+error[syntax-error]: Missing semicolon between statements
+  ╭▸ 
+1 │ create table t ()
+  ╰╴                 ━

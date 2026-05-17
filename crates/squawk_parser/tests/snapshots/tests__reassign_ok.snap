@@ -35,7 +35,7 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         SESSION_USER_KW "session_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REASSIGN
     REASSIGN_KW "reassign"
@@ -53,5 +53,5 @@ SOURCE_FILE
     ROLE_REF_LIST
       ROLE_REF
         CURRENT_ROLE_KW "current_role"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

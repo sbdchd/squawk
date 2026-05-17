@@ -24,7 +24,7 @@ SOURCE_FILE
                 INTEGER_KW "INTEGER"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- missing type"
@@ -44,7 +44,7 @@ SOURCE_FILE
         NAME
           IDENT "a"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- trailing comma"
@@ -72,7 +72,7 @@ SOURCE_FILE
       ERROR
         COMMA ","
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- missing columns / constraints"
@@ -99,7 +99,7 @@ SOURCE_FILE
       ERROR
         COMMA ","
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- a column list with SET DEFAULT is only supported for ON DELETE actions"
@@ -257,7 +257,7 @@ SOURCE_FILE
                 R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- conflicting options"
@@ -439,7 +439,7 @@ SOURCE_FILE
             R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -487,7 +487,7 @@ SOURCE_FILE
       LITERAL
         INT_NUMBER "5"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -528,7 +528,7 @@ SOURCE_FILE
       LITERAL
         INT_NUMBER "3"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- exclude missing a comma"
@@ -606,7 +606,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE " \n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -671,7 +671,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected path name
@@ -722,9 +722,3 @@ error[syntax-error]: expected COMMA
    ╭▸ 
 61 │   exclude using btree ( a with buzz.> b with <) 
    ╰╴                                     ━
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-66 │   )
-   │ ┏━━┛
-67 │ ┃ -- ^ missing semi
-   ╰╴┗━┛

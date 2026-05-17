@@ -49,7 +49,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "u"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi"
   WHITESPACE "\n"
@@ -184,7 +184,7 @@ SOURCE_FILE
               PATH_SEGMENT
                 NAME_REF
                   IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_search"
   WHITESPACE "\n"
@@ -236,7 +236,7 @@ SOURCE_FILE
           FOR_KW "for"
           WHITESPACE " "
           SEARCH_KW "search"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_order"
   WHITESPACE "\n"
@@ -295,7 +295,7 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func"
   WHITESPACE "\n"
@@ -340,7 +340,7 @@ SOURCE_FILE
                       NAME_REF
                         IDENT "t"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func_with_params"
   WHITESPACE "\n"
@@ -411,7 +411,7 @@ SOURCE_FILE
                       NAME_REF
                         IDENT "b"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_op"
   WHITESPACE "\n"
@@ -459,7 +459,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "u"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_op_single_param"
   WHITESPACE "\n"
@@ -499,7 +499,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_func"
   WHITESPACE "\n"
@@ -547,7 +547,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "u"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_func_single_param"
   WHITESPACE "\n"
@@ -587,7 +587,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_multiple"
   WHITESPACE "\n"
@@ -652,7 +652,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -680,7 +680,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -709,7 +709,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
@@ -735,7 +735,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -768,5 +768,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

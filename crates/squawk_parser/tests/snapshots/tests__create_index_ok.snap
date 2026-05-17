@@ -26,7 +26,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- more options"
   WHITESPACE "\n"
@@ -71,7 +71,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column options"
   WHITESPACE "\n"
@@ -108,7 +108,7 @@ SOURCE_FILE
           WHITESPACE " "
           LAST_KW "last"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_INDEX
     CREATE_KW "create"
@@ -137,7 +137,7 @@ SOURCE_FILE
           WHITESPACE " "
           FIRST_KW "first"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- opclass"
   WHITESPACE "\n"
@@ -205,7 +205,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column expr"
   WHITESPACE "\n"
@@ -248,7 +248,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "b"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing options"
   WHITESPACE "\n"
@@ -335,7 +335,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "create"
@@ -376,7 +376,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -404,7 +404,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_examples"
   WHITESPACE "\n"
@@ -432,7 +432,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "title"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -473,7 +473,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "rating"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -513,7 +513,7 @@ SOURCE_FILE
             LITERAL
               OFF_KW "off"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -543,7 +543,7 @@ SOURCE_FILE
               R_PAREN ")"
           R_PAREN ")"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -573,7 +573,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "\"de_DE\""
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -602,7 +602,7 @@ SOURCE_FILE
           WHITESPACE " "
           FIRST_KW "FIRST"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -644,7 +644,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "70"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -690,7 +690,7 @@ SOURCE_FILE
             LITERAL
               OFF_KW "off"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -720,7 +720,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "indexspace"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -759,7 +759,7 @@ SOURCE_FILE
               LOCATION_KW "location"
             R_PAREN ")"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -785,5 +785,5 @@ SOURCE_FILE
         NAME_REF
           IDENT "quantity"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -36,8 +36,6 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                     } else {
                         doc = doc.append(Doc::empty_line());
                     }
-                } else if token.kind() == SyntaxKind::SEMICOLON {
-                    doc = doc.append(Doc::text(";"));
                 }
             }
         }
@@ -46,7 +44,7 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
 }
 
 fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
-    Doc::text("create")
+    let mut doc = Doc::text("create")
         .append(Doc::space())
         .append(Doc::text("table"))
         .append(Doc::space())
@@ -71,7 +69,11 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
                 .append(Doc::line_or_nil())
                 .group(),
         )
-        .append(Doc::text(")"))
+        .append(Doc::text(")"));
+
+    doc = doc.append(build_semicolon(create_table.semicolon_token()));
+
+    doc
 }
 
 fn build_table_arg<'a>(create_table: ast::TableArg) -> Doc<'a> {
@@ -132,7 +134,35 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
         );
     }
 
+    doc = doc.append(build_semicolon(select.semicolon_token()));
+
     doc.group()
+}
+
+fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
+    let Some(semi) = semi else {
+        return Doc::nil();
+    };
+    let mut doc = Doc::nil();
+    let mut comments: Vec<SyntaxToken> = vec![];
+    for next in semi.siblings_with_tokens(Direction::Prev).skip(1) {
+        match next {
+            rowan::NodeOrToken::Node(_) => break,
+            rowan::NodeOrToken::Token(token) => {
+                if token.kind() == SyntaxKind::COMMENT {
+                    comments.push(token);
+                } else if token.kind() == SyntaxKind::WHITESPACE {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    for comment in comments.iter().rev() {
+        doc = doc.append(Doc::text(comment.text().to_string()));
+    }
+    doc.append(Doc::text(";"))
 }
 
 fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {

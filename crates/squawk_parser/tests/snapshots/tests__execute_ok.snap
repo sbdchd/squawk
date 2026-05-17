@@ -27,7 +27,7 @@ SOURCE_FILE
       LITERAL
         FLOAT_NUMBER "200.00"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   EXECUTE
     EXECUTE_KW "EXECUTE"
@@ -43,12 +43,12 @@ SOURCE_FILE
       NAME_REF
         CURRENT_DATE_KW "current_date"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   EXECUTE
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

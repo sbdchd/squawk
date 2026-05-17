@@ -42,7 +42,7 @@ SOURCE_FILE
                 INTEGER_KW "integer"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- with schema prefix"
@@ -86,7 +86,7 @@ SOURCE_FILE
                 INTEGER_KW "integer"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- like source_table"
@@ -134,7 +134,7 @@ SOURCE_FILE
                 INTEGER_KW "integer"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- like option"
@@ -181,7 +181,7 @@ SOURCE_FILE
           COMMENTS_KW "comments"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- like options"
@@ -268,7 +268,7 @@ SOURCE_FILE
           ALL_KW "all"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- with prefix options"
@@ -308,7 +308,7 @@ SOURCE_FILE
                 TEXT_KW "text"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -339,7 +339,7 @@ SOURCE_FILE
                 TEXT_KW "text"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- unlogged"
@@ -370,7 +370,7 @@ SOURCE_FILE
                 TEXT_KW "text"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- inherits from parent"
@@ -423,7 +423,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "buzz"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- partition range"
@@ -514,7 +514,7 @@ SOURCE_FILE
               IDENT "buzz"
         WHITESPACE "\n"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- partition list"
@@ -554,7 +554,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "z"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- partition hash"
@@ -599,7 +599,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- using"
@@ -631,7 +631,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- with"
@@ -694,7 +694,7 @@ SOURCE_FILE
               FALSE_KW "false"
         WHITESPACE "\n"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- without"
@@ -725,7 +725,7 @@ SOURCE_FILE
       WITHOUT_KW "without"
       WHITESPACE " "
       OIDS_KW "OIDS"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- on commit"
@@ -761,7 +761,7 @@ SOURCE_FILE
         PRESERVE_KW "preserve"
         WHITESPACE " "
         ROWS_KW "rows"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -795,7 +795,7 @@ SOURCE_FILE
         DELETE_KW "delete"
         WHITESPACE " "
         ROWS_KW "rows"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -827,7 +827,7 @@ SOURCE_FILE
       WHITESPACE " "
       DROP
         DROP_KW "drop"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- tablespace"
@@ -859,7 +859,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
     COMMENT "-- like_column"
@@ -907,7 +907,7 @@ SOURCE_FILE
               IDENT "t"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- create_table_column_constraints"
@@ -942,7 +942,7 @@ SOURCE_FILE
           NULL_KW "null"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- null"
@@ -973,7 +973,7 @@ SOURCE_FILE
           NULL_KW "null"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- default"
@@ -1007,7 +1007,7 @@ SOURCE_FILE
             INT_NUMBER "100"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- unique constraint"
@@ -1155,7 +1155,7 @@ SOURCE_FILE
               IDENT "foo"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- references actions order"
@@ -1211,7 +1211,7 @@ SOURCE_FILE
               ACTION_KW "action"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- order swapped"
@@ -1267,7 +1267,7 @@ SOURCE_FILE
               ACTION_KW "action"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- primary key"
@@ -1328,7 +1328,7 @@ SOURCE_FILE
           KEY_KW "key"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- check constraint"
@@ -1400,7 +1400,7 @@ SOURCE_FILE
             INHERIT_KW "inherit"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- defer"
@@ -1508,7 +1508,7 @@ SOURCE_FILE
             IMMEDIATE_KW "immediate"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- constraint"
@@ -1545,7 +1545,7 @@ SOURCE_FILE
           NULL_KW "null"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- generated stored"
@@ -1609,7 +1609,7 @@ SOURCE_FILE
           STORED_KW "stored"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_table_table_constraints"
   WHITESPACE "\n\n"
@@ -1676,7 +1676,7 @@ SOURCE_FILE
         INHERIT_KW "inherit"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- check constraint"
@@ -1730,7 +1730,7 @@ SOURCE_FILE
         R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- unique constraint"
@@ -1810,7 +1810,7 @@ SOURCE_FILE
             R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- unique with name constraint"
@@ -1868,7 +1868,7 @@ SOURCE_FILE
         DEFERRED_KW "deferred"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- primary key constraint"
@@ -1935,7 +1935,7 @@ SOURCE_FILE
             IDENT "bar"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- exclude constraint"
@@ -2026,7 +2026,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- exclude constraint multiple exclusions"
@@ -2134,7 +2134,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- exclude constraint all clauses exclusions"
@@ -2274,7 +2274,7 @@ SOURCE_FILE
         DEFERRABLE_KW "deferrable"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- foreign key constraint"
@@ -2359,7 +2359,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- everything"
@@ -2651,7 +2651,7 @@ SOURCE_FILE
         IMMEDIATE_KW "immediate"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
     COMMENT "-- multi_dimensional_arrays"
@@ -2709,7 +2709,7 @@ SOURCE_FILE
           R_BRACK "]"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- array_with_params"
@@ -2746,7 +2746,7 @@ SOURCE_FILE
           R_BRACK "]"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- array_alt_syntax"
@@ -2795,7 +2795,7 @@ SOURCE_FILE
           ARRAY_KW "ARRAY"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- create_table_of_type"
@@ -2824,7 +2824,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- with column defs"
@@ -2900,7 +2900,7 @@ SOURCE_FILE
         R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- create_table_partition_of"
@@ -2933,7 +2933,7 @@ SOURCE_FILE
     WHITESPACE " "
     PARTITION_DEFAULT
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- partition with some columns"
@@ -2993,7 +2993,7 @@ SOURCE_FILE
     WHITESPACE " "
     PARTITION_DEFAULT
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- partition with"
@@ -3039,7 +3039,7 @@ SOURCE_FILE
       WHITESPACE " "
       INT_NUMBER "1"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- partition in"
@@ -3083,7 +3083,7 @@ SOURCE_FILE
       LITERAL
         STRING "'buzz'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- partition from to"
@@ -3130,7 +3130,7 @@ SOURCE_FILE
       LITERAL
         STRING "'buzz'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -3199,7 +3199,7 @@ SOURCE_FILE
       LITERAL
         STRING "'2016-10-01'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- missing entries"
@@ -3216,7 +3216,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- regression"
@@ -3271,7 +3271,7 @@ SOURCE_FILE
                 REAL_KW "REAL"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- compression method"
@@ -3320,7 +3320,7 @@ SOURCE_FILE
           DEFAULT_KW "default"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- storage"
@@ -3417,7 +3417,7 @@ SOURCE_FILE
           DEFAULT_KW "default"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -3443,7 +3443,7 @@ SOURCE_FILE
                 INT_KW "int"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- match partial not implemented yet"
@@ -3541,7 +3541,7 @@ SOURCE_FILE
                 R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
     COMMENT "-- temporal_foreign_key"
@@ -3674,7 +3674,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- unique_constraint_without_overlaps"
@@ -3728,7 +3728,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
     COMMENT "-- primary key without overlaps"
@@ -3811,7 +3811,7 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     COMMENT "-- temporal_primary_key"
@@ -3928,5 +3928,5 @@ SOURCE_FILE
           R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

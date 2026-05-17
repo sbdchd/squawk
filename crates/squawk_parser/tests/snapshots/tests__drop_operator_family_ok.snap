@@ -21,7 +21,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -53,7 +53,7 @@ SOURCE_FILE
       IDENT "i"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_OPERATOR_FAMILY
     DROP_KW "drop"
@@ -83,5 +83,5 @@ SOURCE_FILE
       IDENT "i"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

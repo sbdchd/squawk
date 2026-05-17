@@ -28,7 +28,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends_on"
   WHITESPACE "\n"
@@ -57,7 +57,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -93,5 +93,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

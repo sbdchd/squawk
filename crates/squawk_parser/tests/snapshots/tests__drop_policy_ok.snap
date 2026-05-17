@@ -20,7 +20,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -51,7 +51,7 @@ SOURCE_FILE
             IDENT "t_name"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_POLICY
     DROP_KW "drop"
@@ -75,5 +75,5 @@ SOURCE_FILE
             IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

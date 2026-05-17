@@ -53,5 +53,5 @@ SOURCE_FILE
         NAME
           IDENT "c"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

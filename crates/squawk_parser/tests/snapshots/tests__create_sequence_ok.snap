@@ -14,7 +14,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -113,7 +113,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unlogged"
   WHITESPACE "\n"
@@ -129,5 +129,5 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

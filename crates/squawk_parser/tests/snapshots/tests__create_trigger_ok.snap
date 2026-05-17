@@ -44,7 +44,7 @@ SOURCE_FILE
       ARG_LIST
         L_PAREN "("
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_most_fields"
   WHITESPACE "\n"
@@ -177,7 +177,7 @@ SOURCE_FILE
         LITERAL
           STRING "'3'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- constraint"
   WHITESPACE "\n"
@@ -227,7 +227,7 @@ SOURCE_FILE
       ARG_LIST
         L_PAREN "("
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_most_fields_part2"
   WHITESPACE "\n"
@@ -303,7 +303,7 @@ SOURCE_FILE
         LITERAL
           STRING "'bar'"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple"
   WHITESPACE "\n"
@@ -350,5 +350,5 @@ SOURCE_FILE
       ARG_LIST
         L_PAREN "("
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

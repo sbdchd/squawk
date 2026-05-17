@@ -25,7 +25,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               STRING "'Hello World'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
     CREATE_KW "CREATE"
@@ -60,7 +60,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME
                 IDENT "hello"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
     CREATE_KW "CREATE"
@@ -100,7 +100,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'Comedy'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
     CREATE_KW "CREATE"
@@ -148,7 +148,7 @@ SOURCE_FILE
     CHECK_KW "CHECK"
     WHITESPACE " "
     OPTION_KW "OPTION"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
     CREATE_KW "CREATE"
@@ -196,7 +196,7 @@ SOURCE_FILE
     CHECK_KW "CHECK"
     WHITESPACE " "
     OPTION_KW "OPTION"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
     CREATE_KW "CREATE"
@@ -330,7 +330,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'Comedy'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
     CREATE_KW "CREATE"
@@ -404,7 +404,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "100"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complete_syntax"
   WHITESPACE "\n"
@@ -489,7 +489,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
     CREATE_KW "create"
@@ -532,7 +532,7 @@ SOURCE_FILE
     CHECK_KW "check"
     WHITESPACE " "
     OPTION_KW "option"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression test"
   WHITESPACE "\n"
@@ -568,5 +568,5 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

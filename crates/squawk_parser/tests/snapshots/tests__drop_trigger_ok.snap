@@ -20,7 +20,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
     DROP_KW "drop"
@@ -44,7 +44,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
     DROP_KW "drop"
@@ -68,7 +68,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
     DROP_KW "drop"
@@ -94,7 +94,7 @@ SOURCE_FILE
             IDENT "t"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
     DROP_KW "drop"
@@ -115,5 +115,5 @@ SOURCE_FILE
             IDENT "t"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

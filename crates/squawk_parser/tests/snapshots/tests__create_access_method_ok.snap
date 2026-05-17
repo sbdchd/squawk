@@ -28,7 +28,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -60,5 +60,5 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
