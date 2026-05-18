@@ -1407,13 +1407,13 @@ packages:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
 
-  glob@10.4.5:
-    resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+  glob@10.5.0:
+    resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
     deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
-  glob@11.0.3:
-    resolution: {integrity: sha512-2Nim7dha1KVkaiF4q6Dj+ngPPMdfvLJEOpZk/jKiUAkqKebpGAWQXAq9z1xu9HKu5lWfqw/FASuccEjyznjPaA==}
+  glob@11.1.0:
+    resolution: {integrity: sha512-vuNwKSaKiqm7g0THUBu2x7ckSs3XJLXE+2ssL7/MfTGPLLcrJQ/4Uq1CjPTtO5cCIiRxqvN6Twy1qOwhL0Xjcw==}
     engines: {node: 20 || >=22}
     deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
@@ -3383,7 +3383,7 @@ snapshots:
       c8: 9.1.0
       chokidar: 3.6.0
       enhanced-resolve: 5.18.2
-      glob: 10.4.5
+      glob: 10.5.0
       minimatch: 9.0.8
       mocha: 10.8.2
       supports-color: 9.4.0
@@ -3452,7 +3452,7 @@ snapshots:
       cockatiel: 3.2.1
       commander: 12.1.0
       form-data: 4.0.4
-      glob: 11.0.3
+      glob: 11.1.0
       hosted-git-info: 4.1.0
       jsonc-parser: 3.3.1
       leven: 3.1.0
@@ -4217,7 +4217,7 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob@10.4.5:
+  glob@10.5.0:
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 3.4.3
@@ -4226,7 +4226,7 @@ snapshots:
       package-json-from-dist: 1.0.1
       path-scurry: 1.11.1
 
-  glob@11.0.3:
+  glob@11.1.0:
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 4.1.1
