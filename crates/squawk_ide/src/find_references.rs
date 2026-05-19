@@ -4,7 +4,32 @@ use crate::goto_definition;
 use crate::location::Location;
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::{
+    SyntaxNode,
+    ast::{self, AstNode},
+};
+
+fn is_reference_node(node: &SyntaxNode) -> bool {
+    if ast::NameRef::can_cast(node.kind()) {
+        return true;
+    }
+
+    if let Some(ty) = ast::Type::cast(node.clone()) {
+        return match ty {
+            ast::Type::BitType(_)
+            | ast::Type::CharType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::IntervalType(_)
+            | ast::Type::TimeType(_) => true,
+            ast::Type::ArrayType(_)
+            | ast::Type::ExprType(_)
+            | ast::Type::PathType(_)
+            | ast::Type::PercentType(_) => false,
+        };
+    }
+
+    false
+}
 
 pub fn find_references(db: &dyn Db, position: InFile<TextSize>) -> Vec<Location> {
     let file = position.file_id;
@@ -19,7 +44,7 @@ pub fn find_references(db: &dyn Db, position: InFile<TextSize>) -> Vec<Location>
         .tree()
         .syntax()
         .descendants()
-        .filter(|x| ast::NameRef::can_cast(x.kind()))
+        .filter(is_reference_node)
     {
         let range = node.text_range();
         let matches = goto_definition::goto_definition(db, InFile::new(file, range.start()))
@@ -399,6 +424,60 @@ select now();
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 3. reference
+        ");
+    }
+
+    #[test]
+    fn bit() {
+        assert_snapshot!(find_refs("
+create type pg_catalog.bit$0;
+
+create function pg_catalog.bit(bigint, integer) returns bit
+  language internal;
+
+create function pg_catalog.bit(bit, integer, boolean) returns bit
+  language internal;
+
+create function pg_catalog.bit(integer, integer) returns bit
+  language internal;
+"), @"
+           ╭▸ 
+         2 │ create type pg_catalog.bit;
+           │                        ┬─┬
+           │                        │ │
+           │                        │ 0. query
+           │                        1. reference
+         3 │
+         4 │ create function pg_catalog.bit(bigint, integer) returns bit
+           │                                                         ─── 2. reference
+           ‡
+         7 │ create function pg_catalog.bit(bit, integer, boolean) returns bit
+           │                                ─── 3. reference               ─── 4. reference
+           ‡
+        10 │ create function pg_catalog.bit(integer, integer) returns bit
+           ╰╴                                                         ─── 5. reference
+        ");
+    }
+
+    #[test]
+    fn char() {
+        assert_snapshot!(find_refs("
+create type pg_catalog.bpchar$0;
+
+select '1'::char;
+select '1'::bpchar;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.bpchar;
+          │                        ┬────┬
+          │                        │    │
+          │                        │    0. query
+          │                        1. reference
+        3 │
+        4 │ select '1'::char;
+          │             ──── 2. reference
+        5 │ select '1'::bpchar;
+          ╰╴            ────── 3. reference
         ");
     }
 }
