@@ -45,3 +45,18 @@ With `vsce` installed from NPM (`npm install -g @vscode/vsce`), clone [this repo
 
 Make sure you're on a vscode version >= the one defined in the `package.json`,
 otherwise the extension development host won't load the extension.
+
+### Syntax grammar tests
+
+The TextMate grammar in `syntaxes/pgsql.tmLanguage.json` is tested with
+`vscode-tmgrammar-test` and `vscode-tmgrammar-snap`.
+
+```bash
+pnpm test
+# or
+pnpm run test:grammar
+```
+
+- Add assertion-based fixtures under `test/syntax/`.
+- Add snapshot fixtures under `test/snap/`.
+- Update snapshot files with `pnpm run test:snap:update`.
