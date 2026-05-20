@@ -76,6 +76,27 @@ pub fn is_reserved_word(text: &str) -> bool {
         .is_ok()
 }
 
+pub fn strip_quotes(text: &str) -> Option<&str> {
+    text.strip_prefix('\'')?.strip_suffix('\'')
+}
+
+pub fn strip_prefixed_quotes(text: &str, prefix: [char; 2]) -> Option<&str> {
+    strip_quotes(text.strip_prefix(prefix)?)
+}
+
+pub fn strip_unicode_esc_prefix(text: &str) -> Option<&str> {
+    strip_quotes(text.strip_prefix(['u', 'U'])?.strip_prefix('&')?)
+}
+
+pub fn strip_dollar_quotes(text: &str) -> Option<&str> {
+    let after_first = text.strip_prefix('$')?;
+    let tag_end = after_first.find('$')?;
+    let tag = &after_first[..tag_end];
+    let body = &after_first[tag_end + 1..];
+    let closing = format!("${tag}$");
+    body.strip_suffix(&closing)
+}
+
 #[cfg(test)]
 mod tests {
     use insta::assert_snapshot;

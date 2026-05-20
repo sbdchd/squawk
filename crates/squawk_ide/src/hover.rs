@@ -4,7 +4,7 @@ use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
 use crate::db::{bind, list_files, parse};
 use crate::file::InFile;
-use crate::infer::infer_type_from_expr;
+use crate::infer::{infer_type_from_expr, infer_type_from_literal};
 use crate::location::{Location, LocationKind};
 use crate::name;
 use crate::offsets::token_from_offset;
@@ -14,6 +14,13 @@ use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::SyntaxNodePtr;
+use squawk_syntax::ast::LitKind;
+use squawk_syntax::quote::{
+    strip_dollar_quotes, strip_prefixed_quotes, strip_quotes, strip_unicode_esc_prefix,
+};
+use squawk_syntax::unescape::{
+    decode_esc_string, decode_plain_string, decode_unicode_esc_string, uescape_char,
+};
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
@@ -132,11 +139,168 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         return hover_name_ref(db, position);
     }
 
-    if let Some(name) = ast::Name::cast(parent) {
+    if let Some(name) = ast::Name::cast(parent.clone()) {
         return hover_name(db, InFile::new(file, name));
     }
 
+    if let Some(literal) = ast::Literal::cast(parent.clone()) {
+        return hover_literal(&literal);
+    }
+
     None
+}
+
+fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
+    let kind = literal.kind()?;
+    // TODO: support all literal types
+    if !matches!(
+        kind,
+        LitKind::String(_)
+            | LitKind::BitString(_)
+            | LitKind::ByteString(_)
+            | LitKind::EscString(_)
+            | LitKind::UnicodeEscString(_)
+            | LitKind::DollarQuotedString(_)
+    ) {
+        return None;
+    }
+
+    let value = literal_string_value(literal)?;
+    let ty = infer_type_from_literal(literal)?.to_string();
+
+    let comment = match kind {
+        LitKind::BitString(_) => format_bit_value_comment(&value, 2),
+        LitKind::ByteString(_) => format_bit_value_comment(&value, 16),
+        LitKind::String(_)
+        | LitKind::EscString(_)
+        | LitKind::UnicodeEscString(_)
+        | LitKind::DollarQuotedString(_) => match value.find('\n') {
+            Some(idx) => {
+                let truncated = &value[..idx];
+                format!(
+                    "value of literal (truncated up to newline): {}",
+                    markdown_inline_code(truncated)
+                )
+            }
+            None => format!("value of literal: {}", markdown_inline_code(&value)),
+        },
+        LitKind::FloatNumber(_) => return None,
+        LitKind::IntNumber(_) => return None,
+        LitKind::Null(_) => return None,
+        LitKind::PositionalParam(_) => return None,
+    };
+
+    Some(Hover::new(ty, comment))
+}
+
+fn format_bit_value_comment(digits: &str, radix: u32) -> String {
+    if let Ok(n) = u128::from_str_radix(digits, radix) {
+        return format!(
+            "value of literal: {}",
+            markdown_inline_code(&format!("{n} (0x{n:X}|0b{n:b})"))
+        );
+    }
+
+    format!("value of literal: {}", markdown_inline_code(digits))
+}
+
+// escape backticks that exist in the text
+fn markdown_inline_code(text: &str) -> String {
+    let mut max_run = 0;
+    let mut run = 0;
+
+    for ch in text.chars() {
+        if ch == '`' {
+            run += 1;
+            max_run = max_run.max(run);
+        } else {
+            run = 0;
+        }
+    }
+
+    let fence = "`".repeat(max_run + 1);
+    format!("{fence} {text} {fence}")
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum StringDecoding {
+    BitOrByte,
+    EscString,
+    UnicodeEscString,
+}
+
+fn literal_string_value(literal: &ast::Literal) -> Option<String> {
+    let escape_char = unicode_escape_char(literal);
+    let mut out = String::with_capacity(literal.syntax().text().len().into());
+    let mut decoding: Option<StringDecoding> = None;
+
+    for element in literal.syntax().children_with_tokens() {
+        let Some(token) = element.into_token() else {
+            continue;
+        };
+        match token.kind() {
+            SyntaxKind::ESC_STRING => {
+                let inner = strip_prefixed_quotes(token.text(), ['e', 'E'])?;
+                decode_esc_string(inner, &mut out);
+                decoding = Some(StringDecoding::EscString);
+            }
+            SyntaxKind::UNICODE_ESC_STRING => {
+                let inner = strip_unicode_esc_prefix(token.text())?;
+                decode_unicode_esc_string(inner, escape_char, &mut out);
+                decoding = Some(StringDecoding::UnicodeEscString);
+            }
+            SyntaxKind::BIT_STRING => {
+                let inner = strip_prefixed_quotes(token.text(), ['b', 'B'])?;
+                out.push_str(inner);
+                decoding = Some(StringDecoding::BitOrByte);
+            }
+            SyntaxKind::BYTE_STRING => {
+                let inner = strip_prefixed_quotes(token.text(), ['x', 'X'])?;
+                out.push_str(inner);
+                decoding = Some(StringDecoding::BitOrByte);
+            }
+            SyntaxKind::DOLLAR_QUOTED_STRING => {
+                let inner = strip_dollar_quotes(token.text())?;
+                out.push_str(inner);
+                return Some(out);
+            }
+            SyntaxKind::STRING => {
+                let inner = strip_quotes(token.text())?;
+                match decoding {
+                    Some(StringDecoding::EscString) => decode_esc_string(inner, &mut out),
+                    Some(StringDecoding::UnicodeEscString) => {
+                        decode_unicode_esc_string(inner, escape_char, &mut out)
+                    }
+                    Some(StringDecoding::BitOrByte) => out.push_str(inner),
+                    None => decode_plain_string(inner, &mut out),
+                }
+            }
+            SyntaxKind::UESCAPE_KW => break,
+            _ => (),
+        }
+    }
+
+    Some(out)
+}
+
+fn unicode_escape_char(literal: &ast::Literal) -> char {
+    let mut seen_uescape = false;
+    for element in literal.syntax().children_with_tokens() {
+        let Some(token) = element.into_token() else {
+            continue;
+        };
+        match token.kind() {
+            SyntaxKind::UESCAPE_KW => seen_uescape = true,
+            SyntaxKind::STRING if seen_uescape => {
+                if let Some(ch) = uescape_char(token.text()) {
+                    return ch;
+                }
+                return '\\';
+            }
+            _ => (),
+        }
+    }
+    '\\'
 }
 
 fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
@@ -5278,6 +5442,255 @@ alter property graph foo.ba$0r rename to baz;
           ╭▸ 
         3 │ alter property graph foo.bar rename to baz;
           ╰╴                          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string() {
+        assert_snapshot!(check_hover_info(r"
+select e'fo$0o\nbar';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal (truncated up to newline): ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string_with_tab() {
+        assert_snapshot!(check_hover_info(r"
+select e'a\tb$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` a	b `
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string_hex_byte_sequence_utf8() {
+        assert_snapshot!(check_hover_info(r"
+select e'\xC3\xA$09';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` é `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string() {
+        assert_snapshot!(check_hover_info(r"
+select U&'\0061\0308b$0c';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` äbc `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string_with_uescape() {
+        assert_snapshot!(check_hover_info(r"
+select U&'!0061!0062$0' uescape '!';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ab `
+        ");
+    }
+
+    #[test]
+    fn hover_string_continuation() {
+        assert_snapshot!(check_hover_info(r"
+select e'foo$0'
+'\nbar';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal (truncated up to newline): ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string_continuation() {
+        assert_snapshot!(check_hover_info(r"
+select U&'\0061'
+'\006$02';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ab `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_no_escape() {
+        assert_snapshot!(check_hover_info(r"
+select 'foo$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_escaped_quotes() {
+        assert_snapshot!(check_hover_info(r"
+select '''$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ' `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_doubled_quote() {
+        assert_snapshot!(check_hover_info(r"
+select 'it''$0s';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` it's `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_backtick() {
+        assert_snapshot!(check_hover_info(r"
+select 'a`$0b';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` a`b ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_leading_backtick() {
+        assert_snapshot!(check_hover_info(r"
+select '`$0hello';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` `hello ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_backticks() {
+        assert_snapshot!(check_hover_info(r"
+select '`foo`$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` `foo` ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_consecutive_backticks() {
+        assert_snapshot!(check_hover_info(r"
+select 'a``$0b';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ``` a``b ```
+        ");
+    }
+
+    #[test]
+    fn hover_dollar_quoted_string() {
+        assert_snapshot!(check_hover_info(r"
+select $$he$0llo$$;
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` hello `
+        ");
+    }
+
+    #[test]
+    fn hover_bit_string() {
+        assert_snapshot!(check_hover_info(r"
+select b'10$010';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` 10 (0xA|0b1010) `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string() {
+        assert_snapshot!(check_hover_info(r"
+select x'1A$03F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` 6719 (0x1A3F|0b1101000111111) `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_short() {
+        assert_snapshot!(check_hover_info(r"
+select x'F$0F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` 255 (0xFF|0b11111111) `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_exceeds_u128_falls_back() {
+        assert_snapshot!(check_hover_info(r"
+select x'e3b0c44298fc1c14$09afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 `
         ");
     }
 }

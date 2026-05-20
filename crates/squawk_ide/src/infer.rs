@@ -64,7 +64,7 @@ pub(crate) fn infer_type_from_ty(ty: &ast::Type) -> Option<Type> {
     }
 }
 
-fn infer_type_from_literal(literal: &ast::Literal) -> Option<Type> {
+pub(crate) fn infer_type_from_literal(literal: &ast::Literal) -> Option<Type> {
     let token = literal.syntax().first_token()?;
     match token.kind() {
         SyntaxKind::INT_NUMBER => Some(Type::Integer),
