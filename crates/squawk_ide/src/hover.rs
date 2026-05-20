@@ -4,7 +4,10 @@ use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
 use crate::db::{bind, list_files, parse};
 use crate::file::InFile;
-use crate::infer::infer_type_from_expr;
+use crate::infer::{infer_type_from_expr, infer_type_from_literal};
+use crate::literals::binary_digits_to_hex;
+use crate::literals::hex_digits_to_binary;
+use crate::literals::literal_string_value;
 use crate::location::{Location, LocationKind};
 use crate::name;
 use crate::offsets::token_from_offset;
@@ -14,6 +17,7 @@ use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::SyntaxNodePtr;
+use squawk_syntax::ast::LitKind;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
@@ -132,11 +136,99 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         return hover_name_ref(db, position);
     }
 
-    if let Some(name) = ast::Name::cast(parent) {
+    if let Some(name) = ast::Name::cast(parent.clone()) {
         return hover_name(db, InFile::new(file, name));
     }
 
+    if let Some(literal) = ast::Literal::cast(parent) {
+        return hover_literal(&literal);
+    }
+
     None
+}
+
+fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
+    let kind = literal.kind()?;
+    // TODO: support all literal types
+    if !matches!(
+        kind,
+        LitKind::String(_)
+            | LitKind::BitString(_)
+            | LitKind::ByteString(_)
+            | LitKind::EscString(_)
+            | LitKind::UnicodeEscString(_)
+            | LitKind::DollarQuotedString(_)
+    ) {
+        return None;
+    }
+
+    let value = literal_string_value(literal)?;
+    let ty = infer_type_from_literal(literal)?.to_string();
+
+    let comment = match kind {
+        LitKind::BitString(_) => format_bit_value_comment(&value, 2),
+        LitKind::ByteString(_) => format_bit_value_comment(&value, 16),
+        LitKind::String(_)
+        | LitKind::EscString(_)
+        | LitKind::UnicodeEscString(_)
+        | LitKind::DollarQuotedString(_) => match value.find('\n') {
+            Some(idx) => {
+                let truncated = &value[..idx];
+                format!(
+                    "value of literal (truncated up to newline): {}",
+                    markdown_inline_code(truncated)
+                )
+            }
+            None => format!("value of literal: {}", markdown_inline_code(&value)),
+        },
+        LitKind::FloatNumber(_) => return None,
+        LitKind::IntNumber(_) => return None,
+        LitKind::Null(_) => return None,
+        LitKind::PositionalParam(_) => return None,
+    };
+
+    Some(Hover::new(ty, comment))
+}
+
+fn format_bit_value_comment(digits: &str, radix: u32) -> String {
+    let patterns = match radix {
+        2 => bit_string_patterns(digits),
+        16 => byte_string_patterns(digits),
+        _ => None,
+    };
+
+    if let Some((hex, binary)) = patterns {
+        let formatted = format!("x'{hex}'|b'{binary}'");
+        return format!("value of literal: {}", markdown_inline_code(&formatted));
+    }
+
+    format!("value of literal: {}", markdown_inline_code(digits))
+}
+
+fn bit_string_patterns(digits: &str) -> Option<(String, String)> {
+    Some((binary_digits_to_hex(digits)?, digits.to_string()))
+}
+
+fn byte_string_patterns(digits: &str) -> Option<(String, String)> {
+    Some((digits.to_string(), hex_digits_to_binary(digits)?))
+}
+
+// escape backticks that exist in the text
+fn markdown_inline_code(text: &str) -> String {
+    let mut max_run = 0;
+    let mut run = 0;
+
+    for ch in text.chars() {
+        if ch == '`' {
+            run += 1;
+            max_run = max_run.max(run);
+        } else {
+            run = 0;
+        }
+    }
+
+    let fence = "`".repeat(max_run + 1);
+    format!("{fence} {text} {fence}")
 }
 
 fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
@@ -5278,6 +5370,307 @@ alter property graph foo.ba$0r rename to baz;
           ╭▸ 
         3 │ alter property graph foo.bar rename to baz;
           ╰╴                          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string() {
+        assert_snapshot!(check_hover_info(r"
+select e'fo$0o\nbar';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal (truncated up to newline): ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string_with_tab() {
+        assert_snapshot!(check_hover_info(r"
+select e'a\tb$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` a	b `
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string_hex_byte_sequence_utf8() {
+        assert_snapshot!(check_hover_info(r"
+select e'\xC3\xA$09';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` é `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string() {
+        assert_snapshot!(check_hover_info(r"
+select U&'\0061\0308b$0c';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` äbc `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string_with_uescape() {
+        assert_snapshot!(check_hover_info(r"
+select U&'!0061!0062$0' uescape '!';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ab `
+        ");
+    }
+
+    #[test]
+    fn hover_string_continuation() {
+        assert_snapshot!(check_hover_info(r"
+select e'foo$0'
+'\nbar';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal (truncated up to newline): ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string_continuation() {
+        assert_snapshot!(check_hover_info(r"
+select U&'\0061'
+'\006$02';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ab `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_no_escape() {
+        assert_snapshot!(check_hover_info(r"
+select 'foo$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_escaped_quotes() {
+        assert_snapshot!(check_hover_info(r"
+select '''$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ' `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_doubled_quote() {
+        assert_snapshot!(check_hover_info(r"
+select 'it''$0s';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` it's `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_backtick() {
+        assert_snapshot!(check_hover_info(r"
+select 'a`$0b';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` a`b ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_leading_backtick() {
+        assert_snapshot!(check_hover_info(r"
+select '`$0hello';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` `hello ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_backticks() {
+        assert_snapshot!(check_hover_info(r"
+select '`foo`$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` `foo` ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_consecutive_backticks() {
+        assert_snapshot!(check_hover_info(r"
+select 'a``$0b';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ``` a``b ```
+        ");
+    }
+
+    #[test]
+    fn hover_dollar_quoted_string() {
+        assert_snapshot!(check_hover_info(r"
+select $$he$0llo$$;
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` hello `
+        ");
+    }
+
+    #[test]
+    fn hover_bit_string() {
+        assert_snapshot!(check_hover_info(r"
+select b'10$010';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'A'|b'1010' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string() {
+        assert_snapshot!(check_hover_info(r"
+select x'1A$03F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'1A3F'|b'0001101000111111' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_empty() {
+        assert_snapshot!(check_hover_info(r"
+select x'$0';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x''|b'' `
+        ");
+    }
+
+    #[test]
+    fn hover_bit_string_empty() {
+        assert_snapshot!(check_hover_info(r"
+select b'$0';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x''|b'' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_short() {
+        assert_snapshot!(check_hover_info(r"
+select x'F$0F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'FF'|b'11111111' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_preserves_hex_width() {
+        assert_snapshot!(check_hover_info(r"
+select x'0F$0F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'0FF'|b'000011111111' `
+        ");
+    }
+
+    #[test]
+    fn hover_bit_string_preserves_binary_width() {
+        assert_snapshot!(check_hover_info(r"
+select b'0$00';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'0'|b'00' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_large() {
+        assert_snapshot!(check_hover_info(r"
+select x'10000000000000000000000000000000$00';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'100000000000000000000000000000000'|b'000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' `
         ");
     }
 }

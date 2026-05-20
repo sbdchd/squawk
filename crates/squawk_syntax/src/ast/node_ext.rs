@@ -661,6 +661,30 @@ fn name_ref() {
 }
 
 #[test]
+fn unicode_quoted_name_keeps_doubled_single_quotes() {
+    let parse = SourceFile::parse(r#"select 1 U&"a''b""#);
+    assert!(parse.errors().is_empty());
+    let stmt = parse.tree().stmts().next().unwrap();
+    let ast::Stmt::Select(select) = stmt else {
+        unreachable!()
+    };
+    let name = select
+        .select_clause()
+        .unwrap()
+        .target_list()
+        .unwrap()
+        .targets()
+        .next()
+        .unwrap()
+        .as_name()
+        .unwrap()
+        .name()
+        .unwrap();
+
+    assert_snapshot!(name.text().to_string(), @"a''b");
+}
+
+#[test]
 fn index_expr() {
     let source_code = "
         select foo[bar];

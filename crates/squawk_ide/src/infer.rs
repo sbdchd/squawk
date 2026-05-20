@@ -64,11 +64,13 @@ pub(crate) fn infer_type_from_ty(ty: &ast::Type) -> Option<Type> {
     }
 }
 
-fn infer_type_from_literal(literal: &ast::Literal) -> Option<Type> {
+pub(crate) fn infer_type_from_literal(literal: &ast::Literal) -> Option<Type> {
     let token = literal.syntax().first_token()?;
     match token.kind() {
         SyntaxKind::INT_NUMBER => Some(Type::Integer),
         SyntaxKind::FLOAT_NUMBER => Some(Type::Numeric),
+        // TODO: this isn't necessarily text, e.g., select 1 + '1';
+        // We need to look at the context of the string's usage to be sure.
         SyntaxKind::STRING
         | SyntaxKind::DOLLAR_QUOTED_STRING
         | SyntaxKind::ESC_STRING

@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ops::{Range, RangeInclusive};
 
-pub(crate) enum UnicodeEscapeKind {
+pub enum UnicodeEscapeKind {
     Extended,
     Short,
 }
@@ -15,7 +15,7 @@ impl UnicodeEscapeKind {
     }
 }
 
-pub(crate) enum UnicodeEscError {
+pub enum UnicodeEscError {
     InvalidEscape,
     InvalidSurrogatePair,
     OutOfRange,
@@ -47,7 +47,7 @@ impl fmt::Display for UnicodeEscError {
     }
 }
 
-pub(crate) fn escape_unicode_esc_str<F>(text: &str, escape_char: char, mut callback: F)
+pub fn escape_unicode_esc_str<F>(text: &str, escape_char: char, mut callback: F)
 where
     F: FnMut(Range<usize>, Result<char, UnicodeEscError>),
 {
@@ -164,12 +164,149 @@ const fn is_valid_uescape_char(byte: u8) -> bool {
         )
 }
 
-pub(crate) fn uescape_char(text: &str) -> Option<char> {
+pub fn uescape_char(text: &str) -> Option<char> {
     let inner = text.strip_prefix('\'')?.strip_suffix('\'')?;
     let &[byte] = inner.as_bytes() else {
         return None;
     };
     is_valid_uescape_char(byte).then(|| char::from(byte))
+}
+
+pub fn decode_plain_string(inner: &str, out: &mut String) {
+    let mut chars = inner.chars().peekable();
+    while let Some(c) = chars.next() {
+        if c == '\'' && chars.peek() == Some(&'\'') {
+            chars.next();
+            out.push('\'');
+        } else {
+            out.push(c);
+        }
+    }
+}
+
+fn push_char_bytes(c: char, bytes: &mut Vec<u8>) {
+    let mut buf = [0; 4];
+    let encoded = c.encode_utf8(&mut buf);
+    bytes.extend_from_slice(encoded.as_bytes());
+}
+
+pub fn decode_esc_string(inner: &str, out: &mut String) {
+    let mut chars = inner.chars().peekable();
+    let mut bytes = vec![];
+
+    while let Some(c) = chars.next() {
+        if c == '\'' && chars.peek() == Some(&'\'') {
+            chars.next();
+            bytes.push(b'\'');
+            continue;
+        }
+        if c != '\\' {
+            push_char_bytes(c, &mut bytes);
+            continue;
+        }
+        let Some(&next) = chars.peek() else {
+            bytes.push(b'\\');
+            break;
+        };
+        match next {
+            'b' => {
+                chars.next();
+                bytes.push(b'\x08');
+            }
+            'f' => {
+                chars.next();
+                bytes.push(b'\x0C');
+            }
+            'n' => {
+                chars.next();
+                bytes.push(b'\n');
+            }
+            'r' => {
+                chars.next();
+                bytes.push(b'\r');
+            }
+            't' => {
+                chars.next();
+                bytes.push(b'\t');
+            }
+            '0'..='7' => {
+                let mut value: u32 = 0;
+                for _ in 0..3 {
+                    match chars.peek() {
+                        Some(&d) if ('0'..='7').contains(&d) => {
+                            chars.next();
+                            value = value * 8 + d.to_digit(8).unwrap();
+                        }
+                        _ => break,
+                    }
+                }
+                if value != 0 {
+                    bytes.push(value as u8);
+                }
+            }
+            'x' => {
+                chars.next();
+                let mut value: u8 = 0;
+                let mut got_any = false;
+                for _ in 0..2 {
+                    match chars.peek() {
+                        Some(&d) if d.is_ascii_hexdigit() => {
+                            chars.next();
+                            value = value * 16 + d.to_digit(16).unwrap() as u8;
+                            got_any = true;
+                        }
+                        _ => break,
+                    }
+                }
+                if got_any {
+                    if value != 0 {
+                        bytes.push(value);
+                    }
+                } else {
+                    bytes.push(b'x');
+                }
+            }
+            'u' | 'U' => {
+                chars.next();
+                let required = if next == 'u' { 4 } else { 8 };
+                let mut value: u32 = 0;
+                let mut got_all = true;
+                for _ in 0..required {
+                    match chars.peek() {
+                        Some(&d) if d.is_ascii_hexdigit() => {
+                            chars.next();
+                            value = value * 16 + d.to_digit(16).unwrap();
+                        }
+                        _ => {
+                            got_all = false;
+                            break;
+                        }
+                    }
+                }
+                if got_all
+                    && let Some(ch) = char::from_u32(value)
+                    && ch != '\0'
+                {
+                    push_char_bytes(ch, &mut bytes);
+                }
+            }
+            _ => {
+                chars.next();
+                push_char_bytes(next, &mut bytes);
+            }
+        }
+    }
+
+    out.push_str(&String::from_utf8_lossy(&bytes));
+}
+
+pub fn decode_unicode_esc_string(inner: &str, escape_char: char, out: &mut String) {
+    let inner = inner.replace("''", "'");
+    escape_unicode_esc_str(&inner, escape_char, |_range, result| {
+        if let Ok(ch) = result {
+            out.push(ch);
+        }
+    });
 }
 
 #[cfg(test)]
@@ -190,6 +327,18 @@ mod tests {
         });
 
         events.join("\n")
+    }
+
+    fn decode_escape_string(inner: &str) -> String {
+        let mut out = String::new();
+        decode_esc_string(inner, &mut out);
+        out
+    }
+
+    fn decode_unicode_escape_string(inner: &str, escape_char: char) -> String {
+        let mut out = String::new();
+        decode_unicode_esc_string(inner, escape_char, &mut out);
+        out
     }
 
     #[test]
@@ -250,5 +399,20 @@ mod tests {
         assert_snapshot!(unicode_escape_events(r"\D800\0061", '\\'), @r"
         0..10 err Invalid Unicode surrogate pair
         ");
+    }
+
+    #[test]
+    fn decode_escape_string_hex_bytes_as_utf8() {
+        assert_snapshot!(decode_escape_string(r"\xC3\xA9"), @"é");
+    }
+
+    #[test]
+    fn decode_escape_string_skips_nul_byte() {
+        assert_snapshot!(decode_escape_string(r"a\000b"), @"ab");
+    }
+
+    #[test]
+    fn decode_unicode_string_collapses_doubled_quotes() {
+        assert_snapshot!(decode_unicode_escape_string("a''b", '\\'), @"a'b");
     }
 }
