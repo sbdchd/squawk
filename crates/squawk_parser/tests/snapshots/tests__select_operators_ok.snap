@@ -483,6 +483,85 @@ SOURCE_FILE
                 STRING "'(1,1),(-2,-2)'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- operators that sort of look like prefixes"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              POUND "#"
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+            LITERAL
+              POSITIONAL_PARAM "$1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- closest point"
   WHITESPACE "\n"
   SELECT

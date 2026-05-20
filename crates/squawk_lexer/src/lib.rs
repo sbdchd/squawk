@@ -50,17 +50,17 @@ impl Cursor<'_> {
             c if is_whitespace(c) => self.whitespace(),
 
             // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE
-            'u' | 'U' => match self.first() {
-                '&' => {
+            'u' | 'U' => {
+                if self.first() == '&' && matches!(self.second(), '\'' | '"') {
                     self.bump();
                     self.prefixed_string(
                         |terminated| LiteralKind::UnicodeEscStr { terminated },
                         true,
                     )
+                } else {
+                    self.ident_or_unknown_prefix()
                 }
-                _ => self.ident_or_unknown_prefix(),
-            },
-
+            }
             // escaped strings
             'e' | 'E' => {
                 self.prefixed_string(|terminated| LiteralKind::EscStr { terminated }, false)
@@ -165,7 +165,7 @@ impl Cursor<'_> {
         // Known prefixes must have been handled earlier. So if
         // we see a prefix here, it is definitely an unknown prefix.
         match self.first() {
-            '#' | '"' | '\'' => TokenKind::UnknownPrefix,
+            '"' | '\'' => TokenKind::UnknownPrefix,
             _ => TokenKind::Ident,
         }
     }
