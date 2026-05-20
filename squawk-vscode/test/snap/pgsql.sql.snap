@@ -1,0 +1,166 @@
+>select count(1) from tbl;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^^ source.pgsql entity.name.function.pgsql
+#            ^ source.pgsql
+#             ^ source.pgsql constant.numeric.pgsql
+#              ^ source.pgsql
+#               ^ source.pgsql
+#                ^^^^ source.pgsql keyword.other.pgsql
+#                    ^^^^^^ source.pgsql
+>select 'hello'::text;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.begin.pgsql
+#        ^^^^^ source.pgsql string.quoted.single.pgsql
+#             ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.end.pgsql
+#              ^^ source.pgsql keyword.operator.cast.pgsql
+#                ^^^^ source.pgsql keyword.other.pgsql
+#                    ^^ source.pgsql
+>select 'line\nvalue';
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.begin.pgsql
+#        ^^^^ source.pgsql string.quoted.single.pgsql
+#            ^^ source.pgsql string.quoted.single.pgsql constant.character.escape.pgsql
+#              ^^^^^ source.pgsql string.quoted.single.pgsql
+#                   ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.end.pgsql
+#                    ^^ source.pgsql
+>select E'line\nvalue';
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^^ source.pgsql
+#        ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.begin.pgsql
+#         ^^^^ source.pgsql string.quoted.single.pgsql
+#             ^^ source.pgsql string.quoted.single.pgsql constant.character.escape.pgsql
+#               ^^^^^ source.pgsql string.quoted.single.pgsql
+#                    ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.end.pgsql
+#                     ^^ source.pgsql
+>select U&'d\0061t\0061';
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^^ source.pgsql
+#        ^ source.pgsql keyword.operator.pgsql
+#         ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.begin.pgsql
+#          ^ source.pgsql string.quoted.single.pgsql
+#           ^^ source.pgsql string.quoted.single.pgsql constant.character.escape.pgsql
+#             ^^^^ source.pgsql string.quoted.single.pgsql
+#                 ^^ source.pgsql string.quoted.single.pgsql constant.character.escape.pgsql
+#                   ^^^ source.pgsql string.quoted.single.pgsql
+#                      ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.end.pgsql
+#                       ^^ source.pgsql
+>select $$hello$$;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^ source.pgsql string.unquoted.dollar.pgsql
+#         ^^^^^ source.pgsql string.unquoted.dollar.pgsql
+#              ^^ source.pgsql string.unquoted.dollar.pgsql
+#                ^^ source.pgsql
+>select $tag$hello$tag$;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^^ source.pgsql string.unquoted.dollar.pgsql
+#            ^^^^^ source.pgsql string.unquoted.dollar.pgsql
+#                 ^^^^^ source.pgsql string.unquoted.dollar.pgsql
+#                      ^^ source.pgsql
+>select 0xFF;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^ source.pgsql constant.numeric.pgsql
+#           ^^ source.pgsql
+>select 0o77;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^ source.pgsql constant.numeric.pgsql
+#           ^^ source.pgsql
+>select 0b1010;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^^^ source.pgsql constant.numeric.pgsql
+#             ^^ source.pgsql
+>select 1_000_000;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^^^^^^ source.pgsql constant.numeric.pgsql
+#                ^^ source.pgsql
+>select 1.5;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^ source.pgsql constant.numeric.pgsql
+#          ^^ source.pgsql
+>select 1e10;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^ source.pgsql constant.numeric.pgsql
+#           ^^ source.pgsql
+>select "Col" from "Tbl";
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^^^^^ source.pgsql variable.other.pgsql
+#            ^ source.pgsql
+#             ^^^^ source.pgsql keyword.other.pgsql
+#                 ^ source.pgsql
+#                  ^^^^^ source.pgsql variable.other.pgsql
+#                       ^^ source.pgsql
+>select 1 as U&"foo";
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^ source.pgsql
+#       ^ source.pgsql constant.numeric.pgsql
+#        ^ source.pgsql
+#         ^^ source.pgsql keyword.other.pgsql
+#           ^^ source.pgsql
+#             ^ source.pgsql keyword.operator.pgsql
+#              ^^^^^ source.pgsql variable.other.pgsql
+#                   ^^ source.pgsql
+>select B'1010';
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^^ source.pgsql
+#        ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.begin.pgsql
+#         ^^^^ source.pgsql string.quoted.single.pgsql
+#             ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.end.pgsql
+#              ^^ source.pgsql
+>select X'FF';
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^^ source.pgsql
+#        ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.begin.pgsql
+#         ^^ source.pgsql string.quoted.single.pgsql
+#           ^ source.pgsql string.quoted.single.pgsql punctuation.definition.string.end.pgsql
+#            ^^ source.pgsql
+>select $1;
+#^^^^^^ source.pgsql keyword.other.pgsql
+#      ^^ source.pgsql
+#        ^ source.pgsql constant.numeric.pgsql
+#         ^^ source.pgsql
+>-- comment
+#^^ source.pgsql comment.line.double-dash.pgsql punctuation.definition.comment.pgsql
+#  ^^^^^^^^^ source.pgsql comment.line.double-dash.pgsql
+>\echo hi
+#^^^^^ source.pgsql meta.statement.pgsql.psql meta.preprocessor.pgsql
+#     ^^^ source.pgsql meta.statement.pgsql.psql
+>create function foo()
+#^^^^^^ source.pgsql keyword.other.create.pgsql
+#      ^ source.pgsql
+#       ^^^^^^^^ source.pgsql keyword.other.pgsql
+#               ^ source.pgsql
+#                ^^^ source.pgsql entity.name.function.pgsql
+#                   ^ source.pgsql
+#                    ^ source.pgsql
+>returns int
+#^^^^^^^ source.pgsql keyword.other.pgsql
+#       ^ source.pgsql
+#        ^^^ source.pgsql keyword.other.pgsql
+>as $$
+#^^ source.pgsql keyword.other.pgsql
+#  ^ source.pgsql
+#   ^^ source.pgsql meta.dollar-quote.pgsql
+>select 1;
+#^^^^^^ source.pgsql meta.dollar-quote.pgsql keyword.other.pgsql
+#      ^ source.pgsql meta.dollar-quote.pgsql
+#       ^ source.pgsql meta.dollar-quote.pgsql constant.numeric.pgsql
+#        ^^ source.pgsql meta.dollar-quote.pgsql
+>$$
+#^^ source.pgsql meta.dollar-quote.pgsql
+>language sql;
+#^^^^^^^^ source.pgsql keyword.other.pgsql
+#        ^ source.pgsql
+#         ^^^ source.pgsql keyword.other.pgsql
+#            ^^ source.pgsql
+>

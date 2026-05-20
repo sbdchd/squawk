@@ -184,7 +184,7 @@
           "name": "entity.name.function.pgsql"
         },
         {
-          "match": "\\b\\d+\\b",
+          "match": "\\b(?:0[xX](?:_?[0-9a-fA-F])+|0[oO](?:_?[0-7])+|0[bB](?:_?[01])+|\\d(?:_?\\d)*(?:\\.\\d(?:_?\\d)*)?(?:[eE][+-]?\\d(?:_?\\d)*)?)\\b",
           "name": "constant.numeric.pgsql"
         },
         {
