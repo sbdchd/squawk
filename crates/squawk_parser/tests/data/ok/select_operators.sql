@@ -46,6 +46,13 @@ select lseg '[(0,0),(1,1)]' # lseg '[(1,0),(0,1)]';
 -- box intersection
 select box '(2,2),(-1,-1)' # box '(1,1),(-2,-2)';
 
+-- operators that sort of look like prefixes
+select u#foo;
+select u&foo;
+select u& foo;
+select u&&foo;
+select u&$1;
+
 -- closest point
 select point '(0,0)' ## lseg '[(2,0),(0,2)]';
 
