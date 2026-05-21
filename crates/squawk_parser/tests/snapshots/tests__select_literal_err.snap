@@ -1,0 +1,351 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/select_literal.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "123abc"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0x0o"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "0.a"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "0.0a"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER ".0a"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "0.0e1a"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "0.0e"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "0.0e+a"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            POSITIONAL_PARAM "$1"
+          AS_NAME
+            NAME
+              IDENT "a"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0b"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1b"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0b0x"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0o"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1o"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0o0x"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0x"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1x"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0x0y"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "100_"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "100__000"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "_1_000"
+        TARGET
+          LITERAL
+            INT_NUMBER ".5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "1_000_.5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "1_000._5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "1_000.5_"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FLOAT_NUMBER "1_000.5e_1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            POSITIONAL_PARAM "$0"
+          AS_NAME
+            NAME
+              IDENT "_1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: trailing junk after numeric literal
+  ╭▸ 
+1 │ SELECT 123abc;
+  ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+  ╭▸ 
+2 │ SELECT 0x0o;
+  ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+  ╭▸ 
+3 │ SELECT 0.a;
+  ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+  ╭▸ 
+4 │ SELECT 0.0a;
+  ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+  ╭▸ 
+5 │ SELECT .0a;
+  ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+  ╭▸ 
+6 │ SELECT 0.0e1a;
+  ╰╴       ━
+error[syntax-error]: Missing digits after the exponent symbol
+  ╭▸ 
+7 │ SELECT 0.0e;
+  ╰╴       ━
+error[syntax-error]: Missing digits after the exponent symbol
+  ╭▸ 
+8 │ SELECT 0.0e+a;
+  ╰╴       ━
+error[syntax-error]: Missing digits after the integer base prefix
+   ╭▸ 
+10 │ SELECT 0b;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+11 │ SELECT 1b;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+12 │ SELECT 0b0x;
+   ╰╴       ━
+error[syntax-error]: Missing digits after the integer base prefix
+   ╭▸ 
+13 │ SELECT 0o;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+14 │ SELECT 1o;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+15 │ SELECT 0o0x;
+   ╰╴       ━
+error[syntax-error]: Missing digits after the integer base prefix
+   ╭▸ 
+16 │ SELECT 0x;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+17 │ SELECT 1x;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+18 │ SELECT 0x0y;
+   ╰╴       ━
+error[syntax-error]: missing comma
+   ╭▸ 
+21 │ SELECT _1_000.5;
+   ╰╴             ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+23 │ SELECT 1_000._5;
+   ╰╴       ━
