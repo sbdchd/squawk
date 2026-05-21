@@ -99,7 +99,7 @@ fn regression_suite(fixture: Fixture<&str>) {
     if expect_errors {
         assert!(
             has_errors,
-            "the {test_name}.sql regression test must have errors"
+            "the errors.sql regression test must have errors"
         );
     } else {
         assert!(
