@@ -57,7 +57,31 @@ error[syntax-error]: trailing junk after numeric literal
    ╰╴       ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
+92 │ SELECT 100_;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+93 │ SELECT 100__000;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+96 │ SELECT 1_000_.5;
+   ╰╴       ━
+error[syntax-error]: missing comma
+   ╭▸ 
+96 │ SELECT 1_000_.5;
+   ╰╴             ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
 97 │ SELECT 1_000._5;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+98 │ SELECT 1_000.5_;
+   ╰╴       ━
+error[syntax-error]: Missing digits after the exponent symbol
+   ╭▸ 
+99 │ SELECT 1_000.5e_1;
    ╰╴       ━
 error[syntax-error]: trailing junk after positional parameter
     ╭▸ 
