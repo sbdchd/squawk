@@ -107,14 +107,13 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
             fail_on_violations
         };
 
-    let only_comment_on_violations =
-        if let Some(only_comment_on_violations_cfg) =
-            cfg.upload_to_github.only_comment_on_violations
-        {
-            only_comment_on_violations_cfg
-        } else {
-            only_comment_on_violations
-        };
+    let only_comment_on_violations = if let Some(only_comment_on_violations_cfg) =
+        cfg.upload_to_github.only_comment_on_violations
+    {
+        only_comment_on_violations_cfg
+    } else {
+        only_comment_on_violations
+    };
 
     let github_app = create_gh_app(
         &github_api_url,
@@ -178,9 +177,7 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
 }
 
 fn get_clean_comment_body(file_count: usize) -> String {
-    format!(
-        "{COMMENT_HEADER}\n\n✅ 0 violations across {file_count} file(s)"
-    )
+    format!("{COMMENT_HEADER}\n\n✅ 0 violations across {file_count} file(s)")
 }
 
 fn get_comment_body(files: &[CheckReport], version: &str) -> String {
