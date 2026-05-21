@@ -209,7 +209,14 @@ impl<'a> Converter<'a> {
                 }
                 squawk_lexer::TokenKind::Eof => SyntaxKind::EOF,
                 squawk_lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
-                squawk_lexer::TokenKind::PositionalParam => SyntaxKind::POSITIONAL_PARAM,
+                squawk_lexer::TokenKind::PositionalParam {
+                    trailing_junk_start,
+                } => {
+                    if (*trailing_junk_start as usize) < token_text.len() {
+                        err = "trailing junk after positional parameter";
+                    }
+                    SyntaxKind::POSITIONAL_PARAM
+                }
                 squawk_lexer::TokenKind::QuotedIdent { terminated } => {
                     if !terminated {
                         err = "Missing trailing \" to terminate the quoted identifier"

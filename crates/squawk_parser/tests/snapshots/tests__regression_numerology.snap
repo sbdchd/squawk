@@ -27,6 +27,10 @@ error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 51 │ SELECT 0.0e1a;
    ╰╴       ━
+error[syntax-error]: trailing junk after positional parameter
+   ╭▸ 
+54 │ PREPARE p1 AS SELECT $1a;
+   ╰╴                     ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 58 │ SELECT 1b;
@@ -55,3 +59,7 @@ error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 97 │ SELECT 1_000._5;
    ╰╴       ━
+error[syntax-error]: trailing junk after positional parameter
+    ╭▸ 
+101 │ PREPARE p1 AS SELECT $0_1;
+    ╰╴                     ━

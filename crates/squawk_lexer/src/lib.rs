@@ -116,7 +116,11 @@ impl Cursor<'_> {
                     while self.first().is_ascii_digit() {
                         self.bump();
                     }
-                    TokenKind::PositionalParam
+                    let trailing_junk_start = self.pos_within_token();
+                    self.eat_identifier();
+                    TokenKind::PositionalParam {
+                        trailing_junk_start,
+                    }
                 }
             }
             '`' => TokenKind::Backtick,

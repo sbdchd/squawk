@@ -90,10 +90,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            POSITIONAL_PARAM "$1"
-          AS_NAME
-            NAME
-              IDENT "a"
+            POSITIONAL_PARAM "$1a"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -266,10 +263,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            POSITIONAL_PARAM "$0"
-          AS_NAME
-            NAME
-              IDENT "_1"
+            POSITIONAL_PARAM "$0_1"
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
@@ -304,6 +298,10 @@ error[syntax-error]: Missing digits after the exponent symbol
 error[syntax-error]: Missing digits after the exponent symbol
   ╭▸ 
 8 │ SELECT 0.0e+a;
+  ╰╴       ━
+error[syntax-error]: trailing junk after positional parameter
+  ╭▸ 
+9 │ SELECT $1a;
   ╰╴       ━
 error[syntax-error]: Missing digits after the integer base prefix
    ╭▸ 
@@ -348,4 +346,8 @@ error[syntax-error]: missing comma
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 23 │ SELECT 1_000._5;
+   ╰╴       ━
+error[syntax-error]: trailing junk after positional parameter
+   ╭▸ 
+26 │ SELECT $0_1;
    ╰╴       ━
