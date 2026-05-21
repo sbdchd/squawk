@@ -479,7 +479,7 @@ impl Cursor<'_> {
         let mut has_digits = false;
         loop {
             match self.first() {
-                '_' => {
+                '_' if matches!(self.second(), '0'..='9') => {
                     self.bump();
                 }
                 '0'..='9' => {
@@ -496,7 +496,7 @@ impl Cursor<'_> {
         let mut has_digits = false;
         loop {
             match self.first() {
-                '_' => {
+                '_' if matches!(self.second(), '0'..='9' | 'a'..='f' | 'A'..='F') => {
                     self.bump();
                 }
                 '0'..='9' | 'a'..='f' | 'A'..='F' => {
@@ -512,6 +512,9 @@ impl Cursor<'_> {
     /// Eats the float exponent. Returns true if at least one digit was met,
     /// and returns false otherwise.
     fn eat_float_exponent(&mut self) -> bool {
+        if self.first() == '_' {
+            return false;
+        }
         if self.first() == '-' || self.first() == '+' {
             self.bump();
         }

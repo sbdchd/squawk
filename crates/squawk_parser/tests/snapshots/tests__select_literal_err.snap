@@ -223,7 +223,10 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "1_000_.5"
+            INT_NUMBER "1_000_"
+        TARGET
+          LITERAL
+            INT_NUMBER ".5"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -339,13 +342,37 @@ error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 18 │ SELECT 0x0y;
    ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+19 │ SELECT 100_;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+20 │ SELECT 100__000;
+   ╰╴       ━
 error[syntax-error]: missing comma
    ╭▸ 
 21 │ SELECT _1_000.5;
    ╰╴             ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
+22 │ SELECT 1_000_.5;
+   ╰╴       ━
+error[syntax-error]: missing comma
+   ╭▸ 
+22 │ SELECT 1_000_.5;
+   ╰╴             ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
 23 │ SELECT 1_000._5;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+24 │ SELECT 1_000.5_;
+   ╰╴       ━
+error[syntax-error]: Missing digits after the exponent symbol
+   ╭▸ 
+25 │ SELECT 1_000.5e_1;
    ╰╴       ━
 error[syntax-error]: trailing junk after positional parameter
    ╭▸ 
