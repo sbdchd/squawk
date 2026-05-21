@@ -479,7 +479,7 @@ impl Cursor<'_> {
         let mut has_digits = false;
         loop {
             match self.first() {
-                '_' if matches!(self.second(), '0'..='9') => {
+                '_' if self.second().is_ascii_digit() => {
                     self.bump();
                 }
                 '0'..='9' => {
@@ -496,7 +496,7 @@ impl Cursor<'_> {
         let mut has_digits = false;
         loop {
             match self.first() {
-                '_' if matches!(self.second(), '0'..='9' | 'a'..='f' | 'A'..='F') => {
+                '_' if self.second().is_ascii_hexdigit() => {
                     self.bump();
                 }
                 '0'..='9' | 'a'..='f' | 'A'..='F' => {
