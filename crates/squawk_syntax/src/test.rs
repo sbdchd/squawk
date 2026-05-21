@@ -77,10 +77,10 @@ fn regression_suite_validation(fixture: Fixture<&str>) {
 
     let mut errors = errors;
 
-    if test_name == "errors" {
+    if matches!(test_name, "errors" | "numerology") {
         assert!(
             !errors.is_empty(),
-            "the errors.sql regression test must have validation errors"
+            "the {test_name}.sql regression test must have validation errors"
         );
         return;
     }

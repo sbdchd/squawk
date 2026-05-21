@@ -82,7 +82,7 @@ fn regression_suite(fixture: Fixture<&str>) {
 
     let (_parsed, errors) = parse_text(content);
 
-    let expect_errors = test_name == "errors";
+    let expect_errors = matches!(test_name, "errors" | "numerology");
 
     let snapshot_name = format!("regression_{test_name}");
 
@@ -99,7 +99,7 @@ fn regression_suite(fixture: Fixture<&str>) {
     if expect_errors {
         assert!(
             has_errors,
-            "the errors.sql regression test must have errors"
+            "the {test_name}.sql regression test must have errors"
         );
     } else {
         assert!(

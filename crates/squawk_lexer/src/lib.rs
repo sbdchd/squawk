@@ -231,6 +231,33 @@ impl Cursor<'_> {
     }
 
     fn number(&mut self, first_digit: char) -> LiteralKind {
+        let kind = self.number_content(first_digit);
+        let trailing_junk_start = self.pos_within_token();
+        if is_ident_start(self.first()) {
+            self.eat_while(is_ident_cont);
+        }
+        match kind {
+            LiteralKind::Int {
+                base, empty_int, ..
+            } => LiteralKind::Int {
+                base,
+                empty_int,
+                trailing_junk_start,
+            },
+            LiteralKind::Float {
+                base,
+                empty_exponent,
+                ..
+            } => LiteralKind::Float {
+                base,
+                empty_exponent,
+                trailing_junk_start,
+            },
+            _ => unreachable!(),
+        }
+    }
+
+    fn number_content(&mut self, first_digit: char) -> LiteralKind {
         let mut base = Base::Decimal;
         if first_digit == '0' {
             // Attempt to parse encoding base.
@@ -243,6 +270,7 @@ impl Cursor<'_> {
                         return LiteralKind::Int {
                             base,
                             empty_int: true,
+                            trailing_junk_start: 0,
                         };
                     }
                 }
@@ -254,6 +282,7 @@ impl Cursor<'_> {
                         return LiteralKind::Int {
                             base,
                             empty_int: true,
+                            trailing_junk_start: 0,
                         };
                     }
                 }
@@ -265,6 +294,7 @@ impl Cursor<'_> {
                         return LiteralKind::Int {
                             base,
                             empty_int: true,
+                            trailing_junk_start: 0,
                         };
                     }
                 }
@@ -281,6 +311,7 @@ impl Cursor<'_> {
                     return LiteralKind::Int {
                         base,
                         empty_int: false,
+                        trailing_junk_start: 0,
                     };
                 }
             }
@@ -316,6 +347,7 @@ impl Cursor<'_> {
                 LiteralKind::Float {
                     base,
                     empty_exponent,
+                    trailing_junk_start: 0,
                 }
             }
             'e' | 'E' => {
@@ -324,11 +356,13 @@ impl Cursor<'_> {
                 LiteralKind::Float {
                     base,
                     empty_exponent,
+                    trailing_junk_start: 0,
                 }
             }
             _ => LiteralKind::Int {
                 base,
                 empty_int: false,
+                trailing_junk_start: 0,
             },
         }
     }

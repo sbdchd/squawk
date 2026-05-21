@@ -126,12 +126,28 @@ pub enum Base {
 pub enum LiteralKind {
     /// Integer Numeric, e.g., `42`
     ///
-    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
-    Int { base: Base, empty_int: bool },
-    /// Float Numeric, e.g., `1.925e-3`
+    /// `trailing_junk_start` is the byte offset within the token where the
+    /// numeric content ends. When it is less than the token length, the
+    /// remainder is an invalid ident-like suffix (e.g. `foo` in `1000foo`).
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
-    Float { base: Base, empty_exponent: bool },
+    Int {
+        base: Base,
+        empty_int: bool,
+        trailing_junk_start: u32,
+    },
+    /// Float Numeric, e.g., `1.925e-3`
+    ///
+    /// `trailing_junk_start` is the byte offset within the token where the
+    /// numeric content ends. When it is less than the token length, the
+    /// remainder is an invalid ident-like suffix (e.g. `foo` in `1.5foo`).
+    ///
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
+    Float {
+        base: Base,
+        empty_exponent: bool,
+        trailing_junk_start: u32,
+    },
     /// String, e.g., `'foo'`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS>

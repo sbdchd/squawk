@@ -227,18 +227,27 @@ impl<'a> Converter<'a> {
         let mut err: Option<String> = None;
 
         let syntax_kind = match *kind {
-            squawk_lexer::LiteralKind::Int { empty_int, base: _ } => {
+            squawk_lexer::LiteralKind::Int {
+                empty_int,
+                base: _,
+                trailing_junk_start,
+            } => {
                 if empty_int {
                     err = Some("Missing digits after the integer base prefix".into());
+                } else if (trailing_junk_start as usize) < token_text.len() {
+                    err = Some("trailing junk after numeric literal".into());
                 }
                 SyntaxKind::INT_NUMBER
             }
             squawk_lexer::LiteralKind::Float {
                 empty_exponent,
                 base: _,
+                trailing_junk_start,
             } => {
                 if empty_exponent {
                     err = Some("Missing digits after the exponent symbol".into());
+                } else if (trailing_junk_start as usize) < token_text.len() {
+                    err = Some("trailing junk after numeric literal".into());
                 }
                 SyntaxKind::FLOAT_NUMBER
             }

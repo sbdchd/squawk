@@ -2,4 +2,56 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: postgres/regression_suite/numerology.sql
 ---
-
+---
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+46 │ SELECT 123abc;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+47 │ SELECT 0x0o;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+48 │ SELECT 0.a;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+49 │ SELECT 0.0a;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+50 │ SELECT .0a;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+51 │ SELECT 0.0e1a;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+58 │ SELECT 1b;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+59 │ SELECT 0b0x;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+62 │ SELECT 1o;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+63 │ SELECT 0o0x;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+66 │ SELECT 1x;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+67 │ SELECT 0x0y;
+   ╰╴       ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+97 │ SELECT 1_000._5;
+   ╰╴       ━
