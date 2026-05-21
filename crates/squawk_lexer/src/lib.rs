@@ -231,33 +231,6 @@ impl Cursor<'_> {
     }
 
     fn number(&mut self, first_digit: char) -> LiteralKind {
-        let kind = self.number_content(first_digit);
-        let trailing_junk_start = self.pos_within_token();
-        if is_ident_start(self.first()) {
-            self.eat_while(is_ident_cont);
-        }
-        match kind {
-            LiteralKind::Int {
-                base, empty_int, ..
-            } => LiteralKind::Int {
-                base,
-                empty_int,
-                trailing_junk_start,
-            },
-            LiteralKind::Float {
-                base,
-                empty_exponent,
-                ..
-            } => LiteralKind::Float {
-                base,
-                empty_exponent,
-                trailing_junk_start,
-            },
-            _ => unreachable!(),
-        }
-    }
-
-    fn number_content(&mut self, first_digit: char) -> LiteralKind {
         let mut base = Base::Decimal;
         if first_digit == '0' {
             // Attempt to parse encoding base.
@@ -267,10 +240,12 @@ impl Cursor<'_> {
                     base = Base::Binary;
                     self.bump();
                     if !self.eat_decimal_digits() {
+                        let trailing_junk_start = self.pos_within_token();
+                        self.eat_identifier();
                         return LiteralKind::Int {
                             base,
                             empty_int: true,
-                            trailing_junk_start: 0,
+                            trailing_junk_start,
                         };
                     }
                 }
@@ -279,10 +254,12 @@ impl Cursor<'_> {
                     base = Base::Octal;
                     self.bump();
                     if !self.eat_decimal_digits() {
+                        let trailing_junk_start = self.pos_within_token();
+                        self.eat_identifier();
                         return LiteralKind::Int {
                             base,
                             empty_int: true,
-                            trailing_junk_start: 0,
+                            trailing_junk_start,
                         };
                     }
                 }
@@ -291,10 +268,12 @@ impl Cursor<'_> {
                     base = Base::Hexadecimal;
                     self.bump();
                     if !self.eat_hexadecimal_digits() {
+                        let trailing_junk_start = self.pos_within_token();
+                        self.eat_identifier();
                         return LiteralKind::Int {
                             base,
                             empty_int: true,
-                            trailing_junk_start: 0,
+                            trailing_junk_start,
                         };
                     }
                 }
@@ -308,10 +287,12 @@ impl Cursor<'_> {
 
                 // Just a 0.
                 _ => {
+                    let trailing_junk_start = self.pos_within_token();
+                    self.eat_identifier();
                     return LiteralKind::Int {
                         base,
                         empty_int: false,
-                        trailing_junk_start: 0,
+                        trailing_junk_start,
                     };
                 }
             }
@@ -344,26 +325,34 @@ impl Cursor<'_> {
                         _ => (),
                     }
                 }
+                let trailing_junk_start = self.pos_within_token();
+                self.eat_identifier();
                 LiteralKind::Float {
                     base,
                     empty_exponent,
-                    trailing_junk_start: 0,
+                    trailing_junk_start,
                 }
             }
             'e' | 'E' => {
                 self.bump();
                 let empty_exponent = !self.eat_float_exponent();
+                let trailing_junk_start = self.pos_within_token();
+                self.eat_identifier();
                 LiteralKind::Float {
                     base,
                     empty_exponent,
-                    trailing_junk_start: 0,
+                    trailing_junk_start,
                 }
             }
-            _ => LiteralKind::Int {
-                base,
-                empty_int: false,
-                trailing_junk_start: 0,
-            },
+            _ => {
+                let trailing_junk_start = self.pos_within_token();
+                self.eat_identifier();
+                LiteralKind::Int {
+                    base,
+                    empty_int: false,
+                    trailing_junk_start,
+                }
+            }
         }
     }
 
@@ -523,6 +512,12 @@ impl Cursor<'_> {
             self.bump();
         }
         self.eat_decimal_digits()
+    }
+
+    fn eat_identifier(&mut self) {
+        if is_ident_start(self.first()) {
+            self.eat_while(is_ident_cont);
+        }
     }
 }
 
