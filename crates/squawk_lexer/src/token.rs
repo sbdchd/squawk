@@ -84,7 +84,7 @@ pub enum TokenKind {
     /// Positional Parameter, e.g., `$1`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-expressions.html#SQL-EXPRESSIONS-PARAMETERS-POSITIONAL>
-    PositionalParam,
+    PositionalParam { trailing_junk_start: u32 },
     /// Quoted Identifier, e.g., `"update"` in `update "my_table" set "a" = 5;`
     ///
     /// These are case-sensitive, unlike [`TokenKind::Ident`]
@@ -127,11 +127,19 @@ pub enum LiteralKind {
     /// Integer Numeric, e.g., `42`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
-    Int { base: Base, empty_int: bool },
+    Int {
+        base: Base,
+        empty_int: bool,
+        trailing_junk_start: u32,
+    },
     /// Float Numeric, e.g., `1.925e-3`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
-    Float { base: Base, empty_exponent: bool },
+    Float {
+        base: Base,
+        empty_exponent: bool,
+        trailing_junk_start: u32,
+    },
     /// String, e.g., `'foo'`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS>

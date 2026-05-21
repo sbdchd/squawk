@@ -209,7 +209,14 @@ impl<'a> Converter<'a> {
                 }
                 squawk_lexer::TokenKind::Eof => SyntaxKind::EOF,
                 squawk_lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
-                squawk_lexer::TokenKind::PositionalParam => SyntaxKind::POSITIONAL_PARAM,
+                squawk_lexer::TokenKind::PositionalParam {
+                    trailing_junk_start,
+                } => {
+                    if (*trailing_junk_start as usize) < token_text.len() {
+                        err = "trailing junk after positional parameter";
+                    }
+                    SyntaxKind::POSITIONAL_PARAM
+                }
                 squawk_lexer::TokenKind::QuotedIdent { terminated } => {
                     if !terminated {
                         err = "Missing trailing \" to terminate the quoted identifier"
@@ -227,18 +234,27 @@ impl<'a> Converter<'a> {
         let mut err: Option<String> = None;
 
         let syntax_kind = match *kind {
-            squawk_lexer::LiteralKind::Int { empty_int, base: _ } => {
+            squawk_lexer::LiteralKind::Int {
+                empty_int,
+                base: _,
+                trailing_junk_start,
+            } => {
                 if empty_int {
                     err = Some("Missing digits after the integer base prefix".into());
+                } else if (trailing_junk_start as usize) < token_text.len() {
+                    err = Some("trailing junk after numeric literal".into());
                 }
                 SyntaxKind::INT_NUMBER
             }
             squawk_lexer::LiteralKind::Float {
                 empty_exponent,
                 base: _,
+                trailing_junk_start,
             } => {
                 if empty_exponent {
                     err = Some("Missing digits after the exponent symbol".into());
+                } else if (trailing_junk_start as usize) < token_text.len() {
+                    err = Some("trailing junk after numeric literal".into());
                 }
                 SyntaxKind::FLOAT_NUMBER
             }
