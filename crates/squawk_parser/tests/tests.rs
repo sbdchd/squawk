@@ -82,7 +82,7 @@ fn regression_suite(fixture: Fixture<&str>) {
 
     let (_parsed, errors) = parse_text(content);
 
-    let expect_errors = matches!(test_name, "errors" | "numerology");
+    let expect_errors = test_name == "errors";
 
     let snapshot_name = format!("regression_{test_name}");
 

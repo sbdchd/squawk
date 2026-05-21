@@ -126,10 +126,6 @@ pub enum Base {
 pub enum LiteralKind {
     /// Integer Numeric, e.g., `42`
     ///
-    /// `trailing_junk_start` is the byte offset within the token where the
-    /// numeric content ends. When it is less than the token length, the
-    /// remainder is an invalid ident-like suffix (e.g. `foo` in `1000foo`).
-    ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
     Int {
         base: Base,
@@ -137,10 +133,6 @@ pub enum LiteralKind {
         trailing_junk_start: u32,
     },
     /// Float Numeric, e.g., `1.925e-3`
-    ///
-    /// `trailing_junk_start` is the byte offset within the token where the
-    /// numeric content ends. When it is less than the token length, the
-    /// remainder is an invalid ident-like suffix (e.g. `foo` in `1.5foo`).
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
     Float {
