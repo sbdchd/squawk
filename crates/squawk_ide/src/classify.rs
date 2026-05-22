@@ -305,6 +305,31 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
     }
 
+    // %type clause paths (max 3 segments):
+    //   column%type, table.column%type, schema.table.column%type
+    if let Some(parent) = node.parent()
+        && let Some(mut path) = ast::PathSegment::cast(parent)
+            .and_then(|p| p.syntax().parent().and_then(ast::Path::cast))
+    {
+        let mut hops_up = 0;
+        while let Some(next) = path.syntax().parent().and_then(ast::Path::cast) {
+            path = next;
+            hops_up += 1;
+        }
+        if path
+            .syntax()
+            .parent()
+            .is_some_and(|p| ast::PercentType::can_cast(p.kind()))
+        {
+            return match hops_up {
+                0 => Some(NameRefClass::QualifiedColumn),
+                1 => Some(NameRefClass::Table),
+                2 => Some(NameRefClass::Schema),
+                _ => None,
+            };
+        }
+    }
+
     if let Some(parent) = node.parent()
         && let Some(inner_path) = ast::PathSegment::cast(parent)
             .and_then(|p| p.syntax().parent().and_then(ast::Path::cast))

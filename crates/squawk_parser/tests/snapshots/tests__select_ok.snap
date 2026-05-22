@@ -4523,7 +4523,7 @@ SOURCE_FILE
               COMMA ","
               WHITESPACE " "
               LITERAL
-                FLOAT_NUMBER "1.99"
+                NUMERIC_NUMBER "1.99"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -4544,7 +4544,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             LITERAL
-              FLOAT_NUMBER "1.99"
+              NUMERIC_NUMBER "1.99"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

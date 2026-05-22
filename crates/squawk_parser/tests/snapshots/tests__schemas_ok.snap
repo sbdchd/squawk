@@ -565,7 +565,7 @@ SOURCE_FILE
     COMMA ","
     WHITESPACE " "
     LITERAL
-      FLOAT_NUMBER "10.0"
+      NUMERIC_NUMBER "10.0"
     COMMA ","
     WHITESPACE " "
     LITERAL

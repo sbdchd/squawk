@@ -10032,4 +10032,84 @@ select 1 from graph_table (myshop$0
           ╰╴                                ─ 1. source
         ");
     }
+
+    #[test]
+    fn goto_create_function_param_percent_type_column() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s.t.a$0%type) returns s.t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        3 │ create table s.t (a int, b text);
+          │                   ─ 2. destination
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_param_percent_type_table() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s.t$0.a%type) returns s.t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        3 │ create table s.t (a int, b text);
+          │                ─ 2. destination
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_param_percent_type_schema() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s$0.t.a%type) returns s.t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        2 │ create schema s;
+          │               ─ 2. destination
+        3 │ create table s.t (a int, b text);
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_returns_percent_type_column() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s.t.a%type) returns s.t.b$0%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        3 │ create table s.t (a int, b text);
+          │                          ─ 2. destination
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_param_percent_type_two_part() {
+        assert_snapshot!(goto("
+create table t (a int, b text);
+create function f(x t.a$0%type) returns t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        2 │ create table t (a int, b text);
+          │                 ─ 2. destination
+        3 │ create function f(x t.a%type) returns t.b%type
+          ╰╴                      ─ 1. source
+        ");
+    }
 }

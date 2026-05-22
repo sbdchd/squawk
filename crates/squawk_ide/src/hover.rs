@@ -181,9 +181,9 @@ fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
             }
             None => format!("value of literal: {}", markdown_inline_code(&value)),
         },
-        LitKind::FloatNumber(_) => return None,
         LitKind::IntNumber(_) => return None,
         LitKind::Null(_) => return None,
+        LitKind::NumericNumber(_) => return None,
         LitKind::PositionalParam(_) => return None,
     };
 

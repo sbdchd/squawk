@@ -222,7 +222,7 @@ SOURCE_FILE
         DEFAULT_KW "default"
         WHITESPACE " "
         LITERAL
-          FLOAT_NUMBER "7.77"
+          NUMERIC_NUMBER "7.77"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column default"

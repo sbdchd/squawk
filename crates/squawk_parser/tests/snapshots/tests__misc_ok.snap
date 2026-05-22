@@ -5427,7 +5427,7 @@ SOURCE_FILE
     EQ "="
     WHITESPACE " "
     LITERAL
-      FLOAT_NUMBER "0.001"
+      NUMERIC_NUMBER "0.001"
     SEMICOLON ";"
   WHITESPACE "          "
   COMMENT "-- Lower = more parallelism"
@@ -6896,7 +6896,7 @@ SOURCE_FILE
                   ARG_LIST
                     L_PAREN "("
                     LITERAL
-                      FLOAT_NUMBER "0.75"
+                      NUMERIC_NUMBER "0.75"
                     R_PAREN ")"
                   WHITESPACE " "
                   WITHIN_CLAUSE

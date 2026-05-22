@@ -348,7 +348,7 @@ SOURCE_FILE
                 COMMA ","
                 WHITESPACE " "
                 LITERAL
-                  FLOAT_NUMBER "1.2"
+                  NUMERIC_NUMBER "1.2"
                 R_PAREN ")"
               COMMA ","
               WHITESPACE " "
@@ -363,7 +363,7 @@ SOURCE_FILE
                 COMMA ","
                 WHITESPACE " "
                 LITERAL
-                  FLOAT_NUMBER "1.4"
+                  NUMERIC_NUMBER "1.4"
                 R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "

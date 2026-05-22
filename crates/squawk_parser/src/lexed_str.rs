@@ -246,7 +246,7 @@ impl<'a> Converter<'a> {
                 }
                 SyntaxKind::INT_NUMBER
             }
-            squawk_lexer::LiteralKind::Float {
+            squawk_lexer::LiteralKind::Numeric {
                 empty_exponent,
                 base: _,
                 trailing_junk_start,
@@ -256,7 +256,7 @@ impl<'a> Converter<'a> {
                 } else if (trailing_junk_start as usize) < token_text.len() {
                     err = Some("trailing junk after numeric literal".into());
                 }
-                SyntaxKind::FLOAT_NUMBER
+                SyntaxKind::NUMERIC_NUMBER
             }
             squawk_lexer::LiteralKind::Str { terminated } => {
                 if !terminated {

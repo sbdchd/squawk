@@ -1124,7 +1124,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 ATTRIBUTE_VALUE
                   LITERAL
-                    FLOAT_NUMBER "10.1"
+                    NUMERIC_NUMBER "10.1"
               WHITESPACE "\n    "
               COMMENT "-- others omitted"
               WHITESPACE "\n  "

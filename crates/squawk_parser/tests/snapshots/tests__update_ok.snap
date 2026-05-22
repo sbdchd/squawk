@@ -74,7 +74,7 @@ SOURCE_FILE
               STAR "*"
               WHITESPACE " "
               LITERAL
-                FLOAT_NUMBER "1.10"
+                NUMERIC_NUMBER "1.10"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set muliple"

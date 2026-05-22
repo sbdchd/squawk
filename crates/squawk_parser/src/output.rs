@@ -54,7 +54,7 @@ pub(crate) enum Step<'a> {
         kind: SyntaxKind,
         n_input_tokens: u8,
     },
-    FloatSplit {
+    NumericSplit {
         ends_in_dot: bool,
     },
     Enter {
@@ -107,7 +107,7 @@ impl Output {
                     Step::Enter { kind }
                 }
                 Self::EXIT_EVENT => Step::Exit,
-                Self::SPLIT_EVENT => Step::FloatSplit {
+                Self::SPLIT_EVENT => Step::NumericSplit {
                     ends_in_dot: event & Self::N_INPUT_TOKEN_MASK != 0,
                 },
                 _ => unreachable!(),
@@ -122,7 +122,7 @@ impl Output {
         self.event.push(e)
     }
 
-    pub(crate) fn float_split_hack(&mut self, ends_in_dot: bool) {
+    pub(crate) fn numeric_split_hack(&mut self, ends_in_dot: bool) {
         let e = (Self::SPLIT_EVENT as u32) << Self::TAG_SHIFT
             | ((ends_in_dot as u32) << Self::N_INPUT_TOKEN_SHIFT)
             | Self::EVENT_MASK;
