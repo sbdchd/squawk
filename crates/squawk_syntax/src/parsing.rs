@@ -52,12 +52,8 @@ pub(crate) fn build_tree(
     });
 
     let (node, mut errors) = builder.finish_raw();
-    for (i, err) in lexed.errors() {
-        let text_range = lexed.text_range(i);
-        let text_range = TextRange::new(
-            text_range.start.try_into().unwrap(),
-            text_range.end.try_into().unwrap(),
-        );
+    for (text_range, err) in lexed.errors() {
+        let text_range = TextRange::new(text_range.start.into(), text_range.end.into());
         errors.push(SyntaxError::new(err, text_range))
     }
 

@@ -311,13 +311,14 @@ impl Cursor<'_> {
         match self.first() {
             '.' => self.eat_fractional(base),
             'e' | 'E' => {
+                let exponent_start = self.pos_within_token();
                 self.bump();
-                let empty_exponent = !self.eat_numeric_exponent();
+                let empty_exponent_start = (!self.eat_numeric_exponent()).then_some(exponent_start);
                 let trailing_junk_start = self.pos_within_token();
                 self.eat_identifier();
                 LiteralKind::Numeric {
                     base,
-                    empty_exponent,
+                    empty_exponent_start,
                     trailing_junk_start,
                 }
             }
@@ -504,21 +505,27 @@ impl Cursor<'_> {
         // might have stuff after the ., and if it does, it needs to start
         // with a number
         self.bump();
-        let mut empty_exponent = false;
+        let mut empty_exponent_start = None;
         if self.first().is_ascii_digit() {
             self.eat_decimal_digits();
             match self.first() {
                 'e' | 'E' => {
+                    let exponent_start = self.pos_within_token();
                     self.bump();
-                    empty_exponent = !self.eat_numeric_exponent();
+                    if !self.eat_numeric_exponent() {
+                        empty_exponent_start = Some(exponent_start);
+                    }
                 }
                 _ => (),
             }
         } else {
             match self.first() {
                 'e' | 'E' => {
+                    let exponent_start = self.pos_within_token();
                     self.bump();
-                    empty_exponent = !self.eat_numeric_exponent();
+                    if !self.eat_numeric_exponent() {
+                        empty_exponent_start = Some(exponent_start);
+                    }
                 }
                 _ => (),
             }
@@ -527,7 +534,7 @@ impl Cursor<'_> {
         self.eat_identifier();
         LiteralKind::Numeric {
             base,
-            empty_exponent,
+            empty_exponent_start,
             trailing_junk_start,
         }
     }

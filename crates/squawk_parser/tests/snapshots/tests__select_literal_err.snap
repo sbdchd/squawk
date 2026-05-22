@@ -273,83 +273,83 @@ SOURCE_FILE
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
 1 │ SELECT 123abc;
-  ╰╴       ━
+  ╰╴          ━━━
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
 2 │ SELECT 0x0o;
-  ╰╴       ━
+  ╰╴          ━
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
 3 │ SELECT 0.a;
-  ╰╴       ━
+  ╰╴         ━
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
 4 │ SELECT 0.0a;
-  ╰╴       ━
+  ╰╴          ━
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
 5 │ SELECT .0a;
-  ╰╴       ━
+  ╰╴         ━
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
 6 │ SELECT 0.0e1a;
-  ╰╴       ━
+  ╰╴            ━
 error[syntax-error]: Missing digits after the exponent symbol
   ╭▸ 
 7 │ SELECT 0.0e;
-  ╰╴       ━
+  ╰╴          ━
 error[syntax-error]: Missing digits after the exponent symbol
   ╭▸ 
 8 │ SELECT 0.0e+a;
-  ╰╴       ━
+  ╰╴          ━
 error[syntax-error]: trailing junk after positional parameter
   ╭▸ 
 9 │ SELECT $1a;
-  ╰╴       ━
+  ╰╴         ━
 error[syntax-error]: Missing digits after the integer base prefix
    ╭▸ 
 10 │ SELECT 0b;
-   ╰╴       ━
+   ╰╴       ━━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 11 │ SELECT 1b;
-   ╰╴       ━
+   ╰╴        ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 12 │ SELECT 0b0x;
-   ╰╴       ━
+   ╰╴          ━
 error[syntax-error]: Missing digits after the integer base prefix
    ╭▸ 
 13 │ SELECT 0o;
-   ╰╴       ━
+   ╰╴       ━━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 14 │ SELECT 1o;
-   ╰╴       ━
+   ╰╴        ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 15 │ SELECT 0o0x;
-   ╰╴       ━
+   ╰╴          ━
 error[syntax-error]: Missing digits after the integer base prefix
    ╭▸ 
 16 │ SELECT 0x;
-   ╰╴       ━
+   ╰╴       ━━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 17 │ SELECT 1x;
-   ╰╴       ━
+   ╰╴        ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 18 │ SELECT 0x0y;
-   ╰╴       ━
+   ╰╴          ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 19 │ SELECT 100_;
-   ╰╴       ━
+   ╰╴          ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 20 │ SELECT 100__000;
-   ╰╴       ━
+   ╰╴          ━━━━━
 error[syntax-error]: missing comma
    ╭▸ 
 21 │ SELECT _1_000.5;
@@ -357,7 +357,7 @@ error[syntax-error]: missing comma
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 22 │ SELECT 1_000_.5;
-   ╰╴       ━
+   ╰╴            ━
 error[syntax-error]: missing comma
    ╭▸ 
 22 │ SELECT 1_000_.5;
@@ -365,16 +365,16 @@ error[syntax-error]: missing comma
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 23 │ SELECT 1_000._5;
-   ╰╴       ━
+   ╰╴             ━━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 24 │ SELECT 1_000.5_;
-   ╰╴       ━
+   ╰╴              ━
 error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
 25 │ SELECT 1_000.5e_1;
-   ╰╴       ━
+   ╰╴              ━
 error[syntax-error]: trailing junk after positional parameter
    ╭▸ 
 26 │ SELECT $0_1;
-   ╰╴       ━
+   ╰╴         ━━

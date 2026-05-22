@@ -116,7 +116,7 @@ fn parse_text(text: &str) -> (String, Option<String>) {
     let output = parse(&input);
 
     let mut buf = String::new();
-    let mut errors = Vec::new();
+    let mut errors: Vec<(std::ops::Range<usize>, String)> = Vec::new();
     let mut indent = String::new();
     let mut depth = 0;
     let mut len = 0;
@@ -140,7 +140,7 @@ fn parse_text(text: &str) -> (String, Option<String>) {
         }
         squawk_parser::StrStep::Error { msg, pos } => {
             assert!(depth > 0);
-            errors.push((pos, msg.to_string()));
+            errors.push((pos..pos + 1, msg.to_string()));
         }
     });
     assert_eq!(
@@ -151,23 +151,22 @@ fn parse_text(text: &str) -> (String, Option<String>) {
         text
     );
 
-    for (token, msg) in lexed.errors() {
-        let pos = lexed.text_start(token);
-        errors.push((pos, msg.to_string()));
+    for (range, msg) in lexed.errors() {
+        errors.push((range.start as usize..range.end as usize, msg.to_string()));
     }
 
     let error_message = if !errors.is_empty() {
-        errors.sort_by_key(|(pos, _)| *pos);
+        errors.sort_by_key(|(range, _)| range.start);
 
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
 
         let mut out = "---\n".to_owned();
 
-        for (pos, msg) in &errors {
+        for (range, msg) in &errors {
             let group = Level::ERROR.primary_title(msg).id("syntax-error").element(
                 Snippet::source(text)
                     .fold(true)
-                    .annotation(AnnotationKind::Primary.span(*pos..*pos + 1)),
+                    .annotation(AnnotationKind::Primary.span(range.clone())),
             );
             let rendered = renderer.render(&[group]).to_string();
 
