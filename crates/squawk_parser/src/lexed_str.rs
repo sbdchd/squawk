@@ -383,10 +383,10 @@ mod tests {
     #[test]
     fn empty_int_with_trailing_ident_error() {
         assert_snapshot!(lex("select 0xg;"), @"
-        error: Missing digits after the integer base prefix
+        error: trailing junk after numeric literal
           ╭▸ 
         1 │ select 0xg;
-          ╰╴       ━━━
+          ╰╴         ━
         ");
     }
 
