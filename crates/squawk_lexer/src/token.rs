@@ -137,7 +137,9 @@ pub enum LiteralKind {
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
     Numeric {
         base: Base,
-        empty_exponent: bool,
+        // e.g., `1e` instead of `1e10`
+        empty_exponent_start: Option<u32>,
+        // e.g., `1foo` where `foo` is the junk
         trailing_junk_start: u32,
     },
     /// String, e.g., `'foo'`

@@ -15,7 +15,7 @@ pub struct LexedStr<'a> {
 
 struct LexError {
     msg: String,
-    token: u32,
+    range: ops::Range<u32>,
 }
 
 impl<'a> LexedStr<'a> {
@@ -105,10 +105,10 @@ impl<'a> LexedStr<'a> {
     //     Some(self.error[err].msg.as_str())
     // }
 
-    pub fn errors(&self) -> impl Iterator<Item = (usize, &str)> + '_ {
+    pub fn errors(&self) -> impl Iterator<Item = (ops::Range<u32>, &str)> + '_ {
         self.error
             .iter()
-            .map(|it| (it.token as usize, it.msg.as_str()))
+            .map(|it| (it.range.clone(), it.msg.as_str()))
     }
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
@@ -140,14 +140,16 @@ impl<'a> Converter<'a> {
         self.res
     }
 
-    fn push(&mut self, kind: SyntaxKind, len: usize, err: Option<&str>) {
+    fn push(&mut self, kind: SyntaxKind, len: usize, err: Option<(&str, ops::Range<u32>)>) {
+        let token_start = self.offset as u32;
         self.res.push(kind, self.offset);
         self.offset += len;
 
-        if let Some(err) = err {
-            let token = self.res.len() as u32;
-            let msg = err.to_owned();
-            self.res.error.push(LexError { msg, token });
+        if let Some((msg, err_range)) = err {
+            self.res.error.push(LexError {
+                msg: msg.to_owned(),
+                range: token_start + err_range.start..token_start + err_range.end,
+            });
         }
     }
 
@@ -157,6 +159,7 @@ impl<'a> Converter<'a> {
         // Storing that info in `SyntaxKind` is not possible due to its layout requirements of
         // being `u16` that come from `rowan::SyntaxKind`.
         let mut err = "";
+        let mut err_range: Option<ops::Range<u32>> = None;
 
         let syntax_kind = {
             match kind {
@@ -214,6 +217,7 @@ impl<'a> Converter<'a> {
                 } => {
                     if (*trailing_junk_start as usize) < token_text.len() {
                         err = "trailing junk after positional parameter";
+                        err_range = Some(*trailing_junk_start..token_text.len() as u32);
                     }
                     SyntaxKind::POSITIONAL_PARAM
                 }
@@ -227,11 +231,13 @@ impl<'a> Converter<'a> {
         };
 
         let err = if err.is_empty() { None } else { Some(err) };
+        let err = err.map(|msg| (msg, err_range.unwrap_or(0..token_text.len() as u32)));
         self.push(syntax_kind, token_text.len(), err);
     }
 
     fn extend_literal(&mut self, token_text: &str, kind: &squawk_lexer::LiteralKind) {
         let mut err: Option<String> = None;
+        let mut err_range: Option<ops::Range<u32>> = None;
 
         let syntax_kind = match *kind {
             squawk_lexer::LiteralKind::Int {
@@ -243,18 +249,21 @@ impl<'a> Converter<'a> {
                     err = Some("Missing digits after the integer base prefix".into());
                 } else if (trailing_junk_start as usize) < token_text.len() {
                     err = Some("trailing junk after numeric literal".into());
+                    err_range = Some(trailing_junk_start..token_text.len() as u32);
                 }
                 SyntaxKind::INT_NUMBER
             }
             squawk_lexer::LiteralKind::Numeric {
-                empty_exponent,
+                empty_exponent_start,
                 base: _,
                 trailing_junk_start,
             } => {
-                if empty_exponent {
+                if let Some(exponent_start) = empty_exponent_start {
                     err = Some("Missing digits after the exponent symbol".into());
+                    err_range = Some(exponent_start..exponent_start + 1);
                 } else if (trailing_junk_start as usize) < token_text.len() {
                     err = Some("trailing junk after numeric literal".into());
+                    err_range = Some(trailing_junk_start..token_text.len() as u32);
                 }
                 SyntaxKind::NUMERIC_NUMBER
             }
@@ -312,7 +321,10 @@ impl<'a> Converter<'a> {
             }
         };
 
-        self.push(syntax_kind, token_text.len(), err.as_deref());
+        let err = err
+            .as_deref()
+            .map(|msg| (msg, err_range.unwrap_or(0..token_text.len() as u32)));
+        self.push(syntax_kind, token_text.len(), err);
     }
 }
 
@@ -328,11 +340,12 @@ mod tests {
         let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
         let mut res = String::new();
 
-        for (token, msg) in lexed.errors() {
+        for (range, msg) in lexed.errors() {
+            let span = range.start as usize..range.end as usize;
             let group = Level::ERROR.primary_title(msg).element(
                 Snippet::source(text)
                     .fold(true)
-                    .annotation(AnnotationKind::Primary.span(lexed.text_range(token))),
+                    .annotation(AnnotationKind::Primary.span(span)),
             );
             res.push_str(&renderer.render(&[group]).to_string());
             res.push('\n');
@@ -357,7 +370,7 @@ mod tests {
         error: Missing digits after the exponent symbol
           ╭▸ 
         1 │ select 1e;
-          ╰╴       ━━
+          ╰╴        ━
         ");
     }
 
