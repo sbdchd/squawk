@@ -25,7 +25,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       LITERAL
-        FLOAT_NUMBER "200.00"
+        NUMERIC_NUMBER "200.00"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

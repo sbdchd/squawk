@@ -407,7 +407,7 @@ SOURCE_FILE
             WHITESPACE " "
             ATTRIBUTE_VALUE
               LITERAL
-                FLOAT_NUMBER "1.0"
+                NUMERIC_NUMBER "1.0"
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

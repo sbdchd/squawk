@@ -527,8 +527,8 @@ impl<'t> Parser<'t> {
     }
 
     /// Advances the parser by one token
-    pub(crate) fn split_float(&mut self, mut marker: Marker) -> (bool, Marker) {
-        assert!(self.at(SyntaxKind::FLOAT_NUMBER));
+    pub(crate) fn split_numeric(&mut self, mut marker: Marker) -> (bool, Marker) {
+        assert!(self.at(SyntaxKind::NUMERIC_NUMBER));
         // we have parse `<something>.`
         // `<something>`.0.1
         // here we need to insert an extra event
@@ -554,7 +554,7 @@ impl<'t> Parser<'t> {
             marker = new_marker;
         };
         self.pos += 1;
-        self.push_event(Event::FloatSplitHack { ends_in_dot });
+        self.push_event(Event::NumericSplitHack { ends_in_dot });
         (ends_in_dot, marker)
     }
 

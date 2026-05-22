@@ -236,6 +236,9 @@ impl Cursor<'_> {
 
     fn number(&mut self, first_digit: char) -> LiteralKind {
         let mut base = Base::Decimal;
+        if first_digit == '.' {
+            return self.eat_fractional(base);
+        }
         if first_digit == '0' {
             // Attempt to parse encoding base.
             match self.first() {
@@ -306,43 +309,13 @@ impl Cursor<'_> {
         };
 
         match self.first() {
-            '.' => {
-                // might have stuff after the ., and if it does, it needs to start
-                // with a number
-                self.bump();
-                let mut empty_exponent = false;
-                if self.first().is_ascii_digit() {
-                    self.eat_decimal_digits();
-                    match self.first() {
-                        'e' | 'E' => {
-                            self.bump();
-                            empty_exponent = !self.eat_float_exponent();
-                        }
-                        _ => (),
-                    }
-                } else {
-                    match self.first() {
-                        'e' | 'E' => {
-                            self.bump();
-                            empty_exponent = !self.eat_float_exponent();
-                        }
-                        _ => (),
-                    }
-                }
-                let trailing_junk_start = self.pos_within_token();
-                self.eat_identifier();
-                LiteralKind::Float {
-                    base,
-                    empty_exponent,
-                    trailing_junk_start,
-                }
-            }
+            '.' => self.eat_fractional(base),
             'e' | 'E' => {
                 self.bump();
-                let empty_exponent = !self.eat_float_exponent();
+                let empty_exponent = !self.eat_numeric_exponent();
                 let trailing_junk_start = self.pos_within_token();
                 self.eat_identifier();
-                LiteralKind::Float {
+                LiteralKind::Numeric {
                     base,
                     empty_exponent,
                     trailing_junk_start,
@@ -509,9 +482,9 @@ impl Cursor<'_> {
         has_digits
     }
 
-    /// Eats the float exponent. Returns true if at least one digit was met,
+    /// Eats the numeric exponent. Returns true if at least one digit was met,
     /// and returns false otherwise.
-    fn eat_float_exponent(&mut self) -> bool {
+    fn eat_numeric_exponent(&mut self) -> bool {
         if self.first() == '_' {
             return false;
         }
@@ -524,6 +497,38 @@ impl Cursor<'_> {
     fn eat_identifier(&mut self) {
         if is_ident_start(self.first()) {
             self.eat_while(is_ident_cont);
+        }
+    }
+
+    pub(crate) fn eat_fractional(&mut self, base: Base) -> crate::LiteralKind {
+        // might have stuff after the ., and if it does, it needs to start
+        // with a number
+        self.bump();
+        let mut empty_exponent = false;
+        if self.first().is_ascii_digit() {
+            self.eat_decimal_digits();
+            match self.first() {
+                'e' | 'E' => {
+                    self.bump();
+                    empty_exponent = !self.eat_numeric_exponent();
+                }
+                _ => (),
+            }
+        } else {
+            match self.first() {
+                'e' | 'E' => {
+                    self.bump();
+                    empty_exponent = !self.eat_numeric_exponent();
+                }
+                _ => (),
+            }
+        }
+        let trailing_junk_start = self.pos_within_token();
+        self.eat_identifier();
+        LiteralKind::Numeric {
+            base,
+            empty_exponent,
+            trailing_junk_start,
         }
     }
 }

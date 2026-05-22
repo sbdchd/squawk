@@ -4,7 +4,7 @@ pub enum TokenKind {
     /// Used when there's an error of some sort while lexing.
     Unknown,
     /// Examples: `12u8`, `1.0e-40`, `b"123"`. Note that `_` is an invalid
-    /// suffix, but may be present here on string and float literals. Users of
+    /// suffix, but may be present here on string and numeric literals. Users of
     /// this type will need to check for and reject that case.
     ///
     /// See [`LiteralKind`] for more details.
@@ -132,10 +132,10 @@ pub enum LiteralKind {
         empty_int: bool,
         trailing_junk_start: u32,
     },
-    /// Float Numeric, e.g., `1.925e-3`
+    /// Numeric literal with a decimal point or exponent, e.g., `1.925e-3`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
-    Float {
+    Numeric {
         base: Base,
         empty_exponent: bool,
         trailing_junk_start: u32,

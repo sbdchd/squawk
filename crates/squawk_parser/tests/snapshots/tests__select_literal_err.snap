@@ -30,7 +30,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "0.a"
+            NUMERIC_NUMBER "0.a"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -40,7 +40,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "0.0a"
+            NUMERIC_NUMBER "0.0a"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -50,7 +50,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            INT_NUMBER ".0a"
+            NUMERIC_NUMBER ".0a"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -60,7 +60,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "0.0e1a"
+            NUMERIC_NUMBER "0.0e1a"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -70,7 +70,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "0.0e"
+            NUMERIC_NUMBER "0.0e"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -80,7 +80,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "0.0e+a"
+            NUMERIC_NUMBER "0.0e+a"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -213,7 +213,7 @@ SOURCE_FILE
             IDENT "_1_000"
         TARGET
           LITERAL
-            INT_NUMBER ".5"
+            NUMERIC_NUMBER ".5"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -226,7 +226,7 @@ SOURCE_FILE
             INT_NUMBER "1_000_"
         TARGET
           LITERAL
-            INT_NUMBER ".5"
+            NUMERIC_NUMBER ".5"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -236,7 +236,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "1_000._5"
+            NUMERIC_NUMBER "1_000._5"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -246,7 +246,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "1_000.5_"
+            NUMERIC_NUMBER "1_000.5_"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -256,7 +256,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            FLOAT_NUMBER "1_000.5e_1"
+            NUMERIC_NUMBER "1_000.5e_1"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT

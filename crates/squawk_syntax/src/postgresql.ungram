@@ -353,7 +353,7 @@ Literal =
   value:(
     '@string'
   | '@null'
-  | '@float_number'
+  | '@numeric_number'
   | '@int_number'
   | '@byte_string'
   | '@bit_string'

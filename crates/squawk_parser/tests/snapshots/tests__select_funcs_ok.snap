@@ -3090,7 +3090,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               LITERAL
-                FLOAT_NUMBER "1.5"
+                NUMERIC_NUMBER "1.5"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3298,7 +3298,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               LITERAL
-                FLOAT_NUMBER "0.5"
+                NUMERIC_NUMBER "0.5"
               R_PAREN ")"
             WHITESPACE " "
             WITHIN_CLAUSE

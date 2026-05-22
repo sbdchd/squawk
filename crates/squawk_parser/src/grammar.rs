@@ -2278,8 +2278,8 @@ fn field_expr(
     p.bump(DOT);
     if p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at(INT_NUMBER) || p.at_ts(ALL_KEYWORDS) {
         name_ref_or_index(p);
-    } else if p.at(FLOAT_NUMBER) {
-        return match p.split_float(m) {
+    } else if p.at(NUMERIC_NUMBER) {
+        return match p.split_numeric(m) {
             (true, m) => {
                 let lhs = m.complete(p, FIELD_EXPR);
                 postfix_dot_expr(p, lhs, allow_calls)
@@ -4901,7 +4901,7 @@ const LITERAL_FIRST: TokenSet = TokenSet::new(&[TRUE_KW, FALSE_KW, NULL_KW, DEFA
     .union(NUMERIC_FIRST)
     .union(STRING_FIRST);
 
-const NUMERIC_FIRST: TokenSet = TokenSet::new(&[INT_NUMBER, FLOAT_NUMBER]);
+const NUMERIC_FIRST: TokenSet = TokenSet::new(&[INT_NUMBER, NUMERIC_NUMBER]);
 
 const STRING_FIRST: TokenSet = TokenSet::new(&[
     STRING,

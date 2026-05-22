@@ -64,14 +64,14 @@ impl Builder<'_, '_> {
         self.do_token(kind, n_tokens as usize);
     }
 
-    fn float_split(&mut self, has_pseudo_dot: bool) {
+    fn numeric_split(&mut self, has_pseudo_dot: bool) {
         match mem::replace(&mut self.state, State::Normal) {
             State::PendingEnter => unreachable!(),
             State::PendingExit => (self.sink)(StrStep::Exit),
             State::Normal => (),
         }
         self.eat_trivias();
-        self.do_float_split(has_pseudo_dot);
+        self.do_numeric_split(has_pseudo_dot);
     }
 
     fn enter(&mut self, kind: SyntaxKind) {
@@ -133,7 +133,7 @@ impl Builder<'_, '_> {
         (self.sink)(StrStep::Token { kind, text });
     }
 
-    fn do_float_split(&mut self, has_pseudo_dot: bool) {
+    fn do_numeric_split(&mut self, has_pseudo_dot: bool) {
         let text = &self.lexed.range_text(self.pos..self.pos + 1);
 
         match text.split_once('.') {
@@ -175,17 +175,17 @@ impl Builder<'_, '_> {
                 }
             }
             None => {
-                // illegal float literal which doesn't have dot in form (like 1e0)
+                // illegal numeric literal which doesn't have dot in form (like 1e0)
                 // we should emit an error node here
                 (self.sink)(StrStep::Error {
-                    msg: "illegal float literal",
+                    msg: "illegal numeric literal",
                     pos: self.pos,
                 });
                 (self.sink)(StrStep::Enter {
                     kind: SyntaxKind::ERROR,
                 });
                 (self.sink)(StrStep::Token {
-                    kind: SyntaxKind::FLOAT_NUMBER,
+                    kind: SyntaxKind::NUMERIC_NUMBER,
                     text,
                 });
                 (self.sink)(StrStep::Exit);
@@ -227,10 +227,10 @@ impl LexedStr<'_> {
                     res.was_joint();
                 }
                 res.push(kind);
-                // Tag the token as joint if it is float with a fractional part
+                // Tag the token as joint if it is numeric with a fractional part
                 // we use this jointness to inform the parser about what token split
-                // event to emit when we encounter a float literal in a field access
-                // if kind == SyntaxKind::FLOAT_NUMBER {
+                // event to emit when we encounter a numeric literal in a field access
+                // if kind == SyntaxKind::NUMERIC_NUMBER {
                 //     if !self.text(i).ends_with('.') {
                 //         res.was_joint();
                 //     } else {
@@ -259,9 +259,9 @@ impl LexedStr<'_> {
                     kind,
                     n_input_tokens: n_raw_tokens,
                 } => builder.token(kind, n_raw_tokens),
-                Step::FloatSplit {
+                Step::NumericSplit {
                     ends_in_dot: has_pseudo_dot,
-                } => builder.float_split(has_pseudo_dot),
+                } => builder.numeric_split(has_pseudo_dot),
                 Step::Enter { kind } => builder.enter(kind),
                 Step::Exit => builder.exit(),
                 Step::Error { msg } => {
