@@ -246,43 +246,22 @@ impl Cursor<'_> {
                 'b' | 'B' => {
                     base = Base::Binary;
                     self.bump();
-                    if !self.eat_decimal_digits() {
-                        let trailing_junk_start = self.pos_within_token();
-                        self.eat_identifier();
-                        return LiteralKind::Int {
-                            base,
-                            empty_int: true,
-                            trailing_junk_start,
-                        };
-                    }
+                    let has_digits = self.eat_decimal_digits();
+                    return self.finish_base_prefixed_int(base, has_digits);
                 }
                 // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L402
                 'o' | 'O' => {
                     base = Base::Octal;
                     self.bump();
-                    if !self.eat_decimal_digits() {
-                        let trailing_junk_start = self.pos_within_token();
-                        self.eat_identifier();
-                        return LiteralKind::Int {
-                            base,
-                            empty_int: true,
-                            trailing_junk_start,
-                        };
-                    }
+                    let has_digits = self.eat_decimal_digits();
+                    return self.finish_base_prefixed_int(base, has_digits);
                 }
                 // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L401
                 'x' | 'X' => {
                     base = Base::Hexadecimal;
                     self.bump();
-                    if !self.eat_hexadecimal_digits() {
-                        let trailing_junk_start = self.pos_within_token();
-                        self.eat_identifier();
-                        return LiteralKind::Int {
-                            base,
-                            empty_int: true,
-                            trailing_junk_start,
-                        };
-                    }
+                    let has_digits = self.eat_hexadecimal_digits();
+                    return self.finish_base_prefixed_int(base, has_digits);
                 }
                 // Not a base prefix; consume additional digits.
                 '0'..='9' | '_' => {
@@ -464,6 +443,17 @@ impl Cursor<'_> {
             }
         }
         has_digits
+    }
+
+    fn finish_base_prefixed_int(&mut self, base: Base, has_digits: bool) -> LiteralKind {
+        let trailing_junk_start = self.pos_within_token();
+        self.eat_while(is_ident_cont);
+        let has_trailing_junk = self.pos_within_token() > trailing_junk_start;
+        LiteralKind::Int {
+            base,
+            empty_int: !has_digits && !has_trailing_junk,
+            trailing_junk_start,
+        }
     }
 
     fn eat_hexadecimal_digits(&mut self) -> bool {
