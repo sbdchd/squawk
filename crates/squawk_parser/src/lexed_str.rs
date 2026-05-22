@@ -105,10 +105,8 @@ impl<'a> LexedStr<'a> {
     //     Some(self.error[err].msg.as_str())
     // }
 
-    pub fn errors(&self) -> impl Iterator<Item = (ops::Range<u32>, &str)> + '_ {
-        self.error
-            .iter()
-            .map(|it| (it.range.clone(), it.msg.as_str()))
+    pub fn errors(&self) -> impl Iterator<Item = (&ops::Range<u32>, &str)> + '_ {
+        self.error.iter().map(|it| (&it.range, it.msg.as_str()))
     }
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
@@ -242,14 +240,32 @@ impl<'a> Converter<'a> {
         let syntax_kind = match *kind {
             squawk_lexer::LiteralKind::Int {
                 empty_int,
-                base: _,
+                base,
                 trailing_junk_start,
             } => {
                 if empty_int {
                     err = Some("Missing digits after the integer base prefix".into());
-                } else if (trailing_junk_start as usize) < token_text.len() {
-                    err = Some("trailing junk after numeric literal".into());
-                    err_range = Some(trailing_junk_start..token_text.len() as u32);
+                } else {
+                    if matches!(base, squawk_lexer::Base::Binary | squawk_lexer::Base::Octal) {
+                        let prefix_len = 2u32;
+                        let digits = &token_text[prefix_len as usize..trailing_junk_start as usize];
+                        let base = base as u32;
+                        let token_start = self.offset as u32;
+                        for (i, c) in digits.char_indices() {
+                            if c != '_' && c.to_digit(base).is_none() {
+                                let start = token_start + prefix_len + i as u32;
+                                let end = start + c.len_utf8() as u32;
+                                self.res.error.push(LexError {
+                                    msg: format!("invalid digit for a base {base} literal"),
+                                    range: start..end,
+                                });
+                            }
+                        }
+                    }
+                    if (trailing_junk_start as usize) < token_text.len() {
+                        err = Some("trailing junk after numeric literal".into());
+                        err_range = Some(trailing_junk_start..token_text.len() as u32);
+                    }
                 }
                 SyntaxKind::INT_NUMBER
             }
@@ -361,6 +377,70 @@ mod tests {
           ╭▸ 
         1 │ select 0x;
           ╰╴       ━━
+        ");
+    }
+
+    #[test]
+    fn empty_int_with_trailing_ident_error() {
+        assert_snapshot!(lex("select 0xg;"), @"
+        error: Missing digits after the integer base prefix
+          ╭▸ 
+        1 │ select 0xg;
+          ╰╴       ━━━
+        ");
+    }
+
+    #[test]
+    fn invalid_octal_digits_error() {
+        assert_snapshot!(lex("select 0o999;"), @"
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o999;
+          ╰╴         ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o999;
+          ╰╴          ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o999;
+          ╰╴           ━
+        ");
+    }
+
+    #[test]
+    fn invalid_binary_digits_error() {
+        assert_snapshot!(lex("select 0b234;"), @"
+        error: invalid digit for a base 2 literal
+          ╭▸ 
+        1 │ select 0b234;
+          ╰╴         ━
+        error: invalid digit for a base 2 literal
+          ╭▸ 
+        1 │ select 0b234;
+          ╰╴          ━
+        error: invalid digit for a base 2 literal
+          ╭▸ 
+        1 │ select 0b234;
+          ╰╴           ━
+        ");
+    }
+
+    #[test]
+    fn invalid_octal_digits_after_valid_error() {
+        assert_snapshot!(lex("select 0o7889;"), @"
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o7889;
+          ╰╴          ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o7889;
+          ╰╴           ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o7889;
+          ╰╴            ━
         ");
     }
 

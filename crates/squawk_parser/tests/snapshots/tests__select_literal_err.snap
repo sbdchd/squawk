@@ -190,6 +190,46 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
+            INT_NUMBER "0o999"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0o7889"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0b234"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "0b101_010_"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
             INT_NUMBER "100_"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -342,39 +382,79 @@ error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
 18 │ SELECT 0x0y;
    ╰╴          ━
+error[syntax-error]: invalid digit for a base 8 literal
+   ╭▸ 
+19 │ SELECT 0o999;
+   ╰╴         ━
+error[syntax-error]: invalid digit for a base 8 literal
+   ╭▸ 
+19 │ SELECT 0o999;
+   ╰╴          ━
+error[syntax-error]: invalid digit for a base 8 literal
+   ╭▸ 
+19 │ SELECT 0o999;
+   ╰╴           ━
+error[syntax-error]: invalid digit for a base 8 literal
+   ╭▸ 
+20 │ SELECT 0o7889;
+   ╰╴          ━
+error[syntax-error]: invalid digit for a base 8 literal
+   ╭▸ 
+20 │ SELECT 0o7889;
+   ╰╴           ━
+error[syntax-error]: invalid digit for a base 8 literal
+   ╭▸ 
+20 │ SELECT 0o7889;
+   ╰╴            ━
+error[syntax-error]: invalid digit for a base 2 literal
+   ╭▸ 
+21 │ SELECT 0b234;
+   ╰╴         ━
+error[syntax-error]: invalid digit for a base 2 literal
+   ╭▸ 
+21 │ SELECT 0b234;
+   ╰╴          ━
+error[syntax-error]: invalid digit for a base 2 literal
+   ╭▸ 
+21 │ SELECT 0b234;
+   ╰╴           ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
-19 │ SELECT 100_;
+22 │ SELECT 0b101_010_;
+   ╰╴                ━
+error[syntax-error]: trailing junk after numeric literal
+   ╭▸ 
+23 │ SELECT 100_;
    ╰╴          ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
-20 │ SELECT 100__000;
+24 │ SELECT 100__000;
    ╰╴          ━━━━━
 error[syntax-error]: missing comma
    ╭▸ 
-21 │ SELECT _1_000.5;
+25 │ SELECT _1_000.5;
    ╰╴             ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
-22 │ SELECT 1_000_.5;
+26 │ SELECT 1_000_.5;
    ╰╴            ━
 error[syntax-error]: missing comma
    ╭▸ 
-22 │ SELECT 1_000_.5;
+26 │ SELECT 1_000_.5;
    ╰╴             ━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
-23 │ SELECT 1_000._5;
+27 │ SELECT 1_000._5;
    ╰╴             ━━
 error[syntax-error]: trailing junk after numeric literal
    ╭▸ 
-24 │ SELECT 1_000.5_;
+28 │ SELECT 1_000.5_;
    ╰╴              ━
 error[syntax-error]: Missing digits after the exponent symbol
    ╭▸ 
-25 │ SELECT 1_000.5e_1;
+29 │ SELECT 1_000.5e_1;
    ╰╴              ━
 error[syntax-error]: trailing junk after positional parameter
    ╭▸ 
-26 │ SELECT $0_1;
+30 │ SELECT $0_1;
    ╰╴         ━━
