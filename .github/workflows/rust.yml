@@ -489,9 +489,9 @@ jobs:
 
       - name: Publish Extension (VS Code Marketplace)
         working-directory: ./squawk-vscode
-        run: pnpm exec vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing]
+        run: pnpm exec vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing] trusted publishing isn't possible
 
       - name: Publish Extension (Open VSX)
         working-directory: ./squawk-vscode
-        run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing]
+        run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing] trusted publishing isn't possible
         timeout-minutes: 2
