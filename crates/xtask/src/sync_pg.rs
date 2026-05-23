@@ -46,6 +46,7 @@ const IGNORED_LINES: &[&str] = &[
     "SELECT 0.0e+a;",
     "PREPARE p1 AS SELECT $1a;",
     "PREPARE p1 AS SELECT $2147483648;",
+    r#"CREATE TABLE i_am_a_failure() USING "";"#,
     "SELECT 0b;",
     "SELECT 1b;",
     "SELECT 0b0x;",
