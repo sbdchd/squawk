@@ -180,9 +180,8 @@ jobs:
         uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "squawk-vscode/package.json"
-          # Explicitly disable package-manager caching to avoid cache poisoning
-          # in this artifact-publishing workflow (honored by setup-node v5+).
-          package-manager-cache: false
+          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
+          cache: "pnpm"
 
       - name: VSCode - Install JS dependencies
         working-directory: "squawk-vscode"
@@ -222,9 +221,6 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
-          # Disable package-manager caching in this publishing workflow to
-          # prevent cache poisoning (honored by setup-node v5+).
-          package-manager-cache: false
       - run: npm --version
 
       - name: Download release artifacts
@@ -335,9 +331,8 @@ jobs:
       - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "playground/package.json"
-          # Caching disabled to prevent cache poisoning: this job's build
-          # output is deployed to Netlify on tags.
-          package-manager-cache: false
+          cache-dependency-path: "playground/pnpm-lock.yaml"
+          cache: "pnpm"
 
       - name: Install JS dependencies
         working-directory: "playground"
@@ -474,9 +469,8 @@ jobs:
         uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "squawk-vscode/package.json"
-          # Disable package-manager caching in this publishing workflow to
-          # prevent cache poisoning (honored by setup-node v5+).
-          package-manager-cache: false
+          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
+          cache: "pnpm"
       - name: Install JS dependencies
         working-directory: "squawk-vscode"
         run: pnpm install
