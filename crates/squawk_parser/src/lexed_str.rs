@@ -1,6 +1,6 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/lexed_str.rs
 
-use std::ops;
+use std::{num::IntErrorKind, ops};
 
 use squawk_lexer::tokenize;
 
@@ -120,6 +120,18 @@ struct Converter<'a> {
     offset: usize,
 }
 
+fn is_empty_quoted_ident(token_text: &str) -> bool {
+    let inner = if let Some(stripped) = token_text
+        .strip_prefix(['u', 'U'])
+        .and_then(|s| s.strip_prefix('&'))
+    {
+        stripped
+    } else {
+        token_text
+    };
+    inner == "\"\""
+}
+
 impl<'a> Converter<'a> {
     fn new(text: &'a str) -> Self {
         Self {
@@ -213,7 +225,17 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::PositionalParam {
                     trailing_junk_start,
                 } => {
-                    if (*trailing_junk_start as usize) < token_text.len() {
+                    let digits = &token_text[1..*trailing_junk_start as usize];
+                    if digits.is_empty() {
+                        err = "missing parameter number";
+                        err_range = Some(0..1);
+                    } else if digits
+                        .parse::<i32>()
+                        .is_err_and(|err| matches!(err.kind(), IntErrorKind::PosOverflow))
+                    {
+                        err = "parameter number too large";
+                        err_range = Some(0..*trailing_junk_start);
+                    } else if (*trailing_junk_start as usize) < token_text.len() {
                         err = "trailing junk after positional parameter";
                         err_range = Some(*trailing_junk_start..token_text.len() as u32);
                     }
@@ -222,6 +244,8 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::QuotedIdent { terminated } => {
                     if !terminated {
                         err = "Missing trailing \" to terminate the quoted identifier"
+                    } else if is_empty_quoted_ident(token_text) {
+                        err = "empty delimited identifier";
                     }
                     SyntaxKind::IDENT
                 }

@@ -19,6 +19,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::BeginFuncOptionList(it) => validate_begin_func_option_list(it, errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::CreateTable(it) => validate_create_table(it, errors),
+                ast::CustomOp(it) => validate_custom_op_length(it, errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
                 ast::DropAggregate(it) => validate_drop_aggregate(it, errors),
@@ -584,6 +585,15 @@ fn validate_prefix_expr(prefix_expr: ast::PrefixExpr, acc: &mut Vec<SyntaxError>
         return;
     };
     validate_custom_op(op, acc);
+}
+
+// NAMEDATALEN == 64 and idents and operators can be NAMEDATALEN - 1
+const MAX_OPERATOR_LEN: TextSize = TextSize::new(63);
+fn validate_custom_op_length(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
+    let range = op.syntax().text_range();
+    if range.len() > MAX_OPERATOR_LEN {
+        acc.push(SyntaxError::new("operator too long", range));
+    }
 }
 
 // https://www.postgresql.org/docs/17/sql-createoperator.html

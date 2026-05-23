@@ -309,6 +309,58 @@ SOURCE_FILE
             POSITIONAL_PARAM "$0_1"
     SEMICOLON ";"
   WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            POSITIONAL_PARAM "$2147483648"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- empty placeholder"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            POSITIONAL_PARAM "$"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            POSITIONAL_PARAM "$0111111111111111111111111111111111111111111111111111"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "\"\""
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "U&\"\""
+    SEMICOLON ";"
+  WHITESPACE "\n"
 ---
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
@@ -458,3 +510,23 @@ error[syntax-error]: trailing junk after positional parameter
    ╭▸ 
 30 │ SELECT $0_1;
    ╰╴         ━━
+error[syntax-error]: parameter number too large
+   ╭▸ 
+31 │ SELECT $2147483648;
+   ╰╴       ━━━━━━━━━━━
+error[syntax-error]: missing parameter number
+   ╭▸ 
+33 │ SELECT $;
+   ╰╴       ━
+error[syntax-error]: parameter number too large
+   ╭▸ 
+34 │ SELECT $0111111111111111111111111111111111111111111111111111;
+   ╰╴       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error[syntax-error]: empty delimited identifier
+   ╭▸ 
+35 │ SELECT "";
+   ╰╴       ━━
+error[syntax-error]: empty delimited identifier
+   ╭▸ 
+36 │ SELECT U&"";
+   ╰╴       ━━━━
