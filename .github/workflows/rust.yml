@@ -180,8 +180,9 @@ jobs:
         uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "squawk-vscode/package.json"
-          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
-          cache: "pnpm"
+          # Explicitly disable package-manager caching to avoid cache poisoning
+          # in this artifact-publishing workflow (honored by setup-node v5+).
+          package-manager-cache: false
 
       - name: VSCode - Install JS dependencies
         working-directory: "squawk-vscode"
@@ -198,7 +199,7 @@ jobs:
           path: squawk-vscode/*.vsix
 
       - name: Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1 # zizmor: ignore[superfluous-actions]
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
@@ -221,6 +222,9 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
+          # Disable package-manager caching in this publishing workflow to
+          # prevent cache poisoning (honored by setup-node v5+).
+          package-manager-cache: false
       - run: npm --version
 
       - name: Download release artifacts
@@ -275,7 +279,7 @@ jobs:
           persist-credentials: false
 
       - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1 # 65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -331,8 +335,9 @@ jobs:
       - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "playground/package.json"
-          cache-dependency-path: "playground/pnpm-lock.yaml"
-          cache: "pnpm"
+          # Caching disabled to prevent cache poisoning: this job's build
+          # output is deployed to Netlify on tags.
+          package-manager-cache: false
 
       - name: Install JS dependencies
         working-directory: "playground"
@@ -469,8 +474,9 @@ jobs:
         uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "squawk-vscode/package.json"
-          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
-          cache: "pnpm"
+          # Disable package-manager caching in this publishing workflow to
+          # prevent cache poisoning (honored by setup-node v5+).
+          package-manager-cache: false
       - name: Install JS dependencies
         working-directory: "squawk-vscode"
         run: pnpm install
@@ -483,9 +489,9 @@ jobs:
 
       - name: Publish Extension (VS Code Marketplace)
         working-directory: ./squawk-vscode
-        run: pnpm exec vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix
+        run: pnpm exec vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing]
 
       - name: Publish Extension (Open VSX)
         working-directory: ./squawk-vscode
-        run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix
+        run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing]
         timeout-minutes: 2
