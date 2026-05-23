@@ -8,6 +8,8 @@ on:
       - "**"
   pull_request:
 
+permissions: {}
+
 env:
   RUST_BACKTRACE: 1
   CARGO_TERM_COLOR: always
@@ -16,6 +18,8 @@ env:
 jobs:
   pre_job:
     runs-on: ubuntu-22.04
+    permissions:
+      actions: read
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
       paths_result: ${{ steps.skip_check.outputs.paths_result }}
@@ -28,6 +32,8 @@ jobs:
   build:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
 
     strategy:
       fail-fast: false
@@ -83,7 +89,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Update apt repositories
         if: matrix.target == 'aarch64-unknown-linux-gnu' || matrix.target == 'aarch64-unknown-linux-musl' || matrix.target == 'x86_64-unknown-linux-musl'
@@ -102,6 +110,7 @@ jobs:
         uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2
         with:
           version: 0.11.0
+          use-cache: false
 
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
@@ -111,6 +120,8 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          lookup-only: true
 
       - name: Build
         run: |
@@ -141,7 +152,7 @@ jobs:
         run: mv target/${{ matrix.target }}/release/squawk target/release/${{ matrix.artifact_name }}
 
       - name: Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-${{ matrix.artifact_name }}
           path: target/release/${{ matrix.artifact_name }}
@@ -166,7 +177,7 @@ jobs:
           version: 9
 
       - name: VSCode - Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "squawk-vscode/package.json"
           cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
@@ -181,7 +192,7 @@ jobs:
         run: pnpm exec vsce pack --no-dependencies --target ${{ matrix.vscode_artifact_name }}
 
       - name: VSCode - Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: squawk-vscode-${{ matrix.vscode_artifact_name }}
           path: squawk-vscode/*.vsix
@@ -204,14 +215,16 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
       - run: npm --version
 
       - name: Download release artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: artifacts
           pattern: release-squawk-*
@@ -257,7 +270,9 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1 # 65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -298,10 +313,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          lookup-only: true
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -309,7 +328,7 @@ jobs:
       - uses: pnpm/action-setup@eae0cfeb286e66ffb5155f1a79b90583a127a68b # v2
         with:
           version: 9
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "playground/package.json"
           cache-dependency-path: "playground/pnpm-lock.yaml"
@@ -347,7 +366,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
@@ -357,6 +378,8 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          lookup-only: true
 
       - name: Get Clippy Version
         run: cargo clippy --version
@@ -372,7 +395,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
@@ -381,6 +406,8 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          lookup-only: true
 
       - name: Test
         run: ./s/test
@@ -390,8 +417,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4
         with:
           python-version-file: ".python-version"
 
@@ -404,7 +433,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
@@ -413,6 +444,8 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          lookup-only: true
 
       - name: Publish to crates.io
         run: cargo publish --workspace
@@ -425,13 +458,15 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
       - name: Setup pnpm
         uses: pnpm/action-setup@eae0cfeb286e66ffb5155f1a79b90583a127a68b # v2
         with:
           version: 9
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version-file: "squawk-vscode/package.json"
           cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
@@ -441,7 +476,7 @@ jobs:
         run: pnpm install
 
       - name: Download all VS Code artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           pattern: squawk-vscode-*
           path: ./dist
