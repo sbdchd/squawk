@@ -1,0 +1,60 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/select_literals.sql
+---
+-- null
+select null;
+-- true
+select true;
+-- false
+select false;
+-- int number
+select
+  42;
+-- numeric number
+select 3.14;
+-- string
+select 'hello';
+-- esc string
+select
+  e'esc\n';
+-- unicode esc string
+select u&'unicode';
+-- dollar quoted string
+select
+  $$dollar$$;
+-- dollar quoted string with tag
+select
+  $tag$body$tag$;
+-- bit string
+select b'1010';
+-- byte string
+select
+  x'AF';
+-- positional param
+select $1;
+-- string continuation
+select
+  'foo'
+  'bar';
+-- string continuation, multiple
+select
+  'one'
+  'two'
+  'three';
+-- esc string continuation
+select
+  e'esc\n'
+  'tail';
+-- unicode esc string continuation
+select
+  u&'uni'
+  'tail';
+-- bit string continuation
+select
+  b'1010'
+  '0101';
+-- byte string continuation
+select
+  x'AF'
+  'BE';
