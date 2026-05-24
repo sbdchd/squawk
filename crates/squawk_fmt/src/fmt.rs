@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use rowan::Direction;
 use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::quote::quote_column_alias;
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 use tiny_pretty::Doc;
 use tiny_pretty::{PrintOptions, print};
@@ -445,6 +446,10 @@ fn build_literal<'a>(lit: ast::Literal) -> Doc<'a> {
     Doc::text(lit.syntax().to_string())
 }
 
+fn build_name<'a>(name: ast::Name) -> Doc<'a> {
+    Doc::text(quote_column_alias(&name.text()))
+}
+
 fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
     Doc::text(ty.syntax().to_string())
 }
@@ -538,10 +543,7 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
         }
 
         if let Some(name) = as_name.name() {
-            // TODO: quoting or not?
-            doc = doc
-                .append(Doc::space())
-                .append(Doc::text(name.syntax().to_string()));
+            doc = doc.append(Doc::space()).append(build_name(name));
         }
     }
 
