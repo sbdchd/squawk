@@ -7,6 +7,166 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.54.0 - 2026-05-24
+
+### Added
+
+- lexer: add parsing and erroring for num trailing suffix (#1159)
+
+  ```
+  error[syntax-error]: trailing junk after numeric literal
+    ╭▸ stdin:1:11
+    │
+  1 │ SELECT 0x0y;
+    ╰╴          ━
+  ```
+
+- parser: warn about empty / invalid params & empty quoted idents (#1164)
+
+  ```
+  error[syntax-error]: empty delimited identifier
+    ╭▸ stdin:1:8
+    │
+  1 │ select "", $, $2147483648
+    ╰╴       ━━
+  error[syntax-error]: missing parameter number
+    ╭▸ stdin:1:12
+    │
+  1 │ select "", $, $2147483648
+    ╰╴           ━
+  error[syntax-error]: parameter number too large
+    ╭▸ stdin:1:15
+    │
+  1 │ select "", $, $2147483648
+    ╰╴              ━━━━━━━━━━━
+  ```
+
+- parser: warn about invalid octal/hex/binary digits (#1163)
+
+  ```
+  error[syntax-error]: invalid digit for a base 2 literal
+    ╭▸ stdin:1:12
+    │
+  1 │ select 0b104, 0o7719, 0xg
+    ╰╴           ━
+  error[syntax-error]: invalid digit for a base 8 literal
+    ╭▸ stdin:1:20
+    │
+  1 │ select 0b104, 0o7719, 0xg
+    ╰╴                   ━
+  error[syntax-error]: trailing junk after numeric literal
+    ╭▸ stdin:1:25
+    │
+  1 │ select 0b104, 0o7719, 0xg
+    ╰╴                        ━
+  ```
+
+- parser: improve error reporting for malformed literals (#1162)
+
+  ```
+  error[syntax-error]: trailing junk after positional parameter
+    ╭▸ stdin:1:10
+    │
+  1 │ SELECT $1a;
+    ╰╴         ━
+  ```
+
+  instead of
+
+  ```
+  error[syntax-error]: trailing junk after positional parameter
+    ╭▸ stdin:1:10
+    │
+  1 │ SELECT $1a;
+    ╰╴       ━━━
+  ```
+
+- parser: improve lexing numbers (#1161)
+
+  ```sql
+  select .4;
+  ```
+
+  now produces:
+
+  ```
+  NUMERIC_NUMBER@7..9 ".4"
+  ```
+
+  instead of:
+
+  ```
+  INT_NUMBER@7..9 ".4"
+  ```
+
+- ide: goto def for `t.c%type` (#1161)
+
+  ```sql
+  create table t(a int, b text);
+  --           ^ dest
+  create function f(x t.a%type) returns s.t.b%type
+  --                  ^ source
+    as $$ select 'hello'::text $$ language sql;
+  ```
+
+- ide: find refs for types like `bit` (#1153)
+
+  ```sql
+  create type pg_catalog.bit;
+  --                     ^^^ source
+
+  create function pg_catalog.bit(bigint, integer) returns bit
+  --                                                      ^^^ ref
+    language internal;
+  ```
+
+- ide: add hover for string literals (#1155)
+
+  Now we decode the escape sequences for string literals on hover and show the
+  value up to the first new line.
+
+- ide: improve numeric literal type inference (#1156)
+
+  ```sql
+  select 2147483647; -- type: integer
+  select 2147483648; -- type: bigint
+  select 100000000000000000000000; -- type: numeric
+  ```
+
+- fmt: literals & binary operators (#1169)
+
+  Format binary operators and literals.
+
+  ```sql
+  -- before
+  select TRUE  and  FALSE;
+  select X'AF';
+
+  -- after
+  select true and false;
+  select
+    x'AF';
+  ```
+
+- fmt: unquote column aliases when possible (#1168)
+
+  ```sql
+  -- before
+  select 1 as "foo";
+
+  -- after
+  select 1 as foo;
+  ```
+
+### Changed
+
+- harden github action workflows (#1165). Thanks @chdsbd!
+
+### Fixed
+
+- lexer: fix unicode escape string issue (#1158)
+- vscode: update TextMate grammar to support other numeric literal kinds (#1157)
+
 ## v2.53.0 - 2026-05-17
 
 ### Added
