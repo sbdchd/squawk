@@ -110,7 +110,6 @@ jobs:
         uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2
         with:
           version: 0.11.0
-          use-cache: false
 
       - name: Install Toolchain
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
@@ -120,8 +119,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
-        with:
-          lookup-only: true
 
       - name: Build
         run: |
@@ -319,8 +316,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
-        with:
-          lookup-only: true
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -378,8 +373,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
-        with:
-          lookup-only: true
 
       - name: Get Clippy Version
         run: cargo clippy --version
@@ -406,8 +399,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
-        with:
-          lookup-only: true
 
       - name: Test
         run: ./s/test
@@ -444,8 +435,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
-        with:
-          lookup-only: true
 
       - name: Publish to crates.io
         run: cargo publish --workspace

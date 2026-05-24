@@ -58,7 +58,7 @@ jobs:
           working-directory: crates/squawk
           args: --release --out dist ${{ matrix.platform.maturin-options }}
           manylinux: ${{ matrix.platform.manylinux }}
-          sccache: false
+          sccache: ${{ matrix.platform.sccache }}
           before-script-linux: ${{ matrix.platform.before-script }}
       - name: Upload wheels
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -88,7 +88,7 @@ jobs:
           target: ${{ matrix.platform.target }}
           working-directory: crates/squawk
           args: --release --out dist
-          sccache: false
+          sccache: "true"
       - name: Upload wheels
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -117,7 +117,7 @@ jobs:
           target: ${{ matrix.platform.target }}
           working-directory: crates/squawk
           args: --release --out dist
-          sccache: false
+          sccache: "true"
       - name: Upload wheels
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
