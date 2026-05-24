@@ -504,7 +504,10 @@ fn build_string_literal<'a>(lit: &ast::Literal) -> Doc<'a> {
 
 fn format_string_token(t: &SyntaxToken) -> String {
     let text = t.text();
-    if matches!(t.kind(), SyntaxKind::STRING | SyntaxKind::DOLLAR_QUOTED_STRING) {
+    if matches!(
+        t.kind(),
+        SyntaxKind::STRING | SyntaxKind::DOLLAR_QUOTED_STRING
+    ) {
         return text.to_string();
     }
     match text.find('\'') {
