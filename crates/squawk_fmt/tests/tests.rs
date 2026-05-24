@@ -42,6 +42,31 @@ fn meaningful_tokens(text: &str) -> Vec<(TokenKind, &str)> {
     tokens
 }
 
+fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> bool {
+    let (bkind, btext) = before;
+    let (akind, atext) = after;
+
+    if bkind == akind {
+        return btext.eq_ignore_ascii_case(atext);
+    }
+
+    // We convert `select 1 "foo"` to `select 1 foo` so we need to do some quote
+    // munging
+    let unquote = |kind: TokenKind, text: &str| match kind {
+        TokenKind::QuotedIdent { .. } => text
+            .strip_prefix('"')
+            .and_then(|t| t.strip_suffix('"'))
+            .map(|t| t.to_string()),
+        TokenKind::Ident => Some(text.to_string()),
+        _ => None,
+    };
+
+    match (unquote(bkind, btext), unquote(akind, atext)) {
+        (Some(b), Some(a)) => b.eq_ignore_ascii_case(&a),
+        _ => false,
+    }
+}
+
 fn assert_no_dropped_tokens(before: &str, after: &str) {
     let before_tokens = meaningful_tokens(before);
     let after_tokens = meaningful_tokens(after);
@@ -49,11 +74,11 @@ fn assert_no_dropped_tokens(before: &str, after: &str) {
     let before_len = before_tokens.len();
     let after_len = after_tokens.len();
 
-    for (i, ((bkind, btext), (akind, atext))) in
+    for (i, (&(bkind, btext), &(akind, atext))) in
         before_tokens.iter().zip(after_tokens.iter()).enumerate()
     {
         assert!(
-            bkind == akind && btext.eq_ignore_ascii_case(atext),
+            tokens_equivalent((bkind, btext), (akind, atext)),
             "token mismatch at position {i}:\n  before: {bkind:?} {btext:?}\n  after:  {akind:?} {atext:?}"
         );
     }
