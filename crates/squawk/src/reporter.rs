@@ -115,9 +115,11 @@ fn render_lint_error<W: std::io::Write>(
         .fold(true)
         .annotation(AnnotationKind::Primary.span(err.range.into()));
 
+    let rule_url = format!("https://squawkhq.com/docs/{}", err.rule_name);
     let mut group = level
         .primary_title(&err.message)
         .id(&err.rule_name)
+        .id_url(&rule_url)
         .element(snippet);
 
     if let Some(help) = &err.help {
