@@ -17,7 +17,7 @@ SELECT 1;
 
 
 ```
-warning[adding-not-nullable-field]: Adding a NOT NULL field requires exclusive locks and table rewrites.
+warning[]8;;https://squawkhq.com/docs/adding-not-nullable-field\adding-not-nullable-field]8;;\]: Adding a NOT NULL field requires exclusive locks and table rewrites.
   ╭▸ alpha.sql:1:8
   │
 1 │ SELECT 1;
