@@ -3714,7 +3714,9 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
         ColumnDefKind::NameRef => {
             // https://www.depesz.com/2024/10/03/waiting-for-postgresql-18-add-temporal-foreign-key-contraints/
             // TODO: add validation to ensure this is in the right position
-            p.eat(PERIOD_KW);
+            if p.at(PERIOD_KW) && p.nth_at_ts(1, NAME_REF_FIRST) {
+                p.bump(PERIOD_KW);
+            }
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
             name_ref(p).map(|lhs| postfix_expr(p, lhs, true));

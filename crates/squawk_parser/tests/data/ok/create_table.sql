@@ -398,3 +398,13 @@ CREATE TABLE addresses (
     recipient text NOT NULL,
     PRIMARY KEY (id, valid_range WITHOUT OVERLAPS)
 );
+
+-- regression test gh issue #1171
+-- allow period as a column name
+CREATE TABLE t (
+    symbol text,
+    period text,
+    year int,
+    quarter int,
+    PRIMARY KEY (symbol, period, year, quarter)
+);

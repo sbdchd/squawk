@@ -3929,4 +3929,95 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- regression test gh issue #1171"
+    WHITESPACE "\n"
+    COMMENT "-- allow period as a column name"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "symbol"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          PERIOD_KW "period"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          YEAR_KW "year"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "quarter"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      PRIMARY_KEY_CONSTRAINT
+        PRIMARY_KW "PRIMARY"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "symbol"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              PERIOD_KW "period"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              YEAR_KW "year"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "quarter"
+          R_PAREN ")"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
