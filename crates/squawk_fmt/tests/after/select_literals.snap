@@ -9,28 +9,23 @@ select true;
 -- false
 select false;
 -- int number
-select
-  42;
+select 42;
 -- numeric number
 select 3.14;
 -- string
 select 'hello';
 -- esc string
-select
-  e'esc\n';
+select e'esc\n';
 -- unicode esc string
 select u&'unicode';
 -- dollar quoted string
-select
-  $$dollar$$;
+select $$dollar$$;
 -- dollar quoted string with tag
-select
-  $tag$body$tag$;
+select $tag$body$tag$;
 -- bit string
 select b'1010';
 -- byte string
-select
-  x'AF';
+select x'AF';
 -- positional param
 select $1;
 -- string continuation
