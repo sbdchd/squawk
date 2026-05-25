@@ -60,7 +60,7 @@ CREATE TABLE users (id bigint);
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴
-        4 ± 
+        4 ±         
         5 + COMMIT;
           ╰╴
         ");
@@ -112,7 +112,7 @@ CREATE TABLE posts (id bigint);
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴
-        8 ± 
+        8 ±         
         9 + COMMIT;
           ╰╴
         ");
@@ -132,7 +132,7 @@ CREATE TABLE users (id bigint);
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴
-        4 ± 
+        4 ±         
         5 + COMMIT;
           ╰╴
         ");
@@ -162,7 +162,7 @@ CREATE TABLE users (id bigint);
           │
           ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
           ╭╴
-        4 ± 
+        4 ±         
         5 + COMMIT;
           ╰╴
         ");
