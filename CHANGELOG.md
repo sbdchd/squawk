@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.55.0 - 2026-05-27
+
+### Added
+
+- parser: validation for `default` usages (#1175)
+
+  ```sql
+  -- ok
+  insert into t values (default);
+  ```
+
+  ```sql
+  -- err
+  select default;
+  ```
+
+- linter: setup hyperlinks for rule names in terminal (#1174)
+
+  If your terminal supports it, then clicking on the rule name will navigate
+  you to the docs.
+
+### Fixed
+
+- fmt: upgrade tiny_pretty to latest (#1173)
+
+  We no longer wrap statements unless necessary.
+
+- parser: fix parsing period column (#1172)
+
+  previously we'd error on:
+
+  ```sql
+  create table t (
+    symbol text,
+    period text,
+    year int,
+    quarter int,
+    primary key (symbol, period, year, quarter)
+  );
+  ```
+
 ## v2.54.0 - 2026-05-24
 
 ### Added
