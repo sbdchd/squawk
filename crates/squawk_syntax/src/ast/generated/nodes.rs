@@ -3172,6 +3172,10 @@ impl Column {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn field_expr(&self) -> Option<FieldExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn index_expr(&self) -> Option<IndexExpr> {
         support::child(&self.syntax)
     }

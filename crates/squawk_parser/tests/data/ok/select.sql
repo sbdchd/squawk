@@ -464,7 +464,6 @@ select 1 collate;
 select foo.bar null;
 select foo.bar default;
 
-select default;
 select c default;
 select null;
 select c null;

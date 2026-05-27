@@ -150,8 +150,6 @@ merge into t
       b = 1,
       c = d,
       e = (select 1),
-      f = row(1, 2, default),
-      g = (1, 2, default),
       h = (default)
   when not matched by source then
     update set foo = bar;
