@@ -5869,16 +5869,6 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          LITERAL
-            DEFAULT_KW "default"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
           NAME_REF
             IDENT "c"
           WHITESPACE " "

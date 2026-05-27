@@ -6,7 +6,7 @@
 
 use std::ops::Range;
 
-use crate::ast::AstNode;
+use crate::ast::{AstNode, LitKind};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
@@ -29,6 +29,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::RuleStmtList(it) => validate_rule_stmt_list(it, errors),
                 ast::Select(it) => validate_select(it, errors),
                 ast::SelectInto(it) => validate_select_into(it, errors),
+                ast::SetSingleColumn(it) => validate_set_single_column(it, errors),
                 ast::SourceFile(it) => validate_source_file(it, errors),
                 _ => (),
             }
@@ -245,6 +246,62 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
 
     validate_unicode_esc_string(&lit, acc);
     validate_prefixed_strings(&lit, acc);
+    validate_default_literal(&lit, acc);
+}
+
+fn validate_default_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
+    if !matches!(lit.kind(), Some(LitKind::Default(_))) {
+        return;
+    }
+    let node = lit.syntax();
+    if is_valid_default_literal_position(node) {
+        return;
+    }
+    acc.push(SyntaxError::new(
+        "DEFAULT is not allowed in this context",
+        node.text_range(),
+    ));
+}
+
+fn is_valid_default_literal_position(literal: &SyntaxNode) -> bool {
+    for ancestor in literal.ancestors().skip(1) {
+        match ancestor.kind() {
+            // unwrap parens
+            PAREN_EXPR => continue,
+            SET_EXPR => return true,
+            ROW => return is_row_in_insert_values(&ancestor),
+            _ => return false,
+        }
+    }
+    false
+}
+
+fn is_row_in_insert_values(row: &SyntaxNode) -> bool {
+    // row_list
+    row.parent()
+        // values
+        .and_then(|n| n.parent())
+        // insert / merge_insert
+        .and_then(|n| n.parent())
+        .is_some_and(|p| matches!(p.kind(), INSERT | MERGE_INSERT))
+}
+
+fn validate_set_single_column(it: ast::SetSingleColumn, acc: &mut Vec<SyntaxError>) {
+    let Some(set_expr) = it.set_expr() else {
+        return;
+    };
+    if set_expr.default_token().is_none() {
+        return;
+    }
+    let Some(column) = it.column() else {
+        return;
+    };
+    if column.index_expr().is_some() || column.field_expr().is_some() {
+        acc.push(SyntaxError::new(
+            "DEFAULT may only assign to a simple column name",
+            column.syntax().text_range(),
+        ));
+    }
 }
 
 #[derive(Clone, Copy)]

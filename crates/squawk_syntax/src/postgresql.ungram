@@ -675,6 +675,7 @@ Column =
       NotEnforced? Enforced?
   | 'period'? NameRef
   | IndexExpr
+  | FieldExpr
   )
 ColumnConstraint =
   CheckConstraint
