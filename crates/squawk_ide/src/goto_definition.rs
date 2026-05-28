@@ -670,6 +670,31 @@ cross join ((((select u$0.n * 10 as val)))) x;
     }
 
     #[test]
+    fn goto_lateral_cte_ref_after_lateral_not_found() {
+        // c is defined after the lateral it isn't visible to the subquery
+        // Query 1 ERROR at Line 10: : ERROR:  missing FROM-clause entry for table "c"
+        // LINE 10:     where d.id = c.id
+        //                           ^
+        goto_not_found(
+            "
+with
+  d as (select 1 id, 2 amount),
+  c as (select 2 id)
+select r.amount
+from
+  d,
+  lateral (
+    select d.amount
+    from d
+    where d.id = c$0.id
+    limit 1
+  ) r,
+  c;
+",
+        );
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;

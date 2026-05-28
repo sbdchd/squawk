@@ -1795,9 +1795,13 @@ fn find_from_item_for_select_qualified_name_ref(
         ast::FromItem::cast(ancestor).filter(|from_item| from_item.lateral_token().is_some())
     })?;
 
+    let lateral_start = lateral_from_item.syntax().text_range().start();
+
     for ancestor in lateral_from_item.syntax().ancestors() {
         if let Some(from_clause) = ast::Select::cast(ancestor).and_then(|x| x.from_clause())
-            && let Some(outer_from_item) = find_from_item_in_from_clause(&from_clause, table_name)
+            && let Some(outer_from_item) = ast_nav::iter_from_clause(&from_clause)
+                .filter(|item| item.syntax().text_range().start() < lateral_start)
+                .find(|item| is_from_item_match(item, table_name))
         {
             return Some(outer_from_item);
         }
