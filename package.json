@@ -1,6 +1,6 @@
 {
   "name": "squawk-cli",
-  "version": "2.49.0",
+  "version": "2.55.0",
   "description": "linter for PostgreSQL, focused on migrations",
   "repository": "git@github.com:sbdchd/squawk.git",
   "author": "Squawk Team & Contributors",
@@ -15,21 +15,18 @@
   "bin": {
     "squawk": "js/bin/squawk"
   },
-  "scripts": {
-    "install": "node js/install.js"
-  },
+  "files": [
+    "js/bin/squawk",
+    "js/index.js"
+  ],
   "devDependencies": {
     "@types/node": "^14.0.13",
-    "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^3.3.0",
     "@typescript-eslint/parser": "^3.3.0",
     "eslint": "^7.2.0",
     "eslint-plugin-import": "^2.21.2",
     "oxfmt": "^0.44.0",
     "typescript": "^3.9.5"
-  },
-  "dependencies": {
-    "node-fetch": "2.6.7"
   },
   "volta": {
     "node": "20.19.0",

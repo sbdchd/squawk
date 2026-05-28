@@ -7,6 +7,452 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.55.0 - 2026-05-27
+
+### Added
+
+- parser: validation for `default` usages (#1175)
+
+  ```sql
+  -- ok
+  insert into t values (default);
+  ```
+
+  ```sql
+  -- err
+  select default;
+  ```
+
+- linter: setup hyperlinks for rule names in terminal (#1174)
+
+  If your terminal supports it, then clicking on the rule name will navigate
+  you to the docs.
+
+### Fixed
+
+- fmt: upgrade tiny_pretty to latest (#1173)
+
+  We no longer wrap statements unless necessary.
+
+- parser: fix parsing period column (#1172)
+
+  previously we'd error on:
+
+  ```sql
+  create table t (
+    symbol text,
+    period text,
+    year int,
+    quarter int,
+    primary key (symbol, period, year, quarter)
+  );
+  ```
+
+## v2.54.0 - 2026-05-24
+
+### Added
+
+- lexer: add parsing and erroring for num trailing suffix (#1159)
+
+  ```
+  error[syntax-error]: trailing junk after numeric literal
+    ╭▸ stdin:1:11
+    │
+  1 │ SELECT 0x0y;
+    ╰╴          ━
+  ```
+
+- parser: warn about empty / invalid params & empty quoted idents (#1164)
+
+  ```
+  error[syntax-error]: empty delimited identifier
+    ╭▸ stdin:1:8
+    │
+  1 │ select "", $, $2147483648
+    ╰╴       ━━
+  error[syntax-error]: missing parameter number
+    ╭▸ stdin:1:12
+    │
+  1 │ select "", $, $2147483648
+    ╰╴           ━
+  error[syntax-error]: parameter number too large
+    ╭▸ stdin:1:15
+    │
+  1 │ select "", $, $2147483648
+    ╰╴              ━━━━━━━━━━━
+  ```
+
+- parser: warn about invalid octal/hex/binary digits (#1163)
+
+  ```
+  error[syntax-error]: invalid digit for a base 2 literal
+    ╭▸ stdin:1:12
+    │
+  1 │ select 0b104, 0o7719, 0xg
+    ╰╴           ━
+  error[syntax-error]: invalid digit for a base 8 literal
+    ╭▸ stdin:1:20
+    │
+  1 │ select 0b104, 0o7719, 0xg
+    ╰╴                   ━
+  error[syntax-error]: trailing junk after numeric literal
+    ╭▸ stdin:1:25
+    │
+  1 │ select 0b104, 0o7719, 0xg
+    ╰╴                        ━
+  ```
+
+- parser: improve error reporting for malformed literals (#1162)
+
+  ```
+  error[syntax-error]: trailing junk after positional parameter
+    ╭▸ stdin:1:10
+    │
+  1 │ SELECT $1a;
+    ╰╴         ━
+  ```
+
+  instead of
+
+  ```
+  error[syntax-error]: trailing junk after positional parameter
+    ╭▸ stdin:1:10
+    │
+  1 │ SELECT $1a;
+    ╰╴       ━━━
+  ```
+
+- parser: improve lexing numbers (#1161)
+
+  ```sql
+  select .4;
+  ```
+
+  now produces:
+
+  ```
+  NUMERIC_NUMBER@7..9 ".4"
+  ```
+
+  instead of:
+
+  ```
+  INT_NUMBER@7..9 ".4"
+  ```
+
+- ide: goto def for `t.c%type` (#1161)
+
+  ```sql
+  create table t(a int, b text);
+  --           ^ dest
+  create function f(x t.a%type) returns s.t.b%type
+  --                  ^ source
+    as $$ select 'hello'::text $$ language sql;
+  ```
+
+- ide: find refs for types like `bit` (#1153)
+
+  ```sql
+  create type pg_catalog.bit;
+  --                     ^^^ source
+
+  create function pg_catalog.bit(bigint, integer) returns bit
+  --                                                      ^^^ ref
+    language internal;
+  ```
+
+- ide: add hover for string literals (#1155)
+
+  Now we decode the escape sequences for string literals on hover and show the
+  value up to the first new line.
+
+- ide: improve numeric literal type inference (#1156)
+
+  ```sql
+  select 2147483647; -- type: integer
+  select 2147483648; -- type: bigint
+  select 100000000000000000000000; -- type: numeric
+  ```
+
+- fmt: literals & binary operators (#1169)
+
+  Format binary operators and literals.
+
+  ```sql
+  -- before
+  select TRUE  and  FALSE;
+  select X'AF';
+
+  -- after
+  select true and false;
+  select
+    x'AF';
+  ```
+
+- fmt: unquote column aliases when possible (#1168)
+
+  ```sql
+  -- before
+  select 1 as "foo";
+
+  -- after
+  select 1 as foo;
+  ```
+
+### Changed
+
+- harden github action workflows (#1165). Thanks @chdsbd!
+
+### Fixed
+
+- lexer: fix unicode escape string issue (#1158)
+- vscode: update TextMate grammar to support other numeric literal kinds (#1157)
+
+## v2.53.0 - 2026-05-17
+
+### Added
+
+- parser: validate string continuations (#1137)
+- parser: improve create rule ast (#1147)
+
+### Changed
+
+- parser: update ast nodes to include their trailing semicolons (#1145, #1148)
+
+### Fixed
+
+- install: fix windows npx install bug (#1140)
+
+## v2.52.1 - 2026-05-12
+
+### Changed
+
+Attempt to fix npm install method
+
+## v2.52.0 - 2026-05-12
+
+### Added
+
+- parser: validation for bit, byte, and escape string types (#1132)
+
+  ```sql
+  select b'01' '10';
+  select x'0F' '10';
+  select e'foo' 'bar';
+  ```
+
+  now gives:
+
+  ```sql
+  error[syntax-error]: Expected new line or comma between string literals
+    ╭▸ stdin:1:13
+    │
+  1 │ select b'01' '10';
+    ╰╴            ━
+  error[syntax-error]: Expected new line or comma between string literals
+    ╭▸ stdin:2:13
+    │
+  2 │ select x'0F' '10';
+    ╰╴            ━
+  error[syntax-error]: Expected new line or comma between string literals
+    ╭▸ stdin:3:14
+    │
+  3 │ select e'foo' 'bar';
+    ╰╴             ━
+  ```
+
+- parser: validation for escape sequences (#1125, #1123, #1122, #1128, #1129)
+
+  ```sql
+  select U&'wrong: !061' UESCAPE '!';
+  select U&"wrong: \06" UESCAPE '\';
+  ```
+
+  now gives:
+
+  ```sql
+  error[syntax-error]: Unicode escape requires 4 hex digits: !XXXX
+    ╭▸ stdin:1:20
+    │
+  1 │   select U&'wrong: !061' UESCAPE '!';
+    ╰╴                   ━━━━
+  error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+    ╭▸ stdin:2:20
+    │
+  2 │   select U&"wrong: \06" UESCAPE '\';
+    ╰╴                   ━━━
+  ```
+
+### Changed
+
+- ci: update npm based install method (#1133)
+
+  Instead of fetching the binary via an install script we use an optional
+  peer dependency, mirroring ESBuild and Sentry.
+
+### Fixed
+
+- cli: fix missing binary exit code (#1130)
+
+  Before if the install script didn't run the NPM JS shim would exit without
+  erroring. Thanks @nwalters512!
+
+- parser: parsing unicode escape idents in cast position (#1127)
+
+  ```sql
+  select 2::U&"!0069!006E!0074!0038" UESCAPE '!' from t;
+  ```
+
+  now parses without error
+
+## v2.51.0 - 2026-05-06
+
+### Added
+
+- linter: add file-level override to disable `assume_in_transaction` (#996). Thanks @reteps!
+
+  When using `assume-in-transaction`, you can disable it on a per file basis using a comment:
+
+  ```sql
+  -- squawk-disable-assume-in-transaction
+  ```
+
+- syntax: add validation for `select into` (#1116)
+
+  Warn about invalid usages, such as:
+  - `select 4 a union select 5 a into t;`
+  - `with t as (select 1 a into t) select * from t;`
+  - `select * from t where a in (select 1 a into t);`
+
+  and more!
+
+- parser: add empty statement to ast (#1111)
+
+  ```sql
+  ;
+  ;
+  ;
+  ```
+
+  now gives:
+
+  ```
+  SOURCE_FILE@0..5
+    EMPTY_STMT@0..1
+      SEMICOLON@0..1 ";"
+    WHITESPACE@1..2 "\n"
+    EMPTY_STMT@2..3
+      SEMICOLON@2..3 ";"
+    WHITESPACE@3..4 "\n"
+    EMPTY_STMT@4..5
+      SEMICOLON@4..5 ";"
+  ```
+
+- ide: code actions create table as <-> select into + parser fix (#1113)
+
+  Create table and select into are roughly interchangable, so this code action
+  supports switching between.
+
+- ide: show comments for types and columns (#1110)
+- ide: hover infer more types for columns (#1109, #1108)
+
+### Changed
+
+- parser: cleanup insert & create rule ast grammar to be more strict (#1112)
+
+### Fixed
+
+- vscode: fix text mate grammar for multiple stmts on a line (#1115)
+- ide: fix infer column name w/ column aliases and goto def (#1118)
+- ide: fix output column alias resolution in group by / order by (#1117)
+- ide: fix inherit/like resolution + cte fixes (#1107)
+
+## v2.50.0 - 2026-05-01
+
+### Added
+
+- linter: new rule: prefer-repack (#1105)
+
+  `repack` isn't out yet, coming in PG19, but when it's out:
+
+  ```sql
+  -- instead of
+  cluster foo;
+  -- or
+  vacuum full foo;
+  -- use
+  repack (concurrently) foo;
+  ```
+
+- linter: new rule: require-concurrent-reindex (#1104)
+
+  ```sql
+  -- instead of
+  reindex table foo;
+  -- use
+  reindex table concurrently foo;
+  ```
+
+- linter: new rule: require-concurrent-partition-detach (#1103)
+
+  ```sql
+  -- instead of
+  alter table t detach partition p;
+  -- use
+  alter table t detach partition p concurrently;
+  ```
+
+- linter: new rule: identifier-too-long (#1102)
+
+  Postgres truncates identifiers that are too long, we now warn about this.
+
+  ```sql
+  create table table_very_long_very_long_very_long_very_long_very_long_very_long (c bigint);
+  ```
+
+  ```
+  warning[identifier-too-long]: `table_very_long_very_long_very_long_very_long_very_long_very_long` is too long and will be truncated to 63 bytes.
+    ╭▸ stdin:1:14
+    │
+  1 │ create table table_very_long_very_long_very_long_very_long_very_long_very_long (c bigint);
+    │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ╭╴
+  1 - create table table_very_long_very_long_very_long_very_long_very_long_very_long (c bigint);
+  1 + create table table_very_long_very_long_very_long_very_long_very_long_very_lo (c bigint);
+    ╰╴
+  ```
+
+  Thanks @subnix for coming up with this idea!
+
+- linter: parallel file checking (#1099)
+
+  We now check files in parallel using rayon, which gives a nice speed up of
+  22-55%.
+
+## Fixed
+
+- lexer/ide: fix lexing of non-ascii + fix case folding in goto def (#1101)
+
+  Previously we case folded all of the characters in our unquoted identifiers
+  including unicode. This differed from Postgres behavior which only folded ascii.
+
+  Now we correctly error instead of resolving in the following:
+
+  ```sql
+  with t as (select 1 Äpfel)
+  select äpfel from t;
+  --     ^ goto def no longer resolves
+  ```
+
+  Additionally fixed a bug in the lexer where we weren't lexing unicode identifiers.
+
+  For example, the following now lexes:
+
+  ```sql
+  with t as (select 1 🦀)
+  select 🦀 from t;
+  ```
+
 ## v2.49.0 - 2026-04-27
 
 ### Added

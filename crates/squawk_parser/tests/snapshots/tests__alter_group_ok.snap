@@ -20,7 +20,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_multiple"
   WHITESPACE "\n"
@@ -47,7 +47,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "w"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop"
   WHITESPACE "\n"
@@ -66,7 +66,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_multiple"
   WHITESPACE "\n"
@@ -93,7 +93,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "w"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
@@ -113,7 +113,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_role"
   WHITESPACE "\n"
@@ -131,7 +131,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_user"
   WHITESPACE "\n"
@@ -149,7 +149,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- session_user"
   WHITESPACE "\n"
@@ -167,5 +167,5 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -375,7 +375,7 @@ SELECT attname, atthasmissing, attmissingval FROM pg_attribute
 DROP TABLE T;
 DROP FUNCTION foolme(timestamptz);
 
--- Simple querie
+-- Simple queries
 CREATE TABLE T (pk INT NOT NULL PRIMARY KEY);
 
 SELECT set('t');
@@ -652,6 +652,22 @@ SELECT count(*)
   FROM pg_attribute
   WHERE attrelid = 'ft1'::regclass AND
     (attmissingval IS NOT NULL OR atthasmissing);
+
+-- Verify that table-rewriting maintenance commands preserve attmissingval
+-- columns.
+CREATE TABLE t (id int PRIMARY KEY);
+INSERT INTO t SELECT generate_series(1, 3);
+ALTER TABLE t ADD COLUMN a int DEFAULT 42;
+ALTER TABLE t ADD COLUMN b int NOT NULL DEFAULT 7 CHECK (b > 0);
+VACUUM FULL t;
+SELECT * FROM t ORDER BY id;
+ALTER TABLE t ADD COLUMN c text DEFAULT 'hello';
+CLUSTER t USING t_pkey;
+SELECT * FROM t ORDER BY id;
+ALTER TABLE t ADD COLUMN d int DEFAULT 99;
+REPACK t;
+SELECT * FROM t ORDER BY id;
+DROP TABLE t;
 
 -- cleanup
 DROP FOREIGN TABLE ft1;

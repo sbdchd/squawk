@@ -19,7 +19,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -35,7 +35,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -53,7 +53,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -71,7 +71,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -89,7 +89,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -107,7 +107,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -123,7 +123,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -144,7 +144,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- vertex & table edges"
   WHITESPACE "\n"
@@ -320,7 +320,7 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -363,7 +363,7 @@ SOURCE_FILE
           WHITESPACE " "
           PROPERTIES_KW "properties"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_PROPERTY_GRAPH
     CREATE_KW "create"
@@ -426,7 +426,7 @@ SOURCE_FILE
                 IDENT "y"
             R_PAREN ")"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- vertex & table edges abbr"
   WHITESPACE "\n"
@@ -486,7 +486,7 @@ SOURCE_FILE
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- vertex tables only"
   WHITESPACE "\n"
@@ -528,7 +528,7 @@ SOURCE_FILE
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- edge tables only"
   WHITESPACE "\n"
@@ -570,7 +570,7 @@ SOURCE_FILE
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- vertex & table multiple tables"
   WHITESPACE "\n"
@@ -656,5 +656,5 @@ SOURCE_FILE
             IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

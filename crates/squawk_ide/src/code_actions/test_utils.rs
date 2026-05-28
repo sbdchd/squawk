@@ -3,24 +3,43 @@ use salsa::Database as Db;
 use squawk_linter::Edit;
 use squawk_syntax::ast;
 
-use crate::db::{Database, File};
-use crate::test_utils::fixture;
+use crate::file::InFile;
+use crate::test_utils::Fixture;
 
 use super::{ActionKind, CodeAction};
 
+#[must_use]
 pub(super) fn apply_code_action(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
 ) -> String {
-    let (mut offset, sql) = fixture(sql);
-    let db = Database::default();
-    let file = File::new(&db, sql.clone().into());
-    let parse_result = crate::db::parse(&db, file);
+    apply_code_action_(f, sql, false)
+}
 
-    offset = offset.checked_sub(1.into()).unwrap_or_default();
+#[must_use]
+pub(super) fn apply_code_action_with_errors(
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
+    sql: &str,
+) -> String {
+    apply_code_action_(f, sql, true)
+}
+
+fn apply_code_action_(
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
+    sql: &str,
+    allow_errors: bool,
+) -> String {
+    let fixture = if allow_errors {
+        Fixture::new_allow_errors(sql)
+    } else {
+        Fixture::new(sql)
+    };
+    let offset = fixture.marker().offset_before();
+    let db = fixture.db();
+    let file = offset.file_id;
 
     let mut actions = vec![];
-    f(&db, file, &mut actions, offset);
+    f(db, offset, &mut actions);
 
     assert!(
         !actions.is_empty(),
@@ -29,16 +48,7 @@ pub(super) fn apply_code_action(
 
     let action = &actions[0];
 
-    match action.kind {
-        ActionKind::QuickFix => {
-            // Quickfixes can fix syntax errors so we don't assert
-        }
-        ActionKind::RefactorRewrite => {
-            assert_eq!(parse_result.errors(), vec![]);
-        }
-    }
-
-    let mut result = sql.clone();
+    let mut result = file.content(db).to_string();
 
     let mut edits = action.edits.clone();
     edits.sort_by_key(|e| e.text_range.start());
@@ -62,7 +72,7 @@ pub(super) fn apply_code_action(
             assert_eq!(
                 reparse.errors(),
                 vec![],
-                "Code actions shouldn't cause syntax errors"
+                "Code actions shouldn't cause syntax errors.\nParsed:\n{result}"
             );
         }
     }
@@ -89,32 +99,34 @@ fn check_overlap(edits: &[Edit]) {
 }
 
 fn code_action_not_applicable_(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
     allow_errors: bool,
 ) -> bool {
-    let (offset, sql) = fixture(sql);
-    let db = Database::default();
-    let file = File::new(&db, sql.clone().into());
-    let parse_result = crate::db::parse(&db, file);
-    if !allow_errors {
-        assert_eq!(parse_result.errors(), vec![]);
-    }
+    let fixture = if allow_errors {
+        Fixture::new_allow_errors(sql)
+    } else {
+        Fixture::new(sql)
+    };
+    let offset = fixture.marker().offset_before();
+    let db = fixture.db();
 
     let mut actions = vec![];
-    f(&db, file, &mut actions, offset);
+    f(db, offset, &mut actions);
     actions.is_empty()
 }
 
+#[must_use]
 pub(super) fn code_action_not_applicable(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
 ) -> bool {
     code_action_not_applicable_(f, sql, false)
 }
 
+#[must_use]
 pub(super) fn code_action_not_applicable_with_errors(
-    f: impl Fn(&dyn Db, File, &mut Vec<CodeAction>, TextSize) -> Option<()>,
+    f: impl Fn(&dyn Db, InFile<TextSize>, &mut Vec<CodeAction>) -> Option<()>,
     sql: &str,
 ) -> bool {
     code_action_not_applicable_(f, sql, true)

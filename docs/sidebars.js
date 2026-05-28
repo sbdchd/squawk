@@ -36,6 +36,10 @@ module.exports = {
       "ban-uncommitted-transaction",
       "require-enum-value-ordering",
       "require-table-schema",
+      "identifier-too-long",
+      "require-concurrent-partition-detach",
+      "require-concurrent-reindex",
+      "prefer-repack",
       // xtask:new-rule:error-name
     ],
   },

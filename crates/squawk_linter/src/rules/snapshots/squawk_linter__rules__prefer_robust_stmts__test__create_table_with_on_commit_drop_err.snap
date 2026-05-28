@@ -5,7 +5,7 @@ expression: "lint_errors(r#\"\nselect 1; -- so we don't skip checking\nCREATE TA
 warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ 
 3 │ CREATE TABLE test_table (id int) ON COMMIT DROP;
-  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ╭╴
 3 │ CREATE TABLE if not exists test_table (id int) ON COMMIT DROP;
   ╰╴             +++++++++++++

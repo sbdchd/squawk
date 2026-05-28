@@ -1,6 +1,5 @@
 use anyhow::Result;
 use lsp_types::{Location, ReferenceParams};
-use squawk_ide::db::line_index;
 use squawk_ide::find_references::find_references;
 
 use crate::global_state::Snapshot;
@@ -15,10 +14,9 @@ pub(crate) fn handle_references(
 
     let db = snapshot.db();
     let file = snapshot.file(&uri).unwrap();
-    let line_index = line_index(db, file);
-    let offset = lsp_utils::offset(&line_index, position).unwrap();
+    let position = lsp_utils::offset(db, file, position).unwrap();
 
-    let refs = find_references(db, file, offset);
+    let refs = find_references(db, position);
     let include_declaration = params.context.include_declaration;
 
     let locations: Vec<Location> = refs
@@ -27,7 +25,7 @@ pub(crate) fn handle_references(
             if include_declaration {
                 return true;
             }
-            if loc.file == file && !loc.range.contains(offset) {
+            if loc.file == file && !loc.range.contains(position.value) {
                 return true;
             }
             false

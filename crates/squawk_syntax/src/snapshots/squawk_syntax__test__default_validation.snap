@@ -1,0 +1,157 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/default.sql
+---
+SOURCE_FILE@0..170
+  INSERT@0..36
+    INSERT_KW@0..6 "insert"
+    WHITESPACE@6..7 " "
+    INTO_KW@7..11 "into"
+    WHITESPACE@11..12 " "
+    PATH@12..13
+      PATH_SEGMENT@12..13
+        NAME_REF@12..13
+          IDENT@12..13 "t"
+    WHITESPACE@13..14 " "
+    VALUES@14..35
+      VALUES_KW@14..20 "VALUES"
+      WHITESPACE@20..21 " "
+      ROW_LIST@21..35
+        ROW@21..35
+          L_PAREN@21..22 "("
+          CALL_EXPR@22..34
+            NAME_REF@22..25
+              IDENT@22..25 "foo"
+            ARG_LIST@25..34
+              L_PAREN@25..26 "("
+              LITERAL@26..33
+                DEFAULT_KW@26..33 "DEFAULT"
+              R_PAREN@33..34 ")"
+          R_PAREN@34..35 ")"
+    SEMICOLON@35..36 ";"
+  WHITESPACE@36..38 "\n\n"
+  UPDATE@38..68
+    UPDATE_KW@38..44 "UPDATE"
+    WHITESPACE@44..45 " "
+    RELATION_NAME@45..46
+      PATH@45..46
+        PATH_SEGMENT@45..46
+          NAME_REF@45..46
+            IDENT@45..46 "t"
+    WHITESPACE@46..47 " "
+    SET_CLAUSE@47..67
+      SET_KW@47..50 "SET"
+      WHITESPACE@50..51 " "
+      SET_COLUMN_LIST@51..67
+        SET_SINGLE_COLUMN@51..67
+          COLUMN@51..57
+            INDEX_EXPR@51..57
+              NAME_REF@51..54
+                IDENT@51..54 "arr"
+              L_BRACK@54..55 "["
+              LITERAL@55..56
+                INT_NUMBER@55..56 "1"
+              R_BRACK@56..57 "]"
+          WHITESPACE@57..58 " "
+          EQ@58..59 "="
+          WHITESPACE@59..60 " "
+          SET_EXPR@60..67
+            DEFAULT_KW@60..67 "DEFAULT"
+    SEMICOLON@67..68 ";"
+  WHITESPACE@68..70 "\n\n"
+  UPDATE@70..104
+    UPDATE_KW@70..76 "UPDATE"
+    WHITESPACE@76..77 " "
+    RELATION_NAME@77..78
+      PATH@77..78
+        PATH_SEGMENT@77..78
+          NAME_REF@77..78
+            IDENT@77..78 "t"
+    WHITESPACE@78..79 " "
+    SET_CLAUSE@79..103
+      SET_KW@79..82 "SET"
+      WHITESPACE@82..83 " "
+      SET_COLUMN_LIST@83..103
+        SET_SINGLE_COLUMN@83..103
+          COLUMN@83..93
+            FIELD_EXPR@83..93
+              NAME_REF@83..87
+                IDENT@83..87 "comp"
+              DOT@87..88 "."
+              NAME_REF@88..93
+                IDENT@88..93 "field"
+          WHITESPACE@93..94 " "
+          EQ@94..95 "="
+          WHITESPACE@95..96 " "
+          SET_EXPR@96..103
+            DEFAULT_KW@96..103 "DEFAULT"
+    SEMICOLON@103..104 ";"
+  WHITESPACE@104..106 "\n\n"
+  VALUES@106..123
+    VALUES_KW@106..112 "values"
+    WHITESPACE@112..113 " "
+    ROW_LIST@113..122
+      ROW@113..122
+        L_PAREN@113..114 "("
+        LITERAL@114..121
+          DEFAULT_KW@114..121 "default"
+        R_PAREN@121..122 ")"
+    SEMICOLON@122..123 ";"
+  WHITESPACE@123..125 "\n\n"
+  SELECT@125..140
+    SELECT_CLAUSE@125..139
+      SELECT_KW@125..131 "select"
+      WHITESPACE@131..132 " "
+      TARGET_LIST@132..139
+        TARGET@132..139
+          LITERAL@132..139
+            DEFAULT_KW@132..139 "default"
+    SEMICOLON@139..140 ";"
+  WHITESPACE@140..142 "\n\n"
+  SELECT@142..169
+    SELECT_CLAUSE@142..150
+      SELECT_KW@142..148 "select"
+      WHITESPACE@148..149 " "
+      TARGET_LIST@149..150
+        TARGET@149..150
+          LITERAL@149..150
+            INT_NUMBER@149..150 "1"
+    WHITESPACE@150..151 " "
+    WHERE_CLAUSE@151..168
+      WHERE_KW@151..156 "where"
+      WHITESPACE@156..157 " "
+      BIN_EXPR@157..168
+        LITERAL@157..164
+          DEFAULT_KW@157..164 "default"
+        WHITESPACE@164..165 " "
+        EQ@165..166 "="
+        WHITESPACE@166..167 " "
+        LITERAL@167..168
+          INT_NUMBER@167..168 "1"
+    SEMICOLON@168..169 ";"
+  WHITESPACE@169..170 "\n"
+
+error[syntax-error]: DEFAULT is not allowed in this context
+  ╭▸ 
+1 │ insert into t VALUES (foo(DEFAULT));
+  ╰╴                          ━━━━━━━
+error[syntax-error]: DEFAULT may only assign to a simple column name
+  ╭▸ 
+3 │ UPDATE t SET arr[1] = DEFAULT;
+  ╰╴             ━━━━━━
+error[syntax-error]: DEFAULT may only assign to a simple column name
+  ╭▸ 
+5 │ UPDATE t SET comp.field = DEFAULT;
+  ╰╴             ━━━━━━━━━━
+error[syntax-error]: DEFAULT is not allowed in this context
+  ╭▸ 
+7 │ values (default);
+  ╰╴        ━━━━━━━
+error[syntax-error]: DEFAULT is not allowed in this context
+  ╭▸ 
+9 │ select default;
+  ╰╴       ━━━━━━━
+error[syntax-error]: DEFAULT is not allowed in this context
+   ╭▸ 
+11 │ select 1 where default = 1;
+   ╰╴               ━━━━━━━

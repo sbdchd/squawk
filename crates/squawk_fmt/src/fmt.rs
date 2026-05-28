@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use rowan::Direction;
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::ast::{self, AstNode, LitKind};
+use squawk_syntax::quote::quote_column_alias;
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 use tiny_pretty::Doc;
 use tiny_pretty::{PrintOptions, print};
@@ -36,8 +37,6 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
                     } else {
                         doc = doc.append(Doc::empty_line());
                     }
-                } else if token.kind() == SyntaxKind::SEMICOLON {
-                    doc = doc.append(Doc::text(";"));
                 }
             }
         }
@@ -46,7 +45,7 @@ fn build_source_file(source_file: &ast::SourceFile) -> Doc<'_> {
 }
 
 fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
-    Doc::text("create")
+    let mut doc = Doc::text("create")
         .append(Doc::space())
         .append(Doc::text("table"))
         .append(Doc::space())
@@ -71,12 +70,16 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
                 .append(Doc::line_or_nil())
                 .group(),
         )
-        .append(Doc::text(")"))
+        .append(Doc::text(")"));
+
+    doc = doc.append(build_semicolon(create_table.semicolon_token()));
+
+    doc
 }
 
 fn build_table_arg<'a>(create_table: ast::TableArg) -> Doc<'a> {
     match create_table {
-        ast::TableArg::Column(column) => Doc::text(column.name().unwrap().syntax().to_string())
+        ast::TableArg::Column(column) => build_name(column.name().unwrap())
             .append(Doc::space())
             .append(Doc::text(column.ty().unwrap().syntax().to_string())),
         ast::TableArg::LikeClause(_like_clause) => todo!(),
@@ -132,7 +135,35 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
         );
     }
 
+    doc = doc.append(build_semicolon(select.semicolon_token()));
+
     doc.group()
+}
+
+fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
+    let Some(semi) = semi else {
+        return Doc::nil();
+    };
+    let mut doc = Doc::nil();
+    let mut comments: Vec<SyntaxToken> = vec![];
+    for next in semi.siblings_with_tokens(Direction::Prev).skip(1) {
+        match next {
+            rowan::NodeOrToken::Node(_) => break,
+            rowan::NodeOrToken::Token(token) => {
+                if token.kind() == SyntaxKind::COMMENT {
+                    comments.push(token);
+                } else if token.kind() == SyntaxKind::WHITESPACE {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    for comment in comments.iter().rev() {
+        doc = doc.append(Doc::text(comment.text().to_string()));
+    }
+    doc.append(Doc::text(";"))
 }
 
 fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
@@ -219,7 +250,7 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
         }
         // ast::Expr::FieldExpr(field_expr) => todo!(),
         // ast::Expr::IndexExpr(index_expr) => todo!(),
-        // ast::Expr::Literal(literal) => todo!(),
+        ast::Expr::Literal(literal) => build_literal(literal),
         // ast::Expr::NameRef(name_ref) => todo!(),
         // ast::Expr::ParenExpr(paren_expr) => todo!(),
         ast::Expr::PostfixExpr(postfix_expr) => {
@@ -371,48 +402,128 @@ fn build_unicode_normal_form<'a>(form: ast::UnicodeNormalForm) -> Doc<'a> {
     }
 }
 
+fn build_keyword_node<'a>(node: &SyntaxNode) -> Doc<'a> {
+    let mut docs: Vec<Doc<'a>> = vec![];
+    for el in node.children_with_tokens() {
+        match el {
+            rowan::NodeOrToken::Token(token) => match token.kind() {
+                SyntaxKind::WHITESPACE => continue,
+                SyntaxKind::COMMENT => {
+                    if !docs.is_empty() {
+                        docs.push(Doc::space());
+                    }
+                    docs.push(Doc::text(token.text().to_string()));
+                }
+                _ => {
+                    if !docs.is_empty() {
+                        docs.push(Doc::space());
+                    }
+                    docs.push(Doc::text(token.text().to_ascii_lowercase()));
+                }
+            },
+            rowan::NodeOrToken::Node(_) => (),
+        }
+    }
+    Doc::list(docs)
+}
+
 fn build_op<'a>(op: ast::BinOp) -> Doc<'a> {
     match op {
-        ast::BinOp::And(_) => todo!(),
-        ast::BinOp::AtTimeZone(_) => todo!(),
-        ast::BinOp::Caret(_) => todo!(),
-        ast::BinOp::Collate(_) => todo!(),
-        ast::BinOp::ColonColon(_) => todo!(),
-        ast::BinOp::ColonEq(_) => todo!(),
+        ast::BinOp::And(_) => Doc::text("and"),
+        ast::BinOp::AtTimeZone(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::Caret(_) => Doc::text("^"),
+        ast::BinOp::Collate(_) => Doc::text("collate"),
+        ast::BinOp::ColonColon(_) => Doc::text("::"),
+        ast::BinOp::ColonEq(_) => Doc::text(":="),
         ast::BinOp::CustomOp(custom_op) => Doc::text(custom_op.syntax().to_string()),
-        ast::BinOp::Eq(_) => todo!(),
-        ast::BinOp::FatArrow(_) => todo!(),
-        ast::BinOp::Gteq(_) => todo!(),
-        ast::BinOp::Ilike(_) => todo!(),
-        ast::BinOp::In(_) => todo!(),
-        ast::BinOp::Is(_) => todo!(),
-        ast::BinOp::IsDistinctFrom(_) => todo!(),
-        ast::BinOp::IsNot(_) => todo!(),
-        ast::BinOp::IsNotDistinctFrom(_) => todo!(),
-        ast::BinOp::LAngle(_) => todo!(),
-        ast::BinOp::Like(_) => todo!(),
-        ast::BinOp::Lteq(_) => todo!(),
-        ast::BinOp::Minus(_) => todo!(),
-        ast::BinOp::Neq(_) => todo!(),
-        ast::BinOp::Neqb(_) => todo!(),
-        ast::BinOp::NotIlike(_) => todo!(),
-        ast::BinOp::NotIn(_) => todo!(),
-        ast::BinOp::NotLike(_) => todo!(),
-        ast::BinOp::NotSimilarTo(_) => todo!(),
-        ast::BinOp::OperatorCall(_) => todo!(),
-        ast::BinOp::Or(_) => todo!(),
-        ast::BinOp::Overlaps(_) => todo!(),
-        ast::BinOp::Percent(_) => todo!(),
+        ast::BinOp::Eq(_) => Doc::text("="),
+        ast::BinOp::FatArrow(_) => Doc::text("=>"),
+        ast::BinOp::Gteq(_) => Doc::text(">="),
+        ast::BinOp::Ilike(_) => Doc::text("ilike"),
+        ast::BinOp::In(_) => Doc::text("in"),
+        ast::BinOp::Is(_) => Doc::text("is"),
+        ast::BinOp::IsDistinctFrom(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::IsNot(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::IsNotDistinctFrom(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::LAngle(_) => Doc::text("<"),
+        ast::BinOp::Like(_) => Doc::text("like"),
+        ast::BinOp::Lteq(_) => Doc::text("<="),
+        ast::BinOp::Minus(_) => Doc::text("-"),
+        ast::BinOp::Neq(_) => Doc::text("!="),
+        ast::BinOp::Neqb(_) => Doc::text("<>"),
+        ast::BinOp::NotIlike(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::NotIn(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::NotLike(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::NotSimilarTo(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::OperatorCall(op) => Doc::text(op.syntax().to_string()),
+        ast::BinOp::Or(_) => Doc::text("or"),
+        ast::BinOp::Overlaps(_) => Doc::text("overlaps"),
+        ast::BinOp::Percent(_) => Doc::text("%"),
         ast::BinOp::Plus(_) => Doc::text("+"),
-        ast::BinOp::RAngle(_) => todo!(),
-        ast::BinOp::SimilarTo(_) => todo!(),
-        ast::BinOp::Slash(_) => todo!(),
-        ast::BinOp::Star(_) => todo!(),
+        ast::BinOp::RAngle(_) => Doc::text(">"),
+        ast::BinOp::SimilarTo(n) => build_keyword_node(n.syntax()),
+        ast::BinOp::Slash(_) => Doc::text("/"),
+        ast::BinOp::Star(_) => Doc::text("*"),
     }
 }
 
 fn build_literal<'a>(lit: ast::Literal) -> Doc<'a> {
-    Doc::text(lit.syntax().to_string())
+    let Some(kind) = lit.kind() else {
+        return Doc::nil();
+    };
+    match kind {
+        LitKind::Default(_) => Doc::text("default"),
+        LitKind::False(_) => Doc::text("false"),
+        LitKind::IntNumber(t) => Doc::text(t.text().to_string()),
+        LitKind::Null(_) => Doc::text("null"),
+        LitKind::NumericNumber(t) => Doc::text(t.text().to_string()),
+        LitKind::PositionalParam(t) => Doc::text(t.text().to_string()),
+        LitKind::True(_) => Doc::text("true"),
+        LitKind::BitString(_)
+        | LitKind::ByteString(_)
+        | LitKind::DollarQuotedString(_)
+        | LitKind::EscString(_)
+        | LitKind::String(_)
+        | LitKind::UnicodeEscString(_) => build_string_literal(&lit),
+    }
+}
+
+fn build_string_literal<'a>(lit: &ast::Literal) -> Doc<'a> {
+    let parts: Vec<Doc<'a>> = lit
+        .syntax()
+        .children_with_tokens()
+        .filter_map(|el| match el {
+            rowan::NodeOrToken::Token(t) if t.kind() != SyntaxKind::WHITESPACE => {
+                Some(Doc::text(format_string_token(&t)))
+            }
+            _ => None,
+        })
+        .collect();
+    Doc::list(Itertools::intersperse(parts.into_iter(), Doc::hard_line()).collect())
+}
+
+fn format_string_token(t: &SyntaxToken) -> String {
+    let text = t.text();
+    if matches!(
+        t.kind(),
+        SyntaxKind::STRING | SyntaxKind::DOLLAR_QUOTED_STRING
+    ) {
+        return text.to_string();
+    }
+    match text.find('\'') {
+        Some(idx) => {
+            let (prefix, rest) = text.split_at(idx);
+            let mut s = String::with_capacity(text.len());
+            s.push_str(&prefix.to_ascii_lowercase());
+            s.push_str(rest);
+            s
+        }
+        None => text.to_string(),
+    }
+}
+
+fn build_name<'a>(name: ast::Name) -> Doc<'a> {
+    Doc::text(quote_column_alias(&name.text()))
 }
 
 fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
@@ -422,14 +533,11 @@ fn build_type<'a>(ty: ast::Type) -> Doc<'a> {
 fn leading_comments_token<'a>(node: &SyntaxToken) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
-        println!("prev");
         match next {
-            rowan::NodeOrToken::Node(node) => {
-                println!("before node {:?}", node);
+            rowan::NodeOrToken::Node(_node) => {
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
-                println!("before token {:?}", token);
                 if token.kind() == SyntaxKind::COMMENT {
                     doc = doc
                         .append(Doc::text(token.text().to_string()))
@@ -448,14 +556,11 @@ fn leading_comments_token<'a>(node: &SyntaxToken) -> Doc<'a> {
 fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Prev).skip(1) {
-        println!("prev");
         match next {
-            rowan::NodeOrToken::Node(node) => {
-                println!("before node {:?}", node);
+            rowan::NodeOrToken::Node(_node) => {
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
-                println!("before token {:?}", token);
                 if token.kind() == SyntaxKind::COMMENT {
                     let is_block = token.text().starts_with("--");
                     doc = doc
@@ -479,14 +584,11 @@ fn leading_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
 fn trailing_comments<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut doc = Doc::nil();
     for next in node.siblings_with_tokens(Direction::Next).skip(1) {
-        println!("after");
         match next {
-            rowan::NodeOrToken::Node(node) => {
-                println!("after node {:?}", node);
+            rowan::NodeOrToken::Node(_node) => {
                 break;
             }
             rowan::NodeOrToken::Token(token) => {
-                println!("after token {:?}", token);
                 if token.kind() == SyntaxKind::COMMENT {
                     doc = doc
                         .append(Doc::space())
@@ -517,10 +619,7 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
         }
 
         if let Some(name) = as_name.name() {
-            // TODO: quoting or not?
-            doc = doc
-                .append(Doc::space())
-                .append(Doc::text(name.syntax().to_string()));
+            doc = doc.append(Doc::space()).append(build_name(name));
         }
     }
 
@@ -532,7 +631,7 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
 pub fn fmt(text: &str) -> String {
     let parse = ast::SourceFile::parse(text);
     let file = parse.tree();
-    println!("{}", text);
+    println!("{text}");
     println!("---");
     println!("{:#?}", file.syntax());
     println!("---");

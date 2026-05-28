@@ -14,7 +14,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_names"
   WHITESPACE "\n"
@@ -47,7 +47,7 @@ SOURCE_FILE
               IDENT "c"
         WHITESPACE " "
         STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lock_mode"
   WHITESPACE "\n"
@@ -68,7 +68,7 @@ SOURCE_FILE
     SHARE_KW "share"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
     LOCK_KW "lock"
@@ -87,7 +87,7 @@ SOURCE_FILE
     SHARE_KW "share"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
     LOCK_KW "lock"
@@ -106,7 +106,7 @@ SOURCE_FILE
     EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
     LOCK_KW "lock"
@@ -127,7 +127,7 @@ SOURCE_FILE
     EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
     LOCK_KW "lock"
@@ -144,7 +144,7 @@ SOURCE_FILE
     SHARE_KW "share"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
     LOCK_KW "lock"
@@ -165,7 +165,7 @@ SOURCE_FILE
     EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
     LOCK_KW "lock"
@@ -182,7 +182,7 @@ SOURCE_FILE
     EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   LOCK
     LOCK_KW "lock"
@@ -201,7 +201,7 @@ SOURCE_FILE
     EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
@@ -244,5 +244,5 @@ SOURCE_FILE
     MODE_KW "mode"
     WHITESPACE " "
     NOWAIT_KW "nowait"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

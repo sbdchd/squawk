@@ -51,7 +51,7 @@ SOURCE_FILE
                 IDENT "FLOAT8"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   INSERT
     INSERT_KW "INSERT"
@@ -146,7 +146,7 @@ SOURCE_FILE
                   R_BRACK "]"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   INSERT
     INSERT_KW "INSERT"
@@ -224,7 +224,7 @@ SOURCE_FILE
           LITERAL
             POSITIONAL_PARAM "$3000"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.timescale.com/blog/combining-semantic-search-and-full-text-search-in-postgresql-with-cohere-pgvector-and-pgai/"
   WHITESPACE "\n"
@@ -325,7 +325,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -481,7 +481,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "5"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     WITH_CLAUSE
@@ -602,7 +602,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "5"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -780,7 +780,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "5"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.depesz.com/2024/11/15/grouping-data-into-array-of-sums-fun-with-custom-aggregates/"
   WHITESPACE "\n"
@@ -865,7 +865,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           DOLLAR_QUOTED_STRING "$$\nDECLARE\nBEGIN\n    -- sanity checks\n    IF p_hour < 0 THEN\n        raise exception 'Hour can''t be < 0 : %', p_hour;\n    END IF;\n    IF p_hour > 23 THEN\n        raise exception 'Hour can''t be > 23 : %', p_hour;\n    END IF;\n \n    -- actual count modification\n    p_state[ p_hour ] := p_state[ p_hour ] + p_count;\n \n    RETURN;\nEND;\n$$"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -891,7 +891,7 @@ SOURCE_FILE
                 INT_NUMBER "15"
               WHITESPACE " "
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_AGGREGATE
     CREATE_KW "CREATE"
@@ -967,7 +967,7 @@ SOURCE_FILE
             STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1168,7 +1168,7 @@ SOURCE_FILE
         SORT_BY
           LITERAL
             INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
     CREATE_KW "CREATE"
@@ -1240,7 +1240,7 @@ SOURCE_FILE
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
         IDENT "plpgsql"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/postgres-partitioning-with-a-default-partition"
   WHITESPACE "\n\n"
@@ -1284,7 +1284,7 @@ SOURCE_FILE
                   NAME_REF
                     IDENT "date"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -1318,7 +1318,7 @@ SOURCE_FILE
     WHITESPACE " "
     PARTITION_DEFAULT
       DEFAULT_KW "DEFAULT"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
     INSERT_KW "INSERT"
@@ -1360,7 +1360,7 @@ SOURCE_FILE
                   NAME_REF
                     IDENT "date"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1380,7 +1380,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "time_taptest_table_default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   TABLE
     TABLE_KW "Table"
@@ -1390,7 +1390,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "\"partman_test.time_taptest_table_p20241124\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   TABLE
     TABLE_KW "Table"
@@ -1400,7 +1400,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "\"partman_test.time_taptest_table_default\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -1450,11 +1450,11 @@ SOURCE_FILE
       LITERAL
         STRING "'2024-12-26'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   BEGIN
     BEGIN_KW "BEGIN"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -1484,7 +1484,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "time_taptest_table_default"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
     WITH_CLAUSE
@@ -1574,7 +1574,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "partition_data"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -1624,7 +1624,7 @@ SOURCE_FILE
       LITERAL
         STRING "'2024-12-26'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
     WITH_CLAUSE
@@ -1714,7 +1714,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "partition_data"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TABLE
     DROP_KW "DROP"
@@ -1725,11 +1725,11 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "clean_default_temp"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMIT
     COMMIT_KW "COMMIT"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1749,8 +1749,8 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "time_taptest_table_default"
-  WHITESPACE " "
-  SEMICOLON ";"
+    WHITESPACE " "
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1770,7 +1770,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "time_taptest_table"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1790,8 +1790,8 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "time_taptest_table_p20241225"
-  WHITESPACE " "
-  SEMICOLON ";"
+    WHITESPACE " "
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1815,7 +1815,7 @@ SOURCE_FILE
           ARG_LIST
             L_PAREN "("
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1841,7 +1841,7 @@ SOURCE_FILE
             LITERAL
               FALSE_KW "false"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1861,7 +1861,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "time_taptest_table_default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CALL
     CALL_KW "CALL"
@@ -1880,7 +1880,7 @@ SOURCE_FILE
       LITERAL
         STRING "'partman_test.time_taptest_table'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   VACUUM
     VACUUM_KW "VACUUM"
@@ -1899,7 +1899,7 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "time_taptest_table"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1925,7 +1925,7 @@ SOURCE_FILE
             LITERAL
               STRING "'partman_test.time_taptest_table'"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/smarter-postgres-llm-with-retrieval-augmented-generation"
   WHITESPACE "\n"
@@ -1953,7 +1953,7 @@ SOURCE_FILE
                 STRING "'What is the Star Trek episode where Deanna and her\n   mother are kidnapped?'"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -1990,7 +1990,7 @@ SOURCE_FILE
                 TEXT_KW "text"
       WHITESPACE "\n    "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COPY
     COPY_KW "COPY"
@@ -2039,7 +2039,7 @@ SOURCE_FILE
           ESC_STRING "E'\\t'"
       WHITESPACE "\n        "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Enable pgvector"
   WHITESPACE "\n"
@@ -2050,7 +2050,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "pgvector"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Add an emedding column to the table"
   WHITESPACE "\n"
@@ -2078,7 +2078,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "vector"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Populate the column with embeddings from an LLM model"
   WHITESPACE "\n"
@@ -2140,7 +2140,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "vector"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -2210,7 +2210,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "5"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
     CREATE_KW "CREATE"
@@ -2260,7 +2260,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           DOLLAR_QUOTED_STRING "$$\nDECLARE\n    query_embedding VECTOR;\n    context_chunks TEXT;\nBEGIN\n    -- Step 1: Get the embedding vector for the query text\n    query_embedding := openai.vector(query_text)::VECTOR;\n\n    -- Step 2: Find the 5 closest plot summaries to the query embedding\n    -- Step 3: Lump together results into a context lump\n    SELECT string_agg('Episode: { Title: ' || title || ' } Summary: {' || plot, E'}}\\n\\n\\n') INTO context_chunks\n    FROM (\n        SELECT plot, title\n        FROM tng\n        ORDER BY vec <-> query_embedding\n        LIMIT 5\n    ) AS similar_plots;\n\n    -- Step 4: Run the query against the LLM with the augmented context\n    RETURN openai.prompt(context_chunks, query_text);\nEND;\n$$"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -2276,7 +2276,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/pg_incremental-incremental-data-processing-in-postgres"
   WHITESPACE "\n\n"
@@ -2336,7 +2336,7 @@ SOURCE_FILE
           WHITESPACE " "
           PRECISION_KW "precision"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TABLE
     CREATE_KW "create"
@@ -2400,7 +2400,7 @@ SOURCE_FILE
               IDENT "user_id"
           R_PAREN ")"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* enable fast range scans on the sequence column */"
   WHITESPACE "\n"
@@ -2429,7 +2429,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "event_id"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* for demo: generate some random data */"
   WHITESPACE "\n"
@@ -2516,7 +2516,7 @@ SOURCE_FILE
           ALIAS
             NAME
               IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* define a sequence pipeline that periodically upserts view counts */"
   WHITESPACE "\n"
@@ -2547,7 +2547,7 @@ SOURCE_FILE
                 DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('day', event_time), user_id, count(*)\n    from events where event_id between $1 and $2\n    group by 1, 2\n    on conflict (day, user_id) do update set count = view_counts.count + EXCLUDED.count;\n  $$"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* get the most active users of today */"
   WHITESPACE "\n"
@@ -2631,7 +2631,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
     COMMENT "/* create a table with a single JSONB column and a sequence to track new objects */"
@@ -2679,7 +2679,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "jsonb"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_INDEX
     CREATE_KW "create"
@@ -2706,7 +2706,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "id"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* load some data from a local newline-delimited JSON file */"
   WHITESPACE "\n"
@@ -2741,7 +2741,7 @@ SOURCE_FILE
                 DOLLAR_QUOTED_STRING "$$\n    insert into events (event_id, event_time, user_id, response_time)\n    select\n      nextval('events_event_id_seq'),\n      (payload->>'created_at')::timestamptz,\n      (payload->'actor'->>'id')::bigint,\n      (payload->>'response_time')::double precision\n    from events_json\n    where id between $1 and $2\n  $$"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
     COMMENT "/* create a table for number of active users per hour */"
@@ -2791,7 +2791,7 @@ SOURCE_FILE
               HOUR_KW "hour"
           R_PAREN ")"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* enable fast range scans on the event_time column */"
   WHITESPACE "\n"
@@ -2820,7 +2820,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "event_time"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* aggregates a range of 1 hour intervals after an hour has passed */"
   WHITESPACE "\n"
@@ -2851,7 +2851,7 @@ SOURCE_FILE
                 DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('hour', event_time), count(distinct user_id)\n    from events where event_time >= $1 and event_time < $2\n    group by 1\n  $$"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* get number of active users per hour */"
   WHITESPACE "\n"
@@ -2885,7 +2885,7 @@ SOURCE_FILE
         SORT_BY
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* define a function that wraps a COPY TO command to export data */"
   WHITESPACE "\n"
@@ -2947,7 +2947,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* select all rows in a time range and export them to a Parquet file */\n  execute format(\n    'copy (select * from events where event_time >= %L and event_time < %L) to %L',\n    start_time, end_time, format('s3://mybucket/events/%s.parquet', start_time::date)\n  );\n\nend; $function$"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* export data as 1 file per day, starting at Jan 1st */"
   WHITESPACE "\n"
@@ -3015,7 +3015,7 @@ SOURCE_FILE
               COMMENT "/* export all days from Jan 1st now    */"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "/* define function that wraps a COPY FROM command to import data */"
   WHITESPACE "\n"
@@ -3066,7 +3066,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* load a file into the events table */\n  execute format('copy events from %L', path);\n\nend; $function$"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* load all the files under a prefix, and automatically load new files, one at a time */"
   WHITESPACE "\n"
@@ -3098,7 +3098,7 @@ SOURCE_FILE
                 STRING "'select import_events($1)'"
               WHITESPACE "\n"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3188,7 +3188,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers"
   WHITESPACE "\n\n"
@@ -3220,7 +3220,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "wasm_fdw_validator"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SERVER
     CREATE_KW "create"
@@ -3284,7 +3284,7 @@ SOURCE_FILE
           STRING "'<your Cal.com API key>'"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -3300,7 +3300,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "cal"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
     CREATE_KW "create"
@@ -3353,7 +3353,7 @@ SOURCE_FILE
           STRING "'event-types'"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
     CREATE_KW "create"
@@ -3414,7 +3414,7 @@ SOURCE_FILE
           STRING "'attrs'"
       WHITESPACE "\n  "
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract event types"
   WHITESPACE "\n"
@@ -3574,7 +3574,7 @@ SOURCE_FILE
                 ALIAS
                   NAME
                     IDENT "et"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract bookings"
   WHITESPACE "\n"
@@ -3713,7 +3713,7 @@ SOURCE_FILE
             ALIAS
               NAME
                 IDENT "bk"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- make a 15 minutes meeting with Elon Musk"
   WHITESPACE "\n"
@@ -3758,7 +3758,7 @@ SOURCE_FILE
                     IDENT "jsonb"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.tinybird.co/blog-posts/outgrowing-postgres-how-to-run-olap-workloads-on-postgres"
   WHITESPACE "\n\n"
@@ -3852,7 +3852,7 @@ SOURCE_FILE
           GROUPING_EXPR
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -3874,7 +3874,7 @@ SOURCE_FILE
         NAME_REF
           HOUR_KW "hour"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -3936,7 +3936,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "event_time"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -4023,7 +4023,7 @@ SOURCE_FILE
                 IDENT "jsonb"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -4086,7 +4086,7 @@ SOURCE_FILE
               NAME_REF
                 TEXT_KW "text"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -4147,7 +4147,7 @@ SOURCE_FILE
                 IDENT "inet"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -4197,7 +4197,7 @@ SOURCE_FILE
                 IDENT "jsonb"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- -- Instead of one simple insert"
   WHITESPACE "\n"
@@ -4367,7 +4367,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'1 day'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
     CREATE_KW "CREATE"
@@ -4376,7 +4376,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "cstore_fdw"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SERVER
     CREATE_KW "CREATE"
@@ -4394,7 +4394,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "cstore_fdw"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
     CREATE_KW "CREATE"
@@ -4460,7 +4460,7 @@ SOURCE_FILE
         LITERAL
           STRING "'pglz'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
     CREATE_KW "CREATE"
@@ -4469,7 +4469,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "pg_analytics"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
     CREATE_KW "CREATE"
@@ -4537,7 +4537,7 @@ SOURCE_FILE
         LITERAL
           STRING "'s3://bucket/metrics/*.parquet'"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
     CREATE_KW "CREATE"
@@ -4546,7 +4546,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "pg_duckdb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -4600,7 +4600,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "duckdb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
     CREATE_KW "CREATE"
@@ -4609,7 +4609,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "pg_mooncake"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
     CREATE_KW "CREATE"
@@ -4663,7 +4663,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "columnstore"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Instead of this complex self-join"
   WHITESPACE "\n"
@@ -4780,7 +4780,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "m1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Use this cleaner window function"
   WHITESPACE "\n"
@@ -4855,7 +4855,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "monthly_revenues"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4983,7 +4983,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Use CTEs to break down complex analytics"
   WHITESPACE "\n"
@@ -5297,7 +5297,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
@@ -5380,7 +5380,7 @@ SOURCE_FILE
           GROUPING_EXPR
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Key settings for parallel queries"
   WHITESPACE "\n"
@@ -5396,7 +5396,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "  "
   COMMENT "-- Workers per query"
   WHITESPACE "\n"
@@ -5412,7 +5412,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "             "
   COMMENT "-- Lower = more parallelism"
   WHITESPACE "\n"
@@ -5427,8 +5427,8 @@ SOURCE_FILE
     EQ "="
     WHITESPACE " "
     LITERAL
-      FLOAT_NUMBER "0.001"
-  SEMICOLON ";"
+      NUMERIC_NUMBER "0.001"
+    SEMICOLON ";"
   WHITESPACE "          "
   COMMENT "-- Lower = more parallelism"
   WHITESPACE "\n"
@@ -5444,7 +5444,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'8MB'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " "
   COMMENT "-- Table size threshold"
   WHITESPACE "\n\n"
@@ -5463,9 +5463,9 @@ SOURCE_FILE
     SELECT
       SELECT_CLAUSE
         SELECT_KW "SELECT"
-  WHITESPACE " "
-  COMMENT "/* your query */"
-  SEMICOLON ";"
+    WHITESPACE " "
+    COMMENT "/* your query */"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Look for:"
   WHITESPACE "\n"
@@ -5549,7 +5549,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Remove unnecessary ORDER BY"
   WHITESPACE "\n"
@@ -5613,7 +5613,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Gets all rows then filters"
   WHITESPACE "\n"
@@ -5695,7 +5695,7 @@ SOURCE_FILE
                     IDENT "user_id"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Uses DISTINCT ON"
   WHITESPACE "\n"
@@ -5747,7 +5747,7 @@ SOURCE_FILE
           WHITESPACE " "
           SORT_DESC
             DESC_KW "DESC"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -5783,7 +5783,7 @@ SOURCE_FILE
             R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -5828,7 +5828,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "128"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5891,7 +5891,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "event_logs"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/indexing-materialized-views-in-postgres"
   WHITESPACE "\n"
@@ -6062,7 +6062,7 @@ SOURCE_FILE
             WHITESPACE " "
             SORT_DESC
               DESC_KW "DESC"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -6086,7 +6086,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "sku"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REFRESH
     REFRESH_KW "REFRESH"
@@ -6099,7 +6099,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "recent_product_sales"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
     CREATE_KW "CREATE"
@@ -6124,7 +6124,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "sku"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
     DROP_KW "DROP"
@@ -6135,7 +6135,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "sku_index"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REFRESH
     REFRESH_KW "REFRESH"
@@ -6150,7 +6150,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "recent_product_sales"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
     COMMENT "-- https://www.timescale.com/blog/iot-renewable-energy-models-building-the-future-with-time-series-data"
@@ -6236,7 +6236,7 @@ SOURCE_FILE
           PRECISION_KW "PRECISION"
       WHITESPACE "\n"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Create a hypertable for efficient time series operations"
   WHITESPACE "\n"
@@ -6258,7 +6258,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'time'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Calculate daily energy production and compare with expected output"
   WHITESPACE "\n"
@@ -6446,7 +6446,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "90"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Detect abnormal vibration patterns in wind turbines"
   WHITESPACE "\n"
@@ -6702,7 +6702,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Monitor aggregate power availability across resources"
   WHITESPACE "\n"
@@ -6830,7 +6830,7 @@ SOURCE_FILE
           WHITESPACE " "
           SORT_DESC
             DESC_KW "DESC"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Identify optimal trading windows"
   WHITESPACE "\n"
@@ -6896,7 +6896,7 @@ SOURCE_FILE
                   ARG_LIST
                     L_PAREN "("
                     LITERAL
-                      FLOAT_NUMBER "0.75"
+                      NUMERIC_NUMBER "0.75"
                     R_PAREN ")"
                   WHITESPACE " "
                   WITHIN_CLAUSE
@@ -7055,5 +7055,5 @@ SOURCE_FILE
         SORT_BY
           NAME_REF
             HOUR_KW "hour"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

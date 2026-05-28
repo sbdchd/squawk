@@ -54,7 +54,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- aliases_with_as"
   WHITESPACE "\n"
@@ -119,7 +119,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using_rows_from"
   WHITESPACE "\n"
@@ -174,7 +174,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- aliases_no_as"
   WHITESPACE "\n"
@@ -235,7 +235,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_with_star"
   WHITESPACE "\n"
@@ -290,7 +290,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_with_only"
   WHITESPACE "\n"
@@ -345,7 +345,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- paren_query"
   WHITESPACE "\n"
@@ -416,7 +416,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   MERGE
     MERGE_KW "merge"
@@ -526,7 +526,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   MERGE
     MERGE_KW "merge"
@@ -599,7 +599,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- when_clauses_dupe"
   WHITESPACE "\n"
@@ -664,7 +664,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- when_clauses_all"
   WHITESPACE "\n"
@@ -749,7 +749,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- when_clauses_all_with_conditions"
   WHITESPACE "\n"
@@ -853,7 +853,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning_all"
   WHITESPACE "\n"
@@ -945,7 +945,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning_many"
   WHITESPACE "\n"
@@ -1074,7 +1074,7 @@ SOURCE_FILE
               IDENT "t"
             DOT "."
             STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_simple"
   WHITESPACE "\n"
@@ -1131,7 +1131,7 @@ SOURCE_FILE
         DEFAULT_KW "default"
         WHITESPACE " "
         VALUES_KW "values"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_default"
   WHITESPACE "\n"
@@ -1211,7 +1211,7 @@ SOURCE_FILE
         DEFAULT_KW "default"
         WHITESPACE " "
         VALUES_KW "values"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_values"
   WHITESPACE "\n"
@@ -1308,7 +1308,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "2"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_update"
   WHITESPACE "\n"
@@ -1423,55 +1423,6 @@ SOURCE_FILE
             SET_SINGLE_COLUMN
               COLUMN
                 NAME_REF
-                  IDENT "f"
-              WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              SET_EXPR
-                CALL_EXPR
-                  NAME_REF
-                    ROW_KW "row"
-                  ARG_LIST
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "1"
-                    COMMA ","
-                    WHITESPACE " "
-                    LITERAL
-                      INT_NUMBER "2"
-                    COMMA ","
-                    WHITESPACE " "
-                    LITERAL
-                      DEFAULT_KW "default"
-                    R_PAREN ")"
-            COMMA ","
-            WHITESPACE "\n      "
-            SET_SINGLE_COLUMN
-              COLUMN
-                NAME_REF
-                  IDENT "g"
-              WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              SET_EXPR
-                TUPLE_EXPR
-                  L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "1"
-                  COMMA ","
-                  WHITESPACE " "
-                  LITERAL
-                    INT_NUMBER "2"
-                  COMMA ","
-                  WHITESPACE " "
-                  LITERAL
-                    DEFAULT_KW "default"
-                  R_PAREN ")"
-            COMMA ","
-            WHITESPACE "\n      "
-            SET_SINGLE_COLUMN
-              COLUMN
-                NAME_REF
                   IDENT "h"
               WHITESPACE " "
               EQ "="
@@ -1513,7 +1464,7 @@ SOURCE_FILE
               SET_EXPR
                 NAME_REF
                   IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_delete"
   WHITESPACE "\n"
@@ -1580,7 +1531,7 @@ SOURCE_FILE
       WHITESPACE "\n    "
       MERGE_DELETE
         DELETE_KW "delete"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_select"
   WHITESPACE "\n"
@@ -1663,7 +1614,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
   WHITESPACE "\n"
@@ -1789,7 +1740,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "transaction_value"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
   WHITESPACE "\n"
@@ -1938,7 +1889,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "transaction_value"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_3"
   WHITESPACE "\n"
@@ -2129,7 +2080,7 @@ SOURCE_FILE
               IDENT "w"
             DOT "."
             STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_4"
   WHITESPACE "\n"
@@ -2279,7 +2230,7 @@ SOURCE_FILE
       WHITESPACE "\n  "
       MERGE_DELETE
         DELETE_KW "DELETE"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cross_join_data_source"
   WHITESPACE "\n"
@@ -2343,7 +2294,7 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- natural join"
   WHITESPACE "\n"
@@ -2407,5 +2358,5 @@ SOURCE_FILE
         DO_KW "do"
         WHITESPACE " "
         NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

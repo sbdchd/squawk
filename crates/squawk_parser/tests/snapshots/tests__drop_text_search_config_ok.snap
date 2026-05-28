@@ -18,7 +18,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -42,7 +42,7 @@ SOURCE_FILE
           IDENT "bar"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- restrict"
   WHITESPACE "\n"
@@ -61,5 +61,5 @@ SOURCE_FILE
           IDENT "bar"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -43,7 +43,7 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -334,5 +334,5 @@ SOURCE_FILE
                     NAME_REF
                       TEXT_KW "text"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

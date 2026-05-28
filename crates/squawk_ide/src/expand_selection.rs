@@ -59,6 +59,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::REVOKE_COMMAND_LIST,
     SyntaxKind::ROLE_REF_LIST,
     SyntaxKind::ROW_LIST,
+    SyntaxKind::RULE_STMT_LIST,
     SyntaxKind::EXPR_AS_NAME_LIST,
     SyntaxKind::XML_NAMESPACE_LIST,
     SyntaxKind::SET_COLUMN_LIST,
@@ -290,17 +291,19 @@ fn extend_list_item(node: &SyntaxNode) -> Option<TextRange> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use insta::assert_debug_snapshot;
-    use squawk_syntax::{SourceFile, ast::AstNode};
+    use squawk_syntax::ast::AstNode;
 
+    #[must_use]
     fn expand(sql: &str) -> Vec<String> {
-        let (offset, sql) = fixture(sql);
-        let parse = SourceFile::parse(&sql);
-        let file = parse.tree();
-        let root = file.syntax();
+        let fixture = Fixture::new(sql);
+        let offset = fixture.marker().offset();
+        let sql = offset.file_id.content(fixture.db()).clone();
+        let tree = crate::db::parse(fixture.db(), offset.file_id).tree();
+        let root = tree.syntax();
 
-        let mut range = TextRange::empty(offset);
+        let mut range = TextRange::empty(offset.value);
         let mut results = vec![];
 
         for _ in 0..20 {
@@ -343,15 +346,16 @@ select 'some stret$0ched out words in a string'
     #[test]
     fn string() {
         assert_debug_snapshot!(expand(r"
-select b'foo$0 bar'
+select e'foo$0 bar'
 'buzz';
 "), @r#"
         [
             "foo",
-            "b'foo bar'",
-            "b'foo bar'\n'buzz'",
-            "select b'foo bar'\n'buzz'",
-            "\nselect b'foo bar'\n'buzz';\n",
+            "e'foo bar'",
+            "e'foo bar'\n'buzz'",
+            "select e'foo bar'\n'buzz'",
+            "select e'foo bar'\n'buzz';",
+            "\nselect e'foo bar'\n'buzz';\n",
         ]
         "#);
     }
@@ -365,6 +369,7 @@ select $$foo$0 bar$$;
             "foo",
             "$$foo bar$$",
             "select $$foo bar$$",
+            "select $$foo bar$$;",
             "\nselect $$foo bar$$;\n",
         ]
         "#);
@@ -424,7 +429,7 @@ create table t(
             "x int",
             "x int,",
             "(\n  x int,\n  y text\n)",
-            "-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n)",
+            "-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n);",
             "\n-- foo bar buzz\ncreate table t(\n  x int,\n  y text\n);\n",
         ]
         "#);
@@ -469,7 +474,7 @@ select 1;
 
 $0    select 2;"#), @r#"
         [
-            "    select 2",
+            "    select 2;",
             "    \nselect 1;\n\n    select 2;",
         ]
         "#);
@@ -560,7 +565,7 @@ $0
         let unhandled_list_kinds = (0..SyntaxKind::__LAST as u16)
             .map(SyntaxKind::from)
             .filter(|kind| {
-                format!("{:?}", kind).ends_with("_LIST") && !delimited_ws_list_kinds.contains(kind)
+                format!("{kind:?}").ends_with("_LIST") && !delimited_ws_list_kinds.contains(kind)
             })
             .filter(|kind| !DELIMITED_LIST_KINDS.contains(kind))
             .collect::<Vec<_>>();

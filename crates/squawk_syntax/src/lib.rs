@@ -25,12 +25,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 pub mod ast;
-pub mod identifier;
+mod generated;
 mod parsing;
 mod ptr;
+pub mod quote;
 pub mod syntax_error;
 mod syntax_node;
 mod token_text;
+pub mod unescape;
 mod validation;
 
 #[cfg(test)]
@@ -93,6 +95,7 @@ impl<T> Parse<T> {
             vec![]
         };
         validation::validate(&self.syntax_node(), &mut errors);
+        errors.sort_by_key(|error| error.range().start());
         errors
     }
 }

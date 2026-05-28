@@ -1,39 +1,41 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{db::File, offsets::token_from_offset};
+use crate::{file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn quote_identifier(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let parent = token.parent()?;
 
-    let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
-        name.syntax().clone()
-    } else if let Some(name_ref) = ast::NameRef::cast(parent) {
-        name_ref.syntax().clone()
+    let (is_quoted, text, text_range) = if let Some(name) = ast::Name::cast(parent.clone()) {
+        (name.is_quoted(), name.text(), name.syntax().text_range())
+    } else if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
+        (
+            name_ref.is_quoted(),
+            name_ref.text(),
+            name_ref.syntax().text_range(),
+        )
     } else {
         return None;
     };
 
-    let text = name_node.text().to_string();
-
-    if text.starts_with('"') {
+    if is_quoted {
         return None;
     }
 
-    let quoted = format!(r#""{}""#, text.to_lowercase());
+    let quoted = format!(r#""{text}""#);
 
     actions.push(CodeAction {
         title: "Quote identifier".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(name_node.text_range(), quoted)],
+        edits: vec![Edit::replace(text_range, quoted)],
         kind: ActionKind::RefactorRewrite,
     });
 
@@ -55,6 +57,14 @@ mod test {
             "select x$0 from t;"),
             @r#"select "x" from t;"#
         );
+    }
+
+    #[test]
+    fn quote_doesnt_show_up_for_already_quoted_ident() {
+        assert!(code_action_not_applicable(
+            quote_identifier,
+            r#"create table T("X"$0 int);"#
+        ));
     }
 
     #[test]

@@ -38,6 +38,18 @@ pub(crate) fn find_cte_with_table(
     None
 }
 
+pub(crate) fn iter_values_columns(values: &ast::Values) -> impl Iterator<Item = (Name, ast::Expr)> {
+    values
+        .row_list()
+        .into_iter()
+        .flat_map(|rl| rl.rows().take(1))
+        .flat_map(|r| r.exprs().enumerate())
+        .map(|(idx, expr)| {
+            let name = Name::from_string(format!("column{}", idx + 1));
+            (name, expr)
+        })
+}
+
 #[derive(Debug)]
 pub(crate) enum ParentQuery {
     Select(ast::Select),

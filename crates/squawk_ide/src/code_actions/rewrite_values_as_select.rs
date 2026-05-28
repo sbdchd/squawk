@@ -1,19 +1,19 @@
 use itertools::Itertools;
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{db::File, offsets::token_from_offset};
+use crate::{file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_values_as_select(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let values = token.parent_ancestors().find_map(ast::Values::cast)?;
 
     let value_token_start = values.values_token().map(|x| x.text_range().start())?;
@@ -44,14 +44,17 @@ pub(super) fn rewrite_values_as_select(
         if row_targets.is_empty() {
             return None;
         }
-        select_parts.push(format!("union all\nselect {}", row_targets));
+        select_parts.push(format!("union all\nselect {row_targets}"));
     }
 
-    let select_stmt = select_parts.join("\n");
+    let mut select_stmt = select_parts.join("\n");
+    if values.semicolon_token().is_some() {
+        select_stmt.push(';');
+    }
 
     actions.push(CodeAction {
         title: "Rewrite as `select`".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(values_range, select_stmt)],
+        edits: vec![Edit::replace(values_range, select_stmt)],
         kind: ActionKind::RefactorRewrite,
     });
 
@@ -70,7 +73,7 @@ mod test {
     fn rewrite_values_as_select_simple() {
         assert_snapshot!(
             apply_code_action(rewrite_values_as_select, "valu$0es (1, 'one'), (2, 'two');"),
-            @r"
+            @"
         select 1 as column1, 'one' as column2
         union all
         select 2, 'two';
@@ -98,7 +101,7 @@ mod test {
     fn rewrite_values_as_select_multiple_rows() {
         assert_snapshot!(
             apply_code_action(rewrite_values_as_select, "values (1, 2), (3, 4), (5, 6$0);"),
-            @r"
+            @"
         select 1 as column1, 2 as column2
         union all
         select 3, 4
@@ -115,7 +118,7 @@ mod test {
                 rewrite_values_as_select,
                 "with cte as (select 1) val$0ues (1, 'one'), (2, 'two');"
             ),
-            @r"
+            @"
         with cte as (select 1) select 1 as column1, 'one' as column2
         union all
         select 2, 'two';
@@ -146,7 +149,7 @@ mod test {
     fn rewrite_values_as_select_on_row_content() {
         assert_snapshot!(
             apply_code_action(rewrite_values_as_select, "values (1$0, 2), (3, 4);"),
-            @r"
+            @"
         select 1 as column1, 2 as column2
         union all
         select 3, 4;

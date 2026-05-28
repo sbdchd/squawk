@@ -3,31 +3,30 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use squawk_syntax::{
     Parse, SourceFile, SyntaxNode,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::{Linter, Rule, Version, Violation};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct TableColumn {
-    table: Identifier,
-    column: Identifier,
+    table: String,
+    column: String,
 }
 
 #[derive(Default)]
 struct NotNullValidation {
-    not_null_constraints: FxHashMap<Identifier, TableColumn>,
+    not_null_constraints: FxHashMap<String, TableColumn>,
     validated_columns: FxHashSet<TableColumn>,
-    external_validates: FxHashSet<(Identifier, Identifier)>,
-    dropped_constraints: FxHashSet<(Identifier, Identifier)>,
+    external_validates: FxHashSet<(String, String)>,
+    dropped_constraints: FxHashSet<(String, String)>,
 }
 
 impl NotNullValidation {
-    fn record_not_null_constraint(&mut self, name: Identifier, table_column: TableColumn) {
+    fn record_not_null_constraint(&mut self, name: String, table_column: TableColumn) {
         self.not_null_constraints.insert(name, table_column);
     }
 
-    fn record_validate(&mut self, table: Identifier, constraint: Identifier) {
+    fn record_validate(&mut self, table: String, constraint: String) {
         if let Some(table_column) = self.not_null_constraints.get(&constraint)
             && table_column.table == table
         {
@@ -37,7 +36,7 @@ impl NotNullValidation {
         }
     }
 
-    fn record_drop(&mut self, table: Identifier, constraint: Identifier) {
+    fn record_drop(&mut self, table: String, constraint: String) {
         self.dropped_constraints.insert((table, constraint));
     }
 
@@ -45,7 +44,7 @@ impl NotNullValidation {
         self.validated_columns.contains(table_column)
     }
 
-    fn has_external_validate_for(&self, table: &Identifier) -> bool {
+    fn has_external_validate_for(&self, table: &str) -> bool {
         self.external_validates.iter().any(|(t, _)| t == table)
     }
 
@@ -81,37 +80,34 @@ impl NotNullValidation {
 #[derive(Default)]
 struct ResolvedPairs {
     precise: FxHashSet<TableColumn>,
-    generic_per_table: FxHashMap<Identifier, usize>,
+    generic_per_table: FxHashMap<String, usize>,
 }
 
 // Infer the column covered by a NOT NULL helper constraint from its name.
-// Recognized forms (case-folded by Identifier): `<column>_not_null` and
-// `<table>_<column>_not_null`. Returns None for names that don't fit, in
-// which case the caller falls back to a generic per-table count.
-fn infer_column_from_constraint_name(
-    table: &Identifier,
-    constraint: &Identifier,
-) -> Option<Identifier> {
-    let stem = constraint.as_str().strip_suffix("_not_null")?;
+// Recognized forms: `<column>_not_null` and `<table>_<column>_not_null`.
+// Returns None for names that don't fit, in which case the caller falls back
+// to a generic per-table count.
+fn infer_column_from_constraint_name(table: &str, constraint: &str) -> Option<String> {
+    let stem = constraint.strip_suffix("_not_null")?;
     if stem.is_empty() {
         return None;
     }
-    let table_prefix = format!("{}_", table.as_str());
+    let table_prefix = format!("{}_", table);
     if let Some(column) = stem.strip_prefix(&table_prefix) {
         if column.is_empty() {
             return None;
         }
-        return Some(Identifier::new(column));
+        return Some(column.to_string());
     }
     // Bare `<stem>_not_null`: ambiguous when stem == table name (could be a
     // table-level helper rather than a column-level one), so fall back.
-    if stem == table.as_str() {
+    if stem == table {
         return None;
     }
-    Some(Identifier::new(stem))
+    Some(stem.to_string())
 }
 
-fn is_not_null_check(expr: &ast::Expr) -> Option<Identifier> {
+fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
     let ast::Expr::BinExpr(bin_expr) = expr else {
         return None;
     };
@@ -127,18 +123,18 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<Identifier> {
     }
 
     match bin_expr.lhs()? {
-        ast::Expr::NameRef(name_ref) => Some(Identifier::new(&name_ref.text())),
+        ast::Expr::NameRef(name_ref) => Some(name_ref.text()),
         _ => None,
     }
 }
 
-fn get_table_name(alter_table: &ast::AlterTable) -> Option<Identifier> {
+fn get_table_name(alter_table: &ast::AlterTable) -> Option<String> {
     alter_table
         .relation_name()?
         .path()?
         .segment()?
         .name_ref()
-        .map(|x| Identifier::new(&x.text()))
+        .map(|x| x.text())
 }
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
@@ -169,7 +165,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             && let Some(column) = is_not_null_check(&expr)
                         {
                             validation.record_not_null_constraint(
-                                Identifier::new(&constraint_name.text()),
+                                constraint_name.text(),
                                 TableColumn {
                                     table: table.clone(),
                                     column,
@@ -181,18 +177,16 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                     ast::AlterTableAction::ValidateConstraint(validate_constraint)
                         if is_pg12_plus =>
                     {
-                        if let Some(constraint_name) = validate_constraint
-                            .name_ref()
-                            .map(|x| Identifier::new(&x.text()))
+                        if let Some(constraint_name) =
+                            validate_constraint.name_ref().map(|x| x.text())
                         {
                             validation.record_validate(table.clone(), constraint_name);
                         }
                     }
                     // Track DROP CONSTRAINT for cross-migration pairing
                     ast::AlterTableAction::DropConstraint(drop_constraint) if is_pg12_plus => {
-                        if let Some(constraint_name) = drop_constraint
-                            .name_ref()
-                            .map(|x| Identifier::new(&x.text()))
+                        if let Some(constraint_name) =
+                            drop_constraint.name_ref().map(|x| x.text())
                         {
                             validation.record_drop(table.clone(), constraint_name);
                         }
@@ -206,8 +200,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         };
 
                         if is_pg12_plus
-                            && let Some(column) =
-                                alter_column.name_ref().map(|x| Identifier::new(&x.text()))
+                            && let Some(column) = alter_column.name_ref().map(|x| x.text())
                         {
                             let table_column = TableColumn {
                                 table: table.clone(),

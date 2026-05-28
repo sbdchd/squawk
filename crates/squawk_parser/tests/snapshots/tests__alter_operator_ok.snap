@@ -44,7 +44,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -75,7 +75,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
   WHITESPACE "\n"
@@ -194,7 +194,7 @@ SOURCE_FILE
                     IDENT "enabled"
         WHITESPACE "\n  "
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- none_options"
   WHITESPACE "\n"
@@ -246,5 +246,5 @@ SOURCE_FILE
           ATTRIBUTE_VALUE
             NONE_KW "none"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

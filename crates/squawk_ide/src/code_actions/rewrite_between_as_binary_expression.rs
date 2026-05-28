@@ -1,20 +1,20 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::AstNode;
 
-use crate::{db::File, offsets::token_from_offset};
+use crate::{file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_between_as_binary_expression(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
     use squawk_syntax::ast;
 
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let between_expr = token.parent_ancestors().find_map(ast::BetweenExpr::cast)?;
 
     let target = between_expr.target()?;
@@ -45,7 +45,7 @@ pub(super) fn rewrite_between_as_binary_expression(
 
     actions.push(CodeAction {
         title: "Rewrite as binary expression".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
+        edits: vec![Edit::replace(
             between_expr.syntax().text_range(),
             replacement,
         )],

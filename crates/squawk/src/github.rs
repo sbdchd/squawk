@@ -258,7 +258,7 @@ fn format_comment(
     summary_notice: Option<&str>,
 ) -> String {
     let notice_section = if let Some(notice) = summary_notice {
-        format!("\n> {}\n", notice)
+        format!("\n> {notice}\n")
     } else {
         String::new()
     };
@@ -274,13 +274,7 @@ fn format_comment(
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
 ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
-",
-        violations_emoji = violations_emoji,
-        violation_count = violation_count,
-        file_count = file_count,
-        notice_section = notice_section,
-        content = content,
-        version = version
+"
     )
     .trim_matches('\n')
     .into()
@@ -453,7 +447,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         assert_eq!(result, short_sql);
 
         let long_sql = (0..100)
-            .map(|i| format!("-- Line {}", i))
+            .map(|i| format!("-- Line {i}"))
             .collect::<Vec<_>>()
             .join("\n");
         let (result, truncated) = crate::github::truncate_sql_if_needed(&long_sql);
@@ -465,7 +459,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     fn generating_comment_with_large_content() {
         // Create a very large SQL content
         let large_sql = (0..1000)
-            .map(|i| format!("SELECT {} as col{};", i, i))
+            .map(|i| format!("SELECT {i} as col{i};"))
             .collect::<Vec<_>>()
             .join("\n");
 
@@ -500,7 +494,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     fn generating_comment_forced_summary() {
         // Create content that will definitely trigger summary mode
         let massive_sql = (0..10000)
-            .map(|i| format!("SELECT {} as col{};", i, i))
+            .map(|i| format!("SELECT {i} as col{i};"))
             .collect::<Vec<_>>()
             .join("\n");
 

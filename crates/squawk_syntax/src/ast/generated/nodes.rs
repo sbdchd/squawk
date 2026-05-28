@@ -387,6 +387,10 @@ impl AlterAggregate {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn aggregate_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
     }
@@ -443,6 +447,10 @@ impl AlterCollation {
     #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -518,6 +526,10 @@ impl AlterConversion {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -565,6 +577,10 @@ impl AlterDatabase {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -594,6 +610,10 @@ impl AlterDefaultPrivileges {
     #[inline]
     pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -643,6 +663,10 @@ impl AlterDomain {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -668,6 +692,10 @@ impl AlterEventTrigger {
     #[inline]
     pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -709,6 +737,10 @@ impl AlterExtension {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -738,6 +770,10 @@ impl AlterForeignDataWrapper {
     #[inline]
     pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -787,6 +823,10 @@ impl AlterForeignTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -834,6 +874,10 @@ impl AlterFunction {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -863,6 +907,10 @@ impl AlterGroup {
     #[inline]
     pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn add_token(&self) -> Option<SyntaxToken> {
@@ -912,6 +960,10 @@ impl AlterIndex {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
@@ -959,6 +1011,10 @@ impl AlterLanguage {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -973,6 +1029,10 @@ pub struct AlterLargeObject {
     pub(crate) syntax: SyntaxNode,
 }
 impl AlterLargeObject {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -1015,6 +1075,10 @@ impl AlterMaterializedView {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
@@ -1072,6 +1136,10 @@ impl AlterOperator {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1105,6 +1173,10 @@ impl AlterOperatorClass {
     #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1156,6 +1228,10 @@ impl AlterOperatorFamily {
     #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1243,6 +1319,10 @@ impl AlterPolicy {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1290,6 +1370,10 @@ impl AlterProcedure {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1321,6 +1405,10 @@ impl AlterPropertyGraph {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1344,6 +1432,10 @@ impl AlterPublication {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1361,6 +1453,10 @@ impl AlterRole {
     #[inline]
     pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1406,6 +1502,10 @@ impl AlterRoutine {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1435,6 +1535,10 @@ impl AlterRule {
     #[inline]
     pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1468,6 +1572,10 @@ impl AlterSchema {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1491,6 +1599,10 @@ impl AlterSequence {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1512,6 +1624,10 @@ impl AlterServer {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1560,6 +1676,10 @@ impl AlterStatistics {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1579,6 +1699,10 @@ impl AlterSubscription {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1593,6 +1717,10 @@ pub struct AlterSystem {
     pub(crate) syntax: SyntaxNode,
 }
 impl AlterSystem {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -1619,6 +1747,10 @@ impl AlterTable {
     #[inline]
     pub fn relation_name(&self) -> Option<RelationName> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1656,6 +1788,10 @@ impl AlterTablespace {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1685,6 +1821,10 @@ impl AlterTextSearchConfiguration {
     #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1730,6 +1870,10 @@ impl AlterTextSearchDictionary {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1765,6 +1909,10 @@ impl AlterTextSearchParser {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1798,6 +1946,10 @@ impl AlterTextSearchTemplate {
     #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1841,6 +1993,10 @@ impl AlterTrigger {
     #[inline]
     pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1894,6 +2050,10 @@ impl AlterType {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -1911,6 +2071,10 @@ impl AlterUser {
     #[inline]
     pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -1938,6 +2102,10 @@ impl AlterUserMapping {
     #[inline]
     pub fn server_name(&self) -> Option<ServerName> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
@@ -2010,6 +2178,10 @@ impl AlterView {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -2031,6 +2203,10 @@ impl Analyze {
     #[inline]
     pub fn table_and_columns_list(&self) -> Option<TableAndColumnsList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn analyse_token(&self) -> Option<SyntaxToken> {
@@ -2394,6 +2570,10 @@ impl Begin {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn begin_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BEGIN_KW)
     }
@@ -2408,25 +2588,6 @@ impl Begin {
     #[inline]
     pub fn work_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WORK_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct BeginFuncOption {
-    pub(crate) syntax: SyntaxNode,
-}
-impl BeginFuncOption {
-    #[inline]
-    pub fn return_func_option(&self) -> Option<ReturnFuncOption> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn stmt(&self) -> Option<Stmt> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
 }
 
@@ -2517,6 +2678,10 @@ impl Call {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn call_token(&self) -> Option<SyntaxToken> {
@@ -2835,6 +3000,10 @@ pub struct Checkpoint {
 }
 impl Checkpoint {
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn checkpoint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CHECKPOINT_KW)
     }
@@ -2850,6 +3019,10 @@ impl Close {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn close_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CLOSE_KW)
     }
@@ -2861,6 +3034,10 @@ pub struct Cluster {
 }
 impl Cluster {
     #[inline]
+    pub fn on_path(&self) -> Option<OnPath> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn option_item_list(&self) -> Option<OptionItemList> {
         support::child(&self.syntax)
     }
@@ -2871,6 +3048,10 @@ impl Cluster {
     #[inline]
     pub fn using_method(&self) -> Option<UsingMethod> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cluster_token(&self) -> Option<SyntaxToken> {
@@ -2988,6 +3169,10 @@ impl Column {
     }
     #[inline]
     pub fn enforced(&self) -> Option<Enforced> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn field_expr(&self) -> Option<FieldExpr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3111,6 +3296,10 @@ impl CommentOn {
     #[inline]
     pub fn comma_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn access_token(&self) -> Option<SyntaxToken> {
@@ -3344,6 +3533,10 @@ impl Commit {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn and_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AND_KW)
     }
@@ -3378,6 +3571,10 @@ pub struct CompoundSelect {
     pub(crate) syntax: SyntaxNode,
 }
 impl CompoundSelect {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
     #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
@@ -3680,6 +3877,10 @@ impl Copy {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn binary_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BINARY_KW)
     }
@@ -3768,6 +3969,10 @@ impl CreateAccessMethod {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn access_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ACCESS_KW)
     }
@@ -3811,6 +4016,10 @@ impl CreateAggregate {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn aggregate_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
     }
@@ -3832,6 +4041,10 @@ impl CreateCast {
     #[inline]
     pub fn function_sig(&self) -> Option<FunctionSig> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
@@ -3881,6 +4094,10 @@ impl CreateCollation {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn collation_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLLATION_KW)
     }
@@ -3902,6 +4119,10 @@ impl CreateConversion {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn conversion_token(&self) -> Option<SyntaxToken> {
@@ -3941,6 +4162,10 @@ impl CreateDatabase {
     #[inline]
     pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4036,6 +4261,10 @@ impl CreateDomain {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
     }
@@ -4069,6 +4298,10 @@ impl CreateEventTrigger {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4114,6 +4347,10 @@ impl CreateExtension {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4139,6 +4376,10 @@ impl CreateForeignDataWrapper {
     #[inline]
     pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4196,6 +4437,10 @@ impl CreateForeignTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4235,6 +4480,10 @@ impl CreateFunction {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4256,6 +4505,10 @@ impl CreateGroup {
     #[inline]
     pub fn role_option_list(&self) -> Option<RoleOptionList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4317,6 +4570,10 @@ impl CreateIndex {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn concurrently_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
     }
@@ -4354,6 +4611,10 @@ impl CreateLanguage {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4427,6 +4688,10 @@ impl CreateMaterializedView {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
     }
@@ -4462,6 +4727,10 @@ impl CreateOperator {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4491,6 +4760,10 @@ impl CreateOperatorClass {
     #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
@@ -4544,6 +4817,10 @@ impl CreateOperatorFamily {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4589,6 +4866,10 @@ impl CreatePolicy {
     #[inline]
     pub fn with_check_expr_clause(&self) -> Option<WithCheckExprClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
@@ -4650,6 +4931,10 @@ impl CreateProcedure {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4679,6 +4964,10 @@ impl CreatePropertyGraph {
     #[inline]
     pub fn vertex_tables(&self) -> Option<VertexTables> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4716,6 +5005,10 @@ impl CreatePublication {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
@@ -4751,6 +5044,10 @@ impl CreateRole {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4774,32 +5071,16 @@ impl CreateRule {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn rule_do(&self) -> Option<RuleDo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmt(&self) -> Option<Stmt> {
+    pub fn rule_on(&self) -> Option<RuleOn> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmts(&self) -> AstChildren<Stmt> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn where_clause(&self) -> Option<WhereClause> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn also_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALSO_KW)
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
@@ -4810,48 +5091,8 @@ impl CreateRule {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
     #[inline]
-    pub fn delete_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DELETE_KW)
-    }
-    #[inline]
-    pub fn do_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DO_KW)
-    }
-    #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
-    }
-    #[inline]
-    pub fn insert_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INSERT_KW)
-    }
-    #[inline]
-    pub fn instead_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INSTEAD_KW)
-    }
-    #[inline]
-    pub fn nothing_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NOTHING_KW)
-    }
-    #[inline]
-    pub fn on_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ON_KW)
-    }
-    #[inline]
     pub fn rule_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RULE_KW)
-    }
-    #[inline]
-    pub fn select_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SELECT_KW)
-    }
-    #[inline]
-    pub fn to_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TO_KW)
-    }
-    #[inline]
-    pub fn update_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UPDATE_KW)
     }
 }
 
@@ -4879,6 +5120,10 @@ impl CreateSchema {
     #[inline]
     pub fn schema_elements(&self) -> AstChildren<SchemaElement> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn authorization_token(&self) -> Option<SyntaxToken> {
@@ -4916,6 +5161,10 @@ impl CreateSequence {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -4949,6 +5198,10 @@ impl CreateServer {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -4998,6 +5251,10 @@ impl CreateStatistics {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -5035,6 +5292,10 @@ impl CreateSubscription {
     #[inline]
     pub fn with_params(&self) -> Option<WithParams> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn connection_token(&self) -> Option<SyntaxToken> {
@@ -5116,6 +5377,10 @@ impl CreateTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -5175,6 +5440,10 @@ impl CreateTableAs {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
     }
@@ -5210,6 +5479,10 @@ impl CreateTablespace {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -5239,6 +5512,10 @@ impl CreateTextSearchConfiguration {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn configuration_token(&self) -> Option<SyntaxToken> {
@@ -5272,6 +5549,10 @@ impl CreateTextSearchDictionary {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -5303,6 +5584,10 @@ impl CreateTextSearchParser {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -5332,6 +5617,10 @@ impl CreateTextSearchTemplate {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -5387,6 +5676,10 @@ impl CreateTransform {
     #[inline]
     pub fn comma_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -5468,6 +5761,10 @@ impl CreateTrigger {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
@@ -5531,6 +5828,10 @@ impl CreateType {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
     }
@@ -5566,6 +5867,10 @@ impl CreateUser {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
@@ -5595,6 +5900,10 @@ impl CreateUserMapping {
     #[inline]
     pub fn server_name(&self) -> Option<ServerName> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
@@ -5642,6 +5951,10 @@ impl CreateView {
     #[inline]
     pub fn with_params(&self) -> Option<WithParams> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
@@ -5766,6 +6079,10 @@ impl Deallocate {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
@@ -5791,6 +6108,10 @@ impl Declare {
     #[inline]
     pub fn query(&self) -> Option<SelectVariant> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn asensitive_token(&self) -> Option<SyntaxToken> {
@@ -5919,6 +6240,10 @@ impl Delete {
     #[inline]
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn delete_token(&self) -> Option<SyntaxToken> {
@@ -6089,6 +6414,10 @@ pub struct Discard {
 }
 impl Discard {
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
@@ -6147,6 +6476,10 @@ pub struct Do {
 }
 impl Do {
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn do_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DO_KW)
     }
@@ -6196,6 +6529,10 @@ impl DropAccessMethod {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn access_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ACCESS_KW)
     }
@@ -6229,6 +6566,10 @@ impl DropAggregate {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn aggregate_token(&self) -> Option<SyntaxToken> {
@@ -6289,6 +6630,10 @@ impl DropCast {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6318,6 +6663,10 @@ impl DropCollation {
     #[inline]
     pub fn paths(&self) -> AstChildren<Path> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -6413,6 +6762,10 @@ impl DropConversion {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6442,6 +6795,10 @@ impl DropDatabase {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn database_token(&self) -> Option<SyntaxToken> {
@@ -6480,6 +6837,10 @@ impl DropDomain {
     #[inline]
     pub fn paths(&self) -> AstChildren<Path> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -6556,6 +6917,10 @@ impl DropEventTrigger {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6610,6 +6975,10 @@ impl DropExtension {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6639,6 +7008,10 @@ impl DropForeignDataWrapper {
     #[inline]
     pub fn name_refs(&self) -> AstChildren<NameRef> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -6680,6 +7053,10 @@ impl DropForeignTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6715,6 +7092,10 @@ impl DropFunction {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6744,6 +7125,10 @@ impl DropGroup {
     #[inline]
     pub fn name_refs(&self) -> AstChildren<NameRef> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
@@ -6788,6 +7173,10 @@ impl DropIndex {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6823,6 +7212,10 @@ impl DropLanguage {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6856,6 +7249,10 @@ impl DropMaterializedView {
     #[inline]
     pub fn paths(&self) -> AstChildren<Path> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -6961,6 +7358,10 @@ impl DropOperator {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -6994,6 +7395,10 @@ impl DropOperatorClass {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7039,6 +7444,10 @@ impl DropOperatorFamily {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7072,6 +7481,10 @@ impl DropOwned {
     #[inline]
     pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn by_token(&self) -> Option<SyntaxToken> {
@@ -7113,6 +7526,10 @@ impl DropPolicy {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7144,6 +7561,10 @@ impl DropProcedure {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7173,6 +7594,10 @@ impl DropPropertyGraph {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7210,6 +7635,10 @@ impl DropPublication {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7241,6 +7670,10 @@ impl DropRole {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
@@ -7262,6 +7695,10 @@ impl DropRoutine {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7299,6 +7736,10 @@ impl DropRule {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7328,6 +7769,10 @@ impl DropSchema {
     #[inline]
     pub fn name_refs(&self) -> AstChildren<NameRef> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7361,6 +7806,10 @@ impl DropSequence {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7390,6 +7839,10 @@ impl DropServer {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7423,6 +7876,10 @@ impl DropStatistics {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7452,6 +7909,10 @@ impl DropSubscription {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7489,6 +7950,10 @@ impl DropTable {
         support::token(&self.syntax, SyntaxKind::COMMA)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7520,6 +7985,10 @@ impl DropTablespace {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
@@ -7541,6 +8010,10 @@ impl DropTextSearchConfig {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7582,6 +8055,10 @@ impl DropTextSearchDict {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7621,6 +8098,10 @@ impl DropTextSearchParser {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7658,6 +8139,10 @@ impl DropTextSearchTemplate {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7703,6 +8188,10 @@ impl DropTransform {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7746,6 +8235,10 @@ impl DropTrigger {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -7775,6 +8268,10 @@ impl DropType {
     #[inline]
     pub fn paths(&self) -> AstChildren<Path> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -7808,6 +8305,10 @@ impl DropUser {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
@@ -7833,6 +8334,10 @@ impl DropUserMapping {
     #[inline]
     pub fn server_name(&self) -> Option<ServerName> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
@@ -8025,6 +8530,10 @@ impl DropView {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
@@ -8235,6 +8744,17 @@ impl ElseClause {
     #[inline]
     pub fn else_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ELSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EmptyStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EmptyStmt {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
 }
 
@@ -8503,6 +9023,10 @@ impl Execute {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn execute_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXECUTE_KW)
     }
@@ -8539,6 +9063,10 @@ impl Explain {
     #[inline]
     pub fn explain_stmt(&self) -> Option<ExplainStmt> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn analyse_token(&self) -> Option<SyntaxToken> {
@@ -8723,6 +9251,10 @@ impl Fetch {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn fetch_token(&self) -> Option<SyntaxToken> {
@@ -9205,6 +9737,10 @@ impl Grant {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
@@ -9578,6 +10114,10 @@ impl ImportForeignSchema {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn foreign_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
     }
@@ -9719,16 +10259,16 @@ impl Insert {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn stmt(&self) -> Option<Stmt> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn values(&self) -> Option<Values> {
+    pub fn select_variant(&self) -> Option<SelectVariant> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> {
@@ -11469,6 +12009,10 @@ impl Listen {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn listen_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LISTEN_KW)
     }
@@ -11490,6 +12034,10 @@ impl Load {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn load_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LOAD_KW)
     }
@@ -11503,6 +12051,10 @@ impl Lock {
     #[inline]
     pub fn table_list(&self) -> Option<TableList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn lock_token(&self) -> Option<SyntaxToken> {
@@ -11624,6 +12176,10 @@ impl Merge {
     #[inline]
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn into_token(&self) -> Option<SyntaxToken> {
@@ -11875,6 +12431,10 @@ impl Move {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn from_token(&self) -> Option<SyntaxToken> {
@@ -12280,6 +12840,17 @@ impl NotValid {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Nothing {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Nothing {
+    #[inline]
+    pub fn nothing_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOTHING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Notify {
     pub(crate) syntax: SyntaxNode,
 }
@@ -12295,6 +12866,10 @@ impl Notify {
     #[inline]
     pub fn comma_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn notify_token(&self) -> Option<SyntaxToken> {
@@ -12492,6 +13067,21 @@ impl OnDeleteAction {
     #[inline]
     pub fn delete_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DELETE_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OnPath {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OnPath {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn on_token(&self) -> Option<SyntaxToken> {
@@ -13242,6 +13832,10 @@ impl ParenSelect {
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -13665,6 +14259,10 @@ impl Prepare {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
     }
@@ -13682,6 +14280,10 @@ impl PrepareTransaction {
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn prepare_token(&self) -> Option<SyntaxToken> {
@@ -13973,6 +14575,10 @@ impl Reassign {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn by_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BY_KW)
     }
@@ -14120,6 +14726,10 @@ impl Refresh {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn concurrently_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
     }
@@ -14179,6 +14789,14 @@ impl Reindex {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn concurrently_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
     }
     #[inline]
     pub fn database_token(&self) -> Option<SyntaxToken> {
@@ -14241,6 +14859,10 @@ impl ReleaseSavepoint {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn release_token(&self) -> Option<SyntaxToken> {
@@ -14385,6 +15007,10 @@ impl Repack {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn index_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INDEX_KW)
     }
@@ -14469,6 +15095,10 @@ impl Reset {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
@@ -14536,6 +15166,10 @@ pub struct ResetSessionAuth {
     pub(crate) syntax: SyntaxNode,
 }
 impl ResetSessionAuth {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
     #[inline]
     pub fn authorization_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AUTHORIZATION_KW)
@@ -14607,6 +15241,10 @@ impl ReturnFuncOption {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn return_token(&self) -> Option<SyntaxToken> {
@@ -14703,6 +15341,10 @@ impl Revoke {
     #[inline]
     pub fn role_ref_list(&self) -> Option<RoleRefList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
@@ -15008,6 +15650,10 @@ impl Rollback {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn abort_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ABORT_KW)
     }
@@ -15083,6 +15729,91 @@ impl RowsFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RuleDo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RuleDo {
+    #[inline]
+    pub fn rule_action(&self) -> Option<RuleAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn also_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALSO_KW)
+    }
+    #[inline]
+    pub fn do_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DO_KW)
+    }
+    #[inline]
+    pub fn instead_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INSTEAD_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RuleOn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RuleOn {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn delete_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DELETE_KW)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
+    pub fn insert_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INSERT_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+    #[inline]
+    pub fn select_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SELECT_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn update_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UPDATE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RuleStmtList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RuleStmtList {
+    #[inline]
+    pub fn rule_stmts(&self) -> AstChildren<RuleStmt> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Savepoint {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15090,6 +15821,10 @@ impl Savepoint {
     #[inline]
     pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn savepoint_token(&self) -> Option<SyntaxToken> {
@@ -15140,6 +15875,10 @@ impl SecurityLabel {
     #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn aggregate_token(&self) -> Option<SyntaxToken> {
@@ -15316,6 +16055,10 @@ impl Select {
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -15397,6 +16140,10 @@ impl SelectInto {
     #[inline]
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
 }
 
@@ -15562,6 +16309,10 @@ impl Set {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn eq_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EQ)
     }
@@ -15714,6 +16465,10 @@ impl SetConstraints {
     #[inline]
     pub fn paths(&self) -> AstChildren<Path> {
         support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
@@ -15989,6 +16744,10 @@ impl SetRole {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn local_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LOCAL_KW)
     }
@@ -16056,6 +16815,10 @@ impl SetSessionAuth {
     #[inline]
     pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn authorization_token(&self) -> Option<SyntaxToken> {
@@ -16159,6 +16922,10 @@ impl SetTransaction {
     #[inline]
     pub fn transaction_mode_list(&self) -> Option<TransactionModeList> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
@@ -16267,6 +17034,10 @@ pub struct Show {
     pub(crate) syntax: SyntaxNode,
 }
 impl Show {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
     #[inline]
     pub fn show_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SHOW_KW)
@@ -16602,6 +17373,10 @@ impl Table {
     #[inline]
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
@@ -16992,6 +17767,10 @@ impl Truncate {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
@@ -17108,6 +17887,10 @@ impl Unlisten {
         support::token(&self.syntax, SyntaxKind::STAR)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn unlisten_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::UNLISTEN_KW)
     }
@@ -17160,6 +17943,10 @@ impl Update {
     #[inline]
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn update_token(&self) -> Option<SyntaxToken> {
@@ -17272,6 +18059,10 @@ impl Vacuum {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
     pub fn analyse_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ANALYSE_KW)
     }
@@ -17358,6 +18149,10 @@ impl Values {
     #[inline]
     pub fn with_clause(&self) -> Option<WithClause> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn values_token(&self) -> Option<SyntaxToken> {
@@ -18545,6 +19340,12 @@ pub enum AlterTypeAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BeginFuncOption {
+    ReturnFuncOption(ReturnFuncOption),
+    Stmt(Stmt),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ColumnConstraint {
     CheckConstraint(CheckConstraint),
     DefaultConstraint(DefaultConstraint),
@@ -18769,6 +19570,22 @@ pub enum RefAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RuleAction {
+    Nothing(Nothing),
+    RuleStmtList(RuleStmtList),
+    RuleStmt(RuleStmt),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RuleStmt {
+    Delete(Delete),
+    Insert(Insert),
+    Notify(Notify),
+    Update(Update),
+    SelectVariant(SelectVariant),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SchemaElement {
     CreateIndex(CreateIndex),
     CreateSequence(CreateSequence),
@@ -18940,6 +19757,7 @@ pub enum Stmt {
     DropUser(DropUser),
     DropUserMapping(DropUserMapping),
     DropView(DropView),
+    EmptyStmt(EmptyStmt),
     Execute(Execute),
     Explain(Explain),
     Fetch(Fetch),
@@ -20473,24 +21291,6 @@ impl AstNode for Begin {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::BEGIN
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for BeginFuncOption {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BEGIN_FUNC_OPTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -23569,6 +24369,24 @@ impl AstNode for ElseClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ELSE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for EmptyStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EMPTY_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -26787,6 +27605,24 @@ impl AstNode for NotValid {
         &self.syntax
     }
 }
+impl AstNode for Nothing {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NOTHING
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Notify {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -26989,6 +27825,24 @@ impl AstNode for OnDeleteAction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ON_DELETE_ACTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OnPath {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ON_PATH
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -28879,6 +29733,60 @@ impl AstNode for RowsFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ROWS_FUNC_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RuleDo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RULE_DO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RuleOn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RULE_ON
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RuleStmtList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RULE_STMT_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -32572,6 +33480,40 @@ impl From<DropAttribute> for AlterTypeAction {
         AlterTypeAction::DropAttribute(node)
     }
 }
+impl AstNode for BeginFuncOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::RETURN_FUNC_OPTION)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::RETURN_FUNC_OPTION => {
+                BeginFuncOption::ReturnFuncOption(ReturnFuncOption { syntax })
+            }
+            _ => {
+                if let Some(result) = Stmt::cast(syntax) {
+                    return Some(BeginFuncOption::Stmt(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            BeginFuncOption::ReturnFuncOption(it) => &it.syntax,
+            BeginFuncOption::Stmt(it) => it.syntax(),
+        }
+    }
+}
+impl From<ReturnFuncOption> for BeginFuncOption {
+    #[inline]
+    fn from(node: ReturnFuncOption) -> BeginFuncOption {
+        BeginFuncOption::ReturnFuncOption(node)
+    }
+}
 impl AstNode for ColumnConstraint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -34353,6 +35295,105 @@ impl From<SetNullColumns> for RefAction {
         RefAction::SetNullColumns(node)
     }
 }
+impl AstNode for RuleAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::NOTHING | SyntaxKind::RULE_STMT_LIST)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::NOTHING => RuleAction::Nothing(Nothing { syntax }),
+            SyntaxKind::RULE_STMT_LIST => RuleAction::RuleStmtList(RuleStmtList { syntax }),
+            _ => {
+                if let Some(result) = RuleStmt::cast(syntax) {
+                    return Some(RuleAction::RuleStmt(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            RuleAction::Nothing(it) => &it.syntax,
+            RuleAction::RuleStmtList(it) => &it.syntax,
+            RuleAction::RuleStmt(it) => it.syntax(),
+        }
+    }
+}
+impl From<Nothing> for RuleAction {
+    #[inline]
+    fn from(node: Nothing) -> RuleAction {
+        RuleAction::Nothing(node)
+    }
+}
+impl From<RuleStmtList> for RuleAction {
+    #[inline]
+    fn from(node: RuleStmtList) -> RuleAction {
+        RuleAction::RuleStmtList(node)
+    }
+}
+impl AstNode for RuleStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::DELETE | SyntaxKind::INSERT | SyntaxKind::NOTIFY | SyntaxKind::UPDATE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::DELETE => RuleStmt::Delete(Delete { syntax }),
+            SyntaxKind::INSERT => RuleStmt::Insert(Insert { syntax }),
+            SyntaxKind::NOTIFY => RuleStmt::Notify(Notify { syntax }),
+            SyntaxKind::UPDATE => RuleStmt::Update(Update { syntax }),
+            _ => {
+                if let Some(result) = SelectVariant::cast(syntax) {
+                    return Some(RuleStmt::SelectVariant(result));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            RuleStmt::Delete(it) => &it.syntax,
+            RuleStmt::Insert(it) => &it.syntax,
+            RuleStmt::Notify(it) => &it.syntax,
+            RuleStmt::Update(it) => &it.syntax,
+            RuleStmt::SelectVariant(it) => it.syntax(),
+        }
+    }
+}
+impl From<Delete> for RuleStmt {
+    #[inline]
+    fn from(node: Delete) -> RuleStmt {
+        RuleStmt::Delete(node)
+    }
+}
+impl From<Insert> for RuleStmt {
+    #[inline]
+    fn from(node: Insert) -> RuleStmt {
+        RuleStmt::Insert(node)
+    }
+}
+impl From<Notify> for RuleStmt {
+    #[inline]
+    fn from(node: Notify) -> RuleStmt {
+        RuleStmt::Notify(node)
+    }
+}
+impl From<Update> for RuleStmt {
+    #[inline]
+    fn from(node: Update) -> RuleStmt {
+        RuleStmt::Update(node)
+    }
+}
 impl AstNode for SchemaElement {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -34695,6 +35736,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::DROP_USER
                 | SyntaxKind::DROP_USER_MAPPING
                 | SyntaxKind::DROP_VIEW
+                | SyntaxKind::EMPTY_STMT
                 | SyntaxKind::EXECUTE
                 | SyntaxKind::EXPLAIN
                 | SyntaxKind::FETCH
@@ -34954,6 +35996,7 @@ impl AstNode for Stmt {
             SyntaxKind::DROP_USER => Stmt::DropUser(DropUser { syntax }),
             SyntaxKind::DROP_USER_MAPPING => Stmt::DropUserMapping(DropUserMapping { syntax }),
             SyntaxKind::DROP_VIEW => Stmt::DropView(DropView { syntax }),
+            SyntaxKind::EMPTY_STMT => Stmt::EmptyStmt(EmptyStmt { syntax }),
             SyntaxKind::EXECUTE => Stmt::Execute(Execute { syntax }),
             SyntaxKind::EXPLAIN => Stmt::Explain(Explain { syntax }),
             SyntaxKind::FETCH => Stmt::Fetch(Fetch { syntax }),
@@ -35151,6 +36194,7 @@ impl AstNode for Stmt {
             Stmt::DropUser(it) => &it.syntax,
             Stmt::DropUserMapping(it) => &it.syntax,
             Stmt::DropView(it) => &it.syntax,
+            Stmt::EmptyStmt(it) => &it.syntax,
             Stmt::Execute(it) => &it.syntax,
             Stmt::Explain(it) => &it.syntax,
             Stmt::Fetch(it) => &it.syntax,
@@ -36056,6 +37100,12 @@ impl From<DropView> for Stmt {
     #[inline]
     fn from(node: DropView) -> Stmt {
         Stmt::DropView(node)
+    }
+}
+impl From<EmptyStmt> for Stmt {
+    #[inline]
+    fn from(node: EmptyStmt) -> Stmt {
+        Stmt::EmptyStmt(node)
     }
 }
 impl From<Execute> for Stmt {

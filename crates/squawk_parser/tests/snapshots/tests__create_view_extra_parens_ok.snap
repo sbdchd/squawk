@@ -75,5 +75,5 @@ SOURCE_FILE
             WHITESPACE " "
             SORT_DESC
               DESC_KW "desc"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

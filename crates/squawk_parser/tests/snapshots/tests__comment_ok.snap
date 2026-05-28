@@ -23,7 +23,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- aggregate_star"
   WHITESPACE "\n"
@@ -49,7 +49,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- aggregate"
   WHITESPACE "\n"
@@ -75,7 +75,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- aggregate_with_params"
   WHITESPACE "\n"
@@ -120,7 +120,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- aggregate_order_by"
   WHITESPACE "\n"
@@ -167,7 +167,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cast"
   WHITESPACE "\n"
@@ -199,7 +199,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- collation"
   WHITESPACE "\n"
@@ -219,7 +219,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column"
   WHITESPACE "\n"
@@ -244,7 +244,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- constraint_on_table"
   WHITESPACE "\n"
@@ -269,7 +269,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- constraint_on_domain"
   WHITESPACE "\n"
@@ -296,7 +296,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- conversion"
   WHITESPACE "\n"
@@ -316,7 +316,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- database"
   WHITESPACE "\n"
@@ -336,7 +336,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- domain"
   WHITESPACE "\n"
@@ -356,7 +356,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extension"
   WHITESPACE "\n"
@@ -376,7 +376,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- event_trigger"
   WHITESPACE "\n"
@@ -398,7 +398,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data_wrapper"
   WHITESPACE "\n"
@@ -422,7 +422,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- foreign_table"
   WHITESPACE "\n"
@@ -444,7 +444,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function"
   WHITESPACE "\n"
@@ -468,7 +468,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function_with_args"
   WHITESPACE "\n"
@@ -523,7 +523,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- index"
   WHITESPACE "\n"
@@ -543,7 +543,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
   WHITESPACE "\n"
@@ -563,7 +563,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- materialized_view"
   WHITESPACE "\n"
@@ -585,7 +585,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- operator"
   WHITESPACE "\n"
@@ -619,7 +619,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT_ON
     COMMENT_KW "comment"
@@ -657,7 +657,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- operator_class"
   WHITESPACE "\n"
@@ -685,7 +685,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- operator_family"
   WHITESPACE "\n"
@@ -713,7 +713,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- policy"
   WHITESPACE "\n"
@@ -738,7 +738,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- language"
   WHITESPACE "\n"
@@ -758,7 +758,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- procedural_language"
   WHITESPACE "\n"
@@ -780,7 +780,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- procedure"
   WHITESPACE "\n"
@@ -804,7 +804,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- procedure_with_args"
   WHITESPACE "\n"
@@ -859,7 +859,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- publication"
   WHITESPACE "\n"
@@ -879,7 +879,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- role"
   WHITESPACE "\n"
@@ -899,7 +899,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- routine"
   WHITESPACE "\n"
@@ -923,7 +923,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- routine_with_args"
   WHITESPACE "\n"
@@ -981,7 +981,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rule"
   WHITESPACE "\n"
@@ -1006,7 +1006,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -1026,7 +1026,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
   WHITESPACE "\n"
@@ -1046,7 +1046,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- server"
   WHITESPACE "\n"
@@ -1066,7 +1066,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- statistics"
   WHITESPACE "\n"
@@ -1086,7 +1086,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subscription"
   WHITESPACE "\n"
@@ -1106,7 +1106,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
@@ -1126,7 +1126,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_null"
   WHITESPACE "\n"
@@ -1145,7 +1145,7 @@ SOURCE_FILE
     IS_KW "is"
     WHITESPACE " "
     NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
@@ -1165,7 +1165,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- text_search_configuration"
   WHITESPACE "\n"
@@ -1189,7 +1189,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- text_search_dictionary"
   WHITESPACE "\n"
@@ -1213,7 +1213,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- text_search_parser"
   WHITESPACE "\n"
@@ -1237,7 +1237,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- text_search_template"
   WHITESPACE "\n"
@@ -1261,7 +1261,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- transform"
   WHITESPACE "\n"
@@ -1289,7 +1289,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trigger"
   WHITESPACE "\n"
@@ -1314,7 +1314,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type_"
   WHITESPACE "\n"
@@ -1334,7 +1334,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- view"
   WHITESPACE "\n"
@@ -1354,5 +1354,5 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

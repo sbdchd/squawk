@@ -22,7 +22,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
@@ -44,7 +44,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLESPACE
     ALTER_KW "alter"
@@ -63,7 +63,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_option"
   WHITESPACE "\n"
@@ -95,7 +95,7 @@ SOURCE_FILE
                   NAME_REF
                     IDENT "v"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_multiple_options"
   WHITESPACE "\n"
@@ -141,7 +141,7 @@ SOURCE_FILE
                   NAME_REF
                     IDENT "v2"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_option"
   WHITESPACE "\n"
@@ -164,7 +164,7 @@ SOURCE_FILE
           NAME
             IDENT "o"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_multiple_options"
   WHITESPACE "\n"
@@ -192,5 +192,5 @@ SOURCE_FILE
           NAME
             IDENT "o2"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

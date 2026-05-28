@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_EXTENSION
     CREATE_KW "create"
@@ -28,7 +28,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
     CREATE_KW "create"
@@ -42,7 +42,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "addons"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
     CREATE_KW "create"
@@ -64,7 +64,7 @@ SOURCE_FILE
     IDENT "foo"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
     CREATE_KW "create"
@@ -83,5 +83,5 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'buzz'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

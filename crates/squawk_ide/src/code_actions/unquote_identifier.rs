@@ -2,17 +2,19 @@ use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{db::File, offsets::token_from_offset, quote::unquote_ident};
+use squawk_linter::Edit;
+use squawk_syntax::quote::unquote_ident;
+
+use crate::{file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn unquote_identifier(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let parent = token.parent()?;
 
     let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
@@ -27,10 +29,7 @@ pub(super) fn unquote_identifier(
 
     actions.push(CodeAction {
         title: "Unquote identifier".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            name_node.text_range(),
-            unquoted,
-        )],
+        edits: vec![Edit::replace(name_node.text_range(), unquoted)],
         kind: ActionKind::RefactorRewrite,
     });
 

@@ -162,7 +162,6 @@ SELECT x1.a, g.* FROM x1, GRAPH_TABLE (myshop MATCH (x1 IS customers WHERE x1.ad
 -- reference is available
 SELECT x1.a, g.* FROM x1, GRAPH_TABLE (myshop MATCH (x1 IS customers)-[IS customer_orders]->(o IS orders WHERE o.order_id = x1.a) COLUMNS (x1.name AS customer_name, x1.customer_id AS cid, o.order_id)) g; -- error
 SELECT x1.a, g.* FROM x1, GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.address = 'US' AND c.customer_id = x1.a)-[IS customer_orders]->(x1 IS orders) COLUMNS (c.name AS customer_name, c.customer_id AS cid, x1.order_id)) g; -- error
-DROP TABLE x1;
 
 CREATE TABLE v1 (
     id int PRIMARY KEY,
@@ -216,7 +215,7 @@ CREATE PROPERTY GRAPH g1
     VERTEX TABLES (
         v1
             LABEL vl1 PROPERTIES (vname, vprop1)
-            LABEL l1 PROPERTIES (vname AS elname), -- label shared by vertexes as well as edges
+            LABEL l1 PROPERTIES (vname AS elname), -- label shared by vertices as well as edges
         v2 KEY (id1, id2)
             LABEL vl2 PROPERTIES (vname, vprop2, 'vl2_prop'::varchar(10) AS lprop1)
             LABEL vl3 PROPERTIES (vname, vprop1, 'vl2_prop'::varchar(10) AS lprop1)
@@ -394,9 +393,9 @@ SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[b]->(c)-[b]->(d) COLUMNS (a.vname AS an
 SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[c]-(a) COLUMNS (a.vname AS self, c.ename AS loop_name));
 SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-(a) COLUMNS (a.vname AS self));
 
--- test collation specified in the expression
+-- test explicit and implicit collation assignment
 INSERT INTO e3_3 VALUES (2003, 2003, 'E331', 10011);
-SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[b]->(a)-[b]->(a) COLUMNS (a.vname AS self, b.ename AS loop_name)) ORDER BY loop_name COLLATE "C" ASC;
+SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[b]->(a)-[b]->(a) COLUMNS (upper(a.vname) AS self, b.ename AS loop_name)) ORDER BY loop_name COLLATE "C" ASC;
 SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[b IS el2 WHERE b.ename > 'E331' COLLATE "C"]->(a)-[b]->(a) COLUMNS (a.vname AS self, b.ename AS loop_name));
 SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[b]->(a)-[b]->(a) WHERE b.ename > 'E331' COLLATE "C" COLUMNS (a.vname AS self, b.ename AS loop_name));
 SELECT * FROM GRAPH_TABLE (g1 MATCH (a)-[b]->(a)-[b]->(a) COLUMNS (a.vname AS self, b.ename AS loop_name)) WHERE loop_name > 'E331' COLLATE "C";
@@ -520,12 +519,21 @@ CREATE PROPERTY GRAPH g4
             DESTINATION KEY (dest) REFERENCES ptnv(id)
     );
 SELECT * FROM GRAPH_TABLE (g4 MATCH (s IS ptnv)-[e IS ptne]->(d IS ptnv) COLUMNS (s.val, e.val, d.val)) ORDER BY 1, 2, 3;
--- edges from the same vertex in both directions connecting to other vertexes in the same table
+-- edges from the same vertex in both directions connecting to other vertices in the same table
 SELECT * FROM GRAPH_TABLE (g4 MATCH (s)-[e]-(d) WHERE s.id = 3 COLUMNS (s.val, e.val, d.val)) ORDER BY 1, 2, 3;
 SELECT * FROM GRAPH_TABLE (g4 MATCH (s WHERE s.id = 3)-[e]-(d) COLUMNS (s.val, e.val, d.val)) ORDER BY 1, 2, 3;
 
 -- ruleutils reverse parsing
-CREATE VIEW customers_us AS SELECT * FROM GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.address = 'US')-[IS customer_orders | customer_wishlists ]->(l IS orders | wishlists)-[ IS list_items]->(p IS products) COLUMNS (c.name AS customer_name, p.name AS product_name)) ORDER BY customer_name, product_name;
+-- The query in the view definition is intentionally complex to test one view with many
+-- features like label disjunction, lateral references, WHERE clauses in graph
+-- patterns.
+CREATE VIEW customers_us AS
+SELECT g.* FROM x1,
+                GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.address = 'US' AND c.customer_id = x1.a)
+                                          -[IS customer_orders | customer_wishlists ]->
+                                          (l IS orders | wishlists)-[ IS list_items]->(p IS products)
+                                    COLUMNS (c.name AS customer_name, p.name AS product_name, x1.a AS a)) g
+           ORDER BY customer_name, product_name;
 SELECT pg_get_viewdef('customers_us'::regclass);
 
 -- test view/graph nesting
@@ -581,5 +589,11 @@ SELECT * FROM customers co WHERE co.customer_id = (SELECT customer_id FROM GRAPH
 -- query within graph table
 SELECT sname, dname FROM GRAPH_TABLE (g1 MATCH (src)->(dest) WHERE src.vprop1 > (SELECT max(v1.vprop1) FROM v1) COLUMNS(src.vname AS sname, dest.vname AS dname));
 SELECT sname, dname FROM GRAPH_TABLE (g1 MATCH (src)->(dest) WHERE out_degree(src.vname) > (SELECT max(out_degree(nname)) FROM GRAPH_TABLE (g1 MATCH (node) COLUMNS (node.vname AS nname))) COLUMNS(src.vname AS sname, dest.vname AS dname));
+
+-- GRAPH_TABLE subquery in HAVING clause (tests expression mutator)
+SELECT src.vname, count(*) FROM v1 AS src
+  GROUP BY src.vname
+  HAVING count(*) >= (SELECT count(*) FROM GRAPH_TABLE (g1 MATCH (a IS vl1 | vl2) COLUMNS (a.vname AS n)) WHERE n = src.vname)
+  ORDER BY vname;
 
 -- leave the objects behind for pg_upgrade/pg_dump tests

@@ -1,5 +1,5 @@
-use crate::builtins::builtins_file;
-use crate::db::{File, parse};
+use crate::db::{list_files, parse};
+use crate::file::InFile;
 use crate::location::{Location, LocationKind};
 use crate::offsets::token_from_offset;
 use crate::resolve;
@@ -11,9 +11,9 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-#[salsa::tracked]
-pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[Location; 1]> {
-    let Some(token) = token_from_offset(db, file, offset) else {
+pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Location; 1]> {
+    let file = position.file_id;
+    let Some(token) = token_from_offset(db, position) else {
         return smallvec![];
     };
     let Some(parent) = token.parent() else {
@@ -40,21 +40,21 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
 
     // goto def on COMMIT -> BEGIN/START TRANSACTION
     if ast::Commit::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(db, file, offset)
+        && let Some(begin_range) = find_preceding_begin(db, position)
     {
         return smallvec![Location::new(file, begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on ROLLBACK -> BEGIN/START TRANSACTION
     if ast::Rollback::can_cast(parent.kind())
-        && let Some(begin_range) = find_preceding_begin(db, file, offset)
+        && let Some(begin_range) = find_preceding_begin(db, position)
     {
         return smallvec![Location::new(file, begin_range, LocationKind::CommitBegin)];
     }
 
     // goto def on BEGIN/START TRANSACTION -> COMMIT or ROLLBACK
     if ast::Begin::can_cast(parent.kind())
-        && let Some(end_range) = find_following_commit_or_rollback(db, file, offset)
+        && let Some(end_range) = find_following_commit_or_rollback(db, position)
     {
         return smallvec![Location::new(file, end_range, LocationKind::CommitEnd)];
     }
@@ -66,8 +66,12 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
     }
 
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
-        for definition_file in [file, builtins_file(db)] {
-            if let Some(locations) = resolve::resolve_name_ref(db, definition_file, &name_ref) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                // TODO: we shouldn't be wrapping name_ref like this since it's
+                // a different file. Probably a bug.
+                resolve::resolve_name_ref(db, InFile::new(definition_file, &name_ref))
+            {
                 return locations;
             }
         }
@@ -82,10 +86,11 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
         }
     });
     if let Some(ty) = type_node {
-        for definition_file in [file, builtins_file(db)] {
-            let position = token.text_range().start();
+        for definition_file in list_files(db, file) {
             if let Some(ptr) =
-                resolve::resolve_type_ptr_from_type(db, definition_file, &ty, position)
+                // TODO: we shouldn't be wrapping name_ref like this since it's
+                // a different file. Probably a bug.
+                resolve::resolve_type_ptr_from_type(db, InFile::new(definition_file, &ty))
             {
                 return smallvec![Location {
                     file: definition_file,
@@ -99,12 +104,12 @@ pub fn goto_definition(db: &dyn Db, file: File, offset: TextSize) -> SmallVec<[L
     smallvec![]
 }
 
-fn find_preceding_begin(db: &dyn Db, file: File, before: TextSize) -> Option<TextRange> {
+fn find_preceding_begin(db: &dyn Db, position: InFile<TextSize>) -> Option<TextRange> {
     let mut last_begin: Option<TextRange> = None;
-    for stmt in parse(db, file).tree().stmts() {
+    for stmt in parse(db, position.file_id).tree().stmts() {
         if let ast::Stmt::Begin(begin) = stmt {
             let range = begin.syntax().text_range();
-            if range.end() <= before {
+            if range.end() <= position.value {
                 last_begin = Some(range);
             }
         }
@@ -112,18 +117,14 @@ fn find_preceding_begin(db: &dyn Db, file: File, before: TextSize) -> Option<Tex
     last_begin
 }
 
-fn find_following_commit_or_rollback(
-    db: &dyn Db,
-    file: File,
-    after: TextSize,
-) -> Option<TextRange> {
-    for stmt in parse(db, file).tree().stmts() {
+fn find_following_commit_or_rollback(db: &dyn Db, position: InFile<TextSize>) -> Option<TextRange> {
+    for stmt in parse(db, position.file_id).tree().stmts() {
         let range = match &stmt {
             ast::Stmt::Commit(commit) => commit.syntax().text_range(),
             ast::Stmt::Rollback(rollback) => rollback.syntax().text_range(),
             _ => continue,
         };
-        if range.start() >= after {
+        if range.start() >= position.value {
             return Some(range);
         }
     }
@@ -133,15 +134,16 @@ fn find_following_commit_or_rollback(
 #[cfg(test)]
 mod test {
     use crate::builtins::builtins_file;
-    use crate::db::{Database, File};
+    use crate::db::File;
+
     use crate::goto_definition::goto_definition;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
-    use log::info;
     use rowan::TextRange;
     use rustc_hash::FxHashMap;
 
+    #[must_use]
     #[track_caller]
     fn goto(sql: &str) -> String {
         goto_(sql).expect("should always find a definition")
@@ -149,24 +151,24 @@ mod test {
 
     #[track_caller]
     fn goto_(sql: &str) -> Option<String> {
-        info!("starting");
-        let (mut offset, sql) = fixture(sql);
+        let fixture = Fixture::new(sql);
         // For go to def we want the previous character since we usually put the
         // marker after the item we're trying to go to def on.
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let db = Database::default();
-        let current_file = File::new(&db, sql.into());
-        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
-        let results = goto_definition(&db, current_file, offset);
+        let marker = fixture.marker();
+        let offset = marker.offset_before();
+        let source_span = marker.range();
+        let db = fixture.db();
+        let current_file = offset.file_id;
+
+        let results = goto_definition(db, offset);
         if results.is_empty() {
             return None;
         }
 
         let mut file_paths = FxHashMap::default();
         file_paths.insert(current_file, "current.sql");
-        file_paths.insert(builtins_file(&db), "builtins.sql");
+        file_paths.insert(builtins_file(db), "builtins.sql");
 
-        let offset: usize = offset.into();
         let mut dests_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in results.iter().enumerate() {
             dests_by_file
@@ -177,24 +179,20 @@ mod test {
 
         let multi_file = dests_by_file.len() > 1 || !dests_by_file.contains_key(&current_file);
 
-        let mut snippet = Snippet::source(current_file.content(&db).as_ref()).fold(true);
+        let mut snippet = Snippet::source(current_file.content(db).as_ref()).fold(true);
         if multi_file {
             snippet = snippet.path(*file_paths.get(&current_file).unwrap());
         }
         if let Some(current_dests) = dests_by_file.remove(&current_file) {
             snippet = annotate_destinations(snippet, current_dests);
         }
-        snippet = snippet.annotation(
-            AnnotationKind::Context
-                .span(offset..offset + 1)
-                .label("1. source"),
-        );
+        snippet = snippet.annotation(AnnotationKind::Context.span(source_span).label("1. source"));
 
         let mut groups = vec![Level::INFO.primary_title("definition").element(snippet)];
 
         for (dest_file, dests) in dests_by_file {
             let path = file_paths.get(&dest_file).unwrap();
-            let other_snippet = Snippet::source(dest_file.content(&db).as_ref())
+            let other_snippet = Snippet::source(dest_file.content(db).as_ref())
                 .path(*path)
                 .fold(true);
             let other_snippet = annotate_destinations(other_snippet, dests);
@@ -227,7 +225,7 @@ mod test {
             snippet = snippet.annotation(
                 AnnotationKind::Context
                     .span(range.into())
-                    .label(format!("{}. destination", label_index)),
+                    .label(format!("{label_index}. destination")),
             );
         }
 
@@ -297,10 +295,10 @@ begin;
 select 1;
 rollback$0;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
-          │ ───── 2. destination
+          │ ────── 2. destination
         3 │ select 1;
         4 │ rollback;
           ╰╴       ─ 1. source
@@ -868,11 +866,12 @@ alter policy p on t
     #[test]
     fn goto_builtin_now() {
         assert_snapshot!(goto("
+-- include-builtins
 select now$0();
 "), @"
-              ╭▸ current.sql:2:10
+              ╭▸ current.sql:3:10
               │
-            2 │ select now();
+            3 │ select now();
               │          ─ 1. source
               ╰╴
 
@@ -886,11 +885,12 @@ select now$0();
     #[test]
     fn goto_current_timestamp() {
         assert_snapshot!(goto("
+-- include-builtins
 select current_timestamp$0;
 "), @"
-              ╭▸ current.sql:2:24
+              ╭▸ current.sql:3:24
               │
-            2 │ select current_timestamp;
+            3 │ select current_timestamp;
               │                        ─ 1. source
               ╰╴
 
@@ -984,14 +984,41 @@ select current_timestamp$0 from t;
     }
 
     #[test]
+    fn goto_cte_casing() {
+        // postgres only folds ascii characters so Ä doesn't become ä
+        goto_not_found(
+            "
+    with t as (select 1 Äpfel)
+    select äpfel$0 from t;
+    ",
+        );
+    }
+
+    #[test]
+    fn goto_cte_emoji() {
+        assert_snapshot!(goto(
+            "
+    with t as (select 1 🦀)
+    select 🦀$0 from t;
+    "), @"
+          ╭▸ 
+        2 │     with t as (select 1 🦀)
+          │                         ── 2. destination
+        3 │     select 🦀 from t;
+          ╰╴           ── 1. source
+        ");
+    }
+
+    #[test]
     fn goto_current_timestamp_in_where() {
         assert_snapshot!(goto("
+-- include-builtins
 create table t(created_at timestamptz);
 select * from t where current_timestamp$0 > t.created_at;
 "), @"
-              ╭▸ current.sql:3:39
+              ╭▸ current.sql:4:39
               │
-            3 │ select * from t where current_timestamp > t.created_at;
+            4 │ select * from t where current_timestamp > t.created_at;
               │                                       ─ 1. source
               ╰╴
 
@@ -2104,6 +2131,22 @@ create table t (
     }
 
     #[test]
+    fn goto_create_table_like_view() {
+        assert_snapshot!(goto("
+create view v as select 1 a, 2 b;
+create table t (like v);
+select a$0 from t;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 a, 2 b;
+          │                           ─ 2. destination
+        3 │ create table t (like v);
+        4 │ select a from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_inherits() {
         assert_snapshot!(goto("
 create table bar(a int);
@@ -2116,6 +2159,27 @@ inherits (foo.bar, bar$0, buzz);
         3 │ create table t (a int)
         4 │ inherits (foo.bar, bar, buzz);
           ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_inherits_builtin() {
+        assert_snapshot!(goto("
+-- include-builtins
+create table t ()
+inherits (information_schema.sql_features);
+select feature_name$0 from t;
+"), @"
+            ╭▸ current.sql:5:19
+            │
+          5 │ select feature_name from t;
+            │                   ─ 1. source
+            ╰╴
+
+            ╭▸ builtins.sql:437:3
+            │
+        437 │   feature_name information_schema.character_data,
+            ╰╴  ──────────── 2. destination
         ");
     }
 
@@ -2758,6 +2822,52 @@ select a$0 from t;
     }
 
     #[test]
+    fn goto_create_table_as_table() {
+        assert_snapshot!(goto("
+create table t(a bigint);
+create table u as table t;
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a bigint);
+          │                ─ 2. destination
+        3 │ create table u as table t;
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_select_star() {
+        assert_snapshot!(goto("
+create table t(a bigint);
+create table u as select * from t;
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a bigint);
+          │                ─ 2. destination
+        3 │ create table u as select * from t;
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_values() {
+        assert_snapshot!(goto("
+create table k as values (1, 2);
+select column1$0 from k;
+"), @"
+          ╭▸ 
+        2 │ create table k as values (1, 2);
+          │                           ─ 2. destination
+        3 │ select column1 from k;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_select_from_create_table_as() {
         assert_snapshot!(goto("
 create table t as select 1 a;
@@ -2768,6 +2878,20 @@ select a from t$0;
           │              ─ 2. destination
         3 │ select a from t;
           ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_like_view_definition() {
+        assert_snapshot!(goto("
+create view v as select 1 a;
+create table t (like v$0);
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 a;
+          │             ─ 2. destination
+        3 │ create table t (like v);
+          ╰╴                     ─ 1. source
         ");
     }
 
@@ -3360,13 +3484,13 @@ select 1;
 rollback;
 commit;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
           │     ─ 1. source
         3 │ select 1;
         4 │ rollback;
-          ╰╴──────── 2. destination
+          ╰╴───────── 2. destination
         ");
     }
 
@@ -3378,10 +3502,10 @@ begin;
 select 1;
 commit$0;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
-          │ ───── 2. destination
+          │ ────── 2. destination
         3 │ select 1;
         4 │ commit;
           ╰╴     ─ 1. source
@@ -3396,13 +3520,13 @@ begin$0;
 select 1;
 commit;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ begin;
           │     ─ 1. source
         3 │ select 1;
         4 │ commit;
-          ╰╴────── 2. destination
+          ╰╴─────── 2. destination
         ");
     }
 
@@ -3414,10 +3538,10 @@ start transaction;
 select 1;
 commit$0;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ start transaction;
-          │ ───────────────── 2. destination
+          │ ────────────────── 2. destination
         3 │ select 1;
         4 │ commit;
           ╰╴     ─ 1. source
@@ -3432,13 +3556,13 @@ start$0 transaction;
 select 1;
 commit;
 ",
-        ), @r"
+        ), @"
           ╭▸ 
         2 │ start transaction;
           │     ─ 1. source
         3 │ select 1;
         4 │ commit;
-          ╰╴────── 2. destination
+          ╰╴─────── 2. destination
         ");
     }
 
@@ -4629,6 +4753,141 @@ select * from t group by t.b$0;
           │                 ─ 2. destination
         4 │ select * from t group by t.b;
           ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_order_by_column_name_conflict() {
+        // If an ORDER BY expression is a simple name that matches both an
+        // output column name and an input column name, ORDER BY will interpret
+        // it as the output column name.
+        assert_snapshot!(goto("
+with t as (select 2 a)
+select 1 a from t
+order by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 1 a from t
+          │          ─ 2. destination
+        4 │ order by a;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_not_picked_window_order_by() {
+        assert_snapshot!(goto("
+with t as (select 4 a union select 2 a)
+-- should go to the column def, not the alias
+select 2 a, a, row_number() over (order by a$0) from t;
+"), @"
+          ╭▸ 
+        2 │ with t as (select 4 a union select 2 a)
+          │                     ─ 2. destination
+        3 │ -- should go to the column def, not the alias
+        4 │ select 2 a, a, row_number() over (order by a) from t;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_group_by_alias_func() {
+        assert_snapshot!(goto("
+with t as (select 'x'::text as name)
+select lower(name) from t
+group by lower$0;
+"), @"
+          ╭▸ 
+        3 │ select lower(name) from t
+          │        ───── 2. destination
+        4 │ group by lower;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_order_by_alias_func() {
+        assert_snapshot!(goto("
+with t as (select 'x'::text as name)
+select lower(name) from t
+order by lower$0;
+"), @"
+          ╭▸ 
+        3 │ select lower(name) from t
+          │        ───── 2. destination
+        4 │ order by lower;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_group_by_column_name_conflict() {
+        // If a GROUP BY expression is a simple name that matches both output
+        // column name and an input column name, GROUP BY will interpret it as
+        // the input column name.
+        assert_snapshot!(goto("
+with t as (select 2 a)
+select 1 a from t
+group by a$0;
+"), @"
+          ╭▸ 
+        2 │ with t as (select 2 a)
+          │                     ─ 2. destination
+        3 │ select 1 a from t
+        4 │ group by a;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_in_group_by_with_cte() {
+        assert_snapshot!(goto("
+with t as (select 2 b)
+select 1 a from t
+group by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 1 a from t
+          │          ─ 2. destination
+        4 │ group by a;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_expr_in_order_by_not_found() {
+        goto_not_found(
+            "
+with t as (select 2 b)
+select 1 a from t
+order by a$0 + 1
+",
+        );
+    }
+
+    #[test]
+    fn goto_select_alias_expr_in_group_by_expr_not_found() {
+        goto_not_found(
+            "
+with t as (select 2 b)
+select 1 a from t
+group by a$0 + 1
+",
+        );
+    }
+
+    #[test]
+    fn goto_select_alias_in_order_by_with_cte() {
+        assert_snapshot!(goto("
+with t as (select 2 b)
+select 1 a from t
+order by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 1 a from t
+          │          ─ 2. destination
+        4 │ order by a;
+          ╰╴         ─ 1. source
         ");
     }
 
@@ -9771,6 +10030,86 @@ select 1 from graph_table (myshop$0
           │                       ────── 2. destination
         3 │ select 1 from graph_table (myshop
           ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_param_percent_type_column() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s.t.a$0%type) returns s.t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        3 │ create table s.t (a int, b text);
+          │                   ─ 2. destination
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_param_percent_type_table() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s.t$0.a%type) returns s.t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        3 │ create table s.t (a int, b text);
+          │                ─ 2. destination
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_param_percent_type_schema() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s$0.t.a%type) returns s.t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        2 │ create schema s;
+          │               ─ 2. destination
+        3 │ create table s.t (a int, b text);
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_returns_percent_type_column() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t (a int, b text);
+create function f(x s.t.a%type) returns s.t.b$0%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        3 │ create table s.t (a int, b text);
+          │                          ─ 2. destination
+        4 │ create function f(x s.t.a%type) returns s.t.b%type
+          ╰╴                                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_function_param_percent_type_two_part() {
+        assert_snapshot!(goto("
+create table t (a int, b text);
+create function f(x t.a$0%type) returns t.b%type
+  as $$ select 'hello'::text $$ language sql;
+"), @"
+          ╭▸ 
+        2 │ create table t (a int, b text);
+          │                 ─ 2. destination
+        3 │ create function f(x t.a%type) returns t.b%type
+          ╰╴                      ─ 1. source
         ");
     }
 }

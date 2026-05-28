@@ -60,6 +60,7 @@ mod test {
     use crate::test_utils::{lint_errors, lint_ok};
     use crate::{LinterSettings, Rule};
 
+    #[must_use]
     fn lint_errors_with(sql: &str, settings: LinterSettings) -> String {
         crate::test_utils::lint_errors_with(sql, settings, Rule::TransactionNesting)
     }
@@ -161,6 +162,21 @@ COMMIT;
     fn no_nesting_with_assume_transaction_ok() {
         let sql = r#"
 SELECT 1;
+        "#;
+        let settings = LinterSettings {
+            assume_in_transaction: true,
+            ..Default::default()
+        };
+        lint_ok_with(sql, settings);
+    }
+
+    #[test]
+    fn squawk_disable_assume_in_transaction_allows_begin_commit() {
+        let sql = r#"
+-- squawk-disable-assume-in-transaction
+BEGIN;
+SELECT 1;
+COMMIT;
         "#;
         let settings = LinterSettings {
             assume_in_transaction: true,

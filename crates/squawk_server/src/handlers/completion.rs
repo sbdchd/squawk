@@ -1,7 +1,6 @@
 use anyhow::Result;
 use lsp_types::{CompletionParams, CompletionResponse};
 use squawk_ide::completion::completion;
-use squawk_ide::db::line_index;
 
 use crate::global_state::Snapshot;
 use crate::lsp_utils;
@@ -15,13 +14,12 @@ pub(crate) fn handle_completion(
 
     let db = snapshot.db();
     let file = snapshot.file(&uri).unwrap();
-    let line_index = line_index(db, file);
 
-    let Some(offset) = lsp_utils::offset(&line_index, position) else {
+    let Some(position) = lsp_utils::offset(db, file, position) else {
         return Ok(Some(CompletionResponse::Array(vec![])));
     };
 
-    let completion_items = completion(db, file, offset)
+    let completion_items = completion(db, position)
         .into_iter()
         .map(lsp_utils::completion_item)
         .collect();

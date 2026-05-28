@@ -464,7 +464,6 @@ select 1 collate;
 select foo.bar null;
 select foo.bar default;
 
-select default;
 select c default;
 select null;
 select c null;
@@ -508,6 +507,12 @@ ORDER BY sensor_id, day;
 -- select with uescape;
 select U&"d!0061t!+000061" UESCAPE '!';
 SELECT U&' \' UESCAPE '!';
+
+-- select with uescape cast
+select 2::U&"!0069!006E!0074!0038" UESCAPE '!' from t;
+
+-- select with uescape on qualified field
+select t.U&"!0061" UESCAPE '!' from t;
 
 -- select_from_user_table
 select * from user;

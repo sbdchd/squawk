@@ -33,11 +33,16 @@ use crate::db::File;
 /// * `InFile<SyntaxNode>` -- syntax node in a file
 /// * `InFile<ast::FnDef>` -- ast node in a file
 /// * `InFile<TextSize>` -- offset in a file
-#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct InFileWrapper<FileKind, T> {
     pub file_id: FileKind,
     pub value: T,
 }
-#[expect(unused)]
+
+impl<FileKind, T> InFileWrapper<FileKind, T> {
+    pub fn new(file_id: FileKind, value: T) -> Self {
+        Self { file_id, value }
+    }
+}
+
 pub type InFile<T> = InFileWrapper<File, T>;

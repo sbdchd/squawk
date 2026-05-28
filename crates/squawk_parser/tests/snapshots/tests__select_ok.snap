@@ -16,7 +16,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   PAREN_SELECT
     L_PAREN "("
@@ -32,7 +32,7 @@ SOURCE_FILE
                 INT_NUMBER "2"
       R_PAREN ")"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -63,7 +63,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "3"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
     SELECT
@@ -97,7 +97,7 @@ SOURCE_FILE
             TARGET
               LITERAL
                 INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
     PAREN_SELECT
@@ -134,7 +134,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alias_clause"
   WHITESPACE "\n"
@@ -195,7 +195,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- from alias"
   WHITESPACE "\n"
@@ -220,7 +220,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- non-ident column and table names"
   WHITESPACE "\n"
@@ -274,7 +274,7 @@ SOURCE_FILE
               NAME
                 FUNCTION_KW "function"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- from column aliases"
   WHITESPACE "\n"
@@ -310,7 +310,7 @@ SOURCE_FILE
               NAME
                 IDENT "col2"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- w/o as"
   WHITESPACE "\n"
@@ -362,7 +362,7 @@ SOURCE_FILE
               NAME
                 FUNCTION_KW "function"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- from alias shorthand"
   WHITESPACE "\n"
@@ -388,7 +388,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- date_funcs"
   WHITESPACE "\n"
@@ -402,7 +402,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             CURRENT_DATE_KW "current_date"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_time"
   WHITESPACE "\n"
@@ -414,7 +414,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             CURRENT_TIME_KW "current_time"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -430,7 +430,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "10"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_timestamp"
   WHITESPACE "\n"
@@ -442,7 +442,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             CURRENT_TIMESTAMP_KW "current_timestamp"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -458,7 +458,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "5"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- localtime"
   WHITESPACE "\n"
@@ -470,7 +470,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             LOCALTIME_KW "localtime"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -486,7 +486,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "5"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- localtimestamp"
   WHITESPACE "\n"
@@ -498,7 +498,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             LOCALTIMESTAMP_KW "localtimestamp"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -514,7 +514,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "5"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- array_select"
   WHITESPACE "\n"
@@ -557,7 +557,7 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bytea%'"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -583,7 +583,7 @@ SOURCE_FILE
                 R_PAREN ")"
               R_PAREN ")"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- positional_param"
   WHITESPACE "\n"
@@ -595,7 +595,7 @@ SOURCE_FILE
         TARGET
           LITERAL
             POSITIONAL_PARAM "$1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -623,7 +623,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           POSITIONAL_PARAM "$1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- any_and_all"
   WHITESPACE "\n"
@@ -660,7 +660,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- any"
   WHITESPACE "\n"
@@ -695,7 +695,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -740,7 +740,7 @@ SOURCE_FILE
                 STRING "'c'"
               R_BRACK "]"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -767,7 +767,7 @@ SOURCE_FILE
                         LITERAL
                           INT_NUMBER "1"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -820,7 +820,7 @@ SOURCE_FILE
                       NAME_REF
                         IDENT "t"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -855,7 +855,7 @@ SOURCE_FILE
                         INT_NUMBER "3"
                       R_PAREN ")"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- some"
   WHITESPACE "\n"
@@ -884,7 +884,7 @@ SOURCE_FILE
                         LITERAL
                           INT_NUMBER "1"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
@@ -913,7 +913,7 @@ SOURCE_FILE
                         LITERAL
                           INT_NUMBER "1"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- some/all/any with expr"
   WHITESPACE "\n"
@@ -940,7 +940,7 @@ SOURCE_FILE
                     INT_NUMBER "1"
                   R_BRACK "]"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -965,7 +965,7 @@ SOURCE_FILE
                     INT_NUMBER "1"
                   R_BRACK "]"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -990,7 +990,7 @@ SOURCE_FILE
                     INT_NUMBER "1"
                   R_BRACK "]"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all with array"
   WHITESPACE "\n"
@@ -1043,7 +1043,7 @@ SOURCE_FILE
                   R_BRACK "]"
                 R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- some, an alias for any"
   WHITESPACE "\n"
@@ -1078,7 +1078,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- any_values"
   WHITESPACE "\n"
@@ -1134,7 +1134,7 @@ SOURCE_FILE
                         IDENT "d"
                       R_PAREN ")"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- field_exprs"
   WHITESPACE "\n"
@@ -1150,7 +1150,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "mycolumn"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1164,7 +1164,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "somecolumn"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1190,7 +1190,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "col3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1207,7 +1207,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "somefield"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1228,7 +1228,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "somefield"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1244,7 +1244,7 @@ SOURCE_FILE
               R_PAREN ")"
             DOT "."
             STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- case_expr"
   WHITESPACE "\n"
@@ -1290,7 +1290,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- generic conditional case"
   WHITESPACE "\n"
@@ -1357,7 +1357,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "test"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ommitted else"
   WHITESPACE "\n"
@@ -1418,7 +1418,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "test"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- switch style case"
   WHITESPACE "\n"
@@ -1476,7 +1476,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "test"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- col_labels"
   WHITESPACE "\n"
@@ -1501,7 +1501,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1522,7 +1522,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1557,7 +1557,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select"
   WHITESPACE "\n"
@@ -1571,7 +1571,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
@@ -1580,7 +1580,7 @@ SOURCE_FILE
       SELECT_KW "select"
       WHITESPACE " "
       ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi columns"
   WHITESPACE "\n"
@@ -1597,7 +1597,7 @@ SOURCE_FILE
         TARGET
           LITERAL
             INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_quoted_ident"
   WHITESPACE "\n"
@@ -1620,7 +1620,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_from_clause"
   WHITESPACE "\n"
@@ -1641,7 +1641,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from only"
   WHITESPACE "\n"
@@ -1662,7 +1662,7 @@ SOURCE_FILE
         WHITESPACE " "
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from field expr"
   WHITESPACE "\n"
@@ -1685,7 +1685,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from with everything"
   WHITESPACE "\n"
@@ -1756,7 +1756,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "42"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from select stmt"
   WHITESPACE "\n"
@@ -1783,7 +1783,7 @@ SOURCE_FILE
                   LITERAL
                     INT_NUMBER "1"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1832,7 +1832,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function call complex"
   WHITESPACE "\n"
@@ -1887,7 +1887,7 @@ SOURCE_FILE
               NAME
                 IDENT "b"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1938,7 +1938,7 @@ SOURCE_FILE
               NAME
                 IDENT "b"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function with alias"
   WHITESPACE "\n"
@@ -1972,7 +1972,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2002,7 +2002,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2045,7 +2045,7 @@ SOURCE_FILE
               NAME
                 IDENT "b"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2086,7 +2086,7 @@ SOURCE_FILE
               NAME
                 IDENT "b"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function with column def"
   WHITESPACE "\n"
@@ -2137,7 +2137,7 @@ SOURCE_FILE
                     NAME_REF
                       TEXT_KW "text"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2186,7 +2186,7 @@ SOURCE_FILE
                     NAME_REF
                       TEXT_KW "text"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2233,7 +2233,7 @@ SOURCE_FILE
                     NAME_REF
                       TEXT_KW "text"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- function with collate"
   WHITESPACE "\n"
@@ -2300,7 +2300,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "buzz"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2355,7 +2355,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "\"bar\""
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple tables"
   WHITESPACE "\n"
@@ -2378,7 +2378,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2407,7 +2407,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "y"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2440,7 +2440,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from_item"
   WHITESPACE "\n\n"
@@ -2484,7 +2484,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2524,7 +2524,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2560,7 +2560,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2580,7 +2580,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "z"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2604,7 +2604,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "z"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2620,7 +2620,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_query_name"
   WHITESPACE "\n"
@@ -2638,7 +2638,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2676,7 +2676,7 @@ SOURCE_FILE
               NAME
                 IDENT "z"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2698,7 +2698,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2718,7 +2718,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lateral select"
   WHITESPACE "\n"
@@ -2769,7 +2769,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2816,7 +2816,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2845,7 +2845,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2870,7 +2870,7 @@ SOURCE_FILE
                   LITERAL
                     INT_NUMBER "1"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lateral function_name"
   WHITESPACE "\n\n"
@@ -2894,7 +2894,7 @@ SOURCE_FILE
           ARG_LIST
             L_PAREN "("
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2918,7 +2918,7 @@ SOURCE_FILE
         ALIAS
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2964,7 +2964,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3006,7 +3006,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3046,7 +3046,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3074,7 +3074,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "b"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3123,7 +3123,7 @@ SOURCE_FILE
                     NAME_REF
                       TEXT_KW "text"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3170,7 +3170,7 @@ SOURCE_FILE
                     NAME_REF
                       TEXT_KW "text"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- lateral rows from("
   WHITESPACE "\n"
@@ -3243,7 +3243,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "int8"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3274,7 +3274,7 @@ SOURCE_FILE
               IDENT "b"
             R_PAREN ")"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3299,7 +3299,7 @@ SOURCE_FILE
             L_PAREN "("
             R_PAREN ")"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3328,7 +3328,7 @@ SOURCE_FILE
         WITH_KW "with"
         WHITESPACE " "
         ORDINALITY_KW "ordinality"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3363,7 +3363,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3410,7 +3410,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3455,7 +3455,7 @@ SOURCE_FILE
               NAME
                 IDENT "c"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_where_clause"
   WHITESPACE "\n"
@@ -3475,7 +3475,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_limit_clause"
   WHITESPACE "\n"
@@ -3495,7 +3495,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_orderby_clause"
   WHITESPACE "\n"
@@ -3519,7 +3519,7 @@ SOURCE_FILE
         SORT_BY
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- nulls"
   WHITESPACE "\n"
@@ -3546,7 +3546,7 @@ SOURCE_FILE
             NULLS_KW "nulls"
             WHITESPACE " "
             FIRST_KW "first"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3571,7 +3571,7 @@ SOURCE_FILE
             NULLS_KW "nulls"
             WHITESPACE " "
             LAST_KW "last"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3602,7 +3602,7 @@ SOURCE_FILE
             NULLS_KW "nulls"
             WHITESPACE " "
             LAST_KW "last"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_window_clause"
   WHITESPACE "\n"
@@ -3628,7 +3628,7 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with window def order by"
   WHITESPACE "\n"
@@ -3662,7 +3662,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "1"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with window def frame_start, frame_end"
   WHITESPACE "\n"
@@ -3694,7 +3694,7 @@ SOURCE_FILE
             WHITESPACE " "
             PRECEDING_KW "preceding"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3724,7 +3724,7 @@ SOURCE_FILE
             WHITESPACE " "
             PRECEDING_KW "preceding"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3754,7 +3754,7 @@ SOURCE_FILE
             WHITESPACE " "
             PRECEDING_KW "preceding"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with window def frame_exclusion"
   WHITESPACE "\n"
@@ -3792,7 +3792,7 @@ SOURCE_FILE
             WHITESPACE " "
             ROW_KW "row"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3826,7 +3826,7 @@ SOURCE_FILE
             WHITESPACE " "
             GROUP_KW "group"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3860,7 +3860,7 @@ SOURCE_FILE
             WHITESPACE " "
             TIES_KW "ties"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3896,7 +3896,7 @@ SOURCE_FILE
             WHITESPACE " "
             OTHERS_KW "others"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- select_having_clause"
   WHITESPACE "\n"
@@ -3916,7 +3916,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- select_with_group_by_clause"
   WHITESPACE "\n"
@@ -3941,7 +3941,7 @@ SOURCE_FILE
           TUPLE_EXPR
             L_PAREN "("
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple expr"
   WHITESPACE "\n"
@@ -3963,7 +3963,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi expr"
   WHITESPACE "\n"
@@ -3995,7 +3995,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
@@ -4019,7 +4019,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distinct"
   WHITESPACE "\n"
@@ -4043,7 +4043,7 @@ SOURCE_FILE
         GROUPING_EXPR
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rollup"
   WHITESPACE "\n"
@@ -4073,7 +4073,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "2"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rollup multi"
   WHITESPACE "\n"
@@ -4112,7 +4112,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "3"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cube"
   WHITESPACE "\n"
@@ -4148,7 +4148,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "3"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- grouping sets"
   WHITESPACE "\n"
@@ -4216,7 +4216,7 @@ SOURCE_FILE
               R_PAREN ")"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_offset_clause"
   WHITESPACE "\n"
@@ -4236,7 +4236,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rows"
   WHITESPACE "\n"
@@ -4256,7 +4256,7 @@ SOURCE_FILE
         INT_NUMBER "1"
       WHITESPACE " "
       ROW_KW "row"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4274,7 +4274,7 @@ SOURCE_FILE
         INT_NUMBER "1"
       WHITESPACE " "
       ROWS_KW "rows"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- select_with_fetch_clause"
   WHITESPACE "\n"
@@ -4300,7 +4300,7 @@ SOURCE_FILE
       ROWS_KW "rows"
       WHITESPACE " "
       ONLY_KW "only"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- next"
   WHITESPACE "\n"
@@ -4336,7 +4336,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       TIES_KW "ties"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple_expr"
   WHITESPACE "\n"
@@ -4374,7 +4374,7 @@ SOURCE_FILE
                       LITERAL
                         INT_NUMBER "2"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4395,7 +4395,7 @@ SOURCE_FILE
                       LITERAL
                         INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_locking_clause"
   WHITESPACE "\n"
@@ -4427,7 +4427,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple clauses"
   WHITESPACE "\n"
@@ -4455,7 +4455,7 @@ SOURCE_FILE
       SKIP_KW "skip"
       WHITESPACE " "
       LOCKED_KW "locked"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select from"
   WHITESPACE "\n"
@@ -4499,7 +4499,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "3"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- composite_types"
   WHITESPACE "\n"
@@ -4523,9 +4523,9 @@ SOURCE_FILE
               COMMA ","
               WHITESPACE " "
               LITERAL
-                FLOAT_NUMBER "1.99"
+                NUMERIC_NUMBER "1.99"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4544,9 +4544,9 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             LITERAL
-              FLOAT_NUMBER "1.99"
+              NUMERIC_NUMBER "1.99"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- join"
   WHITESPACE "\n"
@@ -4601,7 +4601,7 @@ SOURCE_FILE
                 DOT "."
                 NAME_REF
                   IDENT "id"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- left"
   WHITESPACE "\n"
@@ -4640,7 +4640,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "id"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4682,7 +4682,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "foo"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- right"
   WHITESPACE "\n"
@@ -4721,7 +4721,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "id"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -4760,7 +4760,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "id"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi conditions"
   WHITESPACE "\n"
@@ -4827,7 +4827,7 @@ SOURCE_FILE
                   DOT "."
                   NAME_REF
                     IDENT "org_id"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested joins"
   WHITESPACE "\n"
@@ -4930,7 +4930,7 @@ SOURCE_FILE
         GROUPING_EXPR
           NAME_REF
             IDENT "f1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using w/ join alias"
   WHITESPACE "\n"
@@ -4973,7 +4973,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME
                 IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cross join"
   WHITESPACE "\n"
@@ -5024,7 +5024,7 @@ SOURCE_FILE
             ALIAS
               NAME
                 IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- inner join on true"
   WHITESPACE "\n"
@@ -5084,7 +5084,7 @@ SOURCE_FILE
               LITERAL
                 TRUE_KW "true"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple join clauses"
   WHITESPACE "\n"
@@ -5145,7 +5145,7 @@ SOURCE_FILE
                 NAME_REF
                   EVENT_KW "event"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- natural"
   WHITESPACE "\n"
@@ -5174,7 +5174,7 @@ SOURCE_FILE
           FROM_ITEM
             NAME_REF
               IDENT "departments"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg docs"
   WHITESPACE "\n\n"
@@ -5262,7 +5262,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "did"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5297,7 +5297,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "a_id"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lateral"
   WHITESPACE "\n"
@@ -5368,7 +5368,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
@@ -5382,7 +5382,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only"
   WHITESPACE "\n"
@@ -5396,7 +5396,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- star"
   WHITESPACE "\n"
@@ -5410,7 +5410,7 @@ SOURCE_FILE
             IDENT "t"
       WHITESPACE " "
       STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested"
   WHITESPACE "\n"
@@ -5431,7 +5431,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- union"
   WHITESPACE "\n"
@@ -5457,7 +5457,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
@@ -5483,7 +5483,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distinct"
   WHITESPACE "\n"
@@ -5509,7 +5509,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi"
   WHITESPACE "\n"
@@ -5545,7 +5545,7 @@ SOURCE_FILE
             TARGET
               LITERAL
                 INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- intersect"
   WHITESPACE "\n"
@@ -5571,7 +5571,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
@@ -5597,7 +5597,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distinct"
   WHITESPACE "\n"
@@ -5623,7 +5623,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- except"
   WHITESPACE "\n"
@@ -5649,7 +5649,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
@@ -5675,7 +5675,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distinct"
   WHITESPACE "\n"
@@ -5701,7 +5701,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ident_edge_cases"
   WHITESPACE "\n"
@@ -5721,7 +5721,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME
               SELECT_KW "select"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5737,7 +5737,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME
               FROM_KW "from"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5753,7 +5753,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME
               WHERE_KW "where"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5767,7 +5767,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column labels that are also operators"
   WHITESPACE "\n"
@@ -5783,7 +5783,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               IS_KW "is"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5797,7 +5797,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               AND_KW "and"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5811,7 +5811,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               OR_KW "or"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5825,7 +5825,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               COLLATE_KW "collate"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5843,7 +5843,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5861,18 +5861,8 @@ SOURCE_FILE
           AS_NAME
             NAME
               DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          LITERAL
-            DEFAULT_KW "default"
-  SEMICOLON ";"
-  WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
       SELECT_KW "select"
@@ -5885,7 +5875,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5895,7 +5885,7 @@ SOURCE_FILE
         TARGET
           LITERAL
             NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5909,7 +5899,7 @@ SOURCE_FILE
           AS_NAME
             NAME
               NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_special_funcs"
   WHITESPACE "\n"
@@ -5939,7 +5929,7 @@ SOURCE_FILE
                   IDENT "c"
               WHITESPACE " "
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5972,7 +5962,7 @@ SOURCE_FILE
                     NAME_REF
                       TEXT_KW "text"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_role"
   WHITESPACE "\n"
@@ -5984,7 +5974,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             CURRENT_ROLE_KW "current_role"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_user"
   WHITESPACE "\n"
@@ -5996,7 +5986,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- session_user"
   WHITESPACE "\n"
@@ -6008,7 +5998,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             SESSION_USER_KW "session_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- system_user"
   WHITESPACE "\n"
@@ -6020,7 +6010,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             SYSTEM_USER_KW "system_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- user"
   WHITESPACE "\n"
@@ -6032,7 +6022,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             USER_KW "user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_catalog"
   WHITESPACE "\n"
@@ -6044,7 +6034,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             CURRENT_CATALOG_KW "current_catalog"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_schema"
   WHITESPACE "\n"
@@ -6056,7 +6046,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             CURRENT_SCHEMA_KW "current_schema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order_by_with_custom_op"
   WHITESPACE "\n"
@@ -6093,7 +6083,7 @@ SOURCE_FILE
                 R_ANGLE ">"
                 R_ANGLE ">"
                 R_ANGLE ">"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order_by_regression"
   WHITESPACE "\n"
@@ -6245,7 +6235,7 @@ SOURCE_FILE
         SORT_BY
           NAME_REF
             DAY_KW "day"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select with uescape;"
   WHITESPACE "\n"
@@ -6261,7 +6251,7 @@ SOURCE_FILE
             UESCAPE_KW "UESCAPE"
             WHITESPACE " "
             STRING "'!'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -6275,7 +6265,66 @@ SOURCE_FILE
             UESCAPE_KW "UESCAPE"
             WHITESPACE " "
             STRING "'!'"
-  SEMICOLON ";"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select with uescape cast"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "U&\"!0069!006E!0074!0038\""
+                    WHITESPACE " "
+                    UESCAPE_KW "UESCAPE"
+                    WHITESPACE " "
+                    STRING "'!'"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select with uescape on qualified field"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "U&\"!0061\""
+              WHITESPACE " "
+              UESCAPE_KW "UESCAPE"
+              WHITESPACE " "
+              STRING "'!'"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_from_user_table"
   WHITESPACE "\n"
@@ -6293,7 +6342,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           USER_KW "user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select with aggregates"
   WHITESPACE "\n"
@@ -6356,5 +6405,5 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "varchar_tbl"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

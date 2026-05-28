@@ -17,7 +17,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "''"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -89,5 +89,5 @@ SOURCE_FILE
               INT_NUMBER "4"
         WHITESPACE "\n  "
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

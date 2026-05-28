@@ -212,6 +212,26 @@ const rules = [
     tags: ["schema"],
     description: "Require explicit schema in table DDL to avoid ambiguity.",
   },
+  {
+    name: "identifier-too-long",
+    tags: ["schema"],
+    description: "Prevent implicit truncation for identifiers that are too long.",
+  },
+  {
+    name: "require-concurrent-partition-detach",
+    tags: ["schema", "locking"],
+    description: "Prevent blocking reads/writes to table while partition is detached.",
+  },
+  {
+    name: "require-concurrent-reindex",
+    tags: ["locking"],
+    description: "Prevent blocking reads/writes to table while index is reindexed.",
+  },
+  {
+    name: "prefer-repack",
+    tags: ["locking"],
+    description: "Prevent blocking reads/writes to table when rebuilding.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 

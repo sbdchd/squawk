@@ -165,7 +165,7 @@ SOURCE_FILE
                 DEFAULT_KW "default"
                 WHITESPACE " "
                 LITERAL
-                  FLOAT_NUMBER "0.00"
+                  NUMERIC_NUMBER "0.00"
           COMMA ","
           WHITESPACE "\n        "
           XML_TABLE_COLUMN
@@ -193,11 +193,11 @@ SOURCE_FILE
                 DEFAULT_KW "default"
                 WHITESPACE " "
                 LITERAL
-                  FLOAT_NUMBER "0.00"
+                  NUMERIC_NUMBER "0.00"
               WHITESPACE " "
               XML_COLUMN_OPTION
                 NULL_KW "null"
         WHITESPACE "\n"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

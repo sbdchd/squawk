@@ -1,9 +1,13 @@
 use crate::ast_nav;
-use crate::builtins::builtins_file;
 use crate::collect;
 use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
-use crate::db::{File, bind, parse};
+use crate::db::{bind, list_files, parse};
+use crate::file::InFile;
+use crate::infer::{infer_type_from_expr, infer_type_from_literal};
+use crate::literals::binary_digits_to_hex;
+use crate::literals::hex_digits_to_binary;
+use crate::literals::literal_string_value;
 use crate::location::{Location, LocationKind};
 use crate::name;
 use crate::offsets::token_from_offset;
@@ -13,6 +17,7 @@ use rowan::TextSize;
 use salsa::Database as Db;
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::SyntaxNodePtr;
+use squawk_syntax::ast::LitKind;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
@@ -66,6 +71,10 @@ fn merge_hovers(hovers: Vec<Hover>) -> Option<Hover> {
         return None;
     }
 
+    if hovers.len() == 1 {
+        return Some(hovers[0].clone());
+    }
+
     Some(Hover::snippet(
         hovers
             .into_iter()
@@ -75,28 +84,48 @@ fn merge_hovers(hovers: Vec<Hover>) -> Option<Hover> {
     ))
 }
 
-#[salsa::tracked]
-pub fn hover(db: &dyn Db, file: File, offset: TextSize) -> Option<Hover> {
-    let token = token_from_offset(db, file, offset)?;
+fn hover_with_preceding_comment(snippet: impl Into<String>, node: &SyntaxNode) -> Hover {
+    let snippet = snippet.into();
+    if let Some(comment) = preceding_comment(node) {
+        return Hover::new(snippet, comment);
+    }
+    Hover::snippet(snippet)
+}
+
+fn hover_column_with_preceding_comment(snippet: impl Into<String>, def_node: &SyntaxNode) -> Hover {
+    let snippet = snippet.into();
+    if let Some(definition_node) = def_node
+        .ancestors()
+        .find_map(|node| ast::Column::cast(node.clone()))
+    {
+        return hover_with_preceding_comment(snippet, definition_node.syntax());
+    }
+    Hover::snippet(snippet)
+}
+
+pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
+    let file = position.file_id;
+    let token = token_from_offset(db, position)?;
     let parent = token.parent()?;
 
     if token.kind() == SyntaxKind::STAR {
         if let Some(field_expr) = ast::FieldExpr::cast(parent.clone())
             && field_expr.star_token().is_some()
-            && let Some(result) = hover_qualified_star(db, file, field_expr)
+            && let Some(result) = hover_qualified_star(db, InFile::new(file, field_expr))
         {
             return Some(result);
         }
 
         if let Some(arg_list) = ast::ArgList::cast(parent.clone())
-            && let Some(result) = hover_unqualified_star_in_arg_list(db, file, arg_list)
+            && let Some(result) =
+                hover_unqualified_star_in_arg_list(db, InFile::new(file, arg_list))
         {
             return Some(result);
         }
 
         if let Some(target) = ast::Target::cast(parent.clone())
             && target.star_token().is_some()
-            && let Some(result) = hover_unqualified_star(db, file, target)
+            && let Some(result) = hover_unqualified_star(db, InFile::new(file, target))
         {
             return Some(result);
         }
@@ -104,17 +133,110 @@ pub fn hover(db: &dyn Db, file: File, offset: TextSize) -> Option<Hover> {
     }
 
     if ast::NameRef::can_cast(parent.kind()) {
-        return hover_name_ref(db, file, offset);
+        return hover_name_ref(db, position);
     }
 
-    if let Some(name) = ast::Name::cast(parent) {
-        return hover_name(db, file, name);
+    if let Some(name) = ast::Name::cast(parent.clone()) {
+        return hover_name(db, InFile::new(file, name));
+    }
+
+    if let Some(literal) = ast::Literal::cast(parent) {
+        return hover_literal(&literal);
     }
 
     None
 }
 
-fn hover_name(db: &dyn Db, file: File, name: ast::Name) -> Option<Hover> {
+fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
+    let kind = literal.kind()?;
+    // TODO: support all literal types
+    if !matches!(
+        kind,
+        LitKind::String(_)
+            | LitKind::BitString(_)
+            | LitKind::ByteString(_)
+            | LitKind::EscString(_)
+            | LitKind::UnicodeEscString(_)
+            | LitKind::DollarQuotedString(_)
+    ) {
+        return None;
+    }
+
+    let value = literal_string_value(literal)?;
+    let ty = infer_type_from_literal(literal)?.to_string();
+
+    let comment = match kind {
+        LitKind::BitString(_) => format_bit_value_comment(&value, 2),
+        LitKind::ByteString(_) => format_bit_value_comment(&value, 16),
+        LitKind::String(_)
+        | LitKind::EscString(_)
+        | LitKind::UnicodeEscString(_)
+        | LitKind::DollarQuotedString(_) => match value.find('\n') {
+            Some(idx) => {
+                let truncated = &value[..idx];
+                format!(
+                    "value of literal (truncated up to newline): {}",
+                    markdown_inline_code(truncated)
+                )
+            }
+            None => format!("value of literal: {}", markdown_inline_code(&value)),
+        },
+        LitKind::Default(_) => return None,
+        LitKind::False(_) => return None,
+        LitKind::IntNumber(_) => return None,
+        LitKind::Null(_) => return None,
+        LitKind::NumericNumber(_) => return None,
+        LitKind::PositionalParam(_) => return None,
+        LitKind::True(_) => return None,
+    };
+
+    Some(Hover::new(ty, comment))
+}
+
+fn format_bit_value_comment(digits: &str, radix: u32) -> String {
+    let patterns = match radix {
+        2 => bit_string_patterns(digits),
+        16 => byte_string_patterns(digits),
+        _ => None,
+    };
+
+    if let Some((hex, binary)) = patterns {
+        let formatted = format!("x'{hex}'|b'{binary}'");
+        return format!("value of literal: {}", markdown_inline_code(&formatted));
+    }
+
+    format!("value of literal: {}", markdown_inline_code(digits))
+}
+
+fn bit_string_patterns(digits: &str) -> Option<(String, String)> {
+    Some((binary_digits_to_hex(digits)?, digits.to_string()))
+}
+
+fn byte_string_patterns(digits: &str) -> Option<(String, String)> {
+    Some((digits.to_string(), hex_digits_to_binary(digits)?))
+}
+
+// escape backticks that exist in the text
+fn markdown_inline_code(text: &str) -> String {
+    let mut max_run = 0;
+    let mut run = 0;
+
+    for ch in text.chars() {
+        if ch == '`' {
+            run += 1;
+            max_run = max_run.max(run);
+        } else {
+            run = 0;
+        }
+    }
+
+    let fence = "`".repeat(max_run + 1);
+    format!("{fence} {text} {fence}")
+}
+
+fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
+    let file = name.file_id;
+    let name = name.value;
     let def = Location::from_node(file, name.syntax())?;
     match def.kind {
         LocationKind::Aggregate => hover_aggregate(db, def),
@@ -159,26 +281,26 @@ fn hover_name_column(db: &dyn Db, def: Location) -> Option<Hover> {
     if let Some(column) = def_node.parent().and_then(ast::Column::cast)
         && let Some(create_table) = def_node.ancestors().find_map(ast::CreateTableLike::cast)
     {
-        return hover_column_definition(db, def.file, create_table, column);
+        return hover_column_definition(db, InFile::new(def.file, create_table), column);
     }
 
     if def_node
         .ancestors()
         .any(|ancestor| ast::ColumnList::can_cast(ancestor.kind()))
-        && let Some(create_view) = def_node.ancestors().find_map(ast::CreateView::cast)
+        && let Some(create_view) = def_node.ancestors().find_map(ast::CreateViewLike::cast)
     {
-        return format_view_column(db, def.file, create_view, &def_node);
+        return format_view_column(db, InFile::new(def.file, &create_view), &def_node);
     }
 
     None
 }
 
-fn hover_name_ref(db: &dyn Db, file: File, offset: TextSize) -> Option<Hover> {
+fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
     // We can get multiple in the case of using
     //
     // select * from t join u using (id);
     //
-    let definitions = goto_definition::goto_definition(db, file, offset);
+    let definitions = goto_definition::goto_definition(db, position);
     let def = *definitions.first()?;
     match def.kind {
         LocationKind::Aggregate => hover_aggregate(db, def),
@@ -252,10 +374,10 @@ impl ColumnHover {
     }
 
     fn anon_column(col_name: &str) -> String {
-        format!("column {}", col_name)
+        format!("column {col_name}")
     }
     fn anon_column_type(col_name: &str, ty: &str) -> String {
-        format!("column {} {}", col_name, ty)
+        format!("column {col_name} {ty}")
     }
 }
 
@@ -268,105 +390,153 @@ fn hover_column(db: &dyn Db, definitions: &[Location]) -> Option<Hover> {
     merge_hovers(results)
 }
 
-fn column_name_from_node(column_name_node: &SyntaxNode) -> Option<Name> {
-    if column_name_node
-        .ancestors()
-        .any(|ancestor| ast::Values::can_cast(ancestor.kind()))
-    {
-        let row = column_name_node.ancestors().find_map(ast::Row::cast)?;
-        let idx = row
-            .exprs()
-            .position(|expr| expr.syntax() == column_name_node)?;
-        Some(Name::from_string(format!("column{}", idx + 1)))
-    } else if let Some(name) = ast::Name::cast(column_name_node.clone()) {
-        Some(Name::from_node(&name))
-    } else {
-        let target = column_name_node.ancestors().find_map(ast::Target::cast)?;
-        let (col_name, _) = ColumnName::from_target(target)?;
-        Some(Name::from_string(col_name.to_string()?))
-    }
-}
-
 fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
     let def_node = &def.to_node(db)?;
     match ast_nav::parent_source(def_node)? {
         ast_nav::ParentSouce::WithTable(with_table) => {
             let cte_name = with_table.name()?;
-            let column_name = column_name_from_node(def_node)?;
+            let column_name = collect::column_name_from_node(def_node)?;
             let table_name = Name::from_node(&cte_name);
-            return Some(Hover::snippet(ColumnHover::table_column(
-                &table_name.to_string(),
-                &column_name.to_string(),
-            )));
+            let ty = collect::with_table_columns_with_types(db, def.file, with_table)
+                .into_iter()
+                .find(|(name, _)| *name == column_name)
+                .and_then(|(_, ty)| ty);
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::table_column_type(
+                        &table_name.to_string(),
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => {
+                        ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
+                    }
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::ParenSelect(paren_select) => {
             // Qualified access like `t.a`
-            if let Some(table_name) = subquery_alias_name(&paren_select) {
-                let column_name = column_name_from_node(def_node)?;
-                return Some(Hover::snippet(ColumnHover::table_column(
-                    &table_name.to_string(),
-                    &column_name.to_string(),
-                )));
-            }
+            let table_name = subquery_alias_name(&paren_select);
 
             // Unqualified access like `a` from `select a from (select 1 a)`
-            let column_name = column_name_from_node(def_node)?;
+            let column_name = collect::column_name_from_node(def_node)?;
 
             let ty = collect::paren_select_columns_with_types(db, def.file, &paren_select)
                 .into_iter()
                 .find(|(name, _)| *name == column_name)
                 .and_then(|(_, ty)| ty)?;
-            return Some(Hover::snippet(ColumnHover::anon_column_type(
-                &column_name.to_string(),
-                &ty.to_string(),
-            )));
+            if let Some(table_name) = table_name {
+                Some(hover_column_with_preceding_comment(
+                    ColumnHover::table_column_type(
+                        &table_name.to_string(),
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    def_node,
+                ))
+            } else {
+                Some(hover_column_with_preceding_comment(
+                    ColumnHover::anon_column_type(&column_name.to_string(), &ty.to_string()),
+                    def_node,
+                ))
+            }
         }
         // create view v(a) as select 1;
         // select a from v;
         //        ^
         ast_nav::ParentSouce::CreateView(create_view) => {
-            let column_name = column_name_from_node(def_node)?;
+            let column_name = collect::column_name_from_node(def_node)?;
             let path = create_view.path()?;
-            let (schema, view_name) = resolve::resolve_view_info(db, def.file, &path)?;
-            return Some(Hover::snippet(ColumnHover::schema_table_column(
-                &schema.to_string(),
-                &view_name,
-                &column_name.to_string(),
-            )));
+            let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(def.file, &path))?;
+            let ty = collect::view_like_columns_with_types(db, def.file, &create_view)
+                .into_iter()
+                .find(|(name, _)| *name == column_name)
+                .and_then(|(_, ty)| ty);
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::schema_table_column_type(
+                        &schema.to_string(),
+                        &view_name,
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => ColumnHover::schema_table_column(
+                        &schema.to_string(),
+                        &view_name,
+                        &column_name.to_string(),
+                    ),
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::Alias(alias) => {
             let alias_name = alias.name()?;
             alias.column_list()?;
+            let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
             let table_name = Name::from_node(&alias_name);
             let column_name = Name::from_string(def_node.text().to_string());
-            return Some(Hover::snippet(ColumnHover::table_column(
-                &table_name.to_string(),
-                &column_name.to_string(),
-            )));
+            let ty = collect::columns_for_star_from_alias(db, def.file, &from_item, &alias)
+                .into_iter()
+                .find(|(name, _)| *name == column_name)
+                .and_then(|(_, ty)| ty);
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::table_column_type(
+                        &table_name.to_string(),
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => {
+                        ColumnHover::table_column(&table_name.to_string(), &column_name.to_string())
+                    }
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
-            let column_name = column_name_from_node(def_node)?;
+            let column_name = collect::column_name_from_node(def_node)?;
             let path = create_table_as.path()?;
-            let (schema, table_name) = resolve::resolve_table_info(db, def.file, &path)?;
-            return Some(Hover::snippet(ColumnHover::schema_table_column(
-                &schema.to_string(),
-                &table_name,
-                &column_name.to_string(),
-            )));
+            let (schema, table_name) =
+                resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
+            let ty = collect::create_table_as_columns_with_types(db, def.file, &create_table_as)
+                .into_iter()
+                .find(|(name, _)| *name == column_name)
+                .and_then(|(_, ty)| ty);
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::schema_table_column_type(
+                        &schema.to_string(),
+                        &table_name,
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => ColumnHover::schema_table_column(
+                        &schema.to_string(),
+                        &table_name,
+                        &column_name.to_string(),
+                    ),
+                },
+                def_node,
+            ));
         }
         ast_nav::ParentSouce::CreateTable(create_table) => {
             let column = def_node.ancestors().find_map(ast::Column::cast)?;
             let column_name = column.name()?;
             let ty = column.ty()?;
             let path = create_table.path()?;
-            let (schema, table_name) = resolve::resolve_table_info(db, def.file, &path)?;
+            let (schema, table_name) =
+                resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
 
-            return Some(Hover::snippet(ColumnHover::schema_table_column_type(
-                &schema.to_string(),
-                &table_name,
-                &Name::from_node(&column_name).to_string(),
-                &ty.syntax().text().to_string(),
-            )));
+            return Some(hover_column_with_preceding_comment(
+                ColumnHover::schema_table_column_type(
+                    &schema.to_string(),
+                    &table_name,
+                    &Name::from_node(&column_name).to_string(),
+                    &ty.syntax().text().to_string(),
+                ),
+                def_node,
+            ));
         }
     }
 }
@@ -381,48 +551,53 @@ fn hover_composite_type_field(db: &dyn Db, def: Location) -> Option<Hover> {
         .ancestors()
         .find_map(ast::CreateType::cast)?;
     let type_path = create_type.path()?;
-    let (schema, type_name) = resolve::resolve_type_info(db, def.file, &type_path)?;
+    let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(def.file, &type_path))?;
 
-    Some(Hover::snippet(format!(
-        "field {}.{}.{} {}",
-        schema,
-        type_name,
-        field_name,
-        ty.syntax().text()
-    )))
+    Some(hover_with_preceding_comment(
+        format!(
+            "field {}.{}.{} {}",
+            schema,
+            type_name,
+            field_name,
+            ty.syntax().text()
+        ),
+        column.syntax(),
+    ))
 }
 
 fn hover_column_definition(
     db: &dyn Db,
-    file: File,
-    create_table: impl ast::HasCreateTable,
+    create_table: InFile<impl ast::HasCreateTable>,
     column: ast::Column,
 ) -> Option<Hover> {
+    let file = create_table.file_id;
+    let create_table = create_table.value;
     let column_name = column.name()?.syntax().text().to_string();
     let ty = column.ty()?;
     let path = create_table.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let ty = ty.syntax().text().to_string();
-    Some(Hover::snippet(ColumnHover::schema_table_column_type(
-        &schema.to_string(),
-        &table_name,
-        &column_name,
-        &ty,
-    )))
+    Some(hover_with_preceding_comment(
+        ColumnHover::schema_table_column_type(&schema.to_string(), &table_name, &column_name, &ty),
+        column.syntax(),
+    ))
 }
 
-fn format_table_source(db: &dyn Db, file: File, source: ast_nav::ParentSouce) -> Option<Hover> {
-    match source {
-        ast_nav::ParentSouce::Alias(alias) => format_alias_with_column_list(db, file, alias),
+fn format_table_source(db: &dyn Db, source: InFile<ast_nav::ParentSouce>) -> Option<Hover> {
+    let file = source.file_id;
+    match source.value {
+        ast_nav::ParentSouce::Alias(alias) => {
+            format_alias_with_column_list(db, InFile::new(file, alias))
+        }
         ast_nav::ParentSouce::WithTable(with_table) => format_with_table(with_table),
         ast_nav::ParentSouce::CreateView(create_view) => {
-            format_create_view_like(db, file, create_view)
+            format_create_view_like(db, InFile::new(file, create_view))
         }
         ast_nav::ParentSouce::CreateTable(create_table) => {
-            format_create_table(db, file, create_table)
+            format_create_table(db, InFile::new(file, create_table))
         }
         ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
-            format_create_table_as(db, file, create_table_as)
+            format_create_table_as(db, InFile::new(file, create_table_as))
         }
         ast_nav::ParentSouce::ParenSelect(paren_select) => format_paren_select(paren_select),
     }
@@ -430,10 +605,12 @@ fn format_table_source(db: &dyn Db, file: File, source: ast_nav::ParentSouce) ->
 
 fn hover_table(db: &dyn Db, def: Location) -> Option<Hover> {
     let source = ast_nav::parent_source(&def.to_node(db)?)?;
-    format_table_source(db, def.file, source)
+    format_table_source(db, InFile::new(def.file, source))
 }
 
-fn format_alias_with_column_list(db: &dyn Db, file: File, alias: ast::Alias) -> Option<Hover> {
+fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::Alias>) -> Option<Hover> {
+    let file = alias.file_id;
+    let alias = alias.value;
     let alias_name = alias.name()?;
     let name = Name::from_node(&alias_name);
 
@@ -454,7 +631,8 @@ fn format_alias_with_column_list(db: &dyn Db, file: File, alias: ast::Alias) -> 
         .collect();
 
     if let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast)
-        && let Some(table_ptr) = resolve::table_ptr_from_from_item(db, file, &from_item)
+        && let Some(table_ptr) =
+            resolve::table_ptr_from_from_item(db, InFile::new(file, &from_item))
     {
         let base_columns = collect::star_column_names(db, file, &table_ptr);
         for column in base_columns.iter().skip(columns.len()) {
@@ -467,30 +645,35 @@ fn format_alias_with_column_list(db: &dyn Db, file: File, alias: ast::Alias) -> 
         .map(|column| column.to_string())
         .collect::<Vec<_>>()
         .join(", ");
-    Some(Hover::snippet(format!("table {}({})", name, columns)))
+    Some(Hover::snippet(format!("table {name}({columns})")))
 }
 
-fn hover_qualified_star(db: &dyn Db, file: File, field_expr: ast::FieldExpr) -> Option<Hover> {
-    let table_ptr = qualified_star_table_ptr(db, file, field_expr)?;
-    hover_qualified_star_columns(db, file, &table_ptr)
+fn hover_qualified_star(db: &dyn Db, field_expr: InFile<ast::FieldExpr>) -> Option<Hover> {
+    let file = field_expr.file_id;
+    let table_ptr = qualified_star_table_ptr(db, field_expr)?;
+    hover_qualified_star_columns(db, InFile::new(file, &table_ptr))
 }
 
-fn hover_unqualified_star(db: &dyn Db, file: File, target: ast::Target) -> Option<Hover> {
-    let mut results = hover_unqualified_star_with_binder(db, file, &target);
-
-    if results.is_empty() && target_has_schema_qualified_from_item(&target) {
-        results = hover_unqualified_star_with_binder(db, builtins_file(db), &target);
+fn hover_unqualified_star(db: &dyn Db, target: InFile<ast::Target>) -> Option<Hover> {
+    let mut results = vec![];
+    for file in list_files(db, target.file_id) {
+        results = hover_unqualified_star_with_binder(db, InFile::new(file, &target.value));
+        if results.is_empty() && target_has_schema_qualified_from_item(&target.value) {
+            continue;
+        } else {
+            break;
+        }
     }
-
     merge_hovers(results)
 }
 
-fn hover_unqualified_star_with_binder(db: &dyn Db, file: File, target: &ast::Target) -> Vec<Hover> {
+fn hover_unqualified_star_with_binder(db: &dyn Db, target: InFile<&ast::Target>) -> Vec<Hover> {
+    let file = target.file_id;
     let mut results = vec![];
 
-    if let Some(table_ptrs) = unqualified_star_table_ptrs(db, file, target) {
+    if let Some(table_ptrs) = unqualified_star_table_ptrs(db, target) {
         for table_ptr in table_ptrs {
-            if let Some(columns) = hover_qualified_star_columns(db, file, &table_ptr) {
+            if let Some(columns) = hover_qualified_star_columns(db, InFile::new(file, &table_ptr)) {
                 results.push(columns);
             }
         }
@@ -518,13 +701,13 @@ fn target_has_schema_qualified_from_item(target: &ast::Target) -> bool {
 
 fn hover_unqualified_star_in_arg_list(
     db: &dyn Db,
-    file: File,
-    arg_list: ast::ArgList,
+    arg_list: InFile<ast::ArgList>,
 ) -> Option<Hover> {
-    let table_ptrs = unqualified_star_in_arg_list_ptrs(db, file, &arg_list)?;
+    let file = arg_list.file_id;
+    let table_ptrs = unqualified_star_in_arg_list_ptrs(db, InFile::new(file, &arg_list.value))?;
     let mut results = vec![];
     for table_ptr in table_ptrs {
-        if let Some(columns) = hover_qualified_star_columns(db, file, &table_ptr) {
+        if let Some(columns) = hover_qualified_star_columns(db, InFile::new(file, &table_ptr)) {
             results.push(columns);
         }
     }
@@ -535,87 +718,82 @@ fn hover_unqualified_star_in_arg_list(
 fn format_subquery_table(name: Name, paren_select: ast::ParenSelect) -> Option<Hover> {
     let name = name.to_string();
     let query = paren_select.syntax().text().to_string();
-    Some(Hover::snippet(format!("subquery {} as {}", name, query)))
+    Some(Hover::snippet(format!("subquery {name} as {query}")))
 }
 
 fn hover_qualified_star_columns(
     db: &dyn Db,
-    file: File,
-    table_ptr: &squawk_syntax::SyntaxNodePtr,
+    table_ptr: InFile<&squawk_syntax::SyntaxNodePtr>,
 ) -> Option<Hover> {
+    let file = table_ptr.file_id;
     let source_file = parse(db, file).tree();
     let root = source_file.syntax();
-    let table_name_node = table_ptr.to_node(root);
+    let table_name_node = table_ptr.value.to_node(root);
 
     match ast_nav::parent_source(&table_name_node)? {
         ast_nav::ParentSouce::Alias(alias) => {
-            hover_qualified_star_columns_from_alias(db, file, &alias)
+            hover_qualified_star_columns_from_alias(db, InFile::new(file, &alias))
         }
         ast_nav::ParentSouce::WithTable(with_table) => {
-            hover_qualified_star_columns_from_cte(db, file, with_table)
+            hover_qualified_star_columns_from_cte(db, InFile::new(file, with_table))
         }
         ast_nav::ParentSouce::CreateTable(create_table) => {
-            hover_qualified_star_columns_from_table(db, file, create_table)
+            hover_qualified_star_columns_from_table(db, InFile::new(file, create_table))
         }
         ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
-            hover_qualified_star_columns_from_table_as(db, file, &create_table_as)
+            hover_qualified_star_columns_from_table_as(db, InFile::new(file, &create_table_as))
         }
         ast_nav::ParentSouce::CreateView(create_view) => {
-            hover_qualified_star_columns_from_view_like(db, file, &create_view)
+            hover_qualified_star_columns_from_view_like(db, InFile::new(file, &create_view))
         }
         ast_nav::ParentSouce::ParenSelect(paren_select) => {
-            hover_qualified_star_columns_from_subquery(db, file, &paren_select)
+            hover_qualified_star_columns_from_subquery(db, InFile::new(file, &paren_select))
         }
     }
 }
 
 fn hover_qualified_star_columns_from_alias(
     db: &dyn Db,
-    file: File,
-    alias: &ast::Alias,
+    alias: InFile<&ast::Alias>,
 ) -> Option<Hover> {
+    let file = alias.file_id;
+    let alias = alias.value;
     let alias_name = Name::from_node(&alias.name()?);
-    let alias_columns: Vec<Name> = alias
-        .column_list()?
-        .columns()
-        .filter_map(|column| column.name().map(|name| Name::from_node(&name)))
-        .collect();
+    alias.column_list()?;
+    let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
+    let columns = collect::columns_for_star_from_alias(db, file, &from_item, alias);
 
-    if alias_columns.is_empty() {
+    if columns.is_empty() {
         return None;
     }
 
-    let mut results: Vec<Hover> = alias_columns
-        .iter()
-        .map(|column_name| {
-            Hover::snippet(ColumnHover::table_column(
-                &alias_name.to_string(),
-                &column_name.to_string(),
-            ))
+    let results: Vec<Hover> = columns
+        .into_iter()
+        .map(|(column_name, ty)| {
+            Hover::snippet(match ty {
+                Some(ty) => ColumnHover::table_column_type(
+                    &alias_name.to_string(),
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                ),
+                None => {
+                    ColumnHover::table_column(&alias_name.to_string(), &column_name.to_string())
+                }
+            })
         })
         .collect();
-
-    let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
-    let table_ptr = resolve::table_ptr_from_from_item(db, file, &from_item)?;
-    let base_column_names = collect::star_column_names(db, file, &table_ptr);
-
-    for column_name in base_column_names.iter().skip(alias_columns.len()) {
-        results.push(Hover::snippet(ColumnHover::table_column(
-            &alias_name.to_string(),
-            &column_name.to_string(),
-        )));
-    }
 
     merge_hovers(results)
 }
 
 fn hover_qualified_star_columns_from_table(
     db: &dyn Db,
-    file: File,
-    create_table: impl ast::HasCreateTable,
+    create_table: InFile<impl ast::HasCreateTable>,
 ) -> Option<Hover> {
+    let file = create_table.file_id;
+    let create_table = create_table.value;
     let path = create_table.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let schema = schema.to_string();
     let results: Vec<Hover> = collect::table_columns(db, file, &create_table)
         .into_iter()
@@ -635,14 +813,15 @@ fn hover_qualified_star_columns_from_table(
 
 fn hover_qualified_star_columns_from_table_as(
     db: &dyn Db,
-    file: File,
-    create_table_as: &ast::CreateTableAs,
+    create_table_as: InFile<&ast::CreateTableAs>,
 ) -> Option<Hover> {
+    let file = create_table_as.file_id;
+    let create_table_as = create_table_as.value;
     let path = create_table_as.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let schema_str = schema.to_string();
 
-    let columns = collect::create_table_as_columns_with_types(create_table_as);
+    let columns = collect::create_table_as_columns_with_types(db, file, create_table_as);
     let results: Vec<Hover> = columns
         .into_iter()
         .map(|(column_name, ty)| {
@@ -667,9 +846,10 @@ fn hover_qualified_star_columns_from_table_as(
 
 fn hover_qualified_star_columns_from_cte(
     db: &dyn Db,
-    file: File,
-    with_table: ast::WithTable,
+    with_table: InFile<ast::WithTable>,
 ) -> Option<Hover> {
+    let file = with_table.file_id;
+    let with_table = with_table.value;
     let cte_name = Name::from_node(&with_table.name()?);
     let cte_name = cte_name.to_string();
     let columns = collect::with_table_columns_with_types(db, file, with_table);
@@ -694,14 +874,15 @@ fn hover_qualified_star_columns_from_cte(
 
 fn hover_qualified_star_columns_from_view_like(
     db: &dyn Db,
-    file: File,
-    create_view: &ast::CreateViewLike,
+    create_view: InFile<&ast::CreateViewLike>,
 ) -> Option<Hover> {
+    let file = create_view.file_id;
+    let create_view = create_view.value;
     let path = create_view.path()?;
-    let (schema, view_name) = resolve::resolve_view_info(db, file, &path)?;
+    let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
 
     let schema_str = schema.to_string();
-    let columns = collect::view_like_columns_with_types(create_view);
+    let columns = collect::view_like_columns_with_types(db, file, create_view);
     let results: Vec<Hover> = columns
         .into_iter()
         .map(|(column_name, ty)| {
@@ -727,9 +908,10 @@ fn hover_qualified_star_columns_from_view_like(
 
 fn hover_qualified_star_columns_from_subquery(
     db: &dyn Db,
-    file: File,
-    paren_select: &ast::ParenSelect,
+    paren_select: InFile<&ast::ParenSelect>,
 ) -> Option<Hover> {
+    let file = paren_select.file_id;
+    let paren_select = paren_select.value;
     let select_variant = paren_select.select()?;
 
     if let Some(select) = ast_nav::select_from_variant(select_variant) {
@@ -740,18 +922,22 @@ fn hover_qualified_star_columns_from_subquery(
 
         for target in target_list.targets() {
             if target.star_token().is_some() {
-                let table_ptrs = unqualified_star_table_ptrs(db, file, &target)?;
+                let table_ptrs = unqualified_star_table_ptrs(db, InFile::new(file, &target))?;
                 for table_ptr in table_ptrs {
-                    if let Some(columns) = hover_qualified_star_columns(db, file, &table_ptr) {
+                    if let Some(columns) =
+                        hover_qualified_star_columns(db, InFile::new(file, &table_ptr))
+                    {
                         results.push(columns)
                     }
                 }
                 continue;
             }
 
-            if let Some(result) =
-                hover_subquery_target_column(db, file, &target, subquery_alias.as_ref())
-            {
+            if let Some(result) = hover_subquery_target_column(
+                db,
+                InFile::new(file, &target),
+                subquery_alias.as_ref(),
+            ) {
                 results.push(result);
             }
         }
@@ -793,25 +979,32 @@ fn subquery_alias_name(paren_select: &ast::ParenSelect) -> Option<Name> {
 
 fn hover_subquery_target_column(
     db: &dyn Db,
-    file: File,
-    target: &ast::Target,
+    target: InFile<&ast::Target>,
     subquery_alias: Option<&Name>,
 ) -> Option<Hover> {
+    let file = target.file_id;
+    let target = target.value;
     if let Some(alias) = subquery_alias
         && let Some((col_name, _node)) = ColumnName::from_target(target.clone())
         && let Some(col_name) = col_name.to_string()
     {
-        return Some(Hover::snippet(ColumnHover::table_column(
-            &alias.to_string(),
-            &col_name,
-        )));
+        let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
+        return Some(Hover::snippet(match ty {
+            Some(ty) => {
+                ColumnHover::table_column_type(&alias.to_string(), &col_name, &ty.to_string())
+            }
+            None => ColumnHover::table_column(&alias.to_string(), &col_name),
+        }));
     }
 
     let result = match target.expr()? {
-        ast::Expr::NameRef(name_ref) => hover(db, file, name_ref.syntax().text_range().start()),
+        ast::Expr::NameRef(name_ref) => hover(
+            db,
+            InFile::new(file, name_ref.syntax().text_range().start()),
+        ),
         ast::Expr::FieldExpr(field_expr) => {
             let field = field_expr.field()?;
-            hover(db, file, field.syntax().text_range().start())
+            hover(db, InFile::new(file, field.syntax().text_range().start()))
         }
         _ => None,
     };
@@ -823,7 +1016,11 @@ fn hover_subquery_target_column(
     if let Some((col_name, _node)) = ColumnName::from_target(target.clone())
         && let Some(col_name) = col_name.to_string()
     {
-        return Some(Hover::snippet(ColumnHover::anon_column(&col_name)));
+        let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
+        return Some(Hover::snippet(match ty {
+            Some(ty) => ColumnHover::anon_column_type(&col_name, &ty.to_string()),
+            None => ColumnHover::anon_column(&col_name),
+        }));
     }
 
     None
@@ -834,7 +1031,7 @@ fn hover_index(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreateIndex::cast)?;
-    format_create_index(db, def.file, create_index)
+    format_create_index(db, InFile::new(def.file, create_index))
 }
 
 fn hover_sequence(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -842,7 +1039,7 @@ fn hover_sequence(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreateSequence::cast)?;
-    format_create_sequence(db, def.file, create_sequence)
+    format_create_sequence(db, InFile::new(def.file, create_sequence))
 }
 
 fn hover_trigger(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -850,7 +1047,7 @@ fn hover_trigger(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreateTrigger::cast)?;
-    format_create_trigger(db, def.file, create_trigger)
+    format_create_trigger(db, InFile::new(def.file, create_trigger))
 }
 
 fn hover_policy(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -858,7 +1055,7 @@ fn hover_policy(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreatePolicy::cast)?;
-    format_create_policy(db, def.file, create_policy)
+    format_create_policy(db, InFile::new(def.file, create_policy))
 }
 
 fn hover_property_graph(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -866,7 +1063,7 @@ fn hover_property_graph(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreatePropertyGraph::cast)?;
-    format_create_property_graph(db, def.file, create_property_graph)
+    format_create_property_graph(db, InFile::new(def.file, create_property_graph))
 }
 
 fn hover_event_trigger(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -950,7 +1147,7 @@ fn hover_type(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreateType::cast)?;
-    format_create_type(db, def.file, create_type)
+    format_create_type(db, InFile::new(def.file, create_type))
 }
 
 fn format_declare_cursor(declare: ast::Declare) -> Option<Hover> {
@@ -980,11 +1177,12 @@ fn format_listen(listen: ast::Listen) -> Option<Hover> {
 
 fn format_create_table(
     db: &dyn Db,
-    file: File,
-    create_table: impl ast::HasCreateTable,
+    create_table: InFile<impl ast::HasCreateTable>,
 ) -> Option<Hover> {
+    let file = create_table.file_id;
+    let create_table = create_table.value;
     let path = create_table.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let schema = schema.to_string();
     let args = create_table.table_arg_list()?.syntax().text().to_string();
 
@@ -1001,32 +1199,30 @@ fn format_create_table(
 
 fn format_create_table_as(
     db: &dyn Db,
-    file: File,
-    create_table_as: ast::CreateTableAs,
+    create_table_as: InFile<ast::CreateTableAs>,
 ) -> Option<Hover> {
+    let file = create_table_as.file_id;
+    let create_table_as = create_table_as.value;
     let path = create_table_as.path()?;
-    let (schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let query = create_table_as.query()?.syntax().text().to_string();
     Some(Hover::snippet(format!(
-        "table {}.{} as {}",
-        schema, table_name, query
+        "table {schema}.{table_name} as {query}"
     )))
 }
 
 fn format_create_view(db: &dyn Db, def: Location) -> Option<Hover> {
     let create_view = ast::CreateViewLike::cast(def.to_node(db)?)?;
-    format_create_view_like(db, def.file, create_view)
+    format_create_view_like(db, InFile::new(def.file, create_view))
 }
 
-fn format_create_view_like(
-    db: &dyn Db,
-    file: File,
-    create_view: ast::CreateViewLike,
-) -> Option<Hover> {
+fn format_create_view_like(db: &dyn Db, create_view: InFile<ast::CreateViewLike>) -> Option<Hover> {
+    let file = create_view.file_id;
+    let create_view = create_view.value;
     let path = create_view.path()?;
     // TODO: we use this to infer the schema, we should either rename this or
     // create a different function
-    let (schema, view_name) = resolve::resolve_view_info(db, file, &path)?;
+    let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
     let schema = schema.to_string();
 
     let column_list = create_view
@@ -1043,178 +1239,176 @@ fn format_create_view_like(
     };
 
     Some(Hover::snippet(format!(
-        "{view_kind} {}.{}{} as {}",
-        schema, view_name, column_list, query
+        "{view_kind} {schema}.{view_name}{column_list} as {query}",
     )))
 }
 
 fn format_view_column(
     db: &dyn Db,
-    file: File,
-    create_view: ast::CreateView,
+    create_view: InFile<&ast::CreateViewLike>,
     def_node: &SyntaxNode,
 ) -> Option<Hover> {
+    let file = create_view.file_id;
+    let create_view = create_view.value;
     let path = create_view.path()?;
-    let (schema, view_name) = resolve::resolve_view_info(db, file, &path)?;
-    Some(Hover::snippet(ColumnHover::schema_table_column(
-        &schema.to_string(),
-        &view_name,
-        &def_node.to_string(),
-    )))
+    let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
+    let column_name = Name::from_string(def_node.to_string());
+    let ty = collect::view_like_columns_with_types(db, file, create_view)
+        .into_iter()
+        .find(|(name, _)| *name == column_name)
+        .and_then(|(_, ty)| ty);
+    Some(hover_column_with_preceding_comment(
+        match ty {
+            Some(ty) => ColumnHover::schema_table_column_type(
+                &schema.to_string(),
+                &view_name,
+                &column_name.to_string(),
+                &ty.to_string(),
+            ),
+            None => ColumnHover::schema_table_column(
+                &schema.to_string(),
+                &view_name,
+                &column_name.to_string(),
+            ),
+        },
+        def_node,
+    ))
 }
 
 fn format_with_table(with_table: ast::WithTable) -> Option<Hover> {
     let name = with_table.name()?.syntax().text().to_string();
     let query = with_table.query()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("with {} as ({})", name, query)))
+    Some(Hover::snippet(format!("with {name} as ({query})")))
 }
 
 fn format_paren_select(paren_select: ast::ParenSelect) -> Option<Hover> {
     let query = paren_select.select()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("({})", query)))
+    Some(Hover::snippet(format!("({query})")))
 }
 
-fn format_create_index(db: &dyn Db, file: File, create_index: ast::CreateIndex) -> Option<Hover> {
+fn format_create_index(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> Option<Hover> {
+    let file = create_index.file_id;
+    let create_index = create_index.value;
     let index_name = create_index.name()?.syntax().text().to_string();
 
-    let index_schema = index_schema(db, file, create_index.clone())?;
+    let index_schema = index_schema(db, InFile::new(file, create_index.clone()))?;
 
     let path = create_index.relation_name()?.path()?;
-    let (table_schema, table_name) = resolve::resolve_table_info(db, file, &path)?;
+    let (table_schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
 
     let partition_item_list = create_index.partition_item_list()?;
     let columns = partition_item_list.syntax().text().to_string();
 
     Some(Hover::snippet(format!(
-        "index {}.{} on {}.{}{}",
-        index_schema, index_name, table_schema, table_name, columns
+        "index {index_schema}.{index_name} on {table_schema}.{table_name}{columns}"
     )))
 }
 
 fn format_create_sequence(
     db: &dyn Db,
-    file: File,
-    create_sequence: ast::CreateSequence,
+    create_sequence: InFile<ast::CreateSequence>,
 ) -> Option<Hover> {
+    let file = create_sequence.file_id;
+    let create_sequence = create_sequence.value;
     let path = create_sequence.path()?;
-    let (schema, sequence_name) = resolve::resolve_sequence_info(db, file, &path)?;
+    let (schema, sequence_name) = resolve::resolve_sequence_info(db, InFile::new(file, &path))?;
 
-    Some(Hover::snippet(format!(
-        "sequence {}.{}",
-        schema, sequence_name
-    )))
+    Some(Hover::snippet(format!("sequence {schema}.{sequence_name}")))
 }
 
-fn format_create_trigger(
-    db: &dyn Db,
-    file: File,
-    create_trigger: ast::CreateTrigger,
-) -> Option<Hover> {
+fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>) -> Option<Hover> {
+    let file = create_trigger.file_id;
+    let create_trigger = create_trigger.value;
     let trigger_name = create_trigger.name()?.syntax().text().to_string();
     let on_table_path = create_trigger.on_table()?.path()?;
 
-    let (schema, table_name) = resolve::resolve_table_info(db, file, &on_table_path)?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
-        "trigger {}.{} on {}.{}",
-        schema, trigger_name, schema, table_name
+        "trigger {schema}.{trigger_name} on {schema}.{table_name}"
     )))
 }
 
-fn format_create_policy(
-    db: &dyn Db,
-    file: File,
-    create_policy: ast::CreatePolicy,
-) -> Option<Hover> {
+fn format_create_policy(db: &dyn Db, create_policy: InFile<ast::CreatePolicy>) -> Option<Hover> {
+    let file = create_policy.file_id;
+    let create_policy = create_policy.value;
     let policy_name = create_policy.name()?.syntax().text().to_string();
     let on_table_path = create_policy.on_table()?.path()?;
 
-    let (schema, table_name) = resolve::resolve_table_info(db, file, &on_table_path)?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
-        "policy {}.{} on {}.{}",
-        schema, policy_name, schema, table_name
+        "policy {schema}.{policy_name} on {schema}.{table_name}"
     )))
 }
 
 fn format_create_property_graph(
     db: &dyn Db,
-    file: File,
-    create_property_graph: ast::CreatePropertyGraph,
+    create_property_graph: InFile<ast::CreatePropertyGraph>,
 ) -> Option<Hover> {
+    let file = create_property_graph.file_id;
+    let create_property_graph = create_property_graph.value;
     let path = create_property_graph.path()?;
-    let (schema, name) = resolve::resolve_property_graph_info(db, file, &path)?;
-    Some(Hover::snippet(format!(
-        "property graph {}.{}",
-        schema, name
-    )))
+    let (schema, name) = resolve::resolve_property_graph_info(db, InFile::new(file, &path))?;
+    Some(Hover::snippet(format!("property graph {schema}.{name}")))
 }
 
 fn format_create_event_trigger(create_event_trigger: ast::CreateEventTrigger) -> Option<Hover> {
     let name = create_event_trigger.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("event trigger {}", name)))
+    Some(Hover::snippet(format!("event trigger {name}")))
 }
 
 fn format_create_tablespace(create_tablespace: ast::CreateTablespace) -> Option<Hover> {
     let name = create_tablespace.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("tablespace {}", name)))
+    Some(Hover::snippet(format!("tablespace {name}")))
 }
 
 fn format_create_database(create_database: ast::CreateDatabase) -> Option<Hover> {
     let name = create_database.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("database {}", name)))
+    Some(Hover::snippet(format!("database {name}")))
 }
 
 fn format_create_server(create_server: ast::CreateServer) -> Option<Hover> {
     let name = create_server.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("server {}", name)))
+    Some(Hover::snippet(format!("server {name}")))
 }
 
 fn format_create_extension(create_extension: ast::CreateExtension) -> Option<Hover> {
     let name = create_extension.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("extension {}", name)))
+    Some(Hover::snippet(format!("extension {name}")))
 }
 
 fn format_create_role(create_role: ast::CreateRole) -> Option<Hover> {
     let name = create_role.name()?.syntax().text().to_string();
-    Some(Hover::snippet(format!("role {}", name)))
+    Some(Hover::snippet(format!("role {name}")))
 }
 
-fn index_schema(db: &dyn Db, file: File, create_index: ast::CreateIndex) -> Option<String> {
-    let position = create_index.syntax().text_range().start();
-    bind(db, file)
+fn index_schema(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> Option<String> {
+    let position = create_index.value.syntax().text_range().start();
+    bind(db, create_index.file_id)
         .search_path_at(position)
         .first()
         .map(|s| s.to_string())
 }
 
-fn format_create_type(db: &dyn Db, file: File, create_type: ast::CreateType) -> Option<Hover> {
+fn format_create_type(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Option<Hover> {
+    let file = create_type.file_id;
+    let create_type = create_type.value;
     let path = create_type.path()?;
-    let (schema, type_name) = resolve::resolve_type_info(db, file, &path)?;
+    let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(file, &path))?;
 
-    if let Some(variant_list) = create_type.variant_list() {
+    let snippet = if let Some(variant_list) = create_type.variant_list() {
         let variants = variant_list.syntax().text().to_string();
-        return Some(Hover::snippet(format!(
-            "type {}.{} as enum {}",
-            schema, type_name, variants
-        )));
-    }
-
-    if let Some(column_list) = create_type.column_list() {
+        format!("type {schema}.{type_name} as enum {variants}")
+    } else if let Some(column_list) = create_type.column_list() {
         let columns = column_list.syntax().text().to_string();
-        return Some(Hover::snippet(format!(
-            "type {}.{} as {}",
-            schema, type_name, columns
-        )));
-    }
-
-    if let Some(attribute_list) = create_type.attribute_list() {
+        format!("type {schema}.{type_name} as {columns}")
+    } else if let Some(attribute_list) = create_type.attribute_list() {
         let attributes = attribute_list.syntax().text().to_string();
-        return Some(Hover::snippet(format!(
-            "type {}.{} {}",
-            schema, type_name, attributes
-        )));
-    }
+        format!("type {schema}.{type_name} {attributes}")
+    } else {
+        format!("type {schema}.{type_name}")
+    };
 
-    Some(Hover::snippet(format!("type {}.{}", schema, type_name)))
+    Some(hover_with_preceding_comment(snippet, create_type.syntax()))
 }
 
 fn hover_schema(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -1238,7 +1432,7 @@ fn create_schema_name(create_schema: ast::CreateSchema) -> Option<String> {
 
 fn format_create_schema(create_schema: ast::CreateSchema) -> Option<Hover> {
     let schema_name = create_schema_name(create_schema)?;
-    Some(Hover::snippet(format!("schema {}", schema_name)))
+    Some(Hover::snippet(format!("schema {schema_name}")))
 }
 
 fn hover_function(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -1246,7 +1440,7 @@ fn hover_function(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreateFunction::cast)?;
-    format_create_function(db, def.file, create_function)
+    format_create_function(db, InFile::new(def.file, create_function))
 }
 
 fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -1258,7 +1452,8 @@ fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
     for ancestor in def_node.ancestors() {
         if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
             let path = create_function.path()?;
-            let (schema, function_name) = resolve::resolve_function_info(db, def.file, &path)?;
+            let (schema, function_name) =
+                resolve::resolve_function_info(db, InFile::new(def.file, &path))?;
             return Some(format_param_hover(
                 schema,
                 function_name,
@@ -1268,7 +1463,8 @@ fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
         }
         if let Some(create_procedure) = ast::CreateProcedure::cast(ancestor.clone()) {
             let path = create_procedure.path()?;
-            let (schema, procedure_name) = resolve::resolve_procedure_info(db, def.file, &path)?;
+            let (schema, procedure_name) =
+                resolve::resolve_procedure_info(db, InFile::new(def.file, &path))?;
             return Some(format_param_hover(
                 schema,
                 procedure_name,
@@ -1278,7 +1474,8 @@ fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
         }
         if let Some(create_aggregate) = ast::CreateAggregate::cast(ancestor) {
             let path = create_aggregate.path()?;
-            let (schema, aggregate_name) = resolve::resolve_aggregate_info(db, def.file, &path)?;
+            let (schema, aggregate_name) =
+                resolve::resolve_aggregate_info(db, InFile::new(def.file, &path))?;
             return Some(format_param_hover(
                 schema,
                 aggregate_name,
@@ -1299,37 +1496,30 @@ fn format_param_hover(
 ) -> Hover {
     if let Some(param_type) = param_type {
         return Hover::snippet(format!(
-            "parameter {}.{}.{} {}",
-            schema, routine_name, param_name, param_type
+            "parameter {schema}.{routine_name}.{param_name} {param_type}"
         ));
     }
 
-    Hover::snippet(format!(
-        "parameter {}.{}.{}",
-        schema, routine_name, param_name
-    ))
+    Hover::snippet(format!("parameter {schema}.{routine_name}.{param_name}"))
 }
 
 fn format_create_function(
     db: &dyn Db,
-    file: File,
-    create_function: ast::CreateFunction,
+    create_function: InFile<ast::CreateFunction>,
 ) -> Option<Hover> {
+    let file = create_function.file_id;
+    let create_function = create_function.value;
     let path = create_function.path()?;
-    let (schema, function_name) = resolve::resolve_function_info(db, file, &path)?;
+    let (schema, function_name) = resolve::resolve_function_info(db, InFile::new(file, &path))?;
 
     let params = create_function.param_list()?.syntax().text().to_string();
     let return_type = create_function.ret_type()?.syntax().text().to_string();
-    let snippet = format!(
-        "function {}.{}{} {}",
-        schema, function_name, params, return_type
-    );
+    let snippet = format!("function {schema}.{function_name}{params} {return_type}");
 
-    if let Some(comment) = preceding_comment(create_function.syntax()) {
-        return Some(Hover::new(snippet, comment));
-    }
-
-    Some(Hover::snippet(snippet))
+    Some(hover_with_preceding_comment(
+        snippet,
+        create_function.syntax(),
+    ))
 }
 
 fn hover_aggregate(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -1337,23 +1527,23 @@ fn hover_aggregate(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreateAggregate::cast)?;
-    format_create_aggregate(db, def.file, create_aggregate)
+    format_create_aggregate(db, InFile::new(def.file, create_aggregate))
 }
 
 fn format_create_aggregate(
     db: &dyn Db,
-    file: File,
-    create_aggregate: ast::CreateAggregate,
+    create_aggregate: InFile<ast::CreateAggregate>,
 ) -> Option<Hover> {
+    let file = create_aggregate.file_id;
+    let create_aggregate = create_aggregate.value;
     let path = create_aggregate.path()?;
-    let (schema, aggregate_name) = resolve::resolve_aggregate_info(db, file, &path)?;
+    let (schema, aggregate_name) = resolve::resolve_aggregate_info(db, InFile::new(file, &path))?;
 
     let param_list = create_aggregate.param_list()?;
     let params = param_list.syntax().text().to_string();
 
     Some(Hover::snippet(format!(
-        "aggregate {}.{}{}",
-        schema, aggregate_name, params
+        "aggregate {schema}.{aggregate_name}{params}"
     )))
 }
 
@@ -1362,36 +1552,36 @@ fn hover_procedure(db: &dyn Db, def: Location) -> Option<Hover> {
         .to_node(db)?
         .ancestors()
         .find_map(ast::CreateProcedure::cast)?;
-    format_create_procedure(db, def.file, create_procedure)
+    format_create_procedure(db, InFile::new(def.file, create_procedure))
 }
 
 fn format_create_procedure(
     db: &dyn Db,
-    file: File,
-    create_procedure: ast::CreateProcedure,
+    create_procedure: InFile<ast::CreateProcedure>,
 ) -> Option<Hover> {
+    let file = create_procedure.file_id;
+    let create_procedure = create_procedure.value;
     let path = create_procedure.path()?;
-    let (schema, procedure_name) = resolve::resolve_procedure_info(db, file, &path)?;
+    let (schema, procedure_name) = resolve::resolve_procedure_info(db, InFile::new(file, &path))?;
 
     let param_list = create_procedure.param_list()?;
     let params = param_list.syntax().text().to_string();
 
     Some(Hover::snippet(format!(
-        "procedure {}.{}{}",
-        schema, procedure_name, params
+        "procedure {schema}.{procedure_name}{params}"
     )))
 }
 
 fn hover_routine(db: &dyn Db, def: Location) -> Option<Hover> {
     for ancestor in def.to_node(db)?.ancestors() {
         if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
-            return format_create_function(db, def.file, create_function);
+            return format_create_function(db, InFile::new(def.file, create_function));
         }
         if let Some(create_aggregate) = ast::CreateAggregate::cast(ancestor.clone()) {
-            return format_create_aggregate(db, def.file, create_aggregate);
+            return format_create_aggregate(db, InFile::new(def.file, create_aggregate));
         }
         if let Some(create_procedure) = ast::CreateProcedure::cast(ancestor) {
-            return format_create_procedure(db, def.file, create_procedure);
+            return format_create_procedure(db, InFile::new(def.file, create_procedure));
         }
     }
 
@@ -1400,9 +1590,10 @@ fn hover_routine(db: &dyn Db, def: Location) -> Option<Hover> {
 
 fn qualified_star_table_ptr(
     db: &dyn Db,
-    file: File,
-    field_expr: ast::FieldExpr,
+    field_expr: InFile<ast::FieldExpr>,
 ) -> Option<SyntaxNodePtr> {
+    let file = field_expr.file_id;
+    let field_expr = field_expr.value;
     let table_name = resolve::qualified_star_table_name(&field_expr)?;
     let position = field_expr.syntax().text_range().start();
     let target = field_expr
@@ -1424,14 +1615,10 @@ fn qualified_star_table_ptr(
             let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
 
             let name_ref = from_item.name_ref();
-            if let Some((table_like_ptr, _kind)) = resolve::resolve_table_like(
-                db,
-                file,
-                name_ref.as_ref(),
-                &table_name,
-                &schema,
-                position,
-            ) {
+            let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+            if let Some((table_like_ptr, _kind)) =
+                resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
+            {
                 return Some(table_like_ptr);
             }
 
@@ -1443,23 +1630,25 @@ fn qualified_star_table_ptr(
         ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path()?,
     };
 
-    table_or_view_or_cte_ptrs(db, file, position, &path)?
+    table_or_view_or_cte_ptrs(db, InFile::new(file, &path), position)?
         .into_iter()
         .next()
 }
 
 fn table_or_view_or_cte_ptrs(
     db: &dyn Db,
-    file: File,
+    path: InFile<&ast::Path>,
     position: TextSize,
-    path: &ast::Path,
 ) -> Option<Vec<SyntaxNodePtr>> {
+    let file = path.file_id;
+    let path = path.value;
     let (schema, table_name) = name::schema_and_name_path(path)?;
     let mut results = vec![];
     let name_ref = path.segment().and_then(|x| x.name_ref());
+    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
 
     if let Some((table_like_ptr, _kind)) =
-        resolve::resolve_table_like(db, file, name_ref.as_ref(), &table_name, &schema, position)
+        resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
     {
         results.push(table_like_ptr);
     }
@@ -1472,15 +1661,16 @@ fn table_or_view_or_cte_ptrs(
 
 fn unqualified_star_table_ptrs(
     db: &dyn Db,
-    file: File,
-    target: &ast::Target,
+    target: InFile<&ast::Target>,
 ) -> Option<Vec<SyntaxNodePtr>> {
+    let file = target.file_id;
+    let target = target.value;
     target.star_token()?;
 
     let path = match ast_nav::target_parent_query(target.clone())? {
         ast_nav::ParentQuery::Select(select) => {
             let from_clause = select.from_clause()?;
-            let results = resolve::table_ptrs_from_clause(db, file, &from_clause);
+            let results = resolve::table_ptrs_from_clause(db, InFile::new(file, &from_clause));
             if results.is_empty() {
                 return None;
             }
@@ -1493,20 +1683,21 @@ fn unqualified_star_table_ptrs(
     }?;
 
     let position = target.syntax().text_range().start();
-    table_or_view_or_cte_ptrs(db, file, position, &path)
+    table_or_view_or_cte_ptrs(db, InFile::new(file, &path), position)
 }
 
 fn unqualified_star_in_arg_list_ptrs(
     db: &dyn Db,
-    file: File,
-    arg_list: &ast::ArgList,
+    arg_list: InFile<&ast::ArgList>,
 ) -> Option<Vec<SyntaxNodePtr>> {
+    let file = arg_list.file_id;
+    let arg_list = arg_list.value;
     let from_clause = arg_list
         .syntax()
         .ancestors()
         .find_map(ast::Select::cast)?
         .from_clause()?;
-    let results = resolve::table_ptrs_from_clause(db, file, &from_clause);
+    let results = resolve::table_ptrs_from_clause(db, InFile::new(file, &from_clause));
 
     if results.is_empty() {
         return None;
@@ -1517,12 +1708,13 @@ fn unqualified_star_in_arg_list_ptrs(
 
 #[cfg(test)]
 mod test {
-    use crate::db::{Database, File};
+
     use crate::hover::hover;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
 
+    #[must_use]
     #[track_caller]
     fn check_hover(sql: &str) -> String {
         check_hover_(sql).expect("should find hover information")
@@ -1530,21 +1722,16 @@ mod test {
 
     #[track_caller]
     fn check_hover_(sql: &str) -> Option<String> {
-        let db = Database::default();
-        let (mut offset, sql) = fixture(sql);
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let file = File::new(&db, sql.clone().into());
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
-
-        if let Some(type_info) = hover(&db, file, offset) {
-            let offset_usize: usize = offset.into();
+        let fixture = Fixture::new(sql);
+        let marker = fixture.marker();
+        let offset = marker.offset_before();
+        let db = fixture.db();
+        if let Some(type_info) = hover(db, offset) {
             let title = format!("hover: {}", type_info.snippet);
             let group = Level::INFO.primary_title(&title).element(
-                Snippet::source(&sql).fold(true).annotation(
-                    AnnotationKind::Context
-                        .span(offset_usize..offset_usize + 1)
-                        .label("hover"),
-                ),
+                Snippet::source(offset.file_id.content(db).as_ref())
+                    .fold(true)
+                    .annotation(AnnotationKind::Context.span(marker.range()).label("hover")),
             );
             let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
             return Some(
@@ -1558,15 +1745,13 @@ mod test {
         None
     }
 
+    #[must_use]
     #[track_caller]
     fn check_hover_info(sql: &str) -> super::Hover {
-        let db = Database::default();
-        let (mut offset, sql) = fixture(sql);
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let file = File::new(&db, sql.into());
-        assert_eq!(crate::db::parse(&db, file).errors(), vec![]);
+        let fixture = Fixture::new(sql);
+        let offset = fixture.marker().offset_before();
 
-        hover(&db, file, offset).expect("should find hover information")
+        hover(fixture.db(), offset).expect("should find hover information")
     }
 
     #[test]
@@ -2177,6 +2362,104 @@ select foo$0();
     }
 
     #[test]
+    fn hover_type_extracts_preceding_comment() {
+        let hover = check_hover_info(
+            "
+-- this is a doc comment
+-- for foo
+create type foo as enum ('a', 'b');
+select 1::foo$0;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        type public.foo as enum ('a', 'b')
+        ```
+        ---
+        this is a doc comment
+        for foo
+        ");
+    }
+
+    #[test]
+    fn hover_bigint_extracts_preceding_comment_from_int8_definition() {
+        let hover = check_hover_info(
+            "
+-- 64-bit integer
+create type pg_catalog.int8;
+select 1::bigint$0;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        type pg_catalog.int8
+        ```
+        ---
+        64-bit integer
+        ");
+    }
+
+    #[test]
+    fn hover_text_type() {
+        let hover = check_hover_info(
+            "
+-- variable-length string, no limit specified
+--
+-- size: -1, align: 4
+create type pg_catalog.text;
+select '1'::text$0;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        type pg_catalog.text
+        ```
+        ---
+        variable-length string, no limit specified
+        size: -1, align: 4
+        ");
+    }
+
+    #[test]
+    fn hover_column_extracts_preceding_comment() {
+        let hover = check_hover_info(
+            "
+create table users(
+  -- email address
+  email text
+);
+select email$0 from users;
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        column public.users.email text
+        ```
+        ---
+        email address
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_column_extracts_preceding_comment() {
+        let hover = check_hover_info(
+            "
+create table users(
+  -- email address
+  email$0 text
+);
+",
+        );
+        assert_snapshot!(hover.markdown(), @"
+        ```sql
+        column public.users.email text
+        ```
+        ---
+        email address
+        ");
+    }
+
+    #[test]
     fn hover_on_drop_function_with_search_path() {
         assert_snapshot!(check_hover(r#"
 set search_path to myschema;
@@ -2354,11 +2637,12 @@ select add$0(1, 2);
     #[test]
     fn hover_on_builtin_function_call() {
         assert_snapshot!(check_hover("
+-- include-builtins
 select now$0();
-"), @r"
+"), @"
         hover: function pg_catalog.now() returns timestamp with time zone
           ╭▸ 
-        2 │ select now();
+        3 │ select now();
           ╰╴         ─ hover
         ");
     }
@@ -2555,8 +2839,8 @@ select t$0.a from (select 1 a) t;
     fn hover_on_subquery_qualified_column_ref() {
         assert_snapshot!(check_hover("
 select t.a$0 from (select 1 a) t;
-"), @r"
-        hover: column t.a
+"), @"
+        hover: column t.a integer
           ╭▸ 
         2 │ select t.a from (select 1 a) t;
           ╰╴         ─ hover
@@ -2568,7 +2852,7 @@ select t.a$0 from (select 1 a) t;
         assert_snapshot!(check_hover("
 select a$0 from (select 1 a) t;
 "), @"
-        hover: column t.a
+        hover: column t.a integer
           ╭▸ 
         2 │ select a from (select 1 a) t;
           ╰╴       ─ hover
@@ -3008,8 +3292,8 @@ select t$0 from t;
         assert_snapshot!(check_hover("
 with t as (select 1 a)
 select a$0 from t;
-"), @r"
-        hover: column t.a
+"), @"
+        hover: column t.a integer
           ╭▸ 
         3 │ select a from t;
           ╰╴       ─ hover
@@ -3021,8 +3305,8 @@ select a$0 from t;
         assert_snapshot!(check_hover("
 with t as (select 1 a, 2 b)
 select b$0 from t;
-"), @r"
-        hover: column t.b
+"), @"
+        hover: column t.b integer
           ╭▸ 
         3 │ select b from t;
           ╰╴       ─ hover
@@ -3034,8 +3318,8 @@ select b$0 from t;
         assert_snapshot!(check_hover("
 with t(a) as (select 1)
 select a$0 from t;
-"), @r"
-        hover: column t.a
+"), @"
+        hover: column t.a integer
           ╭▸ 
         3 │ select a from t;
           ╰╴       ─ hover
@@ -3048,8 +3332,8 @@ select a$0 from t;
 with x as (select 1 a),
      y as (select a from x)
 select a$0 from y;
-"), @r"
-        hover: column y.a
+"), @"
+        hover: column y.a integer
           ╭▸ 
         4 │ select a from y;
           ╰╴       ─ hover
@@ -3090,8 +3374,8 @@ with t as (
     values (1, 2), (3, 4)
 )
 select column1$0, column2 from t;
-"), @r"
-        hover: column t.column1
+"), @"
+        hover: column t.column1 integer
           ╭▸ 
         5 │ select column1, column2 from t;
           ╰╴             ─ hover
@@ -3105,8 +3389,8 @@ with t as (
     values (1, 2), (3, 4)
 )
 select column1, column2$0 from t;
-"), @r"
-        hover: column t.column2
+"), @"
+        hover: column t.column2 integer
           ╭▸ 
         5 │ select column1, column2 from t;
           ╰╴                      ─ hover
@@ -3120,8 +3404,8 @@ with t as (
     values (1), (2), (3)
 )
 select column1$0 from t;
-"), @r"
-        hover: column t.column1
+"), @"
+        hover: column t.column1 integer
           ╭▸ 
         5 │ select column1 from t;
           ╰╴             ─ hover
@@ -3135,8 +3419,8 @@ with t as (
     values (1, 2), (3, 4)
 )
 select COLUMN1$0, COLUMN2 from t;
-"), @r"
-        hover: column t.column1
+"), @"
+        hover: column t.column1 integer
           ╭▸ 
         5 │ select COLUMN1, COLUMN2 from t;
           ╰╴             ─ hover
@@ -3214,7 +3498,7 @@ select u$0.x, u.y from t as u(x, y);
 with t as (select 1 a, 2 b, 3 c)
 select u.x$0 from t as u(x, y);
 "), @"
-        hover: column u.x
+        hover: column u.x integer
           ╭▸ 
         3 │ select u.x from t as u(x, y);
           ╰╴         ─ hover
@@ -3266,9 +3550,9 @@ select z$0 from ((select * from t)) as z(x, y);
 with t as (select 1 a, 2 b, 3 c)
 select *$0 from t u(x, y);
 "), @"
-        hover: column u.x
-              column u.y
-              column u.c
+        hover: column u.x integer
+              column u.y integer
+              column u.c integer
           ╭▸ 
         3 │ select * from t u(x, y);
           ╰╴       ─ hover
@@ -3278,18 +3562,39 @@ select *$0 from t u(x, y);
     #[test]
     fn hover_on_cte_table_alias_with_partial_column_list_star_from_information_schema() {
         assert_snapshot!(check_hover("
+-- include-builtins
 with t as (select * from information_schema.sql_features)
 select *$0 from t u(x);
 "), @"
-        hover: column u.x
-              column u.feature_name
-              column u.sub_feature_id
-              column u.sub_feature_name
-              column u.is_supported
-              column u.is_verified_by
-              column u.comments
+        hover: column u.x character_data
+              column u.feature_name character_data
+              column u.sub_feature_id character_data
+              column u.sub_feature_name character_data
+              column u.is_supported yes_or_no
+              column u.is_verified_by character_data
+              column u.comments character_data
           ╭▸ 
-        3 │ select * from t u(x);
+        4 │ select * from t u(x);
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_cte_builtin_information_schema() {
+        assert_snapshot!(check_hover("
+-- include-builtins
+with t as (select * from information_schema.sql_features) 
+select *$0 from t;
+"), @"
+        hover: column t.feature_id character_data
+              column t.feature_name character_data
+              column t.sub_feature_id character_data
+              column t.sub_feature_name character_data
+              column t.is_supported yes_or_no
+              column t.is_verified_by character_data
+              column t.comments character_data
+          ╭▸ 
+        4 │ select * from t;
           ╰╴       ─ hover
         ");
     }
@@ -3300,9 +3605,9 @@ select *$0 from t u(x);
 with t as (select 1 a, 2 b, 3 c)
 select u.*$0 from t u(x, y);
 "), @"
-        hover: column u.x
-              column u.y
-              column u.c
+        hover: column u.x integer
+              column u.y integer
+              column u.c integer
           ╭▸ 
         3 │ select u.* from t u(x, y);
           ╰╴         ─ hover
@@ -3358,9 +3663,9 @@ select *$0 from (select a from t);
         assert_snapshot!(check_hover("
 with t as (select 1 a, 2 b)
 select *$0 from (table t);
-"), @r"
-        hover: column a
-              column b
+"), @"
+        hover: column a integer
+              column b integer
           ╭▸ 
         3 │ select * from (table t);
           ╰╴       ─ hover
@@ -3370,6 +3675,7 @@ select *$0 from (table t);
     #[test]
     fn hover_on_star_from_information_schema_table() {
         assert_snapshot!(check_hover("
+-- include-builtins
 select *$0 from information_schema.sql_features;
 "), @"
         hover: column information_schema.sql_features.feature_id character_data
@@ -3380,7 +3686,7 @@ select *$0 from information_schema.sql_features;
               column information_schema.sql_features.is_verified_by character_data
               column information_schema.sql_features.comments character_data
           ╭▸ 
-        2 │ select * from information_schema.sql_features;
+        3 │ select * from information_schema.sql_features;
           ╰╴       ─ hover
         ");
     }
@@ -3389,8 +3695,8 @@ select *$0 from information_schema.sql_features;
     fn hover_on_star_with_subquery_literal() {
         assert_snapshot!(check_hover("
 select *$0 from (select 1);
-"), @r"
-        hover: column ?column?
+"), @"
+        hover: column ?column? integer
           ╭▸ 
         2 │ select * from (select 1);
           ╰╴       ─ hover
@@ -3401,8 +3707,8 @@ select *$0 from (select 1);
     fn hover_on_star_with_subquery_literal_with_alias() {
         assert_snapshot!(check_hover("
 select *$0 from (select 1) as sub;
-"), @r"
-        hover: column sub.?column?
+"), @"
+        hover: column sub.?column? integer
           ╭▸ 
         2 │ select * from (select 1) as sub;
           ╰╴       ─ hover
@@ -3410,12 +3716,12 @@ select *$0 from (select 1) as sub;
     }
 
     #[test]
-    fn hover_on_view_inferred_column_anme() {
+    fn hover_on_view_inferred_column_name() {
         assert_snapshot!(check_hover(r#"
 create view v as select 1;
 select "?column?"$0 from v;
 "#), @r#"
-        hover: column public.v.?column?
+        hover: column public.v.?column? integer
           ╭▸ 
         3 │ select "?column?" from v;
           ╰╴                ─ hover
@@ -3428,7 +3734,7 @@ select "?column?"$0 from v;
 with x as (select 1)
 select "?column?"$0 from x;
 "#), @r#"
-        hover: column x.?column?
+        hover: column x.?column? integer
           ╭▸ 
         3 │ select "?column?" from x;
           ╰╴                ─ hover
@@ -3441,7 +3747,7 @@ select "?column?"$0 from x;
 create table t as select 1;
 select "?column?"$0 from t;
 "#), @r#"
-        hover: column public.t.?column?
+        hover: column public.t.?column? integer
           ╭▸ 
         3 │ select "?column?" from t;
           ╰╴                ─ hover
@@ -3465,7 +3771,7 @@ select "?column?"$0 from (select 1);
         assert_snapshot!(check_hover(r#"
 select sub."?column?"$0 from (select 1) sub;
 "#), @r#"
-        hover: column sub.?column?
+        hover: column sub.?column? integer
           ╭▸ 
         2 │ select sub."?column?" from (select 1) sub;
           ╰╴                    ─ hover
@@ -3914,8 +4220,8 @@ with new_data as (
     select 1 as id, 'new@example.com' as email
 )
 update users set email = new_data.email$0 from new_data where users.id = new_data.id;
-"), @r"
-        hover: column new_data.email
+"), @"
+        hover: column new_data.email text
           ╭▸ 
         6 │ update users set email = new_data.email from new_data where users.id = new_data.id;
           ╰╴                                      ─ hover
@@ -3930,8 +4236,8 @@ with new_data as (
     select 1 as id, 'new@example.com' as email
 )
 update users set email = new_data.email from new_data where new_data.id$0 = users.id;
-"), @r"
-        hover: column new_data.id
+"), @"
+        hover: column new_data.id integer
           ╭▸ 
         6 │ update users set email = new_data.email from new_data where new_data.id = users.id;
           ╰╴                                                                      ─ hover
@@ -3942,7 +4248,7 @@ update users set email = new_data.email from new_data where new_data.id$0 = user
     fn hover_on_create_view_definition() {
         assert_snapshot!(check_hover("
 create view v$0 as select 1;
-"), @r"
+"), @"
         hover: view public.v as select 1
           ╭▸ 
         2 │ create view v as select 1;
@@ -3954,7 +4260,7 @@ create view v$0 as select 1;
     fn hover_on_create_view_definition_with_schema() {
         assert_snapshot!(check_hover("
 create view myschema.v$0 as select 1;
-"), @r"
+"), @"
         hover: view myschema.v as select 1
           ╭▸ 
         2 │ create view myschema.v as select 1;
@@ -3966,7 +4272,7 @@ create view myschema.v$0 as select 1;
     fn hover_on_create_temp_view_definition() {
         assert_snapshot!(check_hover("
 create temp view v$0 as select 1;
-"), @r"
+"), @"
         hover: view pg_temp.v as select 1
           ╭▸ 
         2 │ create temp view v as select 1;
@@ -3978,11 +4284,26 @@ create temp view v$0 as select 1;
     fn hover_on_create_view_with_column_list() {
         assert_snapshot!(check_hover("
 create view v(col1$0) as select 1;
-"), @r"
-        hover: column public.v.col1
+"), @"
+        hover: column public.v.col1 integer
           ╭▸ 
         2 │ create view v(col1) as select 1;
           ╰╴                 ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_on_create_view_create_table_select_col() {
+        assert_snapshot!(check_hover("
+create table t(a bigint); 
+create view v as
+  select a from t;
+select a$0 from v;
+"), @"
+        hover: column public.v.a bigint
+          ╭▸ 
+        5 │ select a from v;
+          ╰╴       ─ hover
         ");
     }
 
@@ -3991,7 +4312,7 @@ create view v(col1$0) as select 1;
         assert_snapshot!(check_hover("
 create view v as select 1;
 select * from v$0;
-"), @r"
+"), @"
         hover: view public.v as select 1
           ╭▸ 
         3 │ select * from v;
@@ -4004,8 +4325,8 @@ select * from v$0;
         assert_snapshot!(check_hover("
 create view v(a) as select 1;
 select a$0 from v;
-"), @r"
-        hover: column public.v.a
+"), @"
+        hover: column public.v.a integer
           ╭▸ 
         3 │ select a from v;
           ╰╴       ─ hover
@@ -4017,8 +4338,8 @@ select a$0 from v;
         assert_snapshot!(check_hover("
 create view v(a) as select 1, 2 b;
 select a, b$0 from v;
-"), @r"
-        hover: column public.v.b
+"), @"
+        hover: column public.v.b integer
           ╭▸ 
         3 │ select a, b from v;
           ╰╴          ─ hover
@@ -4030,8 +4351,8 @@ select a, b$0 from v;
         assert_snapshot!(check_hover("
 create view v as select 1 a, 2 b;
 select a$0, b from v;
-"), @r"
-        hover: column public.v.a
+"), @"
+        hover: column public.v.a integer
           ╭▸ 
         3 │ select a, b from v;
           ╰╴       ─ hover
@@ -4043,8 +4364,8 @@ select a$0, b from v;
         assert_snapshot!(check_hover("
 create table t as select 1 a;
 select a$0 from t;
-"), @r"
-        hover: column public.t.a
+"), @"
+        hover: column public.t.a integer
           ╭▸ 
         3 │ select a from t;
           ╰╴       ─ hover
@@ -4069,7 +4390,7 @@ select a from t$0;
         assert_snapshot!(check_hover("
 create view myschema.v as select 1;
 select * from myschema.v$0;
-"), @r"
+"), @"
         hover: view myschema.v as select 1
           ╭▸ 
         3 │ select * from myschema.v;
@@ -4082,7 +4403,7 @@ select * from myschema.v$0;
         assert_snapshot!(check_hover("
 create view v as select 1;
 drop view v$0;
-"), @r"
+"), @"
         hover: view public.v as select 1
           ╭▸ 
         3 │ drop view v;
@@ -4262,7 +4583,7 @@ alter table users alter email$0 set not null;
         assert_snapshot!(check_hover("
 create materialized view mv as select 1;
 refresh materialized view mv$0;
-"), @r"
+"), @"
         hover: materialized view public.mv as select 1
           ╭▸ 
         3 │ refresh materialized view mv;
@@ -4316,11 +4637,62 @@ merged as (
 )
 select *$0 from merged;
 "), @r"
-        hover: column merged.x
-              column merged.y
+        hover: column merged.x int
+              column merged.y int
            ╭▸ 
         16 │ select * from merged;
            ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_cte_insert_returning_aliased_column() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+with inserted as (
+  insert into t values (1, 2)
+  returning a as x, b as y
+)
+select x$0 from inserted;
+"), @r"
+        hover: column inserted.x int
+          ╭▸ 
+        7 │ select x from inserted;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_cte_update_returning_aliased_column() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+with updated as (
+  update t set a = 42
+  returning a as x, b as y
+)
+select x$0 from updated;
+"), @r"
+        hover: column updated.x int
+          ╭▸ 
+        7 │ select x from updated;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_cte_delete_returning_aliased_column() {
+        assert_snapshot!(check_hover("
+create table t(a int, b int);
+with deleted as (
+  delete from t
+  returning a as x, b as y
+)
+select x$0 from deleted;
+"), @r"
+        hover: column deleted.x int
+          ╭▸ 
+        7 │ select x from deleted;
+          ╰╴       ─ hover
         ");
     }
 
@@ -4587,6 +4959,78 @@ select *$0 from u;
     }
 
     #[test]
+    fn hover_create_table_inherits_builtin_star() {
+        assert_snapshot!(check_hover_info("
+-- include-builtins
+create table t ()
+inherits (information_schema.sql_features);
+select *$0 from t;
+").snippet, @"
+        column public.t.feature_id character_data
+        column public.t.feature_name character_data
+        column public.t.sub_feature_id character_data
+        column public.t.sub_feature_name character_data
+        column public.t.is_supported yes_or_no
+        column public.t.is_verified_by character_data
+        column public.t.comments character_data
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_like_builtin_star() {
+        assert_snapshot!(check_hover_info("
+-- include-builtins
+create table t (like information_schema.sql_features);
+select *$0 from t;
+").snippet, @"
+        column public.t.feature_id character_data
+        column public.t.feature_name character_data
+        column public.t.sub_feature_id character_data
+        column public.t.sub_feature_name character_data
+        column public.t.is_supported yes_or_no
+        column public.t.is_verified_by character_data
+        column public.t.comments character_data
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_create_table_as_star() {
+        assert_snapshot!(check_hover_info("
+create table parent as select 1 a, 'x'::text b;
+create table child (c int) inherits (parent);
+select *$0 from child;
+").snippet, @"
+        column public.child.a integer
+        column public.child.b text
+        column public.child.c int
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_like_select_into_star() {
+        assert_snapshot!(check_hover_info("
+select 1 a, 'x'::text b into parent;
+create table child (like parent);
+select *$0 from child;
+").snippet, @"
+        column public.child.a integer
+        column public.child.b text
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_like_view_star() {
+        assert_snapshot!(check_hover_info("
+create view parent as select 1 a, 'x'::text b;
+create table child (like parent);
+select *$0 from child;
+").snippet, @"
+        column public.child.a integer
+        column public.child.b text
+        ");
+    }
+
+    #[test]
     fn hover_create_table_inherits_column() {
         assert_snapshot!(check_hover("
 create table t (
@@ -4601,6 +5045,21 @@ select a$0 from u;
           ╭▸ 
         8 │ select a from u;
           ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_create_table_inherits_builtin_column() {
+        assert_snapshot!(check_hover("
+-- include-builtins
+create table t ()
+inherits (information_schema.sql_features);
+select feature_name$0 from t;
+"), @"
+        hover: column information_schema.sql_features.feature_name information_schema.character_data
+          ╭▸ 
+        5 │ select feature_name from t;
+          ╰╴                  ─ hover
         ");
     }
 
@@ -4769,7 +5228,7 @@ create tablespace t owner read$0er location 'foo';
         assert_snapshot!(check_hover("
 declare c scroll cursor for select * from t;
 fetch forward 5 from c$0;
-"), @r"
+"), @"
         hover: cursor c for select * from t
           ╭▸ 
         3 │ fetch forward 5 from c;
@@ -4782,7 +5241,7 @@ fetch forward 5 from c$0;
         assert_snapshot!(check_hover("
 declare c scroll cursor for select * from t;
 close c$0;
-"), @r"
+"), @"
         hover: cursor c for select * from t
           ╭▸ 
         3 │ close c;
@@ -4795,7 +5254,7 @@ close c$0;
         assert_snapshot!(check_hover("
 declare c scroll cursor for select * from t;
 move forward 10 from c$0;
-"), @r"
+"), @"
         hover: cursor c for select * from t
           ╭▸ 
         3 │ move forward 10 from c;
@@ -4807,7 +5266,7 @@ move forward 10 from c$0;
     fn hover_on_prepare_statement() {
         assert_snapshot!(check_hover("
 prepare stmt$0 as select 1;
-"), @r"
+"), @"
         hover: prepare stmt as select 1
           ╭▸ 
         2 │ prepare stmt as select 1;
@@ -4820,7 +5279,7 @@ prepare stmt$0 as select 1;
         assert_snapshot!(check_hover("
 prepare stmt as select 1;
 execute stmt$0;
-"), @r"
+"), @"
         hover: prepare stmt as select 1
           ╭▸ 
         3 │ execute stmt;
@@ -4833,7 +5292,7 @@ execute stmt$0;
         assert_snapshot!(check_hover("
 prepare stmt as select 1;
 deallocate stmt$0;
-"), @r"
+"), @"
         hover: prepare stmt as select 1
           ╭▸ 
         3 │ deallocate stmt;
@@ -4914,6 +5373,307 @@ alter property graph foo.ba$0r rename to baz;
           ╭▸ 
         3 │ alter property graph foo.bar rename to baz;
           ╰╴                          ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string() {
+        assert_snapshot!(check_hover_info(r"
+select e'fo$0o\nbar';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal (truncated up to newline): ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string_with_tab() {
+        assert_snapshot!(check_hover_info(r"
+select e'a\tb$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` a	b `
+        ");
+    }
+
+    #[test]
+    fn hover_esc_string_hex_byte_sequence_utf8() {
+        assert_snapshot!(check_hover_info(r"
+select e'\xC3\xA$09';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` é `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string() {
+        assert_snapshot!(check_hover_info(r"
+select U&'\0061\0308b$0c';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` äbc `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string_with_uescape() {
+        assert_snapshot!(check_hover_info(r"
+select U&'!0061!0062$0' uescape '!';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ab `
+        ");
+    }
+
+    #[test]
+    fn hover_string_continuation() {
+        assert_snapshot!(check_hover_info(r"
+select e'foo$0'
+'\nbar';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal (truncated up to newline): ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_unicode_esc_string_continuation() {
+        assert_snapshot!(check_hover_info(r"
+select U&'\0061'
+'\006$02';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ab `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_no_escape() {
+        assert_snapshot!(check_hover_info(r"
+select 'foo$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_escaped_quotes() {
+        assert_snapshot!(check_hover_info(r"
+select '''$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` ' `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_doubled_quote() {
+        assert_snapshot!(check_hover_info(r"
+select 'it''$0s';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` it's `
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_backtick() {
+        assert_snapshot!(check_hover_info(r"
+select 'a`$0b';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` a`b ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_leading_backtick() {
+        assert_snapshot!(check_hover_info(r"
+select '`$0hello';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` `hello ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_backticks() {
+        assert_snapshot!(check_hover_info(r"
+select '`foo`$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: `` `foo` ``
+        ");
+    }
+
+    #[test]
+    fn hover_plain_string_with_consecutive_backticks() {
+        assert_snapshot!(check_hover_info(r"
+select 'a``$0b';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ``` a``b ```
+        ");
+    }
+
+    #[test]
+    fn hover_dollar_quoted_string() {
+        assert_snapshot!(check_hover_info(r"
+select $$he$0llo$$;
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` hello `
+        ");
+    }
+
+    #[test]
+    fn hover_bit_string() {
+        assert_snapshot!(check_hover_info(r"
+select b'10$010';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'A'|b'1010' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string() {
+        assert_snapshot!(check_hover_info(r"
+select x'1A$03F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'1A3F'|b'0001101000111111' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_empty() {
+        assert_snapshot!(check_hover_info(r"
+select x'$0';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x''|b'' `
+        ");
+    }
+
+    #[test]
+    fn hover_bit_string_empty() {
+        assert_snapshot!(check_hover_info(r"
+select b'$0';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x''|b'' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_short() {
+        assert_snapshot!(check_hover_info(r"
+select x'F$0F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'FF'|b'11111111' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_preserves_hex_width() {
+        assert_snapshot!(check_hover_info(r"
+select x'0F$0F';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'0FF'|b'000011111111' `
+        ");
+    }
+
+    #[test]
+    fn hover_bit_string_preserves_binary_width() {
+        assert_snapshot!(check_hover_info(r"
+select b'0$00';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'0'|b'00' `
+        ");
+    }
+
+    #[test]
+    fn hover_byte_string_large() {
+        assert_snapshot!(check_hover_info(r"
+select x'10000000000000000000000000000000$00';
+").markdown(), @"
+        ```sql
+        bit
+        ```
+        ---
+        value of literal: ` x'100000000000000000000000000000000'|b'000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' `
         ");
     }
 }

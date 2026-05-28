@@ -5,7 +5,7 @@ input_file: crates/squawk_parser/tests/data/ok/repack.sql
 SOURCE_FILE
   REPACK
     REPACK_KW "repack"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REPACK
     REPACK_KW "repack"
@@ -14,7 +14,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       INDEX_KW "index"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REPACK
     REPACK_KW "repack"
@@ -26,7 +26,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "idx"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -74,5 +74,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "idx"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

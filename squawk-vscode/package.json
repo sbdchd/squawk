@@ -12,7 +12,7 @@
   "icon": "icon.png",
   "author": "Squawk Team & Contributors",
   "license": "(Apache-2.0 OR MIT)",
-  "version": "2.49.0",
+  "version": "2.55.0",
   "engines": {
     "vscode": "^1.101.0"
   },
@@ -125,21 +125,19 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "node esbuild.js --production",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "pnpm run compile-tests && pnpm run compile",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "pnpm run test:grammar",
+    "test:grammar": "pnpm run test:syntax && pnpm run test:snap",
+    "test:snap": "vscode-tmgrammar-snap 'test/snap/**/*.sql'",
+    "test:snap:update": "vscode-tmgrammar-snap --updateSnapshot 'test/snap/**/*.sql'",
+    "test:syntax": "vscode-tmgrammar-test 'test/syntax/**/*.sql'"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.101.0",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
     "@vscode/vsce": "^3.6.0",
     "esbuild": "^0.25.9",
     "eslint": "^9.34.0",
@@ -148,7 +146,8 @@
     "ovsx": "^0.10.5",
     "oxfmt": "^0.44.0",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.41.0"
+    "typescript-eslint": "^8.41.0",
+    "vscode-tmgrammar-test": "^0.1.3"
   },
   "volta": {
     "node": "20.19.0",

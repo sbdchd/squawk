@@ -1,13 +1,39 @@
-use crate::db::{File, parse};
+use crate::db::parse;
+use crate::file::InFile;
 use crate::goto_definition;
 use crate::location::Location;
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::{
+    SyntaxNode,
+    ast::{self, AstNode},
+};
 
-#[salsa::tracked]
-pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Location> {
-    let targets = goto_definition::goto_definition(db, file, offset);
+fn is_reference_node(node: &SyntaxNode) -> bool {
+    if ast::NameRef::can_cast(node.kind()) {
+        return true;
+    }
+
+    if let Some(ty) = ast::Type::cast(node.clone()) {
+        return match ty {
+            ast::Type::BitType(_)
+            | ast::Type::CharType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::IntervalType(_)
+            | ast::Type::TimeType(_) => true,
+            ast::Type::ArrayType(_)
+            | ast::Type::ExprType(_)
+            | ast::Type::PathType(_)
+            | ast::Type::PercentType(_) => false,
+        };
+    }
+
+    false
+}
+
+pub fn find_references(db: &dyn Db, position: InFile<TextSize>) -> Vec<Location> {
+    let file = position.file_id;
+    let targets = goto_definition::goto_definition(db, position);
     let Some(first) = targets.first() else {
         return vec![];
     };
@@ -18,10 +44,10 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
         .tree()
         .syntax()
         .descendants()
-        .filter(|x| ast::NameRef::can_cast(x.kind()))
+        .filter(is_reference_node)
     {
         let range = node.text_range();
-        let matches = goto_definition::goto_definition(db, file, range.start())
+        let matches = goto_definition::goto_definition(db, InFile::new(file, range.start()))
             .into_iter()
             .any(|location| targets.contains(&location));
         if matches {
@@ -39,28 +65,30 @@ pub fn find_references(db: &dyn Db, file: File, offset: TextSize) -> Vec<Locatio
 #[cfg(test)]
 mod test {
     use crate::builtins::builtins_file;
-    use crate::db::{Database, File};
+    use crate::db::File;
+
     use crate::find_references::find_references;
-    use crate::test_utils::fixture;
+    use crate::test_utils::Fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use rowan::TextRange;
     use rustc_hash::FxHashMap;
 
+    #[must_use]
     #[track_caller]
     fn find_refs(sql: &str) -> String {
-        let (mut offset, sql) = fixture(sql);
-        offset = offset.checked_sub(1.into()).unwrap_or_default();
-        let db = Database::default();
-        let current_file = File::new(&db, sql.clone().into());
-        assert_eq!(crate::db::parse(&db, current_file).errors(), vec![]);
+        let fixture = Fixture::new(sql);
+        let marker = fixture.marker();
+        let offset = marker.offset_before();
+        let query_span = marker.range();
+        let db = fixture.db();
+        let current_file = offset.file_id;
 
-        let references = find_references(&db, current_file, offset);
-        let offset_usize: usize = offset.into();
+        let references = find_references(db, offset);
 
         let mut file_paths = FxHashMap::default();
         file_paths.insert(current_file, "current.sql");
-        file_paths.insert(builtins_file(&db), "builtins.sql");
+        file_paths.insert(builtins_file(db), "builtins.sql");
 
         let mut refs_by_file: FxHashMap<File, Vec<(usize, TextRange)>> = FxHashMap::default();
         for (i, location) in references.iter().enumerate() {
@@ -72,15 +100,11 @@ mod test {
 
         let multi_file = refs_by_file.len() > 1 || !refs_by_file.contains_key(&current_file);
 
-        let mut snippet = Snippet::source(&sql).fold(true);
+        let mut snippet = Snippet::source(current_file.content(db).as_ref()).fold(true);
         if multi_file {
             snippet = snippet.path(*file_paths.get(&current_file).unwrap());
         }
-        snippet = snippet.annotation(
-            AnnotationKind::Context
-                .span(offset_usize..offset_usize + 1)
-                .label("0. query"),
-        );
+        snippet = snippet.annotation(AnnotationKind::Context.span(query_span).label("0. query"));
         if let Some(current_refs) = refs_by_file.remove(&current_file) {
             snippet = annotate_refs(snippet, current_refs);
         }
@@ -89,7 +113,7 @@ mod test {
 
         for (ref_file, refs) in refs_by_file {
             let path = file_paths.get(&ref_file).unwrap();
-            let other_snippet = Snippet::source(ref_file.content(&db).as_ref())
+            let other_snippet = Snippet::source(ref_file.content(db).as_ref())
                 .path(*path)
                 .fold(true);
             let other_snippet = annotate_refs(other_snippet, refs);
@@ -115,7 +139,7 @@ mod test {
             snippet = snippet.annotation(
                 AnnotationKind::Context
                     .span(range.into())
-                    .label(format!("{}. reference", label_index)),
+                    .label(format!("{label_index}. reference")),
             );
         }
         snippet
@@ -381,17 +405,18 @@ drop table foo_bar;
     #[test]
     fn builtin_function_references() {
         assert_snapshot!(find_refs("
+-- include-builtins
 select now$0();
 select now();
 "), @"
-              ╭▸ current.sql:2:8
+              ╭▸ current.sql:3:8
               │
-            2 │ select now();
+            3 │ select now();
               │        ┬─┬
               │        │ │
               │        │ 0. query
               │        1. reference
-            3 │ select now();
+            4 │ select now();
               │        ─── 2. reference
               ╰╴
 
@@ -399,6 +424,60 @@ select now();
               │
         11089 │ create function pg_catalog.now() returns timestamp with time zone
               ╰╴                           ─── 3. reference
+        ");
+    }
+
+    #[test]
+    fn bit() {
+        assert_snapshot!(find_refs("
+create type pg_catalog.bit$0;
+
+create function pg_catalog.bit(bigint, integer) returns bit
+  language internal;
+
+create function pg_catalog.bit(bit, integer, boolean) returns bit
+  language internal;
+
+create function pg_catalog.bit(integer, integer) returns bit
+  language internal;
+"), @"
+           ╭▸ 
+         2 │ create type pg_catalog.bit;
+           │                        ┬─┬
+           │                        │ │
+           │                        │ 0. query
+           │                        1. reference
+         3 │
+         4 │ create function pg_catalog.bit(bigint, integer) returns bit
+           │                                                         ─── 2. reference
+           ‡
+         7 │ create function pg_catalog.bit(bit, integer, boolean) returns bit
+           │                                ─── 3. reference               ─── 4. reference
+           ‡
+        10 │ create function pg_catalog.bit(integer, integer) returns bit
+           ╰╴                                                         ─── 5. reference
+        ");
+    }
+
+    #[test]
+    fn char() {
+        assert_snapshot!(find_refs("
+create type pg_catalog.bpchar$0;
+
+select '1'::char;
+select '1'::bpchar;
+"), @"
+          ╭▸ 
+        2 │ create type pg_catalog.bpchar;
+          │                        ┬────┬
+          │                        │    │
+          │                        │    0. query
+          │                        1. reference
+        3 │
+        4 │ select '1'::char;
+          │             ──── 2. reference
+        5 │ select '1'::bpchar;
+          ╰╴            ────── 3. reference
         ");
     }
 }

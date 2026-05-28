@@ -1,5 +1,0 @@
----
-source: crates/squawk_parser/tests/tests.rs
-input_file: postgres/regression_suite/database_ddl.sql
----
-

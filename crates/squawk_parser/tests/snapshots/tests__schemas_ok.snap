@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "myschema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -27,7 +27,7 @@ SOURCE_FILE
     ROLE_REF
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -41,7 +41,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF
       CURRENT_ROLE_KW "current_role"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -55,7 +55,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF
       CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -69,7 +69,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF
       SESSION_USER_KW "session_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -81,7 +81,7 @@ SOURCE_FILE
     ROLE
       NAME
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -97,7 +97,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -119,7 +119,7 @@ SOURCE_FILE
     ROLE_REF
       NAME_REF
         IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -138,7 +138,7 @@ SOURCE_FILE
     ROLE
       NAME
         IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -204,7 +204,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "int8"
         R_PAREN ")"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   TABLE
     TABLE_KW "table"
@@ -219,7 +219,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             TABLE_KW "table"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   TABLE
     TABLE_KW "table"
@@ -239,7 +239,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             TABLE_KW "table"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_SCHEMA
     DROP_KW "drop"
@@ -248,7 +248,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "myschema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_SCHEMA
     DROP_KW "drop"
@@ -259,7 +259,7 @@ SOURCE_FILE
       IDENT "myschema"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_SCHEMA
     DROP_KW "drop"
@@ -275,7 +275,7 @@ SOURCE_FILE
       IDENT "myschema"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   DROP_SCHEMA
     DROP_KW "drop"
@@ -297,7 +297,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
     CREATE_KW "create"
@@ -312,7 +312,7 @@ SOURCE_FILE
     ROLE_REF
       NAME_REF
         IDENT "user_name"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_schema_with_sequence"
   WHITESPACE "\n"
@@ -333,7 +333,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME
             IDENT "s"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_schema_with_trigger"
   WHITESPACE "\n"
@@ -378,7 +378,7 @@ SOURCE_FILE
         ARG_LIST
           L_PAREN "("
           R_PAREN ")"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search_path"
   WHITESPACE "\n"
@@ -389,7 +389,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "search_path"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -406,7 +406,7 @@ SOURCE_FILE
     COMMA ","
     NAME_REF
       IDENT "public"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -420,7 +420,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "myschema"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -434,7 +434,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -443,7 +443,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'foo'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -453,7 +453,7 @@ SOURCE_FILE
     OPTION_KW "option"
     WHITESPACE " "
     DOCUMENT_KW "document"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
@@ -463,7 +463,7 @@ SOURCE_FILE
     OPTION_KW "option"
     WHITESPACE " "
     CONTENT_KW "content"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE
     SET_KW "set"
@@ -473,7 +473,7 @@ SOURCE_FILE
     ROLE_REF
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -484,7 +484,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'America/Los_Angeles'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
@@ -494,7 +494,7 @@ SOURCE_FILE
     ZONE_KW "zone"
     WHITESPACE " "
     DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
@@ -504,7 +504,7 @@ SOURCE_FILE
     ZONE_KW "zone"
     WHITESPACE " "
     LOCAL_KW "local"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -517,7 +517,7 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     CURRENT_KW "current"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
@@ -535,7 +535,7 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     CURRENT_KW "current"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
@@ -548,7 +548,7 @@ SOURCE_FILE
     EQ "="
     WHITESPACE " "
     DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
@@ -565,7 +565,7 @@ SOURCE_FILE
     COMMA ","
     WHITESPACE " "
     LITERAL
-      FLOAT_NUMBER "10.0"
+      NUMERIC_NUMBER "10.0"
     COMMA ","
     WHITESPACE " "
     LITERAL
@@ -582,7 +582,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
@@ -595,7 +595,7 @@ SOURCE_FILE
     TO_KW "to"
     WHITESPACE " "
     DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- operator"
   WHITESPACE "\n"
@@ -621,7 +621,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -641,7 +641,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -665,7 +665,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unary"
   WHITESPACE "\n"
@@ -686,7 +686,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -703,7 +703,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -724,7 +724,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   SET
     SET_KW "set"
@@ -733,5 +733,5 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'foo'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

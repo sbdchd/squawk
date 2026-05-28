@@ -22,7 +22,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- explain_analyze"
   WHITESPACE "\n"
@@ -46,7 +46,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_options"
   WHITESPACE "\n"
@@ -144,7 +144,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
   WHITESPACE "\n"
@@ -171,7 +171,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
   WHITESPACE "\n"
@@ -204,7 +204,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_3"
   WHITESPACE "\n"
@@ -241,7 +241,7 @@ SOURCE_FILE
           EQ "="
           LITERAL
             STRING "'4'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_4"
   WHITESPACE "\n"
@@ -281,7 +281,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_5"
   WHITESPACE "\n"
@@ -321,7 +321,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_6"
   WHITESPACE "\n"
@@ -405,7 +405,7 @@ SOURCE_FILE
           GROUPING_EXPR
             NAME_REF
               IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
@@ -426,7 +426,7 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "200"
         R_PAREN ")"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_7"
   WHITESPACE "\n"
@@ -492,7 +492,7 @@ SOURCE_FILE
           GROUPING_EXPR
             NAME_REF
               IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_8"
   WHITESPACE "\n"
@@ -576,7 +576,7 @@ SOURCE_FILE
           GROUPING_EXPR
             NAME_REF
               IDENT "foo"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- parens_select"
   WHITESPACE "\n"
@@ -608,7 +608,7 @@ SOURCE_FILE
           R_PAREN ")"
         R_PAREN ")"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- parens_values"
   WHITESPACE "\n"
@@ -641,7 +641,7 @@ SOURCE_FILE
           R_PAREN ")"
         R_PAREN ")"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- boolean off"
   WHITESPACE "\n"
@@ -681,7 +681,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- boolean on"
   WHITESPACE "\n"
@@ -721,7 +721,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- boolean 1"
   WHITESPACE "\n"
@@ -761,7 +761,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- boolean 0"
   WHITESPACE "\n"
@@ -801,7 +801,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- compound select"
   WHITESPACE "\n"
@@ -828,7 +828,7 @@ SOURCE_FILE
             TARGET
               LITERAL
                 INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select into"
   WHITESPACE "\n"
@@ -868,7 +868,7 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- paren select"
   WHITESPACE "\n"
@@ -886,7 +886,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
@@ -901,7 +901,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"
   WHITESPACE "\n"
@@ -924,7 +924,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "2"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- insert"
   WHITESPACE "\n"
@@ -965,7 +965,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "4"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- update"
   WHITESPACE "\n"
@@ -1007,7 +1007,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- delete"
   WHITESPACE "\n"
@@ -1036,7 +1036,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge"
   WHITESPACE "\n"
@@ -1092,7 +1092,7 @@ SOURCE_FILE
           DO_KW "do"
           WHITESPACE " "
           NOTHING_KW "nothing"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- execute"
   WHITESPACE "\n"
@@ -1104,7 +1104,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "foo"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- declare"
   WHITESPACE "\n"
@@ -1129,7 +1129,7 @@ SOURCE_FILE
             TARGET
               LITERAL
                 INT_NUMBER "1"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create table as"
   WHITESPACE "\n"
@@ -1174,7 +1174,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create materialized view"
   WHITESPACE "\n"
@@ -1203,5 +1203,5 @@ SOURCE_FILE
             TARGET
               LITERAL
                 INT_NUMBER "1"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n"

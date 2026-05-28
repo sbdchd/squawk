@@ -1,18 +1,18 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{db::File, offsets::token_from_offset};
+use crate::{file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_double_colon_to_cast(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let cast_expr = token.parent_ancestors().find_map(ast::CastExpr::cast)?;
 
     if cast_expr.cast_token().is_some() {
@@ -25,14 +25,11 @@ pub(super) fn rewrite_double_colon_to_cast(
     let expr_text = expr.syntax().text();
     let type_text = ty.syntax().text();
 
-    let replacement = format!("cast({} as {})", expr_text, type_text);
+    let replacement = format!("cast({expr_text} as {type_text})");
 
     actions.push(CodeAction {
         title: "Rewrite as cast function `cast()`".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            cast_expr.syntax().text_range(),
-            replacement,
-        )],
+        edits: vec![Edit::replace(cast_expr.syntax().text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 

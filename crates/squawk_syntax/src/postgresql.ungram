@@ -353,7 +353,7 @@ Literal =
   value:(
     '@string'
   | '@null'
-  | '@float_number'
+  | '@numeric_number'
   | '@int_number'
   | '@byte_string'
   | '@bit_string'
@@ -675,6 +675,7 @@ Column =
       NotEnforced? Enforced?
   | 'period'? NameRef
   | IndexExpr
+  | FieldExpr
   )
 ColumnConstraint =
   CheckConstraint
@@ -859,7 +860,10 @@ TableList =
 Truncate =
   'truncate' 'table'? TableList
   ('restart' 'identity' | 'continue' 'identity')?
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
+
+EmptyStmt =
+  ';'
 
 LikeOption =
   ('including' | 'excluding')
@@ -1042,7 +1046,7 @@ ParenSelect =
   WithClause?
  '('
   select:SelectVariant
- ')'
+ ')' ';'?
 
 Select =
  WithClause?
@@ -1057,7 +1061,7 @@ Select =
  LimitClause?
  FetchClause?
  OffsetClause?
- FilterClause?
+ FilterClause? ';'?
 
 Serializable =
   'isolation' 'level' 'serializable'
@@ -1099,37 +1103,37 @@ TransactionModeList =
 
 Begin =
   ('begin' ('work' | 'transaction') | 'start' 'transaction')
-  TransactionModeList?
+  TransactionModeList? ';'?
 
 Commit =
-  'commit' (('work' | 'transaction')? ('and' 'no'? 'chain') | 'prepared' Literal)
+  'commit' (('work' | 'transaction')? ('and' 'no'? 'chain') | 'prepared' Literal) ';'?
 
 Rollback =
-  'rollback' ('work' | 'transaction')? ('and' 'no'? 'chain')?
-| 'abort' ('work' | 'transaction')? ('and' 'no'? 'chain')?
-| 'rollback' ('work' | 'transaction')? 'to' 'savepoint'? NameRef
-| 'rollback' 'prepared' Literal
+  'rollback' ('work' | 'transaction')? ('and' 'no'? 'chain')? ';'?
+| 'abort' ('work' | 'transaction')? ('and' 'no'? 'chain')? ';'?
+| 'rollback' ('work' | 'transaction')? 'to' 'savepoint'? NameRef ';'?
+| 'rollback' 'prepared' Literal ';'?
 
 CreateAggregate =
-  'create' OrReplace? 'aggregate' Path ParamList
+  'create' OrReplace? 'aggregate' Path ParamList ';'?
 
 IfExists =
  'if' 'exists'
 
 DropType =
   'drop' 'type' IfExists? (Path (',' Path)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropIndex =
   'drop' 'index' 'concurrently'? IfExists? (Path (',' Path)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropTable =
   'drop' 'table' IfExists? (Path (',' Path))
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropDatabase =
-  'drop' 'database' IfExists? NameRef
+  'drop' 'database' IfExists? NameRef ';'?
 
 IfNotExists =
   'if' 'not' 'exists'
@@ -1184,7 +1188,7 @@ CreateTable =
   UsingMethod?
   (WithParams | WithoutOids)?
   OnCommit?
-  Tablespace?
+  Tablespace? ';'?
 
 CreateIndex =
   'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName
@@ -1194,7 +1198,7 @@ CreateIndex =
   (NullsNotDistinct | NullsDistinct)?
   WithParams?
   Tablespace?
-  WhereClause?
+  WhereClause? ';'?
 
 OrReplace =
   'or' 'replace'
@@ -1208,11 +1212,11 @@ BeginFuncOptionList =
   'end'
 
 BeginFuncOption =
-  Stmt ';'
-| ReturnFuncOption ';'
+  Stmt
+| ReturnFuncOption
 
 ReturnFuncOption =
-  'return' Expr
+  'return' Expr ';'
 
 FuncOptionList =
   options:(FuncOption*)
@@ -1238,7 +1242,7 @@ FuncOption =
 
 
 CreateFunction =
-  'create' OrReplace? 'function' Path ParamList RetType? option_list:FuncOptionList
+  'create' OrReplace? 'function' Path ParamList RetType? option_list:FuncOptionList ';'?
 
 SetDefault =
   'set' 'default' Expr
@@ -1309,10 +1313,10 @@ AlterDomainAction =
 | SetSchema
 
 AlterDomain =
-  'alter' 'domain' Path action:AlterDomainAction
+  'alter' 'domain' Path action:AlterDomainAction ';'?
 
 AlterTable =
-  'alter' 'table' RelationName actions:AlterTableAction*
+  'alter' 'table' RelationName actions:AlterTableAction* ';'?
 
 Revoke =
   'revoke' ('grant' 'option' 'for')?
@@ -1320,7 +1324,7 @@ Revoke =
   'on' ('table' (Path (',' Path)*) | 'all' 'tables' 'in' 'schema' (NameRef (',' NameRef)*))
   'from' RoleRefList
   ('granted' 'by' RoleRef)?
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 Row =
   (Expr (',' Expr)*)
@@ -1330,19 +1334,19 @@ RowList =
 
 Values =
   WithClause?
-  'values' RowList
+  'values' RowList ';'?
 
 Table =
   WithClause?
-  'table' RelationName
+  'table' RelationName ';'?
 
 Insert =
   WithClause?
   'insert' 'into' Path Alias? ColumnList?
   ('overriding' ('system' | 'user') 'value')?
-  ('default' 'values' | Values | Stmt)
+  ('default' 'values' | SelectVariant)
   OnConflictClause?
-  ReturningClause?
+  ReturningClause? ';'?
 
 OnConflictClause =
   'on' 'conflict' ConflictTarget? ConflictAction
@@ -1413,7 +1417,7 @@ Update =
   SetClause
   FromClause?
   WhereClause?
-  ReturningClause?
+  ReturningClause? ';'?
 
 ForPortionOf =
   'for' 'portion' 'of' NameRef
@@ -1439,13 +1443,13 @@ Delete =
   Alias?
   UsingClause?
   (WhereClause | WhereCurrentOf)?
-  ReturningClause?
+  ReturningClause? ';'?
 
 WhereCurrentOf =
   'where' 'current' 'of' NameRef
 
 Notify =
-  'notify' NameRef (',' Literal)?
+  'notify' NameRef (',' Literal)? ';'?
 
 MergeWhenMatched =
   'when' 'matched'
@@ -1489,7 +1493,7 @@ Merge =
   'merge' 'into' RelationName Alias?
   UsingOnClause
   MergeWhenClause*
-  ReturningClause?
+  ReturningClause? ';'?
 
 Declare =
   'declare' Name
@@ -1499,11 +1503,11 @@ Declare =
   'cursor'
   (('with' | 'without') 'hold')?
   'for'
-  query:SelectVariant
+  query:SelectVariant ';'?
 
 
 Execute =
-  'execute' NameRef ArgList?
+  'execute' NameRef ArgList? ';'?
 
 WithData =
   'with' 'data'
@@ -1523,7 +1527,7 @@ CreateTableAs =
   Tablespace?
   'as'
   query:SelectVariant
-  (WithData | WithNoData)?
+  (WithData | WithNoData)? ';'?
 
 CreateMaterializedView =
   'create' 'materialized' 'view' IfNotExists? Path ColumnList?
@@ -1532,16 +1536,16 @@ CreateMaterializedView =
   Tablespace?
   'as'
   query:SelectVariant
-  (WithData | WithNoData)?
+  (WithData | WithNoData)? ';'?
 
 Savepoint =
-  'savepoint' Name
+  'savepoint' Name ';'?
 
 PrepareTransaction =
-  'prepare' 'transaction' Literal
+  'prepare' 'transaction' Literal ';'?
 
 ReleaseSavepoint =
-  'release' 'savepoint' NameRef
+  'release' 'savepoint' NameRef ';'?
 
 ParenExpr =
   '(' Expr | Select | FromItem ')'
@@ -1726,6 +1730,7 @@ CompoundSelect =
   ('union' | 'intersect' | 'except' )
   'all'?
   rhs:SelectVariant
+  ';'?
 
 SelectInto =
   WithClause?
@@ -1740,7 +1745,7 @@ SelectInto =
   LockingClause*
   LimitClause?
   OffsetClause?
-  FilterClause?
+  FilterClause? ';'?
 
 IntoClause =
   'into' Persistence? 'table'? Path
@@ -1833,10 +1838,10 @@ WindowSpec =
   '#ident'? ('partition' 'by' (Expr (',' Expr)*))? OrderByClause? FrameClause?
 
 AlterStatistics =
-  'alter' 'statistics' Path
+  'alter' 'statistics' Path ';'?
 
 AlterServer =
-  'alter' 'server' NameRef AlterOptionList
+  'alter' 'server' NameRef AlterOptionList ';'?
 
 AlterOptionList =
   AlterOption (',' AlterOption)*
@@ -1847,15 +1852,15 @@ AlterOption =
 | 'drop' NameRef
 
 AlterSequence =
-  'alter' 'sequence' IfExists? Path
+  'alter' 'sequence' IfExists? Path ';'?
 
 AlterSchema =
   'alter' 'schema' NameRef
   (RenameTo
-  | OwnerTo)
+  | OwnerTo) ';'?
 
 AlterRule =
-  'alter' 'rule' NameRef 'on' OnTable RenameTo
+  'alter' 'rule' NameRef 'on' OnTable RenameTo ';'?
 
 AlterRoutine =
   'alter' 'routine' FunctionSig
@@ -1867,13 +1872,13 @@ AlterRoutine =
   | NoDependsOnExtension
   | FuncOptionList
   )
-  'restrict'?
+  'restrict'? ';'?
 
 AlterRole =
-  'alter' 'role' RoleRef
+  'alter' 'role' RoleRef ';'?
 
 AlterPublication =
-  'alter' 'publication' NameRef
+  'alter' 'publication' NameRef ';'?
 
 AlterProcedure =
   'alter' 'procedure' FunctionSig
@@ -1885,7 +1890,7 @@ AlterProcedure =
   | NoDependsOnExtension
   | FuncOptionList
   )
-  'restrict'?
+  'restrict'? ';'?
 
 AlterPolicy =
   'alter' 'policy' NameRef OnTable
@@ -1894,8 +1899,8 @@ AlterPolicy =
     ('to' RoleRefList)?
     UsingExprClause?
     WithCheckExprClause?
-  ))
-  
+  )) ';'?
+
 
 AlterOperatorFamily =
   'alter' 'operator' 'family' Path 'using' NameRef
@@ -1905,7 +1910,7 @@ AlterOperatorFamily =
   | RenameTo
   | OwnerTo
   | SetSchema
-  )
+  ) ';'?
 
 DropOpClassOptions =
   'drop' DropOpClassOptionList
@@ -1931,7 +1936,7 @@ AlterOperatorClass =
     RenameTo
   | OwnerTo
   | SetSchema
-  )
+  ) ';'?
 
 AlterOperator =
   'alter' 'operator' OpSig
@@ -1939,7 +1944,7 @@ AlterOperator =
     OwnerTo
   | SetSchema
   | SetOptions
-  )
+  ) ';'?
 
 AlterMaterializedViewAction =
   RenameTo
@@ -1960,20 +1965,20 @@ AlterMaterializedView =
   (
     'all' 'in' 'tablespace' NameRef OwnedByRoles? 'set' 'tablespace' Name 'nowait'?
   | IfExists? Path action:AlterMaterializedViewAction*
-  )
+  ) ';'?
 
 AlterLargeObject =
-  'alter' 'large' 'object'
+  'alter' 'large' 'object' ';'?
 
 AlterLanguage =
   'alter' 'language' NameRef
-  (RenameTo | OwnerTo)?
+  (RenameTo | OwnerTo)? ';'?
 
 AlterIndex =
   'alter' 'index' (
   'all' 'in' 'tablespace' Path OwnedByRoles? 'set' 'tablespace' NameRef 'nowait'?
 | IfExists? Path AlterIndexAction
-)
+) ';'?
 
 OwnedByRoles =
   'owned' 'by' RoleRefList
@@ -1994,7 +1999,7 @@ AlterGroup =
   'add' 'user' (NameRef (',' NameRef)*)
   | 'drop' 'user' (NameRef (',' NameRef)*)
   | RenameTo
-  )
+  ) ';'?
 
 AlterFunction =
   'alter' 'function' FunctionSig
@@ -2006,7 +2011,7 @@ AlterFunction =
   | NoDependsOnExtension
   | FuncOptionList
   )
-  'restrict'?
+  'restrict'? ';'?
 
 AlterForeignTable =
   'alter' 'foreign' 'table' IfExists? RelationName
@@ -2014,14 +2019,14 @@ AlterForeignTable =
   | RenameColumn
   | SetSchema
   | AlterTableAction*
-  )
+  ) ';'?
 
 AlterForeignDataWrapper =
   'alter' 'foreign' 'data' 'wrapper' NameRef
   (RenameTo
   | OwnerTo
   | FdwOptionList
-  )?
+  )? ';'?
 
 FdwOptionList =
   FdwOption*
@@ -2037,10 +2042,10 @@ FdwOption =
 
 AlterEventTrigger =
   'alter' 'event' 'trigger' NameRef
-  ('disable' | 'enable' | 'enable' 'replica' | 'enable' 'always' | OwnerTo | RenameTo)?
+  ('disable' | 'enable' | 'enable' 'replica' | 'enable' 'always' | OwnerTo | RenameTo)? ';'?
 
 AlterExtension =
-  'alter' 'extension' NameRef
+  'alter' 'extension' NameRef ';'?
 
 AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
@@ -2049,7 +2054,7 @@ AlterDefaultPrivileges =
   (
     GrantDefaultPrivileges
   | RevokeDefaultPrivileges
-  )?
+  )? ';'?
 
 GrantDefaultPrivileges =
   'grant' Privileges 'on' PrivilegeTarget 'to' RoleRefList ('with' 'grant' 'option')?
@@ -2080,7 +2085,7 @@ AlterDatabase =
   | ResetConfigParam
   | RefreshCollationVersion
   | CreateDatabaseOptionList
-  )?
+  )? ';'?
 
 CreateDatabaseOptionList =
   'with'? CreateDatabaseOption*
@@ -2110,7 +2115,7 @@ AlterConversion =
     RenameTo
   | OwnerTo
   | SetSchema
-  )
+  ) ';'?
 
 AlterCollation =
   'alter' 'collation' Path
@@ -2118,19 +2123,19 @@ AlterCollation =
   | RefreshVersion
   | OwnerTo
   | SetSchema
-  )
+  ) ';'?
 
 RefreshVersion =
   'refresh' 'version'
 
 AlterAggregate =
-  'alter' 'aggregate' Aggregate
+  'alter' 'aggregate' Aggregate ';'?
 
 AlterSubscription =
-  'alter' 'subscription' NameRef
+  'alter' 'subscription' NameRef ';'?
 
 AlterSystem =
-  'alter' 'system' 'set'
+  'alter' 'system' 'set' ';'?
 
 AlterTablespace =
   'alter' 'tablespace' Path
@@ -2139,11 +2144,11 @@ AlterTablespace =
   | OwnerTo
   | SetOptions
   | ResetOptions
-  )
+  ) ';'?
 
 AlterTextSearchParser =
   'alter' 'text' 'search' 'parser' Path
-  (RenameTo | SetSchema)
+  (RenameTo | SetSchema) ';'?
 
 AlterTextSearchDictionary =
   'alter' 'text' 'search' 'dictionary' Path
@@ -2152,7 +2157,7 @@ AlterTextSearchDictionary =
   | OwnerTo
   | SetSchema
   | AttributeList
-  )
+  ) ';'?
 
 AlterTextSearchConfiguration =
   'alter' 'text' 'search' 'configuration' Path
@@ -2160,11 +2165,11 @@ AlterTextSearchConfiguration =
     RenameTo
   | OwnerTo
   | SetSchema
-  )
+  ) ';'?
 
 AlterTextSearchTemplate =
   'alter' 'text' 'search' 'template' Path
-  (RenameTo | SetSchema)
+  (RenameTo | SetSchema) ';'?
 
 AlterTrigger =
   'alter' 'trigger' NameRef OnTable
@@ -2172,7 +2177,7 @@ AlterTrigger =
     RenameTo
   | DependsOnExtension
   | NoDependsOnExtension
-  )
+  ) ';'?
 
 AlterType =
   'alter' 'type' Path
@@ -2185,7 +2190,7 @@ AlterType =
   | RenameAttribute
   | RenameValue
   | AddValue
-  )
+  ) ';'?
 
 RenameAttribute =
   'rename' 'attribute' NameRef 'to' Name
@@ -2221,18 +2226,18 @@ AfterValue =
   'after' Literal
 
 AlterUser =
-  'alter' 'user' RoleRef
+  'alter' 'user' RoleRef ';'?
 
 AlterUserMapping =
-  'alter' 'user' 'mapping' 'for' RoleRef ServerName AlterOptionList
+  'alter' 'user' 'mapping' 'for' RoleRef ServerName AlterOptionList ';'?
 
 AlterView =
-  'alter' 'view' Path
+  'alter' 'view' Path ';'?
 
 Analyze =
   ('analyze' | 'analyse')
   ('verbose' | OptionItemList)?
-  TableAndColumnsList?
+  TableAndColumnsList? ';'?
 
 // suffix it with `On` to avoid conflicting with comment nodes
 CommentOn =
@@ -2283,13 +2288,17 @@ CommentOn =
   | 'view' Path
   )
   'is'
-  ('null' | Literal)
+  ('null' | Literal) ';'?
 
 Cluster =
   'cluster'
   ('verbose' | OptionItemList)?
   Path?
-  UsingMethod?
+  (UsingMethod | OnPath)? ';'?
+
+OnPath =
+  'on'
+  Path
 
 Repack =
   'repack'
@@ -2297,7 +2306,7 @@ Repack =
   TableAndColumnsList?
   (
      'using' 'index' NameRef?
-  )?
+  )? ';'?
 
 Persistence =
   Temp
@@ -2317,7 +2326,7 @@ Unlogged =
 CreatePropertyGraph =
   'create' Persistence? 'property' 'graph' Path
   VertexTables?
-  EdgeTables?
+  EdgeTables? ';'?
 
 VertexTables =
   ('vertex' | 'node') 'tables' '(' (VertexTableDef (',' VertexTableDef)*)  ')'
@@ -2381,7 +2390,7 @@ DestVertexTable =
 
 AlterPropertyGraph =
   'alter' 'property' 'graph' IfExists? Path
-  AlterPropertyGraphAction
+  AlterPropertyGraphAction ';'?
 
 AlterPropertyGraphAction =
   RenameTo
@@ -2430,7 +2439,7 @@ DropVertexEdgeLabelProperties =
     'drop' 'properties' '(' (Name (',' Name)*) ')' ('cascade' | 'restrict')?
 
 DropPropertyGraph =
-  'drop' 'property' 'graph' IfExists? Path ('cascade' | 'restrict')?
+  'drop' 'property' 'graph' IfExists? Path ('cascade' | 'restrict')? ';'?
 
 GraphTableFn =
   'graph_table' '(' Path 'match' PathPatternList WhereClause? 'columns' '(' ExprAsNameList ')' ')'
@@ -2482,7 +2491,7 @@ GraphPatternQualifier =
 CreateAccessMethod =
   'create' 'access' 'method' name:Path
   'type' ('table' | 'index')
-  HandlerClause
+  HandlerClause ';'?
 
 HandlerClause =
   'handler' Path
@@ -2494,29 +2503,29 @@ CreateCast =
   | 'without' 'function'
   | 'with' 'inout'
   )
-  ('as' 'assignment' | 'as' 'implicit')?
+  ('as' 'assignment' | 'as' 'implicit')? ';'?
 
 CreateCollation =
-  'create' 'collation' Path
+  'create' 'collation' Path ';'?
 
 CreateConversion =
   'create' 'default'? 'conversion' Path
   'for' Literal
   'to' Literal
-  'from' Path
+  'from' Path ';'?
 
 CreateDatabase =
-  'create' 'database' Name CreateDatabaseOptionList
+  'create' 'database' Name CreateDatabaseOptionList ';'?
 
 CreateDomain =
-  'create' 'domain' Path 'as'? Type Collate? Constraint*
+  'create' 'domain' Path 'as'? Type Collate? Constraint* ';'?
 
 CreateEventTrigger =
   'create' 'event' 'trigger' Name 'on' NameRef
   EventTriggerWhenClause?
   'execute'
   ('function' | 'procedure')
-  CallExpr
+  CallExpr ';'?
 
 EventTriggerWhenClause =
   'when' (EventTriggerWhen ('and' EventTriggerWhen)*)
@@ -2527,7 +2536,7 @@ EventTriggerWhen =
 CreateForeignDataWrapper =
   'create' 'foreign' 'data' 'wrapper' Name
   FdwOptionList?
-  AlterOptionList?
+  AlterOptionList? ';'?
 
 CreateForeignTable =
   'create' 'foreign' 'table' IfNotExists? Path
@@ -2536,13 +2545,13 @@ CreateForeignTable =
   Inherits?
   PartitionType?
   ServerName
-  AlterOptionList?
+  AlterOptionList? ';'?
 
 ServerName =
   'server' NameRef
 
 CreateGroup =
-  'create' 'group' Name RoleOptionList
+  'create' 'group' Name RoleOptionList ';'?
 
 RoleOptionList =
   'with'? RoleOption*
@@ -2552,25 +2561,25 @@ RoleOption =
 
 CreateLanguage =
   'create' OrReplace 'trusted'? 'procedural'? 'language' Name
-  ('handler' Path ('inline' Path)? ('validator' Path)?)?
+  ('handler' Path ('inline' Path)? ('validator' Path)?)? ';'?
 
 CreateOperator =
   'create' 'operator'
   Path?
   Op
-  AttributeList
+  AttributeList ';'?
 
 CreateOperatorClass =
   'create' 'operator' 'class' Path 'default'? 'for' 'type' Type
   'using' NameRef ('family' Path)
   'as'
-  OperatorClassOptionList
+  OperatorClassOptionList ';'?
 
 OperatorClassOptionList =
   (OpClassOption (',' OpClassOption)*)
 
 CreateOperatorFamily =
-  'create' 'operator' 'family' Path 'using' NameRef
+  'create' 'operator' 'family' Path 'using' NameRef ';'?
 
 CreatePolicy =
   'create' 'policy' Name OnTable
@@ -2578,7 +2587,7 @@ CreatePolicy =
   ('for' ('all' | 'select' | 'insert' | 'update' | 'delete'))?
   ('to' RoleRefList)?
   UsingExprClause?
-  WithCheckExprClause?
+  WithCheckExprClause? ';'?
 
 AsPolicyType =
   'as' '#ident'
@@ -2590,12 +2599,12 @@ UsingExprClause =
   'using' '(' Expr ')'
 
 CreateProcedure =
-  'create' OrReplace? 'procedure' Path ParamList option_list:FuncOptionList
+  'create' OrReplace? 'procedure' Path ParamList option_list:FuncOptionList ';'?
 
 CreatePublication =
   'create' 'publication' Name
   ('for' 'all' 'tables' ExceptTableClause? | 'for' (PublicationObject (',' PublicationObject)*))
-  WithParams?
+  WithParams? ';'?
 
 ExceptTableClause =
   'except' 'table' '(' (RelationName (',' RelationName)*) ')'
@@ -2606,55 +2615,82 @@ PublicationObject  =
 | 'current_schema'
 
 CreateRole =
-  'create' 'role' Name RoleOptionList
+  'create' 'role' Name RoleOptionList ';'?
 
 CreateRule =
-  'create' OrReplace? 'rule' Name 'as' 'on' ('#ident' | 'select' | 'insert' | 'update' | 'delete')
+  'create' OrReplace? 'rule' Name 'as'
+  RuleOn
+  RuleDo
+  ';'?
+
+RuleOn =
+  'on' ('#ident' | 'select' | 'insert' | 'update' | 'delete')
   'to' Path WhereClause?
-  'do' ('also' | 'instead')? ('nothing' | '(' (Stmt (',' Stmt)*) ')' | Stmt)
+
+RuleDo =
+  'do' ('also' | 'instead')?
+   RuleAction
+
+Nothing =
+  'nothing'
+
+RuleAction =
+  Nothing
+| RuleStmtList
+| RuleStmt
+
+RuleStmtList =
+  '(' (RuleStmt (';' RuleStmt)*) ')'
+
+RuleStmt =
+  SelectVariant
+| Insert
+| Update
+| Delete
+| Notify
 
 CreateSequence =
   'create' Persistence? 'sequence' IfNotExists? Path
-  SequenceOption*
+  SequenceOption* ';'?
 
 CreateServer =
   'create' 'server' IfNotExists? Name
   ('type' Literal)?
   ('version' Literal)?
   'foreign' 'data' 'wrapper' NameRef
-  AlterOptionList?
+  AlterOptionList? ';'?
 
 
 CreateStatistics =
-  'create' 'statistics' Path ('on' (NameRef (',' NameRef)*))? FromTable?
+  'create' 'statistics' Path ('on' (NameRef (',' NameRef)*))? FromTable? ';'?
 
 CreateSubscription =
   'create' 'subscription' Name
   ('connection' Literal | 'server' NameRef)
   'publication' (NameRef (',' NameRef)*)
-  WithParams?
+  WithParams? ';'?
 
 CreateTablespace =
   'create' 'tablespace' Name
   ('owner' RoleRef)?
   'location' Literal
-  WithParams?
+  WithParams? ';'?
 
 CreateTextSearchParser =
-  'create' 'text' 'search' 'parser' Path AttributeList
+  'create' 'text' 'search' 'parser' Path AttributeList ';'?
 
 CreateTextSearchDictionary =
-  'create' 'text' 'search' 'dictionary' Path AttributeList
+  'create' 'text' 'search' 'dictionary' Path AttributeList ';'?
 
 CreateTextSearchConfiguration =
-  'create' 'text' 'search' 'configuration' Path AttributeList
+  'create' 'text' 'search' 'configuration' Path AttributeList ';'?
 
 CreateTextSearchTemplate =
-  'create' 'text' 'search' 'template' Path AttributeList
+  'create' 'text' 'search' 'template' Path AttributeList ';'?
 
 CreateTransform =
   'create' OrReplace? 'transform' 'for' Type 'language' language:NameRef
-  '(' from_func:TransformFromFunc ',' to_func:TransformToFunc ')'
+  '(' from_func:TransformFromFunc ',' to_func:TransformToFunc ')' ';'?
 
 TransformFromFunc =
    'from' 'sql' 'with' 'function' FunctionSig
@@ -2665,22 +2701,22 @@ TransformToFunc =
 CreateUserMapping =
   'create' 'user' 'mapping' IfNotExists? 'for' RoleRef
   ServerName
-  AlterOptionList?
+  AlterOptionList? ';'?
 
 CreateUser =
   'create' 'user' Name
-  RoleOptionList?
+  RoleOptionList? ';'?
 
 DropLanguage =
   'drop' 'procedural'? 'language' IfExists? NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropGroup =
-  'drop' 'group' IfExists? (NameRef (',' NameRef)*)
+  'drop' 'group' IfExists? (NameRef (',' NameRef)*) ';'?
 
 DropFunction =
   'drop' 'function' IfExists? FunctionSigList
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 FunctionSigList =
   (FunctionSig (',' FunctionSig)*)
@@ -2690,61 +2726,61 @@ FunctionSig =
 
 DropForeignDataWrapper =
   'drop' 'foreign' 'data' 'wrapper' IfExists? (NameRef (',' NameRef)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropForeignTable =
   'drop' 'foreign' 'table' IfExists? Path
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropAccessMethod =
   'drop' 'access' 'method' IfExists? NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 Aggregate =
   Path ParamList
 
 DropAggregate =
   'drop' 'aggregate' IfExists? (Aggregate (',' Aggregate)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropCast =
   'drop' 'cast' IfExists? CastSig
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 CastSig =
   '(' lhs:Type 'as' rhs:Type ')'
 
 DropCollation =
   'drop' 'collation' IfExists? (Path (',' Path)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropConversion =
   'drop' 'conversion' IfExists? Path
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropDomain =
   'drop' 'domain' IfExists? (Path (',' Path)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropEventTrigger =
   'drop' 'event' 'trigger' IfExists? NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropExtension =
   'drop' 'extension' IfExists? (NameRef (',' NameRef)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropMaterializedView =
   'drop' 'materialized' 'view' IfExists? (Path (',' Path)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropOperatorFamily =
   'drop' 'operator' 'family' IfExists? Path 'using' NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropOperator =
   'drop' 'operator' IfExists? OpSigList
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 OpSigList =
   (OpSig (',' OpSig)*)
@@ -2754,88 +2790,88 @@ OpSig =
 
 DropOperatorClass =
   'drop' 'operator' 'class' IfExists? Path 'using' NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropOwned =
   'drop' 'owned' 'by' RoleRefList
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropPolicy =
   'drop' 'policy' IfExists? NameRef OnTable
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropProcedure =
   'drop' 'procedure' IfExists? FunctionSigList
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropPublication =
   'drop' 'publication' IfExists? (NameRef (',' NameRef)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropRole =
-  'drop' 'role' IfExists? (NameRef (',' NameRef)*)
+  'drop' 'role' IfExists? (NameRef (',' NameRef)*) ';'?
 
 DropRoutine =
   'drop' 'routine' IfExists? FunctionSigList
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropRule =
   'drop' 'rule' IfExists? NameRef OnTable
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropSequence =
   'drop' 'sequence' IfExists? (Path (',' Path)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropServer =
   'drop' 'server' IfExists? NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropStatistics =
   'drop' 'statistics' IfExists? (Path (',' Path)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropSubscription =
   'drop' 'subscription' IfExists? NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropTablespace =
-  'drop' 'tablespace' IfExists? NameRef
+  'drop' 'tablespace' IfExists? NameRef ';'?
 
 DropTextSearchParser =
   'drop' 'text' 'search' 'parser' IfExists? Path
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropTextSearchConfig =
   'drop' 'text' 'search' 'configuration' IfExists? Path
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropTextSearchDict =
   'drop' 'text' 'search' 'dictionary' IfExists? Path
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropTextSearchTemplate =
   'drop' 'text' 'search' 'template' IfExists? Path
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropTransform =
   'drop' 'transform' IfExists? 'for' ty:Type 'language' language:NameRef
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 DropUser =
-  'drop' 'user' IfExists? (NameRef (',' NameRef)*)
+  'drop' 'user' IfExists? (NameRef (',' NameRef)*) ';'?
 
 DropUserMapping =
-  'drop' 'user' 'mapping' IfExists? 'for' RoleRef ServerName
+  'drop' 'user' 'mapping' IfExists? 'for' RoleRef ServerName ';'?
 
 DropView =
   'drop' 'view' IfExists? Path
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 Explain =
   'explain'
   ('analyze' | 'analyse' | 'verbose')?
-  ExplainStmt
+  ExplainStmt ';'?
 
 ExplainStmt =
   Select
@@ -2858,7 +2894,7 @@ ImportForeignSchema =
   (LimitToTables | ExceptTables)?
   'from' ServerName
   IntoSchema
-  AlterOptionList?
+  AlterOptionList? ';'?
 
 LimitToTables =
   'limit' 'to' (NameRef (',' NameRef)*)
@@ -2870,14 +2906,14 @@ IntoSchema =
   'into' NameRef
 
 Lock =
-  'lock' 'table'? TableList?
+  'lock' 'table'? TableList? ';'?
 
 Reassign =
-  'reassign' 'owned' 'by' old_roles:RoleRefList 'to' new_roles:RoleRefList
+  'reassign' 'owned' 'by' old_roles:RoleRefList 'to' new_roles:RoleRefList ';'?
 
 Refresh =
   'refresh' 'materialized' 'view' 'concurrently'? Path
-  (WithData | WithNoData)?
+  (WithData | WithNoData)? ';'?
 
 Grant =
   'grant'
@@ -2885,7 +2921,7 @@ Grant =
   'on' ('table' (Path (',' Path)*) | 'all' 'tables' 'in' 'schema' (NameRef (',' NameRef)*))
   'to' RoleRefList
   ('with' 'grant' 'option')?
-  ('granted' 'by' RoleRef)?
+  ('granted' 'by' RoleRef)? ';'?
 
 RevokeCommandList =
   (RevokeCommand (',' RevokeCommand)*)
@@ -2924,7 +2960,7 @@ SecurityLabel =
   | 'aggregate' Aggregate
   )
   'is'
-  ('null' | Literal)
+  ('null' | Literal) ';'?
 
 ForProvider =
   'for' Literal | NameRef
@@ -2932,17 +2968,17 @@ ForProvider =
 SetConstraints =
   'set' 'constraints'
   ('all' | (Path (',' Path)*))
-  'deferred' | 'immediate'
+  'deferred' | 'immediate' ';'?
 
 SetRole =
-  'set' ('session' | 'local')? 'role' (RoleRef | 'none')?
-| 'reset' 'role'
+  'set' ('session' | 'local')? 'role' (RoleRef | 'none')? ';'?
+| 'reset' 'role' ';'?
 
 SetSessionAuth =
-  'set' ('session' | 'local')? 'session' 'authorization' (RoleRef | Literal | 'default')
+  'set' ('session' | 'local')? 'session' 'authorization' (RoleRef | Literal | 'default') ';'?
 
 ResetSessionAuth =
-  'reset' 'session' 'authorization'
+  'reset' 'session' 'authorization' ';'?
 
 SetTransaction =
   'set'
@@ -2950,19 +2986,19 @@ SetTransaction =
     'session' 'characteristics' 'as' 'transaction' TransactionModeList
   | 'transaction' 'snapshot' Literal
   | 'transaction' TransactionModeList
-  )
+  ) ';'?
 
 Reindex =
-  'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? Path?
+  'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? 'concurrently'? Path? ';'?
 
 CreateView =
   'create' OrReplace? Persistence? 'recursive'? 'view' Path ColumnList?
   WithParams?
   'as' query:SelectVariant
-  ('with' ('cascaded' | 'local')? 'check' 'option')?
+  ('with' ('cascaded' | 'local')? 'check' 'option')? ';'?
 
 Prepare =
-  'prepare' Name 'as' PreparableStmt
+  'prepare' Name 'as' PreparableStmt ';'?
 
 PreparableStmt =
   Select
@@ -2976,37 +3012,37 @@ PreparableStmt =
 | Merge
 
 Unlisten =
-  'unlisten' ('*' | NameRef)
+  'unlisten' ('*' | NameRef) ';'?
 
 Checkpoint =
-  'checkpoint'
+  'checkpoint' ';'?
 
 Deallocate =
-  'deallocate' ('prepare' NameRef | 'all')
+  'deallocate' ('prepare' NameRef | 'all') ';'?
 
 Load =
-  'load' Literal
+  'load' Literal ';'?
 
 Listen =
-  'listen' Name
+  'listen' Name ';'?
 
 Reset =
-  'reset' (NameRef | 'all')
+  'reset' (NameRef | 'all') ';'?
 
 Discard =
-  'discard' ('all' | 'temp' | 'temporary' | 'plans' | 'sequences')
+  'discard' ('all' | 'temp' | 'temporary' | 'plans' | 'sequences') ';'?
 
 Do =
-  'do'
+  'do' ';'?
 
 Move =
-  'move' ('from' | 'in')? NameRef
+  'move' ('from' | 'in')? NameRef ';'?
 
 Fetch =
-  'fetch' ('from' | 'in')? NameRef
+  'fetch' ('from' | 'in')? NameRef ';'?
 
 Close =
-  'close' NameRef
+  'close' NameRef ';'?
 
 VacuumOptionList =
  '(' (VacuumOption (',' VacuumOption)*)? ')'
@@ -3018,7 +3054,7 @@ Vacuum =
   'verbose'?
   ('analyze' | 'analyse')?
   VacuumOptionList?
-  TableAndColumnsList?
+  TableAndColumnsList? ';'?
 
 TableAndColumnsList =
   TableAndColumns (',' TableAndColumns)*
@@ -3037,7 +3073,7 @@ Copy =
     | ('to' ('stdout' | 'program'? Literal))
   )
   'with'?
-  WhereClause?
+  WhereClause? ';'?
 
 CopyOptionList =
   '(' (CopyOption (',' CopyOption)*) ')'
@@ -3046,7 +3082,7 @@ CopyOption =
   Name
 
 Call =
-  'call' Path ArgList
+  'call' Path ArgList ';'?
 
 TriggerEventUpdate =
   'update'
@@ -3082,7 +3118,7 @@ CreateTrigger =
   Referencing?
   ('for' 'each'? ('row' | 'statement'))?
   WhenCondition?
-  'execute' ('function' | 'procedure') CallExpr
+  'execute' ('function' | 'procedure') CallExpr ';'?
 
 WhenCondition =
   'when' '(' Expr ')'
@@ -3095,13 +3131,13 @@ TriggerEventList =
 
 DropSchema =
   'drop' 'schema' IfExists? (NameRef (',' NameRef)*)
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 CreateSchema =
-  'create' 'schema' Name ('authorization' RoleRef)? SchemaElement*
-| 'create' 'schema' 'authorization' Role SchemaElement*
-| 'create' 'schema' IfNotExists Name ('authorization' RoleRef)?
-| 'create' 'schema' IfNotExists 'authorization' Role
+  'create' 'schema' Name ('authorization' RoleRef)? SchemaElement* ';'?
+| 'create' 'schema' 'authorization' Role SchemaElement* ';'?
+| 'create' 'schema' IfNotExists Name ('authorization' RoleRef)? ';'?
+| 'create' 'schema' IfNotExists 'authorization' Role ';'?
 
 SchemaElement =
   CreateTable
@@ -3113,7 +3149,7 @@ SchemaElement =
 
 DropTrigger =
   'drop' 'trigger' IfExists? Path OnTable
-  ('cascade' | 'restrict')?
+  ('cascade' | 'restrict')? ';'?
 
 OnTable =
   'on' Path
@@ -3130,7 +3166,7 @@ CreateType =
   ('as' 'enum' VariantList
 | 'as' 'range' AttributeList
 | 'as' ColumnList
-| AttributeList)
+| AttributeList) ';'?
 
 VariantList =
   '('
@@ -3141,7 +3177,7 @@ Variant =
   Literal
 
 CreateExtension =
-  'create' 'extension' IfNotExists? Name
+  'create' 'extension' IfNotExists? Name ';'?
 
 Set =
   'set'
@@ -3153,14 +3189,14 @@ Set =
       'from' 'current'
     | (('to' | '=') (ConfigValue* | 'default') )
     )
-  )
+  ) ';'?
 
 ConfigValue =
   Literal
 | NameRef
 
 Show =
-  'show'
+  'show' ';'?
 
 LanguageFuncOption =
   'language' NameRef
@@ -3614,7 +3650,7 @@ Stmt =
 | Vacuum
 | Values
 | ParenSelect
-| ';'
+| EmptyStmt
 
 
 SourceFile =

@@ -12,34 +12,6 @@
       "include": "#comments"
     },
     {
-      "begin": "^",
-      "end": ";\\s*",
-      "name": "meta.statement.pgsql",
-      "patterns": [
-        {
-          "include": "#create_entities"
-        },
-        {
-          "include": "#parens"
-        },
-        {
-          "include": "#dollar_quotes"
-        },
-        {
-          "include": "#comments"
-        },
-        {
-          "include": "#strings"
-        },
-        {
-          "include": "#keywords"
-        },
-        {
-          "include": "#misc"
-        }
-      ]
-    },
-    {
       "begin": "^(\\\\[\\S]+)",
       "beginCaptures": {
         "0": {
@@ -49,6 +21,24 @@
       "comment": "psql directives",
       "end": "\\n",
       "name": "meta.statement.pgsql.psql"
+    },
+    {
+      "include": "#create_entities"
+    },
+    {
+      "include": "#parens"
+    },
+    {
+      "include": "#dollar_quotes"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#misc"
     }
   ],
   "repository": {
@@ -194,7 +184,7 @@
           "name": "entity.name.function.pgsql"
         },
         {
-          "match": "\\b\\d+\\b",
+          "match": "\\b(?:0[xX](?:_?[0-9a-fA-F])+|0[oO](?:_?[0-7])+|0[bB](?:_?[01])+|\\d(?:_?\\d)*(?:\\.\\d(?:_?\\d)*)?(?:[eE][+-]?\\d(?:_?\\d)*)?)\\b",
           "name": "constant.numeric.pgsql"
         },
         {

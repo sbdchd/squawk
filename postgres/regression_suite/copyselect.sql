@@ -37,7 +37,7 @@ copy (select t from test1 where id=3 for update) to stdout;
 --
 -- This should fail
 --
-copy (select t into temp test3 from test1 where id=3) to stdout;
+-- copy (select t into temp test3 from test1 where id=3) to stdout;
 --
 -- This should fail
 --

@@ -5,6 +5,6 @@ expression: "lint_errors(sql, Rule::TransactionNesting)"
 warning[transaction-nesting]: There is an existing transaction already in progress.
   ╭▸ 
 3 │ BEGIN;
-  │ ━━━━━
+  │ ━━━━━━
   │
   ╰ help: Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.

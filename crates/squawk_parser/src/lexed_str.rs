@@ -1,6 +1,6 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/lexed_str.rs
 
-use std::ops;
+use std::{num::IntErrorKind, ops};
 
 use squawk_lexer::tokenize;
 
@@ -15,7 +15,7 @@ pub struct LexedStr<'a> {
 
 struct LexError {
     msg: String,
-    token: u32,
+    range: ops::Range<u32>,
 }
 
 impl<'a> LexedStr<'a> {
@@ -105,10 +105,8 @@ impl<'a> LexedStr<'a> {
     //     Some(self.error[err].msg.as_str())
     // }
 
-    pub fn errors(&self) -> impl Iterator<Item = (usize, &str)> + '_ {
-        self.error
-            .iter()
-            .map(|it| (it.token as usize, it.msg.as_str()))
+    pub fn errors(&self) -> impl Iterator<Item = (&ops::Range<u32>, &str)> + '_ {
+        self.error.iter().map(|it| (&it.range, it.msg.as_str()))
     }
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
@@ -120,6 +118,18 @@ impl<'a> LexedStr<'a> {
 struct Converter<'a> {
     res: LexedStr<'a>,
     offset: usize,
+}
+
+fn is_empty_quoted_ident(token_text: &str) -> bool {
+    let inner = if let Some(stripped) = token_text
+        .strip_prefix(['u', 'U'])
+        .and_then(|s| s.strip_prefix('&'))
+    {
+        stripped
+    } else {
+        token_text
+    };
+    inner == "\"\""
 }
 
 impl<'a> Converter<'a> {
@@ -140,14 +150,16 @@ impl<'a> Converter<'a> {
         self.res
     }
 
-    fn push(&mut self, kind: SyntaxKind, len: usize, err: Option<&str>) {
+    fn push(&mut self, kind: SyntaxKind, len: usize, err: Option<(&str, ops::Range<u32>)>) {
+        let token_start = self.offset as u32;
         self.res.push(kind, self.offset);
         self.offset += len;
 
-        if let Some(err) = err {
-            let token = self.res.len() as u32;
-            let msg = err.to_owned();
-            self.res.error.push(LexError { msg, token });
+        if let Some((msg, err_range)) = err {
+            self.res.error.push(LexError {
+                msg: msg.to_owned(),
+                range: token_start + err_range.start..token_start + err_range.end,
+            });
         }
     }
 
@@ -157,6 +169,7 @@ impl<'a> Converter<'a> {
         // Storing that info in `SyntaxKind` is not possible due to its layout requirements of
         // being `u16` that come from `rowan::SyntaxKind`.
         let mut err = "";
+        let mut err_range: Option<ops::Range<u32>> = None;
 
         let syntax_kind = {
             match kind {
@@ -170,20 +183,10 @@ impl<'a> Converter<'a> {
 
                 squawk_lexer::TokenKind::Whitespace => SyntaxKind::WHITESPACE,
                 squawk_lexer::TokenKind::Ident => {
-                    // TODO: check for max identifier length
-                    //
-                    // see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-                    // The system uses no more than NAMEDATALEN-1 bytes of an
-                    // identifier; longer names can be written in commands, but
-                    // they will be truncated. By default, NAMEDATALEN is 64 so
-                    // the maximum identifier length is 63 bytes. If this limit
-                    // is problematic, it can be raised by changing the
-                    // NAMEDATALEN constant in src/include/pg_config_manual.h.
-                    // see: https://github.com/postgres/postgres/blob/e032e4c7ddd0e1f7865b246ec18944365d4f8614/src/include/pg_config_manual.h#L29
                     SyntaxKind::from_keyword(token_text).unwrap_or(SyntaxKind::IDENT)
                 }
                 squawk_lexer::TokenKind::Literal { kind, .. } => {
-                    self.extend_literal(token_text.len(), kind);
+                    self.extend_literal(token_text, kind);
                     return;
                 }
                 squawk_lexer::TokenKind::Semi => SyntaxKind::SEMICOLON,
@@ -219,10 +222,30 @@ impl<'a> Converter<'a> {
                 }
                 squawk_lexer::TokenKind::Eof => SyntaxKind::EOF,
                 squawk_lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
-                squawk_lexer::TokenKind::PositionalParam => SyntaxKind::POSITIONAL_PARAM,
+                squawk_lexer::TokenKind::PositionalParam {
+                    trailing_junk_start,
+                } => {
+                    let digits = &token_text[1..*trailing_junk_start as usize];
+                    if digits.is_empty() {
+                        err = "missing parameter number";
+                        err_range = Some(0..1);
+                    } else if digits
+                        .parse::<i32>()
+                        .is_err_and(|err| matches!(err.kind(), IntErrorKind::PosOverflow))
+                    {
+                        err = "parameter number too large";
+                        err_range = Some(0..*trailing_junk_start);
+                    } else if (*trailing_junk_start as usize) < token_text.len() {
+                        err = "trailing junk after positional parameter";
+                        err_range = Some(*trailing_junk_start..token_text.len() as u32);
+                    }
+                    SyntaxKind::POSITIONAL_PARAM
+                }
                 squawk_lexer::TokenKind::QuotedIdent { terminated } => {
                     if !terminated {
                         err = "Missing trailing \" to terminate the quoted identifier"
+                    } else if is_empty_quoted_ident(token_text) {
+                        err = "empty delimited identifier";
                     }
                     SyntaxKind::IDENT
                 }
@@ -230,74 +253,288 @@ impl<'a> Converter<'a> {
         };
 
         let err = if err.is_empty() { None } else { Some(err) };
+        let err = err.map(|msg| (msg, err_range.unwrap_or(0..token_text.len() as u32)));
         self.push(syntax_kind, token_text.len(), err);
     }
 
-    fn extend_literal(&mut self, len: usize, kind: &squawk_lexer::LiteralKind) {
-        let mut err = "";
+    fn extend_literal(&mut self, token_text: &str, kind: &squawk_lexer::LiteralKind) {
+        let mut err: Option<String> = None;
+        let mut err_range: Option<ops::Range<u32>> = None;
 
         let syntax_kind = match *kind {
-            squawk_lexer::LiteralKind::Int { empty_int, base: _ } => {
+            squawk_lexer::LiteralKind::Int {
+                empty_int,
+                base,
+                trailing_junk_start,
+            } => {
                 if empty_int {
-                    err = "Missing digits after the integer base prefix";
+                    err = Some("Missing digits after the integer base prefix".into());
+                } else {
+                    if matches!(base, squawk_lexer::Base::Binary | squawk_lexer::Base::Octal) {
+                        let prefix_len = 2u32;
+                        let digits = &token_text[prefix_len as usize..trailing_junk_start as usize];
+                        let base = base as u32;
+                        let token_start = self.offset as u32;
+                        for (i, c) in digits.char_indices() {
+                            if c != '_' && c.to_digit(base).is_none() {
+                                let start = token_start + prefix_len + i as u32;
+                                let end = start + c.len_utf8() as u32;
+                                self.res.error.push(LexError {
+                                    msg: format!("invalid digit for a base {base} literal"),
+                                    range: start..end,
+                                });
+                            }
+                        }
+                    }
+                    if (trailing_junk_start as usize) < token_text.len() {
+                        err = Some("trailing junk after numeric literal".into());
+                        err_range = Some(trailing_junk_start..token_text.len() as u32);
+                    }
                 }
                 SyntaxKind::INT_NUMBER
             }
-            squawk_lexer::LiteralKind::Float {
-                empty_exponent,
+            squawk_lexer::LiteralKind::Numeric {
+                empty_exponent_start,
                 base: _,
+                trailing_junk_start,
             } => {
-                if empty_exponent {
-                    err = "Missing digits after the exponent symbol";
+                if let Some(exponent_start) = empty_exponent_start {
+                    err = Some("Missing digits after the exponent symbol".into());
+                    err_range = Some(exponent_start..exponent_start + 1);
+                } else if (trailing_junk_start as usize) < token_text.len() {
+                    err = Some("trailing junk after numeric literal".into());
+                    err_range = Some(trailing_junk_start..token_text.len() as u32);
                 }
-                SyntaxKind::FLOAT_NUMBER
+                SyntaxKind::NUMERIC_NUMBER
             }
             squawk_lexer::LiteralKind::Str { terminated } => {
                 if !terminated {
-                    err = "Missing trailing `'` symbol to terminate the string literal";
+                    err =
+                        Some("Missing trailing `'` symbol to terminate the string literal".into());
                 }
-                // TODO: rust analzyer checks for un-escaped strings, we should too
                 SyntaxKind::STRING
             }
             squawk_lexer::LiteralKind::ByteStr { terminated } => {
                 if !terminated {
-                    err = "Missing trailing `'` symbol to terminate the hex bit string literal";
+                    err = Some(
+                        "Missing trailing `'` symbol to terminate the hex bit string literal"
+                            .into(),
+                    );
                 }
-                // TODO: rust analzyer checks for un-escaped strings, we should too
+                // digit validation in squawk_syntax
                 SyntaxKind::BYTE_STRING
             }
             squawk_lexer::LiteralKind::BitStr { terminated } => {
                 if !terminated {
-                    err = "Missing trailing `\'` symbol to terminate the bit string literal";
+                    err = Some(
+                        "Missing trailing `'` symbol to terminate the bit string literal".into(),
+                    );
                 }
-                // TODO: rust analzyer checks for un-escaped strings, we should too
+                // digit validation in squawk_syntax
                 SyntaxKind::BIT_STRING
             }
             squawk_lexer::LiteralKind::DollarQuotedString { terminated } => {
                 if !terminated {
                     // TODO: we could be fancier and say the ending string we're looking for
-                    err = "Unterminated dollar quoted string literal";
+                    err = Some("Unterminated dollar quoted string literal".into());
                 }
-                // TODO: rust analzyer checks for un-escaped strings, we should too
                 SyntaxKind::DOLLAR_QUOTED_STRING
             }
             squawk_lexer::LiteralKind::UnicodeEscStr { terminated } => {
                 if !terminated {
-                    err = "Missing trailing `'` symbol to terminate the unicode escape string literal";
+                    err = Some(
+                        "Missing trailing `'` symbol to terminate the unicode escape string literal"
+                            .into(),
+                    );
                 }
-                // TODO: rust analzyer checks for un-escaped strings, we should too
+                // validated in squawk_syntax
                 SyntaxKind::UNICODE_ESC_STRING
             }
             squawk_lexer::LiteralKind::EscStr { terminated } => {
                 if !terminated {
-                    err = "Missing trailing `\'` symbol to terminate the escape string literal";
+                    err = Some(
+                        "Missing trailing `'` symbol to terminate the escape string literal".into(),
+                    );
                 }
-                // TODO: rust analzyer checks for un-escaped strings, we should too
+                // unicode escape sequences validated in squawk_syntax
                 SyntaxKind::ESC_STRING
             }
         };
 
-        let err = if err.is_empty() { None } else { Some(err) };
-        self.push(syntax_kind, len, err);
+        let err = err
+            .as_deref()
+            .map(|msg| (msg, err_range.unwrap_or(0..token_text.len() as u32)));
+        self.push(syntax_kind, token_text.len(), err);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
+    use insta::assert_snapshot;
+
+    use super::LexedStr;
+
+    fn lex(text: &str) -> String {
+        let lexed = LexedStr::new(text);
+        let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
+        let mut res = String::new();
+
+        for (range, msg) in lexed.errors() {
+            let span = range.start as usize..range.end as usize;
+            let group = Level::ERROR.primary_title(msg).element(
+                Snippet::source(text)
+                    .fold(true)
+                    .annotation(AnnotationKind::Primary.span(span)),
+            );
+            res.push_str(&renderer.render(&[group]).to_string());
+            res.push('\n');
+        }
+
+        res
+    }
+
+    #[test]
+    fn empty_int_error() {
+        assert_snapshot!(lex("select 0x;"), @"
+        error: Missing digits after the integer base prefix
+          ╭▸ 
+        1 │ select 0x;
+          ╰╴       ━━
+        ");
+    }
+
+    #[test]
+    fn empty_int_with_trailing_ident_error() {
+        assert_snapshot!(lex("select 0xg;"), @"
+        error: trailing junk after numeric literal
+          ╭▸ 
+        1 │ select 0xg;
+          ╰╴         ━
+        ");
+    }
+
+    #[test]
+    fn invalid_octal_digits_error() {
+        assert_snapshot!(lex("select 0o999;"), @"
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o999;
+          ╰╴         ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o999;
+          ╰╴          ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o999;
+          ╰╴           ━
+        ");
+    }
+
+    #[test]
+    fn invalid_binary_digits_error() {
+        assert_snapshot!(lex("select 0b234;"), @"
+        error: invalid digit for a base 2 literal
+          ╭▸ 
+        1 │ select 0b234;
+          ╰╴         ━
+        error: invalid digit for a base 2 literal
+          ╭▸ 
+        1 │ select 0b234;
+          ╰╴          ━
+        error: invalid digit for a base 2 literal
+          ╭▸ 
+        1 │ select 0b234;
+          ╰╴           ━
+        ");
+    }
+
+    #[test]
+    fn invalid_octal_digits_after_valid_error() {
+        assert_snapshot!(lex("select 0o7889;"), @"
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o7889;
+          ╰╴          ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o7889;
+          ╰╴           ━
+        error: invalid digit for a base 8 literal
+          ╭▸ 
+        1 │ select 0o7889;
+          ╰╴            ━
+        ");
+    }
+
+    #[test]
+    fn empty_exponent_error() {
+        assert_snapshot!(lex("select 1e;"), @"
+        error: Missing digits after the exponent symbol
+          ╭▸ 
+        1 │ select 1e;
+          ╰╴        ━
+        ");
+    }
+
+    #[test]
+    fn unterminated_string_error() {
+        assert_snapshot!(lex("select 'hello;"), @"
+        error: Missing trailing `'` symbol to terminate the string literal
+          ╭▸ 
+        1 │ select 'hello;
+          ╰╴       ━━━━━━━
+        ");
+    }
+
+    #[test]
+    fn unterminated_hex_bit_string_error() {
+        assert_snapshot!(lex("select X'1F;"), @"
+        error: Missing trailing `'` symbol to terminate the hex bit string literal
+          ╭▸ 
+        1 │ select X'1F;
+          ╰╴       ━━━━━
+        ");
+    }
+
+    #[test]
+    fn unterminated_bit_string_error() {
+        assert_snapshot!(lex("select B'101;"), @"
+        error: Missing trailing `'` symbol to terminate the bit string literal
+          ╭▸ 
+        1 │ select B'101;
+          ╰╴       ━━━━━━
+        ");
+    }
+
+    #[test]
+    fn unterminated_dollar_quoted_string_error() {
+        assert_snapshot!(lex("select $tag$hello;"), @"
+        error: Unterminated dollar quoted string literal
+          ╭▸ 
+        1 │ select $tag$hello;
+          ╰╴       ━━━━━━━━━━━
+        ");
+    }
+
+    #[test]
+    fn unterminated_unicode_escape_string_error() {
+        assert_snapshot!(lex("select U&'hello;"), @"
+        error: Missing trailing `'` symbol to terminate the unicode escape string literal
+          ╭▸ 
+        1 │ select U&'hello;
+          ╰╴       ━━━━━━━━━
+        ");
+    }
+
+    #[test]
+    fn unterminated_escape_string_error() {
+        assert_snapshot!(lex("select E'hello;"), @"
+        error: Missing trailing `'` symbol to terminate the escape string literal
+          ╭▸ 
+        1 │ select E'hello;
+          ╰╴       ━━━━━━━━
+        ");
     }
 }

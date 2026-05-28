@@ -25,7 +25,7 @@ SOURCE_FILE
         LITERAL
           TRUE_KW "true"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA

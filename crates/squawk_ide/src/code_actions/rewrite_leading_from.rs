@@ -1,21 +1,21 @@
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
 
-use crate::{db::File, offsets::token_from_offset};
+use crate::{file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_leading_from(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let select = token.parent_ancestors().find_map(ast::Select::cast)?;
 
     let from_clause = select.from_clause()?;
@@ -38,9 +38,9 @@ pub(super) fn rewrite_leading_from(
     actions.push(CodeAction {
         title: "Swap `from` and `select` clauses".to_owned(),
         edits: vec![
-            squawk_linter::Edit::delete(select_with_ws),
-            squawk_linter::Edit::insert(
-                format!("{} ", select_text),
+            Edit::delete(select_with_ws),
+            Edit::insert(
+                format!("{select_text} "),
                 from_clause.syntax().text_range().start(),
             ),
         ],
@@ -54,13 +54,15 @@ pub(super) fn rewrite_leading_from(
 mod test {
     use insta::assert_snapshot;
 
-    use crate::code_actions::test_utils::{apply_code_action, code_action_not_applicable};
+    use crate::code_actions::test_utils::{
+        apply_code_action_with_errors, code_action_not_applicable,
+    };
 
     use super::rewrite_leading_from;
 
     #[test]
     fn rewrite_leading_from_simple() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from$0 t select c;"),
             @"select c from t;"
@@ -69,7 +71,7 @@ mod test {
 
     #[test]
     fn rewrite_leading_from_multiple_cols() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from$0 t select a, b;"),
             @"select a, b from t;"
@@ -78,7 +80,7 @@ mod test {
 
     #[test]
     fn rewrite_leading_from_with_where() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from$0 t select c where x = 1;"),
             @"select c from t where x = 1;"
@@ -87,7 +89,7 @@ mod test {
 
     #[test]
     fn rewrite_leading_from_on_select() {
-        assert_snapshot!(apply_code_action(
+        assert_snapshot!(apply_code_action_with_errors(
             rewrite_leading_from,
             "from t sel$0ect c;"),
             @"select c from t;"

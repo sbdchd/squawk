@@ -28,7 +28,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_schema"
   WHITESPACE "\n"
@@ -60,5 +60,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

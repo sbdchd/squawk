@@ -14,7 +14,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "g"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_PROPERTY_GRAPH
     DROP_KW "drop"
@@ -39,7 +39,7 @@ SOURCE_FILE
           IDENT "bar"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_PROPERTY_GRAPH
     DROP_KW "drop"
@@ -54,5 +54,5 @@ SOURCE_FILE
           IDENT "g"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

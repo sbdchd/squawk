@@ -24,7 +24,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -55,7 +55,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"
   WHITESPACE "\n"
@@ -81,7 +81,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -117,7 +117,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
@@ -140,7 +140,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -166,7 +166,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends_extension"
   WHITESPACE "\n"
@@ -191,7 +191,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -216,7 +216,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "e"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"
   WHITESPACE "\n"
@@ -242,7 +242,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -282,7 +282,7 @@ SOURCE_FILE
       IDENT "n"
     WHITESPACE " "
     NOWAIT_KW "nowait"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_stats"
   WHITESPACE "\n"
@@ -311,7 +311,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "100"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -342,7 +342,7 @@ SOURCE_FILE
           MINUS "-"
           LITERAL
             INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -370,7 +370,7 @@ SOURCE_FILE
         STATISTICS_KW "statistics"
         WHITESPACE " "
         DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_set"
   WHITESPACE "\n"
@@ -407,9 +407,9 @@ SOURCE_FILE
             WHITESPACE " "
             ATTRIBUTE_VALUE
               LITERAL
-                FLOAT_NUMBER "1.0"
+                NUMERIC_NUMBER "1.0"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -455,7 +455,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_reset"
   WHITESPACE "\n"
@@ -486,7 +486,7 @@ SOURCE_FILE
             NAME
               IDENT "n_distinct"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -522,7 +522,7 @@ SOURCE_FILE
             NAME
               IDENT "n_distinct_inherited"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_storage"
   WHITESPACE "\n"
@@ -550,7 +550,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         IDENT "plain"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -576,7 +576,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         EXTERNAL_KW "external"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -602,7 +602,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         IDENT "extended"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -628,7 +628,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         IDENT "main"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -659,7 +659,7 @@ SOURCE_FILE
         STORAGE_KW "storage"
         WHITESPACE " "
         DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_compression"
   WHITESPACE "\n"
@@ -687,7 +687,7 @@ SOURCE_FILE
         COMPRESSION_KW "compression"
         WHITESPACE " "
         IDENT "pglz"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
     ALTER_KW "alter"
@@ -715,7 +715,7 @@ SOURCE_FILE
         COMPRESSION_KW "compression"
         WHITESPACE " "
         IDENT "pglz"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_cluster"
   WHITESPACE "\n"
@@ -738,7 +738,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_set_without_cluster"
   WHITESPACE "\n"
@@ -760,5 +760,5 @@ SOURCE_FILE
       WITHOUT_KW "without"
       WHITESPACE " "
       CLUSTER_KW "cluster"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

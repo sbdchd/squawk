@@ -140,3 +140,25 @@ fn syntaxtest(fixture: Fixture<&str>) {
         );
     }
 }
+
+#[test]
+fn parse_errors_are_sorted_by_position() {
+    let sql = "from t select 1 + ;";
+    let parse = SourceFile::parse(sql);
+    let rendered = parse
+        .errors()
+        .iter()
+        .map(|syntax_error| {
+            let range = syntax_error.range();
+            let start: u32 = range.start().into();
+            let end: u32 = range.end().into();
+            format!("{start}..{end}: {}", syntax_error.message())
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    assert_snapshot!(rendered, @r"
+    0..6: Leading from clauses are not supported in Postgres
+    17..17: expected an expression, found SEMICOLON
+    ");
+}

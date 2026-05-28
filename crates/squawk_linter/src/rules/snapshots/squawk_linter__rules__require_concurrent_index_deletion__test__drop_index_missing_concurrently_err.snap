@@ -5,7 +5,7 @@ expression: "lint_errors(sql, Rule::RequireConcurrentIndexDeletion)"
 warning[require-concurrent-index-deletion]: A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.
   ╭▸ 
 3 │   DROP INDEX IF EXISTS "field_name_idx";
-  │   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
   ├ help: Drop the index `CONCURRENTLY`.
   ╭╴

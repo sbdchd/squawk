@@ -13,7 +13,7 @@ SOURCE_FILE
     NAME
       IDENT "d"
     CREATE_DATABASE_OPTION_LIST
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -160,5 +160,5 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "1010"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

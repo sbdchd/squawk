@@ -24,7 +24,7 @@ SOURCE_FILE
     IDENTITY_KW "identity"
     WHITESPACE "\n"
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_tables"
   WHITESPACE "\n"
@@ -55,7 +55,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rest"
   WHITESPACE "\n"
@@ -68,7 +68,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   TRUNCATE
     TRUNCATE_KW "truncate"
@@ -83,7 +83,7 @@ SOURCE_FILE
     CONTINUE_KW "continue"
     WHITESPACE " "
     IDENTITY_KW "identity"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   TRUNCATE
     TRUNCATE_KW "truncate"
@@ -100,5 +100,5 @@ SOURCE_FILE
     IDENTITY_KW "identity"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

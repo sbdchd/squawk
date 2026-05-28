@@ -1,0 +1,284 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/unicode_escape_ident.sql
+---
+SOURCE_FILE@0..489
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..33
+    SELECT_CLAUSE@6..32
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..32
+        TARGET@13..32
+          NAME_REF@13..32
+            IDENT@13..32 "U&\"d\\0061t\\+000061\""
+    SEMICOLON@32..33 ";"
+  WHITESPACE@33..34 "\n"
+  SELECT@34..48
+    SELECT_CLAUSE@34..47
+      SELECT_KW@34..40 "select"
+      WHITESPACE@40..41 " "
+      TARGET_LIST@41..47
+        TARGET@41..47
+          NAME_REF@41..47
+            IDENT@41..47 "U&\"\\\\\""
+    SEMICOLON@47..48 ";"
+  WHITESPACE@48..49 "\n"
+  SELECT@49..82
+    SELECT_CLAUSE@49..81
+      SELECT_KW@49..55 "select"
+      WHITESPACE@55..56 " "
+      TARGET_LIST@56..81
+        TARGET@56..81
+          NAME_REF@56..81
+            IDENT@56..69 "U&\"ok: !0061\""
+            WHITESPACE@69..70 " "
+            UESCAPE_KW@70..77 "UESCAPE"
+            WHITESPACE@77..78 " "
+            STRING@78..81 "'!'"
+    SEMICOLON@81..82 ";"
+  WHITESPACE@82..83 "\n"
+  SELECT@83..109
+    SELECT_CLAUSE@83..108
+      SELECT_KW@83..89 "select"
+      WHITESPACE@89..90 " "
+      TARGET_LIST@90..108
+        TARGET@90..108
+          NAME_REF@90..108
+            IDENT@90..96 "U&\" \\\""
+            WHITESPACE@96..97 " "
+            UESCAPE_KW@97..104 "UESCAPE"
+            WHITESPACE@104..105 " "
+            STRING@105..108 "'!'"
+    SEMICOLON@108..109 ";"
+  WHITESPACE@109..111 "\n\n"
+  COMMENT@111..120 "-- errors"
+  WHITESPACE@120..121 "\n"
+  SELECT@121..137
+    SELECT_CLAUSE@121..136
+      SELECT_KW@121..127 "select"
+      WHITESPACE@127..128 " "
+      TARGET_LIST@128..136
+        TARGET@128..136
+          NAME_REF@128..136
+            IDENT@128..136 "U&\"\\006\""
+    SEMICOLON@136..137 ";"
+  WHITESPACE@137..138 "\n"
+  SELECT@138..156
+    SELECT_CLAUSE@138..155
+      SELECT_KW@138..144 "select"
+      WHITESPACE@144..145 " "
+      TARGET_LIST@145..155
+        TARGET@145..155
+          NAME_REF@145..155
+            IDENT@145..155 "U&\"\\+0061\""
+    SEMICOLON@155..156 ";"
+  WHITESPACE@156..157 "\n"
+  SELECT@157..191
+    SELECT_CLAUSE@157..190
+      SELECT_KW@157..163 "select"
+      WHITESPACE@163..164 " "
+      TARGET_LIST@164..190
+        TARGET@164..190
+          NAME_REF@164..190
+            IDENT@164..178 "U&\"wrong: \\06\""
+            WHITESPACE@178..179 " "
+            UESCAPE_KW@179..186 "UESCAPE"
+            WHITESPACE@186..187 " "
+            STRING@187..190 "'\\'"
+    SEMICOLON@190..191 ";"
+  WHITESPACE@191..192 "\n"
+  SELECT@192..227
+    SELECT_CLAUSE@192..226
+      SELECT_KW@192..198 "select"
+      WHITESPACE@198..199 " "
+      TARGET_LIST@199..226
+        TARGET@199..226
+          NAME_REF@199..226
+            IDENT@199..214 "U&\"wrong: !061\""
+            WHITESPACE@214..215 " "
+            UESCAPE_KW@215..222 "UESCAPE"
+            WHITESPACE@222..223 " "
+            STRING@223..226 "'!'"
+    SEMICOLON@226..227 ";"
+  WHITESPACE@227..228 "\n"
+  SELECT@228..263
+    SELECT_CLAUSE@228..262
+      SELECT_KW@228..234 "select"
+      WHITESPACE@234..235 " "
+      TARGET_LIST@235..262
+        TARGET@235..262
+          NAME_REF@235..262
+            IDENT@235..262 "U&\"many: \\061 \\+0061  ..."
+    SEMICOLON@262..263 ";"
+  WHITESPACE@263..264 "\n"
+  SELECT@264..291
+    SELECT_CLAUSE@264..290
+      SELECT_KW@264..270 "select"
+      WHITESPACE@270..271 " "
+      TARGET_LIST@271..290
+        TARGET@271..290
+          NAME_REF@271..290
+            IDENT@271..290 "U&\"\\D800\\D801\\DC00\""
+    SEMICOLON@290..291 ";"
+  WHITESPACE@291..292 "\n"
+  SELECT@292..306
+    SELECT_CLAUSE@292..305
+      SELECT_KW@292..298 "select"
+      WHITESPACE@298..299 " "
+      TARGET_LIST@299..305
+        TARGET@299..305
+          NAME_REF@299..305
+            IDENT@299..305 "U&\" \\\""
+    SEMICOLON@305..306 ";"
+  WHITESPACE@306..307 "\n"
+  SELECT@307..335
+    SELECT_CLAUSE@307..334
+      SELECT_KW@307..313 "select"
+      WHITESPACE@313..314 " "
+      TARGET_LIST@314..334
+        TARGET@314..334
+          NAME_REF@314..334
+            IDENT@314..323 "U&\"error\""
+            WHITESPACE@323..324 " "
+            UESCAPE_KW@324..331 "UESCAPE"
+            WHITESPACE@331..332 " "
+            STRING@332..334 "''"
+    SEMICOLON@334..335 ";"
+  WHITESPACE@335..336 "\n"
+  SELECT@336..365
+    SELECT_CLAUSE@336..364
+      SELECT_KW@336..342 "select"
+      WHITESPACE@342..343 " "
+      TARGET_LIST@343..364
+        TARGET@343..364
+          NAME_REF@343..364
+            IDENT@343..352 "U&\"error\""
+            WHITESPACE@352..353 " "
+            UESCAPE_KW@353..360 "UESCAPE"
+            WHITESPACE@360..361 " "
+            STRING@361..364 "' '"
+    SEMICOLON@364..365 ";"
+  WHITESPACE@365..366 "\n"
+  SELECT@366..395
+    SELECT_CLAUSE@366..394
+      SELECT_KW@366..372 "select"
+      WHITESPACE@372..373 " "
+      TARGET_LIST@373..394
+        TARGET@373..394
+          NAME_REF@373..394
+            IDENT@373..382 "U&\"error\""
+            WHITESPACE@382..383 " "
+            UESCAPE_KW@383..390 "UESCAPE"
+            WHITESPACE@390..391 " "
+            STRING@391..394 "'+'"
+    SEMICOLON@394..395 ";"
+  WHITESPACE@395..396 "\n"
+  SELECT@396..425
+    SELECT_CLAUSE@396..424
+      SELECT_KW@396..402 "select"
+      WHITESPACE@402..403 " "
+      TARGET_LIST@403..424
+        TARGET@403..424
+          NAME_REF@403..424
+            IDENT@403..412 "U&\"error\""
+            WHITESPACE@412..413 " "
+            UESCAPE_KW@413..420 "UESCAPE"
+            WHITESPACE@420..421 " "
+            STRING@421..424 "'A'"
+    SEMICOLON@424..425 ";"
+  WHITESPACE@425..426 "\n"
+  SELECT@426..456
+    SELECT_CLAUSE@426..455
+      SELECT_KW@426..432 "select"
+      WHITESPACE@432..433 " "
+      TARGET_LIST@433..455
+        TARGET@433..455
+          NAME_REF@433..455
+            IDENT@433..442 "U&\"error\""
+            WHITESPACE@442..443 " "
+            UESCAPE_KW@443..450 "UESCAPE"
+            WHITESPACE@450..451 " "
+            STRING@451..455 "'é'"
+    SEMICOLON@455..456 ";"
+  WHITESPACE@456..457 "\n"
+  SELECT@457..488
+    SELECT_CLAUSE@457..487
+      SELECT_KW@457..463 "select"
+      WHITESPACE@463..464 " "
+      TARGET_LIST@464..487
+        TARGET@464..487
+          NAME_REF@464..487
+            IDENT@464..473 "U&\"error\""
+            WHITESPACE@473..474 " "
+            UESCAPE_KW@474..481 "UESCAPE"
+            WHITESPACE@481..482 " "
+            STRING@482..487 "'foo'"
+    SEMICOLON@487..488 ";"
+  WHITESPACE@488..489 "\n"
+
+error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+  ╭▸ 
+8 │ select U&"\006";
+  ╰╴          ━━━━
+error[syntax-error]: Unicode escape requires 6 hex digits: \+XXXXXX
+  ╭▸ 
+9 │ select U&"\+0061";
+  ╰╴          ━━━━━━
+error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+   ╭▸ 
+10 │ select U&"wrong: \06" UESCAPE '\';
+   ╰╴                 ━━━
+error[syntax-error]: Unicode escape requires 4 hex digits: !XXXX
+   ╭▸ 
+11 │ select U&"wrong: !061" UESCAPE '!';
+   ╰╴                 ━━━━
+error[syntax-error]: Unicode escape requires 4 hex digits: \XXXX
+   ╭▸ 
+12 │ select U&"many: \061 \+0061 \zzzz";
+   ╰╴                ━━━━
+error[syntax-error]: Unicode escape requires 6 hex digits: \+XXXXXX
+   ╭▸ 
+12 │ select U&"many: \061 \+0061 \zzzz";
+   ╰╴                     ━━━━━━
+error[syntax-error]: Invalid Unicode escape sequence
+   ╭▸ 
+12 │ select U&"many: \061 \+0061 \zzzz";
+   ╰╴                            ━━
+error[syntax-error]: Invalid Unicode surrogate pair
+   ╭▸ 
+13 │ select U&"\D800\D801\DC00";
+   ╰╴          ━━━━━━━━━━
+error[syntax-error]: Invalid Unicode surrogate pair
+   ╭▸ 
+13 │ select U&"\D800\D801\DC00";
+   ╰╴                    ━━━━━
+error[syntax-error]: Invalid Unicode escape sequence
+   ╭▸ 
+14 │ select U&" \";
+   ╰╴           ━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+15 │ select U&"error" UESCAPE '';
+   ╰╴                         ━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+16 │ select U&"error" UESCAPE ' ';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+17 │ select U&"error" UESCAPE '+';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+18 │ select U&"error" UESCAPE 'A';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+19 │ select U&"error" UESCAPE 'é';
+   ╰╴                         ━━━
+error[syntax-error]: Invalid unicode escape character
+   ╭▸ 
+20 │ select U&"error" UESCAPE 'foo';
+   ╰╴                         ━━━━━

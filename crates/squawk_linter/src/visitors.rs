@@ -1,12 +1,12 @@
 use rustc_hash::FxHashSet;
 
-use squawk_syntax::{ast, identifier::Identifier};
+use squawk_syntax::ast;
 
 use crate::Linter;
 
 pub(crate) fn is_not_valid_int_type(
     ty: &ast::Type,
-    invalid_type_names: &FxHashSet<Identifier>,
+    invalid_type_names: &FxHashSet<&'static str>,
 ) -> bool {
     match ty {
         ast::Type::ArrayType(array_type) => {
@@ -22,12 +22,11 @@ pub(crate) fn is_not_valid_int_type(
                 .path()
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
-                .map(|x| x.text().to_string())
+                .map(|x| x.text())
             else {
                 return false;
             };
-            let name = Identifier::new(ty_name.as_str());
-            invalid_type_names.contains(&name)
+            invalid_type_names.contains(ty_name.as_str())
         }
         ast::Type::CharType(_) => false,
         ast::Type::BitType(_) => false,

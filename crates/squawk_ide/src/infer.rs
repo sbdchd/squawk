@@ -7,29 +7,31 @@ use squawk_syntax::{
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Type {
-    Integer,
-    Numeric,
-    Text,
+    Array(Box<Type>),
+    Bigint,
     Bit,
     Boolean,
-    Unknown,
-    Record,
-    Array(Box<Type>),
+    Integer,
+    Numeric,
     Other(String),
+    Record,
+    Text,
+    Unknown,
 }
 
 impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Type::Integer => write!(f, "integer"),
-            Type::Numeric => write!(f, "numeric"),
-            Type::Text => write!(f, "text"),
+            Type::Array(inner) => write!(f, "{inner}[]"),
+            Type::Bigint => write!(f, "bigint"),
             Type::Bit => write!(f, "bit"),
             Type::Boolean => write!(f, "boolean"),
-            Type::Unknown => write!(f, "unknown"),
-            Type::Record => write!(f, "record"),
-            Type::Array(inner) => write!(f, "{inner}[]"),
+            Type::Integer => write!(f, "integer"),
+            Type::Numeric => write!(f, "numeric"),
             Type::Other(s) => write!(f, "{s}"),
+            Type::Record => write!(f, "record"),
+            Type::Text => write!(f, "text"),
+            Type::Unknown => write!(f, "unknown"),
         }
     }
 }
@@ -64,11 +66,32 @@ pub(crate) fn infer_type_from_ty(ty: &ast::Type) -> Option<Type> {
     }
 }
 
-fn infer_type_from_literal(literal: &ast::Literal) -> Option<Type> {
+fn infer_int_type(text: &str) -> Type {
+    let cleaned = text.replace('_', "");
+    let lower = cleaned.to_ascii_lowercase();
+    let (digits, radix) = if let Some(rest) = lower.strip_prefix("0x") {
+        (rest, 16)
+    } else if let Some(rest) = lower.strip_prefix("0o") {
+        (rest, 8)
+    } else if let Some(rest) = lower.strip_prefix("0b") {
+        (rest, 2)
+    } else {
+        (lower.as_str(), 10)
+    };
+    match u64::from_str_radix(digits, radix) {
+        Ok(n) if n <= i32::MAX as u64 => Type::Integer,
+        Ok(n) if n <= i64::MAX as u64 => Type::Bigint,
+        _ => Type::Numeric,
+    }
+}
+
+pub(crate) fn infer_type_from_literal(literal: &ast::Literal) -> Option<Type> {
     let token = literal.syntax().first_token()?;
     match token.kind() {
-        SyntaxKind::INT_NUMBER => Some(Type::Integer),
-        SyntaxKind::FLOAT_NUMBER => Some(Type::Numeric),
+        SyntaxKind::INT_NUMBER => Some(infer_int_type(token.text())),
+        SyntaxKind::NUMERIC_NUMBER => Some(Type::Numeric),
+        // TODO: this isn't necessarily text, e.g., select 1 + '1';
+        // We need to look at the context of the string's usage to be sure.
         SyntaxKind::STRING
         | SyntaxKind::DOLLAR_QUOTED_STRING
         | SyntaxKind::ESC_STRING
@@ -85,6 +108,7 @@ mod tests {
     use super::*;
     use insta::assert_snapshot;
 
+    #[must_use]
     fn infer(sql: &str) -> String {
         let parse = ast::SourceFile::parse(sql);
         for stmt in parse.tree().stmts() {
@@ -111,8 +135,63 @@ mod tests {
     }
 
     #[test]
+    fn integer_max() {
+        assert_snapshot!(infer("select 2147483647"), @"integer");
+    }
+
+    #[test]
+    fn bigint_just_over_int_max() {
+        assert_snapshot!(infer("select 2147483648"), @"bigint");
+    }
+
+    #[test]
+    fn bigint_literal() {
+        assert_snapshot!(infer("select 100000000000000"), @"bigint");
+    }
+
+    #[test]
+    fn numeric_over_bigint() {
+        assert_snapshot!(infer("select 100000000000000000000000"), @"numeric");
+    }
+
+    #[test]
+    fn hex_literal() {
+        assert_snapshot!(infer("select 0xFF"), @"integer");
+    }
+
+    #[test]
+    fn hex_literal_bigint() {
+        assert_snapshot!(infer("select 0xFFFFFFFFFF"), @"bigint");
+    }
+
+    #[test]
+    fn octal_literal() {
+        assert_snapshot!(infer("select 0o17"), @"integer");
+    }
+
+    #[test]
+    fn binary_literal() {
+        assert_snapshot!(infer("select 0b1001"), @"integer");
+    }
+
+    #[test]
+    fn integer_with_underscores() {
+        assert_snapshot!(infer("select 1_000_000"), @"integer");
+    }
+
+    #[test]
     fn float_literal() {
         assert_snapshot!(infer("select 1.5"), @"numeric");
+    }
+
+    #[test]
+    fn float_with_zero_decimal() {
+        assert_snapshot!(infer("select 10000.0"), @"numeric");
+    }
+
+    #[test]
+    fn exponent_literal() {
+        assert_snapshot!(infer("select 1e5"), @"numeric");
     }
 
     #[test]
@@ -128,6 +207,11 @@ mod tests {
     #[test]
     fn escape_string() {
         assert_snapshot!(infer("select E'hello'"), @"text");
+    }
+
+    #[test]
+    fn unicode_escape_string() {
+        assert_snapshot!(infer("select U&' \' UESCAPE '!'"), @"text");
     }
 
     #[test]
@@ -158,6 +242,11 @@ mod tests {
     #[test]
     fn bit_string() {
         assert_snapshot!(infer("select b'100'"), @"bit");
+    }
+
+    #[test]
+    fn byte_string() {
+        assert_snapshot!(infer("select x'FF'"), @"bit");
     }
 
     #[test]

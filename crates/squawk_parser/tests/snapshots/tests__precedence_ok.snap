@@ -34,7 +34,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "3"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -71,7 +71,7 @@ SOURCE_FILE
                       LITERAL
                         INT_NUMBER "2"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMPOUND_SELECT
     SELECT
@@ -103,7 +103,7 @@ SOURCE_FILE
         SORT_BY
           NAME_REF
             IDENT "baz"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- equal to:"
   WHITESPACE "\n"
@@ -140,5 +140,5 @@ SOURCE_FILE
         SORT_BY
           NAME_REF
             IDENT "baz"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

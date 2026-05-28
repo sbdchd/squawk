@@ -30,7 +30,7 @@ SOURCE_FILE
       ARG_LIST
         L_PAREN "("
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -98,7 +98,7 @@ SOURCE_FILE
       ARG_LIST
         L_PAREN "("
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
   WHITESPACE "\n"
@@ -127,5 +127,5 @@ SOURCE_FILE
       ARG_LIST
         L_PAREN "("
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

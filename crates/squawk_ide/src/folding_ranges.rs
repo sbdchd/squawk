@@ -144,6 +144,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::ROLE_OPTION_LIST
         | SyntaxKind::ROLE_REF_LIST
         | SyntaxKind::ROW_LIST
+        | SyntaxKind::RULE_STMT_LIST
         | SyntaxKind::SEQUENCE_OPTION_LIST
         | SyntaxKind::SET_COLUMN_LIST
         | SyntaxKind::SET_EXPR_LIST
@@ -235,6 +236,7 @@ mod tests {
         }
     }
 
+    #[must_use]
     fn check(sql: &str) -> String {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());
@@ -298,7 +300,7 @@ create table t (
         <fold statement>create table t <fold arglist>(
           id int,
           name text
-        )</fold></fold>;
+        )</fold>;</fold>
         ");
     }
 
@@ -312,7 +314,7 @@ from t;"), @"
         <fold statement>select
           <fold list>id,
           name</fold>
-        from t</fold>;
+        from t;</fold>
         ");
     }
 
@@ -354,7 +356,7 @@ select a, b, 3
         -- with some more</fold>
         <fold statement>select a, b, 3
           from t
-          where c > 10</fold>;
+          where c > 10;</fold>
         ");
     }
 
@@ -399,7 +401,7 @@ select * from (
 );"), @"
         <fold statement>select * from <fold statement>(
           select id from t
-        )</fold></fold>;
+        )</fold>;</fold>
         ");
     }
 
@@ -417,7 +419,7 @@ from t;"), @"
             <fold list>when x = 1 then 'a'
             when x = 2 then 'b'</fold>
           end</fold>
-        from t</fold>;
+        from t;</fold>
         ");
     }
 
@@ -431,7 +433,7 @@ join b
         <fold statement>select *
         from a
         <fold join>join b
-          on a.id = b.id</fold></fold>;
+          on a.id = b.id</fold>;</fold>
         ");
     }
 
@@ -449,7 +451,7 @@ select * from t where
             1,
             2,
             3
-          ]</fold>)</fold></fold>;
+          ]</fold>)</fold>;</fold>
         ");
     }
 
@@ -465,7 +467,7 @@ select (
           1,
           2,
           3
-        )</fold></fold></fold>;
+        )</fold></fold>;</fold>
         ");
     }
 
@@ -488,7 +490,7 @@ select * from x
             3,
             4,
             5
-          )</fold></fold>;
+          )</fold>;</fold>
         ");
     }
 
@@ -504,7 +506,7 @@ select coalesce(
           a,
           b,
           c
-        )</fold></fold></fold></fold>;
+        )</fold></fold></fold>;</fold>
         ");
     }
 
@@ -518,7 +520,7 @@ create type status as enum (
         <fold statement>create type status as enum <fold list>(
           'active',
           'inactive'
-        )</fold></fold>;
+        )</fold>;</fold>
         ");
     }
 
@@ -532,7 +534,7 @@ values
         <fold statement>insert into t (id, name)
         <fold statement>values
           <fold list>(1, 'a'),
-          (2, 'b')</fold></fold></fold>;
+          (2, 'b')</fold></fold>;</fold>
         ");
     }
 
@@ -545,7 +547,7 @@ values
     fn list_variants() {
         let unhandled_list_kinds: Vec<SyntaxKind> = (0..SyntaxKind::__LAST as u16)
             .map(SyntaxKind::from)
-            .filter(|kind| format!("{:?}", kind).ends_with("_LIST"))
+            .filter(|kind| format!("{kind:?}").ends_with("_LIST"))
             .filter(|kind| fold_kind(*kind).is_none())
             .collect();
 

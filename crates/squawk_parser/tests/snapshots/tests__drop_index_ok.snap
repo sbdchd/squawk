@@ -14,7 +14,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
     DROP_KW "drop"
@@ -30,7 +30,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
     DROP_KW "drop"
@@ -62,7 +62,7 @@ SOURCE_FILE
           IDENT "c"
     WHITESPACE " "
     CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
     DROP_KW "drop"
@@ -80,7 +80,7 @@ SOURCE_FILE
           IDENT "d"
     WHITESPACE " "
     RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
     DROP_KW "drop"
@@ -96,7 +96,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "\"field_name_idx\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
     DROP_KW "drop"
@@ -114,5 +114,5 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "\"field_name_idx\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

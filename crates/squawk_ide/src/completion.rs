@@ -7,6 +7,7 @@ use crate::ast_nav;
 use crate::binder;
 use crate::collect;
 use crate::db::{File, bind, parse};
+use crate::file::InFile;
 use crate::name::{self, Name, Schema};
 use crate::resolve;
 use crate::symbols::SymbolKind;
@@ -14,7 +15,9 @@ use crate::tokens::is_string_or_comment;
 
 const COMPLETION_MARKER: &str = "squawkCompletionMarker";
 
-pub fn completion(db: &dyn Db, file: File, offset: TextSize) -> Vec<CompletionItem> {
+pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem> {
+    let file = position.file_id;
+    let offset = position.value;
     let parse = parse(db, file);
     let source_file = parse.tree();
 
@@ -61,7 +64,7 @@ fn select_completions(
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
-    completions.extend(function_completions(db, file, &schema, position));
+    completions.extend(function_completions(db, file, schema.as_ref(), position));
 
     let tables = binder.all_symbols_by_kind(SymbolKind::Table, schema.as_ref());
     completions.extend(tables.into_iter().map(|name| CompletionItem {
@@ -270,7 +273,7 @@ fn limit_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<Comple
         sort_text: None,
     }];
 
-    completions.extend(function_completions(db, file, &schema, position));
+    completions.extend(function_completions(db, file, schema.as_ref(), position));
     completions
 }
 
@@ -278,7 +281,7 @@ fn offset_completions(db: &dyn Db, file: File, token: &SyntaxToken) -> Vec<Compl
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
-    function_completions(db, file, &schema, position)
+    function_completions(db, file, schema.as_ref(), position)
 }
 
 fn select_expr_completions(
@@ -291,7 +294,7 @@ fn select_expr_completions(
     let schema = schema_qualifier_at_token(token);
     let position = token.text_range().start();
 
-    completions.extend(function_completions(db, file, &schema, position));
+    completions.extend(function_completions(db, file, schema.as_ref(), position));
 
     if let Some(from_clause) = select.from_clause() {
         for from_item in from_clause.from_items() {
@@ -317,12 +320,12 @@ fn select_expr_completions(
 fn function_completions(
     db: &dyn Db,
     file: File,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Vec<CompletionItem> {
     let binder = bind(db, file);
     binder
-        .all_symbols_by_kind(SymbolKind::Function, schema.as_ref())
+        .all_symbols_by_kind(SymbolKind::Function, schema)
         .into_iter()
         .map(|name| CompletionItem {
             label: format!("{name}()"),
@@ -343,7 +346,7 @@ fn column_completions_from_clause(
 ) -> Vec<CompletionItem> {
     let mut completions = vec![];
     let syntax_root = from_clause.syntax().ancestors().last().unwrap();
-    for table_ptr in resolve::table_ptrs_from_clause(db, file, from_clause) {
+    for table_ptr in resolve::table_ptrs_from_clause(db, InFile::new(file, from_clause)) {
         let table_node = table_ptr.to_node(&syntax_root);
         match ast_nav::parent_source(&table_node) {
             Some(ast_nav::ParentSouce::CreateTable(create_table)) => {
@@ -371,7 +374,8 @@ fn column_completions_from_clause(
                 }));
             }
             Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
-                let columns = collect::create_table_as_columns_with_types(&create_table_as);
+                let columns =
+                    collect::create_table_as_columns_with_types(db, file, &create_table_as);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
                     kind: CompletionItemKind::Column,
@@ -383,7 +387,7 @@ fn column_completions_from_clause(
                 }));
             }
             Some(ast_nav::ParentSouce::CreateView(create_view)) => {
-                let columns = collect::view_like_columns_with_types(&create_view);
+                let columns = collect::view_like_columns_with_types(db, file, &create_view);
                 completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
                     label: name.to_string(),
                     kind: CompletionItemKind::Column,
@@ -459,7 +463,8 @@ fn alias_base_columns_with_types(
     let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
         return vec![];
     };
-    let Some(table_ptr) = resolve::table_ptr_from_from_item(db, file, &from_item) else {
+    let Some(table_ptr) = resolve::table_ptr_from_from_item(db, InFile::new(file, &from_item))
+    else {
         return vec![];
     };
 
@@ -479,7 +484,7 @@ fn alias_base_columns_with_types(
                 .collect()
         }
         Some(ast_nav::ParentSouce::CreateView(create_view)) => {
-            collect::view_like_columns_with_types(&create_view)
+            collect::view_like_columns_with_types(db, file, &create_view)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
@@ -491,7 +496,7 @@ fn alias_base_columns_with_types(
                 .collect()
         }
         Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
-            collect::create_table_as_columns_with_types(&create_table_as)
+            collect::create_table_as_columns_with_types(db, file, &create_table_as)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
@@ -639,7 +644,7 @@ fn delete_expr_completions(
         completions.extend(functions.into_iter().map(|name| CompletionItem {
             label: name.to_string(),
             kind: CompletionItemKind::Function,
-            detail: function_detail(db, file, name, &schema, position),
+            detail: function_detail(db, file, name, schema.as_ref(), position),
             insert_text: None,
             insert_text_format: None,
             trigger_completion_after_insert: false,
@@ -650,7 +655,7 @@ fn delete_expr_completions(
         completions.extend(functions.into_iter().map(|name| CompletionItem {
             label: format!("{name}()"),
             kind: CompletionItemKind::Function,
-            detail: function_detail(db, file, name, &schema, position),
+            detail: function_detail(db, file, name, schema.as_ref(), position),
             insert_text: None,
             insert_text_format: None,
             trigger_completion_after_insert: false,
@@ -669,8 +674,8 @@ fn delete_expr_completions(
     }
 
     let schema = name::schema_name(&path);
-    if let Some(table_ptr) =
-        binder.lookup_with(&delete_table_name, SymbolKind::Table, position, &schema)
+    let schemas = binder.resolved_schemas(position, schema.as_ref());
+    if let Some(table_ptr) = binder.lookup_with(&delete_table_name, SymbolKind::Table, &schemas)
         && let Some(create_table) = table_ptr
             .to_node(source_file.syntax())
             .ancestors()
@@ -836,18 +841,19 @@ fn function_detail(
     db: &dyn Db,
     file: File,
     function_name: &Name,
-    schema: &Option<Schema>,
+    schema: Option<&Schema>,
     position: TextSize,
 ) -> Option<String> {
     let binder = bind(db, file);
     let source_file = parse(db, file).tree();
+    let schemas = binder.resolved_schemas(position, schema);
     let create_function = binder
-        .lookup_with(function_name, SymbolKind::Function, position, schema)?
+        .lookup_with(function_name, SymbolKind::Function, &schemas)?
         .to_node(source_file.syntax())
         .ancestors()
         .find_map(ast::CreateFunction::cast)?;
     let path = create_function.path()?;
-    let (schema, function_name) = resolve::resolve_function_info(db, file, &path)?;
+    let (schema, function_name) = resolve::resolve_function_info(db, InFile::new(file, &path))?;
 
     let param_list = create_function.param_list()?;
     let params = param_list.syntax().text().to_string();
@@ -855,10 +861,7 @@ fn function_detail(
     let ret_type = create_function.ret_type()?;
     let return_type = ret_type.syntax().text().to_string();
 
-    Some(format!(
-        "{}.{}{} {}",
-        schema, function_name, params, return_type
-    ))
+    Some(format!("{schema}.{function_name}{params} {return_type}"))
 }
 
 fn default_completions() -> Vec<CompletionItem> {
@@ -931,17 +934,17 @@ pub struct CompletionItem {
 #[cfg(test)]
 mod tests {
     use super::completion;
-    use crate::db::{Database, File};
-    use crate::test_utils::fixture;
+
+    use crate::test_utils::Fixture;
     use insta::assert_snapshot;
     use tabled::builder::Builder;
     use tabled::settings::Style;
 
+    #[must_use]
     fn completions(sql: &str) -> String {
-        let (offset, sql) = fixture(sql);
-        let db = Database::default();
-        let file = File::new(&db, sql.into());
-        let items = completion(&db, file, offset);
+        let fixture = Fixture::new_allow_errors(sql);
+        let offset = fixture.marker().offset();
+        let items = completion(fixture.db(), offset);
         assert!(
             !items.is_empty(),
             "No completions found. If this was intended, use `completions_not_found` instead."
@@ -950,10 +953,9 @@ mod tests {
     }
 
     fn completions_not_found(sql: &str) {
-        let (offset, sql) = fixture(sql);
-        let db = Database::default();
-        let file = File::new(&db, sql.into());
-        let items = completion(&db, file, offset);
+        let fixture = Fixture::new_allow_errors(sql);
+        let offset = fixture.marker().offset();
+        let items = completion(fixture.db(), offset);
         assert_eq!(
             items,
             vec![],
@@ -1129,6 +1131,78 @@ select $0 from t;
          pg_catalog         | Schema   |                         
          pg_temp            | Schema   |                         
          pg_toast           | Schema   |                         
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_create_table_inherits_builtin() {
+        assert_snapshot!(completions("
+-- include-builtins
+create table t ()
+inherits (information_schema.sql_features);
+select $0 from t;
+"), @"
+         label              | kind     | detail         
+        --------------------+----------+----------------
+         comments           | Column   | character_data 
+         feature_id         | Column   | character_data 
+         feature_name       | Column   | character_data 
+         is_supported       | Column   | yes_or_no      
+         is_verified_by     | Column   | character_data 
+         sub_feature_id     | Column   | character_data 
+         sub_feature_name   | Column   | character_data 
+         t                  | Table    |                
+         *                  | Operator |                
+         public             | Schema   |                
+         pg_catalog         | Schema   |                
+         pg_temp            | Schema   |                
+         pg_toast           | Schema   |                
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_create_table_inherits_create_table_as() {
+        assert_snapshot!(completions("
+create table parent as select 1 a, 'x'::text b;
+create table child (c int) inherits (parent);
+select $0 from child;
+"), @"
+         label              | kind     | detail  
+        --------------------+----------+---------
+         a                  | Column   | integer 
+         b                  | Column   | text    
+         c                  | Column   | int     
+         child              | Table    |         
+         parent             | Table    |         
+         *                  | Operator |         
+         public             | Schema   |         
+         pg_catalog         | Schema   |         
+         pg_temp            | Schema   |         
+         pg_toast           | Schema   |         
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_create_table_like_select_into() {
+        assert_snapshot!(completions("
+select 1 a, 'x'::text b into parent;
+create table child (like parent);
+select $0 from child;
+"), @"
+         label              | kind     | detail  
+        --------------------+----------+---------
+         a                  | Column   | integer 
+         b                  | Column   | text    
+         child              | Table    |         
+         parent             | Table    |         
+         *                  | Operator |         
+         public             | Schema   |         
+         pg_catalog         | Schema   |         
+         pg_temp            | Schema   |         
+         pg_toast           | Schema   |         
          information_schema | Schema   |
         ");
     }

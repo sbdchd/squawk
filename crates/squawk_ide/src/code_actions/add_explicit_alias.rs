@@ -1,20 +1,19 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::quote::quote_column_alias;
 
-use crate::{
-    column_name::ColumnName, db::File, offsets::token_from_offset, quote::quote_column_alias,
-};
+use crate::{column_name::ColumnName, file::InFile, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn add_explicit_alias(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
     let target = token.parent_ancestors().find_map(ast::Target::cast)?;
 
     if target.as_name().is_some() {
@@ -32,11 +31,11 @@ pub(super) fn add_explicit_alias(
     let expr_end = target.expr().map(|e| e.syntax().text_range().end())?;
 
     let quoted_alias = quote_column_alias(&alias);
-    let replacement = format!(" as {}", quoted_alias);
+    let replacement = format!(" as {quoted_alias}");
 
     actions.push(CodeAction {
         title: "Add explicit alias".to_owned(),
-        edits: vec![squawk_linter::Edit::insert(replacement, expr_end)],
+        edits: vec![Edit::insert(replacement, expr_end)],
         kind: ActionKind::RefactorRewrite,
     });
 

@@ -14,7 +14,7 @@ SOURCE_FILE
       IDENT "e"
     WHITESPACE " "
     UPDATE_KW "update"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -29,7 +29,7 @@ SOURCE_FILE
     TO_KW "to"
     WHITESPACE " "
     JSON_KW "json"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -45,7 +45,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'foo'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
@@ -64,7 +64,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_access_method"
   WHITESPACE "\n"
@@ -84,7 +84,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -102,7 +102,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_aggregate"
   WHITESPACE "\n"
@@ -160,7 +160,7 @@ SOURCE_FILE
                   IDENT "c"
         WHITESPACE " "
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -184,7 +184,7 @@ SOURCE_FILE
         L_PAREN "("
         STAR "*"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_cast"
   WHITESPACE "\n"
@@ -216,7 +216,7 @@ SOURCE_FILE
             NAME_REF
               TEXT_KW "text"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -249,7 +249,7 @@ SOURCE_FILE
             NAME_REF
               SMALLINT_KW "smallint"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_collation"
   WHITESPACE "\n"
@@ -269,7 +269,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -292,7 +292,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -310,7 +310,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -333,7 +333,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_conversion"
   WHITESPACE "\n"
@@ -353,7 +353,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -376,7 +376,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -394,7 +394,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -417,7 +417,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_domain"
   WHITESPACE "\n"
@@ -435,7 +435,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -451,7 +451,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_event_trigger"
   WHITESPACE "\n"
@@ -471,7 +471,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -489,7 +489,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_foreign_data_wrapper"
   WHITESPACE "\n"
@@ -511,7 +511,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -531,7 +531,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_foreign_table"
   WHITESPACE "\n"
@@ -553,7 +553,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -578,7 +578,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -598,7 +598,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -623,7 +623,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_function"
   WHITESPACE "\n"
@@ -644,7 +644,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -691,7 +691,7 @@ SOURCE_FILE
                 NAME_REF
                   BIGINT_KW "bigint"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -710,7 +710,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -766,7 +766,7 @@ SOURCE_FILE
                   INT_NUMBER "100"
               R_PAREN ")"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_materialized_view"
   WHITESPACE "\n"
@@ -788,7 +788,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -813,7 +813,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -833,7 +833,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -858,7 +858,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator"
   WHITESPACE "\n"
@@ -896,7 +896,7 @@ SOURCE_FILE
             INT_NUMBER "100"
         R_PAREN ")"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -932,7 +932,7 @@ SOURCE_FILE
             INT_NUMBER "100"
         R_PAREN ")"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator_class"
   WHITESPACE "\n"
@@ -957,7 +957,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -980,7 +980,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator_family"
   WHITESPACE "\n"
@@ -1005,7 +1005,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1028,7 +1028,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_language"
   WHITESPACE "\n"
@@ -1046,7 +1046,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1064,7 +1064,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1080,7 +1080,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1098,7 +1098,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_procedure"
   WHITESPACE "\n"
@@ -1119,7 +1119,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1166,7 +1166,7 @@ SOURCE_FILE
                 NAME_REF
                   BIGINT_KW "bigint"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1185,7 +1185,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1241,7 +1241,7 @@ SOURCE_FILE
                   INT_NUMBER "100"
               R_PAREN ")"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_routine"
   WHITESPACE "\n"
@@ -1262,7 +1262,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1309,7 +1309,7 @@ SOURCE_FILE
                 NAME_REF
                   BIGINT_KW "bigint"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1328,7 +1328,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "f"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1384,7 +1384,7 @@ SOURCE_FILE
                   INT_NUMBER "100"
               R_PAREN ")"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_sequence"
   WHITESPACE "\n"
@@ -1404,7 +1404,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1427,7 +1427,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1445,7 +1445,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1468,7 +1468,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_table"
   WHITESPACE "\n"
@@ -1486,7 +1486,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1502,7 +1502,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_configuration"
   WHITESPACE "\n"
@@ -1526,7 +1526,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1553,7 +1553,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1575,7 +1575,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1602,7 +1602,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_dictionary"
   WHITESPACE "\n"
@@ -1626,7 +1626,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1653,7 +1653,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1675,7 +1675,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1702,7 +1702,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_parser"
   WHITESPACE "\n"
@@ -1726,7 +1726,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1753,7 +1753,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1775,7 +1775,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1802,7 +1802,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_template"
   WHITESPACE "\n"
@@ -1826,7 +1826,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1853,7 +1853,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1875,7 +1875,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1902,7 +1902,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_transform"
   WHITESPACE "\n"
@@ -1927,7 +1927,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "l"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1950,7 +1950,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "l"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_type"
   WHITESPACE "\n"
@@ -1968,7 +1968,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -1984,7 +1984,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_view"
   WHITESPACE "\n"
@@ -2004,7 +2004,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2027,7 +2027,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2045,7 +2045,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2068,7 +2068,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_extension"
   WHITESPACE "\n"
@@ -2086,7 +2086,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2102,7 +2102,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_publication"
   WHITESPACE "\n"
@@ -2120,7 +2120,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2136,7 +2136,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_schema"
   WHITESPACE "\n"
@@ -2154,7 +2154,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2170,7 +2170,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_server"
   WHITESPACE "\n"
@@ -2188,7 +2188,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2204,7 +2204,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_database"
   WHITESPACE "\n"
@@ -2222,7 +2222,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2238,7 +2238,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_index"
   WHITESPACE "\n"
@@ -2258,7 +2258,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2281,7 +2281,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2299,7 +2299,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2322,7 +2322,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_statistics"
   WHITESPACE "\n"
@@ -2342,7 +2342,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2365,7 +2365,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2383,7 +2383,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2406,7 +2406,7 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_role"
   WHITESPACE "\n"
@@ -2424,7 +2424,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2440,7 +2440,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_subscription"
   WHITESPACE "\n"
@@ -2458,7 +2458,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2474,7 +2474,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_tablespace"
   WHITESPACE "\n"
@@ -2492,7 +2492,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
     ALTER_KW "alter"
@@ -2508,5 +2508,5 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

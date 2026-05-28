@@ -4,7 +4,7 @@ pub enum TokenKind {
     /// Used when there's an error of some sort while lexing.
     Unknown,
     /// Examples: `12u8`, `1.0e-40`, `b"123"`. Note that `_` is an invalid
-    /// suffix, but may be present here on string and float literals. Users of
+    /// suffix, but may be present here on string and numeric literals. Users of
     /// this type will need to check for and reject that case.
     ///
     /// See [`LiteralKind`] for more details.
@@ -84,7 +84,7 @@ pub enum TokenKind {
     /// Positional Parameter, e.g., `$1`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-expressions.html#SQL-EXPRESSIONS-PARAMETERS-POSITIONAL>
-    PositionalParam,
+    PositionalParam { trailing_junk_start: u32 },
     /// Quoted Identifier, e.g., `"update"` in `update "my_table" set "a" = 5;`
     ///
     /// These are case-sensitive, unlike [`TokenKind::Ident`]
@@ -127,11 +127,21 @@ pub enum LiteralKind {
     /// Integer Numeric, e.g., `42`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
-    Int { base: Base, empty_int: bool },
-    /// Float Numeric, e.g., `1.925e-3`
+    Int {
+        base: Base,
+        empty_int: bool,
+        trailing_junk_start: u32,
+    },
+    /// Numeric literal with a decimal point or exponent, e.g., `1.925e-3`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
-    Float { base: Base, empty_exponent: bool },
+    Numeric {
+        base: Base,
+        // e.g., `1e` instead of `1e10`
+        empty_exponent_start: Option<u32>,
+        // e.g., `1foo` where `foo` is the junk
+        trailing_junk_start: u32,
+    },
     /// String, e.g., `'foo'`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS>

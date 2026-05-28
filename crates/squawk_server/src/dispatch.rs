@@ -166,10 +166,7 @@ where
         Err(panic) => {
             // Check if the request was canceled due to some modifications to the salsa database.
             if panic.payload.downcast_ref::<salsa::Cancelled>().is_some() {
-                log::debug!(
-                    "request id={} was cancelled by salsa, sending content modified",
-                    id
-                );
+                log::debug!("request id={id} was cancelled by salsa, sending content modified");
                 Err(panic)
             } else {
                 let error = panic.to_string();

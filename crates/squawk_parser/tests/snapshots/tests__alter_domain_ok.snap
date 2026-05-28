@@ -22,7 +22,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "42"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_default"
   WHITESPACE "\n"
@@ -45,7 +45,7 @@ SOURCE_FILE
       DROP_KW "drop"
       WHITESPACE " "
       DEFAULT_KW "default"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_not_null"
   WHITESPACE "\n"
@@ -65,7 +65,7 @@ SOURCE_FILE
       NOT_KW "not"
       WHITESPACE " "
       NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_not_null"
   WHITESPACE "\n"
@@ -85,7 +85,7 @@ SOURCE_FILE
       NOT_KW "not"
       WHITESPACE " "
       NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_constraint"
   WHITESPACE "\n"
@@ -121,7 +121,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "0"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DOMAIN
     ALTER_KW "alter"
@@ -154,7 +154,7 @@ SOURCE_FILE
         NOT_KW "not"
         WHITESPACE " "
         VALID_KW "valid"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DOMAIN
     ALTER_KW "alter"
@@ -188,7 +188,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_constraint"
   WHITESPACE "\n"
@@ -211,7 +211,7 @@ SOURCE_FILE
         IDENT "c"
       WHITESPACE " "
       CASCADE_KW "cascade"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DOMAIN
     ALTER_KW "alter"
@@ -237,7 +237,7 @@ SOURCE_FILE
         IDENT "c"
       WHITESPACE " "
       RESTRICT_KW "restrict"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_constraint"
   WHITESPACE "\n"
@@ -263,7 +263,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- validate_constraint"
   WHITESPACE "\n"
@@ -284,7 +284,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
@@ -306,7 +306,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DOMAIN
     ALTER_KW "alter"
@@ -325,7 +325,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF
         CURRENT_USER_KW "current_user"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_to"
   WHITESPACE "\n"
@@ -346,7 +346,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME
         IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
@@ -367,5 +367,5 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "s"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -62,6 +62,7 @@ pub(crate) fn handle_document_symbol(
                 DocumentSymbolKind::Channel => SymbolKind::EVENT,
                 DocumentSymbolKind::EventTrigger => SymbolKind::EVENT,
                 DocumentSymbolKind::Role => SymbolKind::CLASS,
+                DocumentSymbolKind::Rule => SymbolKind::EVENT,
                 DocumentSymbolKind::Policy => SymbolKind::VARIABLE,
                 DocumentSymbolKind::PropertyGraph => SymbolKind::STRUCT,
             },

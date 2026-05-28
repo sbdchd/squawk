@@ -3,7 +3,9 @@
 use crate::ast;
 use crate::ast::{AstNode, support};
 
-pub trait NameLike: AstNode {}
+pub trait NameLike: AstNode {
+    fn text(&self) -> String;
+}
 
 pub trait HasCreateTable: AstNode {
     #[inline]

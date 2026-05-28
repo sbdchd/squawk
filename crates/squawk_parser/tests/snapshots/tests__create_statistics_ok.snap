@@ -25,7 +25,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -104,7 +104,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_1"
   WHITESPACE "\n"
@@ -139,7 +139,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_2"
   WHITESPACE "\n"
@@ -174,7 +174,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_3"
   WHITESPACE "\n"
@@ -229,5 +229,5 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

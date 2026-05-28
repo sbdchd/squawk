@@ -38,7 +38,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "a"
         R_PAREN ")"
-  SEMICOLON ";"
+      SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select"
   WHITESPACE "\n"
@@ -80,7 +80,7 @@ SOURCE_FILE
           WHITESPACE " "
           NAME_REF
             IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
@@ -104,7 +104,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- more fields"
   WHITESPACE "\n"
@@ -198,7 +198,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       DATA_KW "data"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE_AS
     CREATE_KW "create"
@@ -273,7 +273,7 @@ SOURCE_FILE
       NO_KW "no"
       WHITESPACE " "
       DATA_KW "data"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unlogged"
   WHITESPACE "\n"
@@ -300,7 +300,7 @@ SOURCE_FILE
           TARGET
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"
   WHITESPACE "\n"
@@ -328,7 +328,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE_AS
     CREATE_KW "create"
@@ -369,5 +369,5 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "5"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

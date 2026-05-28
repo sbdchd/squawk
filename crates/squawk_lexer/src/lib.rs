@@ -6,12 +6,12 @@ pub use token::{Base, LiteralKind, Token, TokenKind};
 // via: https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L346
 // ident_start		[A-Za-z\200-\377_]
 const fn is_ident_start(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '\u{80}'..='\u{FF}')
+    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '\u{80}'..)
 }
 
 // ident_cont		[A-Za-z\200-\377_0-9\$]
 const fn is_ident_cont(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '$' | '\u{80}'..='\u{FF}')
+    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '$' | '\u{80}'..)
 }
 
 // see:
@@ -50,17 +50,17 @@ impl Cursor<'_> {
             c if is_whitespace(c) => self.whitespace(),
 
             // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE
-            'u' | 'U' => match self.first() {
-                '&' => {
+            'u' | 'U' => {
+                if self.first() == '&' && matches!(self.second(), '\'' | '"') {
                     self.bump();
                     self.prefixed_string(
                         |terminated| LiteralKind::UnicodeEscStr { terminated },
                         true,
                     )
+                } else {
+                    self.ident_or_unknown_prefix()
                 }
-                _ => self.ident_or_unknown_prefix(),
-            },
-
+            }
             // escaped strings
             'e' | 'E' => {
                 self.prefixed_string(|terminated| LiteralKind::EscStr { terminated }, false)
@@ -116,7 +116,11 @@ impl Cursor<'_> {
                     while self.first().is_ascii_digit() {
                         self.bump();
                     }
-                    TokenKind::PositionalParam
+                    let trailing_junk_start = self.pos_within_token();
+                    self.eat_identifier();
+                    TokenKind::PositionalParam {
+                        trailing_junk_start,
+                    }
                 }
             }
             '`' => TokenKind::Backtick,
@@ -165,7 +169,7 @@ impl Cursor<'_> {
         // Known prefixes must have been handled earlier. So if
         // we see a prefix here, it is definitely an unknown prefix.
         match self.first() {
-            '#' | '"' | '\'' => TokenKind::UnknownPrefix,
+            '"' | '\'' => TokenKind::UnknownPrefix,
             _ => TokenKind::Ident,
         }
     }
@@ -232,6 +236,9 @@ impl Cursor<'_> {
 
     fn number(&mut self, first_digit: char) -> LiteralKind {
         let mut base = Base::Decimal;
+        if first_digit == '.' {
+            return self.eat_fractional(base);
+        }
         if first_digit == '0' {
             // Attempt to parse encoding base.
             match self.first() {
@@ -239,34 +246,22 @@ impl Cursor<'_> {
                 'b' | 'B' => {
                     base = Base::Binary;
                     self.bump();
-                    if !self.eat_decimal_digits() {
-                        return LiteralKind::Int {
-                            base,
-                            empty_int: true,
-                        };
-                    }
+                    let has_digits = self.eat_decimal_digits();
+                    return self.finish_base_prefixed_int(base, has_digits);
                 }
                 // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L402
                 'o' | 'O' => {
                     base = Base::Octal;
                     self.bump();
-                    if !self.eat_decimal_digits() {
-                        return LiteralKind::Int {
-                            base,
-                            empty_int: true,
-                        };
-                    }
+                    let has_digits = self.eat_decimal_digits();
+                    return self.finish_base_prefixed_int(base, has_digits);
                 }
                 // https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L401
                 'x' | 'X' => {
                     base = Base::Hexadecimal;
                     self.bump();
-                    if !self.eat_hexadecimal_digits() {
-                        return LiteralKind::Int {
-                            base,
-                            empty_int: true,
-                        };
-                    }
+                    let has_digits = self.eat_hexadecimal_digits();
+                    return self.finish_base_prefixed_int(base, has_digits);
                 }
                 // Not a base prefix; consume additional digits.
                 '0'..='9' | '_' => {
@@ -278,9 +273,12 @@ impl Cursor<'_> {
 
                 // Just a 0.
                 _ => {
+                    let trailing_junk_start = self.pos_within_token();
+                    self.eat_identifier();
                     return LiteralKind::Int {
                         base,
                         empty_int: false,
+                        trailing_junk_start,
                     };
                 }
             }
@@ -290,46 +288,28 @@ impl Cursor<'_> {
         };
 
         match self.first() {
-            '.' => {
-                // might have stuff after the ., and if it does, it needs to start
-                // with a number
-                self.bump();
-                let mut empty_exponent = false;
-                if self.first().is_ascii_digit() {
-                    self.eat_decimal_digits();
-                    match self.first() {
-                        'e' | 'E' => {
-                            self.bump();
-                            empty_exponent = !self.eat_float_exponent();
-                        }
-                        _ => (),
-                    }
-                } else {
-                    match self.first() {
-                        'e' | 'E' => {
-                            self.bump();
-                            empty_exponent = !self.eat_float_exponent();
-                        }
-                        _ => (),
-                    }
-                }
-                LiteralKind::Float {
-                    base,
-                    empty_exponent,
-                }
-            }
+            '.' => self.eat_fractional(base),
             'e' | 'E' => {
+                let exponent_start = self.pos_within_token();
                 self.bump();
-                let empty_exponent = !self.eat_float_exponent();
-                LiteralKind::Float {
+                let empty_exponent_start = (!self.eat_numeric_exponent()).then_some(exponent_start);
+                let trailing_junk_start = self.pos_within_token();
+                self.eat_identifier();
+                LiteralKind::Numeric {
                     base,
-                    empty_exponent,
+                    empty_exponent_start,
+                    trailing_junk_start,
                 }
             }
-            _ => LiteralKind::Int {
-                base,
-                empty_int: false,
-            },
+            _ => {
+                let trailing_junk_start = self.pos_within_token();
+                self.eat_identifier();
+                LiteralKind::Int {
+                    base,
+                    empty_int: false,
+                    trailing_junk_start,
+                }
+            }
         }
     }
 
@@ -452,7 +432,7 @@ impl Cursor<'_> {
         let mut has_digits = false;
         loop {
             match self.first() {
-                '_' => {
+                '_' if self.second().is_ascii_digit() => {
                     self.bump();
                 }
                 '0'..='9' => {
@@ -465,11 +445,22 @@ impl Cursor<'_> {
         has_digits
     }
 
+    fn finish_base_prefixed_int(&mut self, base: Base, has_digits: bool) -> LiteralKind {
+        let trailing_junk_start = self.pos_within_token();
+        self.eat_while(is_ident_cont);
+        let has_trailing_junk = self.pos_within_token() > trailing_junk_start;
+        LiteralKind::Int {
+            base,
+            empty_int: !has_digits && !has_trailing_junk,
+            trailing_junk_start,
+        }
+    }
+
     fn eat_hexadecimal_digits(&mut self) -> bool {
         let mut has_digits = false;
         loop {
             match self.first() {
-                '_' => {
+                '_' if self.second().is_ascii_hexdigit() => {
                     self.bump();
                 }
                 '0'..='9' | 'a'..='f' | 'A'..='F' => {
@@ -482,13 +473,60 @@ impl Cursor<'_> {
         has_digits
     }
 
-    /// Eats the float exponent. Returns true if at least one digit was met,
+    /// Eats the numeric exponent. Returns true if at least one digit was met,
     /// and returns false otherwise.
-    fn eat_float_exponent(&mut self) -> bool {
+    fn eat_numeric_exponent(&mut self) -> bool {
+        if self.first() == '_' {
+            return false;
+        }
         if self.first() == '-' || self.first() == '+' {
             self.bump();
         }
         self.eat_decimal_digits()
+    }
+
+    fn eat_identifier(&mut self) {
+        if is_ident_start(self.first()) {
+            self.eat_while(is_ident_cont);
+        }
+    }
+
+    pub(crate) fn eat_fractional(&mut self, base: Base) -> crate::LiteralKind {
+        // might have stuff after the ., and if it does, it needs to start
+        // with a number
+        self.bump();
+        let mut empty_exponent_start = None;
+        if self.first().is_ascii_digit() {
+            self.eat_decimal_digits();
+            match self.first() {
+                'e' | 'E' => {
+                    let exponent_start = self.pos_within_token();
+                    self.bump();
+                    if !self.eat_numeric_exponent() {
+                        empty_exponent_start = Some(exponent_start);
+                    }
+                }
+                _ => (),
+            }
+        } else {
+            match self.first() {
+                'e' | 'E' => {
+                    let exponent_start = self.pos_within_token();
+                    self.bump();
+                    if !self.eat_numeric_exponent() {
+                        empty_exponent_start = Some(exponent_start);
+                    }
+                }
+                _ => (),
+            }
+        }
+        let trailing_junk_start = self.pos_within_token();
+        self.eat_identifier();
+        LiteralKind::Numeric {
+            base,
+            empty_exponent_start,
+            trailing_junk_start,
+        }
     }
 }
 
@@ -762,6 +800,21 @@ U&"d!0061t!+000061" UESCAPE '!'
         assert_debug_snapshot!(lex("$$$$"), @r#"
         [
             "$$$$" @ Literal { kind: DollarQuotedString { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn ident_non_ascii_above_latin1() {
+        assert_debug_snapshot!(lex("ẞ Ā 漢字 𐐷"), @r#"
+        [
+            "ẞ" @ Ident,
+            " " @ Whitespace,
+            "Ā" @ Ident,
+            " " @ Whitespace,
+            "漢字" @ Ident,
+            " " @ Whitespace,
+            "𐐷" @ Ident,
         ]
         "#);
     }

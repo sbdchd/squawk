@@ -1,17 +1,20 @@
 use rowan::TextSize;
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::{SyntaxKind, ast::AstNode};
 
-use crate::db::{File, parse};
+use crate::db::parse;
+use crate::file::InFile;
 
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_as_dollar_quoted_string(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
+    let file = position.file_id;
+    let offset = position.value;
     let string = parse(db, file)
         .tree()
         .syntax()
@@ -21,10 +24,7 @@ pub(super) fn rewrite_as_dollar_quoted_string(
     let replacement = string_to_dollar_quoted(string.text())?;
     actions.push(CodeAction {
         title: "Rewrite as dollar-quoted string".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(
-            string.text_range(),
-            replacement,
-        )],
+        edits: vec![Edit::replace(string.text_range(), replacement)],
         kind: ActionKind::RefactorRewrite,
     });
 
@@ -34,7 +34,7 @@ pub(super) fn rewrite_as_dollar_quoted_string(
 fn string_to_dollar_quoted(text: &str) -> Option<String> {
     let normalized = normalize_single_quoted_string(text)?;
     let delimiter = dollar_delimiter(&normalized)?;
-    let boundary = format!("${}$", delimiter);
+    let boundary = format!("${delimiter}$");
     Some(format!("{boundary}{normalized}{boundary}"))
 }
 
@@ -53,7 +53,7 @@ fn dollar_delimiter(content: &str) -> Option<String> {
     let mut delim = "q".to_owned();
     // don't want to just loop forever
     for idx in 0..10 {
-        if !content.contains(&format!("${}$", delim)) {
+        if !content.contains(&format!("${delim}$")) {
             return Some(delim);
         }
         delim.push_str(&idx.to_string());
@@ -117,7 +117,7 @@ mod test {
     fn rewrite_prefix_string_not_applicable() {
         assert!(code_action_not_applicable(
             rewrite_as_dollar_quoted_string,
-            "select b'foo$0';"
+            "select b'010$0';"
         ));
     }
 }

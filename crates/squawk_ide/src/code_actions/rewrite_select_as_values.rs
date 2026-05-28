@@ -1,10 +1,11 @@
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
+use squawk_linter::Edit;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{
     ast_nav::{self, SelectContext},
-    db::File,
+    file::InFile,
     offsets::token_from_offset,
     symbols::Name,
 };
@@ -13,11 +14,10 @@ use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_select_as_values(
     db: &dyn Db,
-    file: File,
+    position: InFile<TextSize>,
     actions: &mut Vec<CodeAction>,
-    offset: TextSize,
 ) -> Option<()> {
-    let token = token_from_offset(db, file, offset)?;
+    let token = token_from_offset(db, position)?;
 
     let parent = ast_nav::find_select_parent(token)?;
 
@@ -51,7 +51,15 @@ pub(super) fn rewrite_select_as_values(
         rows.push(format!("({})", exprs.join(", ")));
     }
 
-    let values_stmt = format!("values {}", rows.join(", "));
+    let had_semicolon = match &parent {
+        SelectContext::Compound(compound) => compound.semicolon_token().is_some(),
+        SelectContext::Single(select) => select.semicolon_token().is_some(),
+    };
+
+    let mut values_stmt = format!("values {}", rows.join(", "));
+    if had_semicolon {
+        values_stmt.push(';');
+    }
 
     let select_end = match &parent {
         SelectContext::Compound(compound) => compound.syntax().text_range().end(),
@@ -61,7 +69,7 @@ pub(super) fn rewrite_select_as_values(
 
     actions.push(CodeAction {
         title: "Rewrite as `values`".to_owned(),
-        edits: vec![squawk_linter::Edit::replace(select_range, values_stmt)],
+        edits: vec![Edit::replace(select_range, values_stmt)],
         kind: ActionKind::RefactorRewrite,
     });
 

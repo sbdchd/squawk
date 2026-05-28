@@ -42,7 +42,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "5"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no where"
   WHITESPACE "\n"
@@ -74,8 +74,8 @@ SOURCE_FILE
               STAR "*"
               WHITESPACE " "
               LITERAL
-                FLOAT_NUMBER "1.10"
-  SEMICOLON ";"
+                NUMERIC_NUMBER "1.10"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set muliple"
   WHITESPACE "\n"
@@ -138,7 +138,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "0"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- sub_select"
   WHITESPACE "\n"
@@ -176,7 +176,7 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "1"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- with_stmt"
   WHITESPACE "\n"
@@ -251,7 +251,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "foo_id"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- based_on_schema"
   WHITESPACE "\n"
@@ -422,7 +422,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME
               IDENT "bar"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
@@ -461,7 +461,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'Drama'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -541,7 +541,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'2003-07-03'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -639,7 +639,7 @@ SOURCE_FILE
         TARGET
           NAME_REF
             IDENT "prcp"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -721,7 +721,7 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             STRING "'2003-07-03'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -795,7 +795,7 @@ SOURCE_FILE
             DOT "."
             NAME_REF
               IDENT "sales_person"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -866,7 +866,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'Acme Corporation'"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -939,7 +939,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "sales_person"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -1003,7 +1003,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "sales_person"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -1128,11 +1128,11 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "group_id"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   BEGIN
     BEGIN_KW "BEGIN"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- other operations"
   WHITESPACE "\n"
@@ -1141,7 +1141,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME
       IDENT "sp1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   INSERT
     INSERT_KW "INSERT"
@@ -1165,7 +1165,7 @@ SOURCE_FILE
           LITERAL
             STRING "'24'"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- Assume the above fails because of a unique key violation,"
   WHITESPACE "\n"
@@ -1178,7 +1178,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "sp1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -1221,13 +1221,13 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'Chateau Lafite 2003'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- continue with other operations, and eventually"
   WHITESPACE "\n"
   COMMIT
     COMMIT_KW "COMMIT"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "UPDATE"
@@ -1262,7 +1262,7 @@ SOURCE_FILE
       WHITESPACE " "
       NAME_REF
         IDENT "c_films"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     WITH_CLAUSE
@@ -1416,7 +1416,7 @@ SOURCE_FILE
           DOT "."
           NAME_REF
             IDENT "ctid"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- returning_with_old_new"
   WHITESPACE "\n"
@@ -1541,7 +1541,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME
               IDENT "change"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
     UPDATE_KW "update"
@@ -1607,5 +1607,5 @@ SOURCE_FILE
               IDENT "n"
             DOT "."
             STAR "*"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

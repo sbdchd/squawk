@@ -68,7 +68,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_values"
   WHITESPACE "\n"
@@ -109,7 +109,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with"
   WHITESPACE "\n"
@@ -151,7 +151,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column names"
   WHITESPACE "\n"
@@ -207,7 +207,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- materialized "
   WHITESPACE "\n"
@@ -250,7 +250,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not materialized "
   WHITESPACE "\n"
@@ -295,7 +295,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested"
   WHITESPACE "\n"
@@ -367,7 +367,7 @@ SOURCE_FILE
                     IDENT "t"
             WHITESPACE "\n"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search depth first (from pg docs)"
   WHITESPACE "\n"
@@ -560,7 +560,7 @@ SOURCE_FILE
         SORT_BY
           NAME_REF
             IDENT "ordercol"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search breadth first (from pg docs)"
   WHITESPACE "\n"
@@ -753,7 +753,7 @@ SOURCE_FILE
         SORT_BY
           NAME_REF
             IDENT "ordercol"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- search cycle (from pg docs)"
   WHITESPACE "\n"
@@ -960,7 +960,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "search_graph"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search cycle with to and default values"
   WHITESPACE "\n"
@@ -1053,7 +1053,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "search_graph"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi"
   WHITESPACE "\n"
@@ -1118,7 +1118,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- recursive"
   WHITESPACE "\n"
@@ -1160,7 +1160,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     WITH_CLAUSE
@@ -1226,7 +1226,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- timestamp_edge_cases"
   WHITESPACE "\n"
@@ -1271,7 +1271,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     WITH_CLAUSE
@@ -1314,7 +1314,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- regression gh issue #509"
   WHITESPACE "\n"
@@ -1474,7 +1474,7 @@ SOURCE_FILE
                   INT_NUMBER "1"
           WHITESPACE "\n"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- paren select cte"
   WHITESPACE "\n"
@@ -1509,7 +1509,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- group by all"
   WHITESPACE "\n"
@@ -1562,5 +1562,5 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "x"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

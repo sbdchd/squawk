@@ -2,34 +2,34 @@
 source: crates/squawk/src/reporter.rs
 expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
 ---
-warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow operations
+warning[]8;;https://squawkhq.com/docs/require-timeout-settings\require-timeout-settings]8;;\]: Missing `set lock_timeout` before potentially slow operations
   ╭▸ main.sql:2:4
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-  │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
   ├ help: Configure a `lock_timeout` before this statement.
   ╭╴
 2 +    set lock_timeout = '1s';
   ╰╴
-warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
+warning[]8;;https://squawkhq.com/docs/require-timeout-settings\require-timeout-settings]8;;\]: Missing `set statement_timeout` before potentially slow operations
   ╭▸ main.sql:2:4
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-  │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
   ├ help: Configure a `statement_timeout` before this statement
   ╭╴
 2 +    set statement_timeout = '5s';
   ╰╴
-warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+warning[]8;;https://squawkhq.com/docs/adding-required-field\adding-required-field]8;;\]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
   ╭▸ main.sql:2:30
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
   │                              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
   ╰ help: Make the field nullable or add a non-VOLATILE DEFAULT
-warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+warning[]8;;https://squawkhq.com/docs/prefer-robust-stmts\prefer-robust-stmts]8;;\]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ main.sql:2:30
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
@@ -37,7 +37,7 @@ warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be re
   ╭╴
 2 │    ALTER TABLE "core_recipe" ADD COLUMN if not exists "foo" integer NOT NULL;
   ╰╴                                        +++++++++++++
-warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[]8;;https://squawkhq.com/docs/prefer-bigint-over-int\prefer-bigint-over-int]8;;\]: Using 32-bit integer fields can result in hitting the max `int` limit.
   ╭▸ main.sql:2:47
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
@@ -48,14 +48,14 @@ warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitti
 2 -    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 2 +    ALTER TABLE "core_recipe" ADD COLUMN "foo" bigint NOT NULL;
   ╰╴
-warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+warning[]8;;https://squawkhq.com/docs/adding-required-field\adding-required-field]8;;\]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
   ╭▸ main.sql:3:24
   │
 3 │ ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
   │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
   ╰ help: Make the field nullable or add a non-VOLATILE DEFAULT
-warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+warning[]8;;https://squawkhq.com/docs/prefer-robust-stmts\prefer-robust-stmts]8;;\]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
   ╭▸ main.sql:3:24
   │
 3 │ ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
@@ -63,7 +63,7 @@ warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be re
   ╭╴
 3 │ ALTER TABLE "core_foo" ADD COLUMN if not exists "bar" integer NOT NULL;
   ╰╴                                  +++++++++++++
-warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[]8;;https://squawkhq.com/docs/prefer-bigint-over-int\prefer-bigint-over-int]8;;\]: Using 32-bit integer fields can result in hitting the max `int` limit.
   ╭▸ main.sql:3:41
   │
 3 │ ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;

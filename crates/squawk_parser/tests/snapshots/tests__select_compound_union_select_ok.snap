@@ -137,7 +137,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- version without parentheses."
   WHITESPACE "\n"
@@ -272,7 +272,7 @@ SOURCE_FILE
       WHITESPACE " "
       LITERAL
         INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
     SELECT
@@ -300,10 +300,10 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
-    SELECT
+    TABLE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
@@ -322,7 +322,7 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
     PAREN_SELECT
@@ -350,23 +350,9 @@ SOURCE_FILE
               NAME_REF
                 IDENT "t"
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
-    PAREN_SELECT
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "2"
-      R_PAREN ")"
-    WHITESPACE " "
-    UNION_KW "union"
-    WHITESPACE " "
     SELECT_INTO
       SELECT_CLAUSE
         SELECT_KW "select"
@@ -400,7 +386,21 @@ SOURCE_FILE
         FROM_ITEM
           NAME_REF
             IDENT "t2"
-  SEMICOLON ";"
+    WHITESPACE " "
+    UNION_KW "union"
+    WHITESPACE " "
+    PAREN_SELECT
+      L_PAREN "("
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "2"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
     VALUES
@@ -438,7 +438,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "4"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   PAREN_SELECT
     L_PAREN "("
@@ -475,7 +475,7 @@ SOURCE_FILE
                   INT_NUMBER "1"
       R_PAREN ")"
     R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -529,7 +529,7 @@ SOURCE_FILE
                           INT_NUMBER "1"
               R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -586,5 +586,46 @@ SOURCE_FILE
           WHITESPACE " "
           NAME
             IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  PAREN_SELECT
+    L_PAREN "("
+    COMPOUND_SELECT
+      SELECT_INTO
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AS_NAME
+                NAME
+                  IDENT "a"
+        WHITESPACE " "
+        INTO_CLAUSE
+          INTO_KW "into"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME
+                IDENT "t"
+      WHITESPACE " "
+      UNION_KW "union"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AS_NAME
+                NAME
+                  IDENT "b"
+    R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

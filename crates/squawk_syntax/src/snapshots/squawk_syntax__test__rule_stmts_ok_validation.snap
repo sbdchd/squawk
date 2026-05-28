@@ -1,0 +1,154 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/rule_stmts_ok.sql
+---
+SOURCE_FILE@0..209
+  CREATE_RULE@0..102
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    RULE_KW@7..11 "rule"
+    WHITESPACE@11..12 " "
+    NAME@12..13
+      IDENT@12..13 "r"
+    WHITESPACE@13..14 " "
+    AS_KW@14..16 "as"
+    WHITESPACE@16..17 " "
+    RULE_ON@17..31
+      ON_KW@17..19 "on"
+      WHITESPACE@19..20 " "
+      UPDATE_KW@20..26 "update"
+      WHITESPACE@26..27 " "
+      TO_KW@27..29 "to"
+      WHITESPACE@29..30 " "
+      PATH@30..31
+        PATH_SEGMENT@30..31
+          NAME_REF@30..31
+            IDENT@30..31 "t"
+    WHITESPACE@31..32 " "
+    RULE_DO@32..101
+      DO_KW@32..34 "do"
+      WHITESPACE@34..35 " "
+      INSTEAD_KW@35..42 "instead"
+      WHITESPACE@42..43 " "
+      RULE_STMT_LIST@43..101
+        L_PAREN@43..44 "("
+        WHITESPACE@44..47 "\n  "
+        INSERT@47..72
+          INSERT_KW@47..53 "insert"
+          WHITESPACE@53..54 " "
+          INTO_KW@54..58 "into"
+          WHITESPACE@58..59 " "
+          PATH@59..60
+            PATH_SEGMENT@59..60
+              NAME_REF@59..60
+                IDENT@59..60 "t"
+          WHITESPACE@60..61 " "
+          VALUES@61..71
+            VALUES_KW@61..67 "values"
+            WHITESPACE@67..68 " "
+            ROW_LIST@68..71
+              ROW@68..71
+                L_PAREN@68..69 "("
+                LITERAL@69..70
+                  INT_NUMBER@69..70 "1"
+                R_PAREN@70..71 ")"
+          SEMICOLON@71..72 ";"
+        WHITESPACE@72..75 "\n  "
+        INSERT@75..99
+          INSERT_KW@75..81 "insert"
+          WHITESPACE@81..82 " "
+          INTO_KW@82..86 "into"
+          WHITESPACE@86..87 " "
+          PATH@87..88
+            PATH_SEGMENT@87..88
+              NAME_REF@87..88
+                IDENT@87..88 "t"
+          WHITESPACE@88..89 " "
+          VALUES@89..99
+            VALUES_KW@89..95 "values"
+            WHITESPACE@95..96 " "
+            ROW_LIST@96..99
+              ROW@96..99
+                L_PAREN@96..97 "("
+                LITERAL@97..98
+                  INT_NUMBER@97..98 "2"
+                R_PAREN@98..99 ")"
+        WHITESPACE@99..100 "\n"
+        R_PAREN@100..101 ")"
+    SEMICOLON@101..102 ";"
+  WHITESPACE@102..104 "\n\n"
+  CREATE_RULE@104..208
+    CREATE_KW@104..110 "create"
+    WHITESPACE@110..111 " "
+    RULE_KW@111..115 "rule"
+    WHITESPACE@115..116 " "
+    NAME@116..118
+      IDENT@116..118 "r2"
+    WHITESPACE@118..119 " "
+    AS_KW@119..121 "as"
+    WHITESPACE@121..122 " "
+    RULE_ON@122..136
+      ON_KW@122..124 "on"
+      WHITESPACE@124..125 " "
+      UPDATE_KW@125..131 "update"
+      WHITESPACE@131..132 " "
+      TO_KW@132..134 "to"
+      WHITESPACE@134..135 " "
+      PATH@135..136
+        PATH_SEGMENT@135..136
+          NAME_REF@135..136
+            IDENT@135..136 "t"
+    WHITESPACE@136..137 " "
+    RULE_DO@137..207
+      DO_KW@137..139 "do"
+      WHITESPACE@139..140 " "
+      INSTEAD_KW@140..147 "instead"
+      WHITESPACE@147..148 " "
+      RULE_STMT_LIST@148..207
+        L_PAREN@148..149 "("
+        WHITESPACE@149..152 "\n  "
+        INSERT@152..177
+          INSERT_KW@152..158 "insert"
+          WHITESPACE@158..159 " "
+          INTO_KW@159..163 "into"
+          WHITESPACE@163..164 " "
+          PATH@164..165
+            PATH_SEGMENT@164..165
+              NAME_REF@164..165
+                IDENT@164..165 "t"
+          WHITESPACE@165..166 " "
+          VALUES@166..176
+            VALUES_KW@166..172 "values"
+            WHITESPACE@172..173 " "
+            ROW_LIST@173..176
+              ROW@173..176
+                L_PAREN@173..174 "("
+                LITERAL@174..175
+                  INT_NUMBER@174..175 "1"
+                R_PAREN@175..176 ")"
+          SEMICOLON@176..177 ";"
+        WHITESPACE@177..180 "\n  "
+        INSERT@180..205
+          INSERT_KW@180..186 "insert"
+          WHITESPACE@186..187 " "
+          INTO_KW@187..191 "into"
+          WHITESPACE@191..192 " "
+          PATH@192..193
+            PATH_SEGMENT@192..193
+              NAME_REF@192..193
+                IDENT@192..193 "t"
+          WHITESPACE@193..194 " "
+          VALUES@194..204
+            VALUES_KW@194..200 "values"
+            WHITESPACE@200..201 " "
+            ROW_LIST@201..204
+              ROW@201..204
+                L_PAREN@201..202 "("
+                LITERAL@202..203
+                  INT_NUMBER@202..203 "2"
+                R_PAREN@203..204 ")"
+          SEMICOLON@204..205 ";"
+        WHITESPACE@205..206 "\n"
+        R_PAREN@206..207 ")"
+    SEMICOLON@207..208 ";"
+  WHITESPACE@208..209 "\n"

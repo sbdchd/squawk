@@ -4,7 +4,7 @@ input_file: crates/squawk_syntax/test_data/validation/select.sql
 ---
 SOURCE_FILE@0..64
   WHITESPACE@0..1 "\n"
-  SELECT@1..16
+  SELECT@1..17
     FROM_CLAUSE@1..7
       FROM_KW@1..5 "from"
       WHITESPACE@5..6 " "
@@ -19,18 +19,18 @@ SOURCE_FILE@0..64
         TARGET@15..16
           NAME_REF@15..16
             IDENT@15..16 "c"
-  SEMICOLON@16..17 ";"
+    SEMICOLON@16..17 ";"
   WHITESPACE@17..19 "\n\n"
-  SELECT@19..25
+  SELECT@19..26
     FROM_CLAUSE@19..25
       FROM_KW@19..23 "from"
       WHITESPACE@23..24 " "
       FROM_ITEM@24..25
         NAME_REF@24..25
           IDENT@24..25 "t"
-  SEMICOLON@25..26 ";"
+    SEMICOLON@25..26 ";"
   WHITESPACE@26..28 "\n\n"
-  SELECT@28..62
+  SELECT@28..63
     WITH_CLAUSE@28..46
       WITH_KW@28..32 "with"
       WHITESPACE@32..33 " "
@@ -63,7 +63,7 @@ SOURCE_FILE@0..64
       FROM_ITEM@61..62
         NAME_REF@61..62
           IDENT@61..62 "t"
-  SEMICOLON@62..63 ";"
+    SEMICOLON@62..63 ";"
   WHITESPACE@63..64 "\n"
 
 error[syntax-error]: Leading from clauses are not supported in Postgres

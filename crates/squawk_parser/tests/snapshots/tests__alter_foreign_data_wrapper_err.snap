@@ -16,7 +16,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "w"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: Missing alter foreign data wrapper option or action.

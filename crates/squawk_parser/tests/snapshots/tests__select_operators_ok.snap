@@ -21,7 +21,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- or"
   WHITESPACE "\n"
@@ -39,7 +39,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not"
   WHITESPACE "\n"
@@ -54,7 +54,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not is null"
   WHITESPACE "\n"
@@ -75,7 +75,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -91,7 +91,7 @@ SOURCE_FILE
                 IDENT "x"
               WHITESPACE " "
               ISNULL_KW "isnull"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- geo_operators"
   WHITESPACE "\n\n"
@@ -125,7 +125,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- concat"
   WHITESPACE "\n"
@@ -157,7 +157,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(2,2),(3,3),(4,4)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subtract"
   WHITESPACE "\n"
@@ -189,7 +189,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiply"
   WHITESPACE "\n"
@@ -221,7 +221,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(3.0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -266,7 +266,7 @@ SOURCE_FILE
                       INT_NUMBER "45"
                     R_PAREN ")"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- divide"
   WHITESPACE "\n"
@@ -298,7 +298,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2.0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -343,7 +343,7 @@ SOURCE_FILE
                       INT_NUMBER "45"
                     R_PAREN ")"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- length"
   WHITESPACE "\n"
@@ -368,7 +368,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(0,0),(1,0),(1,1)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- center point"
   WHITESPACE "\n"
@@ -392,7 +392,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- number of points"
   WHITESPACE "\n"
@@ -415,7 +415,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'((1,0),(0,1),(-1,0))'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- point intersection"
   WHITESPACE "\n"
@@ -448,7 +448,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(1,0),(0,1)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- box intersection"
   WHITESPACE "\n"
@@ -481,7 +481,86 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1),(-2,-2)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operators that sort of look like prefixes"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              POUND "#"
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            NAME_REF
+              IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "u"
+            CUSTOM_OP
+              AMP "&"
+            LITERAL
+              POSITIONAL_PARAM "$1"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- closest point"
   WHITESPACE "\n"
@@ -515,7 +594,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(2,0),(0,2)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distance between"
   WHITESPACE "\n"
@@ -550,7 +629,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'<(5,0),1>'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first contains"
   WHITESPACE "\n"
@@ -584,7 +663,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first contained in second"
   WHITESPACE "\n"
@@ -618,7 +697,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'<(0,0),2>'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- objects overlap"
   WHITESPACE "\n"
@@ -652,7 +731,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- object strictly left"
   WHITESPACE "\n"
@@ -686,7 +765,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'<(5,0),1>'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- object strictly right"
   WHITESPACE "\n"
@@ -720,7 +799,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'<(0,0),1>'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first extended to right of second"
   WHITESPACE "\n"
@@ -754,7 +833,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first extends to left of second"
   WHITESPACE "\n"
@@ -788,7 +867,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first strictly below second"
   WHITESPACE "\n"
@@ -823,7 +902,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(5,5),(3,4)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first strictly above second"
   WHITESPACE "\n"
@@ -858,7 +937,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(5,5),(3,4)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first doesn't extend above second"
   WHITESPACE "\n"
@@ -893,7 +972,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first doesn't extend below second"
   WHITESPACE "\n"
@@ -928,7 +1007,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first below second"
   WHITESPACE "\n"
@@ -962,7 +1041,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'((2,2),(1,1))'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first above second"
   WHITESPACE "\n"
@@ -996,7 +1075,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'((1,1),(0,0))'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- objects intersect"
   WHITESPACE "\n"
@@ -1030,7 +1109,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(-2,-2)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- line horizontal"
   WHITESPACE "\n"
@@ -1054,7 +1133,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,0),(1,0)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- points horizontally aligned"
   WHITESPACE "\n"
@@ -1088,7 +1167,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- line vertical"
   WHITESPACE "\n"
@@ -1112,7 +1191,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,0),(1,0)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- points vertically aligned"
   WHITESPACE "\n"
@@ -1146,7 +1225,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'(0,0)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lines perpendicular"
   WHITESPACE "\n"
@@ -1181,7 +1260,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(0,0),(1,0)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lines parallel"
   WHITESPACE "\n"
@@ -1216,7 +1295,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,2),(1,2)]'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- objects the same"
   WHITESPACE "\n"
@@ -1250,7 +1329,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'((1,1),(0,0))'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- network_operators"
   WHITESPACE "\n\n"
@@ -1287,7 +1366,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subnet contain or equal subnet"
   WHITESPACE "\n"
@@ -1322,7 +1401,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- fts_operators"
   WHITESPACE "\n\n"
@@ -1350,7 +1429,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "tsquery"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subnet contain or equal subnet"
   WHITESPACE "\n"
@@ -1385,7 +1464,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- array_operators"
   WHITESPACE "\n"
@@ -1427,7 +1506,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "3"
               R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first array (as a set) contained by the second (as a set)?"
   WHITESPACE "\n"
@@ -1473,7 +1552,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "6"
               R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is there any overlap"
   WHITESPACE "\n"
@@ -1510,7 +1589,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
               R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- concat"
   WHITESPACE "\n"
@@ -1577,7 +1656,7 @@ SOURCE_FILE
                   INT_NUMBER "0"
                 R_BRACK "]"
               R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- starts with"
   WHITESPACE "\n"
@@ -1597,7 +1676,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'alph'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- array_access"
   WHITESPACE "\n"
@@ -1616,7 +1695,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "0"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- slicing"
   WHITESPACE "\n"
@@ -1644,7 +1723,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- omitted bounds"
   WHITESPACE "\n"
@@ -1668,7 +1747,7 @@ SOURCE_FILE
               INT_NUMBER "2"
             COLON ":"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- omitted part 2"
   WHITESPACE "\n"
@@ -1692,7 +1771,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- string_operators"
   WHITESPACE "\n"
@@ -1714,7 +1793,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'greSQL'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1732,7 +1811,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "42"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- normalization check"
   WHITESPACE "\n"
@@ -1750,7 +1829,7 @@ SOURCE_FILE
               IS_KW "is"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1769,7 +1848,7 @@ SOURCE_FILE
                 NFC_KW "nfc"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1788,7 +1867,7 @@ SOURCE_FILE
                 NFD_KW "nfd"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1807,7 +1886,7 @@ SOURCE_FILE
                 NFKC_KW "nfkc"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1826,7 +1905,7 @@ SOURCE_FILE
                 NFKD_KW "nfkd"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1847,7 +1926,7 @@ SOURCE_FILE
                 NFD_KW "nfd"
               WHITESPACE " "
               NORMALIZED_KW "normalized"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pattern_matching"
   WHITESPACE "\n"
@@ -1867,7 +1946,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'bar'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1889,7 +1968,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'#'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- not like"
   WHITESPACE "\n"
@@ -1910,7 +1989,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'bar'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1935,7 +2014,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'#'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ilike"
   WHITESPACE "\n"
@@ -1953,7 +2032,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'bar'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -1975,7 +2054,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'#'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- not ilike"
   WHITESPACE "\n"
@@ -1996,7 +2075,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'bar'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2021,7 +2100,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'#'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ~~"
   WHITESPACE "\n"
@@ -2041,7 +2120,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- !~~"
   WHITESPACE "\n"
@@ -2062,7 +2141,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- similar to"
   WHITESPACE "\n"
@@ -2083,7 +2162,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'abc'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2108,7 +2187,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'#'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -2129,7 +2208,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'abc'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2156,7 +2235,7 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 STRING "'#'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- posix regex"
   WHITESPACE "\n"
@@ -2177,7 +2256,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'f.*'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- string matches regex case insensitive"
   WHITESPACE "\n"
@@ -2197,7 +2276,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- string does not match regex case sensitive"
   WHITESPACE "\n"
@@ -2217,7 +2296,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- string does not match regex case insensitive"
   WHITESPACE "\n"
@@ -2238,7 +2317,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- compare_operators"
   WHITESPACE "\n"
@@ -2258,7 +2337,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- greater than"
   WHITESPACE "\n"
@@ -2276,7 +2355,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- less than or equal to"
   WHITESPACE "\n"
@@ -2294,7 +2373,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- greater than or equal to"
   WHITESPACE "\n"
@@ -2312,7 +2391,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "7"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- equal"
   WHITESPACE "\n"
@@ -2330,7 +2409,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "0"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not equal"
   WHITESPACE "\n"
@@ -2348,7 +2427,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2364,7 +2443,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- between (inclusive of the range endpoints)"
   WHITESPACE "\n"
@@ -2387,7 +2466,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2416,7 +2495,7 @@ SOURCE_FILE
               ARG_LIST
                 L_PAREN "("
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not between (the negation of between)"
   WHITESPACE "\n"
@@ -2441,7 +2520,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2472,7 +2551,7 @@ SOURCE_FILE
               ARG_LIST
                 L_PAREN "("
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- between symmetric (between, after sorting the two endpoint values)"
   WHITESPACE "\n"
@@ -2497,7 +2576,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not between symmetric (not between, after sorting the two endpoint values)"
   WHITESPACE "\n"
@@ -2524,7 +2603,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is distinct from (not equal, treating null as a comparable value)"
   WHITESPACE "\n"
@@ -2547,7 +2626,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is not distinct from (equal, treating null as a comparable value)"
   WHITESPACE "\n"
@@ -2572,7 +2651,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- at time zone"
   WHITESPACE "\n"
@@ -2595,7 +2674,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'UTC'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is null"
   WHITESPACE "\n"
@@ -2607,13 +2686,13 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             LITERAL
-              FLOAT_NUMBER "1.5"
+              NUMERIC_NUMBER "1.5"
             WHITESPACE " "
             IS_KW "is"
             WHITESPACE " "
             LITERAL
               NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is not null"
   WHITESPACE "\n"
@@ -2634,7 +2713,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- isnull (non-standard syntax)"
   WHITESPACE "\n"
@@ -2649,7 +2728,7 @@ SOURCE_FILE
               INT_NUMBER "1"
             WHITESPACE " "
             ISNULL_KW "isnull"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- notnull (non-standard syntax)"
   WHITESPACE "\n"
@@ -2664,7 +2743,7 @@ SOURCE_FILE
               STRING "'foo'"
             WHITESPACE " "
             NOTNULL_KW "notnull"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is true"
   WHITESPACE "\n"
@@ -2682,7 +2761,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is not true"
   WHITESPACE "\n"
@@ -2703,7 +2782,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is false"
   WHITESPACE "\n"
@@ -2721,7 +2800,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is not false"
   WHITESPACE "\n"
@@ -2742,7 +2821,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               FALSE_KW "false"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is unknown"
   WHITESPACE "\n"
@@ -2760,7 +2839,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               UNKNOWN_KW "unknown"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- is not unknown"
   WHITESPACE "\n"
@@ -2781,7 +2860,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               UNKNOWN_KW "unknown"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- math_operators"
   WHITESPACE "\n"
@@ -2801,7 +2880,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- unary plus"
   WHITESPACE "\n"
@@ -2815,8 +2894,8 @@ SOURCE_FILE
             PLUS "+"
             WHITESPACE " "
             LITERAL
-              FLOAT_NUMBER "3.5"
-  SEMICOLON ";"
+              NUMERIC_NUMBER "3.5"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subtraction"
   WHITESPACE "\n"
@@ -2834,7 +2913,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- negation"
   WHITESPACE "\n"
@@ -2854,7 +2933,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "4"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiplication"
   WHITESPACE "\n"
@@ -2872,7 +2951,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- division"
   WHITESPACE "\n"
@@ -2884,13 +2963,13 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             LITERAL
-              FLOAT_NUMBER "5.0"
+              NUMERIC_NUMBER "5.0"
             WHITESPACE " "
             SLASH "/"
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2906,7 +2985,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2927,7 +3006,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- modulo"
   WHITESPACE "\n"
@@ -2945,7 +3024,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- exponentiation"
   WHITESPACE "\n"
@@ -2963,7 +3042,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -2988,7 +3067,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "3"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- square root"
   WHITESPACE "\n"
@@ -3004,8 +3083,8 @@ SOURCE_FILE
               SLASH "/"
             WHITESPACE " "
             LITERAL
-              FLOAT_NUMBER "25.0"
-  SEMICOLON ";"
+              NUMERIC_NUMBER "25.0"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cube root"
   WHITESPACE "\n"
@@ -3022,8 +3101,8 @@ SOURCE_FILE
               SLASH "/"
             WHITESPACE " "
             LITERAL
-              FLOAT_NUMBER "64.0"
-  SEMICOLON ";"
+              NUMERIC_NUMBER "64.0"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- absolute value"
   WHITESPACE "\n"
@@ -3040,8 +3119,8 @@ SOURCE_FILE
             PREFIX_EXPR
               MINUS "-"
               LITERAL
-                FLOAT_NUMBER "5.0"
-  SEMICOLON ";"
+                NUMERIC_NUMBER "5.0"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise and"
   WHITESPACE "\n"
@@ -3060,7 +3139,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "15"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise or"
   WHITESPACE "\n"
@@ -3079,7 +3158,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise exclusive OR"
   WHITESPACE "\n"
@@ -3098,7 +3177,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "5"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise NOT"
   WHITESPACE "\n"
@@ -3113,7 +3192,7 @@ SOURCE_FILE
               TILDE "~"
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise shift left"
   WHITESPACE "\n"
@@ -3133,7 +3212,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "4"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise shift right"
   WHITESPACE "\n"
@@ -3153,7 +3232,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitstring_operators"
   WHITESPACE "\n"
@@ -3174,7 +3253,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               BIT_STRING "B'01101'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise or"
   WHITESPACE "\n"
@@ -3193,7 +3272,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               BIT_STRING "B'01101'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise xor"
   WHITESPACE "\n"
@@ -3212,7 +3291,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               BIT_STRING "B'01101'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitwise not"
   WHITESPACE "\n"
@@ -3228,7 +3307,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               BIT_STRING "B'10001'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitshift left"
   WHITESPACE "\n"
@@ -3248,7 +3327,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "3"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- bitshift right"
   WHITESPACE "\n"
@@ -3268,7 +3347,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- range"
   WHITESPACE "\n"
@@ -3308,7 +3387,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "7"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json_ops"
   WHITESPACE "\n"
@@ -3339,7 +3418,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3366,7 +3445,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'a'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract as text"
   WHITESPACE "\n"
@@ -3396,7 +3475,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "2"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3424,7 +3503,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract path as json"
   WHITESPACE "\n"
@@ -3453,7 +3532,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'{a,b,1}'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract path as text"
   WHITESPACE "\n"
@@ -3483,7 +3562,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'{a,b,1}'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- contains"
   WHITESPACE "\n"
@@ -3521,7 +3600,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "jsonb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -3557,7 +3636,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "jsonb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- existence"
   WHITESPACE "\n"
@@ -3585,7 +3664,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3611,7 +3690,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- any keys exist"
   WHITESPACE "\n"
@@ -3648,7 +3727,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'d'"
               R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all keys exist"
   WHITESPACE "\n"
@@ -3685,7 +3764,7 @@ SOURCE_FILE
               LITERAL
                 STRING "'b'"
               R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- concat"
   WHITESPACE "\n"
@@ -3723,7 +3802,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "jsonb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3759,7 +3838,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "jsonb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3795,7 +3874,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "jsonb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3831,7 +3910,7 @@ SOURCE_FILE
                   PATH_SEGMENT
                     NAME_REF
                       IDENT "jsonb"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3873,7 +3952,7 @@ SOURCE_FILE
                         NAME_REF
                           IDENT "jsonb"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- delete"
   WHITESPACE "\n"
@@ -3900,7 +3979,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'a'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3925,7 +4004,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3962,7 +4041,7 @@ SOURCE_FILE
                         TEXT_KW "text"
                 L_BRACK "["
                 R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -3987,7 +4066,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               INT_NUMBER "1"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- delete at path"
   WHITESPACE "\n"
@@ -4016,7 +4095,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'{1,b}'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json path find"
   WHITESPACE "\n"
@@ -4045,7 +4124,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'$.items[*] ? (@ > 2)'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- json path predicate check"
   WHITESPACE "\n"
@@ -4074,7 +4153,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'$.a[*] > 2'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subscripting"
   WHITESPACE "\n"
@@ -4091,7 +4170,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4106,7 +4185,7 @@ SOURCE_FILE
             LITERAL
               STRING "'a'"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4133,7 +4212,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4160,7 +4239,7 @@ SOURCE_FILE
             LITERAL
               STRING "'a'"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4197,7 +4276,7 @@ SOURCE_FILE
             LITERAL
               STRING "'c'"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4216,7 +4295,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "4"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4240,7 +4319,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "34"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4258,7 +4337,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "42"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4285,7 +4364,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "42"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_with_collate"
   WHITESPACE "\n"
@@ -4319,7 +4398,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4348,7 +4427,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4370,7 +4449,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME_REF
                 IDENT "ignore_accent_case"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4399,7 +4478,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4434,7 +4513,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4474,7 +4553,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME_REF
                 IDENT "\"fr_FR\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4494,7 +4573,7 @@ SOURCE_FILE
               WHITESPACE " "
               NAME_REF
                 IDENT "\"C\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4512,7 +4591,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "\"C\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4530,7 +4609,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "\"C\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4557,7 +4636,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "\"C\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -4588,7 +4667,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "\"C\""
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cube_operators"
   WHITESPACE "\n"
@@ -4608,7 +4687,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4626,7 +4705,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4644,7 +4723,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4662,7 +4741,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4680,7 +4759,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4699,7 +4778,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4718,7 +4797,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -4737,7 +4816,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- more_ops"
   WHITESPACE "\n"
@@ -4758,7 +4837,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- prefix operators"
   WHITESPACE "\n"
@@ -4775,7 +4854,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "a"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- range_operators"
   WHITESPACE "\n"
@@ -4817,7 +4896,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "3"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- contains element"
   WHITESPACE "\n"
@@ -4852,7 +4931,7 @@ SOURCE_FILE
                 COLON ":"
               TIME_TYPE
                 TIMESTAMP_KW "timestamp"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first contained by second"
   WHITESPACE "\n"
@@ -4892,7 +4971,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "7"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- element contained in range"
   WHITESPACE "\n"
@@ -4922,7 +5001,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "7"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- range overlap"
   WHITESPACE "\n"
@@ -4962,7 +5041,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "12"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first range strictly left"
   WHITESPACE "\n"
@@ -5002,7 +5081,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "110"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first range strictly right"
   WHITESPACE "\n"
@@ -5042,7 +5121,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "30"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first range not extend right of second"
   WHITESPACE "\n"
@@ -5082,7 +5161,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "20"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first range not extend left of second"
   WHITESPACE "\n"
@@ -5122,7 +5201,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "10"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ranges adjacent"
   WHITESPACE "\n"
@@ -5139,11 +5218,11 @@ SOURCE_FILE
               ARG_LIST
                 L_PAREN "("
                 LITERAL
-                  FLOAT_NUMBER "1.1"
+                  NUMERIC_NUMBER "1.1"
                 COMMA ","
                 WHITESPACE " "
                 LITERAL
-                  FLOAT_NUMBER "2.2"
+                  NUMERIC_NUMBER "2.2"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5157,13 +5236,13 @@ SOURCE_FILE
               ARG_LIST
                 L_PAREN "("
                 LITERAL
-                  FLOAT_NUMBER "2.2"
+                  NUMERIC_NUMBER "2.2"
                 COMMA ","
                 WHITESPACE " "
                 LITERAL
-                  FLOAT_NUMBER "3.3"
+                  NUMERIC_NUMBER "3.3"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- union"
   WHITESPACE "\n"
@@ -5201,7 +5280,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "20"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- intersection"
   WHITESPACE "\n"
@@ -5239,7 +5318,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "20"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- difference"
   WHITESPACE "\n"
@@ -5277,7 +5356,7 @@ SOURCE_FILE
                 LITERAL
                   INT_NUMBER "20"
                 R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- OVERLAPS"
   WHITESPACE "\n"
@@ -5337,7 +5416,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'2002-10-30'"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- postfix operators"
   WHITESPACE "\n"
@@ -5358,7 +5437,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               NULL_KW "null"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -5377,7 +5456,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               UNKNOWN_KW "unknown"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- single tuple"
   WHITESPACE "\n"
@@ -5398,7 +5477,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi tuple"
   WHITESPACE "\n"
@@ -5427,7 +5506,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "4"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not_in"
   WHITESPACE "\n"
@@ -5453,7 +5532,7 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- single char operators that are okay in the prefix position"
   WHITESPACE "\n"
@@ -5467,7 +5546,7 @@ SOURCE_FILE
             PLUS "+"
             NAME_REF
               IDENT "a"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5479,7 +5558,7 @@ SOURCE_FILE
             MINUS "-"
             NAME_REF
               IDENT "b"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5492,7 +5571,7 @@ SOURCE_FILE
               TILDE "~"
             NAME_REF
               IDENT "h"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5505,7 +5584,7 @@ SOURCE_FILE
               BANG "!"
             NAME_REF
               IDENT "i"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5518,7 +5597,7 @@ SOURCE_FILE
               AT "@"
             NAME_REF
               IDENT "j"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5531,7 +5610,7 @@ SOURCE_FILE
               POUND "#"
             NAME_REF
               IDENT "k"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5544,7 +5623,7 @@ SOURCE_FILE
               AMP "&"
             NAME_REF
               IDENT "n"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5557,7 +5636,7 @@ SOURCE_FILE
               PIPE "|"
             NAME_REF
               IDENT "o"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5570,7 +5649,7 @@ SOURCE_FILE
               QUESTION "?"
             NAME_REF
               IDENT "q"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -5583,5 +5662,5 @@ SOURCE_FILE
               BACKTICK "`"
             NAME_REF
               IDENT "p"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"

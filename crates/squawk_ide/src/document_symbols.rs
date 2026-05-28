@@ -4,6 +4,7 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::binder::extract_string_literal;
 use crate::db::{File, parse};
+use crate::file::InFile;
 use crate::resolve::{
     resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_sequence_info,
     resolve_table_info, resolve_type_info, resolve_view_info,
@@ -20,6 +21,7 @@ pub enum DocumentSymbolKind {
     Procedure,
     EventTrigger,
     Role,
+    Rule,
     Policy,
     PropertyGraph,
     Type,
@@ -64,32 +66,40 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateTable(create_table) => {
-                if let Some(symbol) = create_table_symbol(db, file, create_table) {
+                if let Some(symbol) = create_table_symbol(db, InFile::new(file, create_table)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateTableAs(create_table_as) => {
-                if let Some(symbol) = create_table_as_symbol(db, file, create_table_as) {
+                if let Some(symbol) = create_table_as_symbol(db, InFile::new(file, create_table_as))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateForeignTable(create_foreign_table) => {
-                if let Some(symbol) = create_table_symbol(db, file, create_foreign_table) {
+                if let Some(symbol) =
+                    create_table_symbol(db, InFile::new(file, create_foreign_table))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateFunction(create_function) => {
-                if let Some(symbol) = create_function_symbol(db, file, create_function) {
+                if let Some(symbol) = create_function_symbol(db, InFile::new(file, create_function))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateAggregate(create_aggregate) => {
-                if let Some(symbol) = create_aggregate_symbol(db, file, create_aggregate) {
+                if let Some(symbol) =
+                    create_aggregate_symbol(db, InFile::new(file, create_aggregate))
+                {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateProcedure(create_procedure) => {
-                if let Some(symbol) = create_procedure_symbol(db, file, create_procedure) {
+                if let Some(symbol) =
+                    create_procedure_symbol(db, InFile::new(file, create_procedure))
+                {
                     symbols.push(symbol);
                 }
             }
@@ -99,12 +109,13 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateDomain(create_domain) => {
-                if let Some(symbol) = create_domain_symbol(db, file, create_domain) {
+                if let Some(symbol) = create_domain_symbol(db, InFile::new(file, create_domain)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateSequence(create_sequence) => {
-                if let Some(symbol) = create_sequence_symbol(db, file, create_sequence) {
+                if let Some(symbol) = create_sequence_symbol(db, InFile::new(file, create_sequence))
+                {
                     symbols.push(symbol);
                 }
             }
@@ -143,6 +154,11 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
+            ast::Stmt::CreateRule(create_rule) => {
+                if let Some(symbol) = create_rule_symbol(create_rule) {
+                    symbols.push(symbol);
+                }
+            }
             ast::Stmt::CreatePolicy(create_policy) => {
                 if let Some(symbol) = create_policy_symbol(create_policy) {
                     symbols.push(symbol);
@@ -154,17 +170,19 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                 }
             }
             ast::Stmt::CreateType(create_type) => {
-                if let Some(symbol) = create_type_symbol(db, file, create_type) {
+                if let Some(symbol) = create_type_symbol(db, InFile::new(file, create_type)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateView(create_view) => {
-                if let Some(symbol) = create_view_symbol(db, file, create_view) {
+                if let Some(symbol) = create_view_symbol(db, InFile::new(file, create_view)) {
                     symbols.push(symbol);
                 }
             }
             ast::Stmt::CreateMaterializedView(create_view) => {
-                if let Some(symbol) = create_materialized_view_symbol(db, file, create_view) {
+                if let Some(symbol) =
+                    create_materialized_view_symbol(db, InFile::new(file, create_view))
+                {
                     symbols.push(symbol);
                 }
             }
@@ -269,13 +287,14 @@ fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymb
 
 fn create_table_symbol(
     db: &dyn Db,
-    file: File,
-    create_table: impl ast::HasCreateTable,
+    create_table: InFile<impl ast::HasCreateTable>,
 ) -> Option<DocumentSymbol> {
+    let file = create_table.file_id;
+    let create_table = create_table.value;
     let path = create_table.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, table_name) = resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, table_name);
 
     let full_range = create_table.syntax().text_range();
@@ -302,13 +321,14 @@ fn create_table_symbol(
 
 fn create_table_as_symbol(
     db: &dyn Db,
-    file: File,
-    create_table_as: ast::CreateTableAs,
+    create_table_as: InFile<ast::CreateTableAs>,
 ) -> Option<DocumentSymbol> {
+    let file = create_table_as.file_id;
+    let create_table_as = create_table_as.value;
     let path = create_table_as.path()?;
     let name_node = path.segment()?.name()?.syntax().clone();
 
-    let (schema, table_name) = resolve_table_info(db, file, &path)?;
+    let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, table_name);
 
     let full_range = create_table_as.syntax().text_range();
@@ -326,15 +346,13 @@ fn create_table_as_symbol(
     })
 }
 
-fn create_view_symbol(
-    db: &dyn Db,
-    file: File,
-    create_view: ast::CreateView,
-) -> Option<DocumentSymbol> {
+fn create_view_symbol(db: &dyn Db, create_view: InFile<ast::CreateView>) -> Option<DocumentSymbol> {
+    let file = create_view.file_id;
+    let create_view = create_view.value;
     let path = create_view.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, view_name) = resolve_view_info(db, file, &path)?;
+    let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, view_name);
 
     let full_range = create_view.syntax().text_range();
@@ -378,13 +396,14 @@ fn symbols_from_column_list(
 // TODO: combine with create_view_symbol
 fn create_materialized_view_symbol(
     db: &dyn Db,
-    file: File,
-    create_view: ast::CreateMaterializedView,
+    create_view: InFile<ast::CreateMaterializedView>,
 ) -> Option<DocumentSymbol> {
+    let file = create_view.file_id;
+    let create_view = create_view.value;
     let path = create_view.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, view_name) = resolve_view_info(db, file, &path)?;
+    let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, view_name);
 
     let full_range = create_view.syntax().text_range();
@@ -401,13 +420,14 @@ fn create_materialized_view_symbol(
 
 fn create_function_symbol(
     db: &dyn Db,
-    file: File,
-    create_function: ast::CreateFunction,
+    create_function: InFile<ast::CreateFunction>,
 ) -> Option<DocumentSymbol> {
+    let file = create_function.file_id;
+    let create_function = create_function.value;
     let path = create_function.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, function_name) = resolve_function_info(db, file, &path)?;
+    let (schema, function_name) = resolve_function_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, function_name);
 
     let full_range = create_function.syntax().text_range();
@@ -425,13 +445,14 @@ fn create_function_symbol(
 
 fn create_aggregate_symbol(
     db: &dyn Db,
-    file: File,
-    create_aggregate: ast::CreateAggregate,
+    create_aggregate: InFile<ast::CreateAggregate>,
 ) -> Option<DocumentSymbol> {
+    let file = create_aggregate.file_id;
+    let create_aggregate = create_aggregate.value;
     let path = create_aggregate.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, aggregate_name) = resolve_aggregate_info(db, file, &path)?;
+    let (schema, aggregate_name) = resolve_aggregate_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, aggregate_name);
 
     let full_range = create_aggregate.syntax().text_range();
@@ -449,13 +470,14 @@ fn create_aggregate_symbol(
 
 fn create_procedure_symbol(
     db: &dyn Db,
-    file: File,
-    create_procedure: ast::CreateProcedure,
+    create_procedure: InFile<ast::CreateProcedure>,
 ) -> Option<DocumentSymbol> {
+    let file = create_procedure.file_id;
+    let create_procedure = create_procedure.value;
     let path = create_procedure.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, procedure_name) = resolve_procedure_info(db, file, &path)?;
+    let (schema, procedure_name) = resolve_procedure_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, procedure_name);
 
     let full_range = create_procedure.syntax().text_range();
@@ -490,13 +512,14 @@ fn create_index_symbol(create_index: ast::CreateIndex) -> Option<DocumentSymbol>
 
 fn create_domain_symbol(
     db: &dyn Db,
-    file: File,
-    create_domain: ast::CreateDomain,
+    create_domain: InFile<ast::CreateDomain>,
 ) -> Option<DocumentSymbol> {
+    let file = create_domain.file_id;
+    let create_domain = create_domain.value;
     let path = create_domain.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, domain_name) = resolve_type_info(db, file, &path)?;
+    let (schema, domain_name) = resolve_type_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, domain_name);
 
     let full_range = create_domain.syntax().text_range();
@@ -514,13 +537,14 @@ fn create_domain_symbol(
 
 fn create_sequence_symbol(
     db: &dyn Db,
-    file: File,
-    create_sequence: ast::CreateSequence,
+    create_sequence: InFile<ast::CreateSequence>,
 ) -> Option<DocumentSymbol> {
+    let file = create_sequence.file_id;
+    let create_sequence = create_sequence.value;
     let path = create_sequence.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, sequence_name) = resolve_sequence_info(db, file, &path)?;
+    let (schema, sequence_name) = resolve_sequence_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, sequence_name);
 
     let full_range = create_sequence.syntax().text_range();
@@ -657,6 +681,23 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
     })
 }
 
+fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
+    let name_node = create_rule.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = create_rule.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Rule,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymbol> {
     let name_node = create_policy.name()?;
     let name = name_node.syntax().text().to_string();
@@ -695,15 +736,13 @@ fn create_property_graph_symbol(
     })
 }
 
-fn create_type_symbol(
-    db: &dyn Db,
-    file: File,
-    create_type: ast::CreateType,
-) -> Option<DocumentSymbol> {
+fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Option<DocumentSymbol> {
+    let file = create_type.file_id;
+    let create_type = create_type.value;
     let path = create_type.path()?;
     let name_node = path.segment()?.name()?;
 
-    let (schema, type_name) = resolve_type_info(db, file, &path)?;
+    let (schema, type_name) = resolve_type_info(db, InFile::new(file, &path))?;
     let name = format!("{}.{}", schema.0, type_name);
 
     let full_range = create_type.syntax().text_range();
@@ -877,6 +916,7 @@ mod tests {
         }
     }
 
+    #[must_use]
     fn symbols(sql: &str) -> String {
         let db = Database::default();
         let file = File::new(&db, sql.to_string().into());
@@ -907,6 +947,7 @@ mod tests {
             DocumentSymbolKind::Procedure => "procedure",
             DocumentSymbolKind::EventTrigger => "event trigger",
             DocumentSymbolKind::Role => "role",
+            DocumentSymbolKind::Rule => "rule",
             DocumentSymbolKind::Policy => "policy",
             DocumentSymbolKind::PropertyGraph => "property graph",
             DocumentSymbolKind::Type => "type",
@@ -993,7 +1034,7 @@ mod tests {
 create table users (
   id int,
   email citext
-);"), @r"
+);"), @"
         info: table: public.users
           ╭▸ 
         2 │   create table users (
@@ -1003,7 +1044,7 @@ create table users (
         3 │ │   id int,
         4 │ │   email citext
         5 │ │ );
-          │ └─┘ full range
+          │ └──┘ full range
           │
           ⸬  
         3 │     id int,
@@ -1023,11 +1064,11 @@ create table users (
     fn create_table_as() {
         assert_snapshot!(symbols("
 create table t as select 1 a;
-"), @r"
+"), @"
         info: table: public.t
           ╭▸ 
         2 │ create table t as select 1 a;
-          │ ┬────────────┯──────────────
+          │ ┬────────────┯───────────────
           │ │            │
           │ │            focus range
           ╰╴full range
@@ -1038,11 +1079,11 @@ create table t as select 1 a;
     fn create_schema() {
         assert_snapshot!(symbols("
 create schema foo;
-"), @r"
+"), @"
         info: schema: foo
           ╭▸ 
         2 │ create schema foo;
-          │ ┬─────────────┯━━
+          │ ┬─────────────┯━━─
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1053,11 +1094,11 @@ create schema foo;
     fn create_schema_authorization() {
         assert_snapshot!(symbols("
 create schema authorization foo;
-"), @r"
+"), @"
         info: schema: foo
           ╭▸ 
         2 │ create schema authorization foo;
-          │ ┬───────────────────────────┯━━
+          │ ┬───────────────────────────┯━━─
           │ │                           │
           │ │                           focus range
           ╰╴full range
@@ -1071,11 +1112,11 @@ listen updates;
 notify updates;
 unlisten updates;
 unlisten *;
-"), @r"
+"), @"
         info: channel: updates listen
           ╭▸ 
         2 │ listen updates;
-          │ ┬──────┯━━━━━━
+          │ ┬──────┯━━━━━━─
           │ │      │
           │ │      focus range
           │ full range
@@ -1083,14 +1124,14 @@ unlisten *;
         info: channel: updates notify
           ╭▸ 
         3 │ notify updates;
-          │ ┬──────┯━━━━━━
+          │ ┬──────┯━━━━━━─
           │ │      │
           │ │      focus range
           ╰╴full range
         info: channel: updates unlisten
           ╭▸ 
         4 │ unlisten updates;
-          │ ┬────────┯━━━━━━
+          │ ┬────────┯━━━━━━─
           │ │        │
           │ │        focus range
           ╰╴full range
@@ -1101,11 +1142,11 @@ unlisten *;
     fn create_function() {
         assert_snapshot!(
             symbols("create function hello() returns void as $$ select 1; $$ language sql;"),
-            @r"
+            @"
         info: function: public.hello
           ╭▸ 
         1 │ create function hello() returns void as $$ select 1; $$ language sql;
-          │ ┬───────────────┯━━━━───────────────────────────────────────────────
+          │ ┬───────────────┯━━━━────────────────────────────────────────────────
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1117,11 +1158,11 @@ unlisten *;
     fn create_materialized_view() {
         assert_snapshot!(
             symbols("create materialized view reports as select 1;"),
-            @r"
+            @"
         info: materialized view: public.reports
           ╭▸ 
         1 │ create materialized view reports as select 1;
-          │ ┬────────────────────────┯━━━━━━────────────
+          │ ┬────────────────────────┯━━━━━━─────────────
           │ │                        │
           │ │                        focus range
           ╰╴full range
@@ -1133,11 +1174,11 @@ unlisten *;
     fn create_aggregate() {
         assert_snapshot!(
             symbols("create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);"),
-            @r"
+            @"
         info: aggregate: public.myavg
           ╭▸ 
         1 │ create aggregate myavg(int) (sfunc = int4_avg_accum, stype = _int8);
-          │ ┬────────────────┯━━━━─────────────────────────────────────────────
+          │ ┬────────────────┯━━━━──────────────────────────────────────────────
           │ │                │
           │ │                focus range
           ╰╴full range
@@ -1149,11 +1190,11 @@ unlisten *;
     fn create_procedure() {
         assert_snapshot!(
             symbols("create procedure hello() language sql as $$ select 1; $$;"),
-            @r"
+            @"
         info: procedure: public.hello
           ╭▸ 
         1 │ create procedure hello() language sql as $$ select 1; $$;
-          │ ┬────────────────┯━━━━──────────────────────────────────
+          │ ┬────────────────┯━━━━───────────────────────────────────
           │ │                │
           │ │                focus range
           ╰╴full range
@@ -1165,11 +1206,11 @@ unlisten *;
     fn create_index() {
         assert_snapshot!(symbols("
 create index idx_users_email on users (email);
-"), @r"
+"), @"
         info: index: idx_users_email
           ╭▸ 
         2 │ create index idx_users_email on users (email);
-          │ ┬────────────┯━━━━━━━━━━━━━━─────────────────
+          │ ┬────────────┯━━━━━━━━━━━━━━──────────────────
           │ │            │
           │ │            focus range
           ╰╴full range
@@ -1180,11 +1221,11 @@ create index idx_users_email on users (email);
     fn create_domain() {
         assert_snapshot!(
             symbols("create domain email_addr as text;"),
-            @r"
+            @"
         info: domain: public.email_addr
           ╭▸ 
         1 │ create domain email_addr as text;
-          │ ┬─────────────┯━━━━━━━━━────────
+          │ ┬─────────────┯━━━━━━━━━─────────
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1196,11 +1237,11 @@ create index idx_users_email on users (email);
     fn create_sequence() {
         assert_snapshot!(
             symbols("create sequence user_id_seq;"),
-            @r"
+            @"
         info: sequence: public.user_id_seq
           ╭▸ 
         1 │ create sequence user_id_seq;
-          │ ┬───────────────┯━━━━━━━━━━
+          │ ┬───────────────┯━━━━━━━━━━─
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1214,7 +1255,7 @@ create index idx_users_email on users (email);
 create trigger update_timestamp
   before update on users
   execute function update_modified_column();
-"), @r"
+"), @"
         info: trigger: update_timestamp
           ╭▸ 
         2 │   create trigger update_timestamp
@@ -1223,7 +1264,7 @@ create trigger update_timestamp
           │ │
         3 │ │   before update on users
         4 │ │   execute function update_modified_column();
-          ╰╴└───────────────────────────────────────────┘ full range
+          ╰╴└────────────────────────────────────────────┘ full range
         ");
     }
 
@@ -1231,11 +1272,11 @@ create trigger update_timestamp
     fn create_event_trigger() {
         assert_snapshot!(
             symbols("create event trigger et on ddl_command_start execute function f();"),
-            @r"
+            @"
         info: event trigger: et
           ╭▸ 
         1 │ create event trigger et on ddl_command_start execute function f();
-          │ ┬────────────────────┯━──────────────────────────────────────────
+          │ ┬────────────────────┯━───────────────────────────────────────────
           │ │                    │
           │ │                    focus range
           ╰╴full range
@@ -1247,11 +1288,11 @@ create trigger update_timestamp
     fn create_tablespace() {
         assert_snapshot!(symbols("
 create tablespace dbspace location '/data/dbs';
-"), @r"
+"), @"
         info: tablespace: dbspace
           ╭▸ 
         2 │ create tablespace dbspace location '/data/dbs';
-          │ ┬─────────────────┯━━━━━━─────────────────────
+          │ ┬─────────────────┯━━━━━━──────────────────────
           │ │                 │
           │ │                 focus range
           ╰╴full range
@@ -1262,11 +1303,11 @@ create tablespace dbspace location '/data/dbs';
     fn create_database() {
         assert_snapshot!(
             symbols("create database mydb;"),
-            @r"
+            @"
         info: database: mydb
           ╭▸ 
         1 │ create database mydb;
-          │ ┬───────────────┯━━━
+          │ ┬───────────────┯━━━─
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1278,11 +1319,11 @@ create tablespace dbspace location '/data/dbs';
     fn create_server() {
         assert_snapshot!(symbols("
 create server myserver foreign data wrapper postgres_fdw;
-"), @r"
+"), @"
         info: server: myserver
           ╭▸ 
         2 │ create server myserver foreign data wrapper postgres_fdw;
-          │ ┬─────────────┯━━━━━━━──────────────────────────────────
+          │ ┬─────────────┯━━━━━━━───────────────────────────────────
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1293,11 +1334,11 @@ create server myserver foreign data wrapper postgres_fdw;
     fn create_extension() {
         assert_snapshot!(
             symbols("create extension pgcrypto;"),
-            @r"
+            @"
         info: extension: pgcrypto
           ╭▸ 
         1 │ create extension pgcrypto;
-          │ ┬────────────────┯━━━━━━━
+          │ ┬────────────────┯━━━━━━━─
           │ │                │
           │ │                focus range
           ╰╴full range
@@ -1309,13 +1350,43 @@ create server myserver foreign data wrapper postgres_fdw;
     fn create_role() {
         assert_snapshot!(symbols("
 create role reader;
-"), @r"
+"), @"
         info: role: reader
           ╭▸ 
         2 │ create role reader;
-          │ ┬───────────┯━━━━━
+          │ ┬───────────┯━━━━━─
           │ │           │
           │ │           focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_rule() {
+        assert_snapshot!(symbols("
+create rule r as on select to t do nothing;
+"), @"
+        info: rule: r
+          ╭▸ 
+        2 │ create rule r as on select to t do nothing;
+          │ ┬───────────┯──────────────────────────────
+          │ │           │
+          │ │           focus range
+          ╰╴full range
+        ");
+    }
+
+    #[test]
+    fn create_rule_or_replace() {
+        assert_snapshot!(symbols("
+create or replace rule notify_me as on update to mytable do also notify mytable;
+"), @"
+        info: rule: notify_me
+          ╭▸ 
+        2 │ create or replace rule notify_me as on update to mytable do also notify mytable;
+          │ ┬──────────────────────┯━━━━━━━━────────────────────────────────────────────────
+          │ │                      │
+          │ │                      focus range
           ╰╴full range
         ");
     }
@@ -1324,11 +1395,11 @@ create role reader;
     fn create_policy() {
         assert_snapshot!(symbols("
 create policy allow_read on t;
-"), @r"
+"), @"
         info: policy: allow_read
           ╭▸ 
         2 │ create policy allow_read on t;
-          │ ┬─────────────┯━━━━━━━━━─────
+          │ ┬─────────────┯━━━━━━━━━──────
           │ │             │
           │ │             focus range
           ╰╴full range
@@ -1341,11 +1412,11 @@ create policy allow_read on t;
 create table users (id int);
 create table posts (id int);
 create function get_user(user_id int) returns void as $$ select 1; $$ language sql;
-"), @r"
+"), @"
         info: table: public.users
           ╭▸ 
         2 │ create table users (id int);
-          │ ┬────────────┯━━━━─────────
+          │ ┬────────────┯━━━━──────────
           │ │            │
           │ │            focus range
           │ full range
@@ -1360,7 +1431,7 @@ create function get_user(user_id int) returns void as $$ select 1; $$ language s
         info: table: public.posts
           ╭▸ 
         3 │ create table posts (id int);
-          │ ┬────────────┯━━━━─────────
+          │ ┬────────────┯━━━━──────────
           │ │            │
           │ │            focus range
           │ full range
@@ -1374,7 +1445,7 @@ create function get_user(user_id int) returns void as $$ select 1; $$ language s
         info: function: public.get_user
           ╭▸ 
         4 │ create function get_user(user_id int) returns void as $$ select 1; $$ language sql;
-          │ ┬───────────────┯━━━━━━━──────────────────────────────────────────────────────────
+          │ ┬───────────────┯━━━━━━━───────────────────────────────────────────────────────────
           │ │               │
           │ │               focus range
           ╰╴full range
@@ -1386,11 +1457,11 @@ create function get_user(user_id int) returns void as $$ select 1; $$ language s
         assert_snapshot!(symbols("
 create table public.users (id int);
 create function my_schema.hello() returns void as $$ select 1; $$ language sql;
-"), @r"
+"), @"
         info: table: public.users
           ╭▸ 
         2 │ create table public.users (id int);
-          │ ┬───────────────────┯━━━━─────────
+          │ ┬───────────────────┯━━━━──────────
           │ │                   │
           │ │                   focus range
           │ full range
@@ -1405,7 +1476,7 @@ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
         info: function: my_schema.hello
           ╭▸ 
         3 │ create function my_schema.hello() returns void as $$ select 1; $$ language sql;
-          │ ┬─────────────────────────┯━━━━───────────────────────────────────────────────
+          │ ┬─────────────────────────┯━━━━────────────────────────────────────────────────
           │ │                         │
           │ │                         focus range
           ╰╴full range
@@ -1425,7 +1496,7 @@ create property graph foo.bar
           │ ┌─┘
           │ │
         3 │ │   vertex tables (t key (a) no properties);
-          ╰╴└─────────────────────────────────────────┘ full range
+          ╰╴└──────────────────────────────────────────┘ full range
         ");
     }
 
@@ -1433,11 +1504,11 @@ create property graph foo.bar
     fn create_type() {
         assert_snapshot!(
             symbols("create type status as enum ('active', 'inactive');"),
-            @r"
+            @"
         info: enum: public.status
           ╭▸ 
         1 │ create type status as enum ('active', 'inactive');
-          │ ┬───────────┯━━━━━───────────────────────────────
+          │ ┬───────────┯━━━━━────────────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1458,11 +1529,11 @@ create property graph foo.bar
     fn create_type_composite() {
         assert_snapshot!(
             symbols("create type person as (name text, age int);"),
-            @r"
+            @"
         info: type: public.person
           ╭▸ 
         1 │ create type person as (name text, age int);
-          │ ┬───────────┯━━━━━────────────────────────
+          │ ┬───────────┯━━━━━─────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1483,11 +1554,11 @@ create property graph foo.bar
     fn create_type_composite_multiple_columns() {
         assert_snapshot!(
             symbols("create type address as (street text, city text, zip varchar(10));"),
-            @r"
+            @"
         info: type: public.address
           ╭▸ 
         1 │ create type address as (street text, city text, zip varchar(10));
-          │ ┬───────────┯━━━━━━─────────────────────────────────────────────
+          │ ┬───────────┯━━━━━━──────────────────────────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1510,11 +1581,11 @@ create property graph foo.bar
     fn create_type_with_schema() {
         assert_snapshot!(
             symbols("create type myschema.status as enum ('active', 'inactive');"),
-            @r"
+            @"
         info: enum: myschema.status
           ╭▸ 
         1 │ create type myschema.status as enum ('active', 'inactive');
-          │ ┬────────────────────┯━━━━━───────────────────────────────
+          │ ┬────────────────────┯━━━━━────────────────────────────────
           │ │                    │
           │ │                    focus range
           │ full range
@@ -1535,11 +1606,11 @@ create property graph foo.bar
     fn create_type_enum_multiple_variants() {
         assert_snapshot!(
             symbols("create type priority as enum ('low', 'medium', 'high', 'urgent');"),
-            @r"
+            @"
         info: enum: public.priority
           ╭▸ 
         1 │ create type priority as enum ('low', 'medium', 'high', 'urgent');
-          │ ┬───────────┯━━━━━━━────────────────────────────────────────────
+          │ ┬───────────┯━━━━━━━─────────────────────────────────────────────
           │ │           │
           │ │           focus range
           │ full range
@@ -1564,11 +1635,11 @@ create property graph foo.bar
     fn declare_cursor() {
         assert_snapshot!(symbols("
 declare c scroll cursor for select * from t;
-"), @r"
+"), @"
         info: cursor: c
           ╭▸ 
         2 │ declare c scroll cursor for select * from t;
-          │ ┬───────┯──────────────────────────────────
+          │ ┬───────┯───────────────────────────────────
           │ │       │
           │ │       focus range
           ╰╴full range
@@ -1579,11 +1650,11 @@ declare c scroll cursor for select * from t;
     fn prepare_statement() {
         assert_snapshot!(symbols("
 prepare stmt as select 1;
-"), @r"
+"), @"
         info: prepared statement: stmt
           ╭▸ 
         2 │ prepare stmt as select 1;
-          │ ┬───────┯━━━────────────
+          │ ┬───────┯━━━─────────────
           │ │       │
           │ │       focus range
           ╰╴full range
@@ -1667,7 +1738,7 @@ create foreign table films (
   code char(5),
   title varchar(40)
 ) server film_server;
-"), @r"
+"), @"
         info: table: public.films
           ╭▸ 
         2 │   create foreign table films (
@@ -1677,7 +1748,7 @@ create foreign table films (
         3 │ │   code char(5),
         4 │ │   title varchar(40)
         5 │ │ ) server film_server;
-          │ └────────────────────┘ full range
+          │ └─────────────────────┘ full range
           │
           ⸬  
         3 │     code char(5),

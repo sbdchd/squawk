@@ -1,7 +1,6 @@
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
-    identifier::Identifier,
 };
 
 use crate::visitors::check_not_allowed_types;
@@ -22,13 +21,12 @@ pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
                 .path()
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
-                .map(|x| x.text().to_string())
+                .map(|x| x.text())
             else {
                 return false;
             };
             // if we don't have any args, then it's the same as `text`
-            Identifier::new(ty_name.as_str()) == Identifier::new("varchar")
-                && path_type.arg_list().is_some()
+            ty_name == "varchar" && path_type.arg_list().is_some()
         }
         ast::Type::CharType(_) => false,
         ast::Type::BitType(_) => false,
@@ -89,6 +87,7 @@ mod test {
     use crate::Rule;
     use crate::test_utils::{fix_sql, lint_errors, lint_ok};
 
+    #[must_use]
     fn fix(sql: &str) -> String {
         fix_sql(sql, Rule::PreferTimestampTz)
     }

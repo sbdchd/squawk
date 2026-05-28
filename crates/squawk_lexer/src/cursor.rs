@@ -33,6 +33,11 @@ impl<'a> Cursor<'a> {
         self.chars.clone().next().unwrap_or(EOF_CHAR)
     }
 
+    /// Peeks the second symbol from the input stream without consuming it.
+    pub(crate) fn second(&self) -> char {
+        self.chars.clone().nth(1).unwrap_or(EOF_CHAR)
+    }
+
     /// Checks if there is nothing more to consume.
     pub(crate) fn is_eof(&self) -> bool {
         self.chars.as_str().is_empty()

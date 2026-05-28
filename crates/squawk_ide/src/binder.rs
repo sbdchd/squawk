@@ -2,10 +2,35 @@
 /// see: typescript-go/internal/binder/binder.go
 use la_arena::Arena;
 use rowan::TextSize;
+use smallvec::SmallVec;
 use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 
 use crate::scope::Scope;
 use crate::symbols::{Name, Schema, Symbol, SymbolKind};
+
+type Schemas = SmallVec<[Schema; 3]>;
+
+pub(crate) struct ResolvedSchemas {
+    list: Schemas,
+    unqualified: bool,
+}
+
+impl ResolvedSchemas {
+    pub(crate) fn list(&self) -> &[Schema] {
+        &self.list
+    }
+
+    pub(crate) fn unqualified(&self) -> bool {
+        self.unqualified
+    }
+
+    pub(crate) fn from_single(schema: Schema) -> Self {
+        Self {
+            list: Schemas::from_iter([schema]),
+            unqualified: false,
+        }
+    }
+}
 
 #[derive(Clone, PartialEq)]
 struct SearchPathChange {
@@ -45,21 +70,27 @@ impl Binder {
         Some(self.symbols[symbol_id].ptr)
     }
 
+    pub(crate) fn resolved_schemas(
+        &self,
+        position: TextSize,
+        schema: Option<&Schema>,
+    ) -> ResolvedSchemas {
+        let unqualified = schema.is_none();
+        let list = match schema {
+            Some(s) => Schemas::from_iter([s.clone()]),
+            None => self.search_path_at(position).iter().cloned().collect(),
+        };
+        ResolvedSchemas { list, unqualified }
+    }
+
     pub(crate) fn lookup_with(
         &self,
         name: &Name,
         kind: SymbolKind,
-        position: TextSize,
-        schema: &Option<Schema>,
+        schemas: &ResolvedSchemas,
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
-
-        let search_paths = match schema {
-            Some(s) => std::slice::from_ref(s),
-            None => self.search_path_at(position),
-        };
-
-        for search_schema in search_paths {
+        for search_schema in schemas.list() {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &self.symbols[*id];
                 symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)
@@ -74,18 +105,11 @@ impl Binder {
         &self,
         name: &Name,
         kind: SymbolKind,
-        position: TextSize,
-        schema: &Option<Schema>,
+        schemas: &ResolvedSchemas,
         params: Option<&[Name]>,
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
-
-        let search_paths = match schema {
-            Some(s) => std::slice::from_ref(s),
-            None => self.search_path_at(position),
-        };
-
-        for search_schema in search_paths {
+        for search_schema in schemas.list() {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &self.symbols[*id];
                 let params_match = match (&symbol.params, params) {
@@ -106,18 +130,11 @@ impl Binder {
         &self,
         name: &Name,
         kind: SymbolKind,
-        position: TextSize,
-        schema: &Option<Schema>,
+        schemas: &ResolvedSchemas,
         table: &Option<Name>,
     ) -> Option<SyntaxNodePtr> {
         let symbols = self.scope.get(name)?;
-
-        let search_paths = match schema {
-            Some(s) => std::slice::from_ref(s),
-            None => self.search_path_at(position),
-        };
-
-        for search_schema in search_paths {
+        for search_schema in schemas.list() {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &self.symbols[*id];
                 symbol.kind == kind
@@ -133,18 +150,11 @@ impl Binder {
     pub(crate) fn lookup_info(
         &self,
         name: &Name,
-        schema: Option<&Schema>,
         kind: SymbolKind,
-        position: TextSize,
+        schemas: &ResolvedSchemas,
     ) -> Option<(Schema, String)> {
         let symbols = self.scope.get(name)?;
-
-        let search_paths: &[Schema] = match schema {
-            Some(s) => std::slice::from_ref(s),
-            None => self.search_path_at(position),
-        };
-
-        for search_schema in search_paths {
+        for search_schema in schemas.list() {
             if let Some(symbol_id) = symbols.iter().copied().find(|id| {
                 let symbol = &self.symbols[*id];
                 symbol.kind == kind && symbol.schema.as_ref() == Some(search_schema)

@@ -7,5 +7,5 @@ SOURCE_FILE
   WHITESPACE "\n"
   CHECKPOINT
     CHECKPOINT_KW "checkpoint"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

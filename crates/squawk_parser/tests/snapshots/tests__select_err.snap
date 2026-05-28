@@ -57,8 +57,8 @@ SOURCE_FILE
               IDENT "z"
         ERROR
           COMMA ","
-  WHITESPACE "\n"
-  SEMICOLON ";"
+    WHITESPACE "\n"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma in column list"
   WHITESPACE "\n"
@@ -90,7 +90,7 @@ SOURCE_FILE
             ERROR
               COMMA ","
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing comma"
   WHITESPACE "\n"
@@ -127,7 +127,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--          ^ ^ comma missing"
   WHITESPACE "\n"
@@ -191,7 +191,7 @@ SOURCE_FILE
           WHITESPACE " "
           SORT_DESC
             DESC_KW "desc"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE " \n\n"
   COMMENT "-- group bys with missing commas"
   WHITESPACE "\n"
@@ -229,7 +229,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "3"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -265,7 +265,7 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "3"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -326,7 +326,7 @@ SOURCE_FILE
               R_PAREN ")"
             R_PAREN ")"
           R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma in args"
   WHITESPACE "\n"
@@ -346,7 +346,7 @@ SOURCE_FILE
               ERROR
                 COMMA ","
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing args"
   WHITESPACE "\n"
@@ -373,7 +373,7 @@ SOURCE_FILE
               ERROR
                 COMMA ","
               R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- in can only be used with tuples / sub queries"
   WHITESPACE "\n"
@@ -391,7 +391,7 @@ SOURCE_FILE
             WHITESPACE " "
             NAME_REF
               IDENT "c"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type cast must use a string literal"
   WHITESPACE "\n"
@@ -407,7 +407,7 @@ SOURCE_FILE
         TARGET
           LITERAL
             INT_NUMBER "1234"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing comma"
   WHITESPACE "\n"
@@ -429,7 +429,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "3"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- extra comma"
   WHITESPACE "\n"
@@ -451,7 +451,7 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "3"
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- trailing comma"
   WHITESPACE "\n"
@@ -475,7 +475,7 @@ SOURCE_FILE
             ERROR
               COMMA ","
             R_BRACK "]"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- group by all, order by all"
   WHITESPACE "\n"
@@ -510,7 +510,7 @@ SOURCE_FILE
         SORT_BY
           ERROR
             ALL_KW "all"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cast with malformed type mod args"
   WHITESPACE "\n"
@@ -541,7 +541,7 @@ SOURCE_FILE
                     INT_NUMBER "200"
                 R_PAREN ")"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -574,7 +574,7 @@ SOURCE_FILE
                     INT_NUMBER "200"
                 R_PAREN ")"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -609,7 +609,7 @@ SOURCE_FILE
                   COMMA ","
                 R_PAREN ")"
             R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression test: this would cause the parser to get stuck & panic, now it"
   WHITESPACE "\n"
@@ -622,7 +622,7 @@ SOURCE_FILE
   SELECT
     SELECT_CLAUSE
       SELECT_KW "select"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extra comma"
   WHITESPACE "\n"
@@ -643,7 +643,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- case missing then expr"
   WHITESPACE "\n"
@@ -666,7 +666,7 @@ SOURCE_FILE
                 THEN_KW "then"
             WHITESPACE " "
             END_KW "end"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- case missing when expr"
   WHITESPACE "\n"
@@ -689,7 +689,7 @@ SOURCE_FILE
                   IDENT "x"
             WHITESPACE " "
             END_KW "end"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- case missing else expr"
   WHITESPACE "\n"
@@ -718,7 +718,7 @@ SOURCE_FILE
               ELSE_KW "else"
             WHITESPACE " "
             END_KW "end"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select without semi and trailing create table"
   WHITESPACE "\n"
@@ -739,7 +739,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- select do"
   WHITESPACE "\n"
@@ -752,7 +752,7 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'begin null; end'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select grant"
   WHITESPACE "\n"
@@ -780,7 +780,7 @@ SOURCE_FILE
       ROLE_REF
         NAME_REF
           IDENT "u"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- where with missing expr"
   WHITESPACE "\n"
@@ -809,7 +809,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -836,7 +836,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -856,7 +856,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           INT_NUMBER "10"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -876,7 +876,7 @@ SOURCE_FILE
         WHITESPACE " "
         LITERAL
           STRING "'b'"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -906,7 +906,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE
@@ -936,7 +936,7 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- join after the where"
   WHITESPACE "\n"
@@ -981,7 +981,87 @@ SOURCE_FILE
           WHITESPACE " "
           LITERAL
             TRUE_KW "true"
-  SEMICOLON ";"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- having after order by instead of before"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+                WHITESPACE " "
+                AS_NAME
+                  NAME
+                    IDENT "b"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_NAME
+            NAME
+              IDENT "a"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "a"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+    WHITESPACE "\n"
+    ERROR
+      HAVING_CLAUSE
+        HAVING_KW "having"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select end"
   WHITESPACE "\n"
@@ -991,7 +1071,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMIT
     END_KW "end"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select analyze/analyse"
   WHITESPACE "\n"
@@ -1001,7 +1081,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   ANALYZE
     ANALYZE_KW "analyze"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE
@@ -1009,7 +1089,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   ANALYZE
     ANALYSE_KW "analyse"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select with"
   WHITESPACE "\n\n"
@@ -1051,7 +1131,7 @@ SOURCE_FILE
       FROM_ITEM
         NAME_REF
           IDENT "t"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
@@ -1163,10 +1243,6 @@ error[syntax-error]: unexpected trailing comma
    ╭▸ 
 52 │ select cast(x as t(a, b,));
    ╰╴                       ━
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-56 │ select select;
-   ╰╴      ━
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
 59 │ select a, from t;
@@ -1183,20 +1259,6 @@ error[syntax-error]: expected an expression, found END_KW
    ╭▸ 
 68 │ select case when 1 then 2 else end;
    ╰╴                              ━
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-71 │   select
-   │ ┏━━━━━━━┛
-72 │ ┃ create table users ();
-   ╰╴┗━┛
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-76 │ select 
-   ╰╴      ━
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-80 │ select 
-   ╰╴      ━
 error[syntax-error]: expected expression but got AND_KW
    ╭▸ 
 84 │ select from t where and c > 10;
@@ -1225,31 +1287,11 @@ error[syntax-error]: JOINs must appear before WHERE
    ╭▸ 
 96 │ join k on true;
    ╰╴━
-error[syntax-error]: expected SEMICOLON
-   ╭▸ 
-99 │   select
-   │ ┏━━━━━━━┛
-100│ ┃ end;
-   ╰╴┗━┛
-error[syntax-error]: expected SEMICOLON
+error[syntax-error]: HAVING must appear before ORDER BY
     ╭▸ 
-103 │   select
-    │ ┏━━━━━━━┛
-104 │ ┃ analyze;
-    ╰╴┗━┛
-error[syntax-error]: expected SEMICOLON
-    ╭▸ 
-106 │   select
-    │ ┏━━━━━━━┛
-107 │ ┃ analyse;
-    ╰╴┗━┛
-error[syntax-error]: expected SEMICOLON
-    ╭▸ 
-111 │   select
-    │ ┏━━━━━━━┛
-112 │ ┃ with t as (select 1)
-    ╰╴┗━┛
+103 │ having a > 10;
+    ╰╴━
 error[syntax-error]: unexpected trailing comma
     ╭▸ 
-116 │ select 1,
+123 │ select 1,
     ╰╴        ━

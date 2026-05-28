@@ -22,7 +22,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "a"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
@@ -201,5 +201,5 @@ SOURCE_FILE
               FALSE_KW "false"
         WHITESPACE "\n  "
         R_PAREN ")"
-  SEMICOLON ";"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
