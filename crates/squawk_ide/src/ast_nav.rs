@@ -13,23 +13,31 @@ pub(crate) fn find_cte_with_table(
     name_ref: &ast::NameRef,
     cte_name: &Name,
 ) -> Option<ast::WithTable> {
-    let with_clause = name_ref
+    let ref_start = name_ref.syntax().text_range().start();
+
+    for with_clause in name_ref
         .syntax()
         .ancestors()
-        .find_map(|query| ast::WithQuery::cast(query)?.with_clause())?;
+        .filter_map(|query| ast::WithQuery::cast(query)?.with_clause())
+    {
+        let is_recursive = with_clause.recursive_token().is_some();
+        if let Some(with_table) = with_clause
+            .with_tables()
+            // Without RECURSIVE, only CTEs before the reference are visible.
+            .filter(|with_table| {
+                is_recursive || with_table.syntax().text_range().end() <= ref_start
+            })
+            .find(|with_table| {
+                with_table
+                    .name()
+                    .is_some_and(|name| Name::from_node(&name) == *cte_name)
+            })
+        {
+            return Some(with_table);
+        }
+    }
 
-    let ref_start = name_ref.syntax().text_range().start();
-    let is_recursive = with_clause.recursive_token().is_some();
-
-    with_clause
-        .with_tables()
-        // Without RECURSIVE, only CTEs before the reference are visible.
-        .filter(|with_table| is_recursive || with_table.syntax().text_range().end() <= ref_start)
-        .find(|with_table| {
-            with_table
-                .name()
-                .is_some_and(|name| Name::from_node(&name) == *cte_name)
-        })
+    None
 }
 
 pub(crate) fn iter_values_columns(values: &ast::Values) -> impl Iterator<Item = (Name, ast::Expr)> {
