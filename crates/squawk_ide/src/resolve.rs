@@ -1062,10 +1062,11 @@ fn match_table_in_returning_clause(
         }
     }
 
-    if let Some(alias_name) = alias.and_then(|x| x.name())
-        && Name::from_node(&alias_name) == *table_name
+    let alias_name = alias.and_then(|x| x.name());
+    if let Some(alias_name) = &alias_name
+        && Name::from_node(alias_name) == *table_name
     {
-        return Some(ReturningClauseMatch::TableAlias(alias_name));
+        return Some(ReturningClauseMatch::TableAlias(alias_name.clone()));
     }
 
     let old_name = Name::from_string("old");
@@ -1074,7 +1075,7 @@ fn match_table_in_returning_clause(
         return Some(ReturningClauseMatch::PseudoTable);
     }
 
-    if *stmt_table_name == *table_name {
+    if alias_name.is_none() && *stmt_table_name == *table_name {
         return Some(ReturningClauseMatch::Table);
     }
 
@@ -3067,9 +3068,18 @@ fn resolve_merge_table_name_ptr(
 
     let path = merge.relation_name()?.path()?;
 
-    // Check USING clause for the source table - MERGE-specific
+    // Check USING clause for the source table - MERGE-specific.
+    // A source alias hides the underlying table name.
     if let Some(from_item) = merge.using_on_clause().and_then(|x| x.from_item()) {
-        if let Some(item_name_ref) = from_item.name_ref() {
+        if let Some(alias_name) = from_item.alias().and_then(|x| x.name()) {
+            if Name::from_node(&alias_name) == table_name {
+                return Some(smallvec![Location::new(
+                    file,
+                    alias_name.syntax().text_range(),
+                    LocationKind::Table
+                )]);
+            }
+        } else if let Some(item_name_ref) = from_item.name_ref() {
             let item_name = Name::from_node(&item_name_ref);
             if item_name == table_name {
                 let position = table_name_ref.syntax().text_range().start();
@@ -3078,16 +3088,6 @@ fn resolve_merge_table_name_ptr(
                     resolve_table_like(db, Some(table_name_ref), &item_name, &schemas, file)?;
                 return Some(smallvec![Location::new(file, ptr.text_range(), kind)]);
             }
-        }
-        // Check for aliased source tables
-        if let Some(alias_name) = from_item.alias().and_then(|x| x.name())
-            && Name::from_node(&alias_name) == table_name
-        {
-            return Some(smallvec![Location::new(
-                file,
-                alias_name.syntax().text_range(),
-                LocationKind::Table
-            )]);
         }
     }
 
