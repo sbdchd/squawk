@@ -5008,6 +5008,62 @@ group by a$0 + 1
     }
 
     #[test]
+    fn goto_update_alias_hides_table_name() {
+        goto_not_found(
+            "
+create table t(a int);
+update t as u set a = t$0.a;
+",
+        );
+    }
+
+    #[test]
+    fn goto_insert_alias_hides_table_name() {
+        goto_not_found(
+            "
+create table t(a int);
+insert into t as u values (1) returning t$0.a;
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_alias_hides_table_name() {
+        goto_not_found(
+            "
+create table t(a int);
+delete from t as u where t$0.a = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_alias_hides_target_table_name() {
+        goto_not_found(
+            "
+create table t(a int);
+create table s(a int);
+merge into t as u
+  using s on t$0.a = s.a
+  when matched then do nothing;
+",
+        );
+    }
+
+    #[test]
+    fn goto_merge_using_alias_hides_table_name() {
+        goto_not_found(
+            "
+create table t(a int);
+create table s(a int);
+merge into t
+  using s as u on s$0.a = t.a
+  when matched then do nothing;
+",
+        );
+    }
+
+    #[test]
     fn goto_select_alias_in_order_by_with_cte() {
         assert_snapshot!(goto("
 with t as (select 2 b)
