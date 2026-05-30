@@ -801,6 +801,117 @@ select c$0 from a;
     }
 
     #[test]
+    fn goto_outer_cte_visible_inside_inner_with() {
+        assert_snapshot!(goto("
+with outer_cte as (select 1 c)
+select * from (
+  with inner_cte as (select 2 d)
+  select c$0 from outer_cte
+) s;
+"), @"
+          ╭▸ 
+        2 │ with outer_cte as (select 1 c)
+          │                             ─ 2. destination
+          ‡
+        5 │   select c from outer_cte
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_inner_cte_forward_ref_falls_back_to_outer_cte() {
+        assert_snapshot!(goto("
+with t as (select 1 c)
+select * from (
+  with
+    x as (select c$0 from t),
+    t as (select 2 c)
+  select c from x
+) s;
+"), @"
+          ╭▸ 
+        2 │ with t as (select 1 c)
+          │                     ─ 2. destination
+          ‡
+        5 │     x as (select c from t),
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_recursive_inner_cte_forward_ref_shadows_outer_cte() {
+        assert_snapshot!(goto("
+with t as (select 1 c)
+select * from (
+  with recursive
+    x as (select c$0 from t),
+    t as (select 2 c)
+  select c from x
+) s;
+"), @"
+          ╭▸ 
+        5 │     x as (select c from t),
+          │                  ─ 1. source
+        6 │     t as (select 2 c)
+          ╰╴                   ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_for_qualified_star() {
+        assert_snapshot!(goto("
+create table b(c int);
+with
+  a as (select b.* from b),
+  b as (select 1 c)
+select c$0 from a;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        6 │ select c from a;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_for_star_column_count() {
+        assert_snapshot!(goto("
+create table b(x int, yy int);
+with
+  a(x, yy) as (select *, 2 y, 3 z from b),
+  b as (select 1 only_col)
+select y$0 from a;
+"), @"
+          ╭▸ 
+        4 │   a(x, yy) as (select *, 2 y, 3 z from b),
+          │                            ─ 2. destination
+        5 │   b as (select 1 only_col)
+        6 │ select y from a;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_inside_subquery_table() {
+        assert_snapshot!(goto("
+create table b(c int);
+with
+  a as (select * from (table b) q),
+  b as (select 1 c)
+select c$0 from a;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        6 │ select c from a;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;
