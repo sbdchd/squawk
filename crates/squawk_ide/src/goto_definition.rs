@@ -709,6 +709,98 @@ from
     }
 
     #[test]
+    fn goto_cte_forward_ref_ignored() {
+        assert_snapshot!(goto("
+create table b(c int);
+with
+  a as (select c$0 from b),
+  b as (select 1 c)
+select c from a;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+        3 │ with
+        4 │   a as (select c from b),
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_inside_table_query() {
+        assert_snapshot!(goto("
+create table b(c int);
+with
+  a as (table b),
+  b as (select 1 c)
+select c$0 from a;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        6 │ select c from a;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_inside_create_table_as_star() {
+        assert_snapshot!(goto("
+create table b(c int);
+create table ct as
+  with
+    a as (select * from b),
+    b as (select 1 c)
+  select * from a;
+select c$0 from ct;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        8 │ select c from ct;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_inside_create_table_as_table() {
+        assert_snapshot!(goto("
+create table b(c int);
+create table made as
+  with
+    a as (table b),
+    b as (select 1 c)
+  table a;
+select c$0 from made;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        8 │ select c from made;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_star_over_subquery_from_item() {
+        assert_snapshot!(goto("
+create table t(c int);
+with
+  a as (select * from (select c from t))
+select c$0 from a;
+"), @"
+          ╭▸ 
+        4 │   a as (select * from (select c from t))
+          │                               ─ 2. destination
+        5 │ select c from a;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;
