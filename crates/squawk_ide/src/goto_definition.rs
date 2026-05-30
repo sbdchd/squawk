@@ -695,6 +695,20 @@ from
     }
 
     #[test]
+    fn goto_cte_forward_ref_not_found() {
+        // b is defined after a, so a can't reference it in a non-recursive WITH
+        // ERROR:  relation "b" does not exist
+        goto_not_found(
+            "
+  with
+    a as (select * from b$0),
+    b as (select 1 x)
+  select * from a;
+",
+        );
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;
@@ -4931,6 +4945,36 @@ select a from x$0;
     }
 
     #[test]
+    fn goto_cte_shadows_table_in_from() {
+        assert_snapshot!(goto("
+create table x(a int);
+with x as (select 1 a)
+select a from x$0;
+"), @"
+          ╭▸ 
+        3 │ with x as (select 1 a)
+          │      ─ 2. destination
+        4 │ select a from x;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_shadows_view_column() {
+        assert_snapshot!(goto("
+create view x as select 1 a;
+with x as (select 2 a)
+select a$0 from x;
+"), @"
+          ╭▸ 
+        3 │ with x as (select 2 a)
+          │                     ─ 2. destination
+        4 │ select a from x;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cte_column() {
         assert_snapshot!(goto("
 with x as (select 1 as a)
@@ -7193,6 +7237,16 @@ select m.message$0 from users as u join messages as m on u.id = m.user_id;
         4 │ select m.message from users as u join messages as m on u.id = m.user_id;
           ╰╴               ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_alias_hides_table_name() {
+        goto_not_found(
+            "
+create table t(a int);
+select t$0.a from t as u;
+",
+        );
     }
 
     #[test]

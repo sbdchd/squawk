@@ -777,19 +777,19 @@ pub(crate) fn resolve_table_like(
     schemas: &ResolvedSchemas,
     file: File,
 ) -> Option<(SyntaxNodePtr, LocationKind)> {
+    if schemas.unqualified()
+        && let Some(name_ref) = name_ref
+        && let Some(cte_ptr) = resolve_cte_table(name_ref, table_name)
+    {
+        return Some((cte_ptr, LocationKind::Table));
+    }
+
     if let Some(view_name_ptr) = resolve_view_name_ptr(db, table_name, schemas, file) {
         return Some((view_name_ptr, LocationKind::View));
     }
 
     if let Some(table_name_ptr) = resolve_table_name_ptr(db, table_name, schemas, file) {
         return Some((table_name_ptr, LocationKind::Table));
-    }
-
-    if schemas.unqualified()
-        && let Some(name_ref) = name_ref
-        && let Some(cte_ptr) = resolve_cte_table(name_ref, table_name)
-    {
-        return Some((cte_ptr, LocationKind::Table));
     }
 
     None
@@ -1742,10 +1742,8 @@ fn resolve_fn_call_column(
 }
 
 fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
-    if let Some(alias_name) = from_item.alias().and_then(|a| a.name())
-        && Name::from_node(&alias_name) == *qualifier
-    {
-        return true;
+    if let Some(alias_name) = from_item.alias().and_then(|a| a.name()) {
+        return Name::from_node(&alias_name) == *qualifier;
     }
 
     if let Some((_schema, function_name)) = from_item
