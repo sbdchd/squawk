@@ -18,24 +18,18 @@ pub(crate) fn find_cte_with_table(
         .ancestors()
         .find_map(|query| ast::WithQuery::cast(query)?.with_clause())?;
 
+    let ref_start = name_ref.syntax().text_range().start();
     let is_recursive = with_clause.recursive_token().is_some();
-    for with_table in with_clause.with_tables() {
-        if let Some(name) = with_table.name()
-            && Name::from_node(&name) == *cte_name
-        {
-            // Skip if we're inside this CTE's definition (CTE doesn't shadow itself)
-            if !is_recursive
-                && with_table
-                    .syntax()
-                    .text_range()
-                    .contains_range(name_ref.syntax().text_range())
-            {
-                continue;
-            }
-            return Some(with_table);
-        }
-    }
-    None
+
+    with_clause
+        .with_tables()
+        // Without RECURSIVE, only CTEs before the reference are visible.
+        .filter(|with_table| is_recursive || with_table.syntax().text_range().end() <= ref_start)
+        .find(|with_table| {
+            with_table
+                .name()
+                .is_some_and(|name| Name::from_node(&name) == *cte_name)
+        })
 }
 
 pub(crate) fn iter_values_columns(values: &ast::Values) -> impl Iterator<Item = (Name, ast::Expr)> {

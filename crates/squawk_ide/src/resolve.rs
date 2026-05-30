@@ -777,19 +777,19 @@ pub(crate) fn resolve_table_like(
     schemas: &ResolvedSchemas,
     file: File,
 ) -> Option<(SyntaxNodePtr, LocationKind)> {
+    if schemas.unqualified()
+        && let Some(name_ref) = name_ref
+        && let Some(cte_ptr) = resolve_cte_table(name_ref, table_name)
+    {
+        return Some((cte_ptr, LocationKind::Table));
+    }
+
     if let Some(view_name_ptr) = resolve_view_name_ptr(db, table_name, schemas, file) {
         return Some((view_name_ptr, LocationKind::View));
     }
 
     if let Some(table_name_ptr) = resolve_table_name_ptr(db, table_name, schemas, file) {
         return Some((table_name_ptr, LocationKind::Table));
-    }
-
-    if schemas.unqualified()
-        && let Some(name_ref) = name_ref
-        && let Some(cte_ptr) = resolve_cte_table(name_ref, table_name)
-    {
-        return Some((cte_ptr, LocationKind::Table));
     }
 
     None
@@ -1357,22 +1357,31 @@ fn resolve_from_item_column_ptr(
     from_item: InFile<&ast::FromItem>,
     column_name_ref: &ast::NameRef,
 ) -> Option<SmallVec<[Location; 1]>> {
+    let column_name = Name::from_node(column_name_ref);
+    resolve_from_item_column_by_name(db, from_item, column_name_ref, &column_name)
+}
+
+fn resolve_from_item_column_by_name(
+    db: &dyn Db,
+    from_item: InFile<&ast::FromItem>,
+    scope_name_ref: &ast::NameRef,
+    column_name: &Name,
+) -> Option<SmallVec<[Location; 1]>> {
     let file = from_item.file_id;
     let from_item = from_item.value;
-    let column_name = Name::from_node(column_name_ref);
     if let Some(paren_select) = from_item.paren_select() {
         let alias = from_item.alias();
         if let Some(ptr) = resolve_subquery_column_ptr(
             db,
             InFile::new(file, &paren_select),
-            column_name_ref,
-            &column_name,
+            scope_name_ref,
+            column_name,
             alias.as_ref(),
         ) {
             return Some(ptr);
         }
         if let Some(alias_name) = alias.and_then(|x| x.name())
-            && Name::from_node(&alias_name) == column_name
+            && Name::from_node(&alias_name) == *column_name
         {
             return Some(smallvec![Location::new(
                 file,
@@ -1387,7 +1396,7 @@ fn resolve_from_item_column_ptr(
         if let Some(column_list) = from_item.alias().and_then(|x| x.column_list()) {
             for col in column_list.columns() {
                 if let Some(col_name) = col.name()
-                    && Name::from_node(&col_name) == column_name
+                    && Name::from_node(&col_name) == *column_name
                 {
                     return Some(smallvec![Location::new(
                         file,
@@ -1401,13 +1410,13 @@ fn resolve_from_item_column_ptr(
         if let Some(ptr) = resolve_column_from_paren_expr(
             db,
             InFile::new(file, &paren_expr),
-            column_name_ref,
-            &column_name,
+            scope_name_ref,
+            column_name,
         ) {
             return Some(ptr);
         }
         if let Some(alias_name) = from_item.alias().and_then(|x| x.name())
-            && Name::from_node(&alias_name) == column_name
+            && Name::from_node(&alias_name) == *column_name
         {
             return Some(smallvec![Location::new(
                 file,
@@ -1421,7 +1430,7 @@ fn resolve_from_item_column_ptr(
     let alias_len = if let Some(column_list) = from_item.alias().and_then(|x| x.column_list()) {
         for col in column_list.columns() {
             if let Some(col_name) = col.name()
-                && Name::from_node(&col_name) == column_name
+                && Name::from_node(&col_name) == *column_name
             {
                 return Some(smallvec![Location::new(
                     file,
@@ -1439,8 +1448,8 @@ fn resolve_from_item_column_ptr(
         && let Some(ptr) = resolve_column_from_call_expr_return_table(
             db,
             InFile::new(file, &call_expr),
-            column_name_ref,
-            &column_name,
+            scope_name_ref,
+            column_name,
             alias_len,
         )
     {
@@ -1448,19 +1457,20 @@ fn resolve_from_item_column_ptr(
     }
 
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
+    let scope_name_ref = relation_name_ref_from_from_item(from_item)?;
 
     if let Some(ptr) = resolve_column_from_table_or_view_or_cte(
         db,
-        InFile::new(file, column_name_ref),
+        InFile::new(file, &scope_name_ref),
         &table_name,
         schema.as_ref(),
-        &column_name,
+        column_name,
     ) {
         return Some(ptr);
     }
 
     if let Some(alias_name) = from_item.alias().and_then(|x| x.name())
-        && Name::from_node(&alias_name) == column_name
+        && Name::from_node(&alias_name) == *column_name
     {
         return Some(smallvec![Location::new(
             file,
@@ -1626,12 +1636,13 @@ fn resolve_from_item_for_cte_star(
     if let Some((schema, table_name)) = name::schema_and_table_from_from_item(from_item.value)
         && table_name == *cte_name
     {
-        let position = name_ref.syntax().text_range().start();
+        let scope_name_ref = relation_name_ref_from_from_item(from_item.value)?;
+        let position = scope_name_ref.syntax().text_range().start();
         let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
         return resolve_column_for_table(db, &table_name, &schemas, column_name, file);
     }
 
-    resolve_from_item_column_ptr(db, from_item, name_ref)
+    resolve_from_item_column_by_name(db, from_item, name_ref, column_name)
 }
 
 fn resolve_select_column_ptr(
@@ -1726,9 +1737,10 @@ fn resolve_fn_call_column(
 
     for from_item in ast_nav::iter_from_clause(&from_clause) {
         if let Some((schema, table_name)) = name::schema_and_table_from_from_item(&from_item)
+            && let Some(scope_name_ref) = relation_name_ref_from_from_item(&from_item)
             && let Some(result) = resolve_column_from_table_or_view_or_cte(
                 db,
-                InFile::new(file, name_ref),
+                InFile::new(file, &scope_name_ref),
                 &table_name,
                 schema.as_ref(),
                 &column_name,
@@ -1742,10 +1754,8 @@ fn resolve_fn_call_column(
 }
 
 fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
-    if let Some(alias_name) = from_item.alias().and_then(|a| a.name())
-        && Name::from_node(&alias_name) == *qualifier
-    {
-        return true;
+    if let Some(alias_name) = from_item.alias().and_then(|a| a.name()) {
+        return Name::from_node(&alias_name) == *qualifier;
     }
 
     if let Some((_schema, function_name)) = from_item
@@ -1969,10 +1979,14 @@ fn find_column_in_create_table_as(
     if let ast::SelectVariant::Table(table) = &query {
         let path = table.relation_name()?.path()?;
         let (schema, table_name) = name::schema_and_name_path(&path)?;
-        let position = table.syntax().text_range().start();
-        let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
-        let resolved = resolve_table_name(db, &table_name, &schemas, file)?;
-        return find_column_in_resolved(db, resolved, column_name, 0);
+        let table_name_ref = relation_name_ref_from_table(table)?;
+        return resolve_column_from_table_or_view_or_cte(
+            db,
+            InFile::new(file, &table_name_ref),
+            &table_name,
+            schema.as_ref(),
+            column_name,
+        );
     }
 
     let select = ast_nav::select_from_variant(query)?;
@@ -2015,12 +2029,16 @@ fn find_column_in_from_clause(
         let Some((schema, table_name)) = name::schema_and_table_from_from_item(&from_item) else {
             continue;
         };
-        let position = from_item.syntax().text_range().start();
-        let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
-        let Some(resolved) = resolve_table_name(db, &table_name, &schemas, file) else {
+        let Some(relation_name_ref) = relation_name_ref_from_from_item(&from_item) else {
             continue;
         };
-        if let Some(result) = find_column_in_resolved(db, resolved, column_name, 0) {
+        if let Some(result) = resolve_column_from_table_or_view_or_cte(
+            db,
+            InFile::new(file, &relation_name_ref),
+            &table_name,
+            schema.as_ref(),
+            column_name,
+        ) {
             return Some(result);
         }
     }
@@ -2046,6 +2064,18 @@ fn find_column_in_select_into(
     }
 
     None
+}
+
+fn relation_name_ref_from_table(table: &ast::Table) -> Option<ast::NameRef> {
+    table.relation_name()?.path()?.segment()?.name_ref()
+}
+
+fn relation_name_ref_from_from_item(from_item: &ast::FromItem) -> Option<ast::NameRef> {
+    from_item.name_ref().or_else(|| {
+        from_item
+            .field_expr()
+            .and_then(|field_expr| field_expr.field())
+    })
 }
 
 fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxNodePtr> {
@@ -2212,10 +2242,11 @@ fn resolve_cte_column(
     if let ast::WithQuery::Table(table) = query {
         let path = table.relation_name()?.path()?;
         let (schema, table_name) = name::schema_and_name_path(&path)?;
+        let table_name_ref = relation_name_ref_from_table(&table)?;
 
         return resolve_column_from_table_or_view_or_cte(
             db,
-            InFile::new(file, name_ref),
+            InFile::new(file, &table_name_ref),
             &table_name,
             schema.as_ref(),
             column_name,
@@ -2238,7 +2269,7 @@ fn resolve_cte_column(
         let target_column_count = from_clause
             .as_ref()
             .and_then(|from_clause| {
-                count_columns_for_target(db, InFile::new(file, &target), name_ref, from_clause)
+                count_columns_for_target(db, InFile::new(file, &target), from_clause)
             })
             .unwrap_or(1);
         let column_list_end = column_index.saturating_add(target_column_count);
@@ -2398,10 +2429,11 @@ fn resolve_subquery_column_ptr(
     if let ast::SelectVariant::Table(table) = select_variant {
         let path = table.relation_name()?.path()?;
         let (schema, table_name) = name::schema_and_name_path(&path)?;
+        let table_name_ref = relation_name_ref_from_table(&table)?;
 
         return resolve_column_from_table_or_view_or_cte(
             db,
-            InFile::new(file, name_ref),
+            InFile::new(file, &table_name_ref),
             &table_name,
             schema.as_ref(),
             column_name,
@@ -2464,9 +2496,12 @@ fn resolve_column_from_select_targets(
                 && let Some(from_clause) = &from_clause
             {
                 for from_item in ast_nav::iter_from_clause(from_clause) {
-                    if let Some(result) =
-                        resolve_from_item_column_ptr(db, InFile::new(file, &from_item), name_ref)
-                    {
+                    if let Some(result) = resolve_from_item_column_by_name(
+                        db,
+                        InFile::new(file, &from_item),
+                        name_ref,
+                        column_name,
+                    ) {
                         return Some(result);
                     }
                 }
@@ -2477,8 +2512,12 @@ fn resolve_column_from_select_targets(
             && let Some(table_name) = qualified_star_table_name(&field_expr)
             && let Some(from_clause) = &from_clause
             && let Some(from_item) = find_from_item_in_from_clause(from_clause, &table_name)
-            && let Some(result) =
-                resolve_from_item_column_ptr(db, InFile::new(file, &from_item), name_ref)
+            && let Some(result) = resolve_from_item_column_by_name(
+                db,
+                InFile::new(file, &from_item),
+                name_ref,
+                column_name,
+            )
         {
             return Some(result);
         }
@@ -2581,20 +2620,19 @@ fn table_ptr_from_paren_expr(
 fn count_columns_for_target(
     db: &dyn Db,
     target: InFile<&ast::Target>,
-    name_ref: &ast::NameRef,
     from_clause: &ast::FromClause,
 ) -> Option<usize> {
     let file = target.file_id;
     let target = target.value;
     if target.star_token().is_some() {
-        return count_columns_for_from_clause(db, InFile::new(file, from_clause), name_ref);
+        return count_columns_for_from_clause(db, InFile::new(file, from_clause));
     }
 
     if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr()
         && let Some(table_name) = qualified_star_table_name(&field_expr)
         && let Some(from_item) = find_from_item_in_from_clause(from_clause, &table_name)
     {
-        return count_columns_for_from_item(db, InFile::new(file, &from_item), name_ref);
+        return count_columns_for_from_item(db, InFile::new(file, &from_item));
     }
 
     Some(1)
@@ -2603,7 +2641,6 @@ fn count_columns_for_target(
 fn count_columns_for_from_clause(
     db: &dyn Db,
     from_clause: InFile<&ast::FromClause>,
-    name_ref: &ast::NameRef,
 ) -> Option<usize> {
     let file = from_clause.file_id;
     let from_clause = from_clause.value;
@@ -2611,9 +2648,7 @@ fn count_columns_for_from_clause(
     let mut found = false;
 
     for from_item in ast_nav::iter_from_clause(from_clause) {
-        if let Some(count) =
-            count_columns_for_from_item(db, InFile::new(file, &from_item), name_ref)
-        {
+        if let Some(count) = count_columns_for_from_item(db, InFile::new(file, &from_item)) {
             total = total.saturating_add(count);
             found = true;
         }
@@ -2622,17 +2657,14 @@ fn count_columns_for_from_clause(
     found.then_some(total)
 }
 
-fn count_columns_for_from_item(
-    db: &dyn Db,
-    from_item: InFile<&ast::FromItem>,
-    name_ref: &ast::NameRef,
-) -> Option<usize> {
+fn count_columns_for_from_item(db: &dyn Db, from_item: InFile<&ast::FromItem>) -> Option<usize> {
     let file = from_item.file_id;
     let from_item = from_item.value;
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
-    let position = name_ref.syntax().text_range().start();
+    let scope_name_ref = relation_name_ref_from_from_item(from_item)?;
+    let position = scope_name_ref.syntax().text_range().start();
     let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
-    count_columns_for_table_name(db, &table_name, &schemas, file, Some(name_ref))
+    count_columns_for_table_name(db, &table_name, &schemas, file, Some(&scope_name_ref))
 }
 
 fn resolve_from_clause_for_cte_star(

@@ -695,6 +695,112 @@ from
     }
 
     #[test]
+    fn goto_cte_forward_ref_not_found() {
+        // b is defined after a, so a can't reference it in a non-recursive WITH
+        // ERROR:  relation "b" does not exist
+        goto_not_found(
+            "
+  with
+    a as (select * from b$0),
+    b as (select 1 x)
+  select * from a;
+",
+        );
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored() {
+        assert_snapshot!(goto("
+create table b(c int);
+with
+  a as (select c$0 from b),
+  b as (select 1 c)
+select c from a;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+        3 │ with
+        4 │   a as (select c from b),
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_inside_table_query() {
+        assert_snapshot!(goto("
+create table b(c int);
+with
+  a as (table b),
+  b as (select 1 c)
+select c$0 from a;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        6 │ select c from a;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_inside_create_table_as_star() {
+        assert_snapshot!(goto("
+create table b(c int);
+create table ct as
+  with
+    a as (select * from b),
+    b as (select 1 c)
+  select * from a;
+select c$0 from ct;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        8 │ select c from ct;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_forward_ref_ignored_inside_create_table_as_table() {
+        assert_snapshot!(goto("
+create table b(c int);
+create table made as
+  with
+    a as (table b),
+    b as (select 1 c)
+  table a;
+select c$0 from made;
+"), @"
+          ╭▸ 
+        2 │ create table b(c int);
+          │                ─ 2. destination
+          ‡
+        8 │ select c from made;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_star_over_subquery_from_item() {
+        assert_snapshot!(goto("
+create table t(c int);
+with
+  a as (select * from (select c from t))
+select c$0 from a;
+"), @"
+          ╭▸ 
+        4 │   a as (select * from (select c from t))
+          │                               ─ 2. destination
+        5 │ select c from a;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_sequence() {
         assert_snapshot!(goto("
 create sequence s;
@@ -4931,6 +5037,36 @@ select a from x$0;
     }
 
     #[test]
+    fn goto_cte_shadows_table_in_from() {
+        assert_snapshot!(goto("
+create table x(a int);
+with x as (select 1 a)
+select a from x$0;
+"), @"
+          ╭▸ 
+        3 │ with x as (select 1 a)
+          │      ─ 2. destination
+        4 │ select a from x;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_shadows_view_column() {
+        assert_snapshot!(goto("
+create view x as select 1 a;
+with x as (select 2 a)
+select a$0 from x;
+"), @"
+          ╭▸ 
+        3 │ with x as (select 2 a)
+          │                     ─ 2. destination
+        4 │ select a from x;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cte_column() {
         assert_snapshot!(goto("
 with x as (select 1 as a)
@@ -7193,6 +7329,16 @@ select m.message$0 from users as u join messages as m on u.id = m.user_id;
         4 │ select m.message from users as u join messages as m on u.id = m.user_id;
           ╰╴               ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_alias_hides_table_name() {
+        goto_not_found(
+            "
+create table t(a int);
+select t$0.a from t as u;
+",
+        );
     }
 
     #[test]
