@@ -101,6 +101,12 @@ fn update_versions(sh: &Shell, v: &str) -> Result<()> {
     replace_in_file(sh, "package.json", r#""version": ".*""#, &json_rep)?;
     replace_in_file(
         sh,
+        "package.json",
+        r#"("@squawk-cli/[^"]+": ")[^"]+""#,
+        &format!(r#"${{1}}{v}""#),
+    )?;
+    replace_in_file(
+        sh,
         "squawk-vscode/package.json",
         r#""version": ".*""#,
         &json_rep,
@@ -132,7 +138,7 @@ fn update_versions(sh: &Shell, v: &str) -> Result<()> {
         r#"const SQUAWK_USER_AGENT: &str = "squawk/.*""#,
         &format!(r#"const SQUAWK_USER_AGENT: &str = "squawk/{v}""#),
     )?;
-    replace_in_file(sh, "README.md", "rev: .*", &format!("rev: {v}"))?;
+    replace_in_file(sh, "README.md", "rev: .*", &format!("rev: v{v}"))?;
 
     Ok(())
 }

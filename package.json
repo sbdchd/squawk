@@ -28,9 +28,25 @@
     "oxfmt": "^0.44.0",
     "typescript": "^3.9.5"
   },
+  "optionalDependencies": {
+    "@squawk-cli/darwin-arm64": "2.55.0",
+    "@squawk-cli/darwin-x64": "2.55.0",
+    "@squawk-cli/linux-arm64": "2.55.0",
+    "@squawk-cli/linux-x64": "2.55.0",
+    "@squawk-cli/win32-x64": "2.55.0"
+  },
   "volta": {
     "node": "20.19.0",
     "pnpm": "9.15.4"
   },
-  "packageManager": "pnpm@9.15.4"
+  "packageManager": "pnpm@9.15.4",
+  "pnpm": {
+    "ignoredOptionalDependencies": [
+      "@squawk-cli/darwin-arm64",
+      "@squawk-cli/darwin-x64",
+      "@squawk-cli/linux-arm64",
+      "@squawk-cli/linux-x64",
+      "@squawk-cli/win32-x64"
+    ]
+  }
 }
