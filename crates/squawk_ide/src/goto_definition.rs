@@ -2421,6 +2421,17 @@ select a$0 from v;
     }
 
     #[test]
+    fn goto_values_partial_alias_remaining_column_gap() {
+        assert_snapshot!(goto("
+select column2$0 from (values (1, 2)) v(a);
+"), @"
+          ╭▸ 
+        2 │ select column2 from (values (1, 2)) v(a);
+          ╰╴             ─ 1. source        ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_create_table_inherits() {
         assert_snapshot!(goto("
 create table bar(a int);

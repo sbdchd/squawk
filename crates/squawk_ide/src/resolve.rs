@@ -2270,12 +2270,10 @@ fn resolve_cte_column(
     let query = with_table.query()?;
 
     if let ast::WithQuery::Values(values) = query {
-        if column_list_len > 0 {
-            return None;
-        }
         if let Some(num_str) = column_name.0.strip_prefix("column")
             && let Ok(col_num) = num_str.parse::<usize>()
             && col_num > 0
+            && col_num > column_list_len
             && let Some(expr) = values
                 .row_list()
                 .and_then(|x| x.rows().next()?.exprs().nth(col_num - 1))
@@ -2467,9 +2465,6 @@ fn resolve_subquery_column_ptr(
                 )]);
             }
         }
-        if matches!(select_variant, ast::SelectVariant::Values(_)) {
-            return None;
-        }
         column_list.columns().count()
     } else {
         0
@@ -2494,6 +2489,7 @@ fn resolve_subquery_column_ptr(
         if let Some(num_str) = column_name.0.strip_prefix("column")
             && let Ok(col_num) = num_str.parse::<usize>()
             && col_num > 0
+            && col_num > column_list_len
             && let Some(expr) = values
                 .row_list()
                 .and_then(|x| x.rows().next()?.exprs().nth(col_num - 1))
