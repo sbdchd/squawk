@@ -5655,6 +5655,16 @@ select a$0 from (select 1 a);
     }
 
     #[test]
+    fn goto_subquery_star_partial_alias_masks_original_column_gap() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+select a$0 from (select * from t) u(x);
+",
+        );
+    }
+
+    #[test]
     fn goto_subquery_column_with_as() {
         assert_snapshot!(goto("
 select a$0 from (select 1 as a);
