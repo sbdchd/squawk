@@ -2405,6 +2405,22 @@ select a$0 from v;
     }
 
     #[test]
+    fn goto_view_table_query_column_gap() {
+        assert_snapshot!(goto("
+create table t(a int);
+create view v as table t;
+select a$0 from v;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create view v as table t;
+        4 │ select a from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_inherits() {
         assert_snapshot!(goto("
 create table bar(a int);

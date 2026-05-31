@@ -1936,7 +1936,21 @@ fn find_column_in_create_view_like(
         0
     };
 
-    let select = ast_nav::select_from_variant(create_view.query()?)?;
+    let query = create_view.query()?;
+    if let ast::SelectVariant::Table(table) = &query {
+        let path = table.relation_name()?.path()?;
+        let (schema, table_name) = name::schema_and_name_path(&path)?;
+        let table_name_ref = relation_name_ref_from_table(table)?;
+        return resolve_column_from_table_or_view_or_cte(
+            db,
+            InFile::new(file, &table_name_ref),
+            &table_name,
+            schema.as_ref(),
+            column_name,
+        );
+    }
+
+    let select = ast_nav::select_from_variant(query)?;
     let from_clause = select.from_clause();
     let mut column_index: usize = 0;
 
