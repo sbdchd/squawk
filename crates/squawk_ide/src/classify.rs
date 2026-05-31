@@ -724,6 +724,13 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             // (anything in SELECT except FROM clause)
             return Some(NameRefClass::SelectColumn);
         }
+        if ast::CompoundSelect::can_cast(ancestor.kind())
+            && in_order_by_clause
+            && let Some(parent) = node.parent()
+            && ast::SortBy::can_cast(parent.kind())
+        {
+            return Some(NameRefClass::SelectOrderByAliasOrColumn);
+        }
         if ast::ColumnList::can_cast(ancestor.kind()) {
             in_column_list = true;
         }

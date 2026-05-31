@@ -2389,6 +2389,49 @@ select a$0 from t;
     }
 
     #[test]
+    fn goto_view_select_star_column_gap() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create view v as select * from t;
+select a$0 from v;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create view v as select * from t;
+        4 │ select a from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_table_query_column_gap() {
+        assert_snapshot!(goto("
+create table t(a int);
+create view v as table t;
+select a$0 from v;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create view v as table t;
+        4 │ select a from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_values_partial_alias_remaining_column_gap() {
+        assert_snapshot!(goto("
+select column2$0 from (values (1, 2)) v(a);
+"), @"
+          ╭▸ 
+        2 │ select column2 from (values (1, 2)) v(a);
+          ╰╴             ─ 1. source        ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_create_table_inherits() {
         assert_snapshot!(goto("
 create table bar(a int);
@@ -5505,6 +5548,25 @@ select a$0 from inserted;
     }
 
     #[test]
+    fn goto_cte_returning_qualified_star_column_gap() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with changed as (
+  insert into t values (1, 2)
+  returning new.*
+)
+select a$0 from changed;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        7 │ select a from changed;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cte_delete_returning_star_column() {
         assert_snapshot!(goto("
 create table t(a int, b int);
@@ -5593,6 +5655,16 @@ select a$0 from (select 1 a);
     }
 
     #[test]
+    fn goto_subquery_star_partial_alias_masks_original_column_gap() {
+        goto_not_found(
+            "
+create table t(a int, b int);
+select a$0 from (select * from t) u(x);
+",
+        );
+    }
+
+    #[test]
     fn goto_subquery_column_with_as() {
         assert_snapshot!(goto("
 select a$0 from (select 1 as a);
@@ -5611,6 +5683,18 @@ select c$0 from (select 1 c union select 2 c);
           ╭▸ 
         2 │ select c from (select 1 c union select 2 c);
           ╰╴       ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_compound_select_column_order_by() {
+        assert_snapshot!(goto("
+with t as (select 1 a)
+select 2 a from t union select 1 order by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 2 a from t union select 1 order by a;
+          ╰╴         ─ 2. destination                 ─ 1. source
         ");
     }
 
