@@ -1278,7 +1278,7 @@ fn resolve_column_for_table(
             return resolve_function(db, column_name, schemas, None, file);
         }
         ResolvedTableName::SelectInto(select_into) => {
-            if let Some(ptr) = find_column_in_select_into(file, &select_into, column_name) {
+            if let Some(ptr) = find_column_in_select_into(db, file, &select_into, column_name) {
                 return Some(ptr);
             }
             return resolve_function(db, column_name, schemas, None, file);
@@ -1585,7 +1585,8 @@ fn resolve_column_from_table_or_view_or_cte_impl(
             }
 
             if let Some(select_into) = node.ancestors().find_map(ast::SelectInto::cast) {
-                if let Some(cols) = find_column_in_select_into(file, &select_into, column_name) {
+                if let Some(cols) = find_column_in_select_into(db, file, &select_into, column_name)
+                {
                     return Some(cols);
                 }
 
@@ -1901,7 +1902,7 @@ fn find_column_in_resolved(
             find_column_in_create_table_as(db, InFile::new(file, &create_table_as), column_name)
         }
         ResolvedTableName::SelectInto(select_into) => {
-            find_column_in_select_into(file, &select_into, column_name)
+            find_column_in_select_into(db, file, &select_into, column_name)
         }
         ResolvedTableName::View(create_view) => {
             find_column_in_create_view_like(file, &create_view, column_name)
@@ -2047,11 +2048,22 @@ fn find_column_in_from_clause(
 }
 
 fn find_column_in_select_into(
+    db: &dyn Db,
     file: File,
     select_into: &ast::SelectInto,
     column_name: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
+    let from_clause = select_into.from_clause();
     for target in select_into.select_clause()?.target_list()?.targets() {
+        if target.star_token().is_some() {
+            if let Some(from_clause) = &from_clause
+                && let Some(result) =
+                    find_column_in_from_clause(db, InFile::new(file, from_clause), column_name)
+            {
+                return Some(result);
+            }
+            continue;
+        }
         if let Some((col_name, node)) = ColumnName::from_target(target.clone())
             && let Some(col_name_str) = col_name.to_string()
             && Name::from_string(col_name_str) == *column_name

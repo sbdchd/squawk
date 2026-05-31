@@ -448,6 +448,18 @@ fn column_completions_from_clause(
                     sort_text: None,
                 }));
             }
+            Some(ast_nav::ParentSouce::SelectInto(select_into)) => {
+                let columns = collect::select_into_columns_with_types(db, file, &select_into);
+                completions.extend(columns.into_iter().map(|(name, ty)| CompletionItem {
+                    label: name.to_string(),
+                    kind: CompletionItemKind::Column,
+                    detail: ty.map(|t| t.to_string()),
+                    insert_text: None,
+                    insert_text_format: None,
+                    trigger_completion_after_insert: false,
+                    sort_text: None,
+                }));
+            }
             None => {}
         }
     }
@@ -497,6 +509,12 @@ fn alias_base_columns_with_types(
         }
         Some(ast_nav::ParentSouce::CreateTableAs(create_table_as)) => {
             collect::create_table_as_columns_with_types(db, file, &create_table_as)
+                .into_iter()
+                .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
+                .collect()
+        }
+        Some(ast_nav::ParentSouce::SelectInto(select_into)) => {
+            collect::select_into_columns_with_types(db, file, &select_into)
                 .into_iter()
                 .map(|(name, ty)| (name, ty.map(|t| t.to_string())))
                 .collect()
@@ -1198,6 +1216,26 @@ select $0 from child;
          b                  | Column   | text    
          child              | Table    |         
          parent             | Table    |         
+         *                  | Operator |         
+         public             | Schema   |         
+         pg_catalog         | Schema   |         
+         pg_temp            | Schema   |         
+         pg_toast           | Schema   |         
+         information_schema | Schema   |
+        ");
+    }
+
+    #[test]
+    fn completion_after_select_select_into() {
+        assert_snapshot!(completions("
+select 1 a, 'x'::text b into t;
+select $0 from t;
+"), @"
+         label              | kind     | detail  
+        --------------------+----------+---------
+         a                  | Column   | integer 
+         b                  | Column   | text    
+         t                  | Table    |         
          *                  | Operator |         
          public             | Schema   |         
          pg_catalog         | Schema   |         

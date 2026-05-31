@@ -3050,6 +3050,22 @@ select a from t$0;
     }
 
     #[test]
+    fn goto_select_into_select_star() {
+        assert_snapshot!(goto("
+create table t(a bigint);
+select * into u from t;
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a bigint);
+          │                ─ 2. destination
+        3 │ select * into u from t;
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_table_as_column() {
         assert_snapshot!(goto("
 create table t as select 1 a;
