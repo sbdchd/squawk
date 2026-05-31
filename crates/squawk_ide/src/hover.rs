@@ -520,6 +520,32 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
                 def_node,
             ));
         }
+        ast_nav::ParentSouce::SelectInto(select_into) => {
+            let column_name = collect::column_name_from_node(def_node)?;
+            let path = select_into.into_clause()?.path()?;
+            let (schema, table_name) =
+                resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
+            let ty = collect::select_into_columns_with_types(db, def.file, &select_into)
+                .into_iter()
+                .find(|(name, _)| *name == column_name)
+                .and_then(|(_, ty)| ty);
+            return Some(hover_column_with_preceding_comment(
+                match ty {
+                    Some(ty) => ColumnHover::schema_table_column_type(
+                        &schema.to_string(),
+                        &table_name,
+                        &column_name.to_string(),
+                        &ty.to_string(),
+                    ),
+                    None => ColumnHover::schema_table_column(
+                        &schema.to_string(),
+                        &table_name,
+                        &column_name.to_string(),
+                    ),
+                },
+                def_node,
+            ));
+        }
         ast_nav::ParentSouce::CreateTable(create_table) => {
             let column = def_node.ancestors().find_map(ast::Column::cast)?;
             let column_name = column.name()?;
@@ -600,6 +626,9 @@ fn format_table_source(db: &dyn Db, source: InFile<ast_nav::ParentSouce>) -> Opt
             format_create_table_as(db, InFile::new(file, create_table_as))
         }
         ast_nav::ParentSouce::ParenSelect(paren_select) => format_paren_select(paren_select),
+        ast_nav::ParentSouce::SelectInto(select_into) => {
+            format_select_into(db, InFile::new(file, select_into))
+        }
     }
 }
 
@@ -749,6 +778,9 @@ fn hover_qualified_star_columns(
         ast_nav::ParentSouce::ParenSelect(paren_select) => {
             hover_qualified_star_columns_from_subquery(db, InFile::new(file, &paren_select))
         }
+        ast_nav::ParentSouce::SelectInto(select_into) => {
+            hover_qualified_star_columns_from_select_into(db, InFile::new(file, &select_into))
+        }
     }
 }
 
@@ -822,6 +854,39 @@ fn hover_qualified_star_columns_from_table_as(
     let schema_str = schema.to_string();
 
     let columns = collect::create_table_as_columns_with_types(db, file, create_table_as);
+    let results: Vec<Hover> = columns
+        .into_iter()
+        .map(|(column_name, ty)| {
+            if let Some(ty) = ty {
+                return Hover::snippet(ColumnHover::schema_table_column_type(
+                    &schema_str,
+                    &table_name,
+                    &column_name.to_string(),
+                    &ty.to_string(),
+                ));
+            }
+            Hover::snippet(ColumnHover::schema_table_column(
+                &schema_str,
+                &table_name,
+                &column_name.to_string(),
+            ))
+        })
+        .collect();
+
+    merge_hovers(results)
+}
+
+fn hover_qualified_star_columns_from_select_into(
+    db: &dyn Db,
+    select_into: InFile<&ast::SelectInto>,
+) -> Option<Hover> {
+    let file = select_into.file_id;
+    let select_into = select_into.value;
+    let path = select_into.into_clause()?.path()?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
+    let schema_str = schema.to_string();
+
+    let columns = collect::select_into_columns_with_types(db, file, select_into);
     let results: Vec<Hover> = columns
         .into_iter()
         .map(|(column_name, ty)| {
@@ -1209,6 +1274,14 @@ fn format_create_table_as(
     Some(Hover::snippet(format!(
         "table {schema}.{table_name} as {query}"
     )))
+}
+
+fn format_select_into(db: &dyn Db, select_into: InFile<ast::SelectInto>) -> Option<Hover> {
+    let file = select_into.file_id;
+    let select_into = select_into.value;
+    let path = select_into.into_clause()?.path()?;
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
+    Some(Hover::snippet(format!("table {schema}.{table_name}")))
 }
 
 fn format_create_view(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -5015,6 +5088,55 @@ select *$0 from child;
 ").snippet, @"
         column public.child.a integer
         column public.child.b text
+        ");
+    }
+
+    #[test]
+    fn hover_select_into_column() {
+        assert_snapshot!(check_hover("
+select 1 a into t;
+select a$0 from t;
+"), @"
+        hover: column public.t.a integer
+          ╭▸ 
+        3 │ select a from t;
+          ╰╴       ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_into_star() {
+        assert_snapshot!(check_hover_info("
+select 1 a, 'x'::text b into t;
+select *$0 from t;
+").snippet, @"
+        column public.t.a integer
+        column public.t.b text
+        ");
+    }
+
+    #[test]
+    fn hover_select_into_table() {
+        assert_snapshot!(check_hover("
+select 1 a into t;
+select a from t$0;
+"), @"
+        hover: table public.t
+          ╭▸ 
+        3 │ select a from t;
+          ╰╴              ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_select_into_table_definition() {
+        assert_snapshot!(check_hover("
+select 1 a into t$0;
+"), @"
+        hover: table public.t
+          ╭▸ 
+        2 │ select 1 a into t;
+          ╰╴                ─ hover
         ");
     }
 

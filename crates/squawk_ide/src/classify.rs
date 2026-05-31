@@ -848,6 +848,9 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         if ast::CreateTableAs::can_cast(ancestor.kind()) {
             return Some(LocationKind::Table);
         }
+        if ast::SelectInto::can_cast(ancestor.kind()) {
+            return Some(LocationKind::Table);
+        }
         if ast::CreateIndex::can_cast(ancestor.kind()) {
             return Some(LocationKind::Index);
         }

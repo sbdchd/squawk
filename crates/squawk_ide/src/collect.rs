@@ -102,14 +102,12 @@ fn resolved_to_column_ptrs(
                 .map(|(name, _ty)| (name, None))
                 .collect()
         }
-        ResolvedTableName::SelectInto(select_into) => select_into
-            .select_clause()
-            .and_then(|c| c.target_list())
-            .map(|t| target_list_columns_with_types(&t))
-            .unwrap_or_default()
-            .into_iter()
-            .map(|(name, _ty)| (name, None))
-            .collect(),
+        ResolvedTableName::SelectInto(select_into) => {
+            select_into_columns_with_types(db, file, &select_into)
+                .into_iter()
+                .map(|(name, _ty)| (name, None))
+                .collect()
+        }
         ResolvedTableName::View(create_view_like) => {
             view_like_columns_with_types(db, file, &create_view_like)
                 .into_iter()
@@ -199,11 +197,9 @@ fn resolved_to_columns_with_types(
         ResolvedTableName::TableAs(create_table_as) => {
             select_columns_with_types(db, file, &create_table_as.query())
         }
-        ResolvedTableName::SelectInto(select_into) => select_into
-            .select_clause()
-            .and_then(|c| c.target_list())
-            .map(|t| target_list_columns_with_types(&t))
-            .unwrap_or_default(),
+        ResolvedTableName::SelectInto(select_into) => {
+            select_into_columns_with_types(db, file, &select_into)
+        }
         ResolvedTableName::View(create_view_like) => {
             view_like_columns_with_types(db, file, &create_view_like)
         }
@@ -217,6 +213,27 @@ pub(crate) fn create_table_as_columns_with_types(
 ) -> Vec<(Name, Option<Type>)> {
     for file in list_files(db, file) {
         let columns = select_columns_with_types(db, file, &create_table_as.query());
+        if !columns.is_empty() {
+            return columns;
+        }
+    }
+
+    vec![]
+}
+
+pub(crate) fn select_into_columns_with_types(
+    db: &dyn Db,
+    file: File,
+    select_into: &ast::SelectInto,
+) -> Vec<(Name, Option<Type>)> {
+    let Some(target_list) = select_into.select_clause().and_then(|c| c.target_list()) else {
+        return vec![];
+    };
+    let from_clause = select_into.from_clause();
+
+    for file in list_files(db, file) {
+        let columns =
+            target_list_columns_with_types_in_file(db, file, &target_list, from_clause.as_ref());
         if !columns.is_empty() {
             return columns;
         }
@@ -578,6 +595,12 @@ fn column_type_at_location(db: &dyn Db, def: Location) -> Option<Type> {
                 .find(|(n, _)| *n == column_name)
                 .and_then(|(_, t)| t)
         }
+        ast_nav::ParentSouce::SelectInto(select_into) => {
+            select_into_columns_with_types(db, def.file, &select_into)
+                .into_iter()
+                .find(|(n, _)| *n == column_name)
+                .and_then(|(_, t)| t)
+        }
         ast_nav::ParentSouce::Alias(alias) => {
             let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
             columns_for_star_from_alias(db, def.file, &from_item, &alias)
@@ -712,21 +735,11 @@ fn columns_for_star_from_table_ptr(
         Some(ast_nav::ParentSouce::ParenSelect(paren_select)) => {
             paren_select_columns_with_types(db, file, &paren_select)
         }
+        Some(ast_nav::ParentSouce::SelectInto(select_into)) => {
+            select_into_columns_with_types(db, file, &select_into)
+        }
         None => vec![],
     }
-}
-
-fn target_list_columns_with_types(target_list: &ast::TargetList) -> Vec<(Name, Option<Type>)> {
-    let mut columns = vec![];
-    for target in target_list.targets() {
-        if let Some((col_name, _node)) = ColumnName::from_target(target.clone())
-            && let Some(col_name_str) = col_name.to_string()
-        {
-            let ty = target.expr().and_then(|e| infer_type_from_expr(&e));
-            columns.push((Name::from_string(col_name_str), ty));
-        }
-    }
-    columns
 }
 
 pub(crate) fn paren_select_columns_with_types(
@@ -831,6 +844,12 @@ pub(crate) fn star_column_names(db: &dyn Db, file: File, table_ptr: &SyntaxNodeP
                 return columns;
             }
             return star_column_names_from_paren_select(db, file, &paren_select);
+        }
+        Some(ast_nav::ParentSouce::SelectInto(select_into)) => {
+            select_into_columns_with_types(db, file, &select_into)
+                .into_iter()
+                .map(|(name, _ty)| name)
+                .collect()
         }
         None => vec![],
     }

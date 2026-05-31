@@ -207,6 +207,7 @@ pub(crate) enum ParentSouce {
     CreateTableAs(ast::CreateTableAs),
     CreateView(ast::CreateViewLike),
     ParenSelect(ast::ParenSelect),
+    SelectInto(ast::SelectInto),
     WithTable(ast::WithTable),
 }
 
@@ -238,6 +239,10 @@ pub(crate) fn parent_source(node: &SyntaxNode) -> Option<ParentSouce> {
 
         if let Some(create_table) = ast::CreateTableLike::cast(ancestor.clone()) {
             return Some(ParentSouce::CreateTable(create_table));
+        }
+
+        if let Some(select_into) = ast::SelectInto::cast(ancestor.clone()) {
+            return Some(ParentSouce::SelectInto(select_into));
         }
     }
 
