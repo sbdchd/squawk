@@ -1048,8 +1048,8 @@ enum ReturningClauseMatch {
 fn match_table_in_returning_clause(
     table_name: &Name,
     stmt_table_name: &Name,
-    alias: Option<ast::Alias>,
-    returning_clause: Option<ast::ReturningClause>,
+    alias: Option<&ast::Alias>,
+    returning_clause: Option<&ast::ReturningClause>,
 ) -> Option<ReturningClauseMatch> {
     // Check `returning with (old as alias, new as alias)`
     if let Some(option_list) = returning_clause.and_then(|x| x.returning_option_list()) {
@@ -2389,28 +2389,43 @@ fn column_in_with_query(
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = query.file_id;
     let query = query.value;
-    let (returning_clause, path) = match query {
-        ast::WithQuery::Delete(delete) => {
-            (delete.returning_clause(), delete.relation_name()?.path()?)
+    let (returning_clause, alias, path) = match query {
+        ast::WithQuery::Delete(delete) => (
+            delete.returning_clause(),
+            delete.alias(),
+            delete.relation_name()?.path()?,
+        ),
+        ast::WithQuery::Insert(insert) => {
+            (insert.returning_clause(), insert.alias(), insert.path()?)
         }
-        ast::WithQuery::Insert(insert) => (insert.returning_clause(), insert.path()?),
-        ast::WithQuery::Merge(merge) => (merge.returning_clause(), merge.relation_name()?.path()?),
-        ast::WithQuery::Update(update) => {
-            (update.returning_clause(), update.relation_name()?.path()?)
-        }
+        ast::WithQuery::Merge(merge) => (
+            merge.returning_clause(),
+            merge.alias(),
+            merge.relation_name()?.path()?,
+        ),
+        ast::WithQuery::Update(update) => (
+            update.returning_clause(),
+            update.alias(),
+            update.relation_name()?.path()?,
+        ),
         ast::WithQuery::Select(_)
         | ast::WithQuery::CompoundSelect(_)
         | ast::WithQuery::Table(_)
         | ast::WithQuery::Values(_)
         | ast::WithQuery::ParenSelect(_) => return None,
     };
+    let returning_clause = returning_clause?;
+    let (_, stmt_table_name) = name::schema_and_name_path(&path)?;
 
     let mut column_index: usize = 0;
-    for target in returning_clause?.target_list()?.targets() {
-        let target_column_count = if target.star_token().is_some() {
-            count_columns_for_path(db, InFile::new(file, &path)).unwrap_or(1)
-        } else {
-            1
+    for target in returning_clause.target_list()?.targets() {
+        let target_kind =
+            returning_target_kind(&target, &stmt_table_name, alias.as_ref(), &returning_clause);
+        let target_column_count = match target_kind {
+            ReturningTargetKind::Column => 1,
+            ReturningTargetKind::QualifiedStar | ReturningTargetKind::UnqualifiedStar => {
+                count_columns_for_path(db, InFile::new(file, &path)).unwrap_or(1)
+            }
         };
         let column_list_end = column_index.saturating_add(target_column_count);
 
@@ -2436,10 +2451,49 @@ fn column_in_with_query(
                 return Some(ptr);
             }
         }
+        if matches!(target_kind, ReturningTargetKind::QualifiedStar)
+            && let Some(ptr) =
+                resolve_column_for_path(db, InFile::new(file, &path), column_name.clone())
+        {
+            return Some(ptr);
+        }
         column_index = column_list_end;
     }
 
     None
+}
+
+#[derive(Clone, Copy)]
+enum ReturningTargetKind {
+    Column,
+    QualifiedStar,
+    UnqualifiedStar,
+}
+
+fn returning_target_kind(
+    target: &ast::Target,
+    stmt_table_name: &Name,
+    alias: Option<&ast::Alias>,
+    returning_clause: &ast::ReturningClause,
+) -> ReturningTargetKind {
+    if target.star_token().is_some() {
+        return ReturningTargetKind::UnqualifiedStar;
+    }
+
+    if let Some(ast::Expr::FieldExpr(field_expr)) = target.expr()
+        && let Some(table_name) = qualified_star_table_name(&field_expr)
+        && match_table_in_returning_clause(
+            &table_name,
+            stmt_table_name,
+            alias,
+            Some(returning_clause),
+        )
+        .is_some()
+    {
+        return ReturningTargetKind::QualifiedStar;
+    }
+
+    ReturningTargetKind::Column
 }
 
 fn resolve_subquery_column_ptr(
@@ -3063,8 +3117,12 @@ fn resolve_table_in_returning_clause(
     let table_name = Name::from_node(table_name_ref);
     let (schema, stmt_table_name) = name::schema_and_name_path(path)?;
 
-    let matched =
-        match_table_in_returning_clause(&table_name, &stmt_table_name, alias, returning_clause)?;
+    let matched = match_table_in_returning_clause(
+        &table_name,
+        &stmt_table_name,
+        alias.as_ref(),
+        returning_clause.as_ref(),
+    )?;
 
     let position = table_name_ref.syntax().text_range().start();
     let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());

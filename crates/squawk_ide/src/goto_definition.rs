@@ -5548,6 +5548,25 @@ select a$0 from inserted;
     }
 
     #[test]
+    fn goto_cte_returning_qualified_star_column_gap() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with changed as (
+  insert into t values (1, 2)
+  returning new.*
+)
+select a$0 from changed;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+          ‡
+        7 │ select a from changed;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cte_delete_returning_star_column() {
         assert_snapshot!(goto("
 create table t(a int, b int);
