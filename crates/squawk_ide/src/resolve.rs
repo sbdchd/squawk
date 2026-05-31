@@ -1253,7 +1253,8 @@ fn resolve_column_for_table(
     let file = resolved.file_id;
     match resolved.value {
         ResolvedTableName::View(create_view) => {
-            if let Some(ptr) = find_column_in_create_view_like(file, &create_view, column_name) {
+            if let Some(ptr) = find_column_in_create_view_like(db, file, &create_view, column_name)
+            {
                 return Some(ptr);
             }
             return resolve_function(db, column_name, schemas, None, file);
@@ -1607,7 +1608,8 @@ fn resolve_column_from_table_or_view_or_cte_impl(
             let node = table_like_ptr.to_node(root);
 
             if let Some(create_view) = node.ancestors().find_map(ast::CreateViewLike::cast) {
-                if let Some(cols) = find_column_in_create_view_like(file, &create_view, column_name)
+                if let Some(cols) =
+                    find_column_in_create_view_like(db, file, &create_view, column_name)
                 {
                     return Some(cols);
                 }
@@ -1905,13 +1907,14 @@ fn find_column_in_resolved(
             find_column_in_select_into(db, file, &select_into, column_name)
         }
         ResolvedTableName::View(create_view) => {
-            find_column_in_create_view_like(file, &create_view, column_name)
+            find_column_in_create_view_like(db, file, &create_view, column_name)
         }
     }
 }
 
 // TODO: this is similar to the CTE funcs, maybe we can simplify
 fn find_column_in_create_view_like(
+    db: &dyn Db,
     file: File,
     create_view: &ast::CreateViewLike,
     column_name: &Name,
@@ -1934,9 +1937,19 @@ fn find_column_in_create_view_like(
     };
 
     let select = ast_nav::select_from_variant(create_view.query()?)?;
+    let from_clause = select.from_clause();
+    let mut column_index: usize = 0;
 
-    for (idx, target) in select.select_clause()?.target_list()?.targets().enumerate() {
-        if idx < column_list_len {
+    for target in select.select_clause()?.target_list()?.targets() {
+        let target_column_count = from_clause
+            .as_ref()
+            .and_then(|from_clause| {
+                count_columns_for_target(db, InFile::new(file, &target), from_clause)
+            })
+            .unwrap_or(1);
+        let column_list_end = column_index.saturating_add(target_column_count);
+        if column_list_end <= column_list_len {
+            column_index = column_list_end;
             continue;
         }
 
@@ -1950,7 +1963,17 @@ fn find_column_in_create_view_like(
                     LocationKind::Column
                 )]);
             }
+
+            if matches!(col_name, ColumnName::Star)
+                && let Some(from_clause) = &from_clause
+                && let Some(result) =
+                    find_column_in_from_clause(db, InFile::new(file, from_clause), column_name)
+            {
+                return Some(result);
+            }
         }
+
+        column_index = column_list_end;
     }
 
     None
