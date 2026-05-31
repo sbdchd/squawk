@@ -5687,6 +5687,18 @@ select c$0 from (select 1 c union select 2 c);
     }
 
     #[test]
+    fn goto_subquery_compound_select_column_order_by() {
+        assert_snapshot!(goto("
+with t as (select 1 a)
+select 2 a from t union select 1 order by a$0;
+"), @"
+          ╭▸ 
+        3 │ select 2 a from t union select 1 order by a;
+          ╰╴         ─ 2. destination                 ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_subquery_compound_select_column_with_nested_parens() {
         assert_snapshot!(goto("
 with t as (

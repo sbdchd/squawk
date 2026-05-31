@@ -1750,10 +1750,43 @@ fn resolve_select_order_by_alias_or_column_ptr(
     db: &dyn Db,
     column_name_ref: InFile<&ast::NameRef>,
 ) -> Option<SmallVec<[Location; 1]>> {
+    if let Some(compound_select) = compound_select_for_order_by_name_ref(column_name_ref.value) {
+        return resolve_compound_select_order_by_column_ptr(db, column_name_ref, &compound_select);
+    }
+
     if let Some(ptr) = resolve_select_target_alias_ptr(column_name_ref) {
         return Some(ptr);
     }
     resolve_select_column_ptr(db, column_name_ref)
+}
+
+fn compound_select_for_order_by_name_ref(name_ref: &ast::NameRef) -> Option<ast::CompoundSelect> {
+    let order_by_clause = name_ref
+        .syntax()
+        .ancestors()
+        .find_map(ast::OrderByClause::cast)?;
+    order_by_clause
+        .syntax()
+        .parent()
+        .and_then(ast::CompoundSelect::cast)
+}
+
+fn resolve_compound_select_order_by_column_ptr(
+    db: &dyn Db,
+    column_name_ref: InFile<&ast::NameRef>,
+    compound_select: &ast::CompoundSelect,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = column_name_ref.file_id;
+    let column_name_ref = column_name_ref.value;
+    let column_name = Name::from_node(column_name_ref);
+    let select = ast_nav::select_from_variant(compound_select.lhs()?)?;
+    resolve_column_from_select_targets(
+        db,
+        InFile::new(file, &select),
+        column_name_ref,
+        &column_name,
+        0,
+    )
 }
 
 fn resolve_select_target_alias_ptr(
