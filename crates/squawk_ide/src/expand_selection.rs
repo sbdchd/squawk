@@ -55,6 +55,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::PARAM_LIST,
     SyntaxKind::PARTITION_ITEM_LIST,
     SyntaxKind::PARTITION_LIST,
+    SyntaxKind::PATH_LIST,
     SyntaxKind::RETURNING_OPTION_LIST,
     SyntaxKind::REVOKE_COMMAND_LIST,
     SyntaxKind::ROLE_REF_LIST,
