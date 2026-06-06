@@ -7570,7 +7570,7 @@ fn alter_database(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, REFRESH_COLLATION_VERSION);
         }
         _ => {
-            opt_create_database_option_list(p);
+            opt_database_option_list(p);
         }
     }
     p.eat(SEMICOLON);
@@ -7586,15 +7586,15 @@ fn set_tablespace(p: &mut Parser<'_>) {
     m.complete(p, SET_TABLESPACE);
 }
 
-fn opt_create_database_option_list(p: &mut Parser<'_>) {
+fn opt_database_option_list(p: &mut Parser<'_>) {
     let m = p.start();
     p.eat(WITH_KW);
     while !p.at(EOF) {
-        if !opt_create_database_option(p) {
+        if !opt_database_option(p) {
             break;
         }
     }
-    m.complete(p, CREATE_DATABASE_OPTION_LIST);
+    m.complete(p, DATABASE_OPTION_LIST);
 }
 
 // ALTER CONVERSION name RENAME TO new_name
@@ -8006,6 +8006,14 @@ fn path_name_ref_list(p: &mut Parser<'_>) {
     while !p.at(EOF) && p.eat(COMMA) {
         path_name_ref(p);
     }
+}
+
+fn path_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(L_PAREN);
+    path_name_ref_list(p);
+    p.expect(R_PAREN);
+    m.complete(p, PATH_LIST);
 }
 
 // ALTER TEXT SEARCH TEMPLATE name RENAME TO new_name
@@ -9276,8 +9284,11 @@ fn create_collation(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(COLLATION_KW);
     opt_if_not_exists(p);
     path_name(p);
-    if p.eat(FROM_KW) {
+    if p.at(FROM_KW) {
+        let from = p.start();
+        p.bump(FROM_KW);
         path_name_ref(p);
+        from.complete(p, COLLATION_FROM);
     } else {
         attribute_list(p);
     }
@@ -9320,7 +9331,7 @@ fn opt_option_value(p: &mut Parser<'_>) -> bool {
     true
 }
 
-fn opt_create_database_option(p: &mut Parser<'_>) -> bool {
+fn opt_database_option(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     // option name
     match p.current() {
@@ -9339,10 +9350,10 @@ fn opt_create_database_option(p: &mut Parser<'_>) -> bool {
     p.eat(EQ);
     if !opt_option_value(p) {
         p.error("expected create database option value");
-        m.complete(p, CREATE_DATABASE_OPTION);
+        m.complete(p, DATABASE_OPTION);
         return false;
     }
-    m.complete(p, CREATE_DATABASE_OPTION);
+    m.complete(p, DATABASE_OPTION);
     true
 }
 
@@ -9370,7 +9381,7 @@ fn create_database(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(DATABASE_KW);
     name(p);
-    opt_create_database_option_list(p);
+    opt_database_option_list(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_DATABASE)
 }
@@ -12763,18 +12774,22 @@ fn copy_option_list(p: &mut Parser<'_>) {
 }
 
 fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
-    match p.current() {
+    let m = p.start();
+    let parsed = match p.current() {
         BINARY_KW | FREEZE_KW | CSV_KW | HEADER_KW | JSON_KW => {
             p.bump_any();
+            true
         }
         DELIMITER_KW | NULL_KW | QUOTE_KW | ESCAPE_KW => {
             p.bump_any();
             p.eat(AS_KW);
             string_literal(p);
+            true
         }
         ENCODING_KW => {
             p.bump_any();
             string_literal(p);
+            true
         }
         FORCE_KW => {
             p.bump_any();
@@ -12785,20 +12800,26 @@ fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
                     if !p.eat(STAR) {
                         name_ref_list(p);
                     }
+                    true
                 }
                 QUOTE_KW | NULL_KW => {
                     p.bump_any();
                     if !p.eat(STAR) {
                         name_ref_list(p);
                     }
+                    true
                 }
-                _ => return false,
+                _ => false,
             }
         }
-
-        _ => return false,
+        _ => false,
+    };
+    if parsed {
+        m.complete(p, COPY_LEGACY_OPTION);
+    } else {
+        m.abandon(p);
     }
-    true
+    parsed
 }
 
 // COPY table_name [ ( column_name [, ...] ) ]
@@ -14999,9 +15020,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             let m = p.start();
             p.bump(MERGE_KW);
             p.expect(PARTITIONS_KW);
-            p.expect(L_PAREN);
-            path_name_ref_list(p);
-            p.expect(R_PAREN);
+            path_list(p);
             p.eat(INTO_KW);
             path_name(p);
             m.complete(p, MERGE_PARTITIONS)

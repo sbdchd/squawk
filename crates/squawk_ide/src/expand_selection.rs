@@ -55,6 +55,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::PARAM_LIST,
     SyntaxKind::PARTITION_ITEM_LIST,
     SyntaxKind::PARTITION_LIST,
+    SyntaxKind::PATH_LIST,
     SyntaxKind::RETURNING_OPTION_LIST,
     SyntaxKind::REVOKE_COMMAND_LIST,
     SyntaxKind::ROLE_REF_LIST,
@@ -552,7 +553,7 @@ $0
     #[test]
     fn list_variants() {
         let delimited_ws_list_kinds = &[
-            SyntaxKind::CREATE_DATABASE_OPTION_LIST,
+            SyntaxKind::DATABASE_OPTION_LIST,
             SyntaxKind::FUNC_OPTION_LIST,
             SyntaxKind::ROLE_OPTION_LIST,
             SyntaxKind::SEQUENCE_OPTION_LIST,

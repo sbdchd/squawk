@@ -127,7 +127,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::CONFLICT_INDEX_ITEM_LIST
         | SyntaxKind::CONSTRAINT_EXCLUSION_LIST
         | SyntaxKind::COPY_OPTION_LIST
-        | SyntaxKind::CREATE_DATABASE_OPTION_LIST
+        | SyntaxKind::DATABASE_OPTION_LIST
         | SyntaxKind::DROP_OP_CLASS_OPTION_LIST
         | SyntaxKind::FDW_OPTION_LIST
         | SyntaxKind::FUNCTION_SIG_LIST
@@ -139,6 +139,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::OP_SIG_LIST
         | SyntaxKind::PARTITION_ITEM_LIST
         | SyntaxKind::PARTITION_LIST
+        | SyntaxKind::PATH_LIST
         | SyntaxKind::RETURNING_OPTION_LIST
         | SyntaxKind::REVOKE_COMMAND_LIST
         | SyntaxKind::ROLE_OPTION_LIST
