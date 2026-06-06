@@ -19,7 +19,9 @@ pub(crate) fn require_table_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) 
                 check_path(ctx, alter_table.relation_name().and_then(|r| r.path()));
             }
             ast::Stmt::DropTable(drop_table) => {
-                check_path(ctx, drop_table.path());
+                for path in drop_table.paths() {
+                    check_path(ctx, Some(path));
+                }
             }
             _ => (),
         }

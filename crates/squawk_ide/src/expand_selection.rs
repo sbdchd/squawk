@@ -552,7 +552,7 @@ $0
     #[test]
     fn list_variants() {
         let delimited_ws_list_kinds = &[
-            SyntaxKind::CREATE_DATABASE_OPTION_LIST,
+            SyntaxKind::DATABASE_OPTION_LIST,
             SyntaxKind::FUNC_OPTION_LIST,
             SyntaxKind::ROLE_OPTION_LIST,
             SyntaxKind::SEQUENCE_OPTION_LIST,
