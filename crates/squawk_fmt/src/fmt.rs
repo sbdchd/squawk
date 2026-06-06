@@ -125,19 +125,25 @@ fn build_select_doc<'a>(select: &ast::Select) -> Doc<'a> {
     }
 
     if let Some(group) = &select.group_by_clause() {
-        doc = doc.append(
-            Doc::line_or_space()
-                .append(Doc::text("group by"))
-                .append(Doc::space())
-                .append(Doc::text(
-                    group.group_by_list().unwrap().syntax().to_string(),
-                )),
-        );
+        let mut group_doc = Doc::line_or_space().append(leading_comments(group.syntax()));
+        group_doc = group_doc.append(Doc::text("group")).append(Doc::space());
+        if let Some(by_token) = group.by_token() {
+            group_doc = group_doc.append(leading_comments_token(&by_token));
+        }
+        group_doc = group_doc.append(Doc::text("by")).append(Doc::space());
+        if let Some(list) = group.group_by_list() {
+            group_doc = group_doc.append(build_group_by_list(list));
+        }
+        doc = doc.append(group_doc);
     }
 
     doc = doc.append(build_semicolon(select.semicolon_token()));
 
     doc.group()
+}
+
+fn build_group_by_list<'a>(list: ast::GroupByList) -> Doc<'a> {
+    leading_comments(list.syntax()).append(Doc::text(list.syntax().to_string()))
 }
 
 fn build_semicolon<'a>(semi: Option<SyntaxToken>) -> Doc<'a> {
