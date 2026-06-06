@@ -5146,7 +5146,7 @@ fn partition_item(p: &mut Parser<'_>, allow_extra_params: bool) -> CompletedMark
     }
     opt_collate(p);
     // [ opclass ]
-    opt_ident(p);
+    opt_index_opclass(p);
     if allow_extra_params {
         // [ ( opclass_parameter = value [, ... ] ) ]
         if p.at(L_PAREN) {
@@ -5163,6 +5163,14 @@ fn opt_partition_item(p: &mut Parser<'_>, allow_extra_params: bool) -> Option<Co
         return None;
     }
     Some(partition_item(p, allow_extra_params))
+}
+
+fn opt_index_opclass(p: &mut Parser<'_>) {
+    // at nulls_order
+    if p.at(NULLS_KW) && (p.nth_at(1, FIRST_KW) || p.nth_at(1, LAST_KW)) {
+        return;
+    }
+    opt_path_name_ref(p);
 }
 
 // [ NULLS { FIRST | LAST } ]
@@ -13381,7 +13389,7 @@ fn opt_conflict_index_item(p: &mut Parser<'_>) -> bool {
     }
     opt_collate(p);
     // [ opclass ]
-    opt_ident(p);
+    opt_index_opclass(p);
     m.complete(p, CONFLICT_INDEX_ITEM);
     true
 }

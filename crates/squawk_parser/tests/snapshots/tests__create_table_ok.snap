@@ -470,7 +470,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "\"fr_FR\""
           WHITESPACE " "
-          IDENT "text_pattern_ops"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "text_pattern_ops"
         COMMA ","
         WHITESPACE " \n  "
         PARTITION_ITEM
