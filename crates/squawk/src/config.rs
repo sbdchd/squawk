@@ -131,14 +131,16 @@ impl Config {
         info!("no error on unmatched pattern: {no_error_on_unmatched_pattern:?}");
 
         let is_stdin = !io::stdin().is_terminal();
-        let github_annotations = std::env::var("GITHUB_ACTIONS").is_ok()
-            && std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_err();
 
         // TODO: we should support all of these in the config file as well
         let debug = opts.debug;
         let verbose = opts.verbose;
         let path_patterns = opts.path_patterns;
         let reporter = opts.reporter.unwrap_or_default();
+        // Don't want to corrupt the other reporters, see issue#1186
+        let github_annotations = matches!(reporter, Reporter::Tty)
+            && std::env::var("GITHUB_ACTIONS").is_ok()
+            && std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_err();
         let stdin_filepath = opts.stdin_filepath;
         let upload_to_github = conf.upload_to_github;
         let upload_to_github_args = match opts.cmd {
