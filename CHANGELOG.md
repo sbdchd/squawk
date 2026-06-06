@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.57.0 - 2026-06-06
+
+### Added
+
+- fmt: support comments in group by (#1194)
+
+### Fixed
+
+- linter: fix github actions output clobbering json/gcc (#1192)
+- linter: fix require table schema false positive on temp tables (#1191)
+
+  Previously this would error:
+
+  ```sql
+  create temp table t (id bigint);
+  ```
+
+- parser: fix various ast gaps (#1190)
+- parser: fix index option parsing (#1188)
+
+  Previously this wouldn't parse:
+
+  ```sql
+  create index index_name on public.table_name using gin (column_name public.gin__int_ops);
+  ```
+
+- parser: add ast nodes & fix alter restart (#1193)
+
 ## v2.56.0 - 2026-06-02
 
 ### Fixed
