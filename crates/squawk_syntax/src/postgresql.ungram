@@ -1757,13 +1757,25 @@ IntoClause =
 LockingClause =
   'for'
   (
-    'no' 'key' 'update'
-  | 'key' 'share'
-  | 'share'
-  | 'update'
+    ForNoKeyUpdate
+  | ForKeyShare
+  | ForShare
+  | ForUpdate
   )
   ('of' (Expr (',' Expr)*))?
   ('skip' 'locked' | 'nowait')?
+
+ForNoKeyUpdate =
+  'no' 'key' 'update'
+
+ForKeyShare =
+  'key' 'share'
+
+ForShare =
+  'share'
+
+ForUpdate =
+  'update'
 
 NullsFirst =
   'nulls' 'first'
@@ -1845,26 +1857,51 @@ ExcludeConstraint =
 
 FrameClause =
   ('range' | 'rows' | 'groups')
+  (FrameBetween | FrameBound)
+  FrameExclude?
+
+FrameBetween =
+  'between' start:FrameBound 'and' end:FrameBound
+
+FrameBound =
+  CurrentRow
+| UnboundedPreceding
+| UnboundedFollowing
+| ExprPreceding
+| ExprFollowing
+
+UnboundedPreceding =
+  'unbounded' 'preceding'
+
+UnboundedFollowing =
+  'unbounded' 'following'
+
+ExprPreceding =
+  Expr 'preceding'
+
+ExprFollowing =
+  Expr 'following'
+
+FrameExclude =
+  'exclude'
   (
-    'between'
-    (
-      'current' 'row'
-    | 'unbounded' ('preceding' | 'following')
-    | Expr ('preceding' | 'following')
-    )
-    'and'
-    (
-      'current' 'row'
-    | 'unbounded' ('preceding' | 'following')
-    | Expr ('preceding' | 'following')
-    )
-  | (
-      'current' 'row'
-    | 'unbounded' ('preceding' | 'following')
-    | Expr ('preceding' | 'following')
-    )
+    CurrentRow
+  | Group
+  | Ties
+  | NoOthers
   )
-  ('exclude' ('current' 'row' | 'group' | 'ties' | 'no' 'others'))?
+
+CurrentRow =
+  'current' 'row'
+
+Group =
+  'group'
+
+Ties =
+  'ties'
+
+NoOthers =
+  'no' 'others'
 
 WindowSpec =
   '#ident'? ('partition' 'by' (Expr (',' Expr)*))? OrderByClause? FrameClause?
@@ -3067,20 +3104,42 @@ IntoSchema =
 
 Lock =
   'lock' 'table'? TableList
-  ('in'
-    (
-      'access' 'share'
-    | 'row' 'share'
-    | 'access' 'exclusive'
-    | 'row' 'exclusive'
-    | 'share' 'row' 'exclusive'
-    | 'share' 'update' 'exclusive'
-    | 'share'
-    | 'exclusive'
-    )
-    'mode'
-  )?
+  ('in' LockMode 'mode')?
   'nowait'? ';'?
+
+LockMode =
+  AccessShare
+| RowShare
+| AccessExclusive
+| RowExclusive
+| ShareRowExclusive
+| ShareUpdateExclusive
+| Share
+| Exclusive
+
+AccessShare =
+  'access' 'share'
+
+RowShare =
+  'row' 'share'
+
+AccessExclusive =
+  'access' 'exclusive'
+
+RowExclusive =
+  'row' 'exclusive'
+
+ShareRowExclusive =
+  'share' 'row' 'exclusive'
+
+ShareUpdateExclusive =
+  'share' 'update' 'exclusive'
+
+Share =
+  'share'
+
+Exclusive =
+  'exclusive'
 
 Reassign =
   'reassign' 'owned' 'by' old_roles:RoleRefList 'to' new_roles:RoleRefList ';'?
@@ -3219,13 +3278,15 @@ Do =
 Move =
   'move'
   (
-    'next'
-  | 'prior'
-  | 'first'
-  | 'last'
-  | 'all'
-  | ('relative' | 'absolute') Literal
-  | ('forward' | 'backward') ('all' | Literal)?
+    Next
+  | Prior
+  | First
+  | Last
+  | All
+  | Relative
+  | Absolute
+  | Forward
+  | Backward
   | Literal
   )?
   ('from' | 'in')? NameRef ';'?
@@ -3233,16 +3294,42 @@ Move =
 Fetch =
   'fetch'
   (
-    'next'
-  | 'prior'
-  | 'first'
-  | 'last'
-  | 'all'
-  | ('relative' | 'absolute') Literal
-  | ('forward' | 'backward') ('all' | Literal)?
+    Next
+  | Prior
+  | First
+  | Last
+  | All
+  | Relative
+  | Absolute
+  | Forward
+  | Backward
   | Literal
   )?
   ('from' | 'in')? NameRef ';'?
+
+Next =
+  'next'
+
+Prior =
+  'prior'
+
+First =
+  'first'
+
+Last =
+  'last'
+
+Relative =
+  'relative' Literal
+
+Absolute =
+  'absolute' Literal
+
+Forward =
+  'forward' ('all' | Literal)?
+
+Backward =
+  'backward' ('all' | Literal)?
 
 Close =
   'close' ('all' | NameRef) ';'?
@@ -3421,18 +3508,30 @@ ConfigValue =
 Show =
   'show'
   (
-    'all'
-  | 'session' 'authorization'
-  | 'transaction' 'isolation' 'level'
-  | 'time' 'zone'
+    All
+  | SessionAuthorization
+  | TransactionIsolationLevel
+  | TimeZone
   | Path
   ) ';'?
+
+All =
+  'all'
+
+SessionAuthorization =
+  'session' 'authorization'
+
+TransactionIsolationLevel =
+  'transaction' 'isolation' 'level'
+
+TimeZone =
+  'time' 'zone'
 
 LanguageFuncOption =
   'language' NameRef
 
 TransformFuncOption =
-  'transform'
+  'transform' Type*
 
 WindowFuncOption =
   'window'
@@ -3456,22 +3555,22 @@ ParallelFuncOption =
   'parallel' '#ident'
 
 CostFuncOption =
-  'cost'
+  'cost' Literal
 
 RowsFuncOption =
-  'rows'
+  'rows' Literal
 
 SupportFuncOption =
-  'support'
+  'support' Path
 
 SetFuncOption =
-  'set'
+  SetConfigParam
 
 AsFuncOption =
   'as' (definition:Literal | obj_file:Literal ',' link_symbol:Literal)
 
 ReplicaIdentity =
-  'replica' 'identity'
+  'replica' 'identity' ('default' | 'full' | 'nothing' | 'using' 'index' NameRef)
 
 OfType =
   'of' Type
@@ -3499,37 +3598,37 @@ NoInherit =
   'no' 'inherit' Path
 
 EnableTrigger =
-  'enable' 'trigger'
+  'enable' 'trigger' (NameRef | 'all' | 'user')?
 
 EnableReplicaTrigger =
-  'enable' 'replica' 'trigger'
+  'enable' 'replica' 'trigger' NameRef
 
 EnableReplicaRule =
-  'enable' 'replica' 'rule'
+  'enable' 'replica' 'rule' NameRef
 
 EnableAlwaysTrigger =
-  'enable' 'always' 'trigger'
+  'enable' 'always' 'trigger' NameRef
 
 EnableAlwaysRule =
-  'enable' 'always' 'rule'
+  'enable' 'always' 'rule' NameRef
 
 EnableRule =
-  'enable' 'rule'
+  'enable' 'rule' NameRef
 
 EnableRls =
   'enable' 'row' 'level' 'security'
 
 DisableTrigger =
-  'disable' 'trigger'
+  'disable' 'trigger' (NameRef | 'all' | 'user')?
 
 DisableRls =
   'disable' 'row' 'level' 'security'
 
 DisableRule =
-  'disable' 'rule'
+  'disable' 'rule' NameRef
 
 ClusterOn =
-  'cluster' 'on'
+  'cluster' 'on' NameRef
 
 DetachPartition =
   'detach' 'partition'
@@ -3633,13 +3732,13 @@ AlterColumn =
   'alter' 'column'? NameRef option:AlterColumnOption
 
 Restart =
-  'restart' 'with'?
+  'restart' ('with'? Literal)?
 
 SetSequenceOption =
-  'set'
+  'set' SequenceOption
 
 SetGenerated =
-  'set'
+  'set' 'generated' ('always' | 'by' 'default')
 
 DropExpression =
   'drop' 'expression' IfExists?
@@ -3648,7 +3747,7 @@ DropIdentity =
   'drop' 'identity' IfExists?
 
 AddGenerated =
-  'add'
+  'add' 'generated' ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList?
 
 ResetOptions =
   'reset' AttributeList
@@ -3670,16 +3769,16 @@ SetExpression =
   'set' 'expression' Expr
 
 SetStatistics =
-  'set' 'statistics'
+  'set' 'statistics' ('default' | Literal)
 
 SetOptions =
   'set' AttributeList
 
 SetStorage =
-  'set' 'storage'
+  'set' 'storage' ('default' | NameRef)
 
 SetCompression =
-  'set' 'compression'
+  'set' 'compression' ('default' | NameRef)
 
 Collate =
   'collate' Path

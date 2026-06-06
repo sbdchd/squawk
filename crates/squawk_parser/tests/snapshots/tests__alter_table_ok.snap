@@ -991,7 +991,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        IDENT "plain"
+        NAME_REF
+          IDENT "plain"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1016,7 +1017,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        EXTERNAL_KW "external"
+        NAME_REF
+          EXTERNAL_KW "external"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1041,7 +1043,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        IDENT "extended"
+        NAME_REF
+          IDENT "extended"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1066,7 +1069,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        IDENT "main"
+        NAME_REF
+          IDENT "main"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1141,7 +1145,8 @@ SOURCE_FILE
         WHITESPACE " "
         COMPRESSION_KW "compression"
         WHITESPACE " "
-        IDENT "foo"
+        NAME_REF
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -1161,9 +1166,58 @@ SOURCE_FILE
       NAME_REF
         IDENT "c"
       WHITESPACE " "
-      SET_GENERATED_OPTIONS
-        RESTART
-          RESTART_KW "restart"
+      RESTART
+        RESTART_KW "restart"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTART
+        RESTART_KW "restart"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "5"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTART
+        RESTART_KW "restart"
+        WHITESPACE " "
+        WITH_KW "with"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "5"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- inherit"

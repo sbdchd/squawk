@@ -8,7 +8,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    NEXT_KW "next"
+    NEXT
+      NEXT_KW "next"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
@@ -19,7 +20,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    PRIOR_KW "prior"
+    PRIOR
+      PRIOR_KW "prior"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
@@ -30,7 +32,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    PRIOR_KW "prior"
+    PRIOR
+      PRIOR_KW "prior"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -41,7 +44,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    PRIOR_KW "prior"
+    PRIOR
+      PRIOR_KW "prior"
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"
@@ -50,7 +54,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    NEXT_KW "NEXT"
+    NEXT
+      NEXT_KW "NEXT"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -61,7 +66,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    PRIOR_KW "PRIOR"
+    PRIOR
+      PRIOR_KW "PRIOR"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -72,7 +78,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    FIRST_KW "FIRST"
+    FIRST
+      FIRST_KW "FIRST"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -83,7 +90,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    LAST_KW "LAST"
+    LAST
+      LAST_KW "LAST"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -94,7 +102,35 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    ABSOLUTE_KW "ABSOLUTE"
+    ABSOLUTE
+      ABSOLUTE_KW "ABSOLUTE"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cursor_name"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  MOVE
+    MOVE_KW "move"
+    WHITESPACE " "
+    RELATIVE
+      RELATIVE_KW "RELATIVE"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cursor_name"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  MOVE
+    MOVE_KW "move"
     WHITESPACE " "
     LITERAL
       INT_NUMBER "10"
@@ -108,10 +144,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    RELATIVE_KW "RELATIVE"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    ALL
+      ALL_KW "ALL"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -122,8 +156,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    FORWARD
+      FORWARD_KW "FORWARD"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -134,7 +168,11 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    ALL_KW "ALL"
+    FORWARD
+      FORWARD_KW "FORWARD"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -145,7 +183,10 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    FORWARD_KW "FORWARD"
+    FORWARD
+      FORWARD_KW "FORWARD"
+      WHITESPACE " "
+      ALL_KW "ALL"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -156,10 +197,8 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    FORWARD_KW "FORWARD"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    BACKWARD
+      BACKWARD_KW "BACKWARD"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -170,20 +209,11 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    FORWARD_KW "FORWARD"
-    WHITESPACE " "
-    ALL_KW "ALL"
-    WHITESPACE " "
-    FROM_KW "FROM"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "cursor_name"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  MOVE
-    MOVE_KW "move"
-    WHITESPACE " "
-    BACKWARD_KW "BACKWARD"
+    BACKWARD
+      BACKWARD_KW "BACKWARD"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -194,23 +224,10 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
-    BACKWARD_KW "BACKWARD"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
-    WHITESPACE " "
-    FROM_KW "FROM"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "cursor_name"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  MOVE
-    MOVE_KW "move"
-    WHITESPACE " "
-    BACKWARD_KW "BACKWARD"
-    WHITESPACE " "
-    ALL_KW "ALL"
+    BACKWARD
+      BACKWARD_KW "BACKWARD"
+      WHITESPACE " "
+      ALL_KW "ALL"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "

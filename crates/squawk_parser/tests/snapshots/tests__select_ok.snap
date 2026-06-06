@@ -3689,10 +3689,11 @@ SOURCE_FILE
           FRAME_CLAUSE
             RANGE_KW "range"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
-            WHITESPACE " "
-            PRECEDING_KW "preceding"
+            EXPR_PRECEDING
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              PRECEDING_KW "preceding"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3719,10 +3720,11 @@ SOURCE_FILE
           FRAME_CLAUSE
             ROWS_KW "rows"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
-            WHITESPACE " "
-            PRECEDING_KW "preceding"
+            EXPR_PRECEDING
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              PRECEDING_KW "preceding"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3749,10 +3751,11 @@ SOURCE_FILE
           FRAME_CLAUSE
             GROUPS_KW "groups"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
-            WHITESPACE " "
-            PRECEDING_KW "preceding"
+            EXPR_PRECEDING
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              PRECEDING_KW "preceding"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3781,16 +3784,19 @@ SOURCE_FILE
           FRAME_CLAUSE
             ROWS_KW "rows"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            EXPR_PRECEDING
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              PRECEDING_KW "preceding"
             WHITESPACE " "
-            PRECEDING_KW "preceding"
-            WHITESPACE " "
-            EXCLUDE_KW "exclude"
-            WHITESPACE " "
-            CURRENT_KW "current"
-            WHITESPACE " "
-            ROW_KW "row"
+            FRAME_EXCLUDE
+              EXCLUDE_KW "exclude"
+              WHITESPACE " "
+              CURRENT_ROW
+                CURRENT_KW "current"
+                WHITESPACE " "
+                ROW_KW "row"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3817,14 +3823,17 @@ SOURCE_FILE
           FRAME_CLAUSE
             ROWS_KW "rows"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            EXPR_PRECEDING
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              PRECEDING_KW "preceding"
             WHITESPACE " "
-            PRECEDING_KW "preceding"
-            WHITESPACE " "
-            EXCLUDE_KW "exclude"
-            WHITESPACE " "
-            GROUP_KW "group"
+            FRAME_EXCLUDE
+              EXCLUDE_KW "exclude"
+              WHITESPACE " "
+              GROUP
+                GROUP_KW "group"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3851,14 +3860,17 @@ SOURCE_FILE
           FRAME_CLAUSE
             ROWS_KW "rows"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            EXPR_PRECEDING
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              PRECEDING_KW "preceding"
             WHITESPACE " "
-            PRECEDING_KW "preceding"
-            WHITESPACE " "
-            EXCLUDE_KW "exclude"
-            WHITESPACE " "
-            TIES_KW "ties"
+            FRAME_EXCLUDE
+              EXCLUDE_KW "exclude"
+              WHITESPACE " "
+              TIES
+                TIES_KW "ties"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3885,16 +3897,19 @@ SOURCE_FILE
           FRAME_CLAUSE
             ROWS_KW "rows"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            EXPR_PRECEDING
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              PRECEDING_KW "preceding"
             WHITESPACE " "
-            PRECEDING_KW "preceding"
-            WHITESPACE " "
-            EXCLUDE_KW "exclude"
-            WHITESPACE " "
-            NO_KW "no"
-            WHITESPACE " "
-            OTHERS_KW "others"
+            FRAME_EXCLUDE
+              EXCLUDE_KW "exclude"
+              WHITESPACE " "
+              NO_OTHERS
+                NO_KW "no"
+                WHITESPACE " "
+                OTHERS_KW "others"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -4413,7 +4428,8 @@ SOURCE_FILE
     LOCKING_CLAUSE
       FOR_KW "for"
       WHITESPACE " "
-      SHARE_KW "share"
+      FOR_SHARE
+        SHARE_KW "share"
       WHITESPACE " "
       OF_KW "of"
       WHITESPACE " "
@@ -4443,14 +4459,16 @@ SOURCE_FILE
     LOCKING_CLAUSE
       FOR_KW "for"
       WHITESPACE " "
-      UPDATE_KW "update"
+      FOR_UPDATE
+        UPDATE_KW "update"
       WHITESPACE " "
       NOWAIT_KW "nowait"
     WHITESPACE " "
     LOCKING_CLAUSE
       FOR_KW "for"
       WHITESPACE " "
-      UPDATE_KW "update"
+      FOR_UPDATE
+        UPDATE_KW "update"
       WHITESPACE " "
       SKIP_KW "skip"
       WHITESPACE " "

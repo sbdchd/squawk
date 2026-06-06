@@ -1046,7 +1046,8 @@ SOURCE_FILE
           LOCKING_CLAUSE
             FOR_KW "FOR"
             WHITESPACE " "
-            UPDATE_KW "UPDATE"
+            FOR_UPDATE
+              UPDATE_KW "UPDATE"
           WHITESPACE "\n    "
           LIMIT_CLAUSE
             LIMIT_KW "LIMIT"

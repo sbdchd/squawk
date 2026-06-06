@@ -1859,7 +1859,8 @@ SOURCE_FILE
         LOCKING_CLAUSE
           FOR_KW "FOR"
           WHITESPACE " "
-          UPDATE_KW "UPDATE"
+          FOR_UPDATE
+            UPDATE_KW "UPDATE"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "WHERE"
