@@ -4828,18 +4828,21 @@ SOURCE_FILE
                 FRAME_CLAUSE
                   ROWS_KW "ROWS"
                   WHITESPACE " "
-                  BETWEEN_KW "BETWEEN"
-                  WHITESPACE " "
-                  LITERAL
-                    INT_NUMBER "2"
-                  WHITESPACE " "
-                  PRECEDING_KW "PRECEDING"
-                  WHITESPACE " "
-                  AND_KW "AND"
-                  WHITESPACE " "
-                  CURRENT_KW "CURRENT"
-                  WHITESPACE " "
-                  ROW_KW "ROW"
+                  FRAME_BETWEEN
+                    BETWEEN_KW "BETWEEN"
+                    WHITESPACE " "
+                    EXPR_PRECEDING
+                      LITERAL
+                        INT_NUMBER "2"
+                      WHITESPACE " "
+                      PRECEDING_KW "PRECEDING"
+                    WHITESPACE " "
+                    AND_KW "AND"
+                    WHITESPACE " "
+                    CURRENT_ROW
+                      CURRENT_KW "CURRENT"
+                      WHITESPACE " "
+                      ROW_KW "ROW"
               WHITESPACE "\n  "
               R_PAREN ")"
           WHITESPACE " "

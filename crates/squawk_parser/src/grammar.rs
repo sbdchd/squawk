@@ -2832,17 +2832,32 @@ fn opt_into_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn lock_strength(p: &mut Parser<'_>) -> bool {
-    // NO KEY UPDATE
-    if p.eat(NO_KW) {
-        p.expect(KEY_KW);
-        p.expect(UPDATE_KW)
-    } else if p.eat(KEY_KW) {
-        p.expect(SHARE_KW)
-    } else if !p.eat(SHARE_KW) {
-        p.expect(UPDATE_KW)
-    } else {
-        false
+fn lock_strength(p: &mut Parser<'_>) {
+    let m = p.start();
+    match p.current() {
+        NO_KW => {
+            p.bump(NO_KW);
+            p.expect(KEY_KW);
+            p.expect(UPDATE_KW);
+            m.complete(p, FOR_NO_KEY_UPDATE);
+        }
+        KEY_KW => {
+            p.bump(KEY_KW);
+            p.expect(SHARE_KW);
+            m.complete(p, FOR_KEY_SHARE);
+        }
+        SHARE_KW => {
+            p.bump(SHARE_KW);
+            m.complete(p, FOR_SHARE);
+        }
+        UPDATE_KW => {
+            p.bump(UPDATE_KW);
+            m.complete(p, FOR_UPDATE);
+        }
+        _ => {
+            p.error("expected lock strength");
+            m.abandon(p);
+        }
     }
 }
 
@@ -4691,16 +4706,36 @@ fn opt_having_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // offset FOLLOWING
 fn frame_start_end(p: &mut Parser<'_>) {
     match (p.current(), p.nth(1)) {
-        (CURRENT_KW, ROW_KW) | (UNBOUNDED_KW, PRECEDING_KW | FOLLOWING_KW) => {
-            p.bump_any();
-            p.bump_any();
+        (CURRENT_KW, ROW_KW) => {
+            let m = p.start();
+            p.bump(CURRENT_KW);
+            p.bump(ROW_KW);
+            m.complete(p, CURRENT_ROW);
+        }
+        (UNBOUNDED_KW, PRECEDING_KW) => {
+            let m = p.start();
+            p.bump(UNBOUNDED_KW);
+            p.bump(PRECEDING_KW);
+            m.complete(p, UNBOUNDED_PRECEDING);
+        }
+        (UNBOUNDED_KW, FOLLOWING_KW) => {
+            let m = p.start();
+            p.bump(UNBOUNDED_KW);
+            p.bump(FOLLOWING_KW);
+            m.complete(p, UNBOUNDED_FOLLOWING);
         }
         _ => {
+            let m = p.start();
             expr(p);
-            if p.at(PRECEDING_KW) || p.at(FOLLOWING_KW) {
-                p.bump_any();
+            if p.at(PRECEDING_KW) {
+                p.bump(PRECEDING_KW);
+                m.complete(p, EXPR_PRECEDING);
+            } else if p.at(FOLLOWING_KW) {
+                p.bump(FOLLOWING_KW);
+                m.complete(p, EXPR_FOLLOWING);
             } else {
                 p.err_and_bump("expected preceding or following");
+                m.abandon(p);
             }
         }
     }
@@ -4711,21 +4746,40 @@ fn frame_start_end(p: &mut Parser<'_>) {
 // EXCLUDE GROUP
 // EXCLUDE TIES
 // EXCLUDE NO OTHERS
-fn opt_frame_exclusion(p: &mut Parser<'_>) -> bool {
-    if !p.eat(EXCLUDE_KW) {
-        return false;
+fn opt_frame_exclusion(p: &mut Parser<'_>) {
+    if !p.at(EXCLUDE_KW) {
+        return;
     }
-    if p.eat(CURRENT_KW) {
-        p.expect(ROW_KW)
-    } else if p.eat(NO_KW) {
-        p.expect(OTHERS_KW)
-    } else if p.at(GROUP_KW) || p.at(TIES_KW) {
-        p.bump_any();
-        true
-    } else {
-        p.err_and_bump("expected `group`, `current row`, `ties`, or `no others`");
-        false
+    let m = p.start();
+    p.bump(EXCLUDE_KW);
+    match p.current() {
+        CURRENT_KW => {
+            let inner = p.start();
+            p.bump(CURRENT_KW);
+            p.expect(ROW_KW);
+            inner.complete(p, CURRENT_ROW);
+        }
+        NO_KW => {
+            let inner = p.start();
+            p.bump(NO_KW);
+            p.expect(OTHERS_KW);
+            inner.complete(p, NO_OTHERS);
+        }
+        GROUP_KW => {
+            let inner = p.start();
+            p.bump(GROUP_KW);
+            inner.complete(p, GROUP);
+        }
+        TIES_KW => {
+            let inner = p.start();
+            p.bump(TIES_KW);
+            inner.complete(p, TIES);
+        }
+        _ => {
+            p.err_and_bump("expected `group`, `current row`, `ties`, or `no others`");
+        }
     }
+    m.complete(p, FRAME_EXCLUDE);
 }
 
 const WINDOW_DEF_START: TokenSet =
@@ -4761,10 +4815,13 @@ fn opt_frame_clause(p: &mut Parser<'_>) {
     if p.at(RANGE_KW) || p.at(ROWS_KW) || p.at(GROUPS_KW) {
         let m = p.start();
         p.bump_any();
-        if p.eat(BETWEEN_KW) {
+        if p.at(BETWEEN_KW) {
+            let m = p.start();
+            p.bump(BETWEEN_KW);
             frame_start_end(p);
             p.expect(AND_KW);
             frame_start_end(p);
+            m.complete(p, FRAME_BETWEEN);
             opt_frame_exclusion(p);
         } else {
             frame_start_end(p);
@@ -11262,38 +11319,52 @@ fn lock(p: &mut Parser<'_>) -> CompletedMarker {
     table_list(p);
     // [ IN lockmode MODE ]
     if p.eat(IN_KW) {
+        let m = p.start();
         match (p.current(), p.nth(1)) {
-            // ACCESS SHARE | ROW SHARE
-            (ACCESS_KW | ROW_KW, SHARE_KW) => {
-                p.bump_any();
+            (ACCESS_KW, SHARE_KW) => {
+                p.bump(ACCESS_KW);
                 p.bump(SHARE_KW);
+                m.complete(p, ACCESS_SHARE);
             }
-            // ACCESS EXCLUSIVE | ROW EXCLUSIVE
-            (ACCESS_KW | ROW_KW, EXCLUSIVE_KW) => {
-                p.bump_any();
+            (ROW_KW, SHARE_KW) => {
+                p.bump(ROW_KW);
+                p.bump(SHARE_KW);
+                m.complete(p, ROW_SHARE);
+            }
+            (ACCESS_KW, EXCLUSIVE_KW) => {
+                p.bump(ACCESS_KW);
                 p.bump(EXCLUSIVE_KW);
+                m.complete(p, ACCESS_EXCLUSIVE);
             }
-            // SHARE ROW EXCLUSIVE
+            (ROW_KW, EXCLUSIVE_KW) => {
+                p.bump(ROW_KW);
+                p.bump(EXCLUSIVE_KW);
+                m.complete(p, ROW_EXCLUSIVE);
+            }
             (SHARE_KW, ROW_KW) => {
                 p.bump(SHARE_KW);
                 p.bump(ROW_KW);
                 p.expect(EXCLUSIVE_KW);
+                m.complete(p, SHARE_ROW_EXCLUSIVE);
             }
-            // SHARE UPDATE EXCLUSIVE
             (SHARE_KW, UPDATE_KW) => {
                 p.bump(SHARE_KW);
                 p.bump(UPDATE_KW);
                 p.expect(EXCLUSIVE_KW);
+                m.complete(p, SHARE_UPDATE_EXCLUSIVE);
             }
-            // SHARE
             (SHARE_KW, _) => {
                 p.bump(SHARE_KW);
+                m.complete(p, SHARE);
             }
-            // EXCLUSIVE
             (EXCLUSIVE_KW, _) => {
                 p.bump(EXCLUSIVE_KW);
+                m.complete(p, EXCLUSIVE);
             }
-            _ => p.error("expected lockmode"),
+            _ => {
+                p.error("expected lockmode");
+                m.abandon(p);
+            }
         }
         p.expect(MODE_KW);
     }
@@ -12465,20 +12536,62 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_direction(p: &mut Parser<'_>) -> bool {
     match p.current() {
-        NEXT_KW | PRIOR_KW | FIRST_KW | LAST_KW | ALL_KW => {
-            p.bump_any();
+        NEXT_KW => {
+            let m = p.start();
+            p.bump(NEXT_KW);
+            m.complete(p, NEXT);
         }
-        RELATIVE_KW | ABSOLUTE_KW => {
-            p.bump_any();
+        PRIOR_KW => {
+            let m = p.start();
+            p.bump(PRIOR_KW);
+            m.complete(p, PRIOR);
+        }
+        FIRST_KW => {
+            let m = p.start();
+            p.bump(FIRST_KW);
+            m.complete(p, FIRST);
+        }
+        LAST_KW => {
+            let m = p.start();
+            p.bump(LAST_KW);
+            m.complete(p, LAST);
+        }
+        ALL_KW => {
+            let m = p.start();
+            p.bump(ALL_KW);
+            m.complete(p, ALL);
+        }
+        RELATIVE_KW => {
+            let m = p.start();
+            p.bump(RELATIVE_KW);
             if opt_numeric_literal(p).is_none() {
                 p.error("expected count")
             }
+            m.complete(p, RELATIVE);
         }
-        FORWARD_KW | BACKWARD_KW => {
-            p.bump_any();
+        ABSOLUTE_KW => {
+            let m = p.start();
+            p.bump(ABSOLUTE_KW);
+            if opt_numeric_literal(p).is_none() {
+                p.error("expected count")
+            }
+            m.complete(p, ABSOLUTE);
+        }
+        FORWARD_KW => {
+            let m = p.start();
+            p.bump(FORWARD_KW);
             if !p.eat(ALL_KW) {
                 let _ = opt_numeric_literal(p);
             }
+            m.complete(p, FORWARD);
+        }
+        BACKWARD_KW => {
+            let m = p.start();
+            p.bump(BACKWARD_KW);
+            if !p.eat(ALL_KW) {
+                let _ = opt_numeric_literal(p);
+            }
+            m.complete(p, BACKWARD);
         }
         // count
         _ if p.at_ts(NUMERIC_FIRST) => {
@@ -14632,20 +14745,28 @@ fn show(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SHOW_KW);
     match p.current() {
         ALL_KW => {
+            let m = p.start();
             p.bump(ALL_KW);
+            m.complete(p, ALL);
         }
         SESSION_KW => {
+            let m = p.start();
             p.bump(SESSION_KW);
             p.expect(AUTHORIZATION_KW);
+            m.complete(p, SESSION_AUTHORIZATION);
         }
         TRANSACTION_KW => {
+            let m = p.start();
             p.bump(TRANSACTION_KW);
             p.expect(ISOLATION_KW);
             p.expect(LEVEL_KW);
+            m.complete(p, TRANSACTION_ISOLATION_LEVEL);
         }
         TIME_KW => {
+            let m = p.start();
             p.bump(TIME_KW);
             p.expect(ZONE_KW);
+            m.complete(p, TIME_ZONE);
         }
         _ => {
             path_name_ref(p);
@@ -15406,12 +15527,14 @@ fn alter_column_option(p: &mut Parser<'_>) {
             }
         }
         // RESTART [ [ WITH ] restart ]
-        RESTART => {
+        RESTART_KW => {
             p.bump(RESTART_KW);
             if p.eat(WITH_KW) {
-                p.expect(RESTART_KW);
+                if opt_numeric_literal(p).is_none() {
+                    p.error("expected numeric literal");
+                }
             } else {
-                p.eat(RESTART_KW);
+                let _ = opt_numeric_literal(p);
             }
             RESTART
         }
@@ -15453,11 +15576,6 @@ fn alter_column_option(p: &mut Parser<'_>) {
         }
         // SET sequence_option
         SET_KW if p.nth_at_ts(1, SEQUENCE_OPTION_FIRST) => {
-            generated_options(p);
-            SET_GENERATED_OPTIONS
-        }
-        // RESTART [ [ WITH ] restart ] } [...]
-        RESTART_KW => {
             generated_options(p);
             SET_GENERATED_OPTIONS
         }
@@ -15511,11 +15629,7 @@ fn alter_column_option(p: &mut Parser<'_>) {
             p.bump(SET_KW);
             p.bump(STORAGE_KW);
             if !p.eat(DEFAULT_KW) {
-                if p.at_ts(COLUMN_FIRST) {
-                    p.bump_any();
-                } else {
-                    p.error("expected name");
-                }
+                name_ref(p);
             }
             SET_STORAGE
         }
@@ -15524,11 +15638,7 @@ fn alter_column_option(p: &mut Parser<'_>) {
             p.bump(SET_KW);
             p.bump(COMPRESSION_KW);
             if !p.eat(DEFAULT_KW) {
-                if p.at_ts(COLUMN_FIRST) {
-                    p.bump_any();
-                } else {
-                    p.error("expected name");
-                }
+                name_ref(p);
             }
             SET_COMPRESSION
         }

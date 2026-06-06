@@ -6,33 +6,37 @@ SOURCE_FILE
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    TIME_KW "time"
-    WHITESPACE " "
-    ZONE_KW "zone"
+    TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
     SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    TRANSACTION_KW "transaction"
-    WHITESPACE " "
-    ISOLATION_KW "isolation"
-    WHITESPACE " "
-    LEVEL_KW "level"
+    TRANSACTION_ISOLATION_LEVEL
+      TRANSACTION_KW "transaction"
+      WHITESPACE " "
+      ISOLATION_KW "isolation"
+      WHITESPACE " "
+      LEVEL_KW "level"
     SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    SESSION_KW "session"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
+    SESSION_AUTHORIZATION
+      SESSION_KW "session"
+      WHITESPACE " "
+      AUTHORIZATION_KW "authorization"
     SEMICOLON ";"
   WHITESPACE "\n"
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL
+      ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SHOW

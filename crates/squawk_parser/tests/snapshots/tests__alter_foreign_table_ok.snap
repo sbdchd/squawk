@@ -828,7 +828,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        IDENT "plain"
+        NAME_REF
+          IDENT "plain"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -855,7 +856,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        EXTERNAL_KW "external"
+        NAME_REF
+          EXTERNAL_KW "external"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -882,7 +884,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        IDENT "extended"
+        NAME_REF
+          IDENT "extended"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -909,7 +912,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        IDENT "main"
+        NAME_REF
+          IDENT "main"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE

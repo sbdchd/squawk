@@ -379,6 +379,17 @@ impl ast::BetweenExpr {
     }
 }
 
+impl ast::FrameBetween {
+    #[inline]
+    pub fn start(&self) -> Option<ast::FrameBound> {
+        support::children(&self.syntax).nth(0)
+    }
+    #[inline]
+    pub fn end(&self) -> Option<ast::FrameBound> {
+        support::children(&self.syntax).nth(1)
+    }
+}
+
 impl ast::WhenClause {
     #[inline]
     pub fn condition(&self) -> Option<ast::Expr> {

@@ -63,28 +63,10 @@ SOURCE_FILE
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
-    ACCESS_KW "access"
-    WHITESPACE " "
-    SHARE_KW "share"
-    WHITESPACE " "
-    MODE_KW "mode"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  LOCK
-    LOCK_KW "lock"
-    WHITESPACE " "
-    TABLE_LIST
-      RELATION_NAME
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    ROW_KW "row"
-    WHITESPACE " "
-    SHARE_KW "share"
+    ACCESS_SHARE
+      ACCESS_KW "access"
+      WHITESPACE " "
+      SHARE_KW "share"
     WHITESPACE " "
     MODE_KW "mode"
     SEMICOLON ";"
@@ -101,30 +83,10 @@ SOURCE_FILE
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
-    ROW_KW "row"
-    WHITESPACE " "
-    EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  LOCK
-    LOCK_KW "lock"
-    WHITESPACE " "
-    TABLE_LIST
-      RELATION_NAME
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    SHARE_KW "share"
-    WHITESPACE " "
-    UPDATE_KW "update"
-    WHITESPACE " "
-    EXCLUSIVE_KW "exclusive"
+    ROW_SHARE
+      ROW_KW "row"
+      WHITESPACE " "
+      SHARE_KW "share"
     WHITESPACE " "
     MODE_KW "mode"
     SEMICOLON ";"
@@ -141,7 +103,10 @@ SOURCE_FILE
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
-    SHARE_KW "share"
+    ROW_EXCLUSIVE
+      ROW_KW "row"
+      WHITESPACE " "
+      EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
     SEMICOLON ";"
@@ -158,28 +123,12 @@ SOURCE_FILE
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
-    SHARE_KW "share"
-    WHITESPACE " "
-    ROW_KW "row"
-    WHITESPACE " "
-    EXCLUSIVE_KW "exclusive"
-    WHITESPACE " "
-    MODE_KW "mode"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  LOCK
-    LOCK_KW "lock"
-    WHITESPACE " "
-    TABLE_LIST
-      RELATION_NAME
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    EXCLUSIVE_KW "exclusive"
+    SHARE_UPDATE_EXCLUSIVE
+      SHARE_KW "share"
+      WHITESPACE " "
+      UPDATE_KW "update"
+      WHITESPACE " "
+      EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
     SEMICOLON ";"
@@ -196,9 +145,68 @@ SOURCE_FILE
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
-    ACCESS_KW "access"
+    SHARE
+      SHARE_KW "share"
     WHITESPACE " "
-    EXCLUSIVE_KW "exclusive"
+    MODE_KW "mode"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK
+    LOCK_KW "lock"
+    WHITESPACE " "
+    TABLE_LIST
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    SHARE_ROW_EXCLUSIVE
+      SHARE_KW "share"
+      WHITESPACE " "
+      ROW_KW "row"
+      WHITESPACE " "
+      EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK
+    LOCK_KW "lock"
+    WHITESPACE " "
+    TABLE_LIST
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    EXCLUSIVE
+      EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK
+    LOCK_KW "lock"
+    WHITESPACE " "
+    TABLE_LIST
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    ACCESS_EXCLUSIVE
+      ACCESS_KW "access"
+      WHITESPACE " "
+      EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
     SEMICOLON ";"
@@ -237,9 +245,10 @@ SOURCE_FILE
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
-    ROW_KW "row"
-    WHITESPACE " "
-    EXCLUSIVE_KW "exclusive"
+    ROW_EXCLUSIVE
+      ROW_KW "row"
+      WHITESPACE " "
+      EXCLUSIVE_KW "exclusive"
     WHITESPACE " "
     MODE_KW "mode"
     WHITESPACE " "

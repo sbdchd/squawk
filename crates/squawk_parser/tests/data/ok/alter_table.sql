@@ -63,6 +63,8 @@ alter table t alter c set compression default;
 alter table t alter c set compression foo;
 
 alter table t alter c restart;
+alter table t alter c restart 5;
+alter table t alter c restart with 5;
 
 -- inherit
 alter table t inherit t1;
