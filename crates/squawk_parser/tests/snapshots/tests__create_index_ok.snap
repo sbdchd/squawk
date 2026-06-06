@@ -161,7 +161,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "a"
         WHITESPACE " "
-        IDENT "text_pattern_ops"
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "text_pattern_ops"
         WHITESPACE " "
         ATTRIBUTE_LIST
           L_PAREN "("
@@ -190,7 +193,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "b"
         WHITESPACE " "
-        IDENT "text_pattern_ops"
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "text_pattern_ops"
         WHITESPACE " "
         ATTRIBUTE_LIST
           L_PAREN "("
@@ -787,3 +793,125 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "idx"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gin"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        NULLS_FIRST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          FIRST_KW "first"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "idx"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gin"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              NULLS_KW "nulls"
+        WHITESPACE " "
+        NULLS_FIRST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          FIRST_KW "first"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- regression, see issue#1187"
+  WHITESPACE "\n"
+  CREATE_INDEX
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "index_name"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "public"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "table_name"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "USING"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "GIN"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "column_name"
+        WHITESPACE " "
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "public"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "gin__int_ops"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

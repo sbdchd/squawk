@@ -1365,7 +1365,7 @@ ConflictIndexItemList =
   '(' (ConflictIndexItem (',' ConflictIndexItem)*) ')'
 
 ConflictIndexItem =
-  Expr Collate? '#ident'?
+  Expr Collate? Path?
 
 ConflictAction =
   ConflictDoNothing
@@ -3155,7 +3155,12 @@ OnTable =
   'on' Path
 
 PartitionItem =
-  Expr Collate?
+  Expr
+  Collate?
+  Path?
+  AttributeList?
+  (SortAsc | SortDesc | SortUsing)?
+  (NullsFirst | NullsLast)?
 
 PartitionItemList =
   '(' (PartitionItem (',' PartitionItem)*) ')'

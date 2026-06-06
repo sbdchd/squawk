@@ -72,6 +72,12 @@ INSERT INTO distributors (did, dname) VALUES (7, 'Redline GmbH')
 insert into t (a, b, c) values (1, 2, 3)
     on conflict (a, b) do nothing;
 
+insert into t (c) values (1)
+    on conflict (c public.gin__int_ops) do nothing;
+
+insert into t (c) values (1)
+    on conflict (c nulls) do nothing;
+
 -- Don't update existing distributors based in a certain ZIP code
 INSERT INTO distributors AS d (did, dname) VALUES (8, 'Anvil Distribution')
     ON CONFLICT (did) DO UPDATE

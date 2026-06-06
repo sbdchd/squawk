@@ -3687,8 +3687,8 @@ impl ConflictIndexItem {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
     }
 }
 
@@ -14006,11 +14006,39 @@ pub struct PartitionItem {
 }
 impl PartitionItem {
     #[inline]
+    pub fn attribute_list(&self) -> Option<AttributeList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn collate(&self) -> Option<Collate> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn nulls_first(&self) -> Option<NullsFirst> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn nulls_last(&self) -> Option<NullsLast> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sort_asc(&self) -> Option<SortAsc> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sort_desc(&self) -> Option<SortDesc> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sort_using(&self) -> Option<SortUsing> {
         support::child(&self.syntax)
     }
 }

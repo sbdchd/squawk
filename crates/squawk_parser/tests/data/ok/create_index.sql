@@ -60,3 +60,8 @@ CREATE INDEX pointloc
 
 CREATE INDEX CONCURRENTLY sales_quantity_index ON sales_table (quantity);
 
+create index idx on t using gin (c nulls first);
+create index idx on t using gin (c nulls nulls first);
+
+-- regression, see issue#1187
+CREATE INDEX index_name ON public.table_name USING GIN (column_name public.gin__int_ops);
