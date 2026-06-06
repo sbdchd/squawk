@@ -7,6 +7,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.56.0 - 2026-06-02
+
+### Fixed
+
+- ci: fix precommit install by declaring optional dependencies (#1180)
+
+- ide: fix `select *` w/ `create view` & more (#1184)
+
+  The following now works correctly:
+
+  ```sql
+  create table t(a int);
+  --             ^ dest
+  create view v as table t;
+  select a$0 from v;
+  --     ^ src
+  ```
+
+- ide: treat `select into` like `create table as` (#1183)
+
+  ```sql
+  create table t(a bigint);
+  --             ^ dest
+  select * into u from t;
+  select a from u;
+  --     ^ src
+  ```
+
+- ide: fix column resolution with cte & shadowing (#1182)
+
+  ```sql
+  with outer_cte as (select 1 c)
+  --                          ^ dest
+  select * from (
+    with inner_cte as (select 2 d)
+    select c from outer_cte
+  --       ^ src
+  ) s;
+  ```
+
+- ide: fix aliases not hiding original name (#1181)
+
+  ```sql
+  create table t(a int);
+  update t as u set a = t.a;
+  --                    ^ error
+  ```
+
+- ide: fix cte & alias resolution (#1179)
+
+  ```sql
+    with
+      a as (select * from b),
+  --                      ^ src doesn't resolve
+      b as (select 1 x)
+    select * from a;
+  ```
+
+- ide: don't resolve trailing FromItems in a lateral subquery (#1177)
+
+  ```sql
+  with
+    d as (select 1 id, 2 amount),
+    c as (select 2 id)
+  select r.amount
+  from
+    d,
+    lateral (
+      select d.amount
+      from d
+      where d.id = c.id
+      --           ^ src doesn't resolve
+      limit 1
+    ) r,
+    c;
+  ```
+
 ## v2.55.0 - 2026-05-27
 
 ### Added
