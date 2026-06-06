@@ -7,3 +7,5 @@ select  'really long string                                                    '
 select foo as "Quoted Alias" from "Quoted Table";
 
 select 1 as "foo";
+
+select 1 /*a*/group /* b */by/*c */ 1;
