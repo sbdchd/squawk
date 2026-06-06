@@ -10,9 +10,18 @@ pub(crate) fn require_table_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) 
     for stmt in file.stmts() {
         match stmt {
             ast::Stmt::CreateTable(create_table) => {
+                if matches!(create_table.persistence(), Some(ast::Persistence::Temp(_))) {
+                    continue;
+                }
                 check_path(ctx, create_table.path());
             }
             ast::Stmt::CreateTableAs(create_table_as) => {
+                if matches!(
+                    create_table_as.persistence(),
+                    Some(ast::Persistence::Temp(_))
+                ) {
+                    continue;
+                }
                 check_path(ctx, create_table_as.path());
             }
             ast::Stmt::AlterTable(alter_table) => {
@@ -107,6 +116,23 @@ CREATE TABLE my_table AS SELECT 1;
     fn create_table_as_ok() {
         let sql = r#"
 CREATE TABLE public.my_table AS SELECT 1;
+"#;
+        lint_ok(sql, Rule::RequireTableSchema);
+    }
+
+    #[test]
+    fn create_temp_table_ok() {
+        let sql = r#"
+CREATE TEMP TABLE temp_mapping_table (id int4) ON COMMIT DROP;
+CREATE TEMPORARY TABLE other_temp (id int4);
+"#;
+        lint_ok(sql, Rule::RequireTableSchema);
+    }
+
+    #[test]
+    fn create_temp_table_as_ok() {
+        let sql = r#"
+CREATE TEMP TABLE temp_mapping_table AS SELECT 1;
 "#;
         lint_ok(sql, Rule::RequireTableSchema);
     }
