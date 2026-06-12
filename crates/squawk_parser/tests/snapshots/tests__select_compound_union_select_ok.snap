@@ -53,9 +53,8 @@ SOURCE_FILE
                             CHAR_KW "char"
                             ARG_LIST
                               L_PAREN "("
-                              ARG
-                                LITERAL
-                                  INT_NUMBER "4"
+                              LITERAL
+                                INT_NUMBER "4"
                               R_PAREN ")"
                   WHITESPACE " "
                   ORDER_BY_CLAUSE
@@ -191,9 +190,8 @@ SOURCE_FILE
                             CHAR_KW "char"
                             ARG_LIST
                               L_PAREN "("
-                              ARG
-                                LITERAL
-                                  INT_NUMBER "4"
+                              LITERAL
+                                INT_NUMBER "4"
                               R_PAREN ")"
                   WHITESPACE " "
                   ORDER_BY_CLAUSE

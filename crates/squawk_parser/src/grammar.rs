@@ -1789,16 +1789,7 @@ fn type_mods(
             COMMA,
             || "unexpected comma".to_string(),
             EXPR_FIRST,
-            |p| {
-                let m = p.start();
-                if expr(p).is_some() {
-                    m.complete(p, ARG);
-                    true
-                } else {
-                    m.abandon(p);
-                    false
-                }
-            },
+            |p| expr(p).is_some(),
         );
         m.complete(p, ARG_LIST);
     }
@@ -3884,6 +3875,10 @@ fn opt_column_constraint(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // [ column_constraint [ ... ] ]
 fn opt_column_constraint_list(p: &mut Parser<'_>) {
     while !p.at(EOF) {
+        if p.at(COLLATE_KW) {
+            opt_collate(p);
+            continue;
+        }
         if opt_column_constraint(p).is_none() {
             break;
         }
@@ -5582,9 +5577,10 @@ fn opt_on_commit(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 fn commit(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(COMMIT_KW) || p.at(END_KW));
     let m = p.start();
+    let is_commit = p.at(COMMIT_KW);
     p.bump_any();
     // PREPARED transaction_id
-    if p.eat(PREPARED_KW) {
+    if is_commit && p.eat(PREPARED_KW) {
         string_literal(p);
     } else {
         // [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]
@@ -10365,8 +10361,10 @@ fn create_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // CREATE [ OR REPLACE ] TRANSFORM FOR type_name LANGUAGE lang_name (
-//     FROM SQL WITH FUNCTION from_sql_function_name [ (argument_type [, ...]) ],
-//     TO SQL WITH FUNCTION to_sql_function_name [ (argument_type [, ...]) ]
+//     FROM SQL WITH FUNCTION from_sql_function_name [ (argument_type [, ...]) ]
+//   | TO SQL WITH FUNCTION to_sql_function_name [ (argument_type [, ...]) ]
+//     [, FROM SQL WITH FUNCTION from_sql_function_name [ (argument_type [, ...]) ]
+//      | TO SQL WITH FUNCTION to_sql_function_name [ (argument_type [, ...]) ]]
 // );
 fn create_transform(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
@@ -10379,12 +10377,21 @@ fn create_transform(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(LANGUAGE_KW);
     name_ref(p);
     p.expect(L_PAREN);
-    transform_from_func(p);
-    p.expect(COMMA);
-    transform_to_func(p);
+    transform_func(p);
+    if p.eat(COMMA) {
+        transform_func(p);
+    }
     p.expect(R_PAREN);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_TRANSFORM)
+}
+
+fn transform_func(p: &mut Parser<'_>) {
+    match p.current() {
+        FROM_KW => transform_from_func(p),
+        TO_KW => transform_to_func(p),
+        _ => p.error("expected transform function"),
+    }
 }
 
 fn transform_to_func(p: &mut Parser<'_>) {
@@ -11147,8 +11154,9 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(EXPLAIN_KW));
     let m = p.start();
     p.bump(EXPLAIN_KW);
-    let pre_pg_9_syntax = p.eat(ANALYZE_KW) || p.eat(VERBOSE_KW);
-    if !pre_pg_9_syntax {
+    let has_analyze = p.eat(ANALYZE_KW) || p.eat(ANALYSE_KW);
+    let has_verbose = p.eat(VERBOSE_KW);
+    if !(has_analyze || has_verbose) {
         opt_explain_option_list(p);
     }
     // statement is SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
@@ -11183,10 +11191,11 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, EXPLAIN)
 }
 
-fn opt_explain_option_list(p: &mut Parser<'_>) {
+fn opt_explain_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at(L_PAREN) || (p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST)) {
-        return;
+        return None;
     }
+    let m = p.start();
     delimited(
         p,
         L_PAREN,
@@ -11196,6 +11205,7 @@ fn opt_explain_option_list(p: &mut Parser<'_>) {
         EXPLAIN_OPTION_FIRST,
         opt_explain_option,
     );
+    Some(m.complete(p, EXPLAIN_OPTION_LIST))
 }
 
 const EXPLAIN_OPTION_FIRST: TokenSet =
@@ -11219,20 +11229,28 @@ fn opt_explain_option(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(EXPLAIN_OPTION_FIRST) {
         return false;
     }
-    p.bump_any();
-    //  WAL [ boolean ]
-    if opt_bool_literal(p) {
-        return true;
-    }
-    // [ { NONE | TEXT | BINARY } ]
-    if p.eat(NONE_KW) || p.eat(TEXT_KW) || p.eat(BINARY_KW) {
-        return true;
-    }
-    // { TEXT | XML | JSON | YAML }
-    if p.eat(TEXT_KW) || p.eat(XML_KW) || p.eat(JSON_KW) || opt_ident(p) {
-        return true;
-    }
+    let m = p.start();
+    col_label(p);
+    opt_explain_option_value(p);
+    m.complete(p, EXPLAIN_OPTION);
     true
+}
+
+fn opt_explain_option_value(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    // boolean, { NONE | TEXT | BINARY }, or { TEXT | XML | JSON | YAML }
+    if opt_bool_literal(p)
+        || p.eat(NONE_KW)
+        || p.eat(TEXT_KW)
+        || p.eat(BINARY_KW)
+        || p.eat(XML_KW)
+        || p.eat(JSON_KW)
+        || opt_ident(p)
+    {
+        return Some(m.complete(p, EXPLAIN_OPTION_VALUE));
+    }
+    m.abandon(p);
+    None
 }
 
 // [ OPTIONS ( option 'value' [, ... ] ) ]
@@ -12373,13 +12391,42 @@ fn unlisten(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, UNLISTEN)
 }
 
-// CHECKPOINT
+// CHECKPOINT [ ( option [, ...] ) ]
 fn checkpoint(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CHECKPOINT_KW));
     let m = p.start();
     p.bump(CHECKPOINT_KW);
+    opt_checkpoint_option_list(p);
     p.eat(SEMICOLON);
     m.complete(p, CHECKPOINT)
+}
+
+fn opt_checkpoint_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at(L_PAREN) {
+        return None;
+    }
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        NAME_FIRST,
+        opt_checkpoint_option,
+    );
+    Some(m.complete(p, CHECKPOINT_OPTION_LIST))
+}
+
+fn opt_checkpoint_option(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(NAME_FIRST) {
+        return false;
+    }
+    let m = p.start();
+    name(p);
+    opt_expr(p);
+    m.complete(p, CHECKPOINT_OPTION);
+    true
 }
 
 // DEALLOCATE [ PREPARE ] { name | ALL }

@@ -48,93 +48,196 @@ SOURCE_FILE
             IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- explain_analyze_verbose"
+  WHITESPACE "\n"
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- explain_parenthesized_options"
+  WHITESPACE "\n"
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          ANALYZE_KW "analyze"
+      COMMA ","
+      WHITESPACE " "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "buffers"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- all_options"
   WHITESPACE "\n"
   EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    ANALYZE_KW "analyze"
-    COMMA ","
-    WHITESPACE "\n  "
-    VERBOSE_KW "verbose"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "costs"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "costs"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "costs"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "settings"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "generic_plan"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "buffers"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "serialize"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "serialize"
-    WHITESPACE " "
-    NONE_KW "none"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "serialize"
-    WHITESPACE " "
-    TEXT_KW "text"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "serialize"
-    WHITESPACE " "
-    BINARY_KW "binary"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "wal"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "timing"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "summary"
-    COMMA ","
-    WHITESPACE "\n  "
-    IDENT "memory"
-    COMMA ","
-    WHITESPACE "\n  "
-    FORMAT_KW "format"
-    WHITESPACE " "
-    TEXT_KW "text"
-    COMMA ","
-    WHITESPACE "\n  "
-    FORMAT_KW "format"
-    WHITESPACE " "
-    XML_KW "xml"
-    COMMA ","
-    WHITESPACE "\n  "
-    FORMAT_KW "format"
-    WHITESPACE " "
-    JSON_KW "json"
-    COMMA ","
-    WHITESPACE "\n  "
-    FORMAT_KW "format"
-    WHITESPACE " "
-    IDENT "yaml"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          ANALYZE_KW "analyze"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          VERBOSE_KW "verbose"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "costs"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "costs"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "costs"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "settings"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "generic_plan"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "buffers"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "serialize"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "serialize"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          NONE_KW "none"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "serialize"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "serialize"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          BINARY_KW "binary"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "wal"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "timing"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "summary"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "memory"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          FORMAT_KW "format"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          FORMAT_KW "format"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          XML_KW "xml"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          FORMAT_KW "format"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          JSON_KW "json"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          FORMAT_KW "format"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          IDENT "yaml"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE "\n"
     SELECT
       SELECT_CLAUSE
@@ -151,11 +254,15 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    FORMAT_KW "FORMAT"
-    WHITESPACE " "
-    JSON_KW "JSON"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          FORMAT_KW "FORMAT"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          JSON_KW "JSON"
+      R_PAREN ")"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -211,11 +318,15 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    FORMAT_KW "FORMAT"
-    WHITESPACE " "
-    IDENT "YAML"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          FORMAT_KW "FORMAT"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          IDENT "YAML"
+      R_PAREN ")"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -248,12 +359,16 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "COSTS"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "FALSE"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "COSTS"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            FALSE_KW "FALSE"
+      R_PAREN ")"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -433,9 +548,12 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "GENERIC_PLAN"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "GENERIC_PLAN"
+      R_PAREN ")"
     WHITESPACE "\n  "
     SELECT
       SELECT_CLAUSE
@@ -499,9 +617,12 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "GENERIC_PLAN"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "GENERIC_PLAN"
+      R_PAREN ")"
     WHITESPACE "\n  "
     SELECT
       SELECT_CLAUSE
@@ -648,12 +769,16 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "COSTS"
-    WHITESPACE " "
-    LITERAL
-      OFF_KW "OFF"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "COSTS"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            OFF_KW "OFF"
+      R_PAREN ")"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -688,12 +813,16 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "COSTS"
-    WHITESPACE " "
-    LITERAL
-      ON_KW "ON"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "COSTS"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            ON_KW "ON"
+      R_PAREN ")"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -728,12 +857,16 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "COSTS"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "COSTS"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            INT_NUMBER "1"
+      R_PAREN ")"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE
@@ -768,12 +901,16 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "COSTS"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "0"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "COSTS"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            INT_NUMBER "0"
+      R_PAREN ")"
     WHITESPACE " "
     SELECT
       SELECT_CLAUSE

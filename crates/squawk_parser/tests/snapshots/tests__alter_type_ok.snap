@@ -479,9 +479,8 @@ SOURCE_FILE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("
-          ARG
-            LITERAL
-              INT_NUMBER "100"
+          LITERAL
+            INT_NUMBER "100"
           R_PAREN ")"
       WHITESPACE " "
       RESTRICT_KW "restrict"
@@ -624,9 +623,8 @@ SOURCE_FILE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("
-          ARG
-            LITERAL
-              INT_NUMBER "100"
+          LITERAL
+            INT_NUMBER "100"
           R_PAREN ")"
       WHITESPACE " "
       COLLATE
