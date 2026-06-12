@@ -129,7 +129,7 @@ pub enum BinOp {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PostfixOp {
-    AtLocal(SyntaxToken),
+    AtLocal(ast::AtLocal),
     IsJson(ast::IsJson),
     IsJsonArray(ast::IsJsonArray),
     IsJsonObject(ast::IsJsonObject),
@@ -235,7 +235,6 @@ impl ast::PostfixExpr {
             match child {
                 NodeOrToken::Token(token) => {
                     let op = match token.kind() {
-                        SyntaxKind::AT_KW => PostfixOp::AtLocal(token),
                         SyntaxKind::ISNULL_KW => PostfixOp::IsNull(token),
                         SyntaxKind::NOTNULL_KW => PostfixOp::NotNull(token),
                         _ => continue,
@@ -244,6 +243,7 @@ impl ast::PostfixExpr {
                 }
                 NodeOrToken::Node(node) => {
                     let op = match node.kind() {
+                        SyntaxKind::AT_LOCAL => PostfixOp::AtLocal(ast::AtLocal { syntax: node }),
                         SyntaxKind::IS_JSON => PostfixOp::IsJson(ast::IsJson { syntax: node }),
                         SyntaxKind::IS_JSON_ARRAY => {
                             PostfixOp::IsJsonArray(ast::IsJsonArray { syntax: node })

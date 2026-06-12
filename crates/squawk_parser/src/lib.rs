@@ -210,6 +210,13 @@ impl<'t> Parser<'t> {
                 m.complete(self, SyntaxKind::AT_TIME_ZONE);
                 return true;
             }
+            SyntaxKind::AT_LOCAL => {
+                let m = self.start();
+                self.bump(SyntaxKind::AT_KW);
+                self.bump(SyntaxKind::LOCAL_KW);
+                m.complete(self, SyntaxKind::AT_LOCAL);
+                return true;
+            }
             SyntaxKind::IS_NOT_NORMALIZED => {
                 let m = self.start();
                 self.bump(SyntaxKind::IS_KW);
@@ -699,6 +706,13 @@ impl<'t> Parser<'t> {
                 SyntaxKind::AT_KW,
                 SyntaxKind::TIME_KW,
                 SyntaxKind::ZONE_KW,
+            ),
+            // at local
+            SyntaxKind::AT_LOCAL => self.at_composite2(
+                n,
+                SyntaxKind::AT_KW,
+                SyntaxKind::LOCAL_KW,
+                TrivaBetween::Allowed,
             ),
             // is distinct from
             SyntaxKind::IS_DISTINCT_FROM => self.at_composite3(

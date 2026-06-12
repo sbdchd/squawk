@@ -170,6 +170,34 @@ SOURCE_FILE
         WHITESPACE " "
         IMMEDIATE_KW "immediate"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      DEFERRABLE_CONSTRAINT_OPTION
+        DEFERRABLE_KW "deferrable"
+      WHITESPACE " "
+      INITIALLY_DEFERRED_CONSTRAINT_OPTION
+        INITIALLY_KW "initially"
+        WHITESPACE " "
+        DEFERRED_KW "deferred"
+    SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- validate_constraint"
   WHITESPACE "\n"

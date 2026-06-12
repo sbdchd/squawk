@@ -521,21 +521,24 @@ SOURCE_FILE
         WHITESPACE "\n"
         R_PAREN ")"
         WHITESPACE " "
-        SEARCH_KW "SEARCH"
-        WHITESPACE " "
-        DEPTH_KW "DEPTH"
-        WHITESPACE " "
-        FIRST_KW "FIRST"
-        WHITESPACE " "
-        BY_KW "BY"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "id"
-        WHITESPACE " "
-        SET_KW "SET"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "ordercol"
+        SEARCH_CLAUSE
+          SEARCH_KW "SEARCH"
+          WHITESPACE " "
+          DEPTH_KW "DEPTH"
+          WHITESPACE " "
+          FIRST_KW "FIRST"
+          WHITESPACE " "
+          BY_KW "BY"
+          WHITESPACE " "
+          SEARCH_COLUMNS
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          SEARCH_SET_COLUMN
+            SET_KW "SET"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
       SELECT_KW "SELECT"
@@ -714,21 +717,24 @@ SOURCE_FILE
         WHITESPACE "\n"
         R_PAREN ")"
         WHITESPACE " "
-        SEARCH_KW "SEARCH"
-        WHITESPACE " "
-        BREADTH_KW "BREADTH"
-        WHITESPACE " "
-        FIRST_KW "FIRST"
-        WHITESPACE " "
-        BY_KW "BY"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "id"
-        WHITESPACE " "
-        SET_KW "SET"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "ordercol"
+        SEARCH_CLAUSE
+          SEARCH_KW "SEARCH"
+          WHITESPACE " "
+          BREADTH_KW "BREADTH"
+          WHITESPACE " "
+          FIRST_KW "FIRST"
+          WHITESPACE " "
+          BY_KW "BY"
+          WHITESPACE " "
+          SEARCH_COLUMNS
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          SEARCH_SET_COLUMN
+            SET_KW "SET"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
       SELECT_KW "SELECT"
@@ -932,20 +938,24 @@ SOURCE_FILE
         WHITESPACE "\n"
         R_PAREN ")"
         WHITESPACE " "
-        CYCLE_KW "CYCLE"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "id"
-        WHITESPACE " "
-        SET_KW "SET"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "is_cycle"
-        WHITESPACE " "
-        USING_KW "USING"
-        WHITESPACE " "
-        NAME_REF
-          PATH_KW "path"
+        CYCLE_CLAUSE
+          CYCLE_KW "CYCLE"
+          WHITESPACE " "
+          CYCLE_COLUMNS
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          CYCLE_SET_COLUMN
+            SET_KW "SET"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "is_cycle"
+          WHITESPACE " "
+          CYCLE_PATH
+            USING_KW "USING"
+            WHITESPACE " "
+            NAME_REF
+              PATH_KW "path"
     WHITESPACE "\n"
     SELECT_CLAUSE
       SELECT_KW "SELECT"
@@ -1015,30 +1025,36 @@ SOURCE_FILE
         WHITESPACE "\n"
         R_PAREN ")"
         WHITESPACE " "
-        CYCLE_KW "CYCLE"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "id"
-        WHITESPACE " "
-        SET_KW "SET"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "is_cycle"
-        WHITESPACE " "
-        TO_KW "TO"
-        WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
-        WHITESPACE " "
-        DEFAULT_KW "DEFAULT"
-        WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
-        WHITESPACE " "
-        USING_KW "USING"
-        WHITESPACE " "
-        NAME_REF
-          PATH_KW "path"
+        CYCLE_CLAUSE
+          CYCLE_KW "CYCLE"
+          WHITESPACE " "
+          CYCLE_COLUMNS
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          CYCLE_SET_COLUMN
+            SET_KW "SET"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "is_cycle"
+            WHITESPACE " "
+            CYCLE_COLUMN_TO
+              TO_KW "TO"
+              WHITESPACE " "
+              LITERAL
+                TRUE_KW "true"
+              WHITESPACE " "
+              CYCLE_DEFAULT
+                DEFAULT_KW "DEFAULT"
+                WHITESPACE " "
+                LITERAL
+                  FALSE_KW "false"
+          WHITESPACE " "
+          CYCLE_PATH
+            USING_KW "USING"
+            WHITESPACE " "
+            NAME_REF
+              PATH_KW "path"
     WHITESPACE "\n"
     SELECT_CLAUSE
       SELECT_KW "SELECT"

@@ -11,19 +11,24 @@ SOURCE_FILE
     VACUUM_OPTION_LIST
       L_PAREN "("
       VACUUM_OPTION
-        FULL_KW "full"
+        NAME
+          FULL_KW "full"
       WHITESPACE " "
       VACUUM_OPTION
-        ANALYZE_KW "analyze"
+        NAME
+          ANALYZE_KW "analyze"
         WHITESPACE " "
-        LITERAL
-          FALSE_KW "false"
+        VACUUM_OPTION_VALUE
+          LITERAL
+            FALSE_KW "false"
       WHITESPACE " "
       VACUUM_OPTION
-        IDENT "skip_locked"
+        NAME
+          IDENT "skip_locked"
         WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
+        VACUUM_OPTION_VALUE
+          LITERAL
+            TRUE_KW "true"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

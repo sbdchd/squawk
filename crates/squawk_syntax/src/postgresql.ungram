@@ -62,8 +62,7 @@ ParamList =
 
 ArgList =
  '(' '*' ')'
-| '(' ('distinct' | 'all') 'variadic'? Expr ')'
-| '(' args:(Arg (',' Arg)*)? ')'
+| '(' ('distinct' | 'all')? 'variadic'? args:(Arg (',' Arg)*)? OrderByClause? ')'
 
 CallExpr =
   Expr ArgList WithinClause? FilterClause? OverClause?
@@ -442,6 +441,9 @@ NotSimilarTo =
 AtTimeZone =
   'at' 'time' 'zone'
 
+AtLocal =
+  'at' 'local'
+
 IsNot =
   'is' 'not'
 
@@ -462,11 +464,13 @@ Op =
 | 'in' 
 | 'is'
 | 'isnull'
-| 'like' 
-| 'overlaps' 
-| 'value' 
-| AtTimeZone 
-| ColonColon 
+| 'notnull'
+| 'like'
+| 'overlaps'
+| 'value'
+| AtLocal
+| AtTimeZone
+| ColonColon
 | ColonEq 
 | CustomOp 
 | FatArrow 
@@ -704,12 +708,22 @@ UniqueConstraint =
   'unique'
   (
     UsingIndex
-  | (NullsNotDistinct | NullsDistinct)? ColumnList
+  | (NullsNotDistinct | NullsDistinct)? ColumnList?
+      ConstraintIncludeClause?
+      WithParams?
+      ConstraintIndexTablespace?
   )
 
 PrimaryKeyConstraint =
   ConstraintName?
-  'primary' 'key' (UsingIndex | ColumnList PartitionItemList?)
+  'primary' 'key'
+  (
+    UsingIndex
+  | ColumnList?
+      ConstraintIncludeClause?
+      WithParams?
+      ConstraintIndexTablespace?
+  )
 
 SetNullColumns =
   'set' 'null' ColumnList?
@@ -797,7 +811,7 @@ DefaultConstraint =
 GeneratedConstraint =
   ConstraintName?
   'generated'
-  ('always' 'as' '(' Expr ')' 'stored' | ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList? )
+  ('always' 'as' '(' Expr ')' ('stored' | 'virtual')? | ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList? )
 
 ReferencesConstraint =
   ConstraintName?
@@ -1008,7 +1022,7 @@ ColumnList =
   '(' (Column (',' Column)*) ')'
 
 ConstraintIncludeClause =
-  'include'
+  'include' ColumnList
 
 WithParams =
   'with' AttributeList
@@ -1335,9 +1349,9 @@ AlterTable =
   ) ';'?
 
 Revoke =
-  'revoke' ('grant' 'option' 'for')?
-  (('all' 'privileges'?) | RevokeCommandList)
-  'on' ('table' (Path (',' Path)*) | 'all' 'tables' 'in' 'schema' (NameRef (',' NameRef)*))
+  'revoke' (('admin' | 'inherit' | 'grant' | 'set') 'option' 'for')?
+  Privileges
+  ('on' PrivilegeObjects)?
   'from' RoleRefList
   ('granted' 'by' RoleRef)?
   ('cascade' | 'restrict')? ';'?
@@ -1725,6 +1739,49 @@ WithQuery =
 
 WithTable =
   Name ColumnList? 'as'? (Materialized | NotMaterialized)? '(' query:WithQuery ')'
+  SearchClause?
+  CycleClause?
+
+SearchClause =
+  'search'
+  ('breadth' | 'depth')
+  'first'
+  'by'
+  columns:SearchColumns
+  set_column:SearchSetColumn
+
+SearchColumns =
+  (NameRef (',' NameRef)*)
+
+SearchSetColumn =
+  'set'
+  NameRef
+
+CycleClause =
+  'cycle'
+  columns:CycleColumns
+  set_column:CycleSetColumn
+  path:CyclePath
+
+CycleColumns =
+  (NameRef (',' NameRef)*)
+
+CycleSetColumn = 
+  'set'
+  NameRef
+  column_to:CycleColumnTo?
+
+CycleColumnTo =
+  'to'
+  Expr
+  default:CycleDefault
+
+CycleDefault = 
+  'default' Expr
+
+CyclePath =
+  'using'
+  NameRef
 
 WithClause =
   'with' 'recursive'? (WithTable (',' WithTable)*)
@@ -1745,7 +1802,7 @@ SelectVariant =
 CompoundSelect =
   lhs:SelectVariant
   ('union' | 'intersect' | 'except' )
-  'all'?
+  ('all' | 'distinct')?
   rhs:SelectVariant
   ';'?
 
@@ -1866,6 +1923,9 @@ WhereConditionClause =
 ExcludeConstraint =
   ConstraintName?
   'exclude' ConstraintIndexMethod? ConstraintExclusionList
+  ConstraintIncludeClause?
+  WithParams?
+  ConstraintIndexTablespace?
   WhereConditionClause?
 
 FrameClause =
@@ -3179,11 +3239,40 @@ Refresh =
 
 Grant =
   'grant'
-  (('all' 'privileges'?) | RevokeCommandList)
-  'on' ('table' (Path (',' Path)*) | 'all' 'tables' 'in' 'schema' (NameRef (',' NameRef)*))
+  (
+    'all' 'privileges'? ColumnList?
+  | RevokeCommandList
+  )?
+  ('on' PrivilegeObjects)?
   'to' RoleRefList
-  ('with' 'grant' 'option')?
+  GrantWithClause?
   ('granted' 'by' RoleRef)? ';'?
+
+GrantWithClause =
+  'with'
+  (
+    'grant' 'option'
+  | GrantRoleOptionList
+  )
+
+GrantRoleOptionList =
+  GrantRoleOption (',' GrantRoleOption)*
+
+GrantRoleOption =
+  Name ('option' | 'true' | 'false')
+
+PrivilegeObjects =
+  'all' ('tables' | 'sequences' | 'functions' | 'procedures' | 'routines')
+    'in' 'schema' (NameRef (',' NameRef)*)
+| 'parameter' (Path (',' Path)*)
+| ('function' | 'procedure' | 'routine') FunctionSigList
+| 'type' (Type (',' Type)*)
+| ('database' | 'tablespace' | 'schema' | 'language') (NameRef (',' NameRef)*)
+| ('table' | 'sequence' | 'domain') (Path (',' Path)*)
+| 'foreign' ('data' 'wrapper' | 'server') (NameRef (',' NameRef)*)
+| 'large' 'object' (Literal (',' Literal)*)
+| 'property' 'graph' (Path (',' Path)*)
+| (Path (',' Path)*)
 
 RevokeCommandList =
   (RevokeCommand (',' RevokeCommand)*)
@@ -3191,7 +3280,7 @@ RevokeCommandList =
 RevokeCommand =
 ( RoleRef
 | 'alter' 'system'
-| ('select' | 'insert' | 'update' | 'delete' | 'truncate' | 'references' | 'trigger' | 'ident' | 'all' | 'alter' | 'create' | 'temporary' | 'temp' | 'execute')
+| ('select' | 'insert' | 'update' | 'delete' | 'truncate' | 'references' | 'trigger' | '#ident' | 'all' | 'alter' | 'create' | 'temporary' | 'temp' | 'execute')
 )
 
 SecurityLabel =
@@ -3388,7 +3477,10 @@ TableAndColumns =
   RelationName ColumnList?
 
 VacuumOption =
-  Literal?
+  Name VacuumOptionValue?
+
+VacuumOptionValue =
+  Literal? Name?
 
 Copy =
   'copy'
@@ -3761,7 +3853,11 @@ AlterColumnOption =
 | NoInherit
 
 AlterConstraint =
-  'alter' 'constraint' option:AlterColumnOption
+  'alter' 'constraint' NameRef
+  DeferrableConstraintOption?
+  NotDeferrableConstraintOption?
+  InitiallyDeferredConstraintOption?
+  InitiallyImmediateConstraintOption?
 
 AlterColumn =
   'alter' 'column'? NameRef option:AlterColumnOption

@@ -1081,9 +1081,10 @@ SOURCE_FILE
               LITERAL
                 STRING "'20:38:40-05'"
             WHITESPACE " "
-            AT_KW "at"
-            WHITESPACE " "
-            LOCAL_KW "local"
+            AT_LOCAL
+              AT_KW "at"
+              WHITESPACE " "
+              LOCAL_KW "local"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1096,9 +1097,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "c"
             WHITESPACE " "
-            AT_KW "at"
-            WHITESPACE " "
-            LOCAL_KW "local"
+            AT_LOCAL
+              AT_KW "at"
+              WHITESPACE " "
+              LOCAL_KW "local"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1122,9 +1124,10 @@ SOURCE_FILE
               LITERAL
                 STRING "'2001-02-16 20:38:40-05'"
             WHITESPACE " "
-            AT_KW "at"
-            WHITESPACE " "
-            LOCAL_KW "local"
+            AT_LOCAL
+              AT_KW "at"
+              WHITESPACE " "
+              LOCAL_KW "local"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ConstInterval"
