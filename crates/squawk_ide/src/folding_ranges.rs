@@ -134,6 +134,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::FDW_OPTION_LIST
         | SyntaxKind::FUNCTION_SIG_LIST
         | SyntaxKind::FUNC_OPTION_LIST
+        | SyntaxKind::GRANT_ROLE_OPTION_LIST
         | SyntaxKind::GROUP_BY_LIST
         | SyntaxKind::JSON_TABLE_COLUMN_LIST
         | SyntaxKind::OPERATOR_CLASS_OPTION_LIST

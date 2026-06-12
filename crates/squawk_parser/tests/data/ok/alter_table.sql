@@ -10,6 +10,7 @@ alter table t alter constraint c;
 alter table t alter constraint c deferrable;
 alter table t alter constraint c not deferrable;
 alter table t alter constraint c not deferrable initially immediate;
+alter table t alter constraint c deferrable initially deferred;
 
 
 -- validate_constraint

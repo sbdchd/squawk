@@ -210,6 +210,12 @@ select string_agg(a, ',' order by a) from t;
 -- order by param 1
 select string_agg(a order by a, ',') from "table";
 
+-- distinct with multiple args
+select count(distinct a, b) from t;
+
+-- distinct with order by
+select array_agg(distinct v order by v) from vals;
+
 -- within group
 select foo(0.5) within group (order by c) from t;
 

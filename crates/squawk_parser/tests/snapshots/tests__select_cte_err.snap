@@ -68,28 +68,31 @@ SOURCE_FILE
                   INT_NUMBER "1"
         R_PAREN ")"
         WHITESPACE "\n"
-        SEARCH_KW "search"
-        WHITESPACE " "
-        DEPTH_KW "depth"
-        WHITESPACE " "
-        FIRST_KW "first"
-        WHITESPACE " "
-        BY_KW "by"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "a"
-        COMMA ","
-        WHITESPACE " "
-        ERROR
-          COMMA ","
-        WHITESPACE " "
-        NAME_REF
-          IDENT "c"
-        WHITESPACE " "
-        SET_KW "set"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "ordercol"
+        SEARCH_CLAUSE
+          SEARCH_KW "search"
+          WHITESPACE " "
+          DEPTH_KW "depth"
+          WHITESPACE " "
+          FIRST_KW "first"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          SEARCH_COLUMNS
+            NAME_REF
+              IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            ERROR
+              COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "c"
+          WHITESPACE " "
+          SEARCH_SET_COLUMN
+            SET_KW "set"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
       SELECT_KW "select"
@@ -139,28 +142,31 @@ SOURCE_FILE
                   INT_NUMBER "1"
         R_PAREN ")"
         WHITESPACE "\n"
-        SEARCH_KW "search"
-        WHITESPACE " "
-        DEPTH_KW "depth"
-        WHITESPACE " "
-        FIRST_KW "first"
-        WHITESPACE " "
-        BY_KW "by"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "a"
-        COMMA ","
-        WHITESPACE " "
-        NAME_REF
-          IDENT "b"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "c"
-        WHITESPACE " "
-        SET_KW "set"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "ordercol"
+        SEARCH_CLAUSE
+          SEARCH_KW "search"
+          WHITESPACE " "
+          DEPTH_KW "depth"
+          WHITESPACE " "
+          FIRST_KW "first"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          SEARCH_COLUMNS
+            NAME_REF
+              IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "c"
+          WHITESPACE " "
+          SEARCH_SET_COLUMN
+            SET_KW "set"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
       SELECT_KW "select"

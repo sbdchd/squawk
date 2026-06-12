@@ -49,6 +49,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::EXPLAIN_OPTION_LIST,
     SyntaxKind::FDW_OPTION_LIST,
     SyntaxKind::FUNCTION_SIG_LIST,
+    SyntaxKind::GRANT_ROLE_OPTION_LIST,
     SyntaxKind::GROUP_BY_LIST,
     SyntaxKind::JSON_TABLE_COLUMN_LIST,
     SyntaxKind::OPERATOR_CLASS_OPTION_LIST,

@@ -180,6 +180,13 @@ create unlogged table t (
   ) stored
 );
 
+-- generated virtual (pg18)
+create table t (
+  a int,
+  b int generated always as (a + 1) virtual,
+  c int generated always as (a + 1)
+);
+
 -- create_table_table_constraints
 
 -- named constraint

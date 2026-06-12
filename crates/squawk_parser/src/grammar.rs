@@ -1458,10 +1458,9 @@ fn postfix_expr(
                     break;
                 }
             },
-            AT_KW if p.nth_at(1, LOCAL_KW) => {
+            AT_KW if p.at(AT_LOCAL) => {
                 let m = p.start();
-                p.bump(AT_KW);
-                p.bump(LOCAL_KW);
+                p.bump(AT_LOCAL);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
@@ -2583,6 +2582,13 @@ fn with_query(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(L_PAREN);
     preparable_stmt(p);
     p.expect(R_PAREN);
+    opt_search_clause(p);
+    opt_cycle_clause(p);
+    m.complete(p, WITH_TABLE)
+}
+
+fn opt_search_clause(p: &mut Parser<'_>) {
+    let m = p.start();
     // [ SEARCH { BREADTH | DEPTH } FIRST BY column_name [, ...] SET search_seq_col_name ]
     if p.eat(SEARCH_KW) {
         if !p.eat(BREADTH_KW) {
@@ -2590,27 +2596,16 @@ fn with_query(p: &mut Parser<'_>) -> CompletedMarker {
         }
         p.expect(FIRST_KW);
         p.expect(BY_KW);
-        separated(
-            p,
-            COMMA,
-            || "unexpected comma, expected a column name".to_string(),
-            NAME_REF_FIRST,
-            TokenSet::new(&[SET_KW]),
-            |p| opt_name_ref(p).is_some(),
-        );
-        p.expect(SET_KW);
-        name_ref(p);
+        search_columns(p);
+        search_set_column(p);
+        m.complete(p, SEARCH_CLAUSE);
+    } else {
+        m.abandon(p);
     }
-    opt_cycle_clause(p);
-    m.complete(p, WITH_TABLE)
 }
 
-// [ CYCLE column_name [, ...] SET cycle_mark_col_name [ TO cycle_mark_value DEFAULT cycle_mark_default ] USING cycle_path_col_name ]
-fn opt_cycle_clause(p: &mut Parser<'_>) {
-    if !p.at(CYCLE_KW) {
-        return;
-    }
-    p.expect(CYCLE_KW);
+fn search_columns(p: &mut Parser<'_>) {
+    let m = p.start();
     separated(
         p,
         COMMA,
@@ -2619,15 +2614,74 @@ fn opt_cycle_clause(p: &mut Parser<'_>) {
         TokenSet::new(&[SET_KW]),
         |p| opt_name_ref(p).is_some(),
     );
+    m.complete(p, SEARCH_COLUMNS);
+}
+
+fn search_set_column(p: &mut Parser<'_>) {
+    let m = p.start();
     p.expect(SET_KW);
     name_ref(p);
+    m.complete(p, SEARCH_SET_COLUMN);
+}
+
+// [ CYCLE column_name [, ...] SET cycle_mark_col_name [ TO cycle_mark_value DEFAULT cycle_mark_default ] USING cycle_path_col_name ]
+fn opt_cycle_clause(p: &mut Parser<'_>) {
+    if !p.at(CYCLE_KW) {
+        return;
+    }
+    let m = p.start();
+    p.expect(CYCLE_KW);
+    cycle_columns(p);
+    cycle_set_column(p);
+    cycle_path(p);
+    m.complete(p, CYCLE_CLAUSE);
+}
+
+fn cycle_path(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(USING_KW);
+    // cycle path
+    name_ref(p);
+    m.complete(p, CYCLE_PATH);
+}
+
+fn cycle_set_column(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(SET_KW);
+    name_ref(p);
+    opt_cycle_column_to(p);
+    m.complete(p, CYCLE_SET_COLUMN);
+}
+
+fn opt_cycle_column_to(p: &mut Parser<'_>) {
+    let m = p.start();
     if p.eat(TO_KW) {
         expr(p);
-        p.expect(DEFAULT_KW);
-        expr(p);
+        cycle_default(p);
+        m.complete(p, CYCLE_COLUMN_TO);
+    } else {
+        m.abandon(p);
     }
-    p.expect(USING_KW);
-    name_ref(p);
+}
+
+fn cycle_default(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(DEFAULT_KW);
+    expr(p);
+    m.complete(p, CYCLE_DEFAULT);
+}
+
+fn cycle_columns(p: &mut Parser<'_>) {
+    let m = p.start();
+    separated(
+        p,
+        COMMA,
+        || "unexpected comma, expected a column name".to_string(),
+        NAME_REF_FIRST,
+        TokenSet::new(&[SET_KW]),
+        |p| opt_name_ref(p).is_some(),
+    );
+    m.complete(p, CYCLE_COLUMNS);
 }
 
 // [ [ NOT ] MATERIALIZED ]
@@ -11639,8 +11693,8 @@ fn grant(p: &mut Parser<'_>) -> CompletedMarker {
     // TODO: need more validation here
     // [ WITH GRANT OPTION ]
     // [ WITH { ADMIN | INHERIT | SET } { OPTION | TRUE | FALSE } ]
-    if p.eat(WITH_KW) {
-        grant_role_option_list(p);
+    if p.at(WITH_KW) {
+        grant_with_clause(p);
     }
     opt_granted_by(p);
     p.eat(SEMICOLON);
@@ -11656,16 +11710,23 @@ fn revoke_command_list(p: &mut Parser<'_>) {
     m.complete(p, REVOKE_COMMAND_LIST);
 }
 
-fn grant_role_option_list(p: &mut Parser<'_>) {
+fn grant_with_clause(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(WITH_KW);
     if p.eat(GRANT_KW) {
         p.expect(OPTION_KW);
-        return;
+    } else {
+        grant_role_option_list(p);
     }
+    m.complete(p, GRANT_WITH_CLAUSE);
+}
+
+fn grant_role_option_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    let mut found_option = false;
     while p.at_ts(COL_LABEL_FIRST) {
-        col_label(p);
-        if !(p.eat(OPTION_KW) || p.eat(TRUE_KW) || p.eat(FALSE_KW)) {
-            p.error("expected OPTION, TRUE, or FALSE")
-        }
+        grant_role_option(p);
+        found_option = true;
         if !p.eat(COMMA) {
             if p.at_ts(COL_LABEL_FIRST) && !p.at(GRANTED_KW) {
                 p.error("missing comma");
@@ -11674,9 +11735,25 @@ fn grant_role_option_list(p: &mut Parser<'_>) {
             }
         }
     }
+    if found_option {
+        m.complete(p, GRANT_ROLE_OPTION_LIST);
+    } else {
+        p.error("expected GRANT OPTION or role option");
+        m.abandon(p);
+    }
+}
+
+fn grant_role_option(p: &mut Parser<'_>) {
+    let m = p.start();
+    col_label(p);
+    if !(p.eat(OPTION_KW) || p.eat(TRUE_KW) || p.eat(FALSE_KW)) {
+        p.error("expected OPTION, TRUE, or FALSE")
+    }
+    m.complete(p, GRANT_ROLE_OPTION);
 }
 
 fn privilege_target(p: &mut Parser<'_>) {
+    let m = p.start();
     if p.eat(ALL_KW) {
         match p.current() {
             TABLES_KW | SEQUENCES_KW | FUNCTIONS_KW | PROCEDURES_KW | ROUTINES_KW => {
@@ -11749,6 +11826,7 @@ fn privilege_target(p: &mut Parser<'_>) {
             _ => (),
         }
     }
+    m.complete(p, PRIVILEGE_OBJECTS);
 }
 
 // [ GRANTED BY role_specification ]
@@ -12853,23 +12931,24 @@ fn opt_vacuum_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     // utility_option_name
     if p.at_ts(NON_RESERVED_WORD) || p.at(ANALYZE_KW) || p.at(ANALYSE_KW) || p.at(FORMAT_KW) {
-        p.bump_any();
+        col_label(p);
     }
-    if p.at_ts(NON_RESERVED_WORD) || p.at(ON_KW) {
-        p.bump_any();
-        return Some(m.complete(p, VACUUM_OPTION));
-    }
-    // utility_option_arg
-    if opt_numeric_literal(p).is_some() {
-        return Some(m.complete(p, VACUUM_OPTION));
-    }
-    if opt_string_literal(p).is_some() {
-        return Some(m.complete(p, VACUUM_OPTION));
-    }
-    if opt_bool_literal(p) {
-        return Some(m.complete(p, VACUUM_OPTION));
-    }
+    opt_vacuum_option_value(p);
     Some(m.complete(p, VACUUM_OPTION))
+}
+
+// utility_option_arg
+fn opt_vacuum_option_value(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    if p.at_ts(NON_RESERVED_WORD) || p.at(ON_KW) {
+        col_label(p);
+        return Some(m.complete(p, VACUUM_OPTION_VALUE));
+    }
+    if opt_numeric_literal(p).is_some() || opt_string_literal(p).is_some() || opt_bool_literal(p) {
+        return Some(m.complete(p, VACUUM_OPTION_VALUE));
+    }
+    m.abandon(p);
+    None
 }
 
 // copy_generic_opt_elem:

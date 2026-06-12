@@ -3284,6 +3284,74 @@ SOURCE_FILE
           IDENT "\"table\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- distinct with multiple args"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              DISTINCT_KW "distinct"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- distinct with order by"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              DISTINCT_KW "distinct"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "v"
+              WHITESPACE " "
+              ORDER_BY_CLAUSE
+                ORDER_KW "order"
+                WHITESPACE " "
+                BY_KW "by"
+                WHITESPACE " "
+                SORT_BY_LIST
+                  SORT_BY
+                    NAME_REF
+                      IDENT "v"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "vals"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- within group"
   WHITESPACE "\n"
   SELECT
