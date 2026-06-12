@@ -62,14 +62,12 @@ SOURCE_FILE
                 NUMERIC_KW "numeric"
           ARG_LIST
             L_PAREN "("
-            ARG
-              LITERAL
-                INT_NUMBER "10"
+            LITERAL
+              INT_NUMBER "10"
             COMMA ","
             WHITESPACE " "
-            ARG
-              LITERAL
-                INT_NUMBER "2"
+            LITERAL
+              INT_NUMBER "2"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -3812,9 +3810,8 @@ SOURCE_FILE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("
-          ARG
-            LITERAL
-              INT_NUMBER "30"
+          LITERAL
+            INT_NUMBER "30"
           R_PAREN ")"
       WHITESPACE " "
       DEFAULT_CONSTRAINT

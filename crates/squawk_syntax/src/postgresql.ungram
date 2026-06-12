@@ -63,9 +63,7 @@ ParamList =
 ArgList =
  '(' '*' ')'
 | '(' ('distinct' | 'all') 'variadic'? Expr ')'
-| '(' args:(Expr (',' Expr)*)? ')'
-// TODO: Arg should be a union of *, Expr, or Expr list. Right now it doesn't do much
-| '(' args_:(Arg (',' Arg)*)? ')'
+| '(' args:(Arg (',' Arg)*)? ')'
 
 CallExpr =
   Expr ArgList WithinClause? FilterClause? OverClause?
@@ -178,7 +176,7 @@ JsonArrayAggFn =
 JsonQueryFn =
   'json_query' '('
     Expr
-    JsonFormatClause
+    JsonFormatClause?
     ','
     Expr
     JsonPassingClause?
@@ -217,9 +215,9 @@ JsonTable =
     ','
     Expr
     ('as' Name)?
-    JsonPassingClause
+    JsonPassingClause?
     JsonTableColumnList
-    JsonOnErrorClause
+    JsonOnErrorClause?
   ')'
 
 JsonSerializeFn =
@@ -364,6 +362,9 @@ Literal =
   | '@unicode_esc_string'
   | '@esc_string'
   | '@positional_param'
+  | 'default'
+  | 'false'
+  | 'true'
   )
 
 NamedArg =
@@ -532,7 +533,7 @@ WhenClauseList =
   WhenClause WhenClause*
 
 CaseExpr =
-  'case' Expr? WhenClauseList ElseClause?
+  'case' Expr? WhenClauseList ElseClause? 'end'
 
 FieldExpr =
   // We manually implement these as we have NameRef as a variant of Expr.
@@ -563,7 +564,7 @@ ArrayType =
   Type NameRef 'array'? '[' Expr? ']'
 
 PercentType =
-  '%' 'type'
+  'setof'? Path PercentTypeClause
 
 PathType =
   'setof'? Path ArgList?
@@ -606,7 +607,7 @@ IntervalType =
   | 'hour' 'to' 'minute'
   | 'hour' 'to' 'second'
   | 'minute' 'to' 'second'
-  )
+  )?
   ('(' Literal ')')?
 
 
@@ -624,6 +625,7 @@ Type =
 
 Arg =
   Expr
+| NamedArg
 
 // For when we're parsing expressions and then later we realize they're types.
 // e.g., `select pg_catalog.varchar(10) 'foo'`
@@ -682,12 +684,14 @@ Column =
   )
 ColumnConstraint =
   CheckConstraint
-| NotNullConstraint
-| UniqueConstraint
-| PrimaryKeyConstraint
-| ExcludeConstraint
-| ReferencesConstraint
 | DefaultConstraint
+| ExcludeConstraint
+| GeneratedConstraint
+| NotNullConstraint
+| NullConstraint
+| PrimaryKeyConstraint
+| ReferencesConstraint
+| UniqueConstraint
 
 NullsDistinct =
   'nulls' 'distinct'
@@ -753,7 +757,7 @@ MatchType =
 
 ForeignKeyConstraint =
   ConstraintName?
-  'foreign' 'key' from_columns:ColumnList 'references' Path to_columns:ColumnList
+  'foreign' 'key' from_columns:ColumnList 'references' Path to_columns:ColumnList?
   MatchType?
   OnDeleteAction?
   OnUpdateAction?
@@ -778,20 +782,20 @@ Enforced =
   'enforced'
 
 NotNullConstraint =
-  ('constraint' NameRef)
+  ConstraintName?
   'not' 'null'
-  NoInherit
+  NoInherit?
 
 NullConstraint =
-  ('constraint' NameRef)
+  ConstraintName?
   'null'
 
 DefaultConstraint =
-  ('constraint' NameRef)
+  ConstraintName?
   'default' Expr
 
 GeneratedConstraint =
-  ('constraint' NameRef)
+  ConstraintName?
   'generated'
   ('always' 'as' '(' Expr ')' 'stored' | ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList? )
 
@@ -888,7 +892,7 @@ WhereClause =
   'where' Expr
 
 GroupByClause =
-  'group' 'by' ('all' | 'distinct') GroupByList
+  'group' 'by' ('all' | 'distinct')? GroupByList
 
 GroupByList =
   GroupBy (',' GroupBy)*
@@ -936,7 +940,7 @@ OffsetClause =
   ('row' | 'rows')?
 
 DistinctClause =
-  'distinct' 'on' '(' (Expr (',' Expr)*) ')'
+  'distinct' ('on' '(' (Expr (',' Expr)*) ')')?
 
 Target =
   '*'
@@ -1106,11 +1110,14 @@ TransactionModeList =
   TransactionMode (',' TransactionMode)*
 
 Begin =
-  ('begin' ('work' | 'transaction') | 'start' 'transaction')
+  ('begin' ('work' | 'transaction')? | 'start' 'transaction')
   TransactionModeList? ';'?
 
 Commit =
-  'commit' (('work' | 'transaction')? ('and' 'no'? 'chain') | 'prepared' Literal) ';'?
+  (
+    'commit' ('prepared' Literal | ('work' | 'transaction')? ('and' 'no'? 'chain')?)
+  | 'end' ('work' | 'transaction')? ('and' 'no'? 'chain')?
+  ) ';'?
 
 Rollback =
   'rollback' ('work' | 'transaction')? ('and' 'no'? 'chain')? ';'?
@@ -1186,7 +1193,8 @@ CreateTable =
   'table' IfNotExists? Path
   PartitionOf?
   OfType?
-  TableArgList
+  TableArgList?
+  PartitionType?
   Inherits?
   PartitionBy?
   UsingMethod?
@@ -1320,7 +1328,11 @@ AlterDomain =
   'alter' 'domain' Path action:AlterDomainAction ';'?
 
 AlterTable =
-  'alter' 'table' RelationName actions:AlterTableAction* ';'?
+  'alter' 'table'
+  (
+    'all' 'in' 'tablespace' RelationName OwnedByRoles? SetTablespace 'nowait'?
+  | IfExists? RelationName actions:AlterTableAction*
+  ) ';'?
 
 Revoke =
   'revoke' ('grant' 'option' 'for')?
@@ -1429,8 +1441,8 @@ ForPortionOf =
 
 ReturningClause =
   'returning'
-  ReturningOptionList
-  TargetList?
+  ReturningOptionList?
+  TargetList
 
 ReturningOptionList =
   ('with' '(' (ReturningOption (',' ReturningOption)*) ')' )
@@ -1525,6 +1537,7 @@ CreateTableAs =
   'table'
   IfNotExists?
   Path
+  TableArgList?
   UsingMethod?
   (WithParams | WithoutOids)?
   OnCommit?
@@ -1662,7 +1675,7 @@ JsonPassingClause =
   'passing' (JsonPassingArg (',' JsonPassingArg)*)
 
 PercentTypeClause =
-  Path PercentTypeClause
+  '%' 'type'
 
 WithTimezone =
   'with' 'time' 'zone'
@@ -2887,7 +2900,8 @@ CreateTextSearchTemplate =
 
 CreateTransform =
   'create' OrReplace? 'transform' 'for' Type 'language' language:NameRef
-  '(' from_func:TransformFromFunc ',' to_func:TransformToFunc ')' ';'?
+  '(' (from_func:TransformFromFunc | to_func:TransformToFunc)
+      (',' (from_func:TransformFromFunc | to_func:TransformToFunc))? ')' ';'?
 
 TransformFromFunc =
    'from' 'sql' 'with' 'function' FunctionSig
@@ -3067,8 +3081,23 @@ DropView =
 
 Explain =
   'explain'
-  ('analyze' | 'analyse' | 'verbose')?
+  (ExplainOptionList | ('analyze' | 'analyse') 'verbose'? | 'verbose')?
   ExplainStmt ';'?
+
+ExplainOptionList =
+  '(' (ExplainOption (',' ExplainOption)*) ')'
+
+ExplainOption =
+  Name ExplainOptionValue?
+
+ExplainOptionValue =
+  Literal
+| 'none'
+| 'text'
+| 'xml'
+| 'json'
+| 'binary'
+| '#ident'
 
 ExplainStmt =
   Select
@@ -3248,7 +3277,13 @@ Unlisten =
   'unlisten' ('*' | NameRef) ';'?
 
 Checkpoint =
-  'checkpoint' ';'?
+  'checkpoint' CheckpointOptionList? ';'?
+
+CheckpointOptionList =
+  '(' (CheckpointOption (',' CheckpointOption)*) ')'
+
+CheckpointOption =
+  Name Expr?
 
 Deallocate =
   'deallocate' ('prepare' NameRef | 'all') ';'?
@@ -3273,7 +3308,7 @@ Discard =
   'discard' ('all' | 'temp' | 'temporary' | 'plans' | 'sequences') ';'?
 
 Do =
-  'do' ('language' ('#ident' | Literal))? Literal ';'?
+  'do' ('language' ('#ident' | Literal))? Literal ('language' ('#ident' | Literal))? ';'?
 
 Move =
   'move'
@@ -3472,7 +3507,7 @@ CreateType =
   ('as' 'enum' VariantList
 | 'as' 'range' AttributeList
 | 'as' ColumnList
-| AttributeList) ';'?
+| AttributeList)? ';'?
 
 VariantList =
   '('
@@ -3595,7 +3630,7 @@ Inherit =
   'inherit' Path
 
 NoInherit =
-  'no' 'inherit' Path
+  'no' 'inherit'
 
 EnableTrigger =
   'enable' 'trigger' (NameRef | 'all' | 'user')?

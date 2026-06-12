@@ -9,3 +9,66 @@ SOURCE_FILE
     CHECKPOINT_KW "checkpoint"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- checkpoint options"
+  WHITESPACE "\n"
+  CHECKPOINT
+    CHECKPOINT_KW "checkpoint"
+    WHITESPACE " "
+    CHECKPOINT_OPTION_LIST
+      L_PAREN "("
+      CHECKPOINT_OPTION
+        NAME
+          MODE_KW "mode"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "fast"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CHECKPOINT
+    CHECKPOINT_KW "checkpoint"
+    WHITESPACE " "
+    CHECKPOINT_OPTION_LIST
+      L_PAREN "("
+      CHECKPOINT_OPTION
+        NAME
+          MODE_KW "mode"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "spread"
+      COMMA ","
+      WHITESPACE " "
+      CHECKPOINT_OPTION
+        NAME
+          IDENT "flush_unlogged"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CHECKPOINT
+    CHECKPOINT_KW "checkpoint"
+    WHITESPACE " "
+    CHECKPOINT_OPTION_LIST
+      L_PAREN "("
+      CHECKPOINT_OPTION
+        NAME
+          IDENT "flush_unlogged"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CHECKPOINT
+    CHECKPOINT_KW "checkpoint"
+    WHITESPACE " "
+    CHECKPOINT_OPTION_LIST
+      L_PAREN "("
+      CHECKPOINT_OPTION
+        NAME
+          IDENT "flush_unlogged"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"

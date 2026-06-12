@@ -4023,4 +4023,111 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- collate can appear in many places"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        NAME
+          IDENT "id"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        NAME
+          IDENT "id"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "VARCHAR"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        NAME
+          IDENT "id"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NULL_KW "NULL"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+        WHITESPACE " "
+        UNIQUE_CONSTRAINT
+          UNIQUE_KW "UNIQUE"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

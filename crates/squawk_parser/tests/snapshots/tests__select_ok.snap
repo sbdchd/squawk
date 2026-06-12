@@ -6367,12 +6367,16 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
-    L_PAREN "("
-    IDENT "costs"
-    WHITESPACE " "
-    LITERAL
-      OFF_KW "off"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          IDENT "costs"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            OFF_KW "off"
+      R_PAREN ")"
     WHITESPACE "\n"
     SELECT
       SELECT_CLAUSE

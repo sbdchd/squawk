@@ -4,6 +4,12 @@ explain select * from t;
 -- explain_analyze
 explain analyze select a from t;
 
+-- explain_analyze_verbose
+explain analyze verbose select a from t;
+
+-- explain_parenthesized_options
+explain (analyze, buffers) select 1;
+
 -- all_options
 explain (
   analyze,

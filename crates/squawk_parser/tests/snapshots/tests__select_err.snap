@@ -532,13 +532,11 @@ SOURCE_FILE
               VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
-                ARG
-                  LITERAL
-                    INT_NUMBER "100"
+                LITERAL
+                  INT_NUMBER "100"
                 WHITESPACE " "
-                ARG
-                  LITERAL
-                    INT_NUMBER "200"
+                LITERAL
+                  INT_NUMBER "200"
                 R_PAREN ")"
             R_PAREN ")"
     SEMICOLON ";"
@@ -561,17 +559,15 @@ SOURCE_FILE
               VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
-                ARG
-                  LITERAL
-                    INT_NUMBER "100"
+                LITERAL
+                  INT_NUMBER "100"
                 COMMA ","
                 WHITESPACE " "
                 ERROR
                   COMMA ","
                 WHITESPACE " "
-                ARG
-                  LITERAL
-                    INT_NUMBER "200"
+                LITERAL
+                  INT_NUMBER "200"
                 R_PAREN ")"
             R_PAREN ")"
     SEMICOLON ";"
@@ -597,14 +593,12 @@ SOURCE_FILE
                     IDENT "t"
               ARG_LIST
                 L_PAREN "("
-                ARG
-                  NAME_REF
-                    IDENT "a"
+                NAME_REF
+                  IDENT "a"
                 COMMA ","
                 WHITESPACE " "
-                ARG
-                  NAME_REF
-                    IDENT "b"
+                NAME_REF
+                  IDENT "b"
                 ERROR
                   COMMA ","
                 R_PAREN ")"

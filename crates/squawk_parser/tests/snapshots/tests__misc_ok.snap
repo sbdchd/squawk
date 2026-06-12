@@ -5456,12 +5456,17 @@ SOURCE_FILE
   EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
-    L_PAREN "("
-    ANALYZE_KW "ANALYZE"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "BUFFERS"
-    R_PAREN ")"
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        NAME
+          ANALYZE_KW "ANALYZE"
+      COMMA ","
+      WHITESPACE " "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "BUFFERS"
+      R_PAREN ")"
     WHITESPACE " \n"
     SELECT
       SELECT_CLAUSE

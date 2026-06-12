@@ -408,3 +408,8 @@ CREATE TABLE t (
     quarter int,
     PRIMARY KEY (symbol, period, year, quarter)
 );
+
+-- collate can appear in many places
+CREATE TABLE t (id varchar COLLATE "C" PRIMARY KEY);
+CREATE TABLE t (id VARCHAR PRIMARY KEY COLLATE "C");
+CREATE TABLE t (id varchar NOT NULL COLLATE "C" UNIQUE);

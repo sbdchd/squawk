@@ -72,9 +72,8 @@ SOURCE_FILE
       VARCHAR_KW "varchar"
       ARG_LIST
         L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "100"
+        LITERAL
+          INT_NUMBER "100"
         R_PAREN ")"
     WHITESPACE "\n  "
     USING_KW "using"
@@ -172,9 +171,8 @@ SOURCE_FILE
           VARCHAR_KW "varchar"
           ARG_LIST
             L_PAREN "("
-            ARG
-              LITERAL
-                INT_NUMBER "100"
+            LITERAL
+              INT_NUMBER "100"
             R_PAREN ")"
         COMMA ","
         WHITESPACE " "
@@ -182,9 +180,8 @@ SOURCE_FILE
           VARCHAR_KW "varchar"
           ARG_LIST
             L_PAREN "("
-            ARG
-              LITERAL
-                INT_NUMBER "10"
+            LITERAL
+              INT_NUMBER "10"
             R_PAREN ")"
         R_PAREN ")"
         WHITESPACE " "

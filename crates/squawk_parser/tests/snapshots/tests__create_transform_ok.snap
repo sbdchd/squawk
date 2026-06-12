@@ -85,9 +85,8 @@ SOURCE_FILE
             IDENT "t"
       ARG_LIST
         L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "10231"
+        LITERAL
+          INT_NUMBER "10231"
         R_PAREN ")"
     WHITESPACE " "
     LANGUAGE_KW "language"
@@ -149,6 +148,142 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "g"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- from only"
+  WHITESPACE "\n"
+  CREATE_TRANSFORM
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "only_from"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    TRANSFORM_FROM_FUNC
+      FROM_KW "from"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- to only"
+  WHITESPACE "\n"
+  CREATE_TRANSFORM
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "only_to"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    TRANSFORM_TO_FUNC
+      TO_KW "to"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "g"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- reverse order"
+  WHITESPACE "\n"
+  CREATE_TRANSFORM
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "reverse_order"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    TRANSFORM_TO_FUNC
+      TO_KW "to"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "g"
+    COMMA ","
+    WHITESPACE "\n  "
+    TRANSFORM_FROM_FUNC
+      FROM_KW "from"
+      WHITESPACE " "
+      SQL_KW "sql"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n"
     R_PAREN ")"
     SEMICOLON ";"

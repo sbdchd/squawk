@@ -123,11 +123,13 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::ALTER_OPTION_LIST
         | SyntaxKind::ATTRIBUTE_LIST
         | SyntaxKind::BEGIN_FUNC_OPTION_LIST
+        | SyntaxKind::CHECKPOINT_OPTION_LIST
         | SyntaxKind::COLUMN_LIST
         | SyntaxKind::CONFLICT_INDEX_ITEM_LIST
         | SyntaxKind::CONSTRAINT_EXCLUSION_LIST
         | SyntaxKind::COPY_OPTION_LIST
         | SyntaxKind::DATABASE_OPTION_LIST
+        | SyntaxKind::EXPLAIN_OPTION_LIST
         | SyntaxKind::DROP_OP_CLASS_OPTION_LIST
         | SyntaxKind::FDW_OPTION_LIST
         | SyntaxKind::FUNCTION_SIG_LIST
