@@ -269,4 +269,82 @@ SOURCE_FILE
           NAME_REF
             IDENT "users"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_PUBLICATION
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    TABLES_KW "tables"
+    WHITESPACE " "
+    EXCEPT_TABLE_CLAUSE
+      EXCEPT_KW "except"
+      WHITESPACE " "
+      L_PAREN "("
+      EXCEPT_TABLE_NAME
+        TABLE_KW "table"
+        WHITESPACE " "
+        RELATION_NAME
+          ONLY_KW "only"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_PUBLICATION
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    TABLES_KW "tables"
+    WHITESPACE " "
+    EXCEPT_TABLE_CLAUSE
+      EXCEPT_KW "except"
+      WHITESPACE " "
+      L_PAREN "("
+      EXCEPT_TABLE_NAME
+        TABLE_KW "table"
+        WHITESPACE " "
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+      COMMA ","
+      WHITESPACE " "
+      EXCEPT_TABLE_NAME
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "u"
+      COMMA ","
+      WHITESPACE " "
+      EXCEPT_TABLE_NAME
+        TABLE_KW "table"
+        WHITESPACE " "
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "k"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

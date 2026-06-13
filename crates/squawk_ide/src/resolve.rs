@@ -2246,7 +2246,7 @@ fn find_column_in_create_table_as_with_skip(
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = create_table_as.file_id;
     let create_table_as = create_table_as.value;
-    let query = create_table_as.query()?;
+    let query = create_table_as.query()?.select_variant()?;
 
     if let ast::SelectVariant::Values(values) = &query {
         return resolve_values_column_after_index(file, values, column_name, skip_column_count);
@@ -2435,7 +2435,8 @@ fn count_columns_for_table_name(
                 .ancestors()
                 .find_map(ast::CreateTableAs::cast)
             {
-                let select = ast_nav::select_from_variant(create_table_as.query()?)?;
+                let select =
+                    ast_nav::select_from_variant(create_table_as.query()?.select_variant()?)?;
                 if let Some(target_list) = select.select_clause().and_then(|c| c.target_list()) {
                     return Some(target_list.targets().count());
                 }

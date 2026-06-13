@@ -10,6 +10,7 @@ select
   -- between expr
   2 between 1 and 3,
   2 not between 1 and 3,
+  2 between asymmetric 1 and 3,
   2 between symmetric 1 and 3,
   -- bin expr
   1 + 1,

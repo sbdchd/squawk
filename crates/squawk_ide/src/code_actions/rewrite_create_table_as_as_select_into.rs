@@ -33,7 +33,7 @@ pub(super) fn rewrite_create_table_as_as_select_into(
     }
 
     // TODO: support more
-    let ast::SelectVariant::Select(select) = create_table_as.query()? else {
+    let ast::SelectVariant::Select(select) = create_table_as.query()?.select_variant()? else {
         return None;
     };
 

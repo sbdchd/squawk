@@ -254,6 +254,12 @@ select 2 between foo() and bar();
 select 2 not between 1 and 3;
 select 2 not between foo() and bar();
 
+-- between asymmetric (inclusive of the range endpoints, explicit default)
+select 2 between asymmetric 1 and 3;
+
+-- not between asymmetric (not between, explicit default)
+select 2 not between asymmetric 1 and 3;
+
 -- between symmetric (between, after sorting the two endpoint values)
 select 2 between symmetric 3 and 1;
 

@@ -16,6 +16,15 @@ fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
     Some(Fix::new("Add `concurrently`", vec![edit]))
 }
 
+fn has_concurrently(reindex: &ast::Reindex) -> bool {
+    reindex.concurrently_token().is_some()
+        || reindex.reindex_option_list().is_some_and(|option_list| {
+            option_list
+                .reindex_options()
+                .any(|option| option.concurrently_token().is_some())
+        })
+}
+
 pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for stmt in parse.tree().stmts() {
         if let ast::Stmt::Reindex(reindex) = stmt {
@@ -23,7 +32,7 @@ pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, parse: &Parse<SourceF
             if reindex.system_token().is_some() {
                 continue;
             }
-            if reindex.concurrently_token().is_none() {
+            if !has_concurrently(&reindex) {
                 let fix = concurrently_fix(&reindex);
                 ctx.report(
                     Violation::for_node(

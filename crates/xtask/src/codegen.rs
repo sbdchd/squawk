@@ -943,8 +943,10 @@ const KEYWORD_PHRASES: &[&str] = &[
 // Multi-word entries must come before their single-word components so the
 // regex engine matches the longest form first.
 const KEYWORD_OPERATORS: &[&str] = &[
+    "not between asymmetric",
     "not between symmetric",
     "is not distinct from",
+    "between asymmetric",
     "between symmetric",
     "is distinct from",
     "not similar to",

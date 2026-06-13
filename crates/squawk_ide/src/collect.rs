@@ -96,12 +96,16 @@ fn resolved_to_column_ptrs(
             columns_from_create_table_impl(db, file, &parent_table, &mut cols, depth);
             cols
         }
-        ResolvedTableName::TableAs(create_table_as) => {
-            select_columns_with_types(db, file, &create_table_as.query())
-                .into_iter()
-                .map(|(name, _ty)| (name, None))
-                .collect()
-        }
+        ResolvedTableName::TableAs(create_table_as) => select_columns_with_types(
+            db,
+            file,
+            &create_table_as
+                .query()
+                .and_then(|query| query.select_variant()),
+        )
+        .into_iter()
+        .map(|(name, _ty)| (name, None))
+        .collect(),
         ResolvedTableName::SelectInto(select_into) => {
             select_into_columns_with_types(db, file, &select_into)
                 .into_iter()
@@ -194,9 +198,13 @@ fn resolved_to_columns_with_types(
         ResolvedTableName::Table(parent_table) => {
             table_columns_impl(db, file, &parent_table, depth)
         }
-        ResolvedTableName::TableAs(create_table_as) => {
-            select_columns_with_types(db, file, &create_table_as.query())
-        }
+        ResolvedTableName::TableAs(create_table_as) => select_columns_with_types(
+            db,
+            file,
+            &create_table_as
+                .query()
+                .and_then(|query| query.select_variant()),
+        ),
         ResolvedTableName::SelectInto(select_into) => {
             select_into_columns_with_types(db, file, &select_into)
         }
@@ -212,7 +220,13 @@ pub(crate) fn create_table_as_columns_with_types(
     create_table_as: &ast::CreateTableAs,
 ) -> Vec<(Name, Option<Type>)> {
     for file in list_files(db, file) {
-        let columns = select_columns_with_types(db, file, &create_table_as.query());
+        let columns = select_columns_with_types(
+            db,
+            file,
+            &create_table_as
+                .query()
+                .and_then(|query| query.select_variant()),
+        );
         if !columns.is_empty() {
             return columns;
         }

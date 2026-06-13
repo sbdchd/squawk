@@ -2127,7 +2127,7 @@ fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.eat(NOT_KW);
     p.expect(BETWEEN_KW);
-    p.eat(SYMMETRIC_KW);
+    let _ = p.eat(SYMMETRIC_KW) || p.eat(ASYMMETRIC_KW);
     b_expr(p);
     p.expect(AND_KW);
     b_expr(p);
@@ -8117,9 +8117,15 @@ fn path_name_ref_list(p: &mut Parser<'_>) {
 
 fn path_list(p: &mut Parser<'_>) {
     let m = p.start();
-    p.expect(L_PAREN);
-    path_name_ref_list(p);
-    p.expect(R_PAREN);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        NAME_REF_FIRST,
+        |p| opt_path_name_ref(p).is_some(),
+    );
     m.complete(p, PATH_LIST);
 }
 
@@ -8951,33 +8957,39 @@ fn alter_vertex_edge_table(p: &mut Parser<'_>) {
 }
 
 fn drop_edge_tables(p: &mut Parser<'_>) {
-    assert!(p.at(DROP_KW));
+    assert!(p.at(DROP_KW) && p.nth_at_ts(1, EDGE));
     let m = p.start();
     p.bump(DROP_KW);
     p.bump_any(); // EDGE/RELATIONSHIP
     p.expect(TABLES_KW);
-    p.expect(L_PAREN);
-    path_name_ref(p);
-    while p.eat(COMMA) {
-        path_name_ref(p);
-    }
-    p.expect(R_PAREN);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        NAME_REF_FIRST,
+        |p| opt_path_name_ref(p).is_some(),
+    );
     opt_cascade_or_restrict(p);
     m.complete(p, DROP_EDGE_TABLES);
 }
 
 fn drop_vertex_tables(p: &mut Parser<'_>) {
-    assert!(p.at(DROP_KW));
+    assert!(p.at(DROP_KW) && p.nth_at_ts(1, VERTEX));
     let m = p.start();
     p.bump(DROP_KW);
     p.bump_any(); // VERTEX/NODE
     p.expect(TABLES_KW);
-    p.expect(L_PAREN);
-    path_name_ref(p);
-    while p.eat(COMMA) {
-        path_name_ref(p);
-    }
-    p.expect(R_PAREN);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        NAME_REF_FIRST,
+        |p| opt_path_name_ref(p).is_some(),
+    );
     opt_cascade_or_restrict(p);
     m.complete(p, DROP_VERTEX_TABLES);
 }
@@ -10090,8 +10102,11 @@ fn opt_except_table_clause(p: &mut Parser<'_>) {
         || "unexpected comma".to_string(),
         RELATION_NAME_FIRST.union(TokenSet::new(&[TABLE_KW])),
         |p| {
+            let m = p.start();
             p.eat(TABLE_KW);
-            opt_relation_name(p).is_some()
+            let result = opt_relation_name(p).is_some();
+            m.complete(p, EXCEPT_TABLE_NAME);
+            result
         },
     );
     m.complete(p, EXCEPT_TABLE_CLAUSE);
@@ -10290,13 +10305,19 @@ fn create_statistics(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn opt_paren_name_ref_list(p: &mut Parser<'_>) -> bool {
-    if p.eat(L_PAREN) {
-        name_ref_list(p);
-        p.expect(R_PAREN);
-        true
-    } else {
-        false
+    if !p.at(L_PAREN) {
+        return false;
     }
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        NAME_REF_FIRST,
+        |p| name_ref(p).is_some(),
+    );
+    true
 }
 
 // CREATE SUBSCRIPTION subscription_name
@@ -12324,7 +12345,8 @@ const REINDEX_OPTION_FIRST: TokenSet = TokenSet::new(&[CONCURRENTLY_KW, VERBOSE_
 //     TABLESPACE new_tablespace
 //     VERBOSE [ boolean ]
 fn opt_reindex_option(p: &mut Parser<'_>) -> bool {
-    match p.current() {
+    let m = p.start();
+    let parsed = match p.current() {
         CONCURRENTLY_KW | VERBOSE_KW => {
             p.bump_any();
             opt_bool_literal(p);
@@ -12336,7 +12358,13 @@ fn opt_reindex_option(p: &mut Parser<'_>) -> bool {
             true
         }
         _ => false,
+    };
+    if parsed {
+        m.complete(p, REINDEX_OPTION);
+    } else {
+        m.abandon(p);
     }
+    parsed
 }
 
 // REINDEX [ ( option [, ...] ) ] { INDEX | TABLE | SCHEMA } [ CONCURRENTLY ] name
@@ -12346,6 +12374,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(REINDEX_KW);
     if p.at(L_PAREN) {
+        let options = p.start();
         delimited(
             p,
             L_PAREN,
@@ -12355,6 +12384,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
             REINDEX_OPTION_FIRST,
             opt_reindex_option,
         );
+        options.complete(p, REINDEX_OPTION_LIST);
     }
     let name_required = match p.current() {
         // { INDEX | TABLE | SCHEMA }
@@ -12689,7 +12719,7 @@ fn opt_direction(p: &mut Parser<'_>) -> bool {
         RELATIVE_KW => {
             let m = p.start();
             p.bump(RELATIVE_KW);
-            if opt_numeric_literal(p).is_none() {
+            if b_expr(p).is_none() {
                 p.error("expected count")
             }
             m.complete(p, RELATIVE);
@@ -12697,7 +12727,7 @@ fn opt_direction(p: &mut Parser<'_>) -> bool {
         ABSOLUTE_KW => {
             let m = p.start();
             p.bump(ABSOLUTE_KW);
-            if opt_numeric_literal(p).is_none() {
+            if b_expr(p).is_none() {
                 p.error("expected count")
             }
             m.complete(p, ABSOLUTE);
@@ -12705,22 +12735,22 @@ fn opt_direction(p: &mut Parser<'_>) -> bool {
         FORWARD_KW => {
             let m = p.start();
             p.bump(FORWARD_KW);
-            if !p.eat(ALL_KW) {
-                let _ = opt_numeric_literal(p);
+            if !p.eat(ALL_KW) && p.at_ts(EXPR_FIRST) {
+                let _ = b_expr(p);
             }
             m.complete(p, FORWARD);
         }
         BACKWARD_KW => {
             let m = p.start();
             p.bump(BACKWARD_KW);
-            if !p.eat(ALL_KW) {
-                let _ = opt_numeric_literal(p);
+            if !p.eat(ALL_KW) && p.at_ts(EXPR_FIRST) {
+                let _ = b_expr(p);
             }
             m.complete(p, BACKWARD);
         }
         // count
-        _ if p.at_ts(NUMERIC_FIRST) => {
-            if opt_numeric_literal(p).is_none() {
+        _ if p.at_ts(NUMERIC_FIRST) || p.at(MINUS) || p.at(PLUS) => {
+            if b_expr(p).is_none() {
                 p.error("expected count")
             }
         }

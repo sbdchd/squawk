@@ -569,6 +569,16 @@ impl ast::WithQuery {
     }
 }
 
+impl ast::CreateTableAsQuery {
+    #[inline]
+    pub fn select_variant(&self) -> Option<ast::SelectVariant> {
+        match self {
+            ast::CreateTableAsQuery::Execute(_) => None,
+            ast::CreateTableAsQuery::SelectVariant(select_variant) => Some(select_variant.clone()),
+        }
+    }
+}
+
 impl ast::SelectVariant {
     #[inline]
     pub fn target_list(&self) -> Option<ast::TargetList> {

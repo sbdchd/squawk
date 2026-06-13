@@ -422,3 +422,50 @@ SOURCE_FILE
         IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  ALTER_PUBLICATION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    TABLES_KW "tables"
+    WHITESPACE " "
+    EXCEPT_TABLE_CLAUSE
+      EXCEPT_KW "except"
+      WHITESPACE " "
+      L_PAREN "("
+      EXCEPT_TABLE_NAME
+        TABLE_KW "table"
+        WHITESPACE " "
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+      COMMA ","
+      WHITESPACE " "
+      EXCEPT_TABLE_NAME
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "u"
+      COMMA ","
+      WHITESPACE " "
+      EXCEPT_TABLE_NAME
+        TABLE_KW "table"
+        WHITESPACE " "
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "k"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

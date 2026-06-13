@@ -144,6 +144,20 @@ SOURCE_FILE
   MOVE
     MOVE_KW "move"
     WHITESPACE " "
+    PREFIX_EXPR
+      MINUS "-"
+      LITERAL
+        INT_NUMBER "5"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cursor_name"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  MOVE
+    MOVE_KW "move"
+    WHITESPACE " "
     ALL
       ALL_KW "ALL"
     WHITESPACE " "
@@ -175,6 +189,23 @@ SOURCE_FILE
         INT_NUMBER "10"
     WHITESPACE " "
     FROM_KW "FROM"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cursor_name"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  MOVE
+    MOVE_KW "move"
+    WHITESPACE " "
+    FORWARD
+      FORWARD_KW "FORWARD"
+      WHITESPACE " "
+      PREFIX_EXPR
+        PLUS "+"
+        LITERAL
+          INT_NUMBER "5"
+    WHITESPACE " "
+    IN_KW "IN"
     WHITESPACE " "
     NAME_REF
       IDENT "cursor_name"

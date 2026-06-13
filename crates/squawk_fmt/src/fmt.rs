@@ -208,7 +208,9 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
                 doc = doc.append(Doc::space()).append(Doc::text("not"));
             }
             doc = doc.append(Doc::space()).append(Doc::text("between"));
-            if between_expr.symmetric_token().is_some() {
+            if between_expr.asymmetric_token().is_some() {
+                doc = doc.append(Doc::space()).append(Doc::text("asymmetric"));
+            } else if between_expr.symmetric_token().is_some() {
                 doc = doc.append(Doc::space()).append(Doc::text("symmetric"));
             }
             doc.append(Doc::space())

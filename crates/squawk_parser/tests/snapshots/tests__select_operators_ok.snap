@@ -2553,6 +2553,58 @@ SOURCE_FILE
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- between asymmetric (inclusive of the range endpoints, explicit default)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            ASYMMETRIC_KW "asymmetric"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not between asymmetric (not between, explicit default)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            NOT_KW "not"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            ASYMMETRIC_KW "asymmetric"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- between symmetric (between, after sorting the two endpoint values)"
   WHITESPACE "\n"
   SELECT

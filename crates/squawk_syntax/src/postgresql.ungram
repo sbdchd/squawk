@@ -367,7 +367,7 @@ Literal =
   )
 
 NamedArg =
-  NameRef FatArrow Expr
+  NameRef (FatArrow | ColonEq) Expr
 
 JsonFormatClause =
   'format' 'json' JsonEncodingClause?
@@ -1364,11 +1364,20 @@ RowList =
 
 Values =
   WithClause?
-  'values' RowList ';'?
+  'values' RowList
+  OrderByClause?
+  LimitClause?
+  OffsetClause?
+  FetchClause? ';'?
 
 Table =
   WithClause?
-  'table' RelationName ';'?
+  'table' RelationName
+  OrderByClause?
+  LockingClause*
+  LimitClause?
+  FetchClause?
+  OffsetClause? ';'?
 
 Insert =
   WithClause?
@@ -1446,7 +1455,7 @@ Update =
   Alias?
   SetClause
   FromClause?
-  WhereClause?
+  (WhereClause | WhereCurrentOf)?
   ReturningClause? ';'?
 
 ForPortionOf =
@@ -1545,6 +1554,10 @@ WithData =
 WithNoData =
   'with' 'no' 'data'
 
+CreateTableAsQuery =
+  SelectVariant
+| Execute
+
 CreateTableAs =
   'create'
   Persistence?
@@ -1557,7 +1570,7 @@ CreateTableAs =
   OnCommit?
   Tablespace?
   'as'
-  query:SelectVariant
+  query:CreateTableAsQuery
   (WithData | WithNoData)? ';'?
 
 CreateMaterializedView =
@@ -1600,7 +1613,7 @@ SliceExpr =
   base:Expr '[' start:Expr? ':' end:Expr? ']'
 
 BetweenExpr =
-  target:Expr 'not'? 'between' 'symmetric'? start:Expr 'and' end:Expr
+  target:Expr 'not'? 'between' ('symmetric' | 'asymmetric')? start:Expr 'and' end:Expr
 
 JsonTableColumn =
   Name 'for' 'ordinality'
@@ -2874,7 +2887,11 @@ CreatePublication =
   WithParams? ';'?
 
 ExceptTableClause =
-  'except' 'table' '(' (RelationName (',' RelationName)*) ')'
+  'except' '(' 'table' ( ExceptTableName (',' ExceptTableName)*) ')'
+
+ExceptTableName =
+  'table'?
+  RelationName
 
 PublicationObject  =
   'table' 'only'? (Path | '(' Path ')') '*'? ColumnList?  WhereConditionClause?
@@ -3340,7 +3357,14 @@ SetTransaction =
   ) ';'?
 
 Reindex =
-  'reindex' ('table' | 'index' | 'schema' | 'database' | 'system')? 'concurrently'? Path? ';'?
+  'reindex' ReindexOptionList? ('table' | 'index' | 'schema' | 'database' | 'system')? 'concurrently'? Path? ';'?
+
+ReindexOptionList =
+  '(' (ReindexOption (',' ReindexOption)*)? ')'
+
+ReindexOption =
+  ('concurrently' | 'verbose') Literal?
+| 'tablespace' Name
 
 CreateView =
   'create' OrReplace? Persistence? 'recursive'? 'view' Path ColumnList?
@@ -3375,7 +3399,7 @@ CheckpointOption =
   Name Expr?
 
 Deallocate =
-  'deallocate' ('prepare' NameRef | 'all') ';'?
+  'deallocate' 'prepare'? (NameRef | 'all') ';'?
 
 Load =
   'load' Literal ';'?
@@ -3411,7 +3435,7 @@ Move =
   | Absolute
   | Forward
   | Backward
-  | Literal
+  | Expr
   )?
   ('from' | 'in')? NameRef ';'?
 
@@ -3427,7 +3451,7 @@ Fetch =
   | Absolute
   | Forward
   | Backward
-  | Literal
+  | Expr
   )?
   ('from' | 'in')? NameRef ';'?
 
@@ -3444,16 +3468,16 @@ Last =
   'last'
 
 Relative =
-  'relative' Literal
+  'relative' Expr
 
 Absolute =
-  'absolute' Literal
+  'absolute' Expr
 
 Forward =
-  'forward' ('all' | Literal)?
+  'forward' ('all' | Expr)?
 
 Backward =
-  'backward' ('all' | Literal)?
+  'backward' ('all' | Expr)?
 
 Close =
   'close' ('all' | NameRef) ';'?
