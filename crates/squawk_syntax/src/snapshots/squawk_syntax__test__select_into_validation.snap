@@ -496,24 +496,25 @@ SOURCE_FILE@0..858
             JSON_ARRAY_FN@614..646
               JSON_ARRAY_KW@614..624 "json_array"
               L_PAREN@624..625 "("
-              SELECT_INTO@625..645
-                SELECT_CLAUSE@625..631
-                  SELECT_KW@625..631 "select"
-                WHITESPACE@631..632 " "
-                INTO_CLAUSE@632..638
-                  INTO_KW@632..636 "into"
-                  WHITESPACE@636..637 " "
-                  PATH@637..638
-                    PATH_SEGMENT@637..638
-                      NAME@637..638
-                        IDENT@637..638 "t"
-                WHITESPACE@638..639 " "
-                FROM_CLAUSE@639..645
-                  FROM_KW@639..643 "from"
-                  WHITESPACE@643..644 " "
-                  FROM_ITEM@644..645
-                    NAME_REF@644..645
-                      IDENT@644..645 "u"
+              JSON_SELECT_FORMAT@625..645
+                SELECT_INTO@625..645
+                  SELECT_CLAUSE@625..631
+                    SELECT_KW@625..631 "select"
+                  WHITESPACE@631..632 " "
+                  INTO_CLAUSE@632..638
+                    INTO_KW@632..636 "into"
+                    WHITESPACE@636..637 " "
+                    PATH@637..638
+                      PATH_SEGMENT@637..638
+                        NAME@637..638
+                          IDENT@637..638 "t"
+                  WHITESPACE@638..639 " "
+                  FROM_CLAUSE@639..645
+                    FROM_KW@639..643 "from"
+                    WHITESPACE@643..644 " "
+                    FROM_ITEM@644..645
+                      NAME_REF@644..645
+                        IDENT@644..645 "u"
               R_PAREN@645..646 ")"
     SEMICOLON@646..647 ";"
   WHITESPACE@647..649 "\n\n"

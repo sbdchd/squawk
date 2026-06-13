@@ -404,8 +404,11 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn opt_json_encoding_clause(p: &mut Parser<'_>) {
-    if p.eat(ENCODING_KW) {
+    if p.at(ENCODING_KW) {
+        let m = p.start();
+        p.bump(ENCODING_KW);
         name_ref(p);
+        m.complete(p, JSON_ENCODING_CLAUSE);
     }
 }
 
@@ -426,6 +429,17 @@ fn opt_json_format_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         m.abandon(p);
         None
     }
+}
+
+// json_value_expr:
+//   a_expr json_format_clause_opt
+fn json_value_expr(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_format_clause(p);
+    m.complete(p, JSON_VALUE_EXPR)
 }
 
 // json_returning_clause_opt:
@@ -707,19 +721,20 @@ fn opt_json_path_clause(p: &mut Parser<'_>) {
 fn opt_json_array_fn_arg_list(p: &mut Parser<'_>) {
     // 1, 2, 3, 4
     while !p.at(EOF) && !p.at(R_PAREN) && !p.at(RETURNING_KW) {
+        let m = p.start();
         if p.at_ts(SELECT_FIRST) {
-            if select(p, None, &SelectRestrictions::default(), false).is_none()
-                || p.at(EOF)
-                || p.at(R_PAREN)
-            {
+            if select(p, None, &SelectRestrictions::default(), false).is_none() {
+                m.abandon(p);
                 break;
             }
             opt_json_format_clause(p);
+            m.complete(p, JSON_SELECT_FORMAT);
         } else {
             if expr(p).is_none() {
                 p.error("expected expression");
             }
             opt_json_format_clause(p);
+            m.complete(p, JSON_EXPR_FORMAT);
         }
         if !p.eat(COMMA) {
             break;
@@ -842,10 +857,7 @@ fn json_arrayagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(JSON_ARRAYAGG_KW);
     p.expect(L_PAREN);
-    if expr(p).is_none() {
-        p.error("expected expression");
-    }
-    opt_json_format_clause(p);
+    json_value_expr(p);
     opt_order_by_clause(p);
     opt_json_null_clause(p);
     opt_json_returning_clause(p);
@@ -2345,10 +2357,7 @@ fn json_key_value(p: &mut Parser) -> Option<CompletedMarker> {
         m.abandon(p);
         return None;
     }
-    if expr(p).is_none() {
-        p.error("expected expression");
-    }
-    opt_json_format_clause(p);
+    json_value_expr(p);
     Some(m.complete(p, JSON_KEY_VALUE))
 }
 
@@ -3300,8 +3309,9 @@ fn data_source(p: &mut Parser<'_>) {
     }
 }
 
-fn xml_table_fn(p: &mut Parser<'_>) {
+fn xml_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLTABLE_KW));
+    let m = p.start();
     p.bump(XMLTABLE_KW);
     p.expect(L_PAREN);
     if p.eat(XMLNAMESPACES_KW) {
@@ -3311,6 +3321,7 @@ fn xml_table_fn(p: &mut Parser<'_>) {
     xml_row_passing_clause(p);
     xmltable_column_list(p);
     p.expect(R_PAREN);
+    m.complete(p, XML_TABLE)
 }
 
 fn xml_row_passing_clause(p: &mut Parser<'_>) {
