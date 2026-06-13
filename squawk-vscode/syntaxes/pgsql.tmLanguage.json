@@ -164,7 +164,7 @@
           "name": "keyword.other.pgsql"
         },
         {
-          "match": "(?i)\\b(not\\s+between\\s+symmetric|is\\s+not\\s+distinct\\s+from|between\\s+symmetric|is\\s+distinct\\s+from|not\\s+similar\\s+to|at\\s+time\\s+zone|not\\s+between|similar\\s+to|not\\s+ilike|not\\s+like|overlaps|between|collate|notnull|is\\s+not|not\\s+in|isnull|ilike|like|and|not|in|is|or)\\b",
+          "match": "(?i)\\b(not\\s+between\\s+asymmetric|not\\s+between\\s+symmetric|is\\s+not\\s+distinct\\s+from|between\\s+asymmetric|between\\s+symmetric|is\\s+distinct\\s+from|not\\s+similar\\s+to|at\\s+time\\s+zone|not\\s+between|similar\\s+to|not\\s+ilike|not\\s+like|overlaps|between|collate|notnull|is\\s+not|not\\s+in|isnull|ilike|like|and|not|in|is|or)\\b",
           "name": "keyword.operator.pgsql"
         },
         {

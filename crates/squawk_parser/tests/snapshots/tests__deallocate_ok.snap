@@ -12,13 +12,22 @@ SOURCE_FILE
     WHITESPACE " "
     ALL_KW "all"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n"
   DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
     ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  DEALLOCATE
+    DEALLOCATE_KW "deallocate"
+    WHITESPACE " "
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
   DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "

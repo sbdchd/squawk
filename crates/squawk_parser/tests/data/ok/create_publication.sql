@@ -21,3 +21,6 @@ create publication p
 
 -- multiple tables
 create publication pub for table chats, users;
+
+create publication p for all tables except (table only t);
+create publication p for all tables except (table t, u, table k);

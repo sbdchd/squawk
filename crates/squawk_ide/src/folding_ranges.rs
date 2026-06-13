@@ -143,6 +143,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::PARTITION_ITEM_LIST
         | SyntaxKind::PARTITION_LIST
         | SyntaxKind::PATH_LIST
+        | SyntaxKind::REINDEX_OPTION_LIST
         | SyntaxKind::RETURNING_OPTION_LIST
         | SyntaxKind::REVOKE_COMMAND_LIST
         | SyntaxKind::ROLE_OPTION_LIST
