@@ -88,6 +88,7 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
     let UploadToGithubArgs {
         paths,
         fail_on_violations,
+        only_comment_on_violations,
         github_private_key,
         github_api_url,
         github_token,
@@ -105,6 +106,14 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
         } else {
             fail_on_violations
         };
+
+    let only_comment_on_violations = if let Some(only_comment_on_violations_cfg) =
+        cfg.upload_to_github.only_comment_on_violations
+    {
+        only_comment_on_violations_cfg
+    } else {
+        only_comment_on_violations
+    };
 
     let github_app = create_gh_app(
         &github_api_url,
@@ -133,8 +142,16 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
         info!("no files checked, exiting");
         return Ok(());
     }
-    info!("generating github comment body");
-    let comment_body = get_comment_body(&file_results, VERSION);
+
+    let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
+
+    let comment_body = if only_comment_on_violations && violations == 0 {
+        info!("no violations found, posting clean summary comment");
+        get_clean_comment_body(file_results.len())
+    } else {
+        info!("generating github comment body");
+        get_comment_body(&file_results, VERSION)
+    };
 
     comment_on_pr(
         github_app.as_ref(),
@@ -151,14 +168,16 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
         fmt_github_annotations(&mut handle, &file_results)?;
     }
 
-    let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
-
     if fail_on_violations && violations > 0 {
         let files = file_results.len();
         bail!("Found {violations} violation(s) across {files} file(s)");
     }
 
     Ok(())
+}
+
+fn get_clean_comment_body(file_count: usize) -> String {
+    format!("{COMMENT_HEADER}\n\n✅ 0 violations across {file_count} file(s)")
 }
 
 fn get_comment_body(files: &[CheckReport], version: &str) -> String {
@@ -425,6 +444,12 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
         let body = get_comment_body(&violations, "0.2.3");
 
+        assert_snapshot!(body);
+    }
+
+    #[test]
+    fn generating_clean_comment_no_violations() {
+        let body = super::get_clean_comment_body(8);
         assert_snapshot!(body);
     }
 
