@@ -4460,6 +4460,26 @@ pub struct CompoundSelect {
 }
 impl CompoundSelect {
     #[inline]
+    pub fn fetch_clause(&self) -> Option<FetchClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn limit_clause(&self) -> Option<LimitClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn locking_clauses(&self) -> AstChildren<LockingClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn offset_clause(&self) -> Option<OffsetClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn order_by_clause(&self) -> Option<OrderByClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
@@ -11564,8 +11584,16 @@ pub struct GroupingCube {
 }
 impl GroupingCube {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
     pub fn cube_token(&self) -> Option<SyntaxToken> {
@@ -11590,8 +11618,16 @@ pub struct GroupingRollup {
 }
 impl GroupingRollup {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
     pub fn rollup_token(&self) -> Option<SyntaxToken> {
@@ -11605,8 +11641,8 @@ pub struct GroupingSets {
 }
 impl GroupingSets {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
+    pub fn group_bys(&self) -> AstChildren<GroupBy> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
@@ -12532,10 +12568,6 @@ pub struct JsonArrayAggFn {
 }
 impl JsonArrayAggFn {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn json_null_clause(&self) -> Option<JsonNullClause> {
         support::child(&self.syntax)
     }
@@ -12544,8 +12576,12 @@ impl JsonArrayAggFn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn json_select_formats(&self) -> AstChildren<JsonSelectFormat> {
-        support::children(&self.syntax)
+    pub fn json_value_expr(&self) -> Option<JsonValueExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn order_by_clause(&self) -> Option<OrderByClause> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
@@ -12593,17 +12629,6 @@ impl JsonArrayFn {
     #[inline]
     pub fn json_array_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::JSON_ARRAY_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct JsonBehaviorClause {
-    pub(crate) syntax: SyntaxNode,
-}
-impl JsonBehaviorClause {
-    #[inline]
-    pub fn json_behavior(&self) -> Option<JsonBehavior> {
-        support::child(&self.syntax)
     }
 }
 
@@ -13054,11 +13079,15 @@ impl JsonQueryFn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn json_behavior_clause(&self) -> Option<JsonBehaviorClause> {
+    pub fn json_format_clause(&self) -> Option<JsonFormatClause> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn json_format_clause(&self) -> Option<JsonFormatClause> {
+    pub fn json_on_empty_clause(&self) -> Option<JsonOnEmptyClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn json_on_error_clause(&self) -> Option<JsonOnErrorClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13380,11 +13409,15 @@ impl JsonValueFn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn json_behavior_clause(&self) -> Option<JsonBehaviorClause> {
+    pub fn json_format_clause(&self) -> Option<JsonFormatClause> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn json_format_clause(&self) -> Option<JsonFormatClause> {
+    pub fn json_on_empty_clause(&self) -> Option<JsonOnEmptyClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn json_on_error_clause(&self) -> Option<JsonOnErrorClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -29259,24 +29292,6 @@ impl AstNode for JsonArrayFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JSON_ARRAY_FN
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for JsonBehaviorClause {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::JSON_BEHAVIOR_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

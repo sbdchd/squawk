@@ -166,10 +166,10 @@ JsonObjectAggFn =
 
 JsonArrayAggFn =
   'json_arrayagg' '('
-    (JsonSelectFormat (',' JsonSelectFormat)*)
-      JsonNullClause?
-      JsonReturningClause?
-    | Expr JsonReturningClause
+    JsonValueExpr
+    OrderByClause?
+    JsonNullClause?
+    JsonReturningClause?
   ')'
 
 JsonQueryFn =
@@ -182,7 +182,8 @@ JsonQueryFn =
     JsonReturningClause?
     JsonWrapperBehaviorClause?
     JsonQuotesClause?
-    JsonBehaviorClause?
+    JsonOnEmptyClause?
+    JsonOnErrorClause?
   ')'
 
 XmlTable =
@@ -234,7 +235,8 @@ JsonValueFn =
     Expr
     JsonPassingClause?
     JsonReturningClause?
-    JsonBehaviorClause?
+    JsonOnEmptyClause?
+    JsonOnErrorClause?
   ')'
 
 SubstringFn =
@@ -918,13 +920,13 @@ GroupBy =
 | GroupingSets
 
 GroupingRollup =
-  'rollup' Expr
+  'rollup' '(' (Expr (',' Expr)*)? ')'
 
 GroupingSets =
-  'grouping' 'sets' '(' Expr ')'
+  'grouping' 'sets' '(' (GroupBy (',' GroupBy)*)? ')'
 
 GroupingCube =
-  'cube' Expr
+  'cube' '(' (Expr (',' Expr)*)? ')'
 
 GroupingExpr =
   Expr
@@ -1692,9 +1694,6 @@ JsonOnErrorClause =
 JsonOnEmptyClause =
   JsonBehavior 'on' 'empty'
 
-JsonBehaviorClause =
-  JsonBehavior
-
 JsonPassingArg =
   Expr 'as' Name
 
@@ -1817,6 +1816,11 @@ CompoundSelect =
   ('union' | 'intersect' | 'except' )
   ('all' | 'distinct')?
   rhs:SelectVariant
+  OrderByClause?
+  LockingClause*
+  LimitClause?
+  FetchClause?
+  OffsetClause?
   ';'?
 
 SelectInto =
