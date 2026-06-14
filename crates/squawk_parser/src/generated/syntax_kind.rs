@@ -634,6 +634,7 @@ pub enum SyntaxKind {
     ALTER_VIEW,
     ANALYZE,
     ANY_FN,
+    ARG,
     ARG_LIST,
     ARRAY_EXPR,
     ARRAY_TYPE,

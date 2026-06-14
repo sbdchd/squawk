@@ -637,8 +637,9 @@ SOURCE_FILE
       VARCHAR_KW "varchar"
       ARG_LIST
         L_PAREN "("
-        LITERAL
-          INT_NUMBER "100"
+        ARG
+          LITERAL
+            INT_NUMBER "100"
         R_PAREN ")"
     COMMA ","
     WHITESPACE " "
@@ -646,8 +647,9 @@ SOURCE_FILE
       VARCHAR_KW "varchar"
       ARG_LIST
         L_PAREN "("
-        LITERAL
-          INT_NUMBER "200"
+        ARG
+          LITERAL
+            INT_NUMBER "200"
         R_PAREN ")"
     R_PAREN ")"
     WHITESPACE " "

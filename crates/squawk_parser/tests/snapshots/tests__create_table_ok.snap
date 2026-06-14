@@ -3964,20 +3964,23 @@ SOURCE_FILE
               IDENT "tstzrange"
             ARG_LIST
               L_PAREN "("
-              CALL_EXPR
-                NAME_REF
-                  IDENT "now"
-                ARG_LIST
-                  L_PAREN "("
-                  R_PAREN ")"
+              ARG
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "now"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'infinity'"
+              ARG
+                LITERAL
+                  STRING "'infinity'"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'[)'"
+              ARG
+                LITERAL
+                  STRING "'[)'"
               R_PAREN ")"
       COMMA ","
       WHITESPACE "\n    "

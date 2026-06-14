@@ -414,8 +414,9 @@ SOURCE_FILE
                 IDENT "sum"
               ARG_LIST
                 L_PAREN "("
-                NAME_REF
-                  IDENT "i"
+                ARG
+                  NAME_REF
+                    IDENT "i"
                 R_PAREN ")"
       WHITESPACE " "
       FROM_CLAUSE
@@ -476,8 +477,9 @@ SOURCE_FILE
                 IDENT "sum"
               ARG_LIST
                 L_PAREN "("
-                NAME_REF
-                  IDENT "bar"
+                ARG
+                  NAME_REF
+                    IDENT "bar"
                 R_PAREN ")"
       WHITESPACE " "
       FROM_CLAUSE
@@ -534,12 +536,14 @@ SOURCE_FILE
         IDENT "query"
       ARG_LIST
         L_PAREN "("
-        LITERAL
-          INT_NUMBER "100"
+        ARG
+          LITERAL
+            INT_NUMBER "100"
         COMMA ","
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "200"
+        ARG
+          LITERAL
+            INT_NUMBER "200"
         R_PAREN ")"
       SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -566,8 +570,9 @@ SOURCE_FILE
                 IDENT "sum"
               ARG_LIST
                 L_PAREN "("
-                NAME_REF
-                  IDENT "bar"
+                ARG
+                  NAME_REF
+                    IDENT "bar"
                 R_PAREN ")"
       WHITESPACE " "
       FROM_CLAUSE
@@ -635,8 +640,9 @@ SOURCE_FILE
                 IDENT "sum"
               ARG_LIST
                 L_PAREN "("
-                NAME_REF
-                  IDENT "bar"
+                ARG
+                  NAME_REF
+                    IDENT "bar"
                 R_PAREN ")"
       WHITESPACE " "
       FROM_CLAUSE

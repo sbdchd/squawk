@@ -24,8 +24,9 @@ SOURCE_FILE@0..170
               IDENT@22..25 "foo"
             ARG_LIST@25..34
               L_PAREN@25..26 "("
-              LITERAL@26..33
-                DEFAULT_KW@26..33 "DEFAULT"
+              ARG@26..33
+                LITERAL@26..33
+                  DEFAULT_KW@26..33 "DEFAULT"
               R_PAREN@33..34 ")"
           R_PAREN@34..35 ")"
     SEMICOLON@35..36 ";"

@@ -188,7 +188,7 @@ fn name_from_name_ref(
                 SyntaxKind::FLOAT_KW => {
                     let precision = arg_list.and_then(|arg| {
                         arg.args().find_map(|arg| {
-                            if let ast::Arg::Expr(ast::Expr::Literal(lit)) = arg {
+                            if let Some(ast::Expr::Literal(lit)) = arg.expr() {
                                 lit.syntax().text().to_string().parse::<u32>().ok()
                             } else {
                                 None

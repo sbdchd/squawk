@@ -341,8 +341,9 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                INT_NUMBER "1"
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
               ERROR
                 COMMA ","
               R_PAREN ")"
@@ -361,8 +362,9 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               ERROR
                 COMMA ","
@@ -532,11 +534,13 @@ SOURCE_FILE
               VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "100"
+                ARG
+                  LITERAL
+                    INT_NUMBER "100"
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "200"
+                ARG
+                  LITERAL
+                    INT_NUMBER "200"
                 R_PAREN ")"
             R_PAREN ")"
     SEMICOLON ";"
@@ -559,15 +563,17 @@ SOURCE_FILE
               VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "100"
+                ARG
+                  LITERAL
+                    INT_NUMBER "100"
                 COMMA ","
                 WHITESPACE " "
                 ERROR
                   COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "200"
+                ARG
+                  LITERAL
+                    INT_NUMBER "200"
                 R_PAREN ")"
             R_PAREN ")"
     SEMICOLON ";"
@@ -593,12 +599,14 @@ SOURCE_FILE
                     IDENT "t"
               ARG_LIST
                 L_PAREN "("
-                NAME_REF
-                  IDENT "a"
+                ARG
+                  NAME_REF
+                    IDENT "a"
                 COMMA ","
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "b"
+                ARG
+                  NAME_REF
+                    IDENT "b"
                 ERROR
                   COMMA ","
                 R_PAREN ")"

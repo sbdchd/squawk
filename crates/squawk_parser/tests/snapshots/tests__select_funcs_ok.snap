@@ -16,14 +16,15 @@ SOURCE_FILE
               NORMALIZE_KW "normalize"
             ARG_LIST
               L_PAREN "("
-              BIN_EXPR
-                LITERAL
-                  STRING "'a'"
-                WHITESPACE " "
-                PLUS "+"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'b'"
+              ARG
+                BIN_EXPR
+                  LITERAL
+                    STRING "'a'"
+                  WHITESPACE " "
+                  PLUS "+"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'b'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -38,20 +39,66 @@ SOURCE_FILE
               NORMALIZE_KW "normalize"
             ARG_LIST
               L_PAREN "("
-              BIN_EXPR
+              ARG
+                BIN_EXPR
+                  LITERAL
+                    STRING "'a'"
+                  WHITESPACE " "
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'b'"
+              COMMA ","
+              WHITESPACE " "
+              ARG
+                NAME_REF
+                  NFC_KW "nfc"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NORMALIZE_KW "normalize"
+            ARG_LIST
+              L_PAREN "("
+              ARG
                 LITERAL
-                  STRING "'a'"
-                WHITESPACE " "
-                CUSTOM_OP
-                  PIPE "|"
-                  PIPE "|"
-                WHITESPACE " "
+                  STRING "'c'"
+              COMMA ","
+              WHITESPACE " "
+              ARG
+                NAME_REF
+                  NFD_KW "nfd"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NORMALIZE_KW "normalize"
+            ARG_LIST
+              L_PAREN "("
+              ARG
                 LITERAL
-                  STRING "'b'"
+                  STRING "'d'"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                NFC_KW "nfc"
+              ARG
+                NAME_REF
+                  NFKC_KW "nfkc"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -66,52 +113,14 @@ SOURCE_FILE
               NORMALIZE_KW "normalize"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'c'"
+              ARG
+                LITERAL
+                  STRING "'e'"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                NFD_KW "nfd"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            NAME_REF
-              NORMALIZE_KW "normalize"
-            ARG_LIST
-              L_PAREN "("
-              LITERAL
-                STRING "'d'"
-              COMMA ","
-              WHITESPACE " "
-              NAME_REF
-                NFKC_KW "nfkc"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            NAME_REF
-              NORMALIZE_KW "normalize"
-            ARG_LIST
-              L_PAREN "("
-              LITERAL
-                STRING "'e'"
-              COMMA ","
-              WHITESPACE " "
-              NAME_REF
-                NFKD_KW "nfkd"
+              ARG
+                NAME_REF
+                  NFKD_KW "nfkd"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -128,12 +137,14 @@ SOURCE_FILE
               NULLIF_KW "nullif"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -150,12 +161,14 @@ SOURCE_FILE
               COALESCE_KW "coalesce"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -170,24 +183,29 @@ SOURCE_FILE
               COALESCE_KW "coalesce"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              ARG
+                NAME_REF
+                  IDENT "c"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "d"
+              ARG
+                NAME_REF
+                  IDENT "d"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'foo'"
+              ARG
+                LITERAL
+                  STRING "'foo'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -204,12 +222,14 @@ SOURCE_FILE
               IDENT "greater"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -224,24 +244,29 @@ SOURCE_FILE
               IDENT "greater"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              ARG
+                NAME_REF
+                  IDENT "c"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "d"
+              ARG
+                NAME_REF
+                  IDENT "d"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "0"
+              ARG
+                LITERAL
+                  INT_NUMBER "0"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -258,12 +283,14 @@ SOURCE_FILE
               LEAST_KW "least"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -278,24 +305,29 @@ SOURCE_FILE
               LEAST_KW "least"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              ARG
+                NAME_REF
+                  IDENT "c"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "d"
+              ARG
+                NAME_REF
+                  IDENT "d"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "0"
+              ARG
+                LITERAL
+                  INT_NUMBER "0"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -802,12 +834,14 @@ SOURCE_FILE
               XMLCONCAT_KW "xmlconcat"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2594,12 +2628,14 @@ SOURCE_FILE
               IDENT "buzz"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'x'"
+              ARG
+                LITERAL
+                  STRING "'x'"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'y'"
+              ARG
+                LITERAL
+                  STRING "'y'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2616,24 +2652,26 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              NAMED_ARG
-                NAME_REF
-                  IDENT "a"
-                WHITESPACE " "
-                FAT_ARROW "=>"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'foo'"
+              ARG
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'foo'"
               COMMA ","
               WHITESPACE " "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "b"
-                WHITESPACE " "
-                FAT_ARROW "=>"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'bar'"
+              ARG
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "b"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'bar'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2650,22 +2688,25 @@ SOURCE_FILE
               IDENT "foo"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'bar'"
-              COMMA ","
-              WHITESPACE " "
-              LITERAL
-                STRING "'buzz'"
-              COMMA ","
-              WHITESPACE " "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "boo"
-                WHITESPACE " "
-                FAT_ARROW "=>"
-                WHITESPACE " "
+              ARG
                 LITERAL
-                  TRUE_KW "true"
+                  STRING "'bar'"
+              COMMA ","
+              WHITESPACE " "
+              ARG
+                LITERAL
+                  STRING "'buzz'"
+              COMMA ","
+              WHITESPACE " "
+              ARG
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "boo"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  LITERAL
+                    TRUE_KW "true"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2682,18 +2723,20 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'b'"
+              ARG
+                LITERAL
+                  STRING "'b'"
               COMMA ","
               WHITESPACE " "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "a"
-                WHITESPACE " "
-                COLON_EQ ":="
-                WHITESPACE " "
-                LITERAL
-                  TRUE_KW "true"
+              ARG
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  WHITESPACE " "
+                  LITERAL
+                    TRUE_KW "true"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3133,8 +3176,9 @@ SOURCE_FILE
               IDENT "pg_sleep"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                NUMERIC_NUMBER "1.5"
+              ARG
+                LITERAL
+                  NUMERIC_NUMBER "1.5"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3149,8 +3193,9 @@ SOURCE_FILE
               IDENT "pg_sleep_for"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'5 minutes'"
+              ARG
+                LITERAL
+                  STRING "'5 minutes'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -3165,8 +3210,9 @@ SOURCE_FILE
               IDENT "pg_sleep_until"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'tomorrow 03:00'"
+              ARG
+                LITERAL
+                  STRING "'tomorrow 03:00'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3185,21 +3231,22 @@ SOURCE_FILE
               IDENT "array_agg"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "v"
-              WHITESPACE " "
-              ORDER_BY_CLAUSE
-                ORDER_KW "order"
+              ARG
+                NAME_REF
+                  IDENT "v"
                 WHITESPACE " "
-                BY_KW "by"
-                WHITESPACE " "
-                SORT_BY_LIST
-                  SORT_BY
-                    NAME_REF
-                      IDENT "v"
-                    WHITESPACE " "
-                    SORT_DESC
-                      DESC_KW "desc"
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        IDENT "v"
+                      WHITESPACE " "
+                      SORT_DESC
+                        DESC_KW "desc"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3223,22 +3270,24 @@ SOURCE_FILE
               IDENT "jsonb_object_agg"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "k"
+              ARG
+                NAME_REF
+                  IDENT "k"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "v"
-              WHITESPACE " "
-              ORDER_BY_CLAUSE
-                ORDER_KW "order"
+              ARG
+                NAME_REF
+                  IDENT "v"
                 WHITESPACE " "
-                BY_KW "by"
-                WHITESPACE " "
-                SORT_BY_LIST
-                  SORT_BY
-                    NAME_REF
-                      IDENT "v"
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        IDENT "v"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3262,22 +3311,24 @@ SOURCE_FILE
               IDENT "string_agg"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "','"
-              WHITESPACE " "
-              ORDER_BY_CLAUSE
-                ORDER_KW "order"
+              ARG
+                LITERAL
+                  STRING "','"
                 WHITESPACE " "
-                BY_KW "by"
-                WHITESPACE " "
-                SORT_BY_LIST
-                  SORT_BY
-                    NAME_REF
-                      IDENT "a"
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        IDENT "a"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3301,23 +3352,24 @@ SOURCE_FILE
               IDENT "string_agg"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
-              WHITESPACE " "
-              ORDER_BY_CLAUSE
-                ORDER_KW "order"
+              ARG
+                NAME_REF
+                  IDENT "a"
                 WHITESPACE " "
-                BY_KW "by"
-                WHITESPACE " "
-                SORT_BY_LIST
-                  SORT_BY
-                    NAME_REF
-                      IDENT "a"
-                  COMMA ","
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
                   WHITESPACE " "
-                  SORT_BY
-                    LITERAL
-                      STRING "','"
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        IDENT "a"
+                    COMMA ","
+                    WHITESPACE " "
+                    SORT_BY
+                      LITERAL
+                        STRING "','"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3343,12 +3395,14 @@ SOURCE_FILE
               L_PAREN "("
               DISTINCT_KW "distinct"
               WHITESPACE " "
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3374,18 +3428,19 @@ SOURCE_FILE
               L_PAREN "("
               DISTINCT_KW "distinct"
               WHITESPACE " "
-              NAME_REF
-                IDENT "v"
-              WHITESPACE " "
-              ORDER_BY_CLAUSE
-                ORDER_KW "order"
+              ARG
+                NAME_REF
+                  IDENT "v"
                 WHITESPACE " "
-                BY_KW "by"
-                WHITESPACE " "
-                SORT_BY_LIST
-                  SORT_BY
-                    NAME_REF
-                      IDENT "v"
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        IDENT "v"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3409,8 +3464,9 @@ SOURCE_FILE
               IDENT "foo"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                NUMERIC_NUMBER "0.5"
+              ARG
+                LITERAL
+                  NUMERIC_NUMBER "0.5"
               R_PAREN ")"
             WHITESPACE " "
             WITHIN_CLAUSE
@@ -3541,12 +3597,14 @@ SOURCE_FILE
             IDENT "generate_series"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              INT_NUMBER "1"
+            ARG
+              LITERAL
+                INT_NUMBER "1"
             COMMA ","
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "10"
+            ARG
+              LITERAL
+                INT_NUMBER "10"
             R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -3575,8 +3633,9 @@ SOURCE_FILE
               L_PAREN "("
               ALL_KW "all"
               WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              ARG
+                NAME_REF
+                  IDENT "c"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3593,8 +3652,9 @@ SOURCE_FILE
               L_PAREN "("
               DISTINCT_KW "distinct"
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3613,10 +3673,11 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              VARIADIC_KW "variadic"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "foo"
+              ARG
+                VARIADIC_KW "variadic"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "foo"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3631,79 +3692,8 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              VARIADIC_KW "variadic"
-              WHITESPACE " "
-              ARRAY_EXPR
-                ARRAY_KW "array"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "1"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "3"
-                R_BRACK "]"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n\n"
-  COMMENT "-- array"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            NAME_REF
-              IDENT "b"
-            ARG_LIST
-              L_PAREN "("
-              VARIADIC_KW "variadic"
-              WHITESPACE " "
-              CAST_EXPR
-                ARRAY_EXPR
-                  ARRAY_KW "array"
-                  L_BRACK "["
-                  R_BRACK "]"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                ARRAY_TYPE
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          NUMERIC_KW "numeric"
-                  L_BRACK "["
-                  R_BRACK "]"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n\n"
-  COMMENT "-- named"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            NAME_REF
-              IDENT "c"
-            ARG_LIST
-              L_PAREN "("
-              VARIADIC_KW "variadic"
-              WHITESPACE " "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "arr"
-                WHITESPACE " "
-                FAT_ARROW "=>"
+              ARG
+                VARIADIC_KW "variadic"
                 WHITESPACE " "
                 ARRAY_EXPR
                   ARRAY_KW "array"
@@ -3722,6 +3712,80 @@ SOURCE_FILE
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- array"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "b"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                VARIADIC_KW "variadic"
+                WHITESPACE " "
+                CAST_EXPR
+                  ARRAY_EXPR
+                    ARRAY_KW "array"
+                    L_BRACK "["
+                    R_BRACK "]"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  ARRAY_TYPE
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            NUMERIC_KW "numeric"
+                    L_BRACK "["
+                    R_BRACK "]"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- named"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "c"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                VARIADIC_KW "variadic"
+                WHITESPACE " "
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "arr"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  ARRAY_EXPR
+                    ARRAY_KW "array"
+                    L_BRACK "["
+                    LITERAL
+                      INT_NUMBER "1"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "2"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "3"
+                    R_BRACK "]"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- last param"
   WHITESPACE "\n"
   SELECT
@@ -3735,34 +3799,38 @@ SOURCE_FILE
               IDENT "f"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
+              ARG
+                NAME_REF
+                  IDENT "b"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              ARG
+                NAME_REF
+                  IDENT "c"
               COMMA ","
               WHITESPACE " "
-              VARIADIC_KW "variadic"
-              WHITESPACE " "
-              ARRAY_EXPR
-                ARRAY_KW "array"
-                L_BRACK "["
-                LITERAL
-                  INT_NUMBER "1"
-                COMMA ","
+              ARG
+                VARIADIC_KW "variadic"
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "3"
-                R_BRACK "]"
+                ARRAY_EXPR
+                  ARRAY_KW "array"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "1"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "2"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "3"
+                  R_BRACK "]"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -3781,8 +3849,9 @@ SOURCE_FILE
               IDENT "max"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
             WHITESPACE " "
             OVER_CLAUSE
@@ -3825,8 +3894,9 @@ SOURCE_FILE
               IDENT "max"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "a"
+              ARG
+                NAME_REF
+                  IDENT "a"
               R_PAREN ")"
             WHITESPACE " "
             OVER_CLAUSE

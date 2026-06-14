@@ -35,8 +35,9 @@ SOURCE_FILE
         IDENT "f"
       ARG_LIST
         L_PAREN "("
-        NAME_REF
-          IDENT "a"
+        ARG
+          NAME_REF
+            IDENT "a"
         R_PAREN ")"
       SEMICOLON ";"
   WHITESPACE "\n\n"

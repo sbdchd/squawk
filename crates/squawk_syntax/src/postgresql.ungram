@@ -62,7 +62,7 @@ ParamList =
 
 ArgList =
  '(' '*' ')'
-| '(' ('distinct' | 'all')? 'variadic'? args:(Arg (',' Arg)*)? OrderByClause? ')'
+| '(' ('distinct' | 'all')? args:(Arg (',' Arg)*)? ')'
 
 CallExpr =
   Expr ArgList WithinClause? FilterClause? OverClause?
@@ -241,9 +241,9 @@ JsonValueFn =
 
 SubstringFn =
   'substring' '('
-    Expr 'for' Expr ('from' Expr)
-  | Expr 'from' Expr ('for' Expr)
-  | Expr 'similar' Expr 'escape' Expr
+    Expr 'for' Expr ('from' Expr)?
+  | Expr 'from' Expr ('for' Expr)?
+  | Expr 'similar' Expr
   | (Expr (',' Expr)*)
   ')'
 
@@ -460,9 +460,10 @@ Op =
 | '<' 
 | '=' 
 | '>' 
-| 'and' 
-| 'collate' 
-| 'ilike' 
+| 'and'
+| 'collate'
+| 'escape'
+| 'ilike'
 | 'in' 
 | 'is'
 | 'isnull'
@@ -630,8 +631,8 @@ Type =
 | IntervalType
 
 Arg =
-  Expr
-| NamedArg
+  'variadic'?
+  (Expr | NamedArg) OrderByClause?
 
 // For when we're parsing expressions and then later we realize they're types.
 // e.g., `select pg_catalog.varchar(10) 'foo'`
@@ -1594,7 +1595,7 @@ ReleaseSavepoint =
   'release' 'savepoint' NameRef ';'?
 
 ParenExpr =
-  '(' Expr | Select | FromItem ')'
+  '(' (Expr | Select | FromItem) ')'
 
 TupleExpr =
   '(' (Expr (',' Expr)*) ')'

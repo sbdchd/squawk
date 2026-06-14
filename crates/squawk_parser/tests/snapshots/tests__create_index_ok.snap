@@ -239,8 +239,9 @@ SOURCE_FILE
                 IDENT "f"
               ARG_LIST
                 L_PAREN "("
-                NAME_REF
-                  IDENT "c"
+                ARG
+                  NAME_REF
+                    IDENT "c"
                 R_PAREN ")"
             WHITESPACE " "
             PLUS "+"
@@ -544,8 +545,9 @@ SOURCE_FILE
               IDENT "lower"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "title"
+              ARG
+                NAME_REF
+                  IDENT "title"
               R_PAREN ")"
           R_PAREN ")"
       R_PAREN ")"
@@ -758,11 +760,13 @@ SOURCE_FILE
             IDENT "box"
           ARG_LIST
             L_PAREN "("
-            NAME_REF
-              LOCATION_KW "location"
+            ARG
+              NAME_REF
+                LOCATION_KW "location"
             COMMA ","
-            NAME_REF
-              LOCATION_KW "location"
+            ARG
+              NAME_REF
+                LOCATION_KW "location"
             R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
