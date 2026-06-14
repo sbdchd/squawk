@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.58.0 - 2026-06-13
+
+### Added
+
+- parser: surface `variadic` token in `Arg` AST node (#1201)
+
+### Fixed
+
+- parser: fix gaps with cte search/cycle, grant, vacuum, at local, & more (#1198, #1199, #1200)
+- parser: fix collate parsing in create table + more (#1197)
+
 ## v2.57.0 - 2026-06-06
 
 ### Added
