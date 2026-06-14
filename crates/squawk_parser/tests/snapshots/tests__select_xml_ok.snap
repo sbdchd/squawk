@@ -146,11 +146,13 @@ SOURCE_FILE
                       NUMERIC_KW "numeric"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "5"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "5"
                   COMMA ","
-                  LITERAL
-                    INT_NUMBER "2"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "2"
                   R_PAREN ")"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST
@@ -178,11 +180,13 @@ SOURCE_FILE
                       NUMERIC_KW "numeric"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "5"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "5"
                   COMMA ","
-                  LITERAL
-                    INT_NUMBER "2"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "2"
                   R_PAREN ")"
               WHITESPACE " "
               XML_COLUMN_OPTION_LIST

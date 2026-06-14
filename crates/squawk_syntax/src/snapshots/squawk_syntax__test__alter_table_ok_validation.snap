@@ -44,26 +44,28 @@ SOURCE_FILE@0..470
               IDENT@156..178 "is_widget_config_valid"
           ARG_LIST@178..229
             L_PAREN@178..179 "("
-            CAST_EXPR@179..220
-              LITERAL@179..187
-                STRING@179..187 "'widget'"
-              COLON_COLON@187..189
-                COLON@187..188 ":"
-                COLON@188..189 ":"
-              PATH_TYPE@189..220
-                PATH@189..220
-                  PATH@189..201
-                    PATH_SEGMENT@189..201
-                      NAME_REF@189..201
-                        IDENT@189..201 "custom_types"
-                  DOT@201..202 "."
-                  PATH_SEGMENT@202..220
-                    NAME_REF@202..220
-                      IDENT@202..220 "widget_schema_type"
+            ARG@179..220
+              CAST_EXPR@179..220
+                LITERAL@179..187
+                  STRING@179..187 "'widget'"
+                COLON_COLON@187..189
+                  COLON@187..188 ":"
+                  COLON@188..189 ":"
+                PATH_TYPE@189..220
+                  PATH@189..220
+                    PATH@189..201
+                      PATH_SEGMENT@189..201
+                        NAME_REF@189..201
+                          IDENT@189..201 "custom_types"
+                    DOT@201..202 "."
+                    PATH_SEGMENT@202..220
+                      NAME_REF@202..220
+                        IDENT@202..220 "widget_schema_type"
             COMMA@220..221 ","
             WHITESPACE@221..222 " "
-            NAME_REF@222..228
-              IDENT@222..228 "config"
+            ARG@222..228
+              NAME_REF@222..228
+                IDENT@222..228 "config"
             R_PAREN@228..229 ")"
         WHITESPACE@229..232 "\n  "
         R_PAREN@232..233 ")"
@@ -113,26 +115,28 @@ SOURCE_FILE@0..470
               IDENT@363..385 "is_widget_config_valid"
           ARG_LIST@385..455
             L_PAREN@385..386 "("
-            CAST_EXPR@386..436
-              LITERAL@386..403
-                STRING@386..403 "'widget_instance'"
-              COLON_COLON@403..405
-                COLON@403..404 ":"
-                COLON@404..405 ":"
-              PATH_TYPE@405..436
-                PATH@405..436
-                  PATH@405..417
-                    PATH_SEGMENT@405..417
-                      NAME_REF@405..417
-                        IDENT@405..417 "custom_types"
-                  DOT@417..418 "."
-                  PATH_SEGMENT@418..436
-                    NAME_REF@418..436
-                      IDENT@418..436 "widget_schema_type"
+            ARG@386..436
+              CAST_EXPR@386..436
+                LITERAL@386..403
+                  STRING@386..403 "'widget_instance'"
+                COLON_COLON@403..405
+                  COLON@403..404 ":"
+                  COLON@404..405 ":"
+                PATH_TYPE@405..436
+                  PATH@405..436
+                    PATH@405..417
+                      PATH_SEGMENT@405..417
+                        NAME_REF@405..417
+                          IDENT@405..417 "custom_types"
+                    DOT@417..418 "."
+                    PATH_SEGMENT@418..436
+                      NAME_REF@418..436
+                        IDENT@418..436 "widget_schema_type"
             COMMA@436..437 ","
             WHITESPACE@437..438 " "
-            NAME_REF@438..454
-              IDENT@438..454 "config_overrides"
+            ARG@438..454
+              NAME_REF@438..454
+                IDENT@438..454 "config_overrides"
             R_PAREN@454..455 ")"
         WHITESPACE@455..458 "\n  "
         R_PAREN@458..459 ")"

@@ -614,8 +614,9 @@ SOURCE_FILE
         VARCHAR_KW "varchar"
         ARG_LIST
           L_PAREN "("
-          LITERAL
-            INT_NUMBER "255"
+          ARG
+            LITERAL
+              INT_NUMBER "255"
           R_PAREN ")"
     WHITESPACE "\n"
     FUNC_OPTION_LIST
@@ -630,8 +631,9 @@ SOURCE_FILE
           VARCHAR_KW "varchar"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              INT_NUMBER "100"
+            ARG
+              LITERAL
+                INT_NUMBER "100"
             R_PAREN ")"
       WHITESPACE "\n"
       AS_FUNC_OPTION
@@ -2183,8 +2185,9 @@ SOURCE_FILE
           BIT_KW "bit"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              INT_NUMBER "8"
+            ARG
+              LITERAL
+                INT_NUMBER "8"
             R_PAREN ")"
       R_PAREN ")"
     WHITESPACE "\n"

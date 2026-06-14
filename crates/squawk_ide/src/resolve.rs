@@ -749,11 +749,11 @@ fn fallback_type_alias(type_name: &Name) -> Option<Name> {
 
 fn resolve_float_precision(name_ref: &ast::NameRef, type_name: Name) -> Name {
     if type_name.0.as_str() == "float"
-        && let Some(ast::Arg::Expr(ast::Expr::Literal(lit))) = name_ref
+        && let Some(ast::Expr::Literal(lit)) = name_ref
             .syntax()
             .ancestors()
             .find_map(ast::PathType::cast)
-            .and_then(|x| x.arg_list()?.args().next())
+            .and_then(|x| x.arg_list()?.args().next()?.expr())
     {
         let precision: u32 = lit.syntax().text().to_string().parse().unwrap_or(0);
         return Name::from_string(if precision <= 24 { "float4" } else { "float8" });

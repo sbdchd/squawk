@@ -445,6 +445,7 @@ fn build_op<'a>(op: ast::BinOp) -> Doc<'a> {
         ast::BinOp::ColonEq(_) => Doc::text(":="),
         ast::BinOp::CustomOp(custom_op) => Doc::text(custom_op.syntax().to_string()),
         ast::BinOp::Eq(_) => Doc::text("="),
+        ast::BinOp::Escape(_) => Doc::text("escape"),
         ast::BinOp::FatArrow(_) => Doc::text("=>"),
         ast::BinOp::Gteq(_) => Doc::text(">="),
         ast::BinOp::Ilike(_) => Doc::text("ilike"),

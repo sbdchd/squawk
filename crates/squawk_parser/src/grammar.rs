@@ -1799,8 +1799,8 @@ fn type_mods(
             R_PAREN,
             COMMA,
             || "unexpected comma".to_string(),
-            EXPR_FIRST,
-            |p| expr(p).is_some(),
+            EXPR_FIRST.union(TokenSet::new(&[VARIADIC_KW])),
+            |p| arg_expr(p).is_some(),
         );
         m.complete(p, ARG_LIST);
     }
@@ -1963,13 +1963,19 @@ fn simple_type_name(p: &mut Parser<'_>) {
 
 fn arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // https://www.postgresql.org/docs/17/typeconv-func.html
+    let m = p.start();
     p.eat(VARIADIC_KW);
     let r = Restrictions {
         order_by_allowed: true,
-        as_allowed: true,
         ..Restrictions::default()
     };
-    expr_bp(p, 1, &r)
+    match expr_bp(p, 1, &r) {
+        Some(_) => Some(m.complete(p, ARG)),
+        None => {
+            m.abandon(p);
+            None
+        }
+    }
 }
 
 fn arg_list(p: &mut Parser<'_>) {
@@ -2457,7 +2463,6 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         PERCENT if p.next_not_joined_op(0) => (9, PERCENT, Left), // symbol
         // and
         AND_KW if !r.and_disabled => (2, AND_KW, Left),
-        AS_KW if r.as_allowed => (7, AS_KW, Left),
         // /
         SLASH if p.next_not_joined_op(0) => (9, SLASH, Left), // symbol
         // *
@@ -2484,7 +2489,6 @@ const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLA
 #[derive(Default)]
 struct Restrictions {
     order_by_allowed: bool,
-    as_allowed: bool,
     in_disabled: bool,
     is_disabled: bool,
     not_disabled: bool,

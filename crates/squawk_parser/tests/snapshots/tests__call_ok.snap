@@ -33,8 +33,9 @@ SOURCE_FILE
           IDENT "partition_data_proc"
     ARG_LIST
       L_PAREN "("
-      LITERAL
-        STRING "'partman_test.time_taptest_table'"
+      ARG
+        LITERAL
+          STRING "'partman_test.time_taptest_table'"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -49,28 +50,31 @@ SOURCE_FILE
           IDENT "do_db_maintenance"
     ARG_LIST
       L_PAREN "("
-      NAMED_ARG
-        NAME_REF
-          IDENT "x"
-        WHITESPACE " "
-        FAT_ARROW "=>"
-        WHITESPACE " "
-        LITERAL
-          STRING "'1'"
+      ARG
+        NAMED_ARG
+          NAME_REF
+            IDENT "x"
+          WHITESPACE " "
+          FAT_ARROW "=>"
+          WHITESPACE " "
+          LITERAL
+            STRING "'1'"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        NULL_KW "null"
+      ARG
+        LITERAL
+          NULL_KW "null"
       COMMA ","
       WHITESPACE " "
-      NAMED_ARG
-        NAME_REF
-          IDENT "b"
-        WHITESPACE " "
-        FAT_ARROW "=>"
-        WHITESPACE " "
-        LITERAL
-          STRING "'d'"
+      ARG
+        NAMED_ARG
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          FAT_ARROW "=>"
+          WHITESPACE " "
+          LITERAL
+            STRING "'d'"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

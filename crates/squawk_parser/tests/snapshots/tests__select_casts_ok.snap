@@ -74,8 +74,9 @@ SOURCE_FILE
               IDENT "int8"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'1234'"
+              ARG
+                LITERAL
+                  STRING "'1234'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -95,8 +96,9 @@ SOURCE_FILE
               BIT_KW "bit"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "3"
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -120,8 +122,9 @@ SOURCE_FILE
               BIT_KW "bit"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "12"
+                ARG
+                  LITERAL
+                    INT_NUMBER "12"
                 R_PAREN ")"
             R_PAREN ")"
     SEMICOLON ";"
@@ -143,8 +146,9 @@ SOURCE_FILE
                 BIT_KW "bit"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "4"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "4"
                   R_PAREN ")"
             COLON_COLON
               COLON ":"
@@ -181,8 +185,9 @@ SOURCE_FILE
                       VARCHAR_KW "varchar"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "1"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "1"
                   R_PAREN ")"
               L_BRACK "["
               R_BRACK "]"
@@ -440,8 +445,9 @@ SOURCE_FILE
               VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "4"
+                ARG
+                  LITERAL
+                    INT_NUMBER "4"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1659,12 +1665,14 @@ SOURCE_FILE
                     IDENT "bar"
               ARG_LIST
                 L_PAREN "("
-                NAME_REF
-                  IDENT "buzz"
+                ARG
+                  NAME_REF
+                    IDENT "buzz"
                 COMMA ","
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "bizz"
+                ARG
+                  NAME_REF
+                    IDENT "bizz"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1700,8 +1708,9 @@ SOURCE_FILE
               VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "5"
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1722,8 +1731,9 @@ SOURCE_FILE
                 VARCHAR_KW "varchar"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "255"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "255"
                   R_PAREN ")"
               L_BRACK "["
               R_BRACK "]"
@@ -1770,8 +1780,9 @@ SOURCE_FILE
                       IDENT "t"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "255"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "255"
                   R_PAREN ")"
               L_BRACK "["
               R_BRACK "]"
@@ -1801,8 +1812,9 @@ SOURCE_FILE
                     IDENT "buzz"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "5"
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -1870,8 +1882,9 @@ SOURCE_FILE
                       IDENT "buzz"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "255"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "255"
                   R_PAREN ")"
               L_BRACK "["
               R_BRACK "]"
@@ -1993,8 +2006,9 @@ SOURCE_FILE
                     FLOAT_KW "float"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -2054,16 +2068,19 @@ SOURCE_FILE
                     DECIMAL_KW "decimal"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "3"
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -2105,16 +2122,19 @@ SOURCE_FILE
                     DEC_KW "dec"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "3"
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -2156,12 +2176,14 @@ SOURCE_FILE
                     NUMERIC_KW "numeric"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -2204,11 +2226,13 @@ SOURCE_FILE
                       NUMERIC_KW "numeric"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "10"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "10"
                   COMMA ","
-                  LITERAL
-                    INT_NUMBER "2"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "2"
                   R_PAREN ")"
               L_BRACK "["
               LITERAL
@@ -2545,8 +2569,9 @@ SOURCE_FILE
                 CHAR_KW "char"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "1"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "1"
                   R_PAREN ")"
             WHITESPACE " "
             COLLATE_KW "collate"
@@ -2573,8 +2598,9 @@ SOURCE_FILE
                   CHAR_KW "CHAR"
                   ARG_LIST
                     L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "2"
+                    ARG
+                      LITERAL
+                        INT_NUMBER "2"
                     R_PAREN ")"
               WHITESPACE " "
               COLLATE_KW "collate"
@@ -2594,8 +2620,9 @@ SOURCE_FILE
                 CHAR_KW "CHAR"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "2"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "2"
                   R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2855,8 +2882,9 @@ SOURCE_FILE
               BIT_KW "bit"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE " "
@@ -2878,8 +2906,9 @@ SOURCE_FILE
               BIT_KW "bit"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "3"
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE " "
@@ -2905,8 +2934,9 @@ SOURCE_FILE
               BIT_KW "bit"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "12"
+                ARG
+                  LITERAL
+                    INT_NUMBER "12"
                 R_PAREN ")"
             R_PAREN ")"
     SEMICOLON ";"
@@ -2930,8 +2960,9 @@ SOURCE_FILE
                 BIT_KW "bit"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "4"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "4"
                   R_PAREN ")"
             COLON_COLON
               COLON ":"
@@ -3052,8 +3083,9 @@ SOURCE_FILE
                       VARCHAR_KW "varchar"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "1"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "1"
                   R_PAREN ")"
               L_BRACK "["
               R_BRACK "]"
@@ -3380,8 +3412,9 @@ SOURCE_FILE
                 VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3400,8 +3433,9 @@ SOURCE_FILE
                 CHARACTER_KW "character"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3422,8 +3456,9 @@ SOURCE_FILE
                 VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3442,8 +3477,9 @@ SOURCE_FILE
                 CHAR_KW "char"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3462,8 +3498,9 @@ SOURCE_FILE
                 VARCHAR_KW "varchar"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3486,8 +3523,9 @@ SOURCE_FILE
                 VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3508,8 +3546,9 @@ SOURCE_FILE
                 CHARACTER_KW "character"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3532,8 +3571,9 @@ SOURCE_FILE
                 VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3554,8 +3594,9 @@ SOURCE_FILE
                 CHAR_KW "char"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3576,8 +3617,9 @@ SOURCE_FILE
                 VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3596,8 +3638,9 @@ SOURCE_FILE
                 NCHAR_KW "nchar"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3618,8 +3661,9 @@ SOURCE_FILE
                 VARYING_KW "varying"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3638,8 +3682,9 @@ SOURCE_FILE
                 BIT_KW "bit"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3790,8 +3835,9 @@ SOURCE_FILE
                 FLOAT_KW "float"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "8"
+                ARG
+                  LITERAL
+                    INT_NUMBER "8"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3826,12 +3872,14 @@ SOURCE_FILE
                 DECIMAL_KW "decimal"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3867,12 +3915,14 @@ SOURCE_FILE
                 DEC_KW "dec"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3908,12 +3958,14 @@ SOURCE_FILE
                 NUMERIC_KW "numeric"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -3990,12 +4042,14 @@ SOURCE_FILE
                     IDENT "bar"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "10"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "10"
                   COMMA ","
                   WHITESPACE " "
-                  LITERAL
-                    INT_NUMBER "2"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "2"
                   R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -4019,8 +4073,9 @@ SOURCE_FILE
                     VARCHAR_KW "varchar"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "100"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "100"
                   R_PAREN ")"
             WHITESPACE " "
             LITERAL
@@ -4049,12 +4104,14 @@ SOURCE_FILE
                     IDENT "bar"
                 ARG_LIST
                   L_PAREN "("
-                  LITERAL
-                    INT_NUMBER "10"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "10"
                   COMMA ","
                   WHITESPACE " "
-                  LITERAL
-                    INT_NUMBER "2"
+                  ARG
+                    LITERAL
+                      INT_NUMBER "2"
                   R_PAREN ")"
             WHITESPACE " "
             LITERAL

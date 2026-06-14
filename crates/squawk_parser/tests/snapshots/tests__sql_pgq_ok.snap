@@ -1816,8 +1816,9 @@ SOURCE_FILE
               IDENT "SUM"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "amount"
+              ARG
+                NAME_REF
+                  IDENT "amount"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME

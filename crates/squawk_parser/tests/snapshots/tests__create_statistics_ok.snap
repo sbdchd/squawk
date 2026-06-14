@@ -200,12 +200,14 @@ SOURCE_FILE
         IDENT "date_trunc"
       ARG_LIST
         L_PAREN "("
-        LITERAL
-          STRING "'month'"
+        ARG
+          LITERAL
+            STRING "'month'"
         COMMA ","
         WHITESPACE " "
-        NAME_REF
-          IDENT "a"
+        ARG
+          NAME_REF
+            IDENT "a"
         R_PAREN ")"
     COMMA ","
     WHITESPACE " "
@@ -214,12 +216,14 @@ SOURCE_FILE
         IDENT "date_trunc"
       ARG_LIST
         L_PAREN "("
-        LITERAL
-          STRING "'day'"
+        ARG
+          LITERAL
+            STRING "'day'"
         COMMA ","
         WHITESPACE " "
-        NAME_REF
-          IDENT "a"
+        ARG
+          NAME_REF
+            IDENT "a"
         R_PAREN ")"
     WHITESPACE " "
     FROM_TABLE

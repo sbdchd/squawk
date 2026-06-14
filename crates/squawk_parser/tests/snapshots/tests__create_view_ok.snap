@@ -229,12 +229,13 @@ SOURCE_FILE
                 IDENT "country_code_to_name"
               ARG_LIST
                 L_PAREN "("
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "f"
-                  DOT "."
-                  NAME_REF
-                    IDENT "country_code"
+                ARG
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "f"
+                    DOT "."
+                    NAME_REF
+                      IDENT "country_code"
                 R_PAREN ")"
             WHITESPACE " "
             AS_NAME
@@ -258,12 +259,13 @@ SOURCE_FILE
                           IDENT "avg"
                         ARG_LIST
                           L_PAREN "("
-                          FIELD_EXPR
-                            NAME_REF
-                              IDENT "r"
-                            DOT "."
-                            NAME_REF
-                              IDENT "rating"
+                          ARG
+                            FIELD_EXPR
+                              NAME_REF
+                                IDENT "r"
+                              DOT "."
+                              NAME_REF
+                                IDENT "rating"
                           R_PAREN ")"
                 WHITESPACE "\n            "
                 FROM_CLAUSE

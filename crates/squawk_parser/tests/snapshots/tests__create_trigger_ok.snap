@@ -168,14 +168,17 @@ SOURCE_FILE
           IDENT "z"
       ARG_LIST
         L_PAREN "("
-        LITERAL
-          INT_NUMBER "1"
+        ARG
+          LITERAL
+            INT_NUMBER "1"
         COMMA ","
-        LITERAL
-          INT_NUMBER "2"
+        ARG
+          LITERAL
+            INT_NUMBER "2"
         COMMA ","
-        LITERAL
-          STRING "'3'"
+        ARG
+          LITERAL
+            STRING "'3'"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -300,8 +303,9 @@ SOURCE_FILE
         IDENT "foo"
       ARG_LIST
         L_PAREN "("
-        LITERAL
-          STRING "'bar'"
+        ARG
+          LITERAL
+            STRING "'bar'"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

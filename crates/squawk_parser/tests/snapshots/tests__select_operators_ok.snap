@@ -247,24 +247,28 @@ SOURCE_FILE
                 IDENT "point"
               ARG_LIST
                 L_PAREN "("
-                CALL_EXPR
-                  NAME_REF
-                    IDENT "cosd"
-                  ARG_LIST
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "45"
-                    R_PAREN ")"
+                ARG
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "cosd"
+                    ARG_LIST
+                      L_PAREN "("
+                      ARG
+                        LITERAL
+                          INT_NUMBER "45"
+                      R_PAREN ")"
                 COMMA ","
                 WHITESPACE " "
-                CALL_EXPR
-                  NAME_REF
-                    IDENT "sind"
-                  ARG_LIST
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "45"
-                    R_PAREN ")"
+                ARG
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "sind"
+                    ARG_LIST
+                      L_PAREN "("
+                      ARG
+                        LITERAL
+                          INT_NUMBER "45"
+                      R_PAREN ")"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -324,24 +328,28 @@ SOURCE_FILE
                 IDENT "point"
               ARG_LIST
                 L_PAREN "("
-                CALL_EXPR
-                  NAME_REF
-                    IDENT "cosd"
-                  ARG_LIST
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "45"
-                    R_PAREN ")"
+                ARG
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "cosd"
+                    ARG_LIST
+                      L_PAREN "("
+                      ARG
+                        LITERAL
+                          INT_NUMBER "45"
+                      R_PAREN ")"
                 COMMA ","
                 WHITESPACE " "
-                CALL_EXPR
-                  NAME_REF
-                    IDENT "sind"
-                  ARG_LIST
-                    L_PAREN "("
-                    LITERAL
-                      INT_NUMBER "45"
-                    R_PAREN ")"
+                ARG
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "sind"
+                    ARG_LIST
+                      L_PAREN "("
+                      ARG
+                        LITERAL
+                          INT_NUMBER "45"
+                      R_PAREN ")"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3415,12 +3423,14 @@ SOURCE_FILE
                 IDENT "int4range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "4"
+                ARG
+                  LITERAL
+                    INT_NUMBER "4"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -3432,12 +3442,14 @@ SOURCE_FILE
                 IDENT "int4range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "7"
+                ARG
+                  LITERAL
+                    INT_NUMBER "7"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3992,17 +4004,18 @@ SOURCE_FILE
                 IDENT "jsonb_build_array"
               ARG_LIST
                 L_PAREN "("
-                CAST_EXPR
-                  LITERAL
-                    STRING "'[3, 4]'"
-                  COLON_COLON
-                    COLON ":"
-                    COLON ":"
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          IDENT "jsonb"
+                ARG
+                  CAST_EXPR
+                    LITERAL
+                      STRING "'[3, 4]'"
+                    COLON_COLON
+                      COLON ":"
+                      COLON ":"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "jsonb"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -4405,11 +4418,13 @@ SOURCE_FILE
                   IDENT "arrayfunction"
                 ARG_LIST
                   L_PAREN "("
-                  NAME_REF
-                    IDENT "a"
+                  ARG
+                    NAME_REF
+                      IDENT "a"
                   COMMA ","
-                  NAME_REF
-                    IDENT "b"
+                  ARG
+                    NAME_REF
+                      IDENT "b"
                   R_PAREN ")"
               R_PAREN ")"
             L_BRACK "["
@@ -4924,12 +4939,14 @@ SOURCE_FILE
                 IDENT "int4range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "4"
+                ARG
+                  LITERAL
+                    INT_NUMBER "4"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -4941,12 +4958,14 @@ SOURCE_FILE
                 IDENT "int4range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "3"
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -4999,12 +5018,14 @@ SOURCE_FILE
                 IDENT "int4range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "2"
+                ARG
+                  LITERAL
+                    INT_NUMBER "2"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "4"
+                ARG
+                  LITERAL
+                    INT_NUMBER "4"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5016,12 +5037,14 @@ SOURCE_FILE
                 IDENT "int4range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "7"
+                ARG
+                  LITERAL
+                    INT_NUMBER "7"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5046,12 +5069,14 @@ SOURCE_FILE
                 IDENT "int4range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "7"
+                ARG
+                  LITERAL
+                    INT_NUMBER "7"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5069,12 +5094,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "3"
+                ARG
+                  LITERAL
+                    INT_NUMBER "3"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "7"
+                ARG
+                  LITERAL
+                    INT_NUMBER "7"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5086,12 +5113,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "4"
+                ARG
+                  LITERAL
+                    INT_NUMBER "4"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "12"
+                ARG
+                  LITERAL
+                    INT_NUMBER "12"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5109,12 +5138,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5126,12 +5157,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "100"
+                ARG
+                  LITERAL
+                    INT_NUMBER "100"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "110"
+                ARG
+                  LITERAL
+                    INT_NUMBER "110"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5149,12 +5182,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "50"
+                ARG
+                  LITERAL
+                    INT_NUMBER "50"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "60"
+                ARG
+                  LITERAL
+                    INT_NUMBER "60"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5166,12 +5201,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "20"
+                ARG
+                  LITERAL
+                    INT_NUMBER "20"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "30"
+                ARG
+                  LITERAL
+                    INT_NUMBER "30"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5189,12 +5226,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
+                ARG
+                  LITERAL
+                    INT_NUMBER "1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "20"
+                ARG
+                  LITERAL
+                    INT_NUMBER "20"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5206,12 +5245,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "18"
+                ARG
+                  LITERAL
+                    INT_NUMBER "18"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "20"
+                ARG
+                  LITERAL
+                    INT_NUMBER "20"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5229,12 +5270,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "7"
+                ARG
+                  LITERAL
+                    INT_NUMBER "7"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "20"
+                ARG
+                  LITERAL
+                    INT_NUMBER "20"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5246,12 +5289,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "5"
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5269,12 +5314,14 @@ SOURCE_FILE
                 IDENT "numrange"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  NUMERIC_NUMBER "1.1"
+                ARG
+                  LITERAL
+                    NUMERIC_NUMBER "1.1"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  NUMERIC_NUMBER "2.2"
+                ARG
+                  LITERAL
+                    NUMERIC_NUMBER "2.2"
                 R_PAREN ")"
             WHITESPACE " "
             CUSTOM_OP
@@ -5287,12 +5334,14 @@ SOURCE_FILE
                 IDENT "numrange"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  NUMERIC_NUMBER "2.2"
+                ARG
+                  LITERAL
+                    NUMERIC_NUMBER "2.2"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  NUMERIC_NUMBER "3.3"
+                ARG
+                  LITERAL
+                    NUMERIC_NUMBER "3.3"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5310,12 +5359,14 @@ SOURCE_FILE
                 IDENT "numrange"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "5"
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "15"
+                ARG
+                  LITERAL
+                    INT_NUMBER "15"
                 R_PAREN ")"
             WHITESPACE " "
             PLUS "+"
@@ -5325,12 +5376,14 @@ SOURCE_FILE
                 IDENT "numrange"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "20"
+                ARG
+                  LITERAL
+                    INT_NUMBER "20"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5348,12 +5401,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "5"
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "15"
+                ARG
+                  LITERAL
+                    INT_NUMBER "15"
                 R_PAREN ")"
             WHITESPACE " "
             STAR "*"
@@ -5363,12 +5418,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "20"
+                ARG
+                  LITERAL
+                    INT_NUMBER "20"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5386,12 +5443,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "5"
+                ARG
+                  LITERAL
+                    INT_NUMBER "5"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "15"
+                ARG
+                  LITERAL
+                    INT_NUMBER "15"
                 R_PAREN ")"
             WHITESPACE " "
             MINUS "-"
@@ -5401,12 +5460,14 @@ SOURCE_FILE
                 IDENT "int8range"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
+                ARG
+                  LITERAL
+                    INT_NUMBER "10"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "20"
+                ARG
+                  LITERAL
+                    INT_NUMBER "20"
                 R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

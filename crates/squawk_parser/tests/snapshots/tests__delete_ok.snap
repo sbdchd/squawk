@@ -304,8 +304,9 @@ SOURCE_FILE
                       IDENT "max"
                     ARG_LIST
                       L_PAREN "("
-                      NAME_REF
-                        IDENT "login_time"
+                      ARG
+                        NAME_REF
+                          IDENT "login_time"
                       R_PAREN ")"
                   WHITESPACE " "
                   AS_NAME

@@ -1060,8 +1060,9 @@ SOURCE_FILE
                         IDENT "sum"
                       ARG_LIST
                         L_PAREN "("
-                        NAME_REF
-                          IDENT "x"
+                        ARG
+                          NAME_REF
+                            IDENT "x"
                         R_PAREN ")"
                   COMMA ","
                   WHITESPACE " "
@@ -1071,8 +1072,9 @@ SOURCE_FILE
                         IDENT "sum"
                       ARG_LIST
                         L_PAREN "("
-                        NAME_REF
-                          IDENT "y"
+                        ARG
+                          NAME_REF
+                            IDENT "y"
                         R_PAREN ")"
                   COMMA ","
                   WHITESPACE " "
@@ -1082,8 +1084,9 @@ SOURCE_FILE
                         IDENT "avg"
                       ARG_LIST
                         L_PAREN "("
-                        NAME_REF
-                          IDENT "x"
+                        ARG
+                          NAME_REF
+                            IDENT "x"
                         R_PAREN ")"
                   COMMA ","
                   WHITESPACE " "
@@ -1093,8 +1096,9 @@ SOURCE_FILE
                         IDENT "avg"
                       ARG_LIST
                         L_PAREN "("
-                        NAME_REF
-                          IDENT "y"
+                        ARG
+                          NAME_REF
+                            IDENT "y"
                         R_PAREN ")"
               WHITESPACE " "
               FROM_CLAUSE

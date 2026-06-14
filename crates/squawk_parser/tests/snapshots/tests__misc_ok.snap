@@ -98,52 +98,55 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE "\n    "
-              CAST_EXPR
-                LITERAL
-                  POSITIONAL_PARAM "$1"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                ARRAY_TYPE
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          IDENT "timestamptz"
-                  L_BRACK "["
-                  R_BRACK "]"
+              ARG
+                CAST_EXPR
+                  LITERAL
+                    POSITIONAL_PARAM "$1"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  ARRAY_TYPE
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "timestamptz"
+                    L_BRACK "["
+                    R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
-              CAST_EXPR
-                LITERAL
-                  POSITIONAL_PARAM "$2"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                ARRAY_TYPE
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          TEXT_KW "text"
-                  L_BRACK "["
-                  R_BRACK "]"
+              ARG
+                CAST_EXPR
+                  LITERAL
+                    POSITIONAL_PARAM "$2"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  ARRAY_TYPE
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                    L_BRACK "["
+                    R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
-              CAST_EXPR
-                LITERAL
-                  POSITIONAL_PARAM "$3"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                ARRAY_TYPE
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          IDENT "float8"
-                  L_BRACK "["
-                  R_BRACK "]"
+              ARG
+                CAST_EXPR
+                  LITERAL
+                    POSITIONAL_PARAM "$3"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  ARRAY_TYPE
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "float8"
+                    L_BRACK "["
+                    R_BRACK "]"
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
@@ -259,58 +262,67 @@ SOURCE_FILE
               ARG_LIST
                 L_PAREN "("
                 WHITESPACE "\n    "
-                LITERAL
-                  STRING "'embed-english-v3.0'"
-                WHITESPACE "\n    "
-                COMMA ","
-                WHITESPACE " "
-                CALL_EXPR
-                  NAME_REF
-                    IDENT "CONCAT_WS"
-                  ARG_LIST
-                    L_PAREN "("
-                    LITERAL
-                      STRING "'. '"
-                    COMMA ","
-                    WHITESPACE "\n        "
-                    NAME_REF
-                      IDENT "title"
-                    COMMA ","
-                    WHITESPACE "\n        "
-                    CALL_EXPR
-                      NAME_REF
-                        COALESCE_KW "COALESCE"
-                      ARG_LIST
-                        L_PAREN "("
-                        NAME_REF
-                          IDENT "overview"
-                        COMMA ","
-                        WHITESPACE " "
-                        LITERAL
-                          STRING "''"
-                        R_PAREN ")"
-                    WHITESPACE "\n    "
-                    R_PAREN ")"
-                WHITESPACE "\n    "
-                COMMA ","
-                WHITESPACE " "
-                NAMED_ARG
-                  NAME_REF
-                    IDENT "input_type"
-                  FAT_ARROW "=>"
+                ARG
                   LITERAL
-                    STRING "'search_document'"
+                    STRING "'embed-english-v3.0'"
+                WHITESPACE "\n    "
+                COMMA ","
+                WHITESPACE " "
+                ARG
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "CONCAT_WS"
+                    ARG_LIST
+                      L_PAREN "("
+                      ARG
+                        LITERAL
+                          STRING "'. '"
+                      COMMA ","
+                      WHITESPACE "\n        "
+                      ARG
+                        NAME_REF
+                          IDENT "title"
+                      COMMA ","
+                      WHITESPACE "\n        "
+                      ARG
+                        CALL_EXPR
+                          NAME_REF
+                            COALESCE_KW "COALESCE"
+                          ARG_LIST
+                            L_PAREN "("
+                            ARG
+                              NAME_REF
+                                IDENT "overview"
+                            COMMA ","
+                            WHITESPACE " "
+                            ARG
+                              LITERAL
+                                STRING "''"
+                            R_PAREN ")"
+                      WHITESPACE "\n    "
+                      R_PAREN ")"
+                WHITESPACE "\n    "
+                COMMA ","
+                WHITESPACE " "
+                ARG
+                  NAMED_ARG
+                    NAME_REF
+                      IDENT "input_type"
+                    FAT_ARROW "=>"
+                    LITERAL
+                      STRING "'search_document'"
                 WHITESPACE "\n    "
                 COMMENT "-- , api_key=>%s"
                 WHITESPACE "\n    "
                 COMMA ","
                 WHITESPACE " "
-                NAMED_ARG
-                  NAME_REF
-                    IDENT "api_key"
-                  FAT_ARROW "=>"
-                  LITERAL
-                    POSITIONAL_PARAM "$1"
+                ARG
+                  NAMED_ARG
+                    NAME_REF
+                      IDENT "api_key"
+                    FAT_ARROW "=>"
+                    LITERAL
+                      POSITIONAL_PARAM "$1"
                 WHITESPACE "\n"
                 R_PAREN ")"
     WHITESPACE " "
@@ -355,12 +367,14 @@ SOURCE_FILE
             IDENT "plainto_tsquery"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              STRING "'english'"
+            ARG
+              LITERAL
+                STRING "'english'"
             COMMA ","
             WHITESPACE " "
-            LITERAL
-              POSITIONAL_PARAM "$1"
+            ARG
+              LITERAL
+                POSITIONAL_PARAM "$1"
             R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -376,38 +390,42 @@ SOURCE_FILE
             IDENT "to_tsvector"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              STRING "'english'"
+            ARG
+              LITERAL
+                STRING "'english'"
             COMMA ","
             WHITESPACE " "
-            BIN_EXPR
-              NAME_REF
-                IDENT "title"
-              WHITESPACE " "
-              CUSTOM_OP
-                PIPE "|"
-                PIPE "|"
-              WHITESPACE " "
+            ARG
               BIN_EXPR
-                LITERAL
-                  STRING "' '"
+                NAME_REF
+                  IDENT "title"
                 WHITESPACE " "
                 CUSTOM_OP
                   PIPE "|"
                   PIPE "|"
                 WHITESPACE " "
-                CALL_EXPR
-                  NAME_REF
-                    COALESCE_KW "COALESCE"
-                  ARG_LIST
-                    L_PAREN "("
+                BIN_EXPR
+                  LITERAL
+                    STRING "' '"
+                  WHITESPACE " "
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  WHITESPACE " "
+                  CALL_EXPR
                     NAME_REF
-                      IDENT "overview"
-                    COMMA ","
-                    WHITESPACE " "
-                    LITERAL
-                      STRING "''"
-                    R_PAREN ")"
+                      COALESCE_KW "COALESCE"
+                    ARG_LIST
+                      L_PAREN "("
+                      ARG
+                        NAME_REF
+                          IDENT "overview"
+                      COMMA ","
+                      WHITESPACE " "
+                      ARG
+                        LITERAL
+                          STRING "''"
+                      R_PAREN ")"
             R_PAREN ")"
         WHITESPACE " "
         CUSTOM_OP
@@ -429,48 +447,54 @@ SOURCE_FILE
               IDENT "ts_rank_cd"
             ARG_LIST
               L_PAREN "("
-              CALL_EXPR
-                NAME_REF
-                  IDENT "to_tsvector"
-                ARG_LIST
-                  L_PAREN "("
-                  LITERAL
-                    STRING "'english'"
-                  COMMA ","
-                  WHITESPACE " "
-                  BIN_EXPR
-                    NAME_REF
-                      IDENT "title"
-                    WHITESPACE " "
-                    CUSTOM_OP
-                      PIPE "|"
-                      PIPE "|"
-                    WHITESPACE " "
-                    BIN_EXPR
+              ARG
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "to_tsvector"
+                  ARG_LIST
+                    L_PAREN "("
+                    ARG
                       LITERAL
-                        STRING "' '"
-                      WHITESPACE " "
-                      CUSTOM_OP
-                        PIPE "|"
-                        PIPE "|"
-                      WHITESPACE " "
-                      CALL_EXPR
+                        STRING "'english'"
+                    COMMA ","
+                    WHITESPACE " "
+                    ARG
+                      BIN_EXPR
                         NAME_REF
-                          COALESCE_KW "COALESCE"
-                        ARG_LIST
-                          L_PAREN "("
-                          NAME_REF
-                            IDENT "overview"
-                          COMMA ","
-                          WHITESPACE " "
+                          IDENT "title"
+                        WHITESPACE " "
+                        CUSTOM_OP
+                          PIPE "|"
+                          PIPE "|"
+                        WHITESPACE " "
+                        BIN_EXPR
                           LITERAL
-                            STRING "''"
-                          R_PAREN ")"
-                  R_PAREN ")"
+                            STRING "' '"
+                          WHITESPACE " "
+                          CUSTOM_OP
+                            PIPE "|"
+                            PIPE "|"
+                          WHITESPACE " "
+                          CALL_EXPR
+                            NAME_REF
+                              COALESCE_KW "COALESCE"
+                            ARG_LIST
+                              L_PAREN "("
+                              ARG
+                                NAME_REF
+                                  IDENT "overview"
+                              COMMA ","
+                              WHITESPACE " "
+                              ARG
+                                LITERAL
+                                  STRING "''"
+                              R_PAREN ")"
+                    R_PAREN ")"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "query"
+              ARG
+                NAME_REF
+                  IDENT "query"
               R_PAREN ")"
           WHITESPACE " "
           SORT_DESC
@@ -507,33 +531,37 @@ SOURCE_FILE
                   ARG_LIST
                     L_PAREN "("
                     WHITESPACE "\n        "
-                    LITERAL
-                      STRING "'embed-english-v3.0'"
-                    WHITESPACE "\n        "
-                    COMMA ","
-                    WHITESPACE " "
-                    LITERAL
-                      POSITIONAL_PARAM "$1"
-                    WHITESPACE "\n        "
-                    COMMA ","
-                    WHITESPACE " "
-                    NAMED_ARG
-                      NAME_REF
-                        IDENT "_input_type"
-                      FAT_ARROW "=>"
+                    ARG
                       LITERAL
-                        STRING "'search_query'"
+                        STRING "'embed-english-v3.0'"
+                    WHITESPACE "\n        "
+                    COMMA ","
+                    WHITESPACE " "
+                    ARG
+                      LITERAL
+                        POSITIONAL_PARAM "$1"
+                    WHITESPACE "\n        "
+                    COMMA ","
+                    WHITESPACE " "
+                    ARG
+                      NAMED_ARG
+                        NAME_REF
+                          IDENT "_input_type"
+                        FAT_ARROW "=>"
+                        LITERAL
+                          STRING "'search_query'"
                     WHITESPACE "\n        "
                     COMMENT "-- , _api_key=>%s"
                     WHITESPACE "\n        "
                     COMMA ","
                     WHITESPACE " "
-                    NAMED_ARG
-                      NAME_REF
-                        IDENT "_api_key"
-                      FAT_ARROW "=>"
-                      LITERAL
-                        POSITIONAL_PARAM "$2"
+                    ARG
+                      NAMED_ARG
+                        NAME_REF
+                          IDENT "_api_key"
+                        FAT_ARROW "=>"
+                        LITERAL
+                          POSITIONAL_PARAM "$2"
                     WHITESPACE "\n    "
                     R_PAREN ")"
                 WHITESPACE " "
@@ -658,67 +686,73 @@ SOURCE_FILE
           ARG_LIST
             L_PAREN "("
             WHITESPACE "\n    "
-            BIN_EXPR
-              CALL_EXPR
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "ai"
-                  DOT "."
-                  NAME_REF
-                    IDENT "cohere_rerank"
-                ARG_LIST
-                  L_PAREN "("
-                  WHITESPACE "\n        "
-                  LITERAL
-                    STRING "'rerank-english-v3.0'"
-                  COMMA ","
-                  WHITESPACE "\n        "
-                  COMMENT "-- %s,"
-                  WHITESPACE "\n        "
-                  LITERAL
-                    POSITIONAL_PARAM "$1"
-                  COMMA ","
-                  WHITESPACE "\n        "
-                  COMMENT "-- %s::jsonb,"
-                  WHITESPACE "\n        "
-                  CAST_EXPR
-                    LITERAL
-                      POSITIONAL_PARAM "$2"
-                    COLON_COLON
-                      COLON ":"
-                      COLON ":"
-                    PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
-                          NAME_REF
-                            IDENT "jsonb"
-                  COMMA ","
-                  WHITESPACE "\n        "
-                  NAMED_ARG
+            ARG
+              BIN_EXPR
+                CALL_EXPR
+                  FIELD_EXPR
                     NAME_REF
-                      IDENT "return_documents"
-                    WHITESPACE " "
-                    FAT_ARROW "=>"
-                    WHITESPACE " "
-                    LITERAL
-                      TRUE_KW "true"
-                  COMMA ","
-                  WHITESPACE "\n        "
-                  COMMENT "-- api_key=>%s"
-                  WHITESPACE "\n        "
-                  NAMED_ARG
+                      IDENT "ai"
+                    DOT "."
                     NAME_REF
-                      IDENT "api_key"
-                    FAT_ARROW "=>"
-                    LITERAL
-                      POSITIONAL_PARAM "$3"
-                  WHITESPACE "\n    "
-                  R_PAREN ")"
-              CUSTOM_OP
-                MINUS "-"
-                R_ANGLE ">"
-              LITERAL
-                STRING "'results'"
+                      IDENT "cohere_rerank"
+                  ARG_LIST
+                    L_PAREN "("
+                    WHITESPACE "\n        "
+                    ARG
+                      LITERAL
+                        STRING "'rerank-english-v3.0'"
+                    COMMA ","
+                    WHITESPACE "\n        "
+                    COMMENT "-- %s,"
+                    WHITESPACE "\n        "
+                    ARG
+                      LITERAL
+                        POSITIONAL_PARAM "$1"
+                    COMMA ","
+                    WHITESPACE "\n        "
+                    COMMENT "-- %s::jsonb,"
+                    WHITESPACE "\n        "
+                    ARG
+                      CAST_EXPR
+                        LITERAL
+                          POSITIONAL_PARAM "$2"
+                        COLON_COLON
+                          COLON ":"
+                          COLON ":"
+                        PATH_TYPE
+                          PATH
+                            PATH_SEGMENT
+                              NAME_REF
+                                IDENT "jsonb"
+                    COMMA ","
+                    WHITESPACE "\n        "
+                    ARG
+                      NAMED_ARG
+                        NAME_REF
+                          IDENT "return_documents"
+                        WHITESPACE " "
+                        FAT_ARROW "=>"
+                        WHITESPACE " "
+                        LITERAL
+                          TRUE_KW "true"
+                    COMMA ","
+                    WHITESPACE "\n        "
+                    COMMENT "-- api_key=>%s"
+                    WHITESPACE "\n        "
+                    ARG
+                      NAMED_ARG
+                        NAME_REF
+                          IDENT "api_key"
+                        FAT_ARROW "=>"
+                        LITERAL
+                          POSITIONAL_PARAM "$3"
+                    WHITESPACE "\n    "
+                    R_PAREN ")"
+                CUSTOM_OP
+                  MINUS "-"
+                  R_ANGLE ">"
+                LITERAL
+                  STRING "'results'"
             WHITESPACE "\n"
             R_PAREN ")"
         WHITESPACE " "
@@ -879,16 +913,19 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE " "
-              LITERAL
-                STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
+              ARG
+                LITERAL
+                  STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                INT_NUMBER "15"
+              ARG
+                LITERAL
+                  INT_NUMBER "15"
               WHITESPACE " "
               R_PAREN ")"
     SEMICOLON ";"
@@ -991,12 +1028,14 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE " "
-              LITERAL
-                STRING "'day'"
+              ARG
+                LITERAL
+                  STRING "'day'"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "interaction_ts"
+              ARG
+                NAME_REF
+                  IDENT "interaction_ts"
               WHITESPACE " "
               R_PAREN ")"
           WHITESPACE " "
@@ -1014,31 +1053,33 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE " "
-              CAST_EXPR
-                CALL_EXPR
-                  EXTRACT_FN
-                    EXTRACT_KW "EXTRACT"
-                    L_PAREN "("
-                    WHITESPACE " "
-                    STRING "'hour'"
-                    WHITESPACE " "
-                    FROM_KW "FROM"
-                    WHITESPACE " "
-                    NAME_REF
-                      IDENT "interaction_ts"
-                    R_PAREN ")"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+              ARG
+                CAST_EXPR
+                  CALL_EXPR
+                    EXTRACT_FN
+                      EXTRACT_KW "EXTRACT"
+                      L_PAREN "("
+                      WHITESPACE " "
+                      STRING "'hour'"
+                      WHITESPACE " "
+                      FROM_KW "FROM"
+                      WHITESPACE " "
                       NAME_REF
-                        IDENT "int4"
+                        IDENT "interaction_ts"
+                      R_PAREN ")"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "int4"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "interaction_count"
+              ARG
+                NAME_REF
+                  IDENT "interaction_count"
               WHITESPACE " "
               R_PAREN ")"
             WHITESPACE " "
@@ -1072,31 +1113,33 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE " "
-              CAST_EXPR
-                CALL_EXPR
-                  EXTRACT_FN
-                    EXTRACT_KW "EXTRACT"
-                    L_PAREN "("
-                    WHITESPACE " "
-                    STRING "'hour'"
-                    WHITESPACE " "
-                    FROM_KW "FROM"
-                    WHITESPACE " "
-                    NAME_REF
-                      IDENT "interaction_ts"
-                    R_PAREN ")"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+              ARG
+                CAST_EXPR
+                  CALL_EXPR
+                    EXTRACT_FN
+                      EXTRACT_KW "EXTRACT"
+                      L_PAREN "("
+                      WHITESPACE " "
+                      STRING "'hour'"
+                      WHITESPACE " "
+                      FROM_KW "FROM"
+                      WHITESPACE " "
                       NAME_REF
-                        IDENT "int4"
+                        IDENT "interaction_ts"
+                      R_PAREN ")"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "int4"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "interaction_count"
+              ARG
+                NAME_REF
+                  IDENT "interaction_count"
               WHITESPACE " "
               R_PAREN ")"
             WHITESPACE " "
@@ -1838,8 +1881,9 @@ SOURCE_FILE
               IDENT "check_default"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              FALSE_KW "false"
+            ARG
+              LITERAL
+                FALSE_KW "false"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1877,8 +1921,9 @@ SOURCE_FILE
           IDENT "partition_data_proc"
     ARG_LIST
       L_PAREN "("
-      LITERAL
-        STRING "'partman_test.time_taptest_table'"
+      ARG
+        LITERAL
+          STRING "'partman_test.time_taptest_table'"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1922,8 +1967,9 @@ SOURCE_FILE
               IDENT "partition_gap_fill"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              STRING "'partman_test.time_taptest_table'"
+            ARG
+              LITERAL
+                STRING "'partman_test.time_taptest_table'"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -1945,12 +1991,14 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE "\n  "
-              LITERAL
-                STRING "'You are a science fiction expert!'"
+              ARG
+                LITERAL
+                  STRING "'You are a science fiction expert!'"
               COMMA ","
               WHITESPACE "\n  "
-              LITERAL
-                STRING "'What is the Star Trek episode where Deanna and her\n   mother are kidnapped?'"
+              ARG
+                LITERAL
+                  STRING "'What is the Star Trek episode where Deanna and her\n   mother are kidnapped?'"
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
@@ -2113,24 +2161,25 @@ SOURCE_FILE
                     IDENT "vector"
                 ARG_LIST
                   L_PAREN "("
-                  BIN_EXPR
-                    NAME_REF
-                      IDENT "title"
-                    WHITESPACE " "
-                    CUSTOM_OP
-                      PIPE "|"
-                      PIPE "|"
-                    WHITESPACE " "
+                  ARG
                     BIN_EXPR
-                      LITERAL
-                        STRING "' -- '"
+                      NAME_REF
+                        IDENT "title"
                       WHITESPACE " "
                       CUSTOM_OP
                         PIPE "|"
                         PIPE "|"
                       WHITESPACE " "
-                      NAME_REF
-                        IDENT "plot"
+                      BIN_EXPR
+                        LITERAL
+                          STRING "' -- '"
+                        WHITESPACE " "
+                        CUSTOM_OP
+                          PIPE "|"
+                          PIPE "|"
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "plot"
                   R_PAREN ")"
               COLON_COLON
                 COLON ":"
@@ -2192,8 +2241,9 @@ SOURCE_FILE
                               IDENT "vector"
                           ARG_LIST
                             L_PAREN "("
-                            LITERAL
-                              STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
+                            ARG
+                              LITERAL
+                                STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
                             R_PAREN ")"
                         COLON_COLON
                           COLON ":"
@@ -2273,8 +2323,9 @@ SOURCE_FILE
               IDENT "trektrivia"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
+              ARG
+                LITERAL
+                  STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -2506,11 +2557,13 @@ SOURCE_FILE
               IDENT "generate_series"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                INT_NUMBER "1"
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
               COMMA ","
-              LITERAL
-                INT_NUMBER "1000000"
+              ARG
+                LITERAL
+                  INT_NUMBER "1000000"
               R_PAREN ")"
           WHITESPACE " "
           ALIAS
@@ -2535,16 +2588,19 @@ SOURCE_FILE
                 IDENT "create_sequence_pipeline"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'view-count-pipeline'"
+              ARG
+                LITERAL
+                  STRING "'view-count-pipeline'"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'events'"
+              ARG
+                LITERAL
+                  STRING "'events'"
               COMMA ","
               WHITESPACE "\n  "
-              LITERAL
-                DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('day', event_time), user_id, count(*)\n    from events where event_id between $1 and $2\n    group by 1, 2\n    on conflict (day, user_id) do update set count = view_counts.count + EXCLUDED.count;\n  $$"
+              ARG
+                LITERAL
+                  DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('day', event_time), user_id, count(*)\n    from events where event_id between $1 and $2\n    group by 1, 2\n    on conflict (day, user_id) do update set count = view_counts.count + EXCLUDED.count;\n  $$"
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
@@ -2567,8 +2623,9 @@ SOURCE_FILE
               IDENT "sum"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "count"
+              ARG
+                NAME_REF
+                  IDENT "count"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -2729,16 +2786,19 @@ SOURCE_FILE
                 IDENT "create_sequence_pipeline"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'unpack-json-pipeline'"
+              ARG
+                LITERAL
+                  STRING "'unpack-json-pipeline'"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'events_json'"
+              ARG
+                LITERAL
+                  STRING "'events_json'"
               COMMA ","
               WHITESPACE "\n  "
-              LITERAL
-                DOLLAR_QUOTED_STRING "$$\n    insert into events (event_id, event_time, user_id, response_time)\n    select\n      nextval('events_event_id_seq'),\n      (payload->>'created_at')::timestamptz,\n      (payload->'actor'->>'id')::bigint,\n      (payload->>'response_time')::double precision\n    from events_json\n    where id between $1 and $2\n  $$"
+              ARG
+                LITERAL
+                  DOLLAR_QUOTED_STRING "$$\n    insert into events (event_id, event_time, user_id, response_time)\n    select\n      nextval('events_event_id_seq'),\n      (payload->>'created_at')::timestamptz,\n      (payload->'actor'->>'id')::bigint,\n      (payload->>'response_time')::double precision\n    from events_json\n    where id between $1 and $2\n  $$"
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
@@ -2839,16 +2899,19 @@ SOURCE_FILE
                 IDENT "create_time_interval_pipeline"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'distinct-user-count'"
+              ARG
+                LITERAL
+                  STRING "'distinct-user-count'"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'1 hour'"
+              ARG
+                LITERAL
+                  STRING "'1 hour'"
               COMMA ","
               WHITESPACE "\n  "
-              LITERAL
-                DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('hour', event_time), count(distinct user_id)\n    from events where event_time >= $1 and event_time < $2\n    group by 1\n  $$"
+              ARG
+                LITERAL
+                  DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('hour', event_time), count(distinct user_id)\n    from events where event_time >= $1 and event_time < $2\n    group by 1\n  $$"
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
@@ -2967,50 +3030,56 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE "\n  "
-              LITERAL
-                STRING "'export-events'"
+              ARG
+                LITERAL
+                  STRING "'export-events'"
               COMMA ","
               WHITESPACE "\n  "
-              LITERAL
-                STRING "'1 day'"
+              ARG
+                LITERAL
+                  STRING "'1 day'"
               COMMA ","
               WHITESPACE "\n  "
-              LITERAL
-                STRING "'select export_events($1, $2)'"
+              ARG
+                LITERAL
+                  STRING "'select export_events($1, $2)'"
               COMMA ","
               WHITESPACE "\n\n  "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "source_table_name"
-                WHITESPACE " "
-                COLON_EQ ":="
-                WHITESPACE " "
-                LITERAL
-                  STRING "'events'"
+              ARG
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "source_table_name"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'events'"
               COMMA ","
               WHITESPACE " "
               COMMENT "/* wait for writes on events to finish */"
               WHITESPACE "\n  "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "batched"
-                WHITESPACE " "
-                COLON_EQ ":="
-                WHITESPACE " "
-                LITERAL
-                  FALSE_KW "false"
+              ARG
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "batched"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  WHITESPACE " "
+                  LITERAL
+                    FALSE_KW "false"
               COMMA ","
               WHITESPACE "              "
               COMMENT "/* separate execution for each day     */"
               WHITESPACE "\n  "
-              NAMED_ARG
-                NAME_REF
-                  IDENT "start_time"
-                WHITESPACE " "
-                COLON_EQ ":="
-                WHITESPACE " "
-                LITERAL
-                  STRING "'2024-01-01'"
+              ARG
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "start_time"
+                  WHITESPACE " "
+                  COLON_EQ ":="
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'2024-01-01'"
               WHITESPACE "     "
               COMMENT "/* export all days from Jan 1st now    */"
               WHITESPACE "\n"
@@ -3086,16 +3155,19 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               WHITESPACE "\n    "
-              LITERAL
-                STRING "'import-events'"
+              ARG
+                LITERAL
+                  STRING "'import-events'"
               COMMA ","
               WHITESPACE "\n    "
-              LITERAL
-                STRING "'s3://mybucket/events/*.csv'"
+              ARG
+                LITERAL
+                  STRING "'s3://mybucket/events/*.csv'"
               COMMA ","
               WHITESPACE "\n    "
-              LITERAL
-                STRING "'select import_events($1)'"
+              ARG
+                LITERAL
+                  STRING "'select import_events($1)'"
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
@@ -3511,26 +3583,27 @@ SOURCE_FILE
                   IDENT "json_array_elements"
                 ARG_LIST
                   L_PAREN "("
-                  CAST_EXPR
-                    PAREN_EXPR
-                      L_PAREN "("
-                      BIN_EXPR
-                        NAME_REF
-                          IDENT "attrs"
-                        CUSTOM_OP
-                          MINUS "-"
-                          R_ANGLE ">"
-                        LITERAL
-                          STRING "'eventTypeGroups'"
-                      R_PAREN ")"
-                    COLON_COLON
-                      COLON ":"
-                      COLON ":"
-                    PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                  ARG
+                    CAST_EXPR
+                      PAREN_EXPR
+                        L_PAREN "("
+                        BIN_EXPR
                           NAME_REF
-                            JSON_KW "json"
+                            IDENT "attrs"
+                          CUSTOM_OP
+                            MINUS "-"
+                            R_ANGLE ">"
+                          LITERAL
+                            STRING "'eventTypeGroups'"
+                        R_PAREN ")"
+                      COLON_COLON
+                        COLON ":"
+                        COLON ":"
+                      PATH_TYPE
+                        PATH
+                          PATH_SEGMENT
+                            NAME_REF
+                              JSON_KW "json"
                   R_PAREN ")"
               WHITESPACE " "
               ALIAS
@@ -3549,26 +3622,27 @@ SOURCE_FILE
                     IDENT "json_array_elements"
                   ARG_LIST
                     L_PAREN "("
-                    CAST_EXPR
-                      PAREN_EXPR
-                        L_PAREN "("
-                        BIN_EXPR
-                          NAME_REF
-                            IDENT "etg"
-                          CUSTOM_OP
-                            MINUS "-"
-                            R_ANGLE ">"
-                          LITERAL
-                            STRING "'eventTypes'"
-                        R_PAREN ")"
-                      COLON_COLON
-                        COLON ":"
-                        COLON ":"
-                      PATH_TYPE
-                        PATH
-                          PATH_SEGMENT
+                    ARG
+                      CAST_EXPR
+                        PAREN_EXPR
+                          L_PAREN "("
+                          BIN_EXPR
                             NAME_REF
-                              JSON_KW "json"
+                              IDENT "etg"
+                            CUSTOM_OP
+                              MINUS "-"
+                              R_ANGLE ">"
+                            LITERAL
+                              STRING "'eventTypes'"
+                          R_PAREN ")"
+                        COLON_COLON
+                          COLON ":"
+                          COLON ":"
+                        PATH_TYPE
+                          PATH
+                            PATH_SEGMENT
+                              NAME_REF
+                                JSON_KW "json"
                     R_PAREN ")"
                 WHITESPACE " "
                 ALIAS
@@ -3688,26 +3762,27 @@ SOURCE_FILE
                 IDENT "json_array_elements"
               ARG_LIST
                 L_PAREN "("
-                CAST_EXPR
-                  PAREN_EXPR
-                    L_PAREN "("
-                    BIN_EXPR
-                      NAME_REF
-                        IDENT "attrs"
-                      CUSTOM_OP
-                        MINUS "-"
-                        R_ANGLE ">"
-                      LITERAL
-                        STRING "'bookings'"
-                    R_PAREN ")"
-                  COLON_COLON
-                    COLON ":"
-                    COLON ":"
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                ARG
+                  CAST_EXPR
+                    PAREN_EXPR
+                      L_PAREN "("
+                      BIN_EXPR
                         NAME_REF
-                          JSON_KW "json"
+                          IDENT "attrs"
+                        CUSTOM_OP
+                          MINUS "-"
+                          R_ANGLE ">"
+                        LITERAL
+                          STRING "'bookings'"
+                      R_PAREN ")"
+                    COLON_COLON
+                      COLON ":"
+                      COLON ":"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            JSON_KW "json"
                 R_PAREN ")"
             WHITESPACE " "
             ALIAS
@@ -3787,12 +3862,14 @@ SOURCE_FILE
                 IDENT "date_trunc"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  STRING "'hour'"
+                ARG
+                  LITERAL
+                    STRING "'hour'"
                 COMMA ","
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "event_time"
+                ARG
+                  NAME_REF
+                    IDENT "event_time"
                 R_PAREN ")"
             WHITESPACE " "
             AS_NAME
@@ -3826,8 +3903,9 @@ SOURCE_FILE
                 L_PAREN "("
                 DISTINCT_KW "distinct"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "user_id"
+                ARG
+                  NAME_REF
+                    IDENT "user_id"
                 R_PAREN ")"
             WHITESPACE " "
             AS_NAME
@@ -4697,8 +4775,9 @@ SOURCE_FILE
                         IDENT "AVG"
                       ARG_LIST
                         L_PAREN "("
-                        NAME_REF
-                          IDENT "revenue"
+                        ARG
+                          NAME_REF
+                            IDENT "revenue"
                         R_PAREN ")"
               WHITESPACE " \n    "
               FROM_CLAUSE
@@ -4805,8 +4884,9 @@ SOURCE_FILE
               IDENT "AVG"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "revenue"
+              ARG
+                NAME_REF
+                  IDENT "revenue"
               R_PAREN ")"
             WHITESPACE " "
             OVER_CLAUSE
@@ -4871,12 +4951,14 @@ SOURCE_FILE
               IDENT "date_trunc"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'month'"
+              ARG
+                LITERAL
+                  STRING "'month'"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                TIMESTAMP_KW "timestamp"
+              ARG
+                NAME_REF
+                  TIMESTAMP_KW "timestamp"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -4897,8 +4979,9 @@ SOURCE_FILE
               IDENT "SUM"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "revenue"
+              ARG
+                NAME_REF
+                  IDENT "revenue"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -4914,14 +4997,16 @@ SOURCE_FILE
               IDENT "SUM"
             ARG_LIST
               L_PAREN "("
-              CALL_EXPR
-                NAME_REF
-                  IDENT "SUM"
-                ARG_LIST
-                  L_PAREN "("
+              ARG
+                CALL_EXPR
                   NAME_REF
-                    IDENT "revenue"
-                  R_PAREN ")"
+                    IDENT "SUM"
+                  ARG_LIST
+                    L_PAREN "("
+                    ARG
+                      NAME_REF
+                        IDENT "revenue"
+                    R_PAREN ")"
               R_PAREN ")"
             WHITESPACE " "
             OVER_CLAUSE
@@ -4949,12 +5034,14 @@ SOURCE_FILE
                           IDENT "date_trunc"
                         ARG_LIST
                           L_PAREN "("
-                          LITERAL
-                            STRING "'month'"
+                          ARG
+                            LITERAL
+                              STRING "'month'"
                           COMMA ","
                           WHITESPACE " "
-                          NAME_REF
-                            TIMESTAMP_KW "timestamp"
+                          ARG
+                            NAME_REF
+                              TIMESTAMP_KW "timestamp"
                           R_PAREN ")"
               WHITESPACE "\n  "
               R_PAREN ")"
@@ -5013,12 +5100,14 @@ SOURCE_FILE
                     IDENT "date_trunc"
                   ARG_LIST
                     L_PAREN "("
-                    LITERAL
-                      STRING "'month'"
+                    ARG
+                      LITERAL
+                        STRING "'month'"
                     COMMA ","
                     WHITESPACE " "
-                    NAME_REF
-                      TIMESTAMP_KW "timestamp"
+                    ARG
+                      NAME_REF
+                        TIMESTAMP_KW "timestamp"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -5036,8 +5125,9 @@ SOURCE_FILE
                     L_PAREN "("
                     DISTINCT_KW "DISTINCT"
                     WHITESPACE " "
-                    NAME_REF
-                      IDENT "user_id"
+                    ARG
+                      NAME_REF
+                        IDENT "user_id"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -5053,8 +5143,9 @@ SOURCE_FILE
                     IDENT "SUM"
                   ARG_LIST
                     L_PAREN "("
-                    NAME_REF
-                      IDENT "revenue"
+                    ARG
+                      NAME_REF
+                        IDENT "revenue"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -5211,12 +5302,13 @@ SOURCE_FILE
               L_PAREN "("
               DISTINCT_KW "DISTINCT"
               WHITESPACE " "
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "e"
-                DOT "."
-                NAME_REF
-                  IDENT "user_id"
+              ARG
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "e"
+                  DOT "."
+                  NAME_REF
+                    IDENT "user_id"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -5232,8 +5324,9 @@ SOURCE_FILE
               IDENT "SUM"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "revenue"
+              ARG
+                NAME_REF
+                  IDENT "revenue"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -5318,12 +5411,14 @@ SOURCE_FILE
                 IDENT "date_trunc"
               ARG_LIST
                 L_PAREN "("
-                LITERAL
-                  STRING "'month'"
+                ARG
+                  LITERAL
+                    STRING "'month'"
                 COMMA ","
                 WHITESPACE " "
-                NAME_REF
-                  TIMESTAMP_KW "timestamp"
+                ARG
+                  NAME_REF
+                    TIMESTAMP_KW "timestamp"
                 R_PAREN ")"
             WHITESPACE " "
             AS_NAME
@@ -5357,8 +5452,9 @@ SOURCE_FILE
                 L_PAREN "("
                 DISTINCT_KW "DISTINCT"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "user_id"
+                ARG
+                  NAME_REF
+                    IDENT "user_id"
                 R_PAREN ")"
             WHITESPACE " "
             AS_NAME
@@ -5681,8 +5777,9 @@ SOURCE_FILE
                       IDENT "MAX"
                     ARG_LIST
                       L_PAREN "("
-                      NAME_REF
-                        TIMESTAMP_KW "timestamp"
+                      ARG
+                        NAME_REF
+                          TIMESTAMP_KW "timestamp"
                       R_PAREN ")"
             WHITESPACE "\n  "
             FROM_CLAUSE
@@ -5782,12 +5879,14 @@ SOURCE_FILE
             IDENT "date_trunc"
           ARG_LIST
             L_PAREN "("
-            LITERAL
-              STRING "'month'"
+            ARG
+              LITERAL
+                STRING "'month'"
             COMMA ","
             WHITESPACE " "
-            NAME_REF
-              TIMESTAMP_KW "timestamp"
+            ARG
+              NAME_REF
+                TIMESTAMP_KW "timestamp"
             R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
@@ -5849,10 +5948,19 @@ SOURCE_FILE
               IDENT "corr"
             ARG_LIST
               L_PAREN "("
-              CAST_EXPR
+              ARG
                 CAST_EXPR
-                  NAME_REF
-                    IDENT "ctid"
+                  CAST_EXPR
+                    NAME_REF
+                      IDENT "ctid"
+                    COLON_COLON
+                      COLON ":"
+                      COLON ":"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
                   COLON_COLON
                     COLON ":"
                     COLON ":"
@@ -5860,21 +5968,22 @@ SOURCE_FILE
                     PATH
                       PATH_SEGMENT
                         NAME_REF
-                          TEXT_KW "text"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        IDENT "float8"
+                          IDENT "float8"
               COMMA ","
               WHITESPACE " "
-              CAST_EXPR
+              ARG
                 CAST_EXPR
-                  NAME_REF
-                    TIMESTAMP_KW "timestamp"
+                  CAST_EXPR
+                    NAME_REF
+                      TIMESTAMP_KW "timestamp"
+                    COLON_COLON
+                      COLON ":"
+                      COLON ":"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
                   COLON_COLON
                     COLON ":"
                     COLON ":"
@@ -5882,15 +5991,7 @@ SOURCE_FILE
                     PATH
                       PATH_SEGMENT
                         NAME_REF
-                          TEXT_KW "text"
-                COLON_COLON
-                  COLON ":"
-                  COLON ":"
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        IDENT "float8"
+                          IDENT "float8"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -5937,12 +6038,13 @@ SOURCE_FILE
                 IDENT "SUM"
               ARG_LIST
                 L_PAREN "("
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "po"
-                  DOT "."
-                  NAME_REF
-                    IDENT "qty"
+                ARG
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "po"
+                    DOT "."
+                    NAME_REF
+                      IDENT "qty"
                 R_PAREN ")"
             WHITESPACE " "
             AS_NAME
@@ -6259,12 +6361,14 @@ SOURCE_FILE
               IDENT "create_hypertable"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'solar_panel_metrics'"
+              ARG
+                LITERAL
+                  STRING "'solar_panel_metrics'"
               COMMA ","
               WHITESPACE " "
-              LITERAL
-                STRING "'time'"
+              ARG
+                LITERAL
+                  STRING "'time'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -6281,12 +6385,14 @@ SOURCE_FILE
               IDENT "time_bucket"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'1 day'"
+              ARG
+                LITERAL
+                  STRING "'1 day'"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                TIME_KW "time"
+              ARG
+                NAME_REF
+                  TIME_KW "time"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -6307,14 +6413,15 @@ SOURCE_FILE
               IDENT "avg"
             ARG_LIST
               L_PAREN "("
-              BIN_EXPR
-                NAME_REF
-                  IDENT "voltage"
-                WHITESPACE " "
-                STAR "*"
-                WHITESPACE " "
-                NAME_REF
-                  CURRENT_KW "current"
+              ARG
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "voltage"
+                  WHITESPACE " "
+                  STAR "*"
+                  WHITESPACE " "
+                  NAME_REF
+                    CURRENT_KW "current"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -6341,14 +6448,15 @@ SOURCE_FILE
                       IDENT "avg"
                     ARG_LIST
                       L_PAREN "("
-                      BIN_EXPR
-                        NAME_REF
-                          IDENT "voltage"
-                        WHITESPACE " "
-                        STAR "*"
-                        WHITESPACE " "
-                        NAME_REF
-                          CURRENT_KW "current"
+                      ARG
+                        BIN_EXPR
+                          NAME_REF
+                            IDENT "voltage"
+                          WHITESPACE " "
+                          STAR "*"
+                          WHITESPACE " "
+                          NAME_REF
+                            CURRENT_KW "current"
                       R_PAREN ")"
                   WHITESPACE " "
                   SLASH "/"
@@ -6486,8 +6594,9 @@ SOURCE_FILE
                     IDENT "avg"
                   ARG_LIST
                     L_PAREN "("
-                    NAME_REF
-                      IDENT "vibration_level"
+                    ARG
+                      NAME_REF
+                        IDENT "vibration_level"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -6503,8 +6612,9 @@ SOURCE_FILE
                     IDENT "stddev"
                   ARG_LIST
                     L_PAREN "("
-                    NAME_REF
-                      IDENT "vibration_level"
+                    ARG
+                      NAME_REF
+                        IDENT "vibration_level"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -6568,12 +6678,14 @@ SOURCE_FILE
               IDENT "time_bucket"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'5 minutes'"
+              ARG
+                LITERAL
+                  STRING "'5 minutes'"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                TIME_KW "time"
+              ARG
+                NAME_REF
+                  TIME_KW "time"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -6687,23 +6799,24 @@ SOURCE_FILE
               IDENT "abs"
             ARG_LIST
               L_PAREN "("
-              BIN_EXPR
-                PAREN_EXPR
-                  L_PAREN "("
-                  BIN_EXPR
-                    NAME_REF
-                      IDENT "vibration_level"
-                    WHITESPACE " "
-                    MINUS "-"
-                    WHITESPACE " "
-                    NAME_REF
-                      IDENT "avg_vibration"
-                  R_PAREN ")"
-                WHITESPACE " "
-                SLASH "/"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "stddev_vibration"
+              ARG
+                BIN_EXPR
+                  PAREN_EXPR
+                    L_PAREN "("
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "vibration_level"
+                      WHITESPACE " "
+                      MINUS "-"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "avg_vibration"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  SLASH "/"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "stddev_vibration"
               R_PAREN ")"
           WHITESPACE " "
           R_ANGLE ">"
@@ -6725,12 +6838,14 @@ SOURCE_FILE
               IDENT "time_bucket"
             ARG_LIST
               L_PAREN "("
-              LITERAL
-                STRING "'5 minutes'"
+              ARG
+                LITERAL
+                  STRING "'5 minutes'"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                TIME_KW "time"
+              ARG
+                NAME_REF
+                  TIME_KW "time"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -6751,8 +6866,9 @@ SOURCE_FILE
               IDENT "sum"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "available_power"
+              ARG
+                NAME_REF
+                  IDENT "available_power"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -6768,8 +6884,9 @@ SOURCE_FILE
               IDENT "sum"
             ARG_LIST
               L_PAREN "("
-              NAME_REF
-                IDENT "storage_capacity"
+              ARG
+                NAME_REF
+                  IDENT "storage_capacity"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME
@@ -6865,12 +6982,14 @@ SOURCE_FILE
                     IDENT "time_bucket"
                   ARG_LIST
                     L_PAREN "("
-                    LITERAL
-                      STRING "'1 hour'"
+                    ARG
+                      LITERAL
+                        STRING "'1 hour'"
                     COMMA ","
                     WHITESPACE " "
-                    NAME_REF
-                      TIME_KW "time"
+                    ARG
+                      NAME_REF
+                        TIME_KW "time"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -6886,8 +7005,9 @@ SOURCE_FILE
                     IDENT "avg"
                   ARG_LIST
                     L_PAREN "("
-                    NAME_REF
-                      IDENT "price"
+                    ARG
+                      NAME_REF
+                        IDENT "price"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -6903,8 +7023,9 @@ SOURCE_FILE
                     IDENT "percentile_cont"
                   ARG_LIST
                     L_PAREN "("
-                    LITERAL
-                      NUMERIC_NUMBER "0.75"
+                    ARG
+                      LITERAL
+                        NUMERIC_NUMBER "0.75"
                     R_PAREN ")"
                   WHITESPACE " "
                   WITHIN_CLAUSE

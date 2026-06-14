@@ -3046,6 +3046,29 @@ impl AnyFn {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Arg {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Arg {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn named_arg(&self) -> Option<NamedArg> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn order_by_clause(&self) -> Option<OrderByClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn variadic_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VARIADIC_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArgList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3053,10 +3076,6 @@ impl ArgList {
     #[inline]
     pub fn args(&self) -> AstChildren<Arg> {
         support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn order_by_clause(&self) -> Option<OrderByClause> {
-        support::child(&self.syntax)
     }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
@@ -3077,10 +3096,6 @@ impl ArgList {
     #[inline]
     pub fn distinct_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DISTINCT_KW)
-    }
-    #[inline]
-    pub fn variadic_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VARIADIC_KW)
     }
 }
 
@@ -15068,6 +15083,10 @@ impl Op {
         support::token(&self.syntax, SyntaxKind::COLLATE_KW)
     }
     #[inline]
+    pub fn escape_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ESCAPE_KW)
+    }
+    #[inline]
     pub fn ilike_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ILIKE_KW)
     }
@@ -19769,10 +19788,6 @@ impl SubstringFn {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
-    pub fn escape_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ESCAPE_KW)
-    }
-    #[inline]
     pub fn for_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FOR_KW)
     }
@@ -21942,12 +21957,6 @@ pub enum AlterTypeAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Arg {
-    NamedArg(NamedArg),
-    Expr(Expr),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BeginFuncOption {
     ReturnFuncOption(ReturnFuncOption),
     Stmt(Stmt),
@@ -23748,6 +23757,24 @@ impl AstNode for AnyFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ANY_FN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Arg {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ARG
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -37159,38 +37186,6 @@ impl From<DropAttribute> for AlterTypeAction {
     #[inline]
     fn from(node: DropAttribute) -> AlterTypeAction {
         AlterTypeAction::DropAttribute(node)
-    }
-}
-impl AstNode for Arg {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, SyntaxKind::NAMED_ARG)
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        let res = match syntax.kind() {
-            SyntaxKind::NAMED_ARG => Arg::NamedArg(NamedArg { syntax }),
-            _ => {
-                if let Some(result) = Expr::cast(syntax) {
-                    return Some(Arg::Expr(result));
-                }
-                return None;
-            }
-        };
-        Some(res)
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            Arg::NamedArg(it) => &it.syntax,
-            Arg::Expr(it) => it.syntax(),
-        }
-    }
-}
-impl From<NamedArg> for Arg {
-    #[inline]
-    fn from(node: NamedArg) -> Arg {
-        Arg::NamedArg(node)
     }
 }
 impl AstNode for BeginFuncOption {
