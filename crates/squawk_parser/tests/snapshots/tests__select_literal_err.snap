@@ -361,6 +361,136 @@ SOURCE_FILE
             IDENT "U&\"\""
     SEMICOLON ";"
   WHITESPACE "\n"
+  COMMENT "-- numeric field accesses used to panic in some cases"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            LITERAL
+              INT_NUMBER "0"
+            WHITESPACE " "
+            DOT "."
+            WHITESPACE " "
+            ERROR
+              NUMERIC_NUMBER "0e"
+    WHITESPACE " "
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            WHITESPACE " "
+            DOT "."
+            WHITESPACE " "
+            ERROR
+              NUMERIC_NUMBER "0e"
+    WHITESPACE " "
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            DOT "."
+            WHITESPACE " "
+            ERROR
+              NUMERIC_NUMBER "2e"
+    WHITESPACE " "
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            LITERAL
+              INT_NUMBER "0"
+            WHITESPACE " "
+            DOT "."
+            WHITESPACE " "
+            ERROR
+              NUMERIC_NUMBER "1e5"
+    WHITESPACE " "
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            LITERAL
+              INT_NUMBER "0"
+            WHITESPACE " "
+            DOT "."
+            WHITESPACE " "
+            ERROR
+              NUMERIC_NUMBER ".5"
+    WHITESPACE " "
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            FIELD_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              DOT "."
+              WHITESPACE " "
+              ERROR
+                INT_NUMBER "2"
+            WHITESPACE " "
+            DOT "."
+            WHITESPACE " "
+            ERROR
+              NUMERIC_NUMBER "3e"
+    WHITESPACE " "
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+            WHITESPACE " "
+            DOT "."
+            WHITESPACE " "
+            ERROR
+              NUMERIC_NUMBER "0e"
+    WHITESPACE " "
+    SEMICOLON ";"
+  WHITESPACE "\n"
 ---
 error[syntax-error]: trailing junk after numeric literal
   ╭▸ 
@@ -530,3 +660,55 @@ error[syntax-error]: empty delimited identifier
    ╭▸ 
 36 │ SELECT U&"";
    ╰╴       ━━━━
+error[syntax-error]: expected field name
+   ╭▸ 
+38 │ select 0 . 0e ;
+   ╰╴           ━
+error[syntax-error]: Missing digits after the exponent symbol
+   ╭▸ 
+38 │ select 0 . 0e ;
+   ╰╴            ━
+error[syntax-error]: expected field name
+   ╭▸ 
+39 │ select t . 0e ;
+   ╰╴           ━
+error[syntax-error]: Missing digits after the exponent symbol
+   ╭▸ 
+39 │ select t . 0e ;
+   ╰╴            ━
+error[syntax-error]: expected field name
+   ╭▸ 
+40 │ select 1 . 2e ;
+   ╰╴           ━
+error[syntax-error]: Missing digits after the exponent symbol
+   ╭▸ 
+40 │ select 1 . 2e ;
+   ╰╴            ━
+error[syntax-error]: expected field name
+   ╭▸ 
+41 │ select 0 . 1e5 ;
+   ╰╴           ━
+error[syntax-error]: expected field name
+   ╭▸ 
+42 │ select 0 . .5 ;
+   ╰╴           ━
+error[syntax-error]: expected field name
+   ╭▸ 
+43 │ select 1 . 2 . 3e ;
+   ╰╴           ━
+error[syntax-error]: expected field name
+   ╭▸ 
+43 │ select 1 . 2 . 3e ;
+   ╰╴               ━
+error[syntax-error]: Missing digits after the exponent symbol
+   ╭▸ 
+43 │ select 1 . 2 . 3e ;
+   ╰╴                ━
+error[syntax-error]: expected field name
+   ╭▸ 
+44 │ select (1) . 0e ;
+   ╰╴             ━
+error[syntax-error]: Missing digits after the exponent symbol
+   ╭▸ 
+44 │ select (1) . 0e ;
+   ╰╴              ━

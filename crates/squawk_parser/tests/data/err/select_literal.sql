@@ -34,3 +34,11 @@ SELECT $;
 SELECT $0111111111111111111111111111111111111111111111111111;
 SELECT "";
 SELECT U&"";
+-- numeric field accesses used to panic in some cases
+select 0 . 0e ;
+select t . 0e ;
+select 1 . 2e ;
+select 0 . 1e5 ;
+select 0 . .5 ;
+select 1 . 2 . 3e ;
+select (1) . 0e ;

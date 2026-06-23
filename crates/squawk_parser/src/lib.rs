@@ -533,38 +533,6 @@ impl<'t> Parser<'t> {
         self.do_bump(kind, 1);
     }
 
-    /// Advances the parser by one token
-    pub(crate) fn split_numeric(&mut self, mut marker: Marker) -> (bool, Marker) {
-        assert!(self.at(SyntaxKind::NUMERIC_NUMBER));
-        // we have parse `<something>.`
-        // `<something>`.0.1
-        // here we need to insert an extra event
-        //
-        // `<something>`. 0. 1;
-        // here we need to change the follow up parse, the return value will cause us to emulate a dot
-        // the actual splitting happens later
-        let ends_in_dot = !self.inp.is_joint(self.pos);
-        if !ends_in_dot {
-            let new_marker = self.start();
-            let idx = marker.pos as usize;
-            match &mut self.events[idx] {
-                Event::Start {
-                    forward_parent,
-                    kind,
-                } => {
-                    *kind = SyntaxKind::FIELD_EXPR;
-                    *forward_parent = Some(new_marker.pos - marker.pos);
-                }
-                _ => unreachable!(),
-            }
-            marker.bomb.defuse();
-            marker = new_marker;
-        };
-        self.pos += 1;
-        self.push_event(Event::NumericSplitHack { ends_in_dot });
-        (ends_in_dot, marker)
-    }
-
     /// Consume the next token if it is `kind` or emit an error
     /// otherwise.
     pub(crate) fn expect(&mut self, kind: SyntaxKind) -> bool {
