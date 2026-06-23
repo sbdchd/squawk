@@ -550,7 +550,7 @@ fn json_object_fn_arg_list(p: &mut Parser<'_>) {
             p.bump(COMMA);
             continue;
         } else {
-            p.error("expected a comma");
+            p.err_and_bump("expected a comma");
         }
     }
     opt_json_null_clause(p);
@@ -2064,7 +2064,7 @@ fn opt_interval_trailing(p: &mut Parser<'_>) {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected number")
             }
-            p.bump(R_PAREN);
+            p.expect(R_PAREN);
         }
         _ => (),
     }
@@ -3031,7 +3031,6 @@ const JOIN_TYPE_FIRST: TokenSet =
 //   RIGHT [ OUTER ] JOIN
 //   FULL [ OUTER ] JOIN
 fn join_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    assert!(p.at_ts(JOIN_TYPE_FIRST));
     let m = p.start();
     let kind = match p.current() {
         CROSS_KW => {
@@ -4098,9 +4097,8 @@ fn opt_virtual_or_stored(p: &mut Parser<'_>) {
 fn opt_no_inherit(p: &mut Parser<'_>) {
     let m = p.start();
     if p.eat(NO_KW) {
-        if p.eat(INHERIT_KW) {
-            m.complete(p, NO_INHERIT);
-        }
+        p.expect(INHERIT_KW);
+        m.complete(p, NO_INHERIT);
     } else {
         m.abandon(p);
     }
@@ -5895,7 +5893,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             PARSER_KW => Some(alter_text_search_parser(p)),
             TEMPLATE_KW => Some(alter_text_search_template(p)),
             _ => {
-                p.error("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
@@ -5991,7 +5989,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             PARSER_KW => Some(create_text_search_parser(p)),
             TEMPLATE_KW => Some(create_text_search_template(p)),
             _ => {
-                p.error("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
@@ -6019,7 +6017,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             DATA_KW => Some(drop_foreign_data(p)),
             TABLE_KW => Some(drop_foreign_table(p)),
             _ => {
-                p.error("expected DATA or TABLE");
+                p.err_and_bump("expected DATA or TABLE");
                 None
             }
         },
@@ -6054,7 +6052,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             PARSER_KW => Some(drop_text_search_parser(p)),
             TEMPLATE_KW => Some(drop_text_search_template(p)),
             _ => {
-                p.error("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
@@ -6300,7 +6298,11 @@ fn alter_rule(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(RULE_KW);
     name_ref(p);
     on_table(p);
-    rename_to(p);
+    if p.at(RENAME_KW) {
+        rename_to(p);
+    } else {
+        p.error("expected RENAME");
+    }
     p.eat(SEMICOLON);
     m.complete(p, ALTER_RULE)
 }
@@ -6911,7 +6913,7 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
                 } else {
                     DEPENDS_ON_EXTENSION
                 };
-                p.bump(DEPENDS_KW);
+                p.expect(DEPENDS_KW);
                 p.expect(ON_KW);
                 p.expect(EXTENSION_KW);
                 path_name_ref(p);
@@ -7105,17 +7107,12 @@ fn alter_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER FOREIGN DATA WRAPPER name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER FOREIGN DATA WRAPPER name RENAME TO new_name
 fn alter_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(
-        p.at(ALTER_KW)
-            && p.nth_at(1, FOREIGN_KW)
-            && p.nth_at(2, DATA_KW)
-            && p.nth_at(3, WRAPPER_KW)
-    );
+    assert!(p.at(ALTER_KW) && p.nth_at(1, FOREIGN_KW) && p.nth_at(2, DATA_KW));
     let m = p.start();
     p.bump(ALTER_KW);
     p.bump(FOREIGN_KW);
     p.bump(DATA_KW);
-    p.bump(WRAPPER_KW);
+    p.expect(WRAPPER_KW);
     name_ref(p);
     let found_option = match p.current() {
         OWNER_KW => {
@@ -7303,7 +7300,7 @@ fn alter_extension(p: &mut Parser<'_>) -> CompletedMarker {
                 }
                 LANGUAGE_KW | PROCEDURAL_KW => {
                     p.eat(PROCEDURAL_KW);
-                    p.bump(LANGUAGE_KW);
+                    p.expect(LANGUAGE_KW);
                     name_ref(p);
                 }
                 TEXT_KW => {
@@ -10714,14 +10711,12 @@ fn function_sig_list(p: &mut Parser<'_>) {
 
 // DROP FOREIGN DATA WRAPPER [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
 fn drop_foreign_data(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(
-        p.at(DROP_KW) && p.nth_at(1, FOREIGN_KW) && p.nth_at(2, DATA_KW) && p.nth_at(3, WRAPPER_KW)
-    );
+    assert!(p.at(DROP_KW) && p.nth_at(1, FOREIGN_KW) && p.nth_at(2, DATA_KW));
     let m = p.start();
     p.bump(DROP_KW);
     p.bump(FOREIGN_KW);
     p.bump(DATA_KW);
-    p.bump(WRAPPER_KW);
+    p.expect(WRAPPER_KW);
     opt_if_exists(p);
     name_ref_list(p);
     opt_cascade_or_restrict(p);
@@ -10745,11 +10740,11 @@ fn drop_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
 
 // DROP ACCESS METHOD [ IF EXISTS ] name [ CASCADE | RESTRICT ]
 fn drop_access_method(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(DROP_KW) && p.nth_at(1, ACCESS_KW) && p.nth_at(2, METHOD_KW));
+    assert!(p.at(DROP_KW) && p.nth_at(1, ACCESS_KW));
     let m = p.start();
     p.bump(DROP_KW);
     p.bump(ACCESS_KW);
-    p.bump(METHOD_KW);
+    p.expect(METHOD_KW);
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
@@ -10848,11 +10843,11 @@ fn drop_domain(p: &mut Parser<'_>) -> CompletedMarker {
 
 // DROP EVENT TRIGGER [ IF EXISTS ] name [ CASCADE | RESTRICT ]
 fn drop_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(DROP_KW) && p.nth_at(1, EVENT_KW) && p.nth_at(2, TRIGGER_KW));
+    assert!(p.at(DROP_KW) && p.nth_at(1, EVENT_KW));
     let m = p.start();
     p.bump(DROP_KW);
     p.bump(EVENT_KW);
-    p.bump(TRIGGER_KW);
+    p.expect(TRIGGER_KW);
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
@@ -10875,11 +10870,11 @@ fn drop_extension(p: &mut Parser<'_>) -> CompletedMarker {
 
 // DROP MATERIALIZED VIEW [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
 fn drop_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(DROP_KW) && p.nth_at(1, MATERIALIZED_KW) && p.nth_at(2, VIEW_KW));
+    assert!(p.at(DROP_KW) && p.nth_at(1, MATERIALIZED_KW));
     let m = p.start();
     p.bump(DROP_KW);
     p.bump(MATERIALIZED_KW);
-    p.bump(VIEW_KW);
+    p.expect(VIEW_KW);
     opt_if_exists(p);
     path_name_ref_list(p);
     opt_cascade_or_restrict(p);
@@ -14150,7 +14145,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(CREATE_KW);
     p.eat(UNIQUE_KW);
-    p.bump(INDEX_KW);
+    p.expect(INDEX_KW);
     p.eat(CONCURRENTLY_KW);
     // [ [ IF NOT EXISTS ] name ]
     if opt_if_not_exists(p).is_some() {
@@ -15290,7 +15285,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         CLUSTER_KW => {
             let m = p.start();
             p.bump(CLUSTER_KW);
-            p.bump(ON_KW);
+            p.expect(ON_KW);
             name_ref(p);
             m.complete(p, CLUSTER_ON)
         }

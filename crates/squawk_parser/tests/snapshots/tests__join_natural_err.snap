@@ -1,0 +1,126 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/join_natural.sql
+---
+SOURCE_FILE
+  COMMENT "-- NATURAL with no following join type"
+  WHITESPACE "\n"
+  MERGE
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    USING_ON_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "u"
+        WHITESPACE " "
+        JOIN
+          NATURAL_KW "natural"
+    MERGE_WHEN_NOT_MATCHED_TARGET
+      MERGE_DO_NOTHING
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        JOIN
+          NATURAL_KW "natural"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        JOIN_EXPR
+          FROM_ITEM
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          JOIN
+            JOIN_INNER
+              JOIN_KW "join"
+        WHITESPACE " "
+        JOIN
+          NATURAL_KW "natural"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected join type
+  ╭▸ 
+2 │ merge into t using u natural;
+  ╰╴                            ━
+error[syntax-error]: expected from_item
+  ╭▸ 
+2 │ merge into t using u natural;
+  ╰╴                            ━
+error[syntax-error]: expected on clause
+  ╭▸ 
+2 │ merge into t using u natural;
+  ╰╴                            ━
+error[syntax-error]: expected WHEN_KW
+  ╭▸ 
+2 │ merge into t using u natural;
+  ╰╴                            ━
+error[syntax-error]: expected MATCHED, or NOT MATCHED
+  ╭▸ 
+2 │ merge into t using u natural;
+  ╰╴                            ━
+error[syntax-error]: expected THEN_KW
+  ╭▸ 
+2 │ merge into t using u natural;
+  ╰╴                            ━
+error[syntax-error]: expected INSERT, UPDATE, DELETE, or DO NOTHING
+  ╭▸ 
+2 │ merge into t using u natural;
+  ╰╴                            ━
+error[syntax-error]: expected join type
+  ╭▸ 
+3 │ select * from a natural;
+  ╰╴                       ━
+error[syntax-error]: expected from_item
+  ╭▸ 
+3 │ select * from a natural;
+  ╰╴                       ━
+error[syntax-error]: expected from_item
+  ╭▸ 
+4 │ select * from a join natural;
+  ╰╴                    ━
+error[syntax-error]: expected join type
+  ╭▸ 
+4 │ select * from a join natural;
+  ╰╴                            ━
+error[syntax-error]: expected from_item
+  ╭▸ 
+4 │ select * from a join natural;
+  ╰╴                            ━

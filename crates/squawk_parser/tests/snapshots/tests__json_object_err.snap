@@ -1,0 +1,93 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/json_object.sql
+---
+SOURCE_FILE
+  COMMENT "-- avoid parser getting stuck"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_OBJECT_FN
+              JSON_OBJECT_KW "json_object"
+              L_PAREN "("
+              ERROR
+                R_BRACK "]"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_OBJECT_FN
+              JSON_OBJECT_KW "json_object"
+              L_PAREN "("
+              ERROR
+                SEMICOLON ";"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_OBJECT_FN
+              JSON_OBJECT_KW "json_object"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              ERROR
+                R_BRACK "]"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected an expression, found R_BRACK
+  ╭▸ 
+2 │ select json_object(]);
+  ╰╴                   ━
+error[syntax-error]: expected expression
+  ╭▸ 
+2 │ select json_object(]);
+  ╰╴                   ━
+error[syntax-error]: expected a comma
+  ╭▸ 
+2 │ select json_object(]);
+  ╰╴                   ━
+error[syntax-error]: expected an expression, found SEMICOLON
+  ╭▸ 
+3 │ select json_object(;);
+  ╰╴                   ━
+error[syntax-error]: expected expression
+  ╭▸ 
+3 │ select json_object(;);
+  ╰╴                   ━
+error[syntax-error]: expected a comma
+  ╭▸ 
+3 │ select json_object(;);
+  ╰╴                   ━
+error[syntax-error]: expected an expression, found R_BRACK
+  ╭▸ 
+4 │ select json_object(1, ]);
+  ╰╴                     ━
+error[syntax-error]: expected expression
+  ╭▸ 
+4 │ select json_object(1, ]);
+  ╰╴                     ━
+error[syntax-error]: expected a comma
+  ╭▸ 
+4 │ select json_object(1, ]);
+  ╰╴                      ━

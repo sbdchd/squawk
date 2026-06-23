@@ -1,0 +1,48 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/create_domain.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing trailing inherit"
+  WHITESPACE "\n"
+  CREATE_DOMAIN
+    CREATE_KW "create"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "d"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    WHITESPACE " "
+    CHECK_CONSTRAINT
+      CHECK_KW "check"
+      WHITESPACE " "
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "v"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "0"
+      R_PAREN ")"
+      WHITESPACE " "
+      NO_INHERIT
+        NO_KW "no"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected INHERIT_KW
+  ╭▸ 
+2 │ create domain d as int check (v > 0) no;
+  ╰╴                                       ━
