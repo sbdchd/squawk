@@ -1,0 +1,50 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/alter_extension.sql
+---
+SOURCE_FILE
+  COMMENT "-- PROCEDURAL with no LANGUAGE"
+  WHITESPACE "\n"
+  ALTER_EXTENSION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected LANGUAGE_KW
+  ╭▸ 
+2 │ alter extension e add procedural;
+  ╰╴                                ━
+error[syntax-error]: expected name
+  ╭▸ 
+2 │ alter extension e add procedural;
+  ╰╴                                ━
+error[syntax-error]: expected LANGUAGE_KW
+  ╭▸ 
+3 │ alter extension e drop procedural;
+  ╰╴                                 ━
+error[syntax-error]: expected name
+  ╭▸ 
+3 │ alter extension e drop procedural;
+  ╰╴                                 ━

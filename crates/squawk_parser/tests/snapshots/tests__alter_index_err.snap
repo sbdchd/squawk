@@ -1,0 +1,38 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/alter_index.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing trailing depends"
+  WHITESPACE "\n"
+  ALTER_INDEX
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "idx"
+    WHITESPACE " "
+    NO_DEPENDS_ON_EXTENSION
+      NO_KW "no"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected DEPENDS_KW
+  ╭▸ 
+2 │ alter index idx no;
+  ╰╴                  ━
+error[syntax-error]: expected ON_KW
+  ╭▸ 
+2 │ alter index idx no;
+  ╰╴                  ━
+error[syntax-error]: expected EXTENSION_KW
+  ╭▸ 
+2 │ alter index idx no;
+  ╰╴                  ━
+error[syntax-error]: expected path name
+  ╭▸ 
+2 │ alter index idx no;
+  ╰╴                  ━

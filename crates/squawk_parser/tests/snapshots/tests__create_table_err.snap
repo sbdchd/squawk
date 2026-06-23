@@ -102,6 +102,49 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
+    COMMENT "-- missing inherit"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE " "
+      COLUMN
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        CHECK_CONSTRAINT
+          CHECK_KW "check"
+          WHITESPACE " "
+          L_PAREN "("
+          BIN_EXPR
+            NAME_REF
+              IDENT "c"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
+          R_PAREN ")"
+          WHITESPACE " "
+          NO_INHERIT
+            NO_KW "no"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
     COMMENT "-- a column list with SET DEFAULT is only supported for ON DELETE actions"
     WHITESPACE "\n"
     CREATE_KW "create"
@@ -702,23 +745,31 @@ error[syntax-error]: unexpected comma
    ╭▸ 
 13 │ create table t (,,,,,);
    ╰╴                    ━
+error[syntax-error]: expected INHERIT_KW
+   ╭▸ 
+16 │ create table t ( c int check (c > 10) no;
+   ╰╴                                        ━
+error[syntax-error]: expected R_PAREN
+   ╭▸ 
+16 │ create table t ( c int check (c > 10) no;
+   ╰╴                                        ━
 error[syntax-error]: expected COMMA
    ╭▸ 
-51 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
+54 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
    ╰╴                                 ━
 error[syntax-error]: expected COMMA
    ╭▸ 
-51 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
+54 │     for values from ('2024-01-01'  1) to ('2024-04-01'  5);
    ╰╴                                                      ━
 error[syntax-error]: expected COMMA
    ╭▸ 
-55 │     for values in (1  2  3);
+58 │     for values in (1  2  3);
    ╰╴                    ━
 error[syntax-error]: expected COMMA
    ╭▸ 
-55 │     for values in (1  2  3);
+58 │     for values in (1  2  3);
    ╰╴                       ━
 error[syntax-error]: expected COMMA
    ╭▸ 
-61 │   exclude using btree ( a with buzz.> b with <) 
+64 │   exclude using btree ( a with buzz.> b with <) 
    ╰╴                                     ━

@@ -12,6 +12,9 @@ create table t (a text,);
 -- missing columns / constraints
 create table t (,,,,,);
 
+-- missing inherit
+create table t ( c int check (c > 10) no;
+
 -- a column list with SET DEFAULT is only supported for ON DELETE actions
 create table t (
   a int,
