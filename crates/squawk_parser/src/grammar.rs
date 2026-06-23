@@ -1463,7 +1463,7 @@ fn postfix_expr(
             BETWEEN_KW => between_expr(p),
             L_PAREN if allow_calls => call_expr_args(p, lhs),
             L_BRACK => index_expr(p, lhs),
-            DOT => match postfix_dot_expr(p, lhs, allow_calls) {
+            DOT => match postfix_dot_expr(p, lhs) {
                 Ok(it) => it,
                 Err(it) => {
                     lhs = it;
@@ -2264,8 +2264,8 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     m.complete(p, INDEX_EXPR)
 }
 
-fn name_ref_or_index(p: &mut Parser<'_>) {
-    assert!(p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at_ts(ALL_KEYWORDS) || p.at(INT_NUMBER));
+fn field_name(p: &mut Parser<'_>) {
+    assert!(p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at_ts(ALL_KEYWORDS));
     let m = p.start();
     if !opt_ident(p) {
         p.bump_any();
@@ -2276,7 +2276,6 @@ fn name_ref_or_index(p: &mut Parser<'_>) {
 fn field_expr(
     p: &mut Parser<'_>,
     lhs: Option<CompletedMarker>,
-    allow_calls: bool,
 ) -> Result<CompletedMarker, CompletedMarker> {
     assert!(p.at(DOT));
     let m = match lhs {
@@ -2284,23 +2283,16 @@ fn field_expr(
         None => p.start(),
     };
     p.bump(DOT);
-    if p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at(INT_NUMBER) || p.at_ts(ALL_KEYWORDS) {
-        name_ref_or_index(p);
-    } else if p.at(NUMERIC_NUMBER) {
-        return match p.split_numeric(m) {
-            (true, m) => {
-                let lhs = m.complete(p, FIELD_EXPR);
-                postfix_dot_expr(p, lhs, allow_calls)
-            }
-            (false, m) => Ok(m.complete(p, FIELD_EXPR)),
-        };
+    if p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at_ts(ALL_KEYWORDS) {
+        field_name(p);
+    } else if p.at(INT_NUMBER) || p.at(NUMERIC_NUMBER) {
+        // Unlike Rust, we can't have a number as a field, so we just report an
+        // error.
+        p.err_and_bump("expected field name");
     } else if p.eat(STAR) || opt_operator(p) {
         //
     } else {
-        p.error(format!(
-            "expected field name or number, got {:?}",
-            p.current()
-        ));
+        p.error(format!("expected field name, got {:?}", p.current()));
     }
     Ok(m.complete(p, FIELD_EXPR))
 }
@@ -2308,10 +2300,9 @@ fn field_expr(
 fn postfix_dot_expr(
     p: &mut Parser<'_>,
     lhs: CompletedMarker,
-    allow_calls: bool,
 ) -> Result<CompletedMarker, CompletedMarker> {
     assert!(p.at(DOT));
-    field_expr(p, Some(lhs), allow_calls).map(|cm| {
+    field_expr(p, Some(lhs)).map(|cm| {
         if p.at_ts(STRING_FIRST) {
             // wrap our previous expression in a type
             // TODO: can we unify types & exprs?

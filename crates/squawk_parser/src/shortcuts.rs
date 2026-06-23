@@ -64,16 +64,6 @@ impl Builder<'_, '_> {
         self.do_token(kind, n_tokens as usize);
     }
 
-    fn numeric_split(&mut self, has_pseudo_dot: bool) {
-        match mem::replace(&mut self.state, State::Normal) {
-            State::PendingEnter => unreachable!(),
-            State::PendingExit => (self.sink)(StrStep::Exit),
-            State::Normal => (),
-        }
-        self.eat_trivias();
-        self.do_numeric_split(has_pseudo_dot);
-    }
-
     fn enter(&mut self, kind: SyntaxKind) {
         match mem::replace(&mut self.state, State::Normal) {
             State::PendingEnter => {
@@ -132,77 +122,6 @@ impl Builder<'_, '_> {
         self.pos += n_tokens;
         (self.sink)(StrStep::Token { kind, text });
     }
-
-    fn do_numeric_split(&mut self, has_pseudo_dot: bool) {
-        let text = &self.lexed.range_text(self.pos..self.pos + 1);
-
-        match text.split_once('.') {
-            Some((left, right)) => {
-                assert!(!left.is_empty());
-                (self.sink)(StrStep::Enter {
-                    kind: SyntaxKind::NAME_REF,
-                });
-                (self.sink)(StrStep::Token {
-                    kind: SyntaxKind::INT_NUMBER,
-                    text: left,
-                });
-                (self.sink)(StrStep::Exit);
-
-                // here we move the exit up, the original exit has been deleted in process
-                (self.sink)(StrStep::Exit);
-
-                (self.sink)(StrStep::Token {
-                    kind: SyntaxKind::DOT,
-                    text: ".",
-                });
-
-                if has_pseudo_dot {
-                    assert!(right.is_empty(), "{left}.{right}");
-                    self.state = State::Normal;
-                } else {
-                    assert!(!right.is_empty(), "{left}.{right}");
-                    (self.sink)(StrStep::Enter {
-                        kind: SyntaxKind::NAME_REF,
-                    });
-                    (self.sink)(StrStep::Token {
-                        kind: SyntaxKind::INT_NUMBER,
-                        text: right,
-                    });
-                    (self.sink)(StrStep::Exit);
-
-                    // the parser creates an unbalanced start node, we are required to close it here
-                    self.state = State::PendingExit;
-                }
-            }
-            None => {
-                // illegal numeric literal which doesn't have dot in form (like 1e0)
-                // we should emit an error node here
-                (self.sink)(StrStep::Error {
-                    msg: "illegal numeric literal",
-                    pos: self.pos,
-                });
-                (self.sink)(StrStep::Enter {
-                    kind: SyntaxKind::ERROR,
-                });
-                (self.sink)(StrStep::Token {
-                    kind: SyntaxKind::NUMERIC_NUMBER,
-                    text,
-                });
-                (self.sink)(StrStep::Exit);
-
-                // move up
-                (self.sink)(StrStep::Exit);
-
-                self.state = if has_pseudo_dot {
-                    State::Normal
-                } else {
-                    State::PendingExit
-                };
-            }
-        }
-
-        self.pos += 1;
-    }
 }
 
 impl LexedStr<'_> {
@@ -227,18 +146,7 @@ impl LexedStr<'_> {
                     res.was_joint();
                 }
                 res.push(kind);
-                // Tag the token as joint if it is numeric with a fractional part
-                // we use this jointness to inform the parser about what token split
-                // event to emit when we encounter a numeric literal in a field access
-                // if kind == SyntaxKind::NUMERIC_NUMBER {
-                //     if !self.text(i).ends_with('.') {
-                //         res.was_joint();
-                //     } else {
-                //         was_joint = false;
-                //     }
-                // } else {
                 was_joint = true;
-                // }
             }
         }
         res
@@ -259,9 +167,6 @@ impl LexedStr<'_> {
                     kind,
                     n_input_tokens: n_raw_tokens,
                 } => builder.token(kind, n_raw_tokens),
-                Step::NumericSplit {
-                    ends_in_dot: has_pseudo_dot,
-                } => builder.numeric_split(has_pseudo_dot),
                 Step::Enter { kind } => builder.enter(kind),
                 Step::Exit => builder.exit(),
                 Step::Error { msg } => {
