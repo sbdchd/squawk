@@ -832,6 +832,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         (SOME_KW | ALL_KW | ANY_KW, L_PAREN) => some_any_all_fn(p),
         (EXISTS_KW, L_PAREN) => exists_fn(p),
         (COLLATION_KW, FOR_KW) => collation_for_fn(p),
+        (ROW_KW, L_PAREN) => tuple_expr(p),
         _ if p.at_ts(NAME_REF_FIRST) => name_ref_(p)?,
         (L_PAREN, _) => tuple_expr(p),
         (ARRAY_KW, L_BRACK | L_PAREN) => {
@@ -842,7 +843,6 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         // nested array exprs:
         // array[[1,2],[3,4]]
         (L_BRACK, _) => array_expr(p, None),
-        (ROW_KW, L_PAREN) => tuple_expr(p),
         (CASE_KW, _) => case_expr(p),
         _ => {
             p.err_and_bump("expected expression in atom_expr");
@@ -2398,8 +2398,6 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         IS_KW if !r.is_disabled && p.at(IS_DISTINCT_FROM) => (4, IS_DISTINCT_FROM, Left),
         // is not distinct from
         IS_KW if !r.is_disabled && p.at(IS_NOT_DISTINCT_FROM) => (4, IS_NOT_DISTINCT_FROM, Left),
-        // is not json
-        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON) => NOT_AN_OP,
         // is not json object
         IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_OBJECT) => NOT_AN_OP,
         // is not json array
@@ -2408,6 +2406,8 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_VALUE) => NOT_AN_OP,
         // is not json scalar
         IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_SCALAR) => NOT_AN_OP,
+        // is not json
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON) => NOT_AN_OP,
         // is json object
         IS_KW if !r.is_disabled && p.at(IS_JSON_OBJECT) => NOT_AN_OP,
         // is json array
@@ -3596,7 +3596,6 @@ const SEQUENCE_OPTION_FIRST: TokenSet = TokenSet::new(&[
     UNLOGGED_KW,
     START_KW,
     OWNED_KW,
-    OWNED_KW,
     MAXVALUE_KW,
     MINVALUE_KW,
     NO_KW,
@@ -4433,72 +4432,6 @@ fn opt_constraint_option_list(p: &mut Parser<'_>) {
     }
 }
 
-const COLUMN_NAME_KEYWORDS: TokenSet = TokenSet::new(&[
-    BETWEEN_KW,
-    BIGINT_KW,
-    BIT_KW,
-    BOOLEAN_KW,
-    CHAR_KW,
-    CHARACTER_KW,
-    COALESCE_KW,
-    DEC_KW,
-    DECIMAL_KW,
-    EXISTS_KW,
-    EXTRACT_KW,
-    FLOAT_KW,
-    GREATEST_KW,
-    GROUPING_KW,
-    INOUT_KW,
-    INT_KW,
-    INTEGER_KW,
-    INTERVAL_KW,
-    JSON_KW,
-    JSON_ARRAY_KW,
-    JSON_ARRAYAGG_KW,
-    JSON_EXISTS_KW,
-    JSON_OBJECT_KW,
-    JSON_OBJECTAGG_KW,
-    JSON_QUERY_KW,
-    JSON_SCALAR_KW,
-    JSON_SERIALIZE_KW,
-    JSON_TABLE_KW,
-    JSON_VALUE_KW,
-    LEAST_KW,
-    MERGE_ACTION_KW,
-    NATIONAL_KW,
-    NCHAR_KW,
-    NONE_KW,
-    NORMALIZE_KW,
-    NULLIF_KW,
-    NUMERIC_KW,
-    OUT_KW,
-    OVERLAY_KW,
-    POSITION_KW,
-    PRECISION_KW,
-    REAL_KW,
-    ROW_KW,
-    SETOF_KW,
-    SMALLINT_KW,
-    SUBSTRING_KW,
-    TIME_KW,
-    TIMESTAMP_KW,
-    TREAT_KW,
-    TRIM_KW,
-    VALUES_KW,
-    VARCHAR_KW,
-    XMLATTRIBUTES_KW,
-    XMLCONCAT_KW,
-    XMLELEMENT_KW,
-    XMLEXISTS_KW,
-    XMLFOREST_KW,
-    XMLNAMESPACES_KW,
-    XMLPARSE_KW,
-    XMLPI_KW,
-    XMLROOT_KW,
-    XMLSERIALIZE_KW,
-    XMLTABLE_KW,
-]);
-
 const COL_DEF_FIRST: TokenSet = TokenSet::new(&[LIKE_KW])
     .union(TABLE_CONSTRAINT_FIRST)
     .union(NAME_FIRST);
@@ -4974,13 +4907,13 @@ fn paren_expr_list(p: &mut Parser<'_>) {
 /// All keywords
 const COL_LABEL_FIRST: TokenSet = TokenSet::new(&[IDENT])
     .union(UNRESERVED_KEYWORDS)
-    .union(COLUMN_NAME_KEYWORDS)
+    .union(COL_NAME_KEYWORD_FIRST)
     .union(TYPE_FUNC_NAME_KEYWORDS)
     .union(RESERVED_KEYWORDS);
 
 const NAME_FIRST: TokenSet = TokenSet::new(&[IDENT])
     .union(UNRESERVED_KEYWORDS)
-    .union(COLUMN_NAME_KEYWORDS);
+    .union(COL_NAME_KEYWORD_FIRST);
 
 const BARE_COL_LABEL_FIRST: TokenSet = TokenSet::new(&[IDENT]).union(BARE_LABEL_KEYWORDS);
 
@@ -5068,7 +5001,6 @@ const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     INTO_KW,
     HAVING_KW,
     WINDOW_KW,
-    HAVING_KW,
     FETCH_KW,
     FOR_KW,
     R_PAREN,
@@ -5080,7 +5012,6 @@ const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     // unquoted column name
     CREATE_KW,
     DO_KW,
-    CREATE_KW,
     GRANT_KW,
     END_KW,
     ANALYZE_KW,
@@ -5864,7 +5795,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             PARSER_KW => Some(alter_text_search_parser(p)),
             TEMPLATE_KW => Some(alter_text_search_template(p)),
             _ => {
-                p.err_and_bump("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
@@ -5960,7 +5891,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             PARSER_KW => Some(create_text_search_parser(p)),
             TEMPLATE_KW => Some(create_text_search_template(p)),
             _ => {
-                p.err_and_bump("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
@@ -6023,7 +5954,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             PARSER_KW => Some(drop_text_search_parser(p)),
             TEMPLATE_KW => Some(drop_text_search_template(p)),
             _ => {
-                p.err_and_bump("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
+                p.err_and_bump("expected CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
@@ -6086,7 +6017,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             _ => Some(set(p)),
         },
         (SET_KW, TRANSACTION_KW) => Some(set_transaction(p)),
-        (SET_KW, TIME_KW | _) => Some(set(p)),
+        (SET_KW, _) => Some(set(p)),
         (SHOW_KW, _) => Some(show(p)),
         (START_KW, TRANSACTION_KW) => Some(begin(p)),
         (TRUNCATE_KW, _) => Some(truncate(p)),
@@ -14326,7 +14257,9 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
             opt_param_default(p);
         }
         ParamKind::TypeOnly => {
-            type_name(p);
+            if !opt_type_name(p) {
+                p.err_and_bump("expected type name");
+            }
         }
     }
     m.complete(p, PARAM);
@@ -14919,7 +14852,7 @@ const COLUMN_FIRST: TokenSet = TokenSet::new(&[IDENT])
 
 const NON_RESERVED_WORD: TokenSet = TokenSet::new(&[IDENT])
     .union(UNRESERVED_KEYWORDS)
-    .union(COLUMN_NAME_KEYWORDS)
+    .union(COL_NAME_KEYWORD_FIRST)
     .union(TYPE_FUNC_NAME_KEYWORDS);
 
 const RELATION_NAME_FIRST: TokenSet = TokenSet::new(&[ONLY_KW]).union(PATH_FIRST);

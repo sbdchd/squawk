@@ -1,0 +1,222 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/type_only_params.sql
+---
+SOURCE_FILE
+  COMMENT "-- type-only parameter lists should recover instead of getting stuck"
+  WHITESPACE "\n"
+  PREPARE
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        ERROR
+          VARIADIC_KW "variadic"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  PREPARE
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        ERROR
+          IN_KW "in"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_CLASS
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    OPERATOR_CLASS_OPTION_LIST
+      OP_CLASS_OPTION
+        FUNCTION_KW "function"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            ERROR
+              VARIADIC_KW "variadic"
+          R_PAREN ")"
+        WHITESPACE " "
+        FUNCTION_SIG
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "f"
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INT_KW "int"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+    WHITESPACE " "
+    ADD_OP_CLASS_OPTIONS
+      ADD_KW "add"
+      WHITESPACE " "
+      OPERATOR_CLASS_OPTION_LIST
+        OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              ERROR
+                VARIADIC_KW "variadic"
+            R_PAREN ")"
+          WHITESPACE " "
+          FUNCTION_SIG
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "f"
+            PARAM_LIST
+              L_PAREN "("
+              PARAM
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        INT_KW "int"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+    WHITESPACE " "
+    DROP_OP_CLASS_OPTIONS
+      DROP_KW "drop"
+      WHITESPACE " "
+      DROP_OP_CLASS_OPTION_LIST
+        DROP_OP_CLASS_OPTION
+          FUNCTION_KW "function"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          PARAM_LIST
+            L_PAREN "("
+            PARAM
+              ERROR
+                VARIADIC_KW "variadic"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected type name
+  ╭▸ 
+2 │ prepare p (variadic) as select 1;
+  ╰╴           ━
+error[syntax-error]: expected type name
+  ╭▸ 
+3 │ prepare p (in) as select 1;
+  ╰╴           ━
+error[syntax-error]: expected type name
+  ╭▸ 
+4 │ create operator class c for type int using btree as function 1 (variadic) f(int);
+  ╰╴                                                                ━
+error[syntax-error]: expected type name
+  ╭▸ 
+5 │ alter operator family f using btree add function 1 (variadic) f(int);
+  ╰╴                                                    ━
+error[syntax-error]: expected type name
+  ╭▸ 
+6 │ alter operator family f using btree drop function 1 (variadic);
+  ╰╴                                                     ━
