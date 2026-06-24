@@ -1442,7 +1442,7 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<CompletedMarker> {
         }
         _ => {
             let lhs = atom_expr(p)?;
-            let cm = postfix_expr(p, lhs, true);
+            let cm = postfix_expr(p, lhs);
             return Some(cm);
         }
     };
@@ -1452,24 +1452,14 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<CompletedMarker> {
     Some(cm)
 }
 
-fn postfix_expr(
-    p: &mut Parser<'_>,
-    mut lhs: CompletedMarker,
-    allow_calls: bool,
-) -> CompletedMarker {
+fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker {
     loop {
         lhs = match p.current() {
             NOT_KW if p.nth_at(1, BETWEEN_KW) => between_expr(p),
             BETWEEN_KW => between_expr(p),
-            L_PAREN if allow_calls => call_expr_args(p, lhs),
+            L_PAREN => call_expr_args(p, lhs),
             L_BRACK => index_expr(p, lhs),
-            DOT => match postfix_dot_expr(p, lhs) {
-                Ok(it) => it,
-                Err(it) => {
-                    lhs = it;
-                    break;
-                }
-            },
+            DOT => postfix_dot_expr(p, lhs),
             AT_KW if p.at(AT_LOCAL) => {
                 let m = p.start();
                 p.bump(AT_LOCAL);
@@ -2273,15 +2263,9 @@ fn field_name(p: &mut Parser<'_>) {
     m.complete(p, NAME_REF);
 }
 
-fn field_expr(
-    p: &mut Parser<'_>,
-    lhs: Option<CompletedMarker>,
-) -> Result<CompletedMarker, CompletedMarker> {
+fn field_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(DOT));
-    let m = match lhs {
-        Some(lhs) => lhs.precede(p),
-        None => p.start(),
-    };
+    let m = lhs.precede(p);
     p.bump(DOT);
     if p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at_ts(ALL_KEYWORDS) {
         field_name(p);
@@ -2294,27 +2278,23 @@ fn field_expr(
     } else {
         p.error(format!("expected field name, got {:?}", p.current()));
     }
-    Ok(m.complete(p, FIELD_EXPR))
+    m.complete(p, FIELD_EXPR)
 }
 
-fn postfix_dot_expr(
-    p: &mut Parser<'_>,
-    lhs: CompletedMarker,
-) -> Result<CompletedMarker, CompletedMarker> {
+fn postfix_dot_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(DOT));
-    field_expr(p, Some(lhs)).map(|cm| {
-        if p.at_ts(STRING_FIRST) {
-            // wrap our previous expression in a type
-            // TODO: can we unify types & exprs?
-            let cm = cm.precede(p).complete(p, EXPR_TYPE);
-            string_literal(p);
-            // A field followed by a literal is a type cast so we insert a CAST_EXPR
-            // preceding it to wrap the previously parsed data.
-            cm.precede(p).complete(p, CAST_EXPR)
-        } else {
-            cm
-        }
-    })
+    let cm = field_expr(p, lhs);
+    if p.at_ts(STRING_FIRST) {
+        // wrap our previous expression in a type
+        // TODO: can we unify types & exprs?
+        let cm = cm.precede(p).complete(p, EXPR_TYPE);
+        string_literal(p);
+        // A field followed by a literal is a type cast so we insert a CAST_EXPR
+        // preceding it to wrap the previously parsed data.
+        cm.precede(p).complete(p, CAST_EXPR)
+    } else {
+        cm
+    }
 }
 
 fn expr(p: &mut Parser) -> Option<CompletedMarker> {
@@ -2534,7 +2514,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         if matches!(op, COLON_COLON) {
             type_name(p);
             let cast_expr = m.complete(p, CAST_EXPR);
-            lhs = postfix_expr(p, cast_expr, true);
+            lhs = postfix_expr(p, cast_expr);
             continue;
         }
 
@@ -3216,7 +3196,7 @@ const FROM_ITEM_FIRST: TokenSet = TokenSet::new(&[
 .union(FROM_ITEM_KEYWORDS_FIRST);
 
 fn from_item_name(p: &mut Parser<'_>) {
-    match name_ref_(p).map(|lhs| postfix_expr(p, lhs, true)) {
+    match name_ref_(p).map(|lhs| postfix_expr(p, lhs)) {
         Some(val) => match val.kind() {
             CALL_EXPR => {
                 // [ WITH ORDINALITY ]
@@ -3784,7 +3764,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> CompletedMarker {
             }
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
-            name_ref(p).map(|lhs| postfix_expr(p, lhs, true));
+            name_ref(p).map(|lhs| postfix_expr(p, lhs));
         }
         ColumnDefKind::WithData => {
             name(p);
