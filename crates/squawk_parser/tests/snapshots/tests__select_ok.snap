@@ -4555,25 +4555,20 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          CALL_EXPR
-            NAME_REF
-              ROW_KW "row"
-            ARG_LIST
-              L_PAREN "("
-              ARG
-                LITERAL
-                  STRING "'fuzzy dice'"
-              COMMA ","
-              WHITESPACE " "
-              ARG
-                LITERAL
-                  INT_NUMBER "42"
-              COMMA ","
-              WHITESPACE " "
-              ARG
-                LITERAL
-                  NUMERIC_NUMBER "1.99"
-              R_PAREN ")"
+          TUPLE_EXPR
+            ROW_KW "row"
+            L_PAREN "("
+            LITERAL
+              STRING "'fuzzy dice'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "42"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              NUMERIC_NUMBER "1.99"
+            R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT

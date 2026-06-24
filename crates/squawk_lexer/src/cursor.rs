@@ -55,8 +55,7 @@ impl<'a> Cursor<'a> {
 
     /// Moves to the next character.
     pub(crate) fn bump(&mut self) -> Option<char> {
-        let c = self.chars.next()?;
-        Some(c)
+        self.chars.next()
     }
 
     /// Eats symbols while predicate returns true or until the end of file is reached.

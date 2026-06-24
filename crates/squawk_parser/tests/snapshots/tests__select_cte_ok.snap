@@ -209,6 +209,86 @@ SOURCE_FILE
           IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- adjacent quoted aliases"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+                WHITESPACE " "
+                AS_NAME
+                  NAME
+                    IDENT "e"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+                WHITESPACE " "
+                AS_NAME
+                  NAME
+                    IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "3"
+                WHITESPACE " "
+                AS_NAME
+                  NAME
+                    IDENT "u"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "e"
+          AS_NAME
+            NAME
+              IDENT "\"bar\""
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+          AS_NAME
+            NAME
+              IDENT "\"b\""
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "u"
+          AS_NAME
+            NAME
+              IDENT "\"u\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- materialized "
   WHITESPACE "\n"
   SELECT

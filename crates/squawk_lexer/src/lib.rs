@@ -166,10 +166,10 @@ impl Cursor<'_> {
     fn ident_or_unknown_prefix(&mut self) -> TokenKind {
         // Start is already eaten, eat the rest of identifier.
         self.eat_while(is_ident_cont);
-        // Known prefixes must have been handled earlier. So if
-        // we see a prefix here, it is definitely an unknown prefix.
+        // Known string prefixes must have been handled earlier. So if
+        // we see a prefix here, it is definitely unknown.
         match self.first() {
-            '"' | '\'' => TokenKind::UnknownPrefix,
+            '\'' => TokenKind::UnknownPrefix,
             _ => TokenKind::Ident,
         }
     }

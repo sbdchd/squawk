@@ -26,6 +26,10 @@ with t(a, b) as (
 )
 select * from t;
 
+-- adjacent quoted aliases
+with t as (select 1 e, 2 b, 3 u)
+select e"bar", b"b", u"u" from t;
+
 -- materialized 
 with t as materialized (
   select 1
