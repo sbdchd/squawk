@@ -3076,6 +3076,7 @@ const COL_NAME_KEYWORD_FIRST: TokenSet = TokenSet::new(&[
     EXTRACT_KW,
     FLOAT_KW,
     GREATEST_KW,
+    GRAPH_TABLE_KW,
     GROUPING_KW,
     INOUT_KW,
     INT_KW,
