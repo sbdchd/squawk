@@ -3605,6 +3605,10 @@ impl CallExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn null_treatment(&self) -> Option<NullTreatment> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn over_clause(&self) -> Option<OverClause> {
         support::child(&self.syntax)
     }
@@ -11757,6 +11761,21 @@ impl IfNotExists {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IgnoreNulls {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IgnoreNulls {
+    #[inline]
+    pub fn ignore_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IGNORE_KW)
+    }
+    #[inline]
+    pub fn nulls_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULLS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ImportForeignSchema {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15365,20 +15384,8 @@ impl OverClause {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
-    pub fn ignore_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IGNORE_KW)
-    }
-    #[inline]
-    pub fn nulls_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NULLS_KW)
-    }
-    #[inline]
     pub fn over_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OVER_KW)
-    }
-    #[inline]
-    pub fn respect_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RESPECT_KW)
     }
 }
 
@@ -17329,6 +17336,21 @@ impl ResetSessionAuth {
     #[inline]
     pub fn session_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SESSION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RespectNulls {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RespectNulls {
+    #[inline]
+    pub fn nulls_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULLS_KW)
+    }
+    #[inline]
+    pub fn respect_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESPECT_KW)
     }
 }
 
@@ -22153,6 +22175,12 @@ pub enum MergeWhenClause {
     MergeWhenMatched(MergeWhenMatched),
     MergeWhenNotMatchedSource(MergeWhenNotMatchedSource),
     MergeWhenNotMatchedTarget(MergeWhenNotMatchedTarget),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NullTreatment {
+    IgnoreNulls(IgnoreNulls),
+    RespectNulls(RespectNulls),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -28667,6 +28695,24 @@ impl AstNode for IfNotExists {
         &self.syntax
     }
 }
+impl AstNode for IgnoreNulls {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IGNORE_NULLS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ImportForeignSchema {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -32811,6 +32857,24 @@ impl AstNode for ResetSessionAuth {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::RESET_SESSION_AUTH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RespectNulls {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RESPECT_NULLS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -38774,6 +38838,42 @@ impl From<MergeWhenNotMatchedTarget> for MergeWhenClause {
     #[inline]
     fn from(node: MergeWhenNotMatchedTarget) -> MergeWhenClause {
         MergeWhenClause::MergeWhenNotMatchedTarget(node)
+    }
+}
+impl AstNode for NullTreatment {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::IGNORE_NULLS | SyntaxKind::RESPECT_NULLS)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::IGNORE_NULLS => NullTreatment::IgnoreNulls(IgnoreNulls { syntax }),
+            SyntaxKind::RESPECT_NULLS => NullTreatment::RespectNulls(RespectNulls { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            NullTreatment::IgnoreNulls(it) => &it.syntax,
+            NullTreatment::RespectNulls(it) => &it.syntax,
+        }
+    }
+}
+impl From<IgnoreNulls> for NullTreatment {
+    #[inline]
+    fn from(node: IgnoreNulls) -> NullTreatment {
+        NullTreatment::IgnoreNulls(node)
+    }
+}
+impl From<RespectNulls> for NullTreatment {
+    #[inline]
+    fn from(node: RespectNulls) -> NullTreatment {
+        NullTreatment::RespectNulls(node)
     }
 }
 impl AstNode for OnCommitAction {

@@ -42,6 +42,17 @@ CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUB
 COMMENT ON SUBSCRIPTION regress_testsub IS 'test subscription';
 SELECT obj_description(s.oid, 'pg_subscription') FROM pg_subscription s;
 
+-- Check that only subconninfo is not publicly readable in pg_subscription.
+SELECT count(*) = 0 AS ok
+    FROM pg_attribute
+    WHERE attrelid = 'pg_catalog.pg_subscription'::regclass AND attnum > 0 AND NOT attisdropped
+        AND ((attname = 'subconninfo'
+	        AND has_column_privilege('regress_subscription_user_dummy',
+		    'pg_catalog.pg_subscription', attname, 'SELECT'))
+            OR (attname <> 'subconninfo'
+	        AND NOT has_column_privilege('regress_subscription_user_dummy',
+		    'pg_catalog.pg_subscription', attname, 'SELECT')));
+
 -- Check if the subscription stats are created and stats_reset is updated
 -- by pg_stat_reset_subscription_stats().
 SELECT subname, stats_reset IS NULL stats_reset_is_null FROM pg_stat_subscription_stats WHERE subname = 'regress_testsub';
@@ -121,18 +132,44 @@ RESET SESSION AUTHORIZATION;
 ALTER FOREIGN DATA WRAPPER test_fdw CONNECTION test_fdw_connection;
 SET SESSION AUTHORIZATION regress_subscription_user3;
 
-CREATE SUBSCRIPTION regress_testsub6 SERVER test_server PUBLICATION testpub WITH (slot_name = 'dummy', connect = false);
+CREATE SUBSCRIPTION regress_testsub6 SERVER test_server
+  PUBLICATION testpub WITH (slot_name = 'dummy', connect = false);
 
-DROP USER MAPPING FOR regress_subscription_user3 SERVER test_server;
 RESET SESSION AUTHORIZATION;
 REVOKE USAGE ON FOREIGN SERVER test_server FROM regress_subscription_user3;
 SET SESSION AUTHORIZATION regress_subscription_user3;
 
--- fail, must connect but lacks USAGE on server, as well as user mapping
+-- ok, lacks USAGE on test_server, but replacing connection anyway
+BEGIN;
+ALTER SUBSCRIPTION regress_testsub6 CONNECTION 'dbname=regress_doesnotexist password=secret';
+ABORT;
+
+-- fails, cannot drop slot
 DROP SUBSCRIPTION regress_testsub6;
 
+RESET SESSION AUTHORIZATION;
+GRANT USAGE ON FOREIGN SERVER test_server TO regress_subscription_user3;
+SET SESSION AUTHORIZATION regress_subscription_user3;
+
 ALTER SUBSCRIPTION regress_testsub6 SET (slot_name = NONE);
+DROP SUBSCRIPTION regress_testsub6; --ok
+
+CREATE SUBSCRIPTION regress_testsub6 SERVER test_server
+  PUBLICATION testpub WITH (slot_name = 'dummy', connect = false);
+
+DROP USER MAPPING FOR regress_subscription_user3 SERVER test_server;
+
+-- ok, test_server lacks user mapping, but replacing connection anyway
+BEGIN;
+ALTER SUBSCRIPTION regress_testsub6 CONNECTION 'dbname=regress_doesnotexist password=secret';
+ABORT;
+
+-- fails, cannot drop slot
 DROP SUBSCRIPTION regress_testsub6;
+
+ALTER SUBSCRIPTION regress_testsub6 DISABLE;
+ALTER SUBSCRIPTION regress_testsub6 SET (slot_name = NONE);
+DROP SUBSCRIPTION regress_testsub6; --ok
 
 SET SESSION AUTHORIZATION regress_subscription_user;
 REVOKE CREATE ON DATABASE REGRESSION FROM regress_subscription_user3;
@@ -367,10 +404,16 @@ DROP SUBSCRIPTION regress_testsub;
 -- fail - max_retention_duration must be integer
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, max_retention_duration = foo);
 
+-- fail - max_retention_duration must be non-negative
+CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, max_retention_duration = -1);
+
 -- ok
 CREATE SUBSCRIPTION regress_testsub CONNECTION 'dbname=regress_doesnotexist' PUBLICATION testpub WITH (connect = false, max_retention_duration = 1000);
 
 -- \dRs+
+
+-- fail - max_retention_duration must be non-negative
+ALTER SUBSCRIPTION regress_testsub SET (max_retention_duration = -1);
 
 -- ok
 ALTER SUBSCRIPTION regress_testsub SET (max_retention_duration = 0);
