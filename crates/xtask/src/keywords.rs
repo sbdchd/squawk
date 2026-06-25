@@ -122,6 +122,8 @@ pub(crate) struct KeywordKinds {
     pub(crate) bare_label_keywords: Vec<String>,
     pub(crate) unreserved_keywords: Vec<String>,
     pub(crate) reserved_keywords: Vec<String>,
+    pub(crate) col_name_keywords: Vec<String>,
+    pub(crate) type_func_name_keywords: Vec<String>,
     pub(crate) col_table_keywords: Vec<String>,
     pub(crate) type_keywords: Vec<String>,
 }
@@ -151,6 +153,20 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
         .map(|(key, _value)| key.to_owned())
         .collect::<Vec<String>>();
     reserved_keywords.sort();
+
+    let mut col_name_keywords = keywords
+        .iter()
+        .filter(|(_key, value)| matches!(value.category, KeywordCategory::ColName))
+        .map(|(key, _value)| key.to_owned())
+        .collect::<Vec<String>>();
+    col_name_keywords.sort();
+
+    let mut type_func_name_keywords = keywords
+        .iter()
+        .filter(|(_key, value)| matches!(value.category, KeywordCategory::TypeFuncName))
+        .map(|(key, _value)| key.to_owned())
+        .collect::<Vec<String>>();
+    type_func_name_keywords.sort();
 
     let mut all_keywords = keywords
         .keys()
@@ -193,6 +209,8 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
         bare_label_keywords,
         unreserved_keywords,
         reserved_keywords,
+        col_name_keywords,
+        type_func_name_keywords,
         col_table_keywords,
         type_keywords,
     })
