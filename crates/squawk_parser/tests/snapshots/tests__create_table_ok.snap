@@ -45,6 +45,32 @@ SOURCE_FILE
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          GRAPH_TABLE_KW "graph_table"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
     COMMENT "-- with schema prefix"
     WHITESPACE "\n"
     CREATE_KW "create"

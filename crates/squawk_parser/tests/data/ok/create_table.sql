@@ -5,6 +5,10 @@ create table t (
   b integer
 );
 
+create table t (
+  graph_table int
+);
+
 -- with schema prefix
 create table foo.t (
   a text,
