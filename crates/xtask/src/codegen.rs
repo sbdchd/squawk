@@ -362,6 +362,18 @@ fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
 
+    let col_name_keywords = keyword_kinds
+        .col_name_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
+
+    let type_func_name_keywords = keyword_kinds
+        .type_func_name_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
+
     let all_keywords = &keyword_kinds
         .all_keywords
         .iter()
@@ -394,6 +406,14 @@ fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
 
             pub(crate) const TYPE_KEYWORDS: TokenSet = TokenSet::new(&[
                 #(SyntaxKind::#type_keywords),*
+            ]);
+
+            pub(crate) const COL_NAME_KEYWORD_FIRST: TokenSet = TokenSet::new(&[
+                #(SyntaxKind::#col_name_keywords),*
+            ]);
+
+            pub(crate) const TYPE_FUNC_NAME_KEYWORDS: TokenSet = TokenSet::new(&[
+                #(SyntaxKind::#type_func_name_keywords),*
             ]);
 
             pub(crate) const ALL_KEYWORDS: TokenSet = TokenSet::new(&[

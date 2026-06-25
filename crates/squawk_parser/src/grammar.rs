@@ -4,8 +4,8 @@
 use crate::{
     CompletedMarker, Marker, Parser,
     generated::token_sets::{
-        ALL_KEYWORDS, BARE_LABEL_KEYWORDS, COLUMN_OR_TABLE_KEYWORDS, RESERVED_KEYWORDS,
-        TYPE_KEYWORDS, UNRESERVED_KEYWORDS,
+        ALL_KEYWORDS, BARE_LABEL_KEYWORDS, COL_NAME_KEYWORD_FIRST, COLUMN_OR_TABLE_KEYWORDS,
+        RESERVED_KEYWORDS, TYPE_FUNC_NAME_KEYWORDS, TYPE_KEYWORDS, UNRESERVED_KEYWORDS,
     },
     syntax_kind::SyntaxKind::{self, *},
     token_set::TokenSet,
@@ -3060,74 +3060,6 @@ fn opt_from_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     Some(m.complete(p, FROM_CLAUSE))
 }
-
-// https://github.com/postgres/postgres/blob/b3219c69fc1e161df8d380c464b3f2cce3b6cab9/src/backend/parser/gram.y#L18042
-const COL_NAME_KEYWORD_FIRST: TokenSet = TokenSet::new(&[
-    BETWEEN_KW,
-    BIGINT_KW,
-    BIT_KW,
-    BOOLEAN_KW,
-    CHAR_KW,
-    CHARACTER_KW,
-    COALESCE_KW,
-    DEC_KW,
-    DECIMAL_KW,
-    EXISTS_KW,
-    EXTRACT_KW,
-    FLOAT_KW,
-    GREATEST_KW,
-    GRAPH_TABLE_KW,
-    GROUPING_KW,
-    INOUT_KW,
-    INT_KW,
-    INTEGER_KW,
-    INTERVAL_KW,
-    JSON_KW,
-    JSON_ARRAY_KW,
-    JSON_ARRAYAGG_KW,
-    JSON_EXISTS_KW,
-    JSON_OBJECT_KW,
-    JSON_OBJECTAGG_KW,
-    JSON_QUERY_KW,
-    JSON_SCALAR_KW,
-    JSON_SERIALIZE_KW,
-    JSON_TABLE_KW,
-    JSON_VALUE_KW,
-    LEAST_KW,
-    MERGE_ACTION_KW,
-    NATIONAL_KW,
-    NCHAR_KW,
-    NONE_KW,
-    NORMALIZE_KW,
-    NULLIF_KW,
-    NUMERIC_KW,
-    OUT_KW,
-    OVERLAY_KW,
-    POSITION_KW,
-    PRECISION_KW,
-    REAL_KW,
-    ROW_KW,
-    SETOF_KW,
-    SMALLINT_KW,
-    SUBSTRING_KW,
-    TIME_KW,
-    TIMESTAMP_KW,
-    TREAT_KW,
-    TRIM_KW,
-    VALUES_KW,
-    VARCHAR_KW,
-    XMLATTRIBUTES_KW,
-    XMLCONCAT_KW,
-    XMLELEMENT_KW,
-    XMLEXISTS_KW,
-    XMLFOREST_KW,
-    XMLNAMESPACES_KW,
-    XMLPARSE_KW,
-    XMLPI_KW,
-    XMLROOT_KW,
-    XMLSERIALIZE_KW,
-    XMLTABLE_KW,
-]);
 
 // https://github.com/postgres/postgres/blob/2421e9a51d20bb83154e54a16ce628f9249fa907/src/backend/parser/gram.y#L15798C13-L16258
 // Generated via the above grammar, but we only take the keywords that are
@@ -14164,33 +14096,6 @@ fn opt_param_default(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         None
     }
 }
-
-/// see: <https://github.com/postgres/postgres/blob/29dfffae0a6db6cb880ae873169f5512ddab703d/src/backend/parser/gram.y#L18049>
-const TYPE_FUNC_NAME_KEYWORDS: TokenSet = TokenSet::new(&[
-    AUTHORIZATION_KW,
-    BINARY_KW,
-    COLLATION_KW,
-    CONCURRENTLY_KW,
-    CROSS_KW,
-    CURRENT_SCHEMA_KW,
-    FREEZE_KW,
-    FULL_KW,
-    ILIKE_KW,
-    INNER_KW,
-    IS_KW,
-    ISNULL_KW,
-    JOIN_KW,
-    LEFT_KW,
-    LIKE_KW,
-    NATURAL_KW,
-    NOTNULL_KW,
-    OUTER_KW,
-    OVERLAPS_KW,
-    RIGHT_KW,
-    SIMILAR_KW,
-    TABLESAMPLE_KW,
-    VERBOSE_KW,
-]);
 
 const PARAM_FIRST: TokenSet = PARAM_MODE_FIRST.union(NAME_FIRST).union(TYPE_NAME_FIRST);
 
