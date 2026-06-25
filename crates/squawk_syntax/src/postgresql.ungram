@@ -65,7 +65,7 @@ ArgList =
 | '(' ('distinct' | 'all')? args:(Arg (',' Arg)*)? ')'
 
 CallExpr =
-  Expr ArgList WithinClause? FilterClause? OverClause?
+  Expr ArgList WithinClause? FilterClause? NullTreatment? OverClause?
 | ExtractFn
 | GraphTableFn
 | JsonExistsFn
@@ -1728,7 +1728,17 @@ FilterClause =
   'filter' '(' 'where' Expr ')'
 
 OverClause =
-  (('respect' | 'ignore') 'nulls')? 'over' (NameRef | '(' WindowSpec? ')')
+  'over' (NameRef | '(' WindowSpec? ')')
+
+NullTreatment =
+  IgnoreNulls
+| RespectNulls
+
+IgnoreNulls =
+  'ignore' 'nulls'
+
+RespectNulls =
+  'respect' 'nulls'
 
 WithinClause =
   'within' 'group' '(' OrderByClause ')'

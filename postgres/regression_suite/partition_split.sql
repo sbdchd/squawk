@@ -835,6 +835,57 @@ SELECT tableoid::regclass, * FROM sales_range ORDER BY tableoid::regclass::text 
 DROP TABLE sales_range;
 
 --
+-- Test that SPLIT PARTITION rejects the degenerate case where the only
+-- non-DEFAULT replacement partition keeps the original bound and the command
+-- merely adds a DEFAULT partition.
+--
+CREATE TABLE t (i int) PARTITION BY RANGE (i);
+CREATE TABLE tp_0_50 PARTITION OF t FOR VALUES FROM (0) TO (50);
+INSERT INTO t VALUES (1);
+
+-- ERROR
+ALTER TABLE t SPLIT PARTITION tp_0_50 INTO
+  (PARTITION tp_0_50 FOR VALUES FROM (0) TO (50),
+   PARTITION tp_default DEFAULT);
+
+DROP TABLE t;
+
+--
+-- Test that a LIST split with DEFAULT is not considered degenerate when
+-- only NULL is removed from the explicit replacement partition.
+--
+CREATE TABLE t (i int) PARTITION BY LIST (i);
+CREATE TABLE tp_null_1 PARTITION OF t FOR VALUES IN (NULL, 1);
+
+ALTER TABLE t SPLIT PARTITION tp_null_1 INTO
+  (PARTITION tp_1 FOR VALUES IN (1),
+   PARTITION tp_default DEFAULT);
+
+INSERT INTO t VALUES (NULL), (1), (2);
+SELECT tableoid::regclass, i FROM t ORDER BY tableoid::regclass::text COLLATE "C", i NULLS FIRST;
+
+DROP TABLE t;
+
+--
+-- Test that the same-bound check for LIST partitioning uses the
+-- partition operator family, not byte equality.  -0.0 and 0.0 have
+-- different bit patterns but compare equal under float8, so the
+-- replacement bound (-0.0, 1.0) is the same set as the original
+-- (0.0, 1.0) and the SPLIT is degenerate.  A datumIsEqual()-based
+-- check would let this through; the partsupfunc-based check correctly
+-- rejects it.
+--
+CREATE TABLE t (v float8) PARTITION BY LIST (v);
+CREATE TABLE tp_zero_one PARTITION OF t FOR VALUES IN (0.0, 1.0);
+
+-- ERROR
+ALTER TABLE t SPLIT PARTITION tp_zero_one INTO
+  (PARTITION tp_zero_one FOR VALUES IN (-0.0, 1.0),
+   PARTITION tp_default DEFAULT);
+
+DROP TABLE t;
+
+--
 -- Test that the explicit partition bound cannot extend outside the split
 -- partition's bound when a DEFAULT partition is specified.
 --
@@ -1133,6 +1184,25 @@ SELECT count(*) FROM t WHERE i = 0 AND tab_id IN (SELECT tab_id FROM t WHERE i =
 
 DROP TABLE t;
 
+-- Each new partition produced by SPLIT must get its own TOAST table so
+-- that out-of-line varlena attributes coming from the source partition
+-- can be stored.  SET STORAGE EXTERNAL forces externalization for any
+-- value over the TOAST threshold, so a string over that threshold
+-- suffices to exercise the toast-table dependency.
+CREATE TABLE t (a text) PARTITION BY RANGE(a);
+ALTER TABLE t ALTER COLUMN a SET STORAGE EXTERNAL;
+CREATE TABLE tp_all PARTITION OF t FOR VALUES FROM (MINVALUE) TO (MAXVALUE);
+INSERT INTO t SELECT repeat('1', 10000);
+ALTER TABLE t SPLIT PARTITION tp_all INTO (
+    PARTITION tp_lo FOR VALUES FROM (MINVALUE) TO ('2'),
+    PARTITION tp_hi FOR VALUES FROM ('2') TO (MAXVALUE)
+);
+SELECT relname,
+       reltoastrelid <> 0 AS has_toast,
+       pg_relation_size(reltoastrelid) > 0 AS toast_used
+  FROM pg_class WHERE relname IN ('tp_lo', 'tp_hi') ORDER BY relname;
+SELECT length(a) FROM t;
+DROP TABLE t;
 
 RESET search_path;
 

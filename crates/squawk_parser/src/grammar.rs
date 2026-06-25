@@ -2165,6 +2165,7 @@ fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 fn opt_agg_clauses(p: &mut Parser<'_>) {
     opt_within_clause(p);
     opt_filter_clause(p);
+    opt_null_treatment(p);
     opt_over_clause(p);
 }
 
@@ -2181,13 +2182,10 @@ fn opt_filter_clause(p: &mut Parser<'_>) {
 }
 
 fn opt_over_clause(p: &mut Parser<'_>) {
-    if p.at(OVER_KW) || p.at(RESPECT_KW) || p.at(IGNORE_KW) {
+    if p.at(OVER_KW) {
         // OVER window_name
         // OVER ( window_definition )
         let m = p.start();
-        if p.eat(RESPECT_KW) || p.eat(IGNORE_KW) {
-            p.expect(NULLS_KW);
-        }
         p.expect(OVER_KW);
         if p.eat(L_PAREN) {
             window_spec(p);
@@ -2197,6 +2195,22 @@ fn opt_over_clause(p: &mut Parser<'_>) {
         }
         m.complete(p, OVER_CLAUSE);
     }
+}
+
+fn opt_null_treatment(p: &mut Parser<'_>) {
+    if !p.at(RESPECT_KW) && !p.at(IGNORE_KW) {
+        return;
+    }
+
+    let m = p.start();
+    let kind = if p.eat(RESPECT_KW) {
+        RESPECT_NULLS
+    } else {
+        p.bump(IGNORE_KW);
+        IGNORE_NULLS
+    };
+    p.expect(NULLS_KW);
+    m.complete(p, kind);
 }
 
 fn opt_within_clause(p: &mut Parser<'_>) {

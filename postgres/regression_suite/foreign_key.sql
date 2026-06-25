@@ -2673,6 +2673,20 @@ INSERT INTO fp_fk_cross SELECT generate_series(1, 200);
 INSERT INTO fp_fk_cross VALUES (999);
 DROP TABLE fp_fk_cross, fp_pk_cross;
 
+-- Domain-typed FK column whose base type differs from the PK type: the
+-- fast path must look through the domain to its base type when deciding
+-- whether the cross-type comparison needs a cast.  Otherwise valid rows
+-- were wrongly rejected with "no conversion function from ... to ...".
+CREATE DOMAIN fp_int8dom AS int8;
+CREATE TABLE fp_pk_dom (a int4 PRIMARY KEY);
+INSERT INTO fp_pk_dom SELECT generate_series(1, 200);
+CREATE TABLE fp_fk_dom (a fp_int8dom REFERENCES fp_pk_dom);
+INSERT INTO fp_fk_dom SELECT generate_series(1, 200);
+INSERT INTO fp_fk_dom VALUES (999);
+INSERT INTO fp_fk_dom VALUES (NULL);
+DROP TABLE fp_fk_dom, fp_pk_dom;
+DROP DOMAIN fp_int8dom;
+
 -- Duplicate FK values: when using the batched SAOP path, every
 -- row must be recognized as satisfied, not just the first match
 CREATE TABLE fp_pk_dup (a int PRIMARY KEY);
@@ -2680,3 +2694,72 @@ INSERT INTO fp_pk_dup VALUES (1);
 CREATE TABLE fp_fk_dup (a int REFERENCES fp_pk_dup);
 INSERT INTO fp_fk_dup SELECT 1 FROM generate_series(1, 100);
 DROP TABLE fp_fk_dup, fp_pk_dup;
+
+-- Re-entrant FK fast-path: DML on the same FK table from a cast function
+-- during a full-batch flush must not corrupt the batch array.
+CREATE TABLE fp_reentry_pk (id int PRIMARY KEY);
+INSERT INTO fp_reentry_pk VALUES (1), (2);
+CREATE TYPE fp_vch AS (v int);
+CREATE FUNCTION fp_vcast(fp_vch) RETURNS int LANGUAGE plpgsql AS $$
+BEGIN
+    IF $1.v = 1 THEN
+        INSERT INTO fp_reentry_fk VALUES (row(2)::fp_vch);
+    END IF;
+    RETURN $1.v;
+END$$;
+CREATE CAST (fp_vch AS int) WITH FUNCTION fp_vcast(fp_vch) AS IMPLICIT;
+CREATE TABLE fp_reentry_fk (a fp_vch
+    REFERENCES fp_reentry_pk (id));
+-- Fill exactly one batch so the flush fires; the cast re-enters with DML
+-- on the same FK and must take the per-row path.
+INSERT INTO fp_reentry_fk SELECT row(1)::fp_vch FROM generate_series(1, 64);
+SELECT a, count(*) FROM fp_reentry_fk GROUP BY a ORDER BY a;
+DROP TABLE fp_reentry_fk, fp_reentry_pk;
+DROP CAST (fp_vch AS int);
+DROP FUNCTION fp_vcast(fp_vch);
+DROP TYPE fp_vch;
+
+-- Flush error caught by a savepoint must leave the entry empty and reusable.
+CREATE TABLE fp_reentry_pk2 (id int PRIMARY KEY);
+INSERT INTO fp_reentry_pk2 VALUES (1);
+CREATE TABLE fp_reentry_fk2 (a int REFERENCES fp_reentry_pk2 (id));
+DO $$
+BEGIN
+    -- A batch containing a violating row; the flush reports the violation.
+    BEGIN
+        INSERT INTO fp_reentry_fk2 SELECT CASE WHEN g = 32 THEN 999 ELSE 1 END
+            FROM generate_series(1, 64) g;
+    EXCEPTION WHEN foreign_key_violation THEN
+        RAISE NOTICE 'caught fk violation';
+    END;
+
+    -- Reuse the same FK with a full batch in the same transaction.  The
+    -- entry must be empty after the caught violation: no stale rows from the
+    -- rolled-back batch (in particular no 999), and no array overflow.
+    INSERT INTO fp_reentry_fk2 SELECT 1 FROM generate_series(1, 64);
+END$$;
+SELECT count(*), max(a) FROM fp_reentry_fk2;  -- 64 rows, max 1
+DROP TABLE fp_reentry_fk2, fp_reentry_pk2;
+
+-- Subtransaction abort during after-trigger firing must not drop FK checks
+-- for rows buffered earlier in the same statement.  Batching is confined to
+-- the top transaction level and the buffered batch is no longer discarded on
+-- subxact abort, so the violating rows are detected.
+CREATE TABLE fp_subxact_pk (id int PRIMARY KEY);
+INSERT INTO fp_subxact_pk SELECT g FROM generate_series(1, 10) g;
+CREATE TABLE fp_subxact_fk (a int, tag text);
+ALTER TABLE fp_subxact_fk ADD CONSTRAINT fp_subxact_fk_fkey
+    FOREIGN KEY (a) REFERENCES fp_subxact_pk (id);
+CREATE FUNCTION fp_abort_subxact() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    IF NEW.tag = 'boom' THEN
+        BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN NULL; END;
+    END IF;
+    RETURN NEW;
+END$$;
+CREATE TRIGGER fp_subxact_trg AFTER INSERT ON fp_subxact_fk
+    FOR EACH ROW EXECUTE FUNCTION fp_abort_subxact();
+INSERT INTO fp_subxact_fk VALUES (999, 'bad'), (0, 'boom'), (1, 'ok');
+DROP TRIGGER fp_subxact_trg ON fp_subxact_fk;
+DROP FUNCTION fp_abort_subxact();
+DROP TABLE fp_subxact_fk, fp_subxact_pk;
