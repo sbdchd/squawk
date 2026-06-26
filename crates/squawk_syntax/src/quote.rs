@@ -88,11 +88,13 @@ pub fn strip_unicode_esc_prefix(text: &str) -> Option<&str> {
     strip_quotes(text.strip_prefix(['u', 'U'])?.strip_prefix('&')?)
 }
 
+pub fn dollar_quote_tag(text: &str) -> Option<&str> {
+    text.strip_prefix('$')?.split_once('$').map(|(tag, _)| tag)
+}
+
 pub fn strip_dollar_quotes(text: &str) -> Option<&str> {
-    let after_first = text.strip_prefix('$')?;
-    let tag_end = after_first.find('$')?;
-    let tag = &after_first[..tag_end];
-    let body = &after_first[tag_end + 1..];
+    let tag = dollar_quote_tag(text)?;
+    let body = &text[tag.len() + 2..];
     let closing = format!("${tag}$");
     body.strip_suffix(&closing)
 }

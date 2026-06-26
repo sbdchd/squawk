@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/validate_string_continuation.sql
 ---
-SOURCE_FILE@0..1228
+SOURCE_FILE@0..1287
   COMMENT@0..28 "-- ok strings with ne ..."
   WHITESPACE@28..29 "\n"
   SELECT@29..49
@@ -482,7 +482,21 @@ SOURCE_FILE@0..1228
             WHITESPACE@1221..1222 "\n"
             STRING@1222..1226 "'G0'"
     SEMICOLON@1226..1227 ";"
-  WHITESPACE@1227..1228 "\n"
+  WHITESPACE@1227..1229 "\n\n"
+  COMMENT@1229..1270 "-- ok CR-only newline ..."
+  WHITESPACE@1270..1271 "\n"
+  SELECT@1271..1286
+    SELECT_CLAUSE@1271..1285
+      SELECT_KW@1271..1277 "select"
+      WHITESPACE@1277..1278 " "
+      TARGET_LIST@1278..1285
+        TARGET@1278..1285
+          LITERAL@1278..1285
+            STRING@1278..1281 "'a'"
+            WHITESPACE@1281..1282 "\r"
+            STRING@1282..1285 "'b'"
+    SEMICOLON@1285..1286 ";"
+  WHITESPACE@1286..1287 "\n"
 
 error[syntax-error]: Expected new line or comma between string literals
    ╭▸ 

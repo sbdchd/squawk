@@ -56,6 +56,7 @@ impl Cursor<'_> {
                     self.prefixed_string(
                         |terminated| LiteralKind::UnicodeEscStr { terminated },
                         true,
+                        false,
                     )
                 } else {
                     self.ident_or_unknown_prefix()
@@ -63,18 +64,34 @@ impl Cursor<'_> {
             }
             // escaped strings
             'e' | 'E' => {
-                self.prefixed_string(|terminated| LiteralKind::EscStr { terminated }, false)
+                self.prefixed_string(|terminated| LiteralKind::EscStr { terminated }, false, true)
             }
 
             // bit string
-            'b' | 'B' => {
-                self.prefixed_string(|terminated| LiteralKind::BitStr { terminated }, false)
-            }
+            'b' | 'B' => self.prefixed_string(
+                |terminated| LiteralKind::BitStr { terminated },
+                false,
+                false,
+            ),
 
             // hexadecimal byte string
-            'x' | 'X' => {
-                self.prefixed_string(|terminated| LiteralKind::ByteStr { terminated }, false)
-            }
+            'x' | 'X' => self.prefixed_string(
+                |terminated| LiteralKind::ByteStr { terminated },
+                false,
+                false,
+            ),
+
+            // national character string
+            'n' | 'N' => match self.first() {
+                '\'' => {
+                    self.bump();
+                    let terminated = self.single_quoted_string(false);
+                    TokenKind::Literal {
+                        kind: LiteralKind::Str { terminated },
+                    }
+                }
+                _ => self.ident(),
+            },
 
             // Identifier (this should be checked after other variant that can
             // start as identifier).
@@ -137,7 +154,7 @@ impl Cursor<'_> {
 
             // String literal
             '\'' => {
-                let terminated = self.single_quoted_string();
+                let terminated = self.single_quoted_string(false);
                 let kind = LiteralKind::Str { terminated };
                 TokenKind::Literal { kind }
             }
@@ -179,7 +196,7 @@ impl Cursor<'_> {
     pub(crate) fn line_comment(&mut self) -> TokenKind {
         self.bump();
 
-        self.eat_while(|c| c != '\n');
+        self.eat_while(|c| c != '\n' && c != '\r');
         TokenKind::LineComment
     }
 
@@ -217,11 +234,12 @@ impl Cursor<'_> {
         &mut self,
         mk_kind: fn(bool) -> LiteralKind,
         allows_double: bool,
+        backslash_escapes: bool,
     ) -> TokenKind {
         match self.first() {
             '\'' => {
                 self.bump();
-                let terminated = self.single_quoted_string();
+                let terminated = self.single_quoted_string(backslash_escapes);
                 let kind = mk_kind(terminated);
                 TokenKind::Literal { kind }
             }
@@ -313,10 +331,16 @@ impl Cursor<'_> {
         }
     }
 
-    fn single_quoted_string(&mut self) -> bool {
+    fn single_quoted_string(&mut self, backslash_escapes: bool) -> bool {
         // Parse until either quotes are terminated or error is detected.
         loop {
             match self.first() {
+                '\\' if backslash_escapes => {
+                    // backslash
+                    self.bump();
+                    // escaped char
+                    self.bump();
+                }
                 // Quotes might be terminated.
                 '\'' => {
                     self.bump();
@@ -397,31 +421,30 @@ impl Cursor<'_> {
             }
         } else {
             loop {
-                self.eat_while(|c| c != start[0]);
+                self.eat_while(|c| c != '$');
                 if self.is_eof() {
                     return TokenKind::Literal {
                         kind: LiteralKind::DollarQuotedString { terminated: false },
                     };
                 }
 
-                // might be the start of our start/end sequence
-                let mut match_count = 0;
+                // Eat the leading '$' of a possible closing delimiter.
+                self.bump();
+
+                let mut matches_tag = true;
                 for start_char in &start {
                     if self.first() == *start_char {
                         self.bump();
-                        match_count += 1;
                     } else {
-                        self.bump();
+                        matches_tag = false;
                         break;
                     }
                 }
 
-                // closing '$'
-                let terminated = match_count == start.len();
-                if self.first() == '$' && terminated {
+                if matches_tag && self.first() == '$' {
                     self.bump();
                     return TokenKind::Literal {
-                        kind: LiteralKind::DollarQuotedString { terminated },
+                        kind: LiteralKind::DollarQuotedString { terminated: true },
                     };
                 }
             }
@@ -616,6 +639,25 @@ mod tests {
     }
 
     #[test]
+    fn line_comment_cr_newline() {
+        assert_debug_snapshot!(lex("select 1; -- comment\rselect 2;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+            " " @ Whitespace,
+            "-- comment" @ LineComment,
+            "\r" @ Whitespace,
+            "select" @ Ident,
+            " " @ Whitespace,
+            "2" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
+            ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
     fn line_comment_whitespace() {
         assert_debug_snapshot!(lex(r#"
 select 'Hello' -- This is a comment
@@ -715,6 +757,20 @@ x'1FF'
     }
 
     #[test]
+    fn national_character_string() {
+        assert_debug_snapshot!(lex("N'foo' n'bar' numeric'1'"), @r#"
+        [
+            "N'foo'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "n'bar'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "numeric" @ Ident,
+            "'1'" @ Literal { kind: Str { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
     fn string() {
         assert_debug_snapshot!(lex(r#"
 'Dianne''s horse'
@@ -764,6 +820,33 @@ e'\uAAAA \UFFFFFFFF'
     }
 
     #[test]
+    fn escape_string_with_backslash_escaped_quote() {
+        assert_debug_snapshot!(lex(r"E'foo\'bar'"), @r#"
+        [
+            "E'foo\\'bar'" @ Literal { kind: EscStr { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_with_escaped_terminal_quote_is_unterminated() {
+        assert_debug_snapshot!(lex(r"E'foo\';"), @r#"
+        [
+            "E'foo\\';" @ Literal { kind: EscStr { terminated: false } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_with_even_backslashes_before_quote_is_terminated() {
+        assert_debug_snapshot!(lex(r"E'foo\\'"), @r#"
+        [
+            "E'foo\\\\'" @ Literal { kind: EscStr { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
     fn string_unicode_escape() {
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE
 
@@ -800,6 +883,18 @@ U&"d!0061t!+000061" UESCAPE '!'
         assert_debug_snapshot!(lex("$$$$"), @r#"
         [
             "$$$$" @ Literal { kind: DollarQuotedString { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn tagged_dollar_quote_requires_leading_dollar() {
+        assert_debug_snapshot!(lex("select $foo$abcfoo$def$foo$;"), @r#"
+        [
+            "select" @ Ident,
+            " " @ Whitespace,
+            "$foo$abcfoo$def$foo$" @ Literal { kind: DollarQuotedString { terminated: true } },
+            ";" @ Semi,
         ]
         "#);
     }

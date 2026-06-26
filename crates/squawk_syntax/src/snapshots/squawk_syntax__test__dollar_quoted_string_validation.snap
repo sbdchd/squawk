@@ -1,0 +1,24 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/dollar_quoted_string.sql
+---
+SOURCE_FILE@0..30
+  SELECT@0..29
+    SELECT_CLAUSE@0..28
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..28
+        TARGET@7..28
+          LITERAL@7..28
+            DOLLAR_QUOTED_STRING@7..28 "$foo-bar$abc$foo-bar$"
+    SEMICOLON@28..29 ";"
+  WHITESPACE@29..30 "\n"
+
+error[syntax-error]: "-" is not allowed in dollar quote tags
+  ╭▸ 
+1 │ select $foo-bar$abc$foo-bar$;
+  ╰╴           ━
+error[syntax-error]: "-" is not allowed in dollar quote tags
+  ╭▸ 
+1 │ select $foo-bar$abc$foo-bar$;
+  ╰╴                       ━
