@@ -59,7 +59,7 @@ impl Cursor<'_> {
                         false,
                     )
                 } else {
-                    self.ident_or_unknown_prefix()
+                    self.ident()
                 }
             }
             // escaped strings
@@ -180,17 +180,6 @@ impl Cursor<'_> {
         TokenKind::Whitespace
     }
 
-    fn ident_or_unknown_prefix(&mut self) -> TokenKind {
-        // Start is already eaten, eat the rest of identifier.
-        self.eat_while(is_ident_cont);
-        // Known string prefixes must have been handled earlier. So if
-        // we see a prefix here, it is definitely unknown.
-        match self.first() {
-            '\'' => TokenKind::UnknownPrefix,
-            _ => TokenKind::Ident,
-        }
-    }
-
     // see: https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L227
     // comment			("--"{non_newline}*)
     pub(crate) fn line_comment(&mut self) -> TokenKind {
@@ -248,14 +237,14 @@ impl Cursor<'_> {
                 let terminated = self.double_quoted_string();
                 TokenKind::QuotedIdent { terminated }
             }
-            _ => self.ident_or_unknown_prefix(),
+            _ => self.ident(),
         }
     }
 
     fn number(&mut self, first_digit: char) -> LiteralKind {
         let mut base = Base::Decimal;
         if first_digit == '.' {
-            return self.eat_fractional(base);
+            return self.eat_fractional();
         }
         if first_digit == '0' {
             // Attempt to parse encoding base.
@@ -306,7 +295,7 @@ impl Cursor<'_> {
         };
 
         match self.first() {
-            '.' => self.eat_fractional(base),
+            '.' => self.eat_fractional(),
             'e' | 'E' => {
                 let exponent_start = self.pos_within_token();
                 self.bump();
@@ -314,7 +303,6 @@ impl Cursor<'_> {
                 let trailing_junk_start = self.pos_within_token();
                 self.eat_identifier();
                 LiteralKind::Numeric {
-                    base,
                     empty_exponent_start,
                     trailing_junk_start,
                 }
@@ -514,39 +502,27 @@ impl Cursor<'_> {
         }
     }
 
-    pub(crate) fn eat_fractional(&mut self, base: Base) -> crate::LiteralKind {
+    pub(crate) fn eat_fractional(&mut self) -> crate::LiteralKind {
         // might have stuff after the ., and if it does, it needs to start
         // with a number
         self.bump();
         let mut empty_exponent_start = None;
         if self.first().is_ascii_digit() {
             self.eat_decimal_digits();
-            match self.first() {
-                'e' | 'E' => {
-                    let exponent_start = self.pos_within_token();
-                    self.bump();
-                    if !self.eat_numeric_exponent() {
-                        empty_exponent_start = Some(exponent_start);
-                    }
+        }
+        match self.first() {
+            'e' | 'E' => {
+                let exponent_start = self.pos_within_token();
+                self.bump();
+                if !self.eat_numeric_exponent() {
+                    empty_exponent_start = Some(exponent_start);
                 }
-                _ => (),
             }
-        } else {
-            match self.first() {
-                'e' | 'E' => {
-                    let exponent_start = self.pos_within_token();
-                    self.bump();
-                    if !self.eat_numeric_exponent() {
-                        empty_exponent_start = Some(exponent_start);
-                    }
-                }
-                _ => (),
-            }
+            _ => (),
         }
         let trailing_junk_start = self.pos_within_token();
         self.eat_identifier();
         LiteralKind::Numeric {
-            base,
             empty_exponent_start,
             trailing_junk_start,
         }
@@ -766,6 +742,33 @@ x'1FF'
             " " @ Whitespace,
             "numeric" @ Ident,
             "'1'" @ Literal { kind: Str { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn ident_prefix_then_string_is_consistent() {
+        assert_debug_snapshot!(
+            lex("N1'foo' E1'foo' B1'foo' X1'foo' U1'foo' uuid'00000000'"),
+            @r#"
+        [
+            "N1" @ Ident,
+            "'foo'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "E1" @ Ident,
+            "'foo'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "B1" @ Ident,
+            "'foo'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "X1" @ Ident,
+            "'foo'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "U1" @ Ident,
+            "'foo'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "uuid" @ Ident,
+            "'00000000'" @ Literal { kind: Str { terminated: true } },
         ]
         "#);
     }

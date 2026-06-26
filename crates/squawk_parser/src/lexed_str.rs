@@ -216,10 +216,6 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::Caret => SyntaxKind::CARET,
                 squawk_lexer::TokenKind::Percent => SyntaxKind::PERCENT,
                 squawk_lexer::TokenKind::Unknown => SyntaxKind::ERROR,
-                squawk_lexer::TokenKind::UnknownPrefix => {
-                    err = "unknown literal prefix";
-                    SyntaxKind::IDENT
-                }
                 squawk_lexer::TokenKind::Eof => SyntaxKind::EOF,
                 squawk_lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
                 squawk_lexer::TokenKind::PositionalParam {
@@ -295,7 +291,6 @@ impl<'a> Converter<'a> {
             }
             squawk_lexer::LiteralKind::Numeric {
                 empty_exponent_start,
-                base: _,
                 trailing_junk_start,
             } => {
                 if let Some(exponent_start) = empty_exponent_start {
