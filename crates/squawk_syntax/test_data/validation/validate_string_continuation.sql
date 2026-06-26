@@ -57,3 +57,6 @@ select x'1F1' -- comment
 select x'1F' 'F0' '11';
 select x'1F'
 'G0';
+
+-- ok CR-only newline string continuation
+select 'a''b';

@@ -485,7 +485,15 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 return name_from_expr(base, in_type);
             }
         }
-        ast::Expr::Literal(_) | ast::Expr::PrefixExpr(_) => {
+        ast::Expr::Literal(literal) => {
+            if literal.syntax().first_token().is_some_and(|token| {
+                token.kind() == SyntaxKind::STRING && token.text().starts_with(['n', 'N'])
+            }) {
+                return Some((ColumnName::UnknownColumn(Some("bpchar".to_string())), node));
+            }
+            return Some((ColumnName::UnknownColumn(None), node));
+        }
+        ast::Expr::PrefixExpr(_) => {
             return Some((ColumnName::UnknownColumn(None), node));
         }
         ast::Expr::PostfixExpr(postfix_expr) => match postfix_expr.op() {
@@ -533,6 +541,8 @@ fn examples() {
     assert_snapshot!(name("1 + 2"), @"?column?");
     assert_snapshot!(name("42"), @"?column?");
     assert_snapshot!(name("'string'"), @"?column?");
+    assert_snapshot!(name("n'string'"), @"bpchar");
+    assert_snapshot!(name("N'string'"), @"bpchar");
     // prefix
     assert_snapshot!(name("-42"), @"?column?");
     assert_snapshot!(name("|/ 42"), @"?column?");
