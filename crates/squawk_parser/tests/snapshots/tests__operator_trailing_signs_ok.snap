@@ -1,0 +1,187 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/operator_trailing_signs.sql
+---
+SOURCE_FILE
+  COMMENT "-- PostgreSQL splits trailing + or - from multi-character operators unless"
+  WHITESPACE "\n"
+  COMMENT "-- the operator contains one of: ~ ! @ # % ^ & | ` ?"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            STAR "*"
+            PREFIX_EXPR
+              MINUS "-"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            SLASH "/"
+            PREFIX_EXPR
+              MINUS "-"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            PLUS "+"
+            PREFIX_EXPR
+              MINUS "-"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            LTEQ "<="
+            PREFIX_EXPR
+              MINUS "-"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            EQ "="
+            PREFIX_EXPR
+              MINUS "-"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            STAR "*"
+            PREFIX_EXPR
+              PLUS "+"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            LTEQ "<="
+            PREFIX_EXPR
+              PLUS "+"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            PLUS "+"
+            PREFIX_EXPR
+              PLUS "+"
+              LITERAL
+                INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            CUSTOM_OP
+              AT "@"
+              MINUS "-"
+            LITERAL
+              INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+              MINUS "-"
+            LITERAL
+              INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            CUSTOM_OP
+              BANG "!"
+              EQ "="
+              MINUS "-"
+            LITERAL
+              INT_NUMBER "3"
+    SEMICOLON ";"
+  WHITESPACE "\n"

@@ -95,6 +95,7 @@ pub(crate) fn infer_type_from_literal(literal: &ast::Literal) -> Option<Type> {
         SyntaxKind::STRING
         | SyntaxKind::DOLLAR_QUOTED_STRING
         | SyntaxKind::ESC_STRING
+        | SyntaxKind::NATIONAL_STRING
         | SyntaxKind::UNICODE_ESC_STRING => Some(Type::Text),
         SyntaxKind::BIT_STRING | SyntaxKind::BYTE_STRING => Some(Type::Bit),
         SyntaxKind::TRUE_KW | SyntaxKind::FALSE_KW => Some(Type::Boolean),

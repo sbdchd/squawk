@@ -43,7 +43,12 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         if p.eat(UESCAPE_KW) {
             p.expect(STRING);
         }
-    } else if p.eat(STRING) || p.eat(ESC_STRING) || p.eat(BIT_STRING) || p.eat(BYTE_STRING) {
+    } else if p.eat(NATIONAL_STRING)
+        || p.eat(STRING)
+        || p.eat(ESC_STRING)
+        || p.eat(BIT_STRING)
+        || p.eat(BYTE_STRING)
+    {
         while !p.at(EOF) && p.eat(STRING) {}
     } else {
         p.bump_any();
@@ -4882,6 +4887,7 @@ const STRING_FIRST: TokenSet = TokenSet::new(&[
     BIT_STRING,
     DOLLAR_QUOTED_STRING,
     ESC_STRING,
+    NATIONAL_STRING,
 ]);
 
 // via https://www.postgresql.org/docs/17/sql-createoperator.html

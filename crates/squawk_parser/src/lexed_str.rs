@@ -120,16 +120,15 @@ struct Converter<'a> {
     offset: usize,
 }
 
-fn is_empty_quoted_ident(token_text: &str) -> bool {
-    let inner = if let Some(stripped) = token_text
-        .strip_prefix(['u', 'U'])
-        .and_then(|s| s.strip_prefix('&'))
-    {
-        stripped
-    } else {
+fn is_empty_quoted_ident(token_text: &str, uescape: bool) -> bool {
+    let inner = if uescape {
         token_text
+            .strip_prefix(['u', 'U'])
+            .and_then(|s| s.strip_prefix('&'))
+    } else {
+        Some(token_text)
     };
-    inner == "\"\""
+    inner == Some("\"\"")
 }
 
 impl<'a> Converter<'a> {
@@ -237,10 +236,13 @@ impl<'a> Converter<'a> {
                     }
                     SyntaxKind::POSITIONAL_PARAM
                 }
-                squawk_lexer::TokenKind::QuotedIdent { terminated } => {
+                squawk_lexer::TokenKind::QuotedIdent {
+                    terminated,
+                    uescape,
+                } => {
                     if !terminated {
                         err = "Missing trailing \" to terminate the quoted identifier"
-                    } else if is_empty_quoted_ident(token_text) {
+                    } else if is_empty_quoted_ident(token_text, *uescape) {
                         err = "empty delimited identifier";
                     }
                     SyntaxKind::IDENT
@@ -308,6 +310,15 @@ impl<'a> Converter<'a> {
                         Some("Missing trailing `'` symbol to terminate the string literal".into());
                 }
                 SyntaxKind::STRING
+            }
+            squawk_lexer::LiteralKind::NationalStr { terminated } => {
+                if !terminated {
+                    err = Some(
+                        "Missing trailing `'` symbol to terminate the national character string literal"
+                            .into(),
+                    );
+                }
+                SyntaxKind::NATIONAL_STRING
             }
             squawk_lexer::LiteralKind::ByteStr { terminated } => {
                 if !terminated {

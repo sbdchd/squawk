@@ -173,6 +173,29 @@ enum TrivaBetween {
     Allowed,
 }
 
+const OPERATOR_SIGN: TokenSet = TokenSet::new(&[SyntaxKind::PLUS, SyntaxKind::MINUS]);
+
+/// In order for an operator to end in `+` or `-`, it must contain one of the
+/// following chars:
+///
+/// ```sql
+/// ~ ! @ # % ^ & | ` ?
+/// ```
+///
+/// see: <https://www.postgresql.org/docs/18/sql-createoperator.html>
+const SPECIAL_OP_CHARS: TokenSet = TokenSet::new(&[
+    SyntaxKind::TILDE,
+    SyntaxKind::BANG,
+    SyntaxKind::AT,
+    SyntaxKind::POUND,
+    SyntaxKind::PERCENT,
+    SyntaxKind::CARET,
+    SyntaxKind::AMP,
+    SyntaxKind::PIPE,
+    SyntaxKind::BACKTICK,
+    SyntaxKind::QUESTION,
+]);
+
 impl<'t> Parser<'t> {
     fn new(inp: &'t Input) -> Parser<'t> {
         Parser {
@@ -437,16 +460,8 @@ impl<'t> Parser<'t> {
             }
             SyntaxKind::CUSTOM_OP => {
                 let m = self.start();
-                while !self.at(SyntaxKind::EOF) {
-                    let is_joint = self.inp.is_joint(self.pos);
-                    if self.at_ts(OPERATOR_FIRST) {
-                        self.bump_any();
-                    } else {
-                        break;
-                    }
-                    if !is_joint {
-                        break;
-                    }
+                for _ in 0..self.op_len() {
+                    self.bump_any();
                 }
                 m.complete(self, SyntaxKind::CUSTOM_OP);
                 return true;
@@ -493,16 +508,39 @@ impl<'t> Parser<'t> {
     }
 
     fn next_not_joined_op(&self, n: usize) -> bool {
-        let next = self.inp.kind(self.pos + n + 1);
         // next isn't an operator so we know we're not joined to it
-        if !OPERATOR_FIRST.contains(next) {
+        if !self.nth_at_ts(n + 1, OPERATOR_FIRST) {
             return true;
         }
         // current kind isn't joined
         if !self.inp.is_joint(self.pos + n) {
             return true;
         }
-        false
+        self.op_len() == n + 1
+    }
+
+    fn op_len(&self) -> usize {
+        if !self.at_ts(OPERATOR_FIRST) {
+            return 0;
+        }
+
+        let mut len = 1;
+        let mut has_special = self.at_ts(SPECIAL_OP_CHARS);
+        while self.inp.is_joint(self.pos + len - 1) && self.nth_at_ts(len, OPERATOR_FIRST) {
+            has_special |= self.nth_at_ts(len, SPECIAL_OP_CHARS);
+            len += 1;
+        }
+
+        // PostgreSQL skips trailing signs from ops if they don't contain a
+        // special char.
+        // This means `2*-3` parses as `2 * -3`.
+        if !has_special {
+            while len > 1 && self.nth_at_ts(len - 1, OPERATOR_SIGN) {
+                len -= 1;
+            }
+        }
+
+        len
     }
 
     /// Checks if the current token is in `kinds`.
@@ -870,8 +908,6 @@ impl<'t> Parser<'t> {
     /// token.
     #[must_use]
     fn nth(&self, n: usize) -> SyntaxKind {
-        assert!(n <= 3);
-
         let steps = self.steps.get();
         assert!(
             (steps as usize) < PARSER_STEP_LIMIT,

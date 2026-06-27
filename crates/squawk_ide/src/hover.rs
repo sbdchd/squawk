@@ -156,6 +156,7 @@ fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
             | LitKind::BitString(_)
             | LitKind::ByteString(_)
             | LitKind::EscString(_)
+            | LitKind::NationalString(_)
             | LitKind::UnicodeEscString(_)
             | LitKind::DollarQuotedString(_)
     ) {
@@ -170,6 +171,7 @@ fn hover_literal(literal: &ast::Literal) -> Option<Hover> {
         LitKind::ByteString(_) => format_bit_value_comment(&value, 16),
         LitKind::String(_)
         | LitKind::EscString(_)
+        | LitKind::NationalString(_)
         | LitKind::UnicodeEscString(_)
         | LitKind::DollarQuotedString(_) => match value.find('\n') {
             Some(idx) => {
@@ -5595,6 +5597,19 @@ select U&'\0061'
     fn hover_plain_string_no_escape() {
         assert_snapshot!(check_hover_info(r"
 select 'foo$0';
+").markdown(), @"
+        ```sql
+        text
+        ```
+        ---
+        value of literal: ` foo `
+        ");
+    }
+
+    #[test]
+    fn hover_national_string() {
+        assert_snapshot!(check_hover_info(r"
+select N'fo$0o';
 ").markdown(), @"
         ```sql
         text

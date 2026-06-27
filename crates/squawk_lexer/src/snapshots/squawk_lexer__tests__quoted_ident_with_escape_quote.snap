@@ -4,6 +4,6 @@ expression: "lex(r#\"\n\"foo \"\" bar\"\n\"#)"
 ---
 [
     "\n" @ Whitespace,
-    "\"foo \"\" bar\"" @ QuotedIdent { terminated: true },
+    "\"foo \"\" bar\"" @ QuotedIdent { terminated: true, uescape: false },
     "\n" @ Whitespace,
 ]

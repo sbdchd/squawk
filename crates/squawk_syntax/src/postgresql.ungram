@@ -362,6 +362,7 @@ Literal =
   | '@dollar_quoted_string'
   | '@unicode_esc_string'
   | '@esc_string'
+  | '@national_string'
   | '@positional_param'
   | 'default'
   | 'false'

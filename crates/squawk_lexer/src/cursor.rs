@@ -43,6 +43,11 @@ impl<'a> Cursor<'a> {
         self.chars.as_str().is_empty()
     }
 
+    /// Returns a clone of the remaining chars, for cheap lookahead.
+    pub(crate) fn chars(&self) -> Chars<'a> {
+        self.chars.clone()
+    }
+
     /// Returns amount of already consumed symbols.
     pub(crate) fn pos_within_token(&self) -> u32 {
         (self.len_remaining - self.chars.as_str().len()) as u32
