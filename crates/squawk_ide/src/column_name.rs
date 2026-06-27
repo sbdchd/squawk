@@ -486,9 +486,11 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             }
         }
         ast::Expr::Literal(literal) => {
-            if literal.syntax().first_token().is_some_and(|token| {
-                token.kind() == SyntaxKind::STRING && token.text().starts_with(['n', 'N'])
-            }) {
+            if literal
+                .syntax()
+                .first_token()
+                .is_some_and(|token| token.kind() == SyntaxKind::NATIONAL_STRING)
+            {
                 return Some((ColumnName::UnknownColumn(Some("bpchar".to_string())), node));
             }
             return Some((ColumnName::UnknownColumn(None), node));

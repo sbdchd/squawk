@@ -492,6 +492,7 @@ fn build_literal<'a>(lit: ast::Literal) -> Doc<'a> {
         | LitKind::ByteString(_)
         | LitKind::DollarQuotedString(_)
         | LitKind::EscString(_)
+        | LitKind::NationalString(_)
         | LitKind::String(_)
         | LitKind::UnicodeEscString(_) => build_string_literal(&lit),
     }

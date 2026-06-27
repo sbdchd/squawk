@@ -94,6 +94,10 @@ pub(crate) fn literal_string_value(literal: &ast::Literal) -> Option<String> {
                 out.push_str(inner);
                 return Some(out);
             }
+            SyntaxKind::NATIONAL_STRING => {
+                let inner = strip_prefixed_quotes(token.text(), ['n', 'N'])?;
+                decode_plain_string(inner, &mut out);
+            }
             SyntaxKind::STRING => {
                 let inner = strip_quotes(token.text())?;
                 match decoding {

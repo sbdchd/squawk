@@ -79,8 +79,12 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          LITERAL
-            NUMERIC_NUMBER "0.0e+a"
+          BIN_EXPR
+            LITERAL
+              NUMERIC_NUMBER "0.0e"
+            PLUS "+"
+            NAME_REF
+              IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT

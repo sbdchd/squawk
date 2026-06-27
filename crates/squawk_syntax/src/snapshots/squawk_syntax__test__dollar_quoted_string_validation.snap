@@ -9,16 +9,20 @@ SOURCE_FILE@0..30
       WHITESPACE@6..7 " "
       TARGET_LIST@7..28
         TARGET@7..28
-          LITERAL@7..28
-            DOLLAR_QUOTED_STRING@7..28 "$foo-bar$abc$foo-bar$"
+          BIN_EXPR@7..28
+            BIN_EXPR@7..23
+              LITERAL@7..11
+                POSITIONAL_PARAM@7..11 "$foo"
+              MINUS@11..12 "-"
+              NAME_REF@12..23
+                IDENT@12..23 "bar$abc$foo"
+            MINUS@23..24 "-"
+            NAME_REF@24..28
+              IDENT@24..28 "bar$"
     SEMICOLON@28..29 ";"
   WHITESPACE@29..30 "\n"
 
-error[syntax-error]: "-" is not allowed in dollar quote tags
+error[syntax-error]: missing parameter number
   ╭▸ 
 1 │ select $foo-bar$abc$foo-bar$;
-  ╰╴           ━
-error[syntax-error]: "-" is not allowed in dollar quote tags
-  ╭▸ 
-1 │ select $foo-bar$abc$foo-bar$;
-  ╰╴                       ━
+  ╰╴       ━

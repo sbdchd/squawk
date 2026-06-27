@@ -7,7 +7,6 @@
 use std::ops::Range;
 
 use crate::ast::{AstNode, LitKind};
-use crate::quote::{dollar_quote_tag, strip_dollar_quotes};
 use crate::unescape::{escape_unicode_esc_str, uescape_char};
 use crate::{SyntaxNode, SyntaxToken, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
@@ -208,7 +207,12 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
                     LookingFor::OpenString => {
                         if matches!(
                             token.kind(),
-                            STRING | ESC_STRING | BIT_STRING | BYTE_STRING | UNICODE_ESC_STRING
+                            STRING
+                                | ESC_STRING
+                                | BIT_STRING
+                                | BYTE_STRING
+                                | UNICODE_ESC_STRING
+                                | NATIONAL_STRING
                         ) {
                             state = LookingFor::CloseString(token.text_range().end(), false);
                         }
@@ -249,49 +253,7 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
 
     validate_unicode_esc_string(&lit, acc);
     validate_prefixed_strings(&lit, acc);
-    validate_dollar_quoted_string(&lit, acc);
     validate_default_literal(&lit, acc);
-}
-
-fn validate_dollar_quoted_string(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
-    let Some(LitKind::DollarQuotedString(token)) = lit.kind() else {
-        return;
-    };
-    let text = token.text();
-    let Some(tag) = dollar_quote_tag(text) else {
-        return;
-    };
-    let closing_tag_start = strip_dollar_quotes(text).map(|_| text.len() - tag.len() - 1);
-    let token_start = token.text_range().start();
-    for tag_start in [Some(1), closing_tag_start].into_iter().flatten() {
-        validate_dollar_quote_tag(tag, token_start + TextSize::new(tag_start as u32), acc);
-    }
-}
-
-// dolq_start		[A-Za-z\200-\377_]
-const fn is_dollar_quote_tag_start(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '\u{80}'..)
-}
-
-// dolq_cont		[A-Za-z\200-\377_0-9]
-const fn is_dollar_quote_tag_cont(c: char) -> bool {
-    matches!(c, 'a'..='z' | 'A'..='Z' | '_' | '0'..='9' | '\u{80}'..)
-}
-
-fn validate_dollar_quote_tag(tag: &str, tag_start: TextSize, acc: &mut Vec<SyntaxError>) {
-    for (i, c) in tag.char_indices() {
-        let is_valid = if i == 0 {
-            is_dollar_quote_tag_start(c)
-        } else {
-            is_dollar_quote_tag_cont(c)
-        };
-        if !is_valid {
-            acc.push(SyntaxError::new(
-                format!(r#""{c}" is not allowed in dollar quote tags"#),
-                offset_range(tag_start, i..i + c.len_utf8()),
-            ));
-        }
-    }
 }
 
 fn validate_default_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {

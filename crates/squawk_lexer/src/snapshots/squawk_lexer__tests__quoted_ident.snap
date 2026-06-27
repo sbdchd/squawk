@@ -4,8 +4,8 @@ expression: "lex(r#\"\n\"hello &1 -world\";\n\n\n\"hello-world\n\"#)"
 ---
 [
     "\n" @ Whitespace,
-    "\"hello &1 -world\"" @ QuotedIdent { terminated: true },
+    "\"hello &1 -world\"" @ QuotedIdent { terminated: true, uescape: false },
     ";" @ Semi,
     "\n\n\n" @ Whitespace,
-    "\"hello-world\n" @ QuotedIdent { terminated: false },
+    "\"hello-world\n" @ QuotedIdent { terminated: false, uescape: false },
 ]
