@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.59.0 - 2026-06-27
+
+### Added
+
+- parser: support pg19 null treatment in aggregates (#1210)
+
+### Fixed
+
+- parser: codegen `COL_NAME_KEYWORD_FIRST` and `TYPE_FUNC_NAME_KEYWORDS` (#1209)
+- parser: fix `graph_table` not parsing as a column name (#1208)
+- parser: remove dead code & fix panics (#1207, #1206, #1204)
+- parser: fix invalid field accesses causing panics (#1205)
+- parser/lexer: give national strings own type, support `$$` quoted string err recovery (#1213, #1211, #1212)
+- lexer: fix lexing `123$abc` & string continuation validation (#1214)
+
 ## v2.58.0 - 2026-06-13
 
 ### Added
