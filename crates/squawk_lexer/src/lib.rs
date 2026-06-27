@@ -488,7 +488,7 @@ impl Cursor<'_> {
 
     fn finish_base_prefixed_int(&mut self, base: Base, has_digits: bool) -> LiteralKind {
         let trailing_junk_start = self.pos_within_token();
-        self.eat_while(is_ident_cont);
+        self.eat_identifier();
         let has_trailing_junk = self.pos_within_token() > trailing_junk_start;
         LiteralKind::Int {
             base,
@@ -731,6 +731,34 @@ $foo$hello$world$bar$
 0x42f
 0XFFFF
 "#))
+    }
+
+    #[test]
+    fn numeric_base_prefix_does_not_swallow_dollar_tokens() {
+        assert_debug_snapshot!(lex("123$abc 0b101$2 0o12$abc 0x12$abc 0xFF$1 0x1$$foo$$ 123$$foo$$"), @r#"
+        [
+            "123" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 3 } },
+            "$abc" @ PositionalParam { trailing_junk_start: 1 },
+            " " @ Whitespace,
+            "0b101" @ Literal { kind: Int { base: Binary, empty_int: false, trailing_junk_start: 5 } },
+            "$2" @ PositionalParam { trailing_junk_start: 2 },
+            " " @ Whitespace,
+            "0o12" @ Literal { kind: Int { base: Octal, empty_int: false, trailing_junk_start: 4 } },
+            "$abc" @ PositionalParam { trailing_junk_start: 1 },
+            " " @ Whitespace,
+            "0x12" @ Literal { kind: Int { base: Hexadecimal, empty_int: false, trailing_junk_start: 4 } },
+            "$abc" @ PositionalParam { trailing_junk_start: 1 },
+            " " @ Whitespace,
+            "0xFF" @ Literal { kind: Int { base: Hexadecimal, empty_int: false, trailing_junk_start: 4 } },
+            "$1" @ PositionalParam { trailing_junk_start: 2 },
+            " " @ Whitespace,
+            "0x1" @ Literal { kind: Int { base: Hexadecimal, empty_int: false, trailing_junk_start: 3 } },
+            "$$foo$$" @ Literal { kind: DollarQuotedString { terminated: true } },
+            " " @ Whitespace,
+            "123" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 3 } },
+            "$$foo$$" @ Literal { kind: DollarQuotedString { terminated: true } },
+        ]
+        "#);
     }
 
     #[test]
