@@ -224,6 +224,7 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
                                 || token.text().contains('\r');
                             state = LookingFor::CloseString(text_range_end, seen_new_line);
                         }
+                        COMMENT if token.text().starts_with("--") => (),
                         COMMENT => {
                             maybe_errors.push(SyntaxError::new(
                                 "Comments between string literals are not allowed.",
