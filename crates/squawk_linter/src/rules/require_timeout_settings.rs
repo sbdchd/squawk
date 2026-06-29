@@ -39,6 +39,55 @@ enum ReportOnce {
     Reported,
 }
 
+/// The lock a statement takes. `Unknown` covers statements we don't have a
+/// specific note for; more get added over time (e.g. the ACCESS EXCLUSIVE
+/// `ALTER TABLE` variants).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LockMode {
+    Unknown,
+    ShareUpdateExclusive,
+}
+
+impl LockMode {
+    /// The lock's name, or `None` when we can't classify the statement.
+    fn name(self) -> Option<&'static str> {
+        match self {
+            LockMode::Unknown => None,
+            LockMode::ShareUpdateExclusive => Some("SHARE UPDATE EXCLUSIVE"),
+        }
+    }
+
+    /// The warning message, naming the lock when we can classify it.
+    fn violation_message(self) -> String {
+        match self.name() {
+            Some(name) => {
+                format!("Missing `set lock_timeout` before potentially slow {name} lock operations")
+            }
+            None => "Missing `set lock_timeout` before potentially slow operations".to_string(),
+        }
+    }
+
+    /// The `lock_timeout` help text, ending with what this lock does and doesn't
+    /// block so a reader can judge how much the timeout matters.
+    fn help(self) -> &'static str {
+        match self {
+            LockMode::Unknown => "Configure a `lock_timeout` before this statement.",
+            LockMode::ShareUpdateExclusive => {
+                "Configure a `lock_timeout` before this statement. It takes a SHARE UPDATE \
+                 EXCLUSIVE lock. It will block other schema changes (VACUUM, ANALYZE, index \
+                 builds) but not reads or writes."
+            }
+        }
+    }
+}
+
+fn statement_lock(stmt: &ast::Stmt) -> LockMode {
+    match stmt {
+        ast::Stmt::CommentOn(_) => LockMode::ShareUpdateExclusive,
+        _ => LockMode::Unknown,
+    }
+}
+
 pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
 
@@ -71,15 +120,15 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                 }
             }
             _ if analyze::possibly_slow_stmt(&stmt) => {
+                let lock = statement_lock(&stmt);
                 if lock_timeout == ReportOnce::Missing {
                     ctx.report(
                         Violation::for_node(
                             Rule::RequireTimeoutSettings,
-                            "Missing `set lock_timeout` before potentially slow operations"
-                                .to_string(),
+                            lock.violation_message(),
                             stmt.syntax(),
                         )
-                        .help("Configure a `lock_timeout` before this statement.".to_string())
+                        .help(lock.help().to_string())
                         .fix(create_lock_timeout_fix(&file)),
                     );
                     lock_timeout = ReportOnce::Reported;
@@ -292,6 +341,20 @@ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
         2 + set statement_timeout = '5s';
           ╰╴
         ");
+    }
+
+    #[test]
+    fn err_comment_on_explains_lock_impact() {
+        // COMMENT ON takes a SHARE UPDATE EXCLUSIVE lock, so the help should
+        // name the lock mode.
+        let sql = r#"
+COMMENT ON COLUMN t.c IS 'an opaque id';
+        "#;
+        let out = lint_errors(sql, Rule::RequireTimeoutSettings);
+        assert!(
+            out.contains("EXCLUSIVE"),
+            "expected the lock mode to appear in the help text, got:\n{out}"
+        );
     }
 
     #[test]
