@@ -1,3 +1,5 @@
+use std::fmt;
+
 use rowan::TextSize;
 use squawk_syntax::{
     Parse, SourceFile, SyntaxKind,
@@ -39,52 +41,48 @@ enum ReportOnce {
     Reported,
 }
 
-/// The lock a statement takes. `Unknown` covers statements we don't have a
-/// specific note for; more get added over time (e.g. the ACCESS EXCLUSIVE
-/// `ALTER TABLE` variants).
+/// The lock a statement takes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum LockMode {
+enum LockKind {
     Unknown,
     ShareUpdateExclusive,
 }
 
-impl LockMode {
-    /// The lock's name, or `None` when we can't classify the statement.
-    fn name(self) -> Option<&'static str> {
+impl fmt::Display for LockKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            LockMode::Unknown => None,
-            LockMode::ShareUpdateExclusive => Some("SHARE UPDATE EXCLUSIVE"),
+            LockKind::Unknown => Ok(()),
+            LockKind::ShareUpdateExclusive => f.write_str("SHARE UPDATE EXCLUSIVE"),
+        }
+    }
+}
+
+impl LockKind {
+    fn from(stmt: &ast::Stmt) -> LockKind {
+        match stmt {
+            ast::Stmt::CommentOn(_) => LockKind::ShareUpdateExclusive,
+            _ => LockKind::Unknown,
         }
     }
 
-    /// The warning message, naming the lock when we can classify it.
     fn violation_message(self) -> String {
-        match self.name() {
-            Some(name) => {
-                format!("Missing `set lock_timeout` before potentially slow {name} lock operations")
-            }
-            None => "Missing `set lock_timeout` before potentially slow operations".to_string(),
+        let name = self.to_string();
+        if name.is_empty() {
+            "Missing `set lock_timeout` before potentially slow operations".to_string()
+        } else {
+            format!("Missing `set lock_timeout` before potentially slow {name} lock operations")
         }
     }
 
-    /// The `lock_timeout` help text, ending with what this lock does and doesn't
-    /// block so a reader can judge how much the timeout matters.
     fn help(self) -> &'static str {
         match self {
-            LockMode::Unknown => "Configure a `lock_timeout` before this statement.",
-            LockMode::ShareUpdateExclusive => {
+            LockKind::Unknown => "Configure a `lock_timeout` before this statement.",
+            LockKind::ShareUpdateExclusive => {
                 "Configure a `lock_timeout` before this statement. It takes a SHARE UPDATE \
                  EXCLUSIVE lock. It will block other schema changes (VACUUM, ANALYZE, index \
                  builds) but not reads or writes."
             }
         }
-    }
-}
-
-fn statement_lock(stmt: &ast::Stmt) -> LockMode {
-    match stmt {
-        ast::Stmt::CommentOn(_) => LockMode::ShareUpdateExclusive,
-        _ => LockMode::Unknown,
     }
 }
 
@@ -120,7 +118,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                 }
             }
             _ if analyze::possibly_slow_stmt(&stmt) => {
-                let lock = statement_lock(&stmt);
+                let lock = LockKind::from(&stmt);
                 if lock_timeout == ReportOnce::Missing {
                     ctx.report(
                         Violation::for_node(
@@ -351,10 +349,26 @@ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
 COMMENT ON COLUMN t.c IS 'an opaque id';
         "#;
         let out = lint_errors(sql, Rule::RequireTimeoutSettings);
-        assert!(
-            out.contains("EXCLUSIVE"),
-            "expected the lock mode to appear in the help text, got:\n{out}"
-        );
+        assert_snapshot!(out, @"
+        warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow SHARE UPDATE EXCLUSIVE lock operations
+          ╭▸ 
+        2 │ COMMENT ON COLUMN t.c IS 'an opaque id';
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `lock_timeout` before this statement. It takes a SHARE UPDATE EXCLUSIVE lock. It will block other schema changes (VACUUM, ANALYZE, index builds) but not reads or writes.
+          ╭╴
+        2 + set lock_timeout = '1s';
+          ╰╴
+        warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
+          ╭▸ 
+        2 │ COMMENT ON COLUMN t.c IS 'an opaque id';
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          │
+          ├ help: Configure a `statement_timeout` before this statement
+          ╭╴
+        2 + set statement_timeout = '5s';
+          ╰╴
+        ");
     }
 
     #[test]
