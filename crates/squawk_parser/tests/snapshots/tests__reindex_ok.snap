@@ -77,6 +77,32 @@ SOURCE_FILE
         NAME_REF
           IDENT "foo"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  REINDEX
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    REINDEX_OPTION_LIST
+      L_PAREN "("
+      REINDEX_OPTION
+        CONCURRENTLY_KW "concurrently"
+        WHITESPACE " "
+        LITERAL
+          STRING "'off'"
+      COMMA ","
+      WHITESPACE " "
+      REINDEX_OPTION
+        VERBOSE_KW "verbose"
+        WHITESPACE " "
+        YES_KW "yes"
+      R_PAREN ")"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
     REINDEX_KW "reindex"

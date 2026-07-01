@@ -500,8 +500,43 @@ impl ast::CharType {
     }
 }
 
-fn is_falsey_option(text: &str) -> bool {
-    text == "0" || text.eq_ignore_ascii_case("false") || text.eq_ignore_ascii_case("off")
+fn string_literal_contents(token: &SyntaxToken) -> Option<&str> {
+    match token.kind() {
+        SyntaxKind::STRING => token.text().strip_prefix('\'')?.strip_suffix('\''),
+        SyntaxKind::ESC_STRING | SyntaxKind::NATIONAL_STRING => {
+            token.text().get(2..)?.strip_suffix('\'')
+        }
+        SyntaxKind::UNICODE_ESC_STRING => token.text().get(3..)?.strip_suffix('\''),
+        SyntaxKind::DOLLAR_QUOTED_STRING => {
+            let text = token.text();
+            let rest = text.strip_prefix('$')?;
+            let tag_len = rest.find('$')?;
+            let delimiter = text.get(..=tag_len + 1)?;
+            text.get(delimiter.len()..)?.strip_suffix(delimiter)
+        }
+        _ => None,
+    }
+}
+
+fn is_falsey_token(token: &SyntaxToken) -> bool {
+    match token.kind() {
+        SyntaxKind::FALSE_KW | SyntaxKind::NO_KW | SyntaxKind::OFF_KW => true,
+        SyntaxKind::INT_NUMBER => token.text() == "0",
+        SyntaxKind::STRING
+        | SyntaxKind::ESC_STRING
+        | SyntaxKind::NATIONAL_STRING
+        | SyntaxKind::UNICODE_ESC_STRING
+        | SyntaxKind::DOLLAR_QUOTED_STRING => string_literal_contents(token)
+            .is_some_and(|text| matches!(text.to_ascii_lowercase().as_str(), "false" | "off")),
+        _ => false,
+    }
+}
+
+fn is_falsey_vacuum_option_value(value: &ast::VacuumOptionValue) -> bool {
+    value
+        .syntax()
+        .first_token()
+        .is_some_and(|token| is_falsey_token(&token))
 }
 
 impl ast::Vacuum {
@@ -510,18 +545,13 @@ impl ast::Vacuum {
             // TODO: we need a better way of handling option lists
             || self.vacuum_option_list().is_some_and(|opt_list| {
                 opt_list.vacuum_options().any(|opt| {
-                    let mut tokens = opt
-                        .syntax()
-                        .descendants_with_tokens()
-                        .filter_map(|child| child.into_token())
-                        .filter(|token| !token.kind().is_trivia());
-
-                    tokens
-                        .next()
-                        .is_some_and(|token| token.text().eq_ignore_ascii_case("full"))
-                        && tokens
-                            .next()
-                            .is_none_or(|token| !is_falsey_option(token.text()))
+                    opt.name().is_some_and(|name| {
+                        name.syntax()
+                            .first_token()
+                            .is_some_and(|token| token.text().eq_ignore_ascii_case("full"))
+                    }) && opt
+                        .vacuum_option_value()
+                        .is_none_or(|value| !is_falsey_vacuum_option_value(&value))
                 })
             })
     }
@@ -1036,6 +1066,31 @@ fn vacuum_full_false_is_not_full() {
 #[test]
 fn vacuum_full_off_is_not_full() {
     assert!(!extract_vacuum("VACUUM (FULL OFF) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_no_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL NO) foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_quoted_off_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL 'off') foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_escaped_string_off_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL E'off') foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_unicode_escaped_string_off_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL U&'off') foo;").is_full());
+}
+
+#[test]
+fn vacuum_full_dollar_quoted_off_is_not_full() {
+    assert!(!extract_vacuum("VACUUM (FULL $$off$$) t;").is_full());
 }
 
 #[test]

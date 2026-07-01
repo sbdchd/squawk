@@ -7,6 +7,7 @@ REINDEX TABLE CONCURRENTLY my_broken_table;
 
 -- complete_syntax
 reindex (concurrently true, tablespace fooo, verbose false) database concurrently foo;
+reindex (concurrently 'off', verbose yes) table foo;
 
 reindex system foo;
 

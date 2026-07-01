@@ -31,7 +31,10 @@ explain (
   format text,
   format xml,
   format json,
-  format yaml
+  format yaml,
+  verbose 'true',
+  costs yes,
+  settings no
 )
 select 1;
 

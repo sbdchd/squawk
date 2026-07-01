@@ -3185,12 +3185,14 @@ ExplainOption =
 
 ExplainOptionValue =
   Literal
+| 'binary'
+| '#ident'
+| 'json'
+| 'no'
 | 'none'
 | 'text'
 | 'xml'
-| 'json'
-| 'binary'
-| '#ident'
+| 'yes'
 
 ExplainStmt =
   Select
@@ -3379,7 +3381,7 @@ ReindexOptionList =
   '(' (ReindexOption (',' ReindexOption)*)? ')'
 
 ReindexOption =
-  ('concurrently' | 'verbose') Literal?
+  ('concurrently' | 'verbose') (Literal | '#ident' | 'no' | 'yes')?
 | 'tablespace' Name
 
 CreateView =
@@ -3520,7 +3522,11 @@ VacuumOption =
   Name VacuumOptionValue?
 
 VacuumOptionValue =
-  Literal? Name?
+  Literal
+| Name
+| '#ident'
+| 'no'
+| 'yes'
 
 Copy =
   'copy'

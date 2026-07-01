@@ -236,6 +236,31 @@ SOURCE_FILE
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
           IDENT "yaml"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          VERBOSE_KW "verbose"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          LITERAL
+            STRING "'true'"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "costs"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          YES_KW "yes"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXPLAIN_OPTION
+        NAME
+          IDENT "settings"
+        WHITESPACE " "
+        EXPLAIN_OPTION_VALUE
+          NO_KW "no"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE "\n"
