@@ -140,8 +140,7 @@ SOURCE_FILE
           IDENT "index_cleanup"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
-          NAME
-            IDENT "auto"
+          IDENT "auto"
       COMMA ","
       WHITESPACE "\n    "
       VACUUM_OPTION
@@ -149,7 +148,7 @@ SOURCE_FILE
           IDENT "index_cleanup"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
-          NAME
+          LITERAL
             ON_KW "on"
       COMMA ","
       WHITESPACE "\n    "
@@ -158,7 +157,7 @@ SOURCE_FILE
           IDENT "index_cleanup"
         WHITESPACE " "
         VACUUM_OPTION_VALUE
-          NAME
+          LITERAL
             OFF_KW "off"
       COMMA ","
       WHITESPACE "\n    "
@@ -279,6 +278,31 @@ SOURCE_FILE
         VACUUM_OPTION_VALUE
           LITERAL
             STRING "'10 TB'"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        NAME
+          FULL_KW "full"
+        WHITESPACE " "
+        VACUUM_OPTION_VALUE
+          NO_KW "no"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        NAME
+          VERBOSE_KW "verbose"
+        WHITESPACE " "
+        VACUUM_OPTION_VALUE
+          LITERAL
+            STRING "'off'"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        NAME
+          ANALYZE_KW "analyze"
+        WHITESPACE " "
+        VACUUM_OPTION_VALUE
+          YES_KW "yes"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "

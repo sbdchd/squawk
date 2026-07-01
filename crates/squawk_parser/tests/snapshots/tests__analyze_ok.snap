@@ -125,4 +125,31 @@ SOURCE_FILE
               IDENT "c"
           R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    OPTION_ITEM_LIST
+      L_PAREN "("
+      OPTION_ITEM
+        VERBOSE_KW "verbose"
+        WHITESPACE " "
+        NO_KW "no"
+      COMMA ","
+      WHITESPACE " "
+      OPTION_ITEM
+        IDENT "skip_locked"
+        WHITESPACE " "
+        LITERAL
+          STRING "'on'"
+      R_PAREN ")"
+    WHITESPACE " "
+    TABLE_AND_COLUMNS_LIST
+      TABLE_AND_COLUMNS
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

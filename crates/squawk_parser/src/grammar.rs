@@ -5615,6 +5615,22 @@ fn string_literal(p: &mut Parser<'_>) {
 
 const BOOL_FIRST: TokenSet = TokenSet::new(&[TRUE_KW, FALSE_KW, OFF_KW, ON_KW, INT_NUMBER]);
 
+const UTILITY_OPTION_ARG_FIRST: TokenSet = BOOL_FIRST
+    .union(NUMERIC_FIRST)
+    .union(STRING_FIRST)
+    .union(NON_RESERVED_WORD);
+
+fn opt_utility_option_arg(p: &mut Parser<'_>) -> bool {
+    if opt_bool_literal(p) || opt_numeric_literal(p).is_some() || opt_string_literal(p).is_some() {
+        return true;
+    }
+    if p.at_ts(NON_RESERVED_WORD) {
+        p.bump_any();
+        return true;
+    }
+    false
+}
+
 fn opt_bool_literal(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     // TOOD: add validation to check for `1` or `0` inside the INT_NUMBER
@@ -11178,15 +11194,7 @@ fn opt_explain_option(p: &mut Parser<'_>) -> bool {
 
 fn opt_explain_option_value(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
-    // boolean, { NONE | TEXT | BINARY }, or { TEXT | XML | JSON | YAML }
-    if opt_bool_literal(p)
-        || p.eat(NONE_KW)
-        || p.eat(TEXT_KW)
-        || p.eat(BINARY_KW)
-        || p.eat(XML_KW)
-        || p.eat(JSON_KW)
-        || opt_ident(p)
-    {
+    if opt_utility_option_arg(p) {
         return Some(m.complete(p, EXPLAIN_OPTION_VALUE));
     }
     m.abandon(p);
@@ -12214,7 +12222,7 @@ fn opt_reindex_option(p: &mut Parser<'_>) -> bool {
     let parsed = match p.current() {
         CONCURRENTLY_KW | VERBOSE_KW => {
             p.bump_any();
-            opt_bool_literal(p);
+            opt_utility_option_arg(p);
             true
         }
         TABLESPACE_KW => {
@@ -12800,9 +12808,7 @@ fn opt_table_and_columns(p: &mut Parser<'_>) -> bool {
 
 const VACUUM_OPTION_FIRST: TokenSet = NON_RESERVED_WORD
     .union(TokenSet::new(&[ANALYZE_KW, ANALYSE_KW, FORMAT_KW, ON_KW]))
-    .union(NUMERIC_FIRST)
-    .union(STRING_FIRST)
-    .union(BOOL_FIRST);
+    .union(UTILITY_OPTION_ARG_FIRST);
 
 // where option can be one of:
 //   FORMAT format_name
@@ -12835,11 +12841,7 @@ fn opt_vacuum_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // utility_option_arg
 fn opt_vacuum_option_value(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
-    if p.at_ts(NON_RESERVED_WORD) || p.at(ON_KW) {
-        col_label(p);
-        return Some(m.complete(p, VACUUM_OPTION_VALUE));
-    }
-    if opt_numeric_literal(p).is_some() || opt_string_literal(p).is_some() || opt_bool_literal(p) {
+    if opt_utility_option_arg(p) {
         return Some(m.complete(p, VACUUM_OPTION_VALUE));
     }
     m.abandon(p);

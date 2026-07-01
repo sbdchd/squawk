@@ -10479,6 +10479,10 @@ impl ExplainOptionValue {
         support::token(&self.syntax, SyntaxKind::JSON_KW)
     }
     #[inline]
+    pub fn no_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+    #[inline]
     pub fn none_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NONE_KW)
     }
@@ -10489,6 +10493,10 @@ impl ExplainOptionValue {
     #[inline]
     pub fn xml_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::XML_KW)
+    }
+    #[inline]
+    pub fn yes_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::YES_KW)
     }
 }
 
@@ -16880,12 +16888,24 @@ impl ReindexOption {
         support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
     }
     #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
+    pub fn no_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+    #[inline]
     pub fn tablespace_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
     }
     #[inline]
     pub fn verbose_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VERBOSE_KW)
+    }
+    #[inline]
+    pub fn yes_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::YES_KW)
     }
 }
 
@@ -20730,6 +20750,18 @@ impl VacuumOptionValue {
     #[inline]
     pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
+    pub fn no_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+    #[inline]
+    pub fn yes_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::YES_KW)
     }
 }
 

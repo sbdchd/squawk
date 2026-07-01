@@ -35,7 +35,10 @@ VACUUM (
     only_database_stats true,
     only_database_stats false,
     buffer_usage_limit 10,
-    buffer_usage_limit '10 TB'
+    buffer_usage_limit '10 TB',
+    full no,
+    verbose 'off',
+    analyze yes
 ) t1;
 
 -- pre_pg_9_syntax
