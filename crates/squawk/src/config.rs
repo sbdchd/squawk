@@ -17,6 +17,8 @@ const FILE_NAME: &str = ".squawk.toml";
 pub struct UploadToGitHubConfig {
     #[serde(default)]
     pub fail_on_violations: Option<bool>,
+    #[serde(default)]
+    pub only_comment_on_violations: Option<bool>,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -255,6 +257,16 @@ assume_in_transaction = false
         let file = r"
 [upload_to_github]
 fail_on_violations = true        
+        ";
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+    #[test]
+    fn load_only_comment_on_violations() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r"
+[upload_to_github]
+only_comment_on_violations = true
         ";
         fs::write(&squawk_toml, file).expect("Unable to write file");
         assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));

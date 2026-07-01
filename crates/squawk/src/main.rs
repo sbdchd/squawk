@@ -26,6 +26,9 @@ pub struct UploadToGithubArgs {
     /// Exits with an error if violations are found
     #[arg(long)]
     fail_on_violations: bool,
+    /// Only posts a report comment on violations
+    #[arg(long)]
+    only_comment_on_violations: bool,
     #[arg(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
     github_private_key: Option<String>,
     #[arg(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
