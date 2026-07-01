@@ -539,6 +539,23 @@ fn is_falsey_vacuum_option_value(value: &ast::VacuumOptionValue) -> bool {
         .is_some_and(|token| is_falsey_token(&token))
 }
 
+impl ast::Reindex {
+    pub fn is_concurrently(&self) -> bool {
+        self.concurrently_token().is_some()
+            || self.reindex_option_list().is_some_and(|options| {
+                options.reindex_options().any(|option| {
+                    option.concurrently_token().is_some()
+                        && !option.literal().is_some_and(|literal| {
+                            literal
+                                .syntax()
+                                .first_token()
+                                .is_some_and(|token| is_falsey_token(&token))
+                        })
+                })
+            })
+    }
+}
+
 impl ast::Vacuum {
     pub fn is_full(&self) -> bool {
         self.full_token().is_some()
