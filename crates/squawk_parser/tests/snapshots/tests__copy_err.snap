@@ -44,6 +44,68 @@ SOURCE_FILE
         VERBOSE_KW "verbose"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- legacy force option requires a target"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'s'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    FORCE_KW "force"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'s'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    FORCE_KW "force"
+    WHITESPACE " "
+    NULL_KW "null"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'s'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    FORCE_KW "force"
+  WHITESPACE " "
+  ERROR
+    IDENT "zzz"
+  EMPTY_STMT
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected COMMA
@@ -54,3 +116,19 @@ error[syntax-error]: expected COMMA
   ╭▸ 
 2 │ copy x (i y) from '/tmp/input.file' (on_error ignore  log_verbosity verbose);
   ╰╴                                                    ━
+error[syntax-error]: expected NOT, QUOTE, or NULL
+  ╭▸ 
+5 │ copy t from 's' with force;
+  ╰╴                          ━
+error[syntax-error]: expected name
+  ╭▸ 
+6 │ copy t from 's' with force null;
+  ╰╴                               ━
+error[syntax-error]: expected NOT, QUOTE, or NULL
+  ╭▸ 
+7 │ copy t from 's' with force zzz;
+  ╰╴                          ━
+error[syntax-error]: expected command, found IDENT
+  ╭▸ 
+7 │ copy t from 's' with force zzz;
+  ╰╴                           ━

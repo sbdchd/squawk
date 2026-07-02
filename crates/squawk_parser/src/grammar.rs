@@ -12909,6 +12909,19 @@ fn copy_option_list(p: &mut Parser<'_>) {
     m.complete(p, COPY_OPTION_LIST);
 }
 
+fn opt_copy_force_target(p: &mut Parser<'_>) -> bool {
+    if p.eat(STAR) {
+        return true;
+    }
+    if name_ref(p).is_none() {
+        return false;
+    }
+    while !p.at(EOF) && p.eat(COMMA) {
+        name_ref(p);
+    }
+    true
+}
+
 fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     let parsed = match p.current() {
@@ -12933,19 +12946,20 @@ fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
                 NOT_KW => {
                     p.bump_any();
                     p.expect(NULL_KW);
-                    if !p.eat(STAR) {
-                        name_ref_list(p);
-                    }
-                    true
+                    opt_copy_force_target(p)
                 }
-                QUOTE_KW | NULL_KW => {
+                NULL_KW => {
                     p.bump_any();
-                    if !p.eat(STAR) {
-                        name_ref_list(p);
-                    }
-                    true
+                    opt_copy_force_target(p)
                 }
-                _ => false,
+                QUOTE_KW => {
+                    p.bump_any();
+                    opt_copy_force_target(p)
+                }
+                _ => {
+                    p.error("expected NOT, QUOTE, or NULL");
+                    false
+                }
             }
         }
         _ => false,
