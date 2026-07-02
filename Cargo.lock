@@ -2533,6 +2533,7 @@ dependencies = [
  "serde",
  "serde_plain",
  "squawk-syntax",
+ "tabled",
 ]
 
 [[package]]

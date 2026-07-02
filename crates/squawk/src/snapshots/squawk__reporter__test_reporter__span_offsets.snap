@@ -12,9 +12,9 @@ CheckReport {
             column: 3,
             range: 5..65,
             level: Warning,
-            message: "Missing `set lock_timeout` before potentially slow operations",
+            message: "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
             help: Some(
-                "Configure a `lock_timeout` before this statement.",
+                "Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.",
             ),
             rule_name: "require-timeout-settings",
             column_end: 63,

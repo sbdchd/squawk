@@ -302,10 +302,10 @@ create table users (
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before potentially slow operations",
+                message: "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
                 text_range: 0..32,
                 help: Some(
-                    "Configure a `lock_timeout` before this statement.",
+                    "Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.",
                 ),
                 fix: Some(
                     Fix {
@@ -569,7 +569,7 @@ alter table t2 drop column c2 cascade;
             ),
             (
                 RequireTimeoutSettings,
-                "Missing `set lock_timeout` before potentially slow operations",
+                "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
             ),
             (
                 RequireTimeoutSettings,

@@ -2,13 +2,13 @@
 source: crates/squawk/src/reporter.rs
 expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
 ---
-warning[]8;;https://squawkhq.com/docs/require-timeout-settings\require-timeout-settings]8;;\]: Missing `set lock_timeout` before potentially slow operations
+warning[]8;;https://squawkhq.com/docs/require-timeout-settings\require-timeout-settings]8;;\]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
   ╭▸ main.sql:2:4
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
   │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   │
-  ├ help: Configure a `lock_timeout` before this statement.
+  ├ help: Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.
   ╭╴
 2 +    set lock_timeout = '1s';
   ╰╴
