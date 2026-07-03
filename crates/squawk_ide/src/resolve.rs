@@ -1447,10 +1447,10 @@ fn resolve_from_item_column_by_name_after_index(
         .children()
         .find_map(ast::SelectVariant::cast)
     {
-        let select = ast_nav::select_from_variant(select_variant)?;
-        return resolve_column_from_select_targets(
+        return resolve_column_from_select_variant_with_skip(
             db,
-            InFile::new(file, &select),
+            file,
+            select_variant,
             scope_name_ref,
             column_name,
             skip_column_count,
@@ -1536,6 +1536,48 @@ fn resolve_column_from_table_or_view_or_cte_impl(
     depth: u32,
     skip_column_count: usize,
 ) -> Option<SmallVec<[Location; 1]>> {
+    resolve_column_from_table_or_view_or_cte_impl_inner(
+        db,
+        name_ref,
+        table_name,
+        schema,
+        column_name,
+        depth,
+        skip_column_count,
+        true,
+    )
+}
+
+fn resolve_column_from_table_or_view_or_cte_column_only(
+    db: &dyn Db,
+    name_ref: InFile<&ast::NameRef>,
+    table_name: &Name,
+    schema: Option<&Schema>,
+    column_name: &Name,
+    skip_column_count: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    resolve_column_from_table_or_view_or_cte_impl_inner(
+        db,
+        name_ref,
+        table_name,
+        schema,
+        column_name,
+        0,
+        skip_column_count,
+        false,
+    )
+}
+
+fn resolve_column_from_table_or_view_or_cte_impl_inner(
+    db: &dyn Db,
+    name_ref: InFile<&ast::NameRef>,
+    table_name: &Name,
+    schema: Option<&Schema>,
+    column_name: &Name,
+    depth: u32,
+    skip_column_count: usize,
+    allow_whole_row_fallback: bool,
+) -> Option<SmallVec<[Location; 1]>> {
     let file = name_ref.file_id;
     let name_ref = name_ref.value;
     if depth > 40 {
@@ -1551,12 +1593,13 @@ fn resolve_column_from_table_or_view_or_cte_impl(
     match kind {
         LocationKind::Table => {
             if schemas.unqualified() && resolve_cte_table(name_ref, table_name).is_some() {
-                return resolve_cte_column_with_skip(
+                return resolve_cte_column_with_skip_impl(
                     db,
                     InFile::new(file, name_ref),
                     table_name,
                     column_name,
                     skip_column_count,
+                    allow_whole_row_fallback,
                 );
             }
 
@@ -1583,7 +1626,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                 {
                     let (parent_schema, parent_table_name) =
                         name::schema_and_name_path(&parent_path)?;
-                    return resolve_column_from_table_or_view_or_cte_impl(
+                    return resolve_column_from_table_or_view_or_cte_impl_inner(
                         db,
                         InFile::new(file, name_ref),
                         &parent_table_name,
@@ -1591,6 +1634,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                         column_name,
                         depth + 1,
                         skip_column_count,
+                        allow_whole_row_fallback,
                     );
                 }
 
@@ -1599,7 +1643,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                 // create table t(a int);
                 // select t from t;
                 // ```
-                if skip_column_count == 0 && column_name == table_name {
+                if allow_whole_row_fallback && skip_column_count == 0 && column_name == table_name {
                     return Some(smallvec![Location::new(
                         file,
                         table_like_ptr.text_range(),
@@ -1618,7 +1662,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                     return Some(cols);
                 }
 
-                if skip_column_count == 0 && column_name == table_name {
+                if allow_whole_row_fallback && skip_column_count == 0 && column_name == table_name {
                     return Some(smallvec![Location::new(
                         file,
                         table_like_ptr.text_range(),
@@ -1638,7 +1682,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                     return Some(cols);
                 }
 
-                if skip_column_count == 0 && column_name == table_name {
+                if allow_whole_row_fallback && skip_column_count == 0 && column_name == table_name {
                     return Some(smallvec![Location::new(
                         file,
                         table_like_ptr.text_range(),
@@ -1665,7 +1709,7 @@ fn resolve_column_from_table_or_view_or_cte_impl(
                     return Some(cols);
                 }
 
-                if skip_column_count == 0 && column_name == table_name {
+                if allow_whole_row_fallback && skip_column_count == 0 && column_name == table_name {
                     return Some(smallvec![Location::new(
                         file,
                         table_like_ptr.text_range(),
@@ -1779,13 +1823,88 @@ fn resolve_compound_select_order_by_column_ptr(
     let file = column_name_ref.file_id;
     let column_name_ref = column_name_ref.value;
     let column_name = Name::from_node(column_name_ref);
-    let select = ast_nav::select_from_variant(compound_select.lhs()?)?;
-    resolve_column_from_select_targets(
+    resolve_column_from_select_variant_with_skip(
         db,
-        InFile::new(file, &select),
+        file,
+        compound_select.lhs()?,
         column_name_ref,
         &column_name,
         0,
+    )
+}
+
+fn resolve_column_from_select_variant_with_skip(
+    db: &dyn Db,
+    file: File,
+    select_variant: ast::SelectVariant,
+    name_ref: &ast::NameRef,
+    column_name: &Name,
+    skip_column_count: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    match select_variant {
+        ast::SelectVariant::CompoundSelect(compound_select) => {
+            resolve_column_from_select_variant_with_skip(
+                db,
+                file,
+                compound_select.lhs()?,
+                name_ref,
+                column_name,
+                skip_column_count,
+            )
+        }
+        ast::SelectVariant::ParenSelect(paren_select) => resolve_subquery_column_ptr_with_skip(
+            db,
+            InFile::new(file, &paren_select),
+            name_ref,
+            column_name,
+            None,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Select(select) => resolve_column_from_select_targets(
+            db,
+            InFile::new(file, &select),
+            name_ref,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::SelectInto(select_into) => find_column_in_select_into_with_skip(
+            db,
+            file,
+            &select_into,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Table(table) => resolve_column_from_table_query_with_skip(
+            db,
+            file,
+            &table,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Values(values) => {
+            resolve_values_column_after_index(file, &values, column_name, skip_column_count)
+        }
+    }
+}
+
+fn resolve_column_from_table_query_with_skip(
+    db: &dyn Db,
+    file: File,
+    table: &ast::Table,
+    column_name: &Name,
+    skip_column_count: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    let path = table.relation_name()?.path()?;
+    let (schema, table_name) = name::schema_and_name_path(&path)?;
+    let table_name_ref = relation_name_ref_from_table(table)?;
+
+    resolve_column_from_table_or_view_or_cte_column_only(
+        db,
+        InFile::new(file, &table_name_ref),
+        &table_name,
+        schema.as_ref(),
+        column_name,
+        skip_column_count,
     )
 }
 
@@ -2173,6 +2292,62 @@ fn find_column_in_target_list_with_skip(
     )
 }
 
+fn find_column_in_select_variant_with_skip(
+    db: &dyn Db,
+    file: File,
+    select_variant: ast::SelectVariant,
+    column_name: &Name,
+    skip_column_count: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    match select_variant {
+        ast::SelectVariant::CompoundSelect(compound_select) => {
+            find_column_in_select_variant_with_skip(
+                db,
+                file,
+                compound_select.lhs()?,
+                column_name,
+                skip_column_count,
+            )
+        }
+        ast::SelectVariant::ParenSelect(paren_select) => find_column_in_select_variant_with_skip(
+            db,
+            file,
+            paren_select.select()?,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Select(select) => {
+            let target_list = select.select_clause()?.target_list()?;
+            let from_clause = select.from_clause();
+            find_column_in_target_list_with_skip(
+                db,
+                file,
+                &target_list,
+                from_clause.as_ref(),
+                column_name,
+                skip_column_count,
+            )
+        }
+        ast::SelectVariant::SelectInto(select_into) => find_column_in_select_into_with_skip(
+            db,
+            file,
+            &select_into,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Table(table) => resolve_column_from_table_query_with_skip(
+            db,
+            file,
+            &table,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Values(values) => {
+            resolve_values_column_after_index(file, &values, column_name, skip_column_count)
+        }
+    }
+}
+
 // TODO: this is similar to the CTE funcs, maybe we can simplify
 fn find_column_in_create_view_like(
     db: &dyn Db,
@@ -2201,30 +2376,10 @@ fn find_column_in_create_view_like_with_skip(
     }
     let skip_column_count = skip_column_count.max(column_list_len);
 
-    let query = create_view.query()?;
-    if let ast::SelectVariant::Table(table) = &query {
-        let path = table.relation_name()?.path()?;
-        let (schema, table_name) = name::schema_and_name_path(&path)?;
-        let table_name_ref = relation_name_ref_from_table(table)?;
-        return resolve_column_from_table_or_view_or_cte_impl(
-            db,
-            InFile::new(file, &table_name_ref),
-            &table_name,
-            schema.as_ref(),
-            column_name,
-            0,
-            skip_column_count,
-        );
-    }
-
-    let select = ast_nav::select_from_variant(query)?;
-    let target_list = select.select_clause()?.target_list()?;
-    let from_clause = select.from_clause();
-    find_column_in_target_list_with_skip(
+    find_column_in_select_variant_with_skip(
         db,
         file,
-        &target_list,
-        from_clause.as_ref(),
+        create_view.query()?,
         column_name,
         skip_column_count,
     )
@@ -2246,35 +2401,10 @@ fn find_column_in_create_table_as_with_skip(
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = create_table_as.file_id;
     let create_table_as = create_table_as.value;
-    let query = create_table_as.query()?.select_variant()?;
-
-    if let ast::SelectVariant::Values(values) = &query {
-        return resolve_values_column_after_index(file, values, column_name, skip_column_count);
-    }
-
-    if let ast::SelectVariant::Table(table) = &query {
-        let path = table.relation_name()?.path()?;
-        let (schema, table_name) = name::schema_and_name_path(&path)?;
-        let table_name_ref = relation_name_ref_from_table(table)?;
-        return resolve_column_from_table_or_view_or_cte_impl(
-            db,
-            InFile::new(file, &table_name_ref),
-            &table_name,
-            schema.as_ref(),
-            column_name,
-            0,
-            skip_column_count,
-        );
-    }
-
-    let select = ast_nav::select_from_variant(query)?;
-    let target_list = select.select_clause()?.target_list()?;
-    let from_clause = select.from_clause();
-    find_column_in_target_list_with_skip(
+    find_column_in_select_variant_with_skip(
         db,
         file,
-        &target_list,
-        from_clause.as_ref(),
+        create_table_as.query()?.select_variant()?,
         column_name,
         skip_column_count,
     )
@@ -2412,7 +2542,7 @@ fn count_columns_for_table_name(
                 && let Some(name_ref) = name_ref
                 && let Some(with_table) = ast_nav::find_cte_with_table(name_ref, table_name)
             {
-                return count_columns_for_with_table(with_table);
+                return count_columns_for_with_table(db, file, with_table);
             }
 
             let table_like_node = table_like_ptr.to_node(root);
@@ -2435,11 +2565,11 @@ fn count_columns_for_table_name(
                 .ancestors()
                 .find_map(ast::CreateTableAs::cast)
             {
-                let select =
-                    ast_nav::select_from_variant(create_table_as.query()?.select_variant()?)?;
-                if let Some(target_list) = select.select_clause().and_then(|c| c.target_list()) {
-                    return Some(target_list.targets().count());
-                }
+                return count_columns_for_select_variant(
+                    db,
+                    file,
+                    &create_table_as.query()?.select_variant()?,
+                );
             }
 
             if let Some(select_into) = table_like_node.ancestors().find_map(ast::SelectInto::cast) {
@@ -2460,38 +2590,85 @@ fn count_columns_for_table_name(
                 return Some(column_list.columns().count());
             }
 
-            let select = ast_nav::select_from_variant(create_view.query()?)?;
-            if let Some(target_list) = select.select_clause().and_then(|c| c.target_list()) {
-                // This is not quite right if there's a `*` in the view definition.
-                // It becomes recursive.
-                // For now, let's assume simple views.
-                return Some(target_list.targets().count());
-            }
-
-            None
+            count_columns_for_select_variant(db, file, &create_view.query()?)
         }
         _ => None,
     }
 }
 
-fn count_columns_for_with_table(with_table: ast::WithTable) -> Option<usize> {
+fn count_columns_for_with_table(
+    db: &dyn Db,
+    file: File,
+    with_table: ast::WithTable,
+) -> Option<usize> {
     if let Some(column_list) = with_table.column_list() {
         return Some(column_list.columns().count());
     }
 
-    let query = with_table.query()?;
-    if let ast::WithQuery::Values(values) = query {
-        return values
-            .row_list()
-            .and_then(|x| x.rows().next())
-            .map(|row| row.exprs().count());
-    }
+    count_columns_for_with_query(db, file, with_table.query()?)
+}
 
-    let select = ast_nav::select_from_with_query(query)?;
-    select
-        .select_clause()
-        .and_then(|c| c.target_list())
-        .map(|t| t.targets().count())
+fn count_columns_for_with_query(db: &dyn Db, file: File, query: ast::WithQuery) -> Option<usize> {
+    match query {
+        ast::WithQuery::CompoundSelect(compound_select) => {
+            count_columns_for_select_variant(db, file, &compound_select.lhs()?)
+        }
+        ast::WithQuery::ParenSelect(paren_select) => {
+            count_columns_for_select_variant(db, file, &paren_select.select()?)
+        }
+        ast::WithQuery::Select(select) => Some(count_columns_for_target_list(
+            &select.select_clause()?.target_list()?,
+        )),
+        ast::WithQuery::Table(table) => count_columns_for_table_query(db, file, &table),
+        ast::WithQuery::Values(values) => count_columns_for_values(&values),
+        ast::WithQuery::Delete(_)
+        | ast::WithQuery::Insert(_)
+        | ast::WithQuery::Merge(_)
+        | ast::WithQuery::Update(_) => None,
+    }
+}
+
+fn count_columns_for_select_variant(
+    db: &dyn Db,
+    file: File,
+    select_variant: &ast::SelectVariant,
+) -> Option<usize> {
+    match select_variant {
+        ast::SelectVariant::CompoundSelect(compound_select) => {
+            count_columns_for_select_variant(db, file, &compound_select.lhs()?)
+        }
+        ast::SelectVariant::ParenSelect(paren_select) => {
+            count_columns_for_select_variant(db, file, &paren_select.select()?)
+        }
+        ast::SelectVariant::Select(select) => Some(count_columns_for_target_list(
+            &select.select_clause()?.target_list()?,
+        )),
+        ast::SelectVariant::SelectInto(select_into) => Some(count_columns_for_target_list(
+            &select_into.select_clause()?.target_list()?,
+        )),
+        ast::SelectVariant::Table(table) => count_columns_for_table_query(db, file, table),
+        ast::SelectVariant::Values(values) => count_columns_for_values(values),
+    }
+}
+
+fn count_columns_for_target_list(target_list: &ast::TargetList) -> usize {
+    target_list.targets().count()
+}
+
+fn count_columns_for_table_query(db: &dyn Db, file: File, table: &ast::Table) -> Option<usize> {
+    let path = table.relation_name()?.path()?;
+    let (schema, table_name) = name::schema_and_name_path(&path)?;
+    let table_name_ref = relation_name_ref_from_table(table)?;
+    let position = table_name_ref.syntax().text_range().start();
+    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+    count_columns_for_table_name(db, &table_name, &schemas, file, Some(&table_name_ref))
+}
+
+fn count_columns_for_values(values: &ast::Values) -> Option<usize> {
+    values
+        .row_list()
+        .and_then(|x| x.rows().next())
+        .map(|row| row.exprs().count())
 }
 
 fn resolve_cte_column(
@@ -2510,6 +2687,17 @@ fn resolve_cte_column_with_skip(
     column_name: &Name,
     skip_column_count: usize,
 ) -> Option<SmallVec<[Location; 1]>> {
+    resolve_cte_column_with_skip_impl(db, name_ref, cte_name, column_name, skip_column_count, true)
+}
+
+fn resolve_cte_column_with_skip_impl(
+    db: &dyn Db,
+    name_ref: InFile<&ast::NameRef>,
+    cte_name: &Name,
+    column_name: &Name,
+    skip_column_count: usize,
+    allow_whole_row_fallback: bool,
+) -> Option<SmallVec<[Location; 1]>> {
     let file = name_ref.file_id;
     let name_ref = name_ref.value;
     let with_table = ast_nav::find_cte_with_table(name_ref, cte_name)?;
@@ -2527,26 +2715,6 @@ fn resolve_cte_column_with_skip(
 
     let query = with_table.query()?;
 
-    if let ast::WithQuery::Values(values) = query {
-        return resolve_values_column_after_index(file, &values, column_name, skip_column_count);
-    }
-
-    if let ast::WithQuery::Table(table) = query {
-        let path = table.relation_name()?.path()?;
-        let (schema, table_name) = name::schema_and_name_path(&path)?;
-        let table_name_ref = relation_name_ref_from_table(&table)?;
-
-        return resolve_column_from_table_or_view_or_cte_impl(
-            db,
-            InFile::new(file, &table_name_ref),
-            &table_name,
-            schema.as_ref(),
-            column_name,
-            0,
-            skip_column_count,
-        );
-    }
-
     if let Some(column) = column_in_with_query(
         InFile::new(file, &query),
         db,
@@ -2556,11 +2724,165 @@ fn resolve_cte_column_with_skip(
         return Some(column);
     }
 
-    let cte_select = ast_nav::select_from_with_query(query)?;
-    let target_list = cte_select.select_clause()?.target_list()?;
-    let from_clause = cte_select.from_clause();
+    if let Some(column) = resolve_cte_column_from_with_query_with_skip(
+        db,
+        file,
+        query,
+        name_ref,
+        cte_name,
+        column_name,
+        skip_column_count,
+    ) {
+        return Some(column);
+    }
 
-    let result = resolve_column_from_targets(
+    if allow_whole_row_fallback
+        && skip_column_count == 0
+        && column_name == cte_name
+        && let Some(name_node) = with_table.name()
+    {
+        return Some(smallvec![Location::new(
+            file,
+            name_node.syntax().text_range(),
+            LocationKind::Table
+        )]);
+    }
+
+    None
+}
+
+fn resolve_cte_column_from_with_query_with_skip(
+    db: &dyn Db,
+    file: File,
+    query: ast::WithQuery,
+    name_ref: &ast::NameRef,
+    cte_name: &Name,
+    column_name: &Name,
+    skip_column_count: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    match query {
+        ast::WithQuery::CompoundSelect(compound_select) => {
+            resolve_cte_column_from_select_variant_with_skip(
+                db,
+                file,
+                compound_select.lhs()?,
+                name_ref,
+                cte_name,
+                column_name,
+                skip_column_count,
+            )
+        }
+        ast::WithQuery::ParenSelect(paren_select) => {
+            resolve_cte_column_from_select_variant_with_skip(
+                db,
+                file,
+                paren_select.select()?,
+                name_ref,
+                cte_name,
+                column_name,
+                skip_column_count,
+            )
+        }
+        ast::WithQuery::Select(select) => resolve_cte_column_from_select_with_skip(
+            db,
+            file,
+            &select,
+            name_ref,
+            cte_name,
+            column_name,
+            skip_column_count,
+        ),
+        ast::WithQuery::Table(table) => resolve_column_from_table_query_with_skip(
+            db,
+            file,
+            &table,
+            column_name,
+            skip_column_count,
+        ),
+        ast::WithQuery::Values(values) => {
+            resolve_values_column_after_index(file, &values, column_name, skip_column_count)
+        }
+        ast::WithQuery::Delete(_)
+        | ast::WithQuery::Insert(_)
+        | ast::WithQuery::Merge(_)
+        | ast::WithQuery::Update(_) => None,
+    }
+}
+
+fn resolve_cte_column_from_select_variant_with_skip(
+    db: &dyn Db,
+    file: File,
+    select_variant: ast::SelectVariant,
+    name_ref: &ast::NameRef,
+    cte_name: &Name,
+    column_name: &Name,
+    skip_column_count: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    match select_variant {
+        ast::SelectVariant::CompoundSelect(compound_select) => {
+            resolve_cte_column_from_select_variant_with_skip(
+                db,
+                file,
+                compound_select.lhs()?,
+                name_ref,
+                cte_name,
+                column_name,
+                skip_column_count,
+            )
+        }
+        ast::SelectVariant::ParenSelect(paren_select) => {
+            resolve_cte_column_from_select_variant_with_skip(
+                db,
+                file,
+                paren_select.select()?,
+                name_ref,
+                cte_name,
+                column_name,
+                skip_column_count,
+            )
+        }
+        ast::SelectVariant::Select(select) => resolve_cte_column_from_select_with_skip(
+            db,
+            file,
+            &select,
+            name_ref,
+            cte_name,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::SelectInto(select_into) => find_column_in_select_into_with_skip(
+            db,
+            file,
+            &select_into,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Table(table) => resolve_column_from_table_query_with_skip(
+            db,
+            file,
+            &table,
+            column_name,
+            skip_column_count,
+        ),
+        ast::SelectVariant::Values(values) => {
+            resolve_values_column_after_index(file, &values, column_name, skip_column_count)
+        }
+    }
+}
+
+fn resolve_cte_column_from_select_with_skip(
+    db: &dyn Db,
+    file: File,
+    select: &ast::Select,
+    name_ref: &ast::NameRef,
+    cte_name: &Name,
+    column_name: &Name,
+    skip_column_count: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    let target_list = select.select_clause()?.target_list()?;
+    let from_clause = select.from_clause();
+
+    resolve_column_from_targets(
         db,
         file,
         &target_list,
@@ -2588,23 +2910,7 @@ fn resolve_cte_column_with_skip(
                 skip_column_count,
             )
         },
-    );
-    if result.is_some() {
-        return result;
-    }
-
-    if skip_column_count == 0
-        && column_name == cte_name
-        && let Some(name_node) = with_table.name()
-    {
-        return Some(smallvec![Location::new(
-            file,
-            name_node.syntax().text_range(),
-            LocationKind::Table
-        )]);
-    }
-
-    None
+    )
 }
 
 fn column_in_with_query(
@@ -2755,31 +3061,10 @@ fn resolve_subquery_column_ptr_with_skip(
     }
     let skip_column_count = skip_column_count.max(column_list_len);
 
-    // TODO: this should just be a match stmt
-    if let ast::SelectVariant::Table(table) = select_variant {
-        let path = table.relation_name()?.path()?;
-        let (schema, table_name) = name::schema_and_name_path(&path)?;
-        let table_name_ref = relation_name_ref_from_table(&table)?;
-
-        return resolve_column_from_table_or_view_or_cte_impl(
-            db,
-            InFile::new(file, &table_name_ref),
-            &table_name,
-            schema.as_ref(),
-            column_name,
-            0,
-            skip_column_count,
-        );
-    }
-
-    if let ast::SelectVariant::Values(values) = select_variant {
-        return resolve_values_column_after_index(file, &values, column_name, skip_column_count);
-    }
-
-    let subquery_select = ast_nav::select_from_variant(select_variant)?;
-    resolve_column_from_select_targets(
+    resolve_column_from_select_variant_with_skip(
         db,
-        InFile::new(file, &subquery_select),
+        file,
+        select_variant,
         name_ref,
         column_name,
         skip_column_count,

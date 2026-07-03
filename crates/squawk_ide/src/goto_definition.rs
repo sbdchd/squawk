@@ -2421,6 +2421,80 @@ select a$0 from v;
     }
 
     #[test]
+    fn goto_view_values_query_column_gap() {
+        assert_snapshot!(goto("
+create view v as values (1, 2);
+select column2$0 from v;
+"), @"
+          ╭▸ 
+        2 │ create view v as values (1, 2);
+          │                             ─ 2. destination
+        3 │ select column2 from v;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_compound_table_query_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create view v as table t union table t;
+select a$0 from v;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create view v as table t union table t;
+        4 │ select a from v;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_compound_values_query_column() {
+        assert_snapshot!(goto("
+create view v as values (1, 2) union values (3, 4);
+select column2$0 from v;
+"), @"
+          ╭▸ 
+        2 │ create view v as values (1, 2) union values (3, 4);
+          │                             ─ 2. destination
+        3 │ select column2 from v;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_table_query_column_count_gap() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create view v as table t;
+select b$0 from (select * from v) u(a);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create view v as table t;
+        4 │ select b from (select * from v) u(a);
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_view_values_query_column_count_gap() {
+        assert_snapshot!(goto("
+create view v as values (1, 2);
+select column2$0 from (select * from v) u(a);
+"), @"
+          ╭▸ 
+        2 │ create view v as values (1, 2);
+          │                             ─ 2. destination
+        3 │ select column2 from (select * from v) u(a);
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_values_partial_alias_remaining_column_gap() {
         assert_snapshot!(goto("
 select column2$0 from (values (1, 2)) v(a);
@@ -3164,6 +3238,80 @@ select column1$0 from k;
         2 │ create table k as values (1, 2);
           │                           ─ 2. destination
         3 │ select column1 from k;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_compound_table_query_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u as table t union table t;
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create table u as table t union table t;
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_compound_values_query_column() {
+        assert_snapshot!(goto("
+create table u as values (1, 2) union values (3, 4);
+select column2$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table u as values (1, 2) union values (3, 4);
+          │                              ─ 2. destination
+        3 │ select column2 from u;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_paren_table_query_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u as (table t);
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create table u as (table t);
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_paren_values_query_column() {
+        assert_snapshot!(goto("
+create table u as (values (1, 2));
+select column2$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table u as (values (1, 2));
+          │                               ─ 2. destination
+        3 │ select column2 from u;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_values_column_count_gap() {
+        assert_snapshot!(goto("
+create table u as values (1, 2);
+select column2$0 from (select * from u) x(a);
+"), @"
+          ╭▸ 
+        2 │ create table u as values (1, 2);
+          │                              ─ 2. destination
+        3 │ select column2 from (select * from u) x(a);
           ╰╴             ─ 1. source
         ");
     }
@@ -5687,6 +5835,85 @@ select c$0 from (select 1 c union select 2 c);
     }
 
     #[test]
+    fn goto_subquery_compound_table_query_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+select a$0 from (table t union table t) u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ select a from (table t union table t) u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_table_query_whole_row_alias() {
+        assert_snapshot!(goto("
+create table t(a int);
+select t$0 from (table t) t;
+"), @"
+          ╭▸ 
+        3 │ select t from (table t) t;
+          ╰╴       ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_compound_table_query_whole_row_alias() {
+        assert_snapshot!(goto("
+create table t(a int);
+select t$0 from (table t union table t) t;
+"), @"
+          ╭▸ 
+        3 │ select t from (table t union table t) t;
+          ╰╴       ─ 1. source                    ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_subquery_compound_values_query_column() {
+        assert_snapshot!(goto("
+select column2$0 from (values (1, 2) union values (3, 4)) u;
+"), @"
+          ╭▸ 
+        2 │ select column2 from (values (1, 2) union values (3, 4)) u;
+          ╰╴             ─ 1. source        ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_cte_compound_table_query_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+with u as (table t union table t)
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ with u as (table t union table t)
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_compound_values_query_column() {
+        assert_snapshot!(goto("
+with u as (values (1, 2) union values (3, 4))
+select column2$0 from u;
+"), @"
+          ╭▸ 
+        2 │ with u as (values (1, 2) union values (3, 4))
+          │                       ─ 2. destination
+        3 │ select column2 from u;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_subquery_compound_select_column_order_by() {
         assert_snapshot!(goto("
 with t as (select 1 a)
@@ -5695,6 +5922,20 @@ select 2 a from t union select 1 order by a$0;
           ╭▸ 
         3 │ select 2 a from t union select 1 order by a;
           ╰╴         ─ 2. destination                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_compound_table_query_column_order_by() {
+        assert_snapshot!(goto("
+create table t(a int);
+table t union table t order by a$0;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ table t union table t order by a;
+          ╰╴                               ─ 1. source
         ");
     }
 
@@ -6042,6 +6283,52 @@ select b$0 from u;
           │                          ─ 2. destination
         3 │      u as (table t)
         4 │ select b from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_paren_table_query_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+with u as ((table t))
+select a$0 from u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ with u as ((table t))
+        4 │ select a from u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_paren_values_query_column() {
+        assert_snapshot!(goto("
+with u as ((values (1, 2)))
+select column2$0 from u;
+"), @"
+          ╭▸ 
+        2 │ with u as ((values (1, 2)))
+          │                        ─ 2. destination
+        3 │ select column2 from u;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_table_query_column_count_gap() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+with u as (table t)
+select b$0 from (select * from u) x(a);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ with u as (table t)
+        4 │ select b from (select * from u) x(a);
           ╰╴       ─ 1. source
         ");
     }
