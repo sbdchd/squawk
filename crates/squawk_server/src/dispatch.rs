@@ -3,9 +3,9 @@
 use std::panic::UnwindSafe;
 
 use anyhow::Result;
+use gen_lsp_types::{Notification as LspNotification, Request as LspRequest};
 use log::{error, info};
 use lsp_server::{Request, Response};
-use lsp_types::{notification::Notification as LspNotification, request::Request as LspRequest};
 use salsa::Cancelled;
 use serde::{Serialize, de::DeserializeOwned};
 use squawk_thread::ThreadIntent;
@@ -32,9 +32,11 @@ impl<'a> RequestDispatcher<'a> {
     where
         R: LspRequest,
     {
-        let req = self.req.take_if(|req| req.method.as_str() == R::METHOD)?;
+        let req = self
+            .req
+            .take_if(|req| req.method.as_str() == R::METHOD.as_str())?;
         let id = req.id.clone();
-        match from_json(R::METHOD, &req.params) {
+        match from_json(R::METHOD.as_str(), &req.params) {
             Ok(params) => Some((req, params)),
             Err(err) => {
                 let response = Response::new_err(
@@ -150,7 +152,7 @@ fn thread_result_to_response<R>(
     result: Result<anyhow::Result<R::Result>, PanicError>,
 ) -> Result<lsp_server::Response, PanicError>
 where
-    R: lsp_types::request::Request,
+    R: gen_lsp_types::Request,
     R::Params: DeserializeOwned,
     R::Result: Serialize,
 {
@@ -186,7 +188,7 @@ fn result_to_response<R>(
     result: anyhow::Result<R::Result>,
 ) -> std::result::Result<lsp_server::Response, Cancelled>
 where
-    R: lsp_types::request::Request,
+    R: gen_lsp_types::Request,
 {
     match result {
         Ok(resp) => Ok(lsp_server::Response::new_ok(id, &resp)),
@@ -230,9 +232,9 @@ impl<'a> NotificationDispatcher<'a> {
     {
         let notif = self
             .notif
-            .take_if(|notif| notif.method.as_str() == N::METHOD)?;
+            .take_if(|notif| notif.method.as_str() == N::METHOD.as_str())?;
 
-        match notif.extract(N::METHOD) {
+        match notif.extract(N::METHOD.as_str()) {
             Ok(params) => Some(params),
             Err(err) => {
                 error!("Failed to parse notification params: {err}");

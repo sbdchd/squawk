@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lsp_types::{Hover, HoverContents, HoverParams, MarkedString};
+use gen_lsp_types::{Contents, Hover, HoverParams, MarkupContent, MarkupKind};
 use squawk_ide::hover::hover;
 
 use crate::global_state::Snapshot;
@@ -16,7 +16,10 @@ pub(crate) fn handle_hover(snapshot: &Snapshot, params: HoverParams) -> Result<O
     let hover_info = hover(db, position);
 
     Ok(hover_info.map(|hover_info| Hover {
-        contents: HoverContents::Scalar(MarkedString::from_markdown(hover_info.markdown())),
+        contents: Contents::MarkupContent(MarkupContent {
+            kind: MarkupKind::Markdown,
+            value: hover_info.markdown(),
+        }),
         range: None,
     }))
 }

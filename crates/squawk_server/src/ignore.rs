@@ -165,7 +165,7 @@ create table c (
         ");
     }
 
-    fn apply_text_edits(sql: &str, mut edits: Vec<lsp_types::TextEdit>) -> String {
+    fn apply_text_edits(sql: &str, mut edits: Vec<gen_lsp_types::TextEdit>) -> String {
         use line_index::{LineCol, LineIndex};
 
         // Sort edits by position (reverse order to apply from end to start)
@@ -200,7 +200,7 @@ create table c (
         result
     }
 
-    fn lint_sql(sql: &str) -> Vec<lsp_types::Diagnostic> {
+    fn lint_sql(sql: &str) -> Vec<gen_lsp_types::Diagnostic> {
         let db = Database::default();
         let file = File::new(&db, sql.to_owned().into());
         lint(&db, file)

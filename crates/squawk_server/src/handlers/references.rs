@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lsp_types::{Location, ReferenceParams};
+use gen_lsp_types::{Location, ReferenceParams};
 use squawk_ide::find_references::find_references;
 
 use crate::global_state::Snapshot;
@@ -9,8 +9,8 @@ pub(crate) fn handle_references(
     snapshot: &Snapshot,
     params: ReferenceParams,
 ) -> Result<Option<Vec<Location>>> {
-    let uri = params.text_document_position.text_document.uri;
-    let position = params.text_document_position.position;
+    let uri = params.text_document_position_params.text_document.uri;
+    let position = params.text_document_position_params.position;
 
     let db = snapshot.db();
     let file = snapshot.file(&uri).unwrap();

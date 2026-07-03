@@ -1,18 +1,18 @@
 use anyhow::Result;
-use lsp_server::{Message, Notification};
-use lsp_types::{
+use gen_lsp_types::{
     CancelParams, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
-    DidOpenTextDocumentParams, PublishDiagnosticsParams,
-    notification::{Notification as _, PublishDiagnostics},
+    DidOpenTextDocumentParams, Id, Notification as _, PublishDiagnosticsNotification,
+    PublishDiagnosticsParams,
 };
+use lsp_server::{Message, Notification};
 
 use crate::global_state::GlobalState;
 use crate::lsp_utils;
 
 pub(crate) fn handle_cancel(state: &mut GlobalState, params: CancelParams) -> Result<()> {
     let id: lsp_server::RequestId = match params.id {
-        lsp_types::NumberOrString::Number(id) => id.into(),
-        lsp_types::NumberOrString::String(id) => id.into(),
+        Id::Int(id) => id.into(),
+        Id::String(id) => id.into(),
     };
     state.cancel(id);
     Ok(())
@@ -34,7 +34,7 @@ pub(crate) fn handle_did_change(
     state: &mut GlobalState,
     params: DidChangeTextDocumentParams,
 ) -> Result<()> {
-    let uri = params.text_document.uri;
+    let uri = params.text_document.text_document_identifier.uri;
 
     let db = state.db();
     let file = state.file(&uri).unwrap();
@@ -62,7 +62,7 @@ pub(crate) fn handle_did_close(
     };
 
     let notification = Notification {
-        method: PublishDiagnostics::METHOD.to_owned(),
+        method: PublishDiagnosticsNotification::METHOD.to_string(),
         params: serde_json::to_value(publish_params)?,
     };
 

@@ -1,6 +1,6 @@
 use ::line_index::LineIndex;
 use anyhow::Result;
-use lsp_types::{DocumentSymbol, DocumentSymbolParams, DocumentSymbolResponse, SymbolKind};
+use gen_lsp_types::{DocumentSymbol, DocumentSymbolParams, DocumentSymbolResponse, SymbolKind};
 use squawk_ide::db::line_index;
 use squawk_ide::document_symbols::{DocumentSymbolKind, document_symbols};
 
@@ -38,33 +38,33 @@ pub(crate) fn handle_document_symbol(
             name: sym.name,
             detail: sym.detail,
             kind: match sym.kind {
-                DocumentSymbolKind::Schema => SymbolKind::NAMESPACE,
-                DocumentSymbolKind::Table => SymbolKind::STRUCT,
-                DocumentSymbolKind::View => SymbolKind::STRUCT,
-                DocumentSymbolKind::MaterializedView => SymbolKind::STRUCT,
-                DocumentSymbolKind::Function => SymbolKind::FUNCTION,
-                DocumentSymbolKind::Aggregate => SymbolKind::FUNCTION,
-                DocumentSymbolKind::Procedure => SymbolKind::FUNCTION,
-                DocumentSymbolKind::Type => SymbolKind::CLASS,
-                DocumentSymbolKind::Enum => SymbolKind::ENUM,
-                DocumentSymbolKind::Index => SymbolKind::KEY,
-                DocumentSymbolKind::Domain => SymbolKind::CLASS,
-                DocumentSymbolKind::Sequence => SymbolKind::CONSTANT,
-                DocumentSymbolKind::Trigger => SymbolKind::EVENT,
-                DocumentSymbolKind::Tablespace => SymbolKind::NAMESPACE,
-                DocumentSymbolKind::Database => SymbolKind::MODULE,
-                DocumentSymbolKind::Server => SymbolKind::OBJECT,
-                DocumentSymbolKind::Extension => SymbolKind::PACKAGE,
-                DocumentSymbolKind::Column => SymbolKind::FIELD,
-                DocumentSymbolKind::Variant => SymbolKind::ENUM_MEMBER,
-                DocumentSymbolKind::Cursor => SymbolKind::VARIABLE,
-                DocumentSymbolKind::PreparedStatement => SymbolKind::VARIABLE,
-                DocumentSymbolKind::Channel => SymbolKind::EVENT,
-                DocumentSymbolKind::EventTrigger => SymbolKind::EVENT,
-                DocumentSymbolKind::Role => SymbolKind::CLASS,
-                DocumentSymbolKind::Rule => SymbolKind::EVENT,
-                DocumentSymbolKind::Policy => SymbolKind::VARIABLE,
-                DocumentSymbolKind::PropertyGraph => SymbolKind::STRUCT,
+                DocumentSymbolKind::Schema => SymbolKind::Namespace,
+                DocumentSymbolKind::Table => SymbolKind::Struct,
+                DocumentSymbolKind::View => SymbolKind::Struct,
+                DocumentSymbolKind::MaterializedView => SymbolKind::Struct,
+                DocumentSymbolKind::Function => SymbolKind::Function,
+                DocumentSymbolKind::Aggregate => SymbolKind::Function,
+                DocumentSymbolKind::Procedure => SymbolKind::Function,
+                DocumentSymbolKind::Type => SymbolKind::Class,
+                DocumentSymbolKind::Enum => SymbolKind::Enum,
+                DocumentSymbolKind::Index => SymbolKind::Key,
+                DocumentSymbolKind::Domain => SymbolKind::Class,
+                DocumentSymbolKind::Sequence => SymbolKind::Constant,
+                DocumentSymbolKind::Trigger => SymbolKind::Event,
+                DocumentSymbolKind::Tablespace => SymbolKind::Namespace,
+                DocumentSymbolKind::Database => SymbolKind::Module,
+                DocumentSymbolKind::Server => SymbolKind::Object,
+                DocumentSymbolKind::Extension => SymbolKind::Package,
+                DocumentSymbolKind::Column => SymbolKind::Field,
+                DocumentSymbolKind::Variant => SymbolKind::EnumMember,
+                DocumentSymbolKind::Cursor => SymbolKind::Variable,
+                DocumentSymbolKind::PreparedStatement => SymbolKind::Variable,
+                DocumentSymbolKind::Channel => SymbolKind::Event,
+                DocumentSymbolKind::EventTrigger => SymbolKind::Event,
+                DocumentSymbolKind::Role => SymbolKind::Class,
+                DocumentSymbolKind::Rule => SymbolKind::Event,
+                DocumentSymbolKind::Policy => SymbolKind::Variable,
+                DocumentSymbolKind::PropertyGraph => SymbolKind::Struct,
             },
             tags: None,
             range,
@@ -80,5 +80,7 @@ pub(crate) fn handle_document_symbol(
         .map(|sym| convert_symbol(sym, &line_index))
         .collect();
 
-    Ok(Some(DocumentSymbolResponse::Nested(lsp_symbols)))
+    Ok(Some(DocumentSymbolResponse::DocumentSymbolList(
+        lsp_symbols,
+    )))
 }

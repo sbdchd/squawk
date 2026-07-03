@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lsp_types::{FoldingRange, FoldingRangeParams};
+use gen_lsp_types::{FoldingRange, FoldingRangeParams};
 use squawk_ide::db::line_index;
 use squawk_ide::folding_ranges::folding_ranges;
 

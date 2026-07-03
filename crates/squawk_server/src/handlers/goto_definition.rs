@@ -1,5 +1,5 @@
 use anyhow::Result;
-use lsp_types::{GotoDefinitionParams, GotoDefinitionResponse};
+use gen_lsp_types::{Definition, DefinitionParams, DefinitionResponse};
 use squawk_ide::goto_definition::goto_definition;
 
 use crate::global_state::Snapshot;
@@ -7,8 +7,8 @@ use crate::lsp_utils::{self, to_location};
 
 pub(crate) fn handle_goto_definition(
     snapshot: &Snapshot,
-    params: GotoDefinitionParams,
-) -> Result<Option<GotoDefinitionResponse>> {
+    params: DefinitionParams,
+) -> Result<Option<DefinitionResponse>> {
     let uri = params.text_document_position_params.text_document.uri;
     let position = params.text_document_position_params.position;
 
@@ -27,5 +27,7 @@ pub(crate) fn handle_goto_definition(
         })
         .collect();
 
-    Ok(Some(GotoDefinitionResponse::Array(ranges)))
+    Ok(Some(DefinitionResponse::Definition(
+        Definition::LocationList(ranges),
+    )))
 }

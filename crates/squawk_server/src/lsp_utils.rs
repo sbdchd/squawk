@@ -3,22 +3,23 @@ use std::ops::Range;
 use rustc_hash::FxHashMap;
 
 use ::line_index::{LineIndex, TextRange, TextSize};
-use log::warn;
-use lsp_types::{
+use gen_lsp_types::{
     CodeAction, CodeActionKind, FoldingRange, FoldingRangeKind as LspFoldingRangeKind, Location,
-    SemanticToken, Url, WorkspaceEdit,
+    SemanticToken, TextDocumentContentChangeEvent, WorkspaceEdit,
 };
+use log::warn;
 use salsa::Database as Db;
 use squawk_ide::code_actions::ActionKind;
 use squawk_ide::db::{File, line_index};
 use squawk_ide::file::InFile;
 use squawk_ide::folding_ranges::{Fold, FoldKind};
 use squawk_ide::semantic_tokens::{SemanticTokenModifier, SemanticTokenType};
+use url::Url;
 
 use crate::global_state::Snapshot;
 use crate::semantic_tokens;
 
-pub(crate) fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
+pub(crate) fn text_range(index: &LineIndex, range: gen_lsp_types::Range) -> Option<TextRange> {
     let start = text_size(index, range.start)?;
     let end = text_size(index, range.end)?;
     if end >= start {
@@ -33,7 +34,7 @@ pub(crate) fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<T
     }
 }
 
-fn text_size(index: &LineIndex, position: lsp_types::Position) -> Option<TextSize> {
+fn text_size(index: &LineIndex, position: gen_lsp_types::Position) -> Option<TextSize> {
     let line_range = index.line(position.line)?;
 
     let col = TextSize::from(position.character);
@@ -54,7 +55,7 @@ fn text_size(index: &LineIndex, position: lsp_types::Position) -> Option<TextSiz
 pub(crate) fn offset(
     db: &dyn Db,
     file: File,
-    position: lsp_types::Position,
+    position: gen_lsp_types::Position,
 ) -> Option<InFile<TextSize>> {
     let line_index = line_index(db, file);
     let offset = text_size(&line_index, position)?;
@@ -65,28 +66,31 @@ pub(crate) fn code_action(
     line_index: &LineIndex,
     uri: Url,
     action: squawk_ide::code_actions::CodeAction,
-) -> lsp_types::CodeAction {
+) -> gen_lsp_types::CodeAction {
     let kind = match action.kind {
-        ActionKind::QuickFix => CodeActionKind::QUICKFIX,
-        ActionKind::RefactorRewrite => CodeActionKind::REFACTOR_REWRITE,
+        ActionKind::QuickFix => CodeActionKind::QuickFix,
+        ActionKind::RefactorRewrite => CodeActionKind::RefactorRewrite,
     };
 
     CodeAction {
         title: action.title,
         kind: Some(kind),
-        edit: Some(WorkspaceEdit::new({
-            let mut changes = FxHashMap::default();
-            let edits = action
-                .edits
-                .into_iter()
-                .map(|edit| lsp_types::TextEdit {
-                    range: range(line_index, edit.text_range),
-                    new_text: edit.text.unwrap_or_default(),
-                })
-                .collect();
-            changes.insert(uri, edits);
-            changes.into_iter().collect()
-        })),
+        edit: Some(WorkspaceEdit {
+            changes: Some({
+                let mut changes = FxHashMap::default();
+                let edits = action
+                    .edits
+                    .into_iter()
+                    .map(|edit| gen_lsp_types::TextEdit {
+                        range: range(line_index, edit.text_range),
+                        new_text: edit.text.unwrap_or_default(),
+                    })
+                    .collect();
+                changes.insert(uri, edits);
+                changes.into_iter().collect()
+            }),
+            ..Default::default()
+        }),
         is_preferred: Some(true),
         ..Default::default()
     }
@@ -94,30 +98,31 @@ pub(crate) fn code_action(
 
 pub(crate) fn completion_item(
     item: squawk_ide::completion::CompletionItem,
-) -> lsp_types::CompletionItem {
+) -> gen_lsp_types::CompletionItem {
     use squawk_ide::completion::{CompletionInsertTextFormat, CompletionItemKind};
 
     let kind = match item.kind {
-        CompletionItemKind::Schema => lsp_types::CompletionItemKind::MODULE,
-        CompletionItemKind::Keyword => lsp_types::CompletionItemKind::KEYWORD,
-        CompletionItemKind::Table => lsp_types::CompletionItemKind::STRUCT,
-        CompletionItemKind::Column => lsp_types::CompletionItemKind::FIELD,
-        CompletionItemKind::Function => lsp_types::CompletionItemKind::FUNCTION,
-        CompletionItemKind::Type => lsp_types::CompletionItemKind::CLASS,
-        CompletionItemKind::Snippet => lsp_types::CompletionItemKind::SNIPPET,
-        CompletionItemKind::Operator => lsp_types::CompletionItemKind::OPERATOR,
+        CompletionItemKind::Schema => gen_lsp_types::CompletionItemKind::Module,
+        CompletionItemKind::Keyword => gen_lsp_types::CompletionItemKind::Keyword,
+        CompletionItemKind::Table => gen_lsp_types::CompletionItemKind::Struct,
+        CompletionItemKind::Column => gen_lsp_types::CompletionItemKind::Field,
+        CompletionItemKind::Function => gen_lsp_types::CompletionItemKind::Function,
+        CompletionItemKind::Type => gen_lsp_types::CompletionItemKind::Class,
+        CompletionItemKind::Snippet => gen_lsp_types::CompletionItemKind::Snippet,
+        CompletionItemKind::Operator => gen_lsp_types::CompletionItemKind::Operator,
     };
 
     let sort_text = Some(item.sort_text());
 
     let insert_text_format = item.insert_text_format.map(|x| match x {
-        CompletionInsertTextFormat::PlainText => lsp_types::InsertTextFormat::PLAIN_TEXT,
-        CompletionInsertTextFormat::Snippet => lsp_types::InsertTextFormat::SNIPPET,
+        CompletionInsertTextFormat::PlainText => gen_lsp_types::InsertTextFormat::PlainText,
+        CompletionInsertTextFormat::Snippet => gen_lsp_types::InsertTextFormat::Snippet,
     });
 
     let command = if item.trigger_completion_after_insert {
-        Some(lsp_types::Command {
+        Some(gen_lsp_types::Command {
             title: "Trigger Completion".to_owned(),
+            tooltip: None,
             command: "editor.action.triggerSuggest".to_owned(),
             arguments: None,
         })
@@ -127,14 +132,14 @@ pub(crate) fn completion_item(
 
     let label_details = item
         .detail
-        .map(|detail| lsp_types::CompletionItemLabelDetails {
+        .map(|detail| gen_lsp_types::CompletionItemLabelDetails {
             detail: None,
             // Use description instead of detail so VSCode puts it to the right
             // of the item's name instead of smushing them together.
             description: Some(detail),
         });
 
-    lsp_types::CompletionItem {
+    gen_lsp_types::CompletionItem {
         label: item.label,
         kind: Some(kind),
         // We use label_details instead of detail so that VSCode shows the type
@@ -150,13 +155,13 @@ pub(crate) fn completion_item(
     }
 }
 
-pub(crate) fn range(line_index: &LineIndex, range: TextRange) -> lsp_types::Range {
+pub(crate) fn range(line_index: &LineIndex, range: TextRange) -> gen_lsp_types::Range {
     let start = line_index.line_col(range.start());
     let end = line_index.line_col(range.end());
 
-    lsp_types::Range::new(
-        lsp_types::Position::new(start.line, start.col),
-        lsp_types::Position::new(end.line, end.col),
+    gen_lsp_types::Range::new(
+        gen_lsp_types::Position::new(start.line, start.col),
+        gen_lsp_types::Position::new(end.line, end.col),
     )
 }
 
@@ -181,19 +186,26 @@ pub(crate) fn folding_range(line_index: &LineIndex, fold: Fold) -> FoldingRange 
 // see: https://github.com/rust-lang/rust-analyzer/blob/3816d0ae53c19fe75532a8b41d8c546d94246b53/crates/rust-analyzer/src/lsp/utils.rs#L168C1-L168C1
 pub(crate) fn apply_incremental_changes(
     content: &str,
-    mut content_changes: Vec<lsp_types::TextDocumentContentChangeEvent>,
+    mut content_changes: Vec<TextDocumentContentChangeEvent>,
 ) -> String {
     // If at least one of the changes is a full document change, use the last
     // of them as the starting point and ignore all previous changes.
-    let (mut text, content_changes) = match content_changes
-        .iter()
-        .rposition(|change| change.range.is_none())
-    {
+    let (mut text, content_changes) = match content_changes.iter().rposition(|change| {
+        matches!(
+            change,
+            TextDocumentContentChangeEvent::TextDocumentContentChangeWholeDocument(_)
+        )
+    }) {
         Some(idx) => {
-            let text = std::mem::take(&mut content_changes[idx].text);
-            (text, &content_changes[idx + 1..])
+            let tail = content_changes.split_off(idx + 1);
+            let TextDocumentContentChangeEvent::TextDocumentContentChangeWholeDocument(whole) =
+                content_changes.pop().expect("idx is a valid index")
+            else {
+                unreachable!("checked above via rposition")
+            };
+            (whole.text, tail)
         }
-        None => (content.to_owned(), &content_changes[..]),
+        None => (content.to_owned(), content_changes),
     };
 
     if content_changes.is_empty() {
@@ -208,15 +220,18 @@ pub(crate) fn apply_incremental_changes(
     // remember the last valid line in the index and only rebuild it if needed.
     let mut index_valid = !0u32;
     for change in content_changes {
-        // The None case can't happen as we have handled it above already
-        if let Some(range) = change.range {
-            if index_valid <= range.end.line {
-                line_index = LineIndex::new(&text);
-            }
-            index_valid = range.start.line;
-            if let Some(range) = text_range(&line_index, range) {
-                text.replace_range(Range::<usize>::from(range), &change.text);
-            }
+        // The whole-document case can't happen as we have handled it above already
+        let TextDocumentContentChangeEvent::TextDocumentContentChangePartial(partial) = change
+        else {
+            continue;
+        };
+        let range = partial.range;
+        if index_valid <= range.end.line {
+            line_index = LineIndex::new(&text);
+        }
+        index_valid = range.start.line;
+        if let Some(range) = text_range(&line_index, range) {
+            text.replace_range(Range::<usize>::from(range), &partial.text);
         }
     }
 
@@ -239,7 +254,7 @@ pub(crate) fn to_semantic_tokens(
     text: &str,
     line_index: LineIndex,
     semantic_tokens: Vec<squawk_ide::semantic_tokens::SemanticToken>,
-) -> Vec<lsp_types::SemanticToken> {
+) -> Vec<gen_lsp_types::SemanticToken> {
     let mut encoder = Encoder {
         tokens: Vec::with_capacity(semantic_tokens.len()),
         prev_line: 0,
@@ -276,7 +291,7 @@ struct Encoder {
 impl Encoder {
     fn push_token_at(
         &mut self,
-        start: lsp_types::Position,
+        start: gen_lsp_types::Position,
         length: u32,
         ty: SemanticTokenType,
         _modifiers: Option<SemanticTokenModifier>,
@@ -307,34 +322,54 @@ impl Encoder {
     }
 }
 
-fn to_token_type(ty: SemanticTokenType) -> lsp_types::SemanticTokenType {
+fn to_token_type(ty: SemanticTokenType) -> gen_lsp_types::SemanticTokenTypes {
     match ty {
-        SemanticTokenType::Keyword => lsp_types::SemanticTokenType::KEYWORD,
-        SemanticTokenType::String => lsp_types::SemanticTokenType::STRING,
-        SemanticTokenType::Bool => lsp_types::SemanticTokenType::KEYWORD,
-        SemanticTokenType::Number => lsp_types::SemanticTokenType::NUMBER,
-        SemanticTokenType::Function => lsp_types::SemanticTokenType::FUNCTION,
-        SemanticTokenType::Operator => lsp_types::SemanticTokenType::OPERATOR,
-        SemanticTokenType::Punctuation => lsp_types::SemanticTokenType::OPERATOR,
-        SemanticTokenType::Name => lsp_types::SemanticTokenType::VARIABLE,
-        SemanticTokenType::NameRef => lsp_types::SemanticTokenType::VARIABLE,
-        SemanticTokenType::Comment => lsp_types::SemanticTokenType::COMMENT,
-        SemanticTokenType::Type => lsp_types::SemanticTokenType::TYPE,
+        SemanticTokenType::Keyword => gen_lsp_types::SemanticTokenTypes::Keyword,
+        SemanticTokenType::String => gen_lsp_types::SemanticTokenTypes::String,
+        SemanticTokenType::Bool => gen_lsp_types::SemanticTokenTypes::Keyword,
+        SemanticTokenType::Number => gen_lsp_types::SemanticTokenTypes::Number,
+        SemanticTokenType::Function => gen_lsp_types::SemanticTokenTypes::Function,
+        SemanticTokenType::Operator => gen_lsp_types::SemanticTokenTypes::Operator,
+        SemanticTokenType::Punctuation => gen_lsp_types::SemanticTokenTypes::Operator,
+        SemanticTokenType::Name => gen_lsp_types::SemanticTokenTypes::Variable,
+        SemanticTokenType::NameRef => gen_lsp_types::SemanticTokenTypes::Variable,
+        SemanticTokenType::Comment => gen_lsp_types::SemanticTokenTypes::Comment,
+        SemanticTokenType::Type => gen_lsp_types::SemanticTokenTypes::Type,
         SemanticTokenType::PositionalParam | SemanticTokenType::Parameter => {
-            lsp_types::SemanticTokenType::PARAMETER
+            gen_lsp_types::SemanticTokenTypes::Parameter
         }
-        SemanticTokenType::Column => lsp_types::SemanticTokenType::VARIABLE,
+        SemanticTokenType::Column => gen_lsp_types::SemanticTokenTypes::Variable,
         SemanticTokenType::PropertyGraph | SemanticTokenType::Table => {
-            lsp_types::SemanticTokenType::STRUCT
+            gen_lsp_types::SemanticTokenTypes::Struct
         }
-        SemanticTokenType::Schema => lsp_types::SemanticTokenType::NAMESPACE,
+        SemanticTokenType::Schema => gen_lsp_types::SemanticTokenTypes::Namespace,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use lsp_types::{Position, Range, TextDocumentContentChangeEvent};
+    use gen_lsp_types::{
+        Position, Range, TextDocumentContentChangePartial, TextDocumentContentChangeWholeDocument,
+    };
+
+    fn partial_change(range: Range, text: &str) -> TextDocumentContentChangeEvent {
+        TextDocumentContentChangeEvent::TextDocumentContentChangePartial(
+            TextDocumentContentChangePartial {
+                range,
+                text: text.to_string(),
+                ..Default::default()
+            },
+        )
+    }
+
+    fn whole_change(text: &str) -> TextDocumentContentChangeEvent {
+        TextDocumentContentChangeEvent::TextDocumentContentChangeWholeDocument(
+            TextDocumentContentChangeWholeDocument {
+                text: text.to_string(),
+            },
+        )
+    }
 
     #[test]
     fn apply_incremental_changes_no_changes() {
@@ -347,11 +382,7 @@ mod tests {
     #[test]
     fn apply_incremental_changes_full_document_change() {
         let content = "old content";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: None,
-            range_length: None,
-            text: "new content".to_string(),
-        }];
+        let changes = vec![whole_change("new content")];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "new content");
     }
@@ -359,11 +390,10 @@ mod tests {
     #[test]
     fn apply_incremental_changes_single_line_edit() {
         let content = "hello world";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(0, 6), Position::new(0, 11))),
-            range_length: None,
-            text: "rust".to_string(),
-        }];
+        let changes = vec![partial_change(
+            Range::new(Position::new(0, 6), Position::new(0, 11)),
+            "rust",
+        )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "hello rust");
     }
@@ -372,16 +402,14 @@ mod tests {
     fn apply_incremental_changes_multiple_edits() {
         let content = "line 1\nline 2\nline 3";
         let changes = vec![
-            TextDocumentContentChangeEvent {
-                range: Some(Range::new(Position::new(0, 4), Position::new(0, 6))),
-                range_length: None,
-                text: " updated".to_string(),
-            },
-            TextDocumentContentChangeEvent {
-                range: Some(Range::new(Position::new(2, 4), Position::new(2, 6))),
-                range_length: None,
-                text: " also updated".to_string(),
-            },
+            partial_change(
+                Range::new(Position::new(0, 4), Position::new(0, 6)),
+                " updated",
+            ),
+            partial_change(
+                Range::new(Position::new(2, 4), Position::new(2, 6)),
+                " also updated",
+            ),
         ];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "line updated\nline 2\nline also updated");
@@ -390,11 +418,10 @@ mod tests {
     #[test]
     fn apply_incremental_changes_insertion() {
         let content = "hello world";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(0, 5), Position::new(0, 5))),
-            range_length: None,
-            text: " foo".to_string(),
-        }];
+        let changes = vec![partial_change(
+            Range::new(Position::new(0, 5), Position::new(0, 5)),
+            " foo",
+        )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "hello foo world");
     }
@@ -402,11 +429,10 @@ mod tests {
     #[test]
     fn apply_incremental_changes_deletion() {
         let content = "hello foo world";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(0, 5), Position::new(0, 9))),
-            range_length: None,
-            text: "".to_string(),
-        }];
+        let changes = vec![partial_change(
+            Range::new(Position::new(0, 5), Position::new(0, 9)),
+            "",
+        )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "hello world");
     }
@@ -414,11 +440,10 @@ mod tests {
     #[test]
     fn apply_incremental_changes_multiline_edit() {
         let content = "line 1\nline 2\nline 3";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(0, 6), Position::new(1, 6))),
-            range_length: None,
-            text: " and\nreplaced".to_string(),
-        }];
+        let changes = vec![partial_change(
+            Range::new(Position::new(0, 6), Position::new(1, 6)),
+            " and\nreplaced",
+        )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "line 1 and\nreplaced\nline 3");
     }
@@ -427,16 +452,11 @@ mod tests {
     fn apply_incremental_changes_full_then_incremental() {
         let content = "original";
         let changes = vec![
-            TextDocumentContentChangeEvent {
-                range: None,
-                range_length: None,
-                text: "hello world".to_string(),
-            },
-            TextDocumentContentChangeEvent {
-                range: Some(Range::new(Position::new(0, 6), Position::new(0, 11))),
-                range_length: None,
-                text: "rust".to_string(),
-            },
+            whole_change("hello world"),
+            partial_change(
+                Range::new(Position::new(0, 6), Position::new(0, 11)),
+                "rust",
+            ),
         ];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "hello rust");
@@ -445,11 +465,10 @@ mod tests {
     #[test]
     fn apply_incremental_changes_invalid_range_ignored() {
         let content = "hello";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(10, 0), Position::new(10, 5))),
-            range_length: None,
-            text: "invalid".to_string(),
-        }];
+        let changes = vec![partial_change(
+            Range::new(Position::new(10, 0), Position::new(10, 5)),
+            "invalid",
+        )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "hello");
     }
@@ -457,11 +476,10 @@ mod tests {
     #[test]
     fn apply_incremental_changes_with_invalid_line_no() {
         let content = "hello world";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(10, 0), Position::new(10, 5))),
-            range_length: None,
-            text: "invalid".to_string(),
-        }];
+        let changes = vec![partial_change(
+            Range::new(Position::new(10, 0), Position::new(10, 5)),
+            "invalid",
+        )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "hello world");
     }
@@ -469,11 +487,10 @@ mod tests {
     #[test]
     fn apply_incremental_changes_column_clamping() {
         let content = "short\nlong line";
-        let changes = vec![TextDocumentContentChangeEvent {
-            range: Some(Range::new(Position::new(0, 3), Position::new(0, 100))),
-            range_length: None,
-            text: " extended".to_string(),
-        }];
+        let changes = vec![partial_change(
+            Range::new(Position::new(0, 3), Position::new(0, 100)),
+            " extended",
+        )];
         let result = apply_incremental_changes(content, changes);
         assert_eq!(result, "sho extendedlong line");
     }

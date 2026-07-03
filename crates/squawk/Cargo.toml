@@ -39,7 +39,6 @@ anyhow.workspace = true
 annotate-snippets.workspace = true
 line-index.workspace = true
 lsp-server.workspace = true
-lsp-types.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

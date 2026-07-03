@@ -1,13 +1,13 @@
 use anyhow::Result;
+use gen_lsp_types::{LspRequestMethod, MessageDirection, Request};
 use log::info;
-use lsp_types::request::Request;
 
 use crate::global_state::Snapshot;
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub(crate) struct TokensParams {
     #[serde(rename = "textDocument")]
-    text_document: lsp_types::TextDocumentIdentifier,
+    text_document: gen_lsp_types::TextDocumentIdentifier,
 }
 
 pub(crate) enum TokensRequest {}
@@ -15,7 +15,8 @@ pub(crate) enum TokensRequest {}
 impl Request for TokensRequest {
     type Params = TokensParams;
     type Result = String;
-    const METHOD: &'static str = "squawk/tokens";
+    const METHOD: LspRequestMethod<'static> = LspRequestMethod::new("squawk/tokens");
+    const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
 pub(crate) fn handle_tokens(snapshot: &Snapshot, params: TokensParams) -> Result<String> {

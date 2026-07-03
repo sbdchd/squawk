@@ -1,14 +1,14 @@
 use anyhow::Result;
+use gen_lsp_types::{
+    CodeActionKind, CodeActionOptions, CodeActionProvider, CompletionOptions, DefinitionProvider,
+    DiagnosticOptions, DiagnosticProvider, DocumentSymbolProvider, FoldingRangeProvider, Full,
+    HoverProvider, InitializeParams, InlayHintProvider, ReferencesProvider, SelectionRangeProvider,
+    SemanticTokensLegend, SemanticTokensOptions, SemanticTokensOptionsRange,
+    SemanticTokensProvider, ServerCapabilities, TextDocumentSync, TextDocumentSyncKind,
+    WorkDoneProgressOptions,
+};
 use log::info;
 use lsp_server::Connection;
-use lsp_types::{
-    CodeActionKind, CodeActionOptions, CodeActionProviderCapability, CompletionOptions,
-    DiagnosticOptions, DiagnosticServerCapabilities, FoldingRangeProviderCapability,
-    HoverProviderCapability, InitializeParams, OneOf, SelectionRangeProviderCapability,
-    SemanticTokensFullOptions, SemanticTokensLegend, SemanticTokensOptions,
-    SemanticTokensServerCapabilities, ServerCapabilities, TextDocumentSyncCapability,
-    TextDocumentSyncKind, WorkDoneProgressOptions,
-};
 
 use crate::{
     global_state::GlobalState,
@@ -21,25 +21,24 @@ pub fn run() -> Result<()> {
     let (connection, io_threads) = Connection::stdio();
 
     let server_capabilities = serde_json::to_value(&ServerCapabilities {
-        text_document_sync: Some(TextDocumentSyncCapability::Kind(
-            TextDocumentSyncKind::INCREMENTAL,
-        )),
-        code_action_provider: Some(CodeActionProviderCapability::Options(CodeActionOptions {
+        text_document_sync: Some(TextDocumentSync::Kind(TextDocumentSyncKind::Incremental)),
+        code_action_provider: Some(CodeActionProvider::CodeActionOptions(CodeActionOptions {
             code_action_kinds: Some(vec![
-                CodeActionKind::QUICKFIX,
-                CodeActionKind::REFACTOR_REWRITE,
+                CodeActionKind::QuickFix,
+                CodeActionKind::RefactorRewrite,
             ]),
             work_done_progress_options: WorkDoneProgressOptions {
                 work_done_progress: None,
             },
             resolve_provider: None,
+            documentation: None,
         })),
-        selection_range_provider: Some(SelectionRangeProviderCapability::Simple(true)),
-        references_provider: Some(OneOf::Left(true)),
-        definition_provider: Some(OneOf::Left(true)),
-        hover_provider: Some(HoverProviderCapability::Simple(true)),
-        inlay_hint_provider: Some(OneOf::Left(true)),
-        diagnostic_provider: Some(DiagnosticServerCapabilities::Options(DiagnosticOptions {
+        selection_range_provider: Some(SelectionRangeProvider::Bool(true)),
+        references_provider: Some(ReferencesProvider::Bool(true)),
+        definition_provider: Some(DefinitionProvider::Bool(true)),
+        hover_provider: Some(HoverProvider::Bool(true)),
+        inlay_hint_provider: Some(InlayHintProvider::Bool(true)),
+        diagnostic_provider: Some(DiagnosticProvider::DiagnosticOptions(DiagnosticOptions {
             identifier: None,
             inter_file_dependencies: false,
             workspace_diagnostics: false,
@@ -47,8 +46,8 @@ pub fn run() -> Result<()> {
                 work_done_progress: None,
             },
         })),
-        document_symbol_provider: Some(OneOf::Left(true)),
-        folding_range_provider: Some(FoldingRangeProviderCapability::Simple(true)),
+        document_symbol_provider: Some(DocumentSymbolProvider::Bool(true)),
+        folding_range_provider: Some(FoldingRangeProvider::Bool(true)),
         completion_provider: Some(CompletionOptions {
             resolve_provider: Some(false),
             trigger_characters: Some(vec![".".to_owned()]),
@@ -58,17 +57,21 @@ pub fn run() -> Result<()> {
             },
             completion_item: None,
         }),
-        semantic_tokens_provider: Some(SemanticTokensServerCapabilities::SemanticTokensOptions(
+        semantic_tokens_provider: Some(SemanticTokensProvider::SemanticTokensOptions(
             SemanticTokensOptions {
                 work_done_progress_options: WorkDoneProgressOptions {
                     work_done_progress: None,
                 },
                 legend: SemanticTokensLegend {
-                    token_types: SUPPORTED_TYPES.to_vec(),
-                    token_modifiers: SUPPORTED_MODIFIERS.to_vec(),
+                    token_types: SUPPORTED_TYPES.iter().cloned().map(String::from).collect(),
+                    token_modifiers: SUPPORTED_MODIFIERS
+                        .iter()
+                        .cloned()
+                        .map(String::from)
+                        .collect(),
                 },
-                range: Some(true),
-                full: Some(SemanticTokensFullOptions::Bool(true)),
+                range: Some(SemanticTokensOptionsRange::Bool(true)),
+                full: Some(Full::Bool(true)),
             },
         )),
         ..Default::default()
