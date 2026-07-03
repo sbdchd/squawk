@@ -1,8 +1,11 @@
 use ::line_index::LineIndex;
-use lsp_types::{CodeDescription, Diagnostic, DiagnosticSeverity, Position, Range, TextEdit, Url};
+use gen_lsp_types::{
+    Code, CodeDescription, Diagnostic, DiagnosticSeverity, Message, Position, Range, TextEdit,
+};
 use salsa::Database as Db;
 use squawk_ide::db::{File, line_index as file_line_index, parse};
 use squawk_linter::{Edit, Linter};
+use url::Url;
 
 use crate::{
     diagnostic::{AssociatedDiagnosticData, DIAGNOSTIC_NAME},
@@ -45,15 +48,13 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
                 Position::new(start_line_col.line, start_line_col.col),
                 Position::new(end_line_col.line, end_line_col.col),
             ),
-            severity: Some(DiagnosticSeverity::ERROR),
-            code: Some(lsp_types::NumberOrString::String(
-                "syntax-error".to_string(),
-            )),
+            severity: Some(DiagnosticSeverity::Error),
+            code: Some(Code::String("syntax-error".to_string())),
             code_description: Some(CodeDescription {
                 href: Url::parse("https://squawkhq.com/docs/syntax-error").unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: error.message().to_string(),
+            message: Message::String(error.message().to_string()),
             ..Default::default()
         };
         diagnostics.push(diagnostic);
@@ -97,15 +98,13 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
                 Position::new(start_line_col.line, start_line_col.col),
                 Position::new(end_line_col.line, end_line_col.col),
             ),
-            severity: Some(DiagnosticSeverity::WARNING),
-            code: Some(lsp_types::NumberOrString::String(
-                violation.code.to_string(),
-            )),
+            severity: Some(DiagnosticSeverity::Warning),
+            code: Some(Code::String(violation.code.to_string())),
             code_description: Some(CodeDescription {
                 href: Url::parse(&format!("https://squawkhq.com/docs/{}", violation.code)).unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: violation.message,
+            message: Message::String(violation.message),
             data: Some(serde_json::to_value(data).unwrap()),
             ..Default::default()
         };

@@ -1,23 +1,24 @@
 use std::{num::NonZeroUsize, sync::Arc, time::Instant};
 
 use crossbeam_channel::{Receiver, Sender, select, unbounded};
+use gen_lsp_types::Notification as _;
+use gen_lsp_types::{
+    CancelNotification, DidChangeTextDocumentNotification, DidCloseTextDocumentNotification,
+    DidOpenTextDocumentNotification, ExitNotification,
+};
 use log::info;
 use lsp_server::{Message, Request, Response};
-use lsp_types::Url;
-use lsp_types::notification::Notification as _;
-use lsp_types::notification::{
-    Cancel, DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument,
-};
 use rustc_hash::FxHashMap;
 use salsa::Setter;
 use squawk_ide::builtins::{builtins_file, builtins_url};
 use squawk_ide::db::{Database, File};
 use squawk_thread::TaskPool;
+use url::Url;
 
-use lsp_types::request::{
-    CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
-    FoldingRangeRequest, GotoDefinition, HoverRequest, InlayHintRequest, References,
-    SelectionRangeRequest, SemanticTokensFullRequest, SemanticTokensRangeRequest, Shutdown,
+use gen_lsp_types::{
+    CodeActionRequest, CompletionRequest, DefinitionRequest, DocumentDiagnosticRequest,
+    DocumentSymbolRequest, FoldingRangeRequest, HoverRequest, InlayHintRequest, ReferencesRequest,
+    SelectionRangeRequest, SemanticTokensRangeRequest, SemanticTokensRequest, ShutdownRequest,
 };
 
 use crate::dispatch::{NotificationDispatcher, RequestDispatcher};
@@ -161,15 +162,15 @@ impl GlobalState {
                     Message::Notification(notif) => {
                         info!("Received notification: method={}", notif.method);
 
-                        if notif.method == lsp_types::notification::Exit::METHOD {
+                        if notif.method == ExitNotification::METHOD.as_str() {
                             return Ok(());
                         }
 
                         NotificationDispatcher::new(notif, self)
-                            .on::<Cancel>(handle_cancel)?
-                            .on::<DidOpenTextDocument>(handle_did_open)?
-                            .on::<DidChangeTextDocument>(handle_did_change)?
-                            .on::<DidCloseTextDocument>(handle_did_close)?
+                            .on::<CancelNotification>(handle_cancel)?
+                            .on::<DidOpenTextDocumentNotification>(handle_did_open)?
+                            .on::<DidChangeTextDocumentNotification>(handle_did_change)?
+                            .on::<DidCloseTextDocumentNotification>(handle_did_close)?
                             .finish();
                     }
                 },
@@ -229,14 +230,14 @@ impl GlobalState {
         RequestDispatcher::new(req, self)
             // Request handlers that must run on the main thread because they
             // mutate GlobalState:
-            .on_sync_mut::<Shutdown>(handle_shutdown)
+            .on_sync_mut::<ShutdownRequest>(handle_shutdown)
             // Request handlers which are related to the user typing are run on
             // the main thread to reduce latency:
             .on_sync::<SelectionRangeRequest>(handle_selection_range)
             // latency-sensitive but can't run on the main thread due to
             // semantic analysis, so we use a higher priority thread
-            .on_latency_sensitive::<RETRY, Completion>(handle_completion)
-            .on::<NO_RETRY, GotoDefinition>(handle_goto_definition)
+            .on_latency_sensitive::<RETRY, CompletionRequest>(handle_completion)
+            .on::<NO_RETRY, DefinitionRequest>(handle_goto_definition)
             .on::<NO_RETRY, HoverRequest>(handle_hover)
             .on::<NO_RETRY, CodeActionRequest>(handle_code_action)
             .on::<NO_RETRY, InlayHintRequest>(handle_inlay_hints)
@@ -245,8 +246,8 @@ impl GlobalState {
             .on::<NO_RETRY, DocumentDiagnosticRequest>(handle_document_diagnostic)
             .on::<NO_RETRY, SyntaxTreeRequest>(handle_syntax_tree)
             .on::<NO_RETRY, TokensRequest>(handle_tokens)
-            .on::<NO_RETRY, References>(handle_references)
-            .on::<NO_RETRY, SemanticTokensFullRequest>(handle_semantic_tokens_full)
+            .on::<NO_RETRY, ReferencesRequest>(handle_references)
+            .on::<NO_RETRY, SemanticTokensRequest>(handle_semantic_tokens_full)
             .on::<NO_RETRY, SemanticTokensRangeRequest>(handle_semantic_tokens_range)
             .finish();
     }

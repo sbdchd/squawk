@@ -1,6 +1,6 @@
 use anyhow::Result;
+use gen_lsp_types::{LspRequestMethod, MessageDirection, Request};
 use log::info;
-use lsp_types::request::Request;
 use squawk_ide::db::parse;
 
 use crate::global_state::Snapshot;
@@ -8,7 +8,7 @@ use crate::global_state::Snapshot;
 #[derive(serde::Deserialize, serde::Serialize)]
 pub(crate) struct SyntaxTreeParams {
     #[serde(rename = "textDocument")]
-    text_document: lsp_types::TextDocumentIdentifier,
+    text_document: gen_lsp_types::TextDocumentIdentifier,
 }
 
 pub(crate) enum SyntaxTreeRequest {}
@@ -16,7 +16,8 @@ pub(crate) enum SyntaxTreeRequest {}
 impl Request for SyntaxTreeRequest {
     type Params = SyntaxTreeParams;
     type Result = String;
-    const METHOD: &'static str = "squawk/syntaxTree";
+    const METHOD: LspRequestMethod<'static> = LspRequestMethod::new("squawk/syntaxTree");
+    const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
 pub(crate) fn handle_syntax_tree(snapshot: &Snapshot, params: SyntaxTreeParams) -> Result<String> {
