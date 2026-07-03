@@ -12318,7 +12318,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(AS_KW);
     match stmt(p, &StmtRestrictions::default()) {
         Some(statement) => match statement.kind() {
-            SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | TABLE => (),
+            SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | TABLE | PAREN_SELECT => (),
             kind => p.error(format!("expected SELECT, got {kind:?}")),
         },
         None => p.error("expected SELECT"),
@@ -12548,7 +12548,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
     // select stmt
     let statement = stmt(p, &StmtRestrictions::default());
     match statement.map(|x| x.kind()) {
-        Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
+        Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES | PAREN_SELECT) => (),
         Some(kind) => {
             p.error(format!(
                 "expected SELECT, TABLE, or VALUES statement, got {kind:?}",
@@ -13461,7 +13461,10 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Complete
     path_name_ref(p);
     opt_as_alias_with_as(p);
     // [ ( column_name [, ...] ) ]
-    opt_column_ref_list(p);
+    // a leading `(` may open a parenthesized query instead of a column list
+    if !(p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST)) {
+        opt_column_ref_list(p);
+    }
     // [ OVERRIDING { SYSTEM | USER } VALUE ]
     if p.eat(OVERRIDING_KW) {
         let _ = p.eat(SYSTEM_KW) || p.expect(USER_KW);
@@ -13470,8 +13473,6 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Complete
     // { DEFAULT VALUES | VALUES ( { expression | DEFAULT } [, ...] ) [, ...] | query }
     if p.eat(DEFAULT_KW) {
         p.expect(VALUES_KW);
-    } else if p.at(VALUES_KW) {
-        values(p, None, false);
     } else {
         query(p);
     }

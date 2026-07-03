@@ -46,3 +46,13 @@ with local check option;
 -- regression test
 create or replace view my_view as
 select x from foo;
+
+-- parenthesized / compound queries
+create view v as (select 1);
+create view v as (values (1));
+create view v as (select 1 union select 2);
+create view v as (values (1, 2) union values (3, 4));
+create view v as (table t);
+create view v as (select 1 order by 1);
+create view v as ((select 1));
+create view v as (with x as (select 1) select * from x);
