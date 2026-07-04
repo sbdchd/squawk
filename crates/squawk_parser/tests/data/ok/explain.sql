@@ -74,9 +74,12 @@ EXPLAIN (GENERIC_PLAN)
 
 -- parens_select
 explain analyze (((((select 1)))));
+explain ((select 1));
+explain ((select 1) union (select 2));
 
 -- parens_values
 explain analyze (((((values (1))))));
+explain ((values (1)));
 
 -- boolean off
 EXPLAIN (COSTS OFF) SELECT * FROM foo WHERE i = 4;

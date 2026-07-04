@@ -144,6 +144,10 @@ select json_scalar(1);
 
 -- exists
 select exists(select 1 from t where a = b);
+select exists((select 1));
+select exists(((select 1)));
+select exists((select 1) union (select 2));
+select exists((table t));
 
 select exists(with t as (select 1) select * from t);
 

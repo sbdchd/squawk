@@ -761,6 +761,59 @@ SOURCE_FILE
         R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    PAREN_SELECT
+      L_PAREN "("
+      PAREN_SELECT
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    PAREN_SELECT
+      L_PAREN "("
+      COMPOUND_SELECT
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+        WHITESPACE " "
+        UNION_KW "union"
+        WHITESPACE " "
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "2"
+          R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- parens_values"
   WHITESPACE "\n"
@@ -791,6 +844,26 @@ SOURCE_FILE
               R_PAREN ")"
             R_PAREN ")"
           R_PAREN ")"
+        R_PAREN ")"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    PAREN_SELECT
+      L_PAREN "("
+      PAREN_SELECT
+        L_PAREN "("
+        VALUES
+          VALUES_KW "values"
+          WHITESPACE " "
+          ROW_LIST
+            ROW
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
         R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"

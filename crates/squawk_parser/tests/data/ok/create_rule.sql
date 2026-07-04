@@ -16,6 +16,16 @@ create or replace rule r as on select
     notify f;
   );
 
+-- select_stmt_variants
+create rule r as on insert to t do instead ((select 1));
+create rule r as on insert to t do also ((select 1));
+create rule r as on insert to t do instead (notify foo; (select 1););
+create rule r as on insert to t do instead ((select 1) union (select 2););
+create rule r as on insert to t do instead select 1 union select 2;
+create rule r as on insert to t do instead (select 1 union select 2;);
+create rule r as on insert to t do instead table t;
+create rule r as on insert to t do instead (table t;);
+
 -- doc_1
 CREATE RULE "_RETURN" AS
     ON SELECT TO t1
