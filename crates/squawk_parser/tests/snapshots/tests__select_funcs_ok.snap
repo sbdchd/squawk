@@ -2480,6 +2480,120 @@ SOURCE_FILE
                       IDENT "b"
               R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXISTS_FN
+              EXISTS_KW "exists"
+              L_PAREN "("
+              PAREN_SELECT
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXISTS_FN
+              EXISTS_KW "exists"
+              L_PAREN "("
+              PAREN_SELECT
+                L_PAREN "("
+                PAREN_SELECT
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "select"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "1"
+                  R_PAREN ")"
+                R_PAREN ")"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXISTS_FN
+              EXISTS_KW "exists"
+              L_PAREN "("
+              COMPOUND_SELECT
+                PAREN_SELECT
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "select"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "1"
+                  R_PAREN ")"
+                WHITESPACE " "
+                UNION_KW "union"
+                WHITESPACE " "
+                PAREN_SELECT
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "select"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "2"
+                  R_PAREN ")"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            EXISTS_FN
+              EXISTS_KW "exists"
+              L_PAREN "("
+              PAREN_SELECT
+                L_PAREN "("
+                TABLE
+                  TABLE_KW "table"
+                  WHITESPACE " "
+                  RELATION_NAME
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "t"
+                R_PAREN ")"
+              R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
     SELECT_CLAUSE

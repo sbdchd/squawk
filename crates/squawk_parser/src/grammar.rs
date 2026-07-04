@@ -877,11 +877,7 @@ fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(EXISTS_KW);
     p.expect(L_PAREN);
-    if p.at_ts(SELECT_FIRST) {
-        select(p, None, &SelectRestrictions::default(), false);
-    } else {
-        p.error("expected select");
-    }
+    query(p);
     p.expect(R_PAREN);
     let m = m.complete(p, EXISTS_FN).precede(p);
     opt_agg_clauses(p);
@@ -10024,7 +10020,7 @@ fn create_role(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn select_insert_delete_update_or_notify(p: &mut Parser<'_>, semi_allowed: bool) {
     // statement
-    // Any SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement.
+    // Any SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement.
     let statement = stmt(
         p,
         &StmtRestrictions {
@@ -10034,7 +10030,8 @@ fn select_insert_delete_update_or_notify(p: &mut Parser<'_>, semi_allowed: bool)
     );
     if let Some(statement) = statement {
         match statement.kind() {
-            SELECT | VALUES | INSERT | UPDATE | DELETE | NOTIFY => (),
+            SELECT | COMPOUND_SELECT | PAREN_SELECT | TABLE | VALUES | INSERT | UPDATE | DELETE
+            | NOTIFY => (),
             kind => {
                 p.error(format!(
                     "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, got {kind:?}"
@@ -11148,7 +11145,7 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn opt_explain_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if !p.at(L_PAREN) || (p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST)) {
+    if !p.at(L_PAREN) || p.nth_at_ts(1, PAREN_SELECT_FIRST) {
         return None;
     }
     let m = p.start();

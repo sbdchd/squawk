@@ -211,6 +211,384 @@ SOURCE_FILE
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- select_stmt_variants"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      INSTEAD_KW "instead"
+      WHITESPACE " "
+      RULE_STMT_LIST
+        L_PAREN "("
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      ALSO_KW "also"
+      WHITESPACE " "
+      RULE_STMT_LIST
+        L_PAREN "("
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      INSTEAD_KW "instead"
+      WHITESPACE " "
+      RULE_STMT_LIST
+        L_PAREN "("
+        NOTIFY
+          NOTIFY_KW "notify"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
+          SEMICOLON ";"
+        WHITESPACE " "
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+          SEMICOLON ";"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      INSTEAD_KW "instead"
+      WHITESPACE " "
+      RULE_STMT_LIST
+        L_PAREN "("
+        COMPOUND_SELECT
+          PAREN_SELECT
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "select"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    LITERAL
+                      INT_NUMBER "1"
+            R_PAREN ")"
+          WHITESPACE " "
+          UNION_KW "union"
+          WHITESPACE " "
+          PAREN_SELECT
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "select"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    LITERAL
+                      INT_NUMBER "2"
+            R_PAREN ")"
+          SEMICOLON ";"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      INSTEAD_KW "instead"
+      WHITESPACE " "
+      COMPOUND_SELECT
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        WHITESPACE " "
+        UNION_KW "union"
+        WHITESPACE " "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      INSTEAD_KW "instead"
+      WHITESPACE " "
+      RULE_STMT_LIST
+        L_PAREN "("
+        COMPOUND_SELECT
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          WHITESPACE " "
+          UNION_KW "union"
+          WHITESPACE " "
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "2"
+          SEMICOLON ";"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      INSTEAD_KW "instead"
+      WHITESPACE " "
+      TABLE
+        TABLE_KW "table"
+        WHITESPACE " "
+        RELATION_NAME
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      INSTEAD_KW "instead"
+      WHITESPACE " "
+      RULE_STMT_LIST
+        L_PAREN "("
+        TABLE
+          TABLE_KW "table"
+          WHITESPACE " "
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+          SEMICOLON ";"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- doc_1"
   WHITESPACE "\n"
   CREATE_RULE
