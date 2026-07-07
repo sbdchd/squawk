@@ -208,6 +208,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::Policy
             | LocationKind::PreparedStatement
             | LocationKind::Role
+            | LocationKind::Rule
             | LocationKind::Server
             | LocationKind::Tablespace
             | LocationKind::Trigger

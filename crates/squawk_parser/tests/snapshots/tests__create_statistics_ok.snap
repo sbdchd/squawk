@@ -50,18 +50,19 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME
           IDENT "s"
-    L_PAREN "("
-    NAME_REF
-      IDENT "mcv"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "ndistinct"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "dependencies"
-    R_PAREN ")"
+    STAT_TYPES
+      L_PAREN "("
+      NAME_REF
+        IDENT "mcv"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ndistinct"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "dependencies"
+      R_PAREN ")"
     WHITESPACE "\n"
     ON_KW "on"
     WHITESPACE " "
@@ -118,10 +119,11 @@ SOURCE_FILE
         NAME
           IDENT "s1"
     WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "dependencies"
-    R_PAREN ")"
+    STAT_TYPES
+      L_PAREN "("
+      NAME_REF
+        IDENT "dependencies"
+      R_PAREN ")"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
@@ -153,10 +155,11 @@ SOURCE_FILE
         NAME
           IDENT "s2"
     WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "mcv"
-    R_PAREN ")"
+    STAT_TYPES
+      L_PAREN "("
+      NAME_REF
+        IDENT "mcv"
+      R_PAREN ")"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
@@ -188,10 +191,11 @@ SOURCE_FILE
         NAME
           IDENT "s3"
     WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "ndistinct"
-    R_PAREN ")"
+    STAT_TYPES
+      L_PAREN "("
+      NAME_REF
+        IDENT "ndistinct"
+      R_PAREN ")"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "

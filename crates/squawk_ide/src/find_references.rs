@@ -240,18 +240,20 @@ table users;
     }
 
     #[test]
-    fn temp_table_do_not_shadows_public() {
+    fn temp_table_shadows_public() {
         assert_snapshot!(find_refs("
 create table t();
 create temp table t$0();
 drop table t;
-"), @r"
+"), @"
           ╭▸ 
         3 │ create temp table t();
           │                   ┬
           │                   │
           │                   0. query
-          ╰╴                  1. reference
+          │                   1. reference
+        4 │ drop table t;
+          ╰╴           ─ 2. reference
         ");
     }
 

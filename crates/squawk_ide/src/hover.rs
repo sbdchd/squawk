@@ -257,6 +257,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Procedure => hover_procedure(db, def),
         LocationKind::PropertyGraph => hover_property_graph(db, def),
         LocationKind::Role => hover_role(db, def),
+        LocationKind::Rule => hover_rule(db, def),
         LocationKind::Schema => hover_schema(db, def),
         LocationKind::Sequence => hover_sequence(db, def),
         LocationKind::Server => hover_server(db, def),
@@ -342,6 +343,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         LocationKind::Procedure => hover_procedure(db, def),
         LocationKind::PropertyGraph => hover_property_graph(db, def),
         LocationKind::Role => hover_role(db, def),
+        LocationKind::Rule => hover_rule(db, def),
         LocationKind::Schema => hover_schema(db, def),
         LocationKind::Sequence => hover_sequence(db, def),
         LocationKind::Server => hover_server(db, def),
@@ -1125,6 +1127,14 @@ fn hover_policy(db: &dyn Db, def: Location) -> Option<Hover> {
     format_create_policy(db, InFile::new(def.file, create_policy))
 }
 
+fn hover_rule(db: &dyn Db, def: Location) -> Option<Hover> {
+    let create_rule = def
+        .to_node(db)?
+        .ancestors()
+        .find_map(ast::CreateRule::cast)?;
+    format_create_rule(db, InFile::new(def.file, create_rule))
+}
+
 fn hover_property_graph(db: &dyn Db, def: Location) -> Option<Hover> {
     let create_property_graph = def
         .to_node(db)?
@@ -1412,6 +1422,18 @@ fn format_create_policy(db: &dyn Db, create_policy: InFile<ast::CreatePolicy>) -
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
         "policy {schema}.{policy_name} on {schema}.{table_name}"
+    )))
+}
+
+fn format_create_rule(db: &dyn Db, create_rule: InFile<ast::CreateRule>) -> Option<Hover> {
+    let file = create_rule.file_id;
+    let create_rule = create_rule.value;
+    let rule_name = create_rule.name()?.syntax().text().to_string();
+    let on_table_path = create_rule.rule_on()?.path()?;
+
+    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
+    Some(Hover::snippet(format!(
+        "rule {rule_name} on {schema}.{table_name}"
     )))
 }
 

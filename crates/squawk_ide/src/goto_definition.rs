@@ -607,6 +607,48 @@ cross join lateral (select u$0.n * 10 as val) x;
     }
 
     #[test]
+    fn goto_correlated_subquery_outer_column() {
+        assert_snapshot!(goto("
+create table foo (id int);
+create table bar (fid int);
+select * from bar b where exists (select 1 from foo where foo.id = b.fid$0);
+"), @"
+          ╭▸ 
+        3 │ create table bar (fid int);
+          │                   ─── 2. destination
+        4 │ select * from bar b where exists (select 1 from foo where foo.id = b.fid);
+          ╰╴                                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_correlated_subquery_column() {
+        assert_snapshot!(goto("create table foo(a int, b int); update foo set a = (select b$0);"), @"
+          ╭▸ 
+        1 │ create table foo(a int, b int); update foo set a = (select b);
+          ╰╴                        ─ 2. destination                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_where_correlated_subquery_column() {
+        assert_snapshot!(goto("create table foo(a int, b int); delete from foo where a = (select b$0);"), @"
+          ╭▸ 
+        1 │ create table foo(a int, b int); delete from foo where a = (select b);
+          ╰╴                        ─ 2. destination                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_multi_level_nested_select_outer_column() {
+        assert_snapshot!(goto("create table foo(a int); select (select (select a$0)) from foo;"), @"
+          ╭▸ 
+        1 │ create table foo(a int); select (select (select a)) from foo;
+          ╰╴                 ─ 2. destination               ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_lateral_missing_not_found() {
         // Query 1 ERROR at Line 3: : ERROR:  invalid reference to FROM-clause entry for table "u"
         // LINE 3: cross join (select u.n * 10 as val) x;
@@ -936,6 +978,50 @@ drop trigger tr$0 on t;
           │                ── 2. destination
         3 │ drop trigger tr on t;
           ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_rule_table() {
+        assert_snapshot!(goto("
+create table t(a int);
+create rule r as on select to t$0 do instead nothing;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ create rule r as on select to t do instead nothing;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_rule() {
+        assert_snapshot!(goto("
+create table t(a int);
+create rule r as on select to t do instead nothing;
+drop rule r$0 on t;
+"), @"
+          ╭▸ 
+        3 │ create rule r as on select to t do instead nothing;
+          │             ─ 2. destination
+        4 │ drop rule r on t;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_rule() {
+        assert_snapshot!(goto("
+create table t(a int);
+create rule r as on select to t do instead nothing;
+alter rule r$0 on t rename to r2;
+"), @"
+          ╭▸ 
+        3 │ create rule r as on select to t do instead nothing;
+          │             ─ 2. destination
+        4 │ alter rule r on t rename to r2;
+          ╰╴           ─ 1. source
         ");
     }
 
@@ -1437,6 +1523,77 @@ execute function noop();
     }
 
     #[test]
+    fn goto_create_constraint_trigger_from_table() {
+        assert_snapshot!(goto("
+create table t(id int);
+create table ref_t(id int);
+create constraint trigger trg after insert on t from ref_t$0 for each row execute function f();
+"), @"
+          ╭▸ 
+        3 │ create table ref_t(id int);
+          │              ───── 2. destination
+        4 │ create constraint trigger trg after insert on t from ref_t for each row execute function f();
+          ╰╴                                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_trigger_when_new_column() {
+        assert_snapshot!(goto("
+create table foo (id int);
+create trigger tr before insert on foo for each row when (new.id$0 > 0) execute function f();
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │                   ── 2. destination
+        3 │ create trigger tr before insert on foo for each row when (new.id > 0) execute function f();
+          ╰╴                                                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_trigger_when_old_column() {
+        assert_snapshot!(goto("
+create table foo (id int);
+create trigger tr after update on foo for each row when (old.id$0 > 0) execute function f();
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │                   ── 2. destination
+        3 │ create trigger tr after update on foo for each row when (old.id > 0) execute function f();
+          ╰╴                                                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_trigger_when_new_table() {
+        assert_snapshot!(goto("
+create table foo (id int);
+create trigger tr before insert on foo for each row when (new$0.id > 0) execute function f();
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │              ─── 2. destination
+        3 │ create trigger tr before insert on foo for each row when (new.id > 0) execute function f();
+          ╰╴                                                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_trigger_update_of_column() {
+        assert_snapshot!(goto("
+create table t(id int, updated_at timestamptz);
+create trigger tr before update of updated_at$0 on t for each row execute function f();
+"), @"
+          ╭▸ 
+        2 │ create table t(id int, updated_at timestamptz);
+          │                        ────────── 2. destination
+        3 │ create trigger tr before update of updated_at on t for each row execute function f();
+          ╰╴                                            ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_sequence_owned_by() {
         assert_snapshot!(goto("
 create table t(c serial);
@@ -1687,6 +1844,175 @@ alter extension my$0ext update to '2.0';
           │                  ───── 2. destination
         3 │ alter extension myext update to '2.0';
           ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_sequence() {
+        assert_snapshot!(goto("
+create sequence s;
+alter sequence s$0 restart with 1;
+"), @"
+          ╭▸ 
+        2 │ create sequence s;
+          │                 ─ 2. destination
+        3 │ alter sequence s restart with 1;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_view() {
+        assert_snapshot!(goto("
+create view v as select 1 as id;
+alter view v$0 rename to v2;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1 as id;
+          │             ─ 2. destination
+        3 │ alter view v rename to v2;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_materialized_view() {
+        assert_snapshot!(goto("
+create materialized view mv as select 1 as id;
+alter materialized view mv$0 rename to mv2;
+"), @"
+          ╭▸ 
+        2 │ create materialized view mv as select 1 as id;
+          │                          ── 2. destination
+        3 │ alter materialized view mv rename to mv2;
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_type() {
+        assert_snapshot!(goto("
+create type address as (city text);
+alter type address$0 add attribute zip text;
+"), @"
+          ╭▸ 
+        2 │ create type address as (city text);
+          │             ─────── 2. destination
+        3 │ alter type address add attribute zip text;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_domain() {
+        assert_snapshot!(goto("
+create domain email as text;
+alter domain email$0 set not null;
+"), @"
+          ╭▸ 
+        2 │ create domain email as text;
+          │               ───── 2. destination
+        3 │ alter domain email set not null;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_function() {
+        assert_snapshot!(goto("
+create function f(a int) returns int language sql as $$ select a $$;
+alter function f$0(int) owner to me;
+"), @"
+          ╭▸ 
+        2 │ create function f(a int) returns int language sql as $$ select a $$;
+          │                 ─ 2. destination
+        3 │ alter function f(int) owner to me;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_index() {
+        assert_snapshot!(goto("
+create table t(id int);
+create index idx on t(id);
+alter index idx$0 rename to idx2;
+"), @"
+          ╭▸ 
+        3 │ create index idx on t(id);
+          │              ─── 2. destination
+        4 │ alter index idx rename to idx2;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_schema() {
+        assert_snapshot!(goto("
+create schema app;
+alter schema app$0 rename to app2;
+"), @"
+          ╭▸ 
+        2 │ create schema app;
+          │               ─── 2. destination
+        3 │ alter schema app rename to app2;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_database() {
+        assert_snapshot!(goto("
+create database appdb;
+alter database appdb$0 owner to alice;
+"), @"
+          ╭▸ 
+        2 │ create database appdb;
+          │                 ───── 2. destination
+        3 │ alter database appdb owner to alice;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_tablespace() {
+        assert_snapshot!(goto("
+create tablespace fast location '/tmp/fast';
+alter tablespace fast$0 rename to faster;
+"), @"
+          ╭▸ 
+        2 │ create tablespace fast location '/tmp/fast';
+          │                   ──── 2. destination
+        3 │ alter tablespace fast rename to faster;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_trigger() {
+        assert_snapshot!(goto("
+create trigger trg before insert on t for each row execute function f();
+alter trigger trg$0 on t rename to trg2;
+"), @"
+          ╭▸ 
+        2 │ create trigger trg before insert on t for each row execute function f();
+          │                ─── 2. destination
+        3 │ alter trigger trg on t rename to trg2;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_foreign_table() {
+        assert_snapshot!(goto("
+create foreign table ft(id int) server myserver;
+alter foreign table ft$0 owner to alice;
+"), @"
+          ╭▸ 
+        2 │ create foreign table ft(id int) server myserver;
+          │                      ── 2. destination
+        3 │ alter foreign table ft owner to alice;
+          ╰╴                     ─ 1. source
         ");
     }
 
@@ -2681,11 +3007,10 @@ select a$0 from u;
 create table t();
 create temp table t();
 drop table t$0;
-"), @r"
+"), @"
           ╭▸ 
-        2 │ create table t();
-          │              ─ 2. destination
         3 │ create temp table t();
+          │                   ─ 2. destination
         4 │ drop table t;
           ╰╴           ─ 1. source
         ");
@@ -4335,6 +4660,25 @@ drop index idx_name$0;
     }
 
     #[test]
+    fn goto_drop_index_schema_qualified() {
+        assert_snapshot!(goto("
+create schema a;
+create schema b;
+create table a.t(id int);
+create table b.t(id int);
+create index idx on a.t(id);
+create index idx on b.t(id);
+drop index b.idx$0;
+"), @"
+          ╭▸ 
+        7 │ create index idx on b.t(id);
+          │              ─── 2. destination
+        8 │ drop index b.idx;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_index_multiple() {
         assert_snapshot!(goto("
 create index idx1 on t(x);
@@ -4473,6 +4817,34 @@ create index idx_email on users(email$0);
           │                                 ───── 2. destination
         3 │ create index idx_email on users(email);
           ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_include_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create index idx on users(id) include (email$0);
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ create index idx on users(id) include (email);
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_where_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+create index idx on users(id) where email$0 is not null;
+"), @r"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ create index idx on users(id) where email is not null;
+          ╰╴                                        ─ 1. source
         ");
     }
 
@@ -5300,6 +5672,65 @@ group by a$0;
           │          ─ 2. destination
         4 │ group by a;
           ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_in_group_by_rollup() {
+        assert_snapshot!(goto("
+create table t (a int);
+select a as x from t
+group by rollup(x$0);
+"), @"
+          ╭▸ 
+        3 │ select a as x from t
+          │             ─ 2. destination
+        4 │ group by rollup(x);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_in_group_by_cube() {
+        assert_snapshot!(goto("
+create table t (a int);
+select a as x from t
+group by cube(x$0);
+"), @"
+          ╭▸ 
+        3 │ select a as x from t
+          │             ─ 2. destination
+        4 │ group by cube(x);
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_in_group_by_grouping_sets() {
+        assert_snapshot!(goto("
+create table t (a int);
+select a as x from t
+group by grouping sets ((x$0));
+"), @"
+          ╭▸ 
+        3 │ select a as x from t
+          │             ─ 2. destination
+        4 │ group by grouping sets ((x));
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_alias_in_distinct_on() {
+        assert_snapshot!(goto("
+create table t (a int);
+select distinct on (x$0) a as x from t;
+"), @"
+          ╭▸ 
+        3 │ select distinct on (x) a as x from t;
+          │                     ┬       ─ 2. destination
+          │                     │
+          ╰╴                    1. source
         ");
     }
 
@@ -6617,13 +7048,42 @@ delete from t using public.f$0 where f_id = f.id;
 create table t(id int, f_id int);
 create table f(id int, name text);
 delete from t using f where f_id = f.id$0 and f.name = 'foo';
-"), @r"
+"), @"
           ╭▸ 
-        2 │ create table t(id int, f_id int);
-          │                ── 2. destination
         3 │ create table f(id int, name text);
+          │                ── 2. destination
         4 │ delete from t using f where f_id = f.id and f.name = 'foo';
           ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_source_alias_qualifier() {
+        assert_snapshot!(goto("
+create table target(id int);
+create table src(y int);
+delete from target using src s where s$0.y = target.id;
+"), @"
+          ╭▸ 
+        4 │ delete from target using src s where s.y = target.id;
+          │                              ┬       ─ 1. source
+          │                              │
+          ╰╴                             2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_delete_using_source_alias_column() {
+        assert_snapshot!(goto("
+create table target(id int);
+create table src(y int);
+delete from target using src s where s.y$0 = target.id;
+"), @"
+          ╭▸ 
+        3 │ create table src(y int);
+          │                  ─ 2. destination
+        4 │ delete from target using src s where s.y = target.id;
+          ╰╴                                       ─ 1. source
         ");
     }
 
@@ -6893,6 +7353,48 @@ create schema foo;
           │               ─ 1. source
         3 │ create schema foo;
           ╰╴              ─── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_create_schema_embedded_table() {
+        assert_snapshot!(goto("
+create schema app create table users(id int);
+select id from app.users$0;
+"), @"
+          ╭▸ 
+        2 │ create schema app create table users(id int);
+          │                                ───── 2. destination
+        3 │ select id from app.users;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_schema_embedded_table_column() {
+        assert_snapshot!(goto("
+create schema app create table users(id int);
+select id$0 from app.users;
+"), @"
+          ╭▸ 
+        2 │ create schema app create table users(id int);
+          │                                      ── 2. destination
+        3 │ select id from app.users;
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_schema_embedded_view() {
+        assert_snapshot!(goto("
+create schema app create table users(id int) create view v as select 1;
+select 1 from app.v$0;
+"), @"
+          ╭▸ 
+        2 │ create schema app create table users(id int) create view v as select 1;
+          │                                                          ─ 2. destination
+        3 │ select 1 from app.v;
+          ╰╴                  ─ 1. source
         ");
     }
 
@@ -8234,6 +8736,53 @@ update users set email = messages.email from messages$0 where users.id = message
     }
 
     #[test]
+    fn goto_update_from_table_qualifier_in_set() {
+        assert_snapshot!(goto("
+create table target(id int, x int);
+create table src(id int, y int);
+update target set x = src$0.y from src where src.id = target.id;
+"), @"
+          ╭▸ 
+        3 │ create table src(id int, y int);
+          │              ─── 2. destination
+        4 │ update target set x = src.y from src where src.id = target.id;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_target_resolves_to_target_table() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (a int);
+update t set a$0 = u.a from u;
+"), @"
+          ╭▸ 
+        2 │ create table t (a int);
+          │                 ─ 2. destination
+        3 │ create table u (a int);
+        4 │ update t set a = u.a from u;
+          ╰╴             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_update_set_target_tuple_resolves_to_target_table() {
+        assert_snapshot!(goto("
+create table t (a int, b int);
+create table u (a int);
+update t set (a$0, b) = (u.a, 1) from u;
+"), @"
+          ╭▸ 
+        2 │ create table t (a int, b int);
+          │                 ─ 2. destination
+        3 │ create table u (a int);
+        4 │ update t set (a, b) = (u.a, 1) from u;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_update_from_table_with_schema() {
         assert_snapshot!(goto("
 create table users(id int, email text);
@@ -8452,6 +9001,48 @@ vacuum t1, t2$0;
     }
 
     #[test]
+    fn goto_vacuum_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+vacuum users (id$0);
+"), @"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ vacuum users (id);
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_analyze_table() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+analyze users$0;
+"), @"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │              ───── 2. destination
+        3 │ analyze users;
+          ╰╴            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_analyze_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+analyze users (id$0);
+"), @"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                    ── 2. destination
+        3 │ analyze users (id);
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_alter_table() {
         assert_snapshot!(goto("
 create table users(id int, email text);
@@ -8490,6 +9081,20 @@ alter table users alter column email$0 set not null;
           │                            ───── 2. destination
         3 │ alter table users alter column email set not null;
           ╰╴                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_rename_column() {
+        assert_snapshot!(goto("
+create table users(id int, email text);
+alter table users rename column email$0 to email_address;
+"), @"
+          ╭▸ 
+        2 │ create table users(id int, email text);
+          │                            ───── 2. destination
+        3 │ alter table users rename column email to email_address;
+          ╰╴                                    ─ 1. source
         ");
     }
 
@@ -8647,13 +9252,178 @@ comment on table t$0 is '';
         assert_snapshot!(goto("
 create table t(id int);
 comment on column t.id$0 is '';
-"), @r"
+"), @"
           ╭▸ 
         2 │ create table t(id int);
           │                ── 2. destination
         3 │ comment on column t.id is '';
           ╰╴                     ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_comment_on_view() {
+        assert_snapshot!(goto("
+create view v as select 1;
+comment on view v$0 is '';
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1;
+          │             ─ 2. destination
+        3 │ comment on view v is '';
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_materialized_view() {
+        assert_snapshot!(goto("
+create materialized view mv as select 1;
+comment on materialized view mv$0 is '';
+"), @"
+          ╭▸ 
+        2 │ create materialized view mv as select 1;
+          │                          ── 2. destination
+        3 │ comment on materialized view mv is '';
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_sequence() {
+        assert_snapshot!(goto("
+create sequence s;
+comment on sequence s$0 is '';
+"), @"
+          ╭▸ 
+        2 │ create sequence s;
+          │                 ─ 2. destination
+        3 │ comment on sequence s is '';
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_type() {
+        assert_snapshot!(goto("
+create type t as (a int);
+comment on type t$0 is '';
+"), @"
+          ╭▸ 
+        2 │ create type t as (a int);
+          │             ─ 2. destination
+        3 │ comment on type t is '';
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_function() {
+        assert_snapshot!(goto("
+create function f() returns int language sql as 'select 1';
+comment on function f$0 is '';
+"), @"
+          ╭▸ 
+        2 │ create function f() returns int language sql as 'select 1';
+          │                 ─ 2. destination
+        3 │ comment on function f is '';
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_index() {
+        assert_snapshot!(goto("
+create table foo(id int);
+create index i on foo(id);
+comment on index i$0 is '';
+"), @"
+          ╭▸ 
+        3 │ create index i on foo(id);
+          │              ─ 2. destination
+        4 │ comment on index i is '';
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_security_label_table() {
+        assert_snapshot!(goto("
+create table foo(id int);
+security label on table foo$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create table foo(id int);
+          │              ─── 2. destination
+        3 │ security label on table foo is 'x';
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_security_label_column() {
+        assert_snapshot!(goto("
+create table foo(id int);
+security label on column foo.id$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create table foo(id int);
+          │                  ── 2. destination
+        3 │ security label on column foo.id is 'x';
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_security_label_view() {
+        assert_snapshot!(goto("
+create view v as select 1;
+security label on view v$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1;
+          │             ─ 2. destination
+        3 │ security label on view v is 'x';
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_security_label_type() {
+        assert_snapshot!(goto("
+create type t as (a int);
+security label on type t$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create type t as (a int);
+          │             ─ 2. destination
+        3 │ security label on type t is 'x';
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_security_label_function() {
+        assert_snapshot!(goto("
+create function f() returns int language sql as 'select 1';
+security label on function f$0() is 'x';
+"), @"
+          ╭▸ 
+        2 │ create function f() returns int language sql as 'select 1';
+          │                 ─ 2. destination
+        3 │ security label on function f() is 'x';
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_security_label_provider_unresolved() {
+        goto_not_found(
+            "
+create table foo(id int);
+security label for prov$0 on table foo is 'x';
+",
+        );
     }
 
     #[test]
@@ -8710,6 +9480,63 @@ reindex index idx$0;
           │              ─── 2. destination
         4 │ reindex index idx;
           ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cluster_table() {
+        assert_snapshot!(goto("
+create table foo(id int);
+cluster foo$0;
+"), @"
+          ╭▸ 
+        2 │ create table foo(id int);
+          │              ─── 2. destination
+        3 │ cluster foo;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cluster_using_index() {
+        assert_snapshot!(goto("
+create table foo(id int);
+create index i on foo(id);
+cluster foo using i$0;
+"), @"
+          ╭▸ 
+        3 │ create index i on foo(id);
+          │              ─ 2. destination
+        4 │ cluster foo using i;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_copy_table() {
+        assert_snapshot!(goto("
+create table foo (id int);
+copy foo$0 to stdout;
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │              ─── 2. destination
+        3 │ copy foo to stdout;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_copy_column() {
+        assert_snapshot!(goto("
+create table foo (id int);
+copy foo (id$0) to stdout;
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │                   ── 2. destination
+        3 │ copy foo (id) to stdout;
+          ╰╴           ─ 1. source
         ");
     }
 
@@ -10835,6 +11662,245 @@ create function f(x t.a$0%type) returns t.b%type
           │                 ─ 2. destination
         3 │ create function f(x t.a%type) returns t.b%type
           ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_table() {
+        assert_snapshot!(goto("
+create table foo (id int);
+grant select on foo$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │              ─── 2. destination
+        3 │ grant select on foo to bob;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_table_keyword() {
+        assert_snapshot!(goto("
+create table foo (id int);
+grant select on table foo$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │              ─── 2. destination
+        3 │ grant select on table foo to bob;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_revoke_table() {
+        assert_snapshot!(goto("
+create table foo (id int);
+revoke select on foo$0 from bob;
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │              ─── 2. destination
+        3 │ revoke select on foo from bob;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_column() {
+        assert_snapshot!(goto("
+create table foo (id int);
+grant select (id$0) on foo to bob;
+"), @"
+          ╭▸ 
+        2 │ create table foo (id int);
+          │                   ── 2. destination
+        3 │ grant select (id) on foo to bob;
+          ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_sequence() {
+        assert_snapshot!(goto("
+create sequence s;
+grant usage on sequence s$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create sequence s;
+          │                 ─ 2. destination
+        3 │ grant usage on sequence s to bob;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_function() {
+        assert_snapshot!(goto("
+create function f() returns int language sql as 'select 1';
+grant execute on function f$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create function f() returns int language sql as 'select 1';
+          │                 ─ 2. destination
+        3 │ grant execute on function f to bob;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_schema() {
+        assert_snapshot!(goto("
+create schema myschema;
+grant usage on schema myschema$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create schema myschema;
+          │               ──────── 2. destination
+        3 │ grant usage on schema myschema to bob;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_view() {
+        assert_snapshot!(goto("
+create view v as select 1;
+grant select on v$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create view v as select 1;
+          │             ─ 2. destination
+        3 │ grant select on v to bob;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_domain() {
+        assert_snapshot!(goto("
+create domain d as int;
+grant usage on domain d$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create domain d as int;
+          │               ─ 2. destination
+        3 │ grant usage on domain d to bob;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_grant_all_tables_in_schema() {
+        assert_snapshot!(goto("
+create schema sc;
+grant select on all tables in schema sc$0 to bob;
+"), @"
+          ╭▸ 
+        2 │ create schema sc;
+          │               ── 2. destination
+        3 │ grant select on all tables in schema sc to bob;
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_statistics_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create statistics st on a$0, b from t;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create statistics st on a, b from t;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_statistics_table() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create statistics st on a, b from t$0;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │              ─ 2. destination
+        3 │ create statistics st on a, b from t;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_statistics_schema_qualified_table() {
+        assert_snapshot!(goto("
+create schema s;
+create table s.t(a int, b int);
+create statistics st on a, b from s.t$0;
+"), @"
+          ╭▸ 
+        3 │ create table s.t(a int, b int);
+          │                ─ 2. destination
+        4 │ create statistics st on a, b from s.t;
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_publication_table() {
+        assert_snapshot!(goto("
+create table t(a int);
+create publication pub for table t$0;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ create publication pub for table t;
+          ╰╴                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_publication_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create publication pub for table t (a$0, b);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create publication pub for table t (a, b);
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_publication_where_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create publication pub for table t where (a$0 > 1);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create publication pub for table t where (a > 1);
+          ╰╴                                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_count_star_filter_column() {
+        assert_snapshot!(goto("
+create table t (a int);
+select count(*) filter (where a$0 > 0) from t;
+"), @"
+          ╭▸ 
+        2 │ create table t (a int);
+          │                 ─ 2. destination
+        3 │ select count(*) filter (where a > 0) from t;
+          ╰╴                              ─ 1. source
         ");
     }
 }

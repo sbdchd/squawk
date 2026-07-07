@@ -43,6 +43,9 @@ pub(crate) struct Binder {
     scope: Scope,
     symbols: Arena<Symbol>,
     search_path_changes: Vec<SearchPathChange>,
+    // When binding objects nested inside `create schema ...`, they default to
+    // the schema being created instead of the current search path.
+    default_schema_override: Option<Schema>,
 }
 
 impl Binder {
@@ -58,6 +61,7 @@ impl Binder {
                     Schema::new("pg_catalog"),
                 ],
             }],
+            default_schema_override: None,
         }
     }
 
@@ -78,9 +82,20 @@ impl Binder {
         let unqualified = schema.is_none();
         let list = match schema {
             Some(s) => Schemas::from_iter([s.clone()]),
-            None => self.search_path_at(position).iter().cloned().collect(),
+            None => self.resolution_search_path(position),
         };
         ResolvedSchemas { list, unqualified }
+    }
+
+    fn resolution_search_path(&self, position: TextSize) -> Schemas {
+        let pg_temp = Schema::new("pg_temp");
+        let search_path = self.search_path_at(position);
+        let mut list = Schemas::new();
+        if search_path.contains(&pg_temp) {
+            list.push(pg_temp.clone());
+        }
+        list.extend(search_path.iter().filter(|s| **s != pg_temp).cloned());
+        list
     }
 
     pub(crate) fn lookup_with(
@@ -164,6 +179,13 @@ impl Binder {
             }
         }
         None
+    }
+
+    fn default_schema(&self) -> Option<Schema> {
+        if let Some(schema) = &self.default_schema_override {
+            return Some(schema.clone());
+        }
+        self.current_search_path().first().cloned()
     }
 
     fn current_search_path(&self) -> &[Schema] {
@@ -276,6 +298,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
+        ast::Stmt::CreateRule(create_rule) => bind_create_rule(b, create_rule),
         ast::Stmt::CreatePropertyGraph(create_property_graph) => {
             bind_create_property_graph(b, create_property_graph)
         }
@@ -399,7 +422,11 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
     let index_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let Some(schema) = b.current_search_path().first().cloned() else {
+    let schema = match create_index.relation_name().and_then(|r| r.path()) {
+        Some(table_path) => schema_name(b, &table_path, false),
+        None => b.default_schema(),
+    };
+    let Some(schema) = schema else {
         return;
     };
 
@@ -511,15 +538,36 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
         return;
     };
 
+    let schema = Schema(schema_name.clone());
+
     let schema_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Schema,
         ptr: name_ptr,
-        schema: Some(Schema(schema_name.clone())),
+        schema: Some(schema.clone()),
         params: None,
         table: None,
     });
 
     b.scope.insert(schema_name, schema_id);
+
+    let prev_override = b.default_schema_override.replace(schema);
+    for element in create_schema.schema_elements() {
+        bind_schema_element(b, element);
+    }
+    b.default_schema_override = prev_override;
+}
+
+fn bind_schema_element(b: &mut Binder, element: ast::SchemaElement) {
+    match element {
+        ast::SchemaElement::CreateIndex(create_index) => bind_create_index(b, create_index),
+        ast::SchemaElement::CreateSequence(create_sequence) => {
+            bind_create_sequence(b, create_sequence)
+        }
+        ast::SchemaElement::CreateTable(create_table) => bind_create_table(b, create_table),
+        ast::SchemaElement::CreateTrigger(create_trigger) => bind_create_trigger(b, create_trigger),
+        ast::SchemaElement::CreateView(create_view) => bind_create_view(b, create_view),
+        ast::SchemaElement::Grant(_) => (),
+    }
 }
 
 fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
@@ -793,6 +841,37 @@ fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
     b.scope.insert(policy_name, policy_id);
 }
 
+fn bind_create_rule(b: &mut Binder, create_rule: ast::CreateRule) {
+    let Some(name) = create_rule.name() else {
+        return;
+    };
+
+    let rule_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let Some(table_path) = create_rule.rule_on().and_then(|on| on.path()) else {
+        return;
+    };
+
+    let Some(table_name) = item_name(&table_path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &table_path, false) else {
+        return;
+    };
+
+    let rule_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Rule,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: Some(table_name),
+    });
+
+    b.scope.insert(rule_name, rule_id);
+}
+
 fn bind_create_property_graph(b: &mut Binder, create_property_graph: ast::CreatePropertyGraph) {
     let Some(path) = create_property_graph.path() else {
         return;
@@ -1025,7 +1104,7 @@ fn schema_name(b: &Binder, path: &ast::Path, is_temp: bool) -> Option<Schema> {
         return Some(Schema::new("pg_temp"));
     }
 
-    b.current_search_path().first().cloned()
+    b.default_schema()
 }
 
 fn bind_set(b: &mut Binder, set: ast::Set) {
