@@ -200,6 +200,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::Channel
             | LocationKind::CommitBegin
             | LocationKind::CommitEnd
+            | LocationKind::Constraint
             | LocationKind::Cursor
             | LocationKind::Database
             | LocationKind::EventTrigger

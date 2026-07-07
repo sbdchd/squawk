@@ -54,7 +54,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -78,7 +78,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       TABLE_KW "table"
       WHITESPACE " "
       PATH
@@ -133,7 +133,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       TABLE_KW "table"
       WHITESPACE " "
       PATH
@@ -162,7 +162,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -186,7 +186,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ALL_IN_SCHEMA
       ALL_KW "all"
       WHITESPACE " "
       TABLES_KW "tables"
@@ -243,7 +243,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -283,7 +283,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -323,7 +323,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -361,7 +361,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -389,7 +389,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -415,7 +415,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_DEFAULT
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -439,7 +439,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       SEQUENCE_KW "sequence"
       WHITESPACE " "
       PATH
@@ -463,7 +463,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       SEQUENCE_KW "sequence"
       WHITESPACE " "
       PATH
@@ -494,7 +494,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       SEQUENCE_KW "sequence"
       WHITESPACE " "
       PATH
@@ -532,7 +532,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       SEQUENCE_KW "sequence"
       WHITESPACE " "
       PATH
@@ -554,7 +554,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ALL_IN_SCHEMA
       ALL_KW "all"
       WHITESPACE " "
       SEQUENCES_KW "sequences"
@@ -582,7 +582,7 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ALL_IN_SCHEMA
       ALL_KW "all"
       WHITESPACE " "
       SEQUENCES_KW "sequences"
@@ -620,7 +620,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       DATABASE_KW "database"
       WHITESPACE " "
       NAME_REF
@@ -675,7 +675,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       DATABASE_KW "database"
       WHITESPACE " "
       NAME_REF
@@ -695,7 +695,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       DATABASE_KW "database"
       WHITESPACE " "
       NAME_REF
@@ -721,7 +721,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       DOMAIN_KW "domain"
       WHITESPACE " "
       PATH
@@ -764,7 +764,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       DOMAIN_KW "domain"
       WHITESPACE " "
       PATH
@@ -788,7 +788,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TABLE
       DOMAIN_KW "domain"
       WHITESPACE " "
       PATH
@@ -821,7 +821,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_FOREIGN
       FOREIGN_KW "foreign"
       WHITESPACE " "
       DATA_KW "data"
@@ -862,7 +862,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_FOREIGN
       FOREIGN_KW "foreign"
       WHITESPACE " "
       DATA_KW "data"
@@ -892,7 +892,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_FOREIGN
       FOREIGN_KW "foreign"
       WHITESPACE " "
       SERVER_KW "server"
@@ -931,7 +931,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_FOREIGN
       FOREIGN_KW "foreign"
       WHITESPACE " "
       SERVER_KW "server"
@@ -959,7 +959,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ROUTINE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG_LIST
@@ -1001,7 +1001,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ROUTINE
       PROCEDURE_KW "procedure"
       WHITESPACE " "
       FUNCTION_SIG_LIST
@@ -1088,7 +1088,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ROUTINE
       ROUTINE_KW "routine"
       WHITESPACE " "
       FUNCTION_SIG_LIST
@@ -1112,7 +1112,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ALL_IN_SCHEMA
       ALL_KW "all"
       WHITESPACE " "
       FUNCTIONS_KW "functions"
@@ -1146,7 +1146,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ALL_IN_SCHEMA
       ALL_KW "all"
       WHITESPACE " "
       PROCEDURES_KW "procedures"
@@ -1172,7 +1172,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ALL_IN_SCHEMA
       ALL_KW "all"
       WHITESPACE " "
       ROUTINES_KW "routines"
@@ -1200,7 +1200,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_ROUTINE
       PROCEDURE_KW "procedure"
       WHITESPACE " "
       FUNCTION_SIG_LIST
@@ -1274,7 +1274,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       LANGUAGE_KW "language"
       WHITESPACE " "
       NAME_REF
@@ -1302,7 +1302,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       LANGUAGE_KW "language"
       WHITESPACE " "
       NAME_REF
@@ -1332,7 +1332,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       LANGUAGE_KW "language"
       WHITESPACE " "
       NAME_REF
@@ -1370,7 +1370,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_LARGE_OBJECT
       LARGE_KW "large"
       WHITESPACE " "
       OBJECT_KW "object"
@@ -1398,7 +1398,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_LARGE_OBJECT
       LARGE_KW "large"
       WHITESPACE " "
       OBJECT_KW "object"
@@ -1436,7 +1436,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_PARAMETER
       PARAMETER_KW "parameter"
       WHITESPACE " "
       PATH
@@ -1474,7 +1474,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_PARAMETER
       PARAMETER_KW "parameter"
       WHITESPACE " "
       PATH
@@ -1496,7 +1496,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_PARAMETER
       PARAMETER_KW "parameter"
       WHITESPACE " "
       PATH
@@ -1590,7 +1590,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       SCHEMA_KW "schema"
       WHITESPACE " "
       NAME_REF
@@ -1618,7 +1618,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       SCHEMA_KW "schema"
       WHITESPACE " "
       NAME_REF
@@ -1666,7 +1666,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       SCHEMA_KW "schema"
       WHITESPACE " "
       NAME_REF
@@ -1698,7 +1698,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       NAME_REF
@@ -1726,7 +1726,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_NAME
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       NAME_REF
@@ -1760,7 +1760,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TYPE
       TYPE_KW "type"
       WHITESPACE " "
       PATH_TYPE
@@ -1797,7 +1797,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TYPE
       TYPE_KW "type"
       WHITESPACE " "
       PATH_TYPE
@@ -1820,7 +1820,7 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    PRIVILEGE_OBJECTS
+    PRIVILEGE_TYPE
       TYPE_KW "type"
       WHITESPACE " "
       PATH_TYPE

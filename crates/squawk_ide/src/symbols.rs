@@ -7,6 +7,7 @@ pub(crate) use crate::name::{Name, Schema};
 pub(crate) enum SymbolKind {
     Aggregate,
     Channel,
+    Constraint,
     Cursor,
     Database,
     EventTrigger,

@@ -10,14 +10,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    ACCESS_KW "access"
-    WHITESPACE " "
-    METHOD_KW "method"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "m"
+    OBJECT_ACCESS_METHOD
+      ACCESS_KW "access"
+      WHITESPACE " "
+      METHOD_KW "method"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "m"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -32,18 +31,19 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    AGGREGATE_KW "aggregate"
-    WHITESPACE " "
-    AGGREGATE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "my_agg"
+    OBJECT_AGGREGATE
+      AGGREGATE_KW "aggregate"
       WHITESPACE " "
-      PARAM_LIST
-        L_PAREN "("
-        STAR "*"
-        R_PAREN ")"
+      AGGREGATE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "my_agg"
+        WHITESPACE " "
+        PARAM_LIST
+          L_PAREN "("
+          STAR "*"
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -58,18 +58,19 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    AGGREGATE_KW "aggregate"
-    WHITESPACE " "
-    AGGREGATE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "a"
+    OBJECT_AGGREGATE
+      AGGREGATE_KW "aggregate"
       WHITESPACE " "
-      PARAM_LIST
-        L_PAREN "("
-        STAR "*"
-        R_PAREN ")"
+      AGGREGATE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
+        WHITESPACE " "
+        PARAM_LIST
+          L_PAREN "("
+          STAR "*"
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -84,37 +85,38 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    AGGREGATE_KW "aggregate"
-    WHITESPACE " "
-    AGGREGATE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "a"
+    OBJECT_AGGREGATE
+      AGGREGATE_KW "aggregate"
       WHITESPACE " "
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PARAM_IN
-            IN_KW "in"
-          WHITESPACE " "
-          NAME
-            IDENT "a"
-          WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
-        COMMA ","
+      AGGREGATE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
         WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
-        R_PAREN ")"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PARAM_IN
+              IN_KW "in"
+            WHITESPACE " "
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          COMMA ","
+          WHITESPACE " "
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -129,39 +131,40 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    AGGREGATE_KW "aggregate"
-    WHITESPACE " "
-    AGGREGATE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "a"
+    OBJECT_AGGREGATE
+      AGGREGATE_KW "aggregate"
       WHITESPACE " "
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  INT_KW "int"
-        COMMA ","
+      AGGREGATE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
         WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
-        WHITESPACE " "
-        ORDER_KW "order"
-        WHITESPACE " "
-        BY_KW "by"
-        WHITESPACE " "
-        PARAM
-          TIME_TYPE
-            TIMESTAMP_KW "timestamp"
-        R_PAREN ")"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+          COMMA ","
+          WHITESPACE " "
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          WHITESPACE " "
+          ORDER_KW "order"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          PARAM
+            TIME_TYPE
+              TIMESTAMP_KW "timestamp"
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -176,24 +179,25 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    CAST_KW "cast"
-    WHITESPACE " "
-    CAST_SIG
-      L_PAREN "("
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "s"
+    OBJECT_CAST
+      CAST_KW "cast"
       WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t"
-      R_PAREN ")"
+      CAST_SIG
+        L_PAREN "("
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "s"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -208,12 +212,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    COLLATION_KW "collation"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "c"
+    OBJECT_COLLATION
+      COLLATION_KW "collation"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -228,17 +233,18 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    COLUMN_KW "column"
-    WHITESPACE " "
-    PATH
+    OBJECT_COLUMN
+      COLUMN_KW "column"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "a"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "b"
+            IDENT "b"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -253,17 +259,18 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    CONSTRAINT_KW "constraint"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_CONSTRAINT
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -278,19 +285,20 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    CONSTRAINT_KW "constraint"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    DOMAIN_KW "domain"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "d"
+    OBJECT_CONSTRAINT
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      DOMAIN_KW "domain"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -305,12 +313,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    CONVERSION_KW "conversion"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "c"
+    OBJECT_CONVERSION
+      CONVERSION_KW "conversion"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -325,12 +334,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    DATABASE_KW "database"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "d"
+    OBJECT_DATABASE
+      DATABASE_KW "database"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -345,12 +355,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    DOMAIN_KW "domain"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "d"
+    OBJECT_DOMAIN
+      DOMAIN_KW "domain"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -365,12 +376,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "e"
+    OBJECT_EXTENSION
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "e"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -385,14 +397,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    EVENT_KW "event"
-    WHITESPACE " "
-    TRIGGER_KW "trigger"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "e"
+    OBJECT_EVENT_TRIGGER
+      EVENT_KW "event"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -407,16 +418,15 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    FOREIGN_KW "foreign"
-    WHITESPACE " "
-    DATA_KW "data"
-    WHITESPACE " "
-    WRAPPER_KW "wrapper"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
+    OBJECT_FOREIGN_DATA_WRAPPER
+      FOREIGN_KW "foreign"
+      WHITESPACE " "
+      DATA_KW "data"
+      WHITESPACE " "
+      WRAPPER_KW "wrapper"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -431,14 +441,15 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    FOREIGN_KW "foreign"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
+    OBJECT_FOREIGN_TABLE
+      FOREIGN_KW "foreign"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -453,16 +464,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-      PARAM_LIST
-        L_PAREN "("
-        R_PAREN ")"
+    OBJECT_ROUTINE
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "f"
+        PARAM_LIST
+          L_PAREN "("
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -477,47 +489,48 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    FUNCTION_KW "function"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PARAM_IN
-            IN_KW "in"
+    OBJECT_ROUTINE
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "f"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PARAM_IN
+              IN_KW "in"
+            WHITESPACE " "
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+          COMMA ","
           WHITESPACE " "
-          NAME
-            IDENT "a"
+          PARAM
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+          COMMA ","
           WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  INT_KW "int"
-        COMMA ","
-        WHITESPACE " "
-        PARAM
-          NAME
-            IDENT "b"
-          WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  INT_KW "int"
-        COMMA ","
-        WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
-        R_PAREN ")"
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -532,12 +545,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    INDEX_KW "index"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "idx"
+    OBJECT_INDEX
+      INDEX_KW "index"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "idx"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -552,12 +566,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    LARGE_KW "large"
-    WHITESPACE " "
-    OBJECT_KW "object"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
+    OBJECT_LARGE_OBJECT
+      LARGE_KW "large"
+      WHITESPACE " "
+      OBJECT_KW "object"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -572,14 +587,15 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    MATERIALIZED_KW "materialized"
-    WHITESPACE " "
-    VIEW_KW "view"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "v"
+    OBJECT_MATERIALIZED_VIEW
+      MATERIALIZED_KW "materialized"
+      WHITESPACE " "
+      VIEW_KW "view"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -594,26 +610,27 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    OP
-      CUSTOM_OP
-        AT "@"
-        R_ANGLE ">"
-    L_PAREN "("
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "jsonb"
-    COMMA ","
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "jsonb"
-    R_PAREN ")"
+    OBJECT_OPERATOR
+      OPERATOR_KW "operator"
+      WHITESPACE " "
+      OP
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+      L_PAREN "("
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "jsonb"
+      COMMA ","
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "jsonb"
+      R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -626,32 +643,33 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    OP
-      CUSTOM_OP
-        AT "@"
-        R_ANGLE ">"
-    L_PAREN "("
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      ARG_LIST
-        L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "100"
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      ARG_LIST
-        L_PAREN "("
-        ARG
-          LITERAL
-            INT_NUMBER "200"
-        R_PAREN ")"
-    R_PAREN ")"
+    OBJECT_OPERATOR
+      OPERATOR_KW "operator"
+      WHITESPACE " "
+      OP
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+      L_PAREN "("
+      CHAR_TYPE
+        VARCHAR_KW "varchar"
+        ARG_LIST
+          L_PAREN "("
+          ARG
+            LITERAL
+              INT_NUMBER "100"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      CHAR_TYPE
+        VARCHAR_KW "varchar"
+        ARG_LIST
+          L_PAREN "("
+          ARG
+            LITERAL
+              INT_NUMBER "200"
+          R_PAREN ")"
+      R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -666,20 +684,21 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    CLASS_KW "class"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "c"
-    WHITESPACE " "
-    USING_METHOD
-      USING_KW "using"
+    OBJECT_OPERATOR
+      OPERATOR_KW "operator"
       WHITESPACE " "
-      NAME_REF
-        IDENT "i"
+      CLASS_KW "class"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
+      WHITESPACE " "
+      USING_METHOD
+        USING_KW "using"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "i"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -694,20 +713,21 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    OPERATOR_KW "operator"
-    WHITESPACE " "
-    FAMILY_KW "family"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_METHOD
-      USING_KW "using"
+    OBJECT_OPERATOR
+      OPERATOR_KW "operator"
       WHITESPACE " "
-      NAME_REF
-        IDENT "i"
+      FAMILY_KW "family"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      WHITESPACE " "
+      USING_METHOD
+        USING_KW "using"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "i"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -722,17 +742,18 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    POLICY_KW "policy"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "p"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_POLICY
+      POLICY_KW "policy"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "p"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -747,12 +768,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    LANGUAGE_KW "language"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "l"
+    OBJECT_LANGUAGE
+      LANGUAGE_KW "language"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -767,14 +787,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PROCEDURAL_KW "procedural"
-    WHITESPACE " "
-    LANGUAGE_KW "language"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "l"
+    OBJECT_LANGUAGE
+      PROCEDURAL_KW "procedural"
+      WHITESPACE " "
+      LANGUAGE_KW "language"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -789,16 +808,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PROCEDURE_KW "procedure"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "p"
-      PARAM_LIST
-        L_PAREN "("
-        R_PAREN ")"
+    OBJECT_ROUTINE
+      PROCEDURE_KW "procedure"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "p"
+        PARAM_LIST
+          L_PAREN "("
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -813,47 +833,48 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PROCEDURE_KW "procedure"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "p"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PARAM_IN
-            IN_KW "in"
+    OBJECT_ROUTINE
+      PROCEDURE_KW "procedure"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "p"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PARAM_IN
+              IN_KW "in"
+            WHITESPACE " "
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "date"
+          COMMA ","
           WHITESPACE " "
-          NAME
-            IDENT "a"
+          PARAM
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "date"
+          COMMA ","
           WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "date"
-        COMMA ","
-        WHITESPACE " "
-        PARAM
-          NAME
-            IDENT "b"
-          WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "date"
-        COMMA ","
-        WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  BIGINT_KW "bigint"
-        R_PAREN ")"
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -868,12 +889,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "p"
+    OBJECT_PUBLICATION
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -888,12 +910,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    ROLE_KW "role"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "r"
+    OBJECT_ROLE
+      ROLE_KW "role"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -908,16 +931,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    ROUTINE_KW "routine"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "r"
-      PARAM_LIST
-        L_PAREN "("
-        R_PAREN ")"
+    OBJECT_ROUTINE
+      ROUTINE_KW "routine"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "r"
+        PARAM_LIST
+          L_PAREN "("
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -932,50 +956,51 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    ROUTINE_KW "routine"
-    WHITESPACE " "
-    FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "r"
-      PARAM_LIST
-        L_PAREN "("
-        PARAM
-          PARAM_IN
-            IN_KW "in"
+    OBJECT_ROUTINE
+      ROUTINE_KW "routine"
+      WHITESPACE " "
+      FUNCTION_SIG
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "r"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            PARAM_IN
+              IN_KW "in"
+            WHITESPACE " "
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          COMMA ","
           WHITESPACE " "
-          NAME
-            IDENT "a"
+          PARAM
+            PARAM_OUT
+              OUT_KW "out"
+            WHITESPACE " "
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    JSON_KW "json"
+          COMMA ","
           WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  TEXT_KW "text"
-        COMMA ","
-        WHITESPACE " "
-        PARAM
-          PARAM_OUT
-            OUT_KW "out"
-          WHITESPACE " "
-          NAME
-            IDENT "b"
-          WHITESPACE " "
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  JSON_KW "json"
-        COMMA ","
-        WHITESPACE " "
-        PARAM
-          PATH_TYPE
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  BIGINT_KW "bigint"
-        R_PAREN ")"
+          PARAM
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -990,17 +1015,18 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RULE_KW "rule"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "r"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_RULE
+      RULE_KW "rule"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1015,12 +1041,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "s"
+    OBJECT_SCHEMA
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1035,12 +1062,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    SEQUENCE_KW "sequence"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "s"
+    OBJECT_SEQUENCE
+      SEQUENCE_KW "sequence"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1055,12 +1083,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    SERVER_KW "server"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "s"
+    OBJECT_SERVER
+      SERVER_KW "server"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1075,12 +1104,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    STATISTICS_KW "statistics"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "s"
+    OBJECT_STATISTICS
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1095,12 +1125,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    SUBSCRIPTION_KW "subscription"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "s"
+    OBJECT_SUBSCRIPTION
+      SUBSCRIPTION_KW "subscription"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1115,12 +1146,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TABLE
+      TABLE_KW "table"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1135,12 +1167,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TABLE
+      TABLE_KW "table"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1154,12 +1187,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TABLESPACE
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1174,16 +1208,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TEXT_KW "text"
-    WHITESPACE " "
-    SEARCH_KW "search"
-    WHITESPACE " "
-    CONFIGURATION_KW "configuration"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TEXT_SEARCH
+      TEXT_KW "text"
+      WHITESPACE " "
+      SEARCH_KW "search"
+      WHITESPACE " "
+      CONFIGURATION_KW "configuration"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1198,16 +1233,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TEXT_KW "text"
-    WHITESPACE " "
-    SEARCH_KW "search"
-    WHITESPACE " "
-    DICTIONARY_KW "dictionary"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TEXT_SEARCH
+      TEXT_KW "text"
+      WHITESPACE " "
+      SEARCH_KW "search"
+      WHITESPACE " "
+      DICTIONARY_KW "dictionary"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1222,16 +1258,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TEXT_KW "text"
-    WHITESPACE " "
-    SEARCH_KW "search"
-    WHITESPACE " "
-    PARSER_KW "parser"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TEXT_SEARCH
+      TEXT_KW "text"
+      WHITESPACE " "
+      SEARCH_KW "search"
+      WHITESPACE " "
+      PARSER_KW "parser"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1246,16 +1283,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TEXT_KW "text"
-    WHITESPACE " "
-    SEARCH_KW "search"
-    WHITESPACE " "
-    TEMPLATE_KW "template"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TEXT_SEARCH
+      TEXT_KW "text"
+      WHITESPACE " "
+      SEARCH_KW "search"
+      WHITESPACE " "
+      TEMPLATE_KW "template"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1270,20 +1308,21 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TRANSFORM_KW "transform"
-    WHITESPACE " "
-    FOR_KW "for"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    LANGUAGE_KW "language"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "l"
+    OBJECT_TRANSFORM
+      TRANSFORM_KW "transform"
+      WHITESPACE " "
+      FOR_KW "for"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+      WHITESPACE " "
+      LANGUAGE_KW "language"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1298,17 +1337,18 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TRIGGER_KW "trigger"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "u"
+    OBJECT_TRIGGER
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1323,12 +1363,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    TYPE_KW "type"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    OBJECT_TYPE
+      TYPE_KW "type"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1343,12 +1384,13 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    VIEW_KW "view"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "v"
+    OBJECT_VIEW
+      VIEW_KW "view"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "

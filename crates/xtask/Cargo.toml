@@ -9,6 +9,7 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+annotate-snippets.workspace = true
 anyhow.workspace = true
 csv.workspace = true
 clap.workspace = true

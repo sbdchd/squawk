@@ -324,6 +324,31 @@ pub(crate) fn resolve_name_ref(
                 LocationKind::Rule
             )])
         }
+        NameRefClass::RulePseudoColumn => {
+            let column_name = Name::from_node(name_ref);
+            let create_rule = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateRule::cast)?;
+            let path = create_rule.rule_on()?.path()?;
+            resolve_column_for_path(db, InFile::new(file, &path), column_name)
+        }
+        NameRefClass::RulePseudoColumnTable => {
+            let create_rule = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::CreateRule::cast)?;
+            let path = create_rule.rule_on()?.path()?;
+            let (schema, table_name) = name::schema_and_name_path(&path)?;
+            let position = name_ref.syntax().text_range().start();
+            let schemas = binder.resolved_schemas(position, schema.as_ref());
+            let ptr = resolve_table_name_ptr(db, &table_name, &schemas, file)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Table
+            )])
+        }
         NameRefClass::EventTrigger => {
             let event_trigger_name = Name::from_node(name_ref);
             let binder = bind(db, file);
@@ -444,6 +469,7 @@ pub(crate) fn resolve_name_ref(
             let column_name = Name::from_node(name_ref);
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
+        NameRefClass::Constraint => resolve_constraint(db, InFile::new(file, name_ref)),
         NameRefClass::ConstraintColumn => {
             let column_name = Name::from_node(name_ref);
             for ancestor in name_ref.syntax().ancestors() {
@@ -640,7 +666,10 @@ pub(crate) fn resolve_name_ref(
                     .and_then(|grant| grant.privilege_objects())
                     .or_else(|| ast::Revoke::cast(a).and_then(|revoke| revoke.privilege_objects()))
             })?;
-            let path = privilege_objects.paths().next()?;
+            let path = privilege_objects
+                .syntax()
+                .children()
+                .find_map(ast::Path::cast)?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::FunctionCall => {
@@ -872,6 +901,67 @@ pub(crate) fn resolve_table_like(
     }
 
     None
+}
+
+fn resolve_constraint(
+    db: &dyn Db,
+    name_ref: InFile<&ast::NameRef>,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = name_ref.file_id;
+    let name_ref = name_ref.value;
+    let constraint_name = Name::from_node(name_ref);
+    let position = name_ref.syntax().text_range().start();
+    let (schema, owner_name) = constraint_owner(name_ref)?;
+    let binder = bind(db, file);
+    let schemas = binder.resolved_schemas(position, schema.as_ref());
+    let ptr = match owner_name {
+        Some(owner_name) => binder.lookup_with_table(
+            &constraint_name,
+            SymbolKind::Constraint,
+            &schemas,
+            &Some(owner_name),
+        ),
+        None => binder.lookup_with(&constraint_name, SymbolKind::Constraint, &schemas),
+    }?;
+
+    Some(smallvec![Location::new(
+        file,
+        ptr.text_range(),
+        LocationKind::Constraint,
+    )])
+}
+
+fn constraint_owner(name_ref: &ast::NameRef) -> Option<(Option<Schema>, Option<Name>)> {
+    let mut fallback_schema = None;
+
+    for ancestor in name_ref.syntax().ancestors() {
+        if let Some(path) = ast::Path::cast(ancestor.clone()) {
+            fallback_schema = name::schema_name(&path);
+        }
+
+        if let Some(alter_table) = ast::AlterTable::cast(ancestor.clone()) {
+            let path = alter_table.relation_name()?.path()?;
+            let (schema, table_name) = name::schema_and_name_path(&path)?;
+            return Some((schema, Some(table_name)));
+        }
+
+        if let Some(alter_domain) = ast::AlterDomain::cast(ancestor.clone()) {
+            let (schema, domain_name) = name::schema_and_name_path(&alter_domain.path()?)?;
+            return Some((schema, Some(domain_name)));
+        }
+
+        if let Some(comment_constraint) = ast::ObjectConstraint::cast(ancestor.clone()) {
+            let (schema, owner_name) = name::schema_and_name_path(&comment_constraint.path()?)?;
+            return Some((schema, Some(owner_name)));
+        }
+
+        if let Some(insert) = ast::Insert::cast(ancestor) {
+            let (schema, table_name) = name::schema_and_name_path(&insert.path()?)?;
+            return Some((schema, Some(table_name)));
+        }
+    }
+
+    Some((fallback_schema, None))
 }
 
 fn resolve_for_kind_with_params(

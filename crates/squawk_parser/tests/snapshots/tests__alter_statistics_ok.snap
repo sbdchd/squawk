@@ -103,12 +103,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    STATISTICS_KW "statistics"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
+    SET_STATISTICS
+      SET_KW "set"
+      WHITESPACE " "
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "100"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_STATISTICS
@@ -121,10 +122,11 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    STATISTICS_KW "statistics"
-    WHITESPACE " "
-    DEFAULT_KW "default"
+    SET_STATISTICS
+      SET_KW "set"
+      WHITESPACE " "
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"

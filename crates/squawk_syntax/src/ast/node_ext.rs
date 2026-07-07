@@ -598,6 +598,64 @@ impl ast::CastSig {
     }
 }
 
+impl ast::ColumnConstraint {
+    #[inline]
+    pub fn constraint_name(&self) -> Option<ast::ConstraintName> {
+        match self {
+            ast::ColumnConstraint::CheckConstraint(check_constraint) => {
+                check_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::DefaultConstraint(default_constraint) => {
+                default_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::ExcludeConstraint(exclude_constraint) => {
+                exclude_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::GeneratedConstraint(generated_constraint) => {
+                generated_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::NotNullConstraint(not_null_constraint) => {
+                not_null_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::NullConstraint(null_constraint) => {
+                null_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::PrimaryKeyConstraint(primary_key_constraint) => {
+                primary_key_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::ReferencesConstraint(references_constraint) => {
+                references_constraint.constraint_name()
+            }
+            ast::ColumnConstraint::UniqueConstraint(unique_constraint) => {
+                unique_constraint.constraint_name()
+            }
+        }
+    }
+}
+
+impl ast::TableConstraint {
+    #[inline]
+    pub fn constraint_name(&self) -> Option<ast::ConstraintName> {
+        match self {
+            ast::TableConstraint::CheckConstraint(check_constraint) => {
+                check_constraint.constraint_name()
+            }
+            ast::TableConstraint::ExcludeConstraint(exclude_constraint) => {
+                exclude_constraint.constraint_name()
+            }
+            ast::TableConstraint::ForeignKeyConstraint(foreign_key_constraint) => {
+                foreign_key_constraint.constraint_name()
+            }
+            ast::TableConstraint::PrimaryKeyConstraint(primary_key_constraint) => {
+                primary_key_constraint.constraint_name()
+            }
+            ast::TableConstraint::UniqueConstraint(unique_constraint) => {
+                unique_constraint.constraint_name()
+            }
+        }
+    }
+}
+
 pub(crate) fn text_of_first_token(node: &SyntaxNode) -> TokenText<'_> {
     fn first_token(green_ref: &GreenNodeData) -> &GreenTokenData {
         green_ref

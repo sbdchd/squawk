@@ -245,6 +245,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::CaseExpr | LocationKind::CommitBegin | LocationKind::CommitEnd => None,
         LocationKind::Channel => hover_channel(db, def),
         LocationKind::Column => hover_name_column(db, def),
+        LocationKind::Constraint => hover_constraint(db, def),
         LocationKind::Cursor => hover_cursor(db, def),
         LocationKind::Database => hover_database(db, def),
         LocationKind::EventTrigger => hover_event_trigger(db, def),
@@ -323,6 +324,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             // Finally try as table (handles case like `select t from t;` where t is the table)
             hover_table(db, def)
         }
+        LocationKind::Constraint => hover_constraint(db, def),
         LocationKind::Cursor => hover_cursor(db, def),
         LocationKind::Database => hover_database(db, def),
         LocationKind::EventTrigger => hover_event_trigger(db, def),
@@ -1101,6 +1103,17 @@ fn hover_index(db: &dyn Db, def: Location) -> Option<Hover> {
         .ancestors()
         .find_map(ast::CreateIndex::cast)?;
     format_create_index(db, InFile::new(def.file, create_index))
+}
+
+fn hover_constraint(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    let name = ast::Name::cast(def_node.clone())
+        .map(|name| Name::from_node(&name).to_string())
+        .unwrap_or_else(|| def_node.text().to_string());
+    Some(hover_with_preceding_comment(
+        format!("constraint {name}"),
+        &def_node,
+    ))
 }
 
 fn hover_sequence(db: &dyn Db, def: Location) -> Option<Hover> {

@@ -99,6 +99,7 @@ alter extension e drop sequence s.o;
 -- add_drop_table
 alter extension e add table o;
 alter extension e drop table o;
+alter extension e add table public.t;
 
 -- add_drop_text_search_configuration
 alter extension e add text search configuration o;

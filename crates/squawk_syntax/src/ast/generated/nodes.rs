@@ -873,19 +873,15 @@ pub struct AlterExtension {
 }
 impl AlterExtension {
     #[inline]
-    pub fn aggregate(&self) -> Option<Aggregate> {
+    pub fn alter_extension_add(&self) -> Option<AlterExtensionAdd> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn cast_sig(&self) -> Option<CastSig> {
+    pub fn alter_extension_drop(&self) -> Option<AlterExtensionDrop> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn function_sig(&self) -> Option<FunctionSig> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn alter_extension_update(&self) -> Option<AlterExtensionUpdate> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -893,236 +889,73 @@ impl AlterExtension {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn op(&self) -> Option<Op> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn path(&self) -> Option<Path> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ty(&self) -> Option<Type> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn comma_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COMMA)
     }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
-    pub fn access_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ACCESS_KW)
-    }
-    #[inline]
-    pub fn add_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ADD_KW)
-    }
-    #[inline]
-    pub fn aggregate_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
-    }
-    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-    #[inline]
-    pub fn cast_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CAST_KW)
-    }
-    #[inline]
-    pub fn class_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CLASS_KW)
-    }
-    #[inline]
-    pub fn collation_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COLLATION_KW)
-    }
-    #[inline]
-    pub fn configuration_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONFIGURATION_KW)
-    }
-    #[inline]
-    pub fn conversion_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONVERSION_KW)
-    }
-    #[inline]
-    pub fn data_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATA_KW)
-    }
-    #[inline]
-    pub fn database_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
-    }
-    #[inline]
-    pub fn dictionary_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DICTIONARY_KW)
-    }
-    #[inline]
-    pub fn domain_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
-    }
-    #[inline]
-    pub fn drop_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DROP_KW)
-    }
-    #[inline]
-    pub fn event_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EVENT_KW)
     }
     #[inline]
     pub fn extension_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXTENSION_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterExtensionAdd {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterExtensionAdd {
     #[inline]
-    pub fn family_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FAMILY_KW)
+    pub fn extension_member_object(&self) -> Option<ExtensionMemberObject> {
+        support::child(&self.syntax)
     }
     #[inline]
-    pub fn for_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    pub fn add_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ADD_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterExtensionDrop {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterExtensionDrop {
+    #[inline]
+    pub fn extension_member_object(&self) -> Option<ExtensionMemberObject> {
+        support::child(&self.syntax)
     }
     #[inline]
-    pub fn foreign_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterExtensionUpdate {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterExtensionUpdate {
     #[inline]
-    pub fn function_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
     }
     #[inline]
-    pub fn index_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INDEX_KW)
-    }
-    #[inline]
-    pub fn language_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
-    }
-    #[inline]
-    pub fn materialized_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::MATERIALIZED_KW)
-    }
-    #[inline]
-    pub fn method_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::METHOD_KW)
-    }
-    #[inline]
-    pub fn operator_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
-    }
-    #[inline]
-    pub fn parser_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PARSER_KW)
-    }
-    #[inline]
-    pub fn procedural_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROCEDURAL_KW)
-    }
-    #[inline]
-    pub fn procedure_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
-    }
-    #[inline]
-    pub fn publication_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
-    }
-    #[inline]
-    pub fn role_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROLE_KW)
-    }
-    #[inline]
-    pub fn routine_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROUTINE_KW)
-    }
-    #[inline]
-    pub fn schema_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
-    }
-    #[inline]
-    pub fn search_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SEARCH_KW)
-    }
-    #[inline]
-    pub fn sequence_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
-    }
-    #[inline]
-    pub fn server_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SERVER_KW)
-    }
-    #[inline]
-    pub fn statistics_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::STATISTICS_KW)
-    }
-    #[inline]
-    pub fn subscription_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SUBSCRIPTION_KW)
-    }
-    #[inline]
-    pub fn table_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn tablespace_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
-    }
-    #[inline]
-    pub fn template_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMPLATE_KW)
-    }
-    #[inline]
-    pub fn text_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEXT_KW)
-    }
-    #[inline]
     pub fn to_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TO_KW)
     }
     #[inline]
-    pub fn transform_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TRANSFORM_KW)
-    }
-    #[inline]
-    pub fn trigger_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TRIGGER_KW)
-    }
-    #[inline]
-    pub fn type_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TYPE_KW)
-    }
-    #[inline]
     pub fn update_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::UPDATE_KW)
-    }
-    #[inline]
-    pub fn using_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USING_KW)
-    }
-    #[inline]
-    pub fn view_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VIEW_KW)
-    }
-    #[inline]
-    pub fn wrapper_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::WRAPPER_KW)
     }
 }
 
@@ -1903,11 +1736,11 @@ impl AlterRole {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn reset_config_param(&self) -> Option<ResetConfigParam> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1941,10 +1774,6 @@ impl AlterRole {
     #[inline]
     pub fn in_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IN_KW)
-    }
-    #[inline]
-    pub fn reset_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RESET_KW)
     }
     #[inline]
     pub fn role_token(&self) -> Option<SyntaxToken> {
@@ -2099,7 +1928,15 @@ impl AlterSequence {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn set_logged(&self) -> Option<SetLogged> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_unlogged(&self) -> Option<SetUnlogged> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2111,20 +1948,8 @@ impl AlterSequence {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
     #[inline]
-    pub fn logged_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LOGGED_KW)
-    }
-    #[inline]
     pub fn sequence_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
-    }
-    #[inline]
-    pub fn set_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SET_KW)
-    }
-    #[inline]
-    pub fn unlogged_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UNLOGGED_KW)
     }
 }
 
@@ -2204,10 +2029,6 @@ pub struct AlterStatistics {
 }
 impl AlterStatistics {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
@@ -2224,20 +2045,16 @@ impl AlterStatistics {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn set_statistics(&self) -> Option<SetStatistics> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-    #[inline]
-    pub fn default_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
-    }
-    #[inline]
-    pub fn set_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SET_KW)
     }
     #[inline]
     pub fn statistics_token(&self) -> Option<SyntaxToken> {
@@ -2346,7 +2163,7 @@ pub struct AlterSystem {
 }
 impl AlterSystem {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn reset_config_param(&self) -> Option<ResetConfigParam> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2358,16 +2175,8 @@ impl AlterSystem {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
     #[inline]
-    pub fn all_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALL_KW)
-    }
-    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-    #[inline]
-    pub fn reset_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RESET_KW)
     }
     #[inline]
     pub fn system_token(&self) -> Option<SyntaxToken> {
@@ -2781,6 +2590,10 @@ impl AlterUser {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn reset_config_param(&self) -> Option<ResetConfigParam> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn role_option_list(&self) -> Option<RoleOptionList> {
         support::child(&self.syntax)
     }
@@ -2811,10 +2624,6 @@ impl AlterUser {
     #[inline]
     pub fn in_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IN_KW)
-    }
-    #[inline]
-    pub fn reset_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RESET_KW)
     }
     #[inline]
     pub fn user_token(&self) -> Option<SyntaxToken> {
@@ -4153,15 +3962,7 @@ pub struct CommentOn {
 }
 impl CommentOn {
     #[inline]
-    pub fn aggregate(&self) -> Option<Aggregate> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn cast_sig(&self) -> Option<CastSig> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn function_sig(&self) -> Option<FunctionSig> {
+    pub fn comment_object(&self) -> Option<CommentObject> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4169,260 +3970,24 @@ impl CommentOn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn op(&self) -> Option<Op> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn path(&self) -> Option<Path> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ty(&self) -> Option<Type> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn using_method(&self) -> Option<UsingMethod> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn comma_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COMMA)
-    }
-    #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
-    }
-    #[inline]
-    pub fn access_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ACCESS_KW)
-    }
-    #[inline]
-    pub fn aggregate_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
-    }
-    #[inline]
-    pub fn cast_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CAST_KW)
-    }
-    #[inline]
-    pub fn class_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CLASS_KW)
-    }
-    #[inline]
-    pub fn collation_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COLLATION_KW)
-    }
-    #[inline]
-    pub fn column_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COLUMN_KW)
     }
     #[inline]
     pub fn comment_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COMMENT_KW)
     }
     #[inline]
-    pub fn configuration_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONFIGURATION_KW)
-    }
-    #[inline]
-    pub fn constraint_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
-    }
-    #[inline]
-    pub fn conversion_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONVERSION_KW)
-    }
-    #[inline]
-    pub fn data_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATA_KW)
-    }
-    #[inline]
-    pub fn database_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
-    }
-    #[inline]
-    pub fn dictionary_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DICTIONARY_KW)
-    }
-    #[inline]
-    pub fn domain_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
-    }
-    #[inline]
-    pub fn event_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EVENT_KW)
-    }
-    #[inline]
-    pub fn extension_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EXTENSION_KW)
-    }
-    #[inline]
-    pub fn family_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FAMILY_KW)
-    }
-    #[inline]
-    pub fn for_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FOR_KW)
-    }
-    #[inline]
-    pub fn foreign_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
-    }
-    #[inline]
-    pub fn function_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
-    }
-    #[inline]
-    pub fn graph_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
-    }
-    #[inline]
-    pub fn index_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INDEX_KW)
-    }
-    #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IS_KW)
-    }
-    #[inline]
-    pub fn language_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
-    }
-    #[inline]
-    pub fn large_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LARGE_KW)
-    }
-    #[inline]
-    pub fn materialized_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::MATERIALIZED_KW)
-    }
-    #[inline]
-    pub fn method_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::METHOD_KW)
     }
     #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NULL_KW)
     }
     #[inline]
-    pub fn object_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
-    }
-    #[inline]
     pub fn on_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ON_KW)
-    }
-    #[inline]
-    pub fn operator_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
-    }
-    #[inline]
-    pub fn parser_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PARSER_KW)
-    }
-    #[inline]
-    pub fn policy_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::POLICY_KW)
-    }
-    #[inline]
-    pub fn procedural_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROCEDURAL_KW)
-    }
-    #[inline]
-    pub fn procedure_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
-    }
-    #[inline]
-    pub fn property_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
-    }
-    #[inline]
-    pub fn publication_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
-    }
-    #[inline]
-    pub fn role_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROLE_KW)
-    }
-    #[inline]
-    pub fn routine_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROUTINE_KW)
-    }
-    #[inline]
-    pub fn rule_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RULE_KW)
-    }
-    #[inline]
-    pub fn schema_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
-    }
-    #[inline]
-    pub fn search_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SEARCH_KW)
-    }
-    #[inline]
-    pub fn sequence_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
-    }
-    #[inline]
-    pub fn server_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SERVER_KW)
-    }
-    #[inline]
-    pub fn statistics_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::STATISTICS_KW)
-    }
-    #[inline]
-    pub fn subscription_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SUBSCRIPTION_KW)
-    }
-    #[inline]
-    pub fn table_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn tablespace_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
-    }
-    #[inline]
-    pub fn template_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEMPLATE_KW)
-    }
-    #[inline]
-    pub fn text_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TEXT_KW)
-    }
-    #[inline]
-    pub fn transform_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TRANSFORM_KW)
-    }
-    #[inline]
-    pub fn trigger_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TRIGGER_KW)
-    }
-    #[inline]
-    pub fn type_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TYPE_KW)
-    }
-    #[inline]
-    pub fn view_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VIEW_KW)
-    }
-    #[inline]
-    pub fn wrapper_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::WRAPPER_KW)
     }
 }
 
@@ -14766,6 +14331,690 @@ impl NullsNotDistinct {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectAccessMethod {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectAccessMethod {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn access_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ACCESS_KW)
+    }
+    #[inline]
+    pub fn method_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::METHOD_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectAggregate {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectAggregate {
+    #[inline]
+    pub fn aggregate(&self) -> Option<Aggregate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn aggregate_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectCast {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectCast {
+    #[inline]
+    pub fn cast_sig(&self) -> Option<CastSig> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cast_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CAST_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectCollation {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectCollation {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn collation_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLLATION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectColumn {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn column_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectConstraint {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectConstraint {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn constraint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
+    }
+    #[inline]
+    pub fn domain_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectConversion {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectConversion {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn conversion_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONVERSION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectDatabase {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectDatabase {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn database_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectDomain {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectDomain {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn domain_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectEventTrigger {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectEventTrigger {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn event_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EVENT_KW)
+    }
+    #[inline]
+    pub fn trigger_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TRIGGER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectExtension {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectExtension {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn extension_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXTENSION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectForeignDataWrapper {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectForeignDataWrapper {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn data_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DATA_KW)
+    }
+    #[inline]
+    pub fn foreign_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
+    }
+    #[inline]
+    pub fn wrapper_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WRAPPER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectForeignTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectForeignTable {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn foreign_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectIndex {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectIndex {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn index_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INDEX_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectLanguage {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectLanguage {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn language_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
+    }
+    #[inline]
+    pub fn procedural_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROCEDURAL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectLargeObject {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectLargeObject {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn large_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LARGE_KW)
+    }
+    #[inline]
+    pub fn object_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectMaterializedView {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectMaterializedView {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn materialized_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATERIALIZED_KW)
+    }
+    #[inline]
+    pub fn view_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VIEW_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectOperator {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectOperator {
+    #[inline]
+    pub fn op(&self) -> Option<Op> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_method(&self) -> Option<UsingMethod> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn class_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CLASS_KW)
+    }
+    #[inline]
+    pub fn family_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FAMILY_KW)
+    }
+    #[inline]
+    pub fn operator_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectPolicy {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectPolicy {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+    #[inline]
+    pub fn policy_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::POLICY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectPropertyGraph {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectPropertyGraph {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn graph_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
+    }
+    #[inline]
+    pub fn property_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectPublication {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectPublication {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn publication_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectRole {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectRole {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn role_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectRoutine {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectRoutine {
+    #[inline]
+    pub fn function_sig(&self) -> Option<FunctionSig> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn function_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
+    }
+    #[inline]
+    pub fn procedure_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
+    }
+    #[inline]
+    pub fn routine_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROUTINE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectRule {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectRule {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+    #[inline]
+    pub fn rule_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RULE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectSchema {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectSchema {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn schema_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectSequence {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectSequence {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sequence_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectServer {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectServer {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn server_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SERVER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectStatistics {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectStatistics {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn statistics_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STATISTICS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectSubscription {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectSubscription {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn subscription_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SUBSCRIPTION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectTable {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectTablespace {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectTablespace {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn tablespace_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectTextSearch {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectTextSearch {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn configuration_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONFIGURATION_KW)
+    }
+    #[inline]
+    pub fn dictionary_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DICTIONARY_KW)
+    }
+    #[inline]
+    pub fn parser_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARSER_KW)
+    }
+    #[inline]
+    pub fn search_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEARCH_KW)
+    }
+    #[inline]
+    pub fn template_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TEMPLATE_KW)
+    }
+    #[inline]
+    pub fn text_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TEXT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectTransform {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectTransform {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn language_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
+    }
+    #[inline]
+    pub fn transform_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TRANSFORM_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectTrigger {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectTrigger {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+    #[inline]
+    pub fn trigger_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TRIGGER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectType {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn type_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TYPE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ObjectView {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ObjectView {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn view_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VIEW_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OfType {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16241,28 +16490,12 @@ impl Prior {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PrivilegeObjects {
+pub struct PrivilegeAllInSchema {
     pub(crate) syntax: SyntaxNode,
 }
-impl PrivilegeObjects {
-    #[inline]
-    pub fn function_sig_list(&self) -> Option<FunctionSigList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn literals(&self) -> AstChildren<Literal> {
-        support::children(&self.syntax)
-    }
+impl PrivilegeAllInSchema {
     #[inline]
     pub fn name_refs(&self) -> AstChildren<NameRef> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn types(&self) -> AstChildren<Type> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -16270,68 +16503,16 @@ impl PrivilegeObjects {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
     #[inline]
-    pub fn data_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATA_KW)
-    }
-    #[inline]
-    pub fn database_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
-    }
-    #[inline]
-    pub fn domain_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
-    }
-    #[inline]
-    pub fn foreign_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
-    }
-    #[inline]
-    pub fn function_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
-    }
-    #[inline]
     pub fn functions_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FUNCTIONS_KW)
-    }
-    #[inline]
-    pub fn graph_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
     }
     #[inline]
     pub fn in_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IN_KW)
     }
     #[inline]
-    pub fn language_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
-    }
-    #[inline]
-    pub fn large_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LARGE_KW)
-    }
-    #[inline]
-    pub fn object_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
-    }
-    #[inline]
-    pub fn parameter_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PARAMETER_KW)
-    }
-    #[inline]
-    pub fn procedure_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
-    }
-    #[inline]
     pub fn procedures_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PROCEDURES_KW)
-    }
-    #[inline]
-    pub fn property_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
-    }
-    #[inline]
-    pub fn routine_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROUTINE_KW)
     }
     #[inline]
     pub fn routines_token(&self) -> Option<SyntaxToken> {
@@ -16342,36 +16523,176 @@ impl PrivilegeObjects {
         support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
     }
     #[inline]
-    pub fn sequence_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
-    }
-    #[inline]
     pub fn sequences_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEQUENCES_KW)
+    }
+    #[inline]
+    pub fn tables_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeDefault {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeDefault {
+    #[inline]
+    pub fn paths(&self) -> AstChildren<Path> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeForeign {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeForeign {
+    #[inline]
+    pub fn name_refs(&self) -> AstChildren<NameRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn data_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DATA_KW)
+    }
+    #[inline]
+    pub fn foreign_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
     }
     #[inline]
     pub fn server_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SERVER_KW)
     }
     #[inline]
-    pub fn table_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    pub fn wrapper_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WRAPPER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeLargeObject {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeLargeObject {
+    #[inline]
+    pub fn literals(&self) -> AstChildren<Literal> {
+        support::children(&self.syntax)
     }
     #[inline]
-    pub fn tables_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLES_KW)
+    pub fn large_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LARGE_KW)
+    }
+    #[inline]
+    pub fn object_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeName {
+    #[inline]
+    pub fn name_refs(&self) -> AstChildren<NameRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn database_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
+    }
+    #[inline]
+    pub fn language_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
+    }
+    #[inline]
+    pub fn schema_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
     }
     #[inline]
     pub fn tablespace_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeParameter {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeParameter {
     #[inline]
-    pub fn type_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TYPE_KW)
+    pub fn paths(&self) -> AstChildren<Path> {
+        support::children(&self.syntax)
     }
     #[inline]
-    pub fn wrapper_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::WRAPPER_KW)
+    pub fn parameter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARAMETER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegePropertyGraph {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegePropertyGraph {
+    #[inline]
+    pub fn paths(&self) -> AstChildren<Path> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn graph_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GRAPH_KW)
+    }
+    #[inline]
+    pub fn property_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROPERTY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeRoutine {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeRoutine {
+    #[inline]
+    pub fn function_sig_list(&self) -> Option<FunctionSigList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn function_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
+    }
+    #[inline]
+    pub fn procedure_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
+    }
+    #[inline]
+    pub fn routine_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROUTINE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeTable {
+    #[inline]
+    pub fn paths(&self) -> AstChildren<Path> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn domain_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
+    }
+    #[inline]
+    pub fn sequence_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
+    }
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
     }
 }
 
@@ -16411,6 +16732,21 @@ impl PrivilegeTarget {
     #[inline]
     pub fn types_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TYPES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PrivilegeType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PrivilegeType {
+    #[inline]
+    pub fn types(&self) -> AstChildren<Type> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn type_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TYPE_KW)
     }
 }
 
@@ -18186,15 +18522,7 @@ pub struct SecurityLabel {
 }
 impl SecurityLabel {
     #[inline]
-    pub fn aggregate(&self) -> Option<Aggregate> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn for_provider(&self) -> Option<ForProvider> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn function_sig(&self) -> Option<FunctionSig> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18202,40 +18530,12 @@ impl SecurityLabel {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn security_label_object(&self) -> Option<SecurityLabelObject> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
-    }
-    #[inline]
-    pub fn aggregate_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
-    }
-    #[inline]
-    pub fn column_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COLUMN_KW)
-    }
-    #[inline]
-    pub fn database_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
-    }
-    #[inline]
-    pub fn domain_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
-    }
-    #[inline]
-    pub fn event_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EVENT_KW)
-    }
-    #[inline]
-    pub fn foreign_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
-    }
-    #[inline]
-    pub fn function_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
     }
     #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
@@ -18246,84 +18546,16 @@ impl SecurityLabel {
         support::token(&self.syntax, SyntaxKind::LABEL_KW)
     }
     #[inline]
-    pub fn language_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LANGUAGE_KW)
-    }
-    #[inline]
-    pub fn large_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LARGE_KW)
-    }
-    #[inline]
-    pub fn materialized_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::MATERIALIZED_KW)
-    }
-    #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NULL_KW)
-    }
-    #[inline]
-    pub fn object_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
     }
     #[inline]
     pub fn on_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ON_KW)
     }
     #[inline]
-    pub fn procedural_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROCEDURAL_KW)
-    }
-    #[inline]
-    pub fn procedure_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PROCEDURE_KW)
-    }
-    #[inline]
-    pub fn publication_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PUBLICATION_KW)
-    }
-    #[inline]
-    pub fn role_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROLE_KW)
-    }
-    #[inline]
-    pub fn routine_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROUTINE_KW)
-    }
-    #[inline]
-    pub fn schema_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SCHEMA_KW)
-    }
-    #[inline]
     pub fn security_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SECURITY_KW)
-    }
-    #[inline]
-    pub fn sequence_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SEQUENCE_KW)
-    }
-    #[inline]
-    pub fn subscription_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SUBSCRIPTION_KW)
-    }
-    #[inline]
-    pub fn table_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLE_KW)
-    }
-    #[inline]
-    pub fn tablespace_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLESPACE_KW)
-    }
-    #[inline]
-    pub fn trigger_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TRIGGER_KW)
-    }
-    #[inline]
-    pub fn type_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TYPE_KW)
-    }
-    #[inline]
-    pub fn view_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VIEW_KW)
     }
 }
 
@@ -22041,6 +22273,46 @@ pub enum ColumnConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CommentObject {
+    ObjectAccessMethod(ObjectAccessMethod),
+    ObjectAggregate(ObjectAggregate),
+    ObjectCast(ObjectCast),
+    ObjectCollation(ObjectCollation),
+    ObjectColumn(ObjectColumn),
+    ObjectConstraint(ObjectConstraint),
+    ObjectConversion(ObjectConversion),
+    ObjectDatabase(ObjectDatabase),
+    ObjectDomain(ObjectDomain),
+    ObjectEventTrigger(ObjectEventTrigger),
+    ObjectExtension(ObjectExtension),
+    ObjectForeignDataWrapper(ObjectForeignDataWrapper),
+    ObjectForeignTable(ObjectForeignTable),
+    ObjectIndex(ObjectIndex),
+    ObjectLanguage(ObjectLanguage),
+    ObjectLargeObject(ObjectLargeObject),
+    ObjectMaterializedView(ObjectMaterializedView),
+    ObjectOperator(ObjectOperator),
+    ObjectPolicy(ObjectPolicy),
+    ObjectPropertyGraph(ObjectPropertyGraph),
+    ObjectPublication(ObjectPublication),
+    ObjectRole(ObjectRole),
+    ObjectRoutine(ObjectRoutine),
+    ObjectRule(ObjectRule),
+    ObjectSchema(ObjectSchema),
+    ObjectSequence(ObjectSequence),
+    ObjectServer(ObjectServer),
+    ObjectStatistics(ObjectStatistics),
+    ObjectSubscription(ObjectSubscription),
+    ObjectTable(ObjectTable),
+    ObjectTablespace(ObjectTablespace),
+    ObjectTextSearch(ObjectTextSearch),
+    ObjectTransform(ObjectTransform),
+    ObjectTrigger(ObjectTrigger),
+    ObjectType(ObjectType),
+    ObjectView(ObjectView),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigValue {
     Literal(Literal),
     NameRef(NameRef),
@@ -22126,6 +22398,39 @@ pub enum Expr {
     PrefixExpr(PrefixExpr),
     SliceExpr(SliceExpr),
     TupleExpr(TupleExpr),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExtensionMemberObject {
+    ObjectAccessMethod(ObjectAccessMethod),
+    ObjectAggregate(ObjectAggregate),
+    ObjectCast(ObjectCast),
+    ObjectCollation(ObjectCollation),
+    ObjectConversion(ObjectConversion),
+    ObjectDatabase(ObjectDatabase),
+    ObjectDomain(ObjectDomain),
+    ObjectEventTrigger(ObjectEventTrigger),
+    ObjectExtension(ObjectExtension),
+    ObjectForeignDataWrapper(ObjectForeignDataWrapper),
+    ObjectForeignTable(ObjectForeignTable),
+    ObjectIndex(ObjectIndex),
+    ObjectLanguage(ObjectLanguage),
+    ObjectMaterializedView(ObjectMaterializedView),
+    ObjectOperator(ObjectOperator),
+    ObjectPublication(ObjectPublication),
+    ObjectRole(ObjectRole),
+    ObjectRoutine(ObjectRoutine),
+    ObjectSchema(ObjectSchema),
+    ObjectSequence(ObjectSequence),
+    ObjectServer(ObjectServer),
+    ObjectStatistics(ObjectStatistics),
+    ObjectSubscription(ObjectSubscription),
+    ObjectTable(ObjectTable),
+    ObjectTablespace(ObjectTablespace),
+    ObjectTextSearch(ObjectTextSearch),
+    ObjectTransform(ObjectTransform),
+    ObjectType(ObjectType),
+    ObjectView(ObjectView),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -22278,6 +22583,20 @@ pub enum PreparableStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PrivilegeObjects {
+    PrivilegeAllInSchema(PrivilegeAllInSchema),
+    PrivilegeDefault(PrivilegeDefault),
+    PrivilegeForeign(PrivilegeForeign),
+    PrivilegeLargeObject(PrivilegeLargeObject),
+    PrivilegeName(PrivilegeName),
+    PrivilegeParameter(PrivilegeParameter),
+    PrivilegePropertyGraph(PrivilegePropertyGraph),
+    PrivilegeRoutine(PrivilegeRoutine),
+    PrivilegeTable(PrivilegeTable),
+    PrivilegeType(PrivilegeType),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RefAction {
     Cascade(Cascade),
     NoAction(NoAction),
@@ -22310,6 +22629,29 @@ pub enum SchemaElement {
     CreateTrigger(CreateTrigger),
     CreateView(CreateView),
     Grant(Grant),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SecurityLabelObject {
+    ObjectAggregate(ObjectAggregate),
+    ObjectColumn(ObjectColumn),
+    ObjectDatabase(ObjectDatabase),
+    ObjectDomain(ObjectDomain),
+    ObjectEventTrigger(ObjectEventTrigger),
+    ObjectForeignTable(ObjectForeignTable),
+    ObjectLanguage(ObjectLanguage),
+    ObjectLargeObject(ObjectLargeObject),
+    ObjectMaterializedView(ObjectMaterializedView),
+    ObjectPublication(ObjectPublication),
+    ObjectRole(ObjectRole),
+    ObjectRoutine(ObjectRoutine),
+    ObjectSchema(ObjectSchema),
+    ObjectSequence(ObjectSequence),
+    ObjectSubscription(ObjectSubscription),
+    ObjectTable(ObjectTable),
+    ObjectTablespace(ObjectTablespace),
+    ObjectType(ObjectType),
+    ObjectView(ObjectView),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -23090,6 +23432,60 @@ impl AstNode for AlterExtension {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ALTER_EXTENSION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterExtensionAdd {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_EXTENSION_ADD
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterExtensionDrop {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_EXTENSION_DROP
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterExtensionUpdate {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_EXTENSION_UPDATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -31150,6 +31546,654 @@ impl AstNode for NullsNotDistinct {
         &self.syntax
     }
 }
+impl AstNode for ObjectAccessMethod {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_ACCESS_METHOD
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectAggregate {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_AGGREGATE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectCast {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_CAST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectCollation {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_COLLATION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectConstraint {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_CONSTRAINT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectConversion {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_CONVERSION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectDatabase {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_DATABASE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectDomain {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_DOMAIN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectEventTrigger {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_EVENT_TRIGGER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectExtension {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_EXTENSION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectForeignDataWrapper {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_FOREIGN_DATA_WRAPPER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectForeignTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_FOREIGN_TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectIndex {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_INDEX
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectLanguage {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_LANGUAGE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectLargeObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_LARGE_OBJECT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectMaterializedView {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_MATERIALIZED_VIEW
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectOperator {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_OPERATOR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectPolicy {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_POLICY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectPropertyGraph {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_PROPERTY_GRAPH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectPublication {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_PUBLICATION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectRole {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_ROLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectRoutine {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_ROUTINE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectRule {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_RULE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectSchema {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_SCHEMA
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectSequence {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_SEQUENCE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectServer {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_SERVER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectStatistics {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_STATISTICS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectSubscription {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_SUBSCRIPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectTablespace {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_TABLESPACE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectTextSearch {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_TEXT_SEARCH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectTransform {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_TRANSFORM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectTrigger {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_TRIGGER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_TYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ObjectView {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OBJECT_VIEW
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for OfType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -32248,10 +33292,154 @@ impl AstNode for Prior {
         &self.syntax
     }
 }
-impl AstNode for PrivilegeObjects {
+impl AstNode for PrivilegeAllInSchema {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PRIVILEGE_OBJECTS
+        kind == SyntaxKind::PRIVILEGE_ALL_IN_SCHEMA
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeDefault {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_DEFAULT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeForeign {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_FOREIGN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeLargeObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_LARGE_OBJECT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeParameter {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_PARAMETER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegePropertyGraph {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_PROPERTY_GRAPH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeRoutine {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_ROUTINE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_TABLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -32270,6 +33458,24 @@ impl AstNode for PrivilegeTarget {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PRIVILEGE_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PrivilegeType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PRIVILEGE_TYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -37468,6 +38674,388 @@ impl From<UniqueConstraint> for ColumnConstraint {
         ColumnConstraint::UniqueConstraint(node)
     }
 }
+impl AstNode for CommentObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::OBJECT_ACCESS_METHOD
+                | SyntaxKind::OBJECT_AGGREGATE
+                | SyntaxKind::OBJECT_CAST
+                | SyntaxKind::OBJECT_COLLATION
+                | SyntaxKind::OBJECT_COLUMN
+                | SyntaxKind::OBJECT_CONSTRAINT
+                | SyntaxKind::OBJECT_CONVERSION
+                | SyntaxKind::OBJECT_DATABASE
+                | SyntaxKind::OBJECT_DOMAIN
+                | SyntaxKind::OBJECT_EVENT_TRIGGER
+                | SyntaxKind::OBJECT_EXTENSION
+                | SyntaxKind::OBJECT_FOREIGN_DATA_WRAPPER
+                | SyntaxKind::OBJECT_FOREIGN_TABLE
+                | SyntaxKind::OBJECT_INDEX
+                | SyntaxKind::OBJECT_LANGUAGE
+                | SyntaxKind::OBJECT_LARGE_OBJECT
+                | SyntaxKind::OBJECT_MATERIALIZED_VIEW
+                | SyntaxKind::OBJECT_OPERATOR
+                | SyntaxKind::OBJECT_POLICY
+                | SyntaxKind::OBJECT_PROPERTY_GRAPH
+                | SyntaxKind::OBJECT_PUBLICATION
+                | SyntaxKind::OBJECT_ROLE
+                | SyntaxKind::OBJECT_ROUTINE
+                | SyntaxKind::OBJECT_RULE
+                | SyntaxKind::OBJECT_SCHEMA
+                | SyntaxKind::OBJECT_SEQUENCE
+                | SyntaxKind::OBJECT_SERVER
+                | SyntaxKind::OBJECT_STATISTICS
+                | SyntaxKind::OBJECT_SUBSCRIPTION
+                | SyntaxKind::OBJECT_TABLE
+                | SyntaxKind::OBJECT_TABLESPACE
+                | SyntaxKind::OBJECT_TEXT_SEARCH
+                | SyntaxKind::OBJECT_TRANSFORM
+                | SyntaxKind::OBJECT_TRIGGER
+                | SyntaxKind::OBJECT_TYPE
+                | SyntaxKind::OBJECT_VIEW
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::OBJECT_ACCESS_METHOD => {
+                CommentObject::ObjectAccessMethod(ObjectAccessMethod { syntax })
+            }
+            SyntaxKind::OBJECT_AGGREGATE => {
+                CommentObject::ObjectAggregate(ObjectAggregate { syntax })
+            }
+            SyntaxKind::OBJECT_CAST => CommentObject::ObjectCast(ObjectCast { syntax }),
+            SyntaxKind::OBJECT_COLLATION => {
+                CommentObject::ObjectCollation(ObjectCollation { syntax })
+            }
+            SyntaxKind::OBJECT_COLUMN => CommentObject::ObjectColumn(ObjectColumn { syntax }),
+            SyntaxKind::OBJECT_CONSTRAINT => {
+                CommentObject::ObjectConstraint(ObjectConstraint { syntax })
+            }
+            SyntaxKind::OBJECT_CONVERSION => {
+                CommentObject::ObjectConversion(ObjectConversion { syntax })
+            }
+            SyntaxKind::OBJECT_DATABASE => CommentObject::ObjectDatabase(ObjectDatabase { syntax }),
+            SyntaxKind::OBJECT_DOMAIN => CommentObject::ObjectDomain(ObjectDomain { syntax }),
+            SyntaxKind::OBJECT_EVENT_TRIGGER => {
+                CommentObject::ObjectEventTrigger(ObjectEventTrigger { syntax })
+            }
+            SyntaxKind::OBJECT_EXTENSION => {
+                CommentObject::ObjectExtension(ObjectExtension { syntax })
+            }
+            SyntaxKind::OBJECT_FOREIGN_DATA_WRAPPER => {
+                CommentObject::ObjectForeignDataWrapper(ObjectForeignDataWrapper { syntax })
+            }
+            SyntaxKind::OBJECT_FOREIGN_TABLE => {
+                CommentObject::ObjectForeignTable(ObjectForeignTable { syntax })
+            }
+            SyntaxKind::OBJECT_INDEX => CommentObject::ObjectIndex(ObjectIndex { syntax }),
+            SyntaxKind::OBJECT_LANGUAGE => CommentObject::ObjectLanguage(ObjectLanguage { syntax }),
+            SyntaxKind::OBJECT_LARGE_OBJECT => {
+                CommentObject::ObjectLargeObject(ObjectLargeObject { syntax })
+            }
+            SyntaxKind::OBJECT_MATERIALIZED_VIEW => {
+                CommentObject::ObjectMaterializedView(ObjectMaterializedView { syntax })
+            }
+            SyntaxKind::OBJECT_OPERATOR => CommentObject::ObjectOperator(ObjectOperator { syntax }),
+            SyntaxKind::OBJECT_POLICY => CommentObject::ObjectPolicy(ObjectPolicy { syntax }),
+            SyntaxKind::OBJECT_PROPERTY_GRAPH => {
+                CommentObject::ObjectPropertyGraph(ObjectPropertyGraph { syntax })
+            }
+            SyntaxKind::OBJECT_PUBLICATION => {
+                CommentObject::ObjectPublication(ObjectPublication { syntax })
+            }
+            SyntaxKind::OBJECT_ROLE => CommentObject::ObjectRole(ObjectRole { syntax }),
+            SyntaxKind::OBJECT_ROUTINE => CommentObject::ObjectRoutine(ObjectRoutine { syntax }),
+            SyntaxKind::OBJECT_RULE => CommentObject::ObjectRule(ObjectRule { syntax }),
+            SyntaxKind::OBJECT_SCHEMA => CommentObject::ObjectSchema(ObjectSchema { syntax }),
+            SyntaxKind::OBJECT_SEQUENCE => CommentObject::ObjectSequence(ObjectSequence { syntax }),
+            SyntaxKind::OBJECT_SERVER => CommentObject::ObjectServer(ObjectServer { syntax }),
+            SyntaxKind::OBJECT_STATISTICS => {
+                CommentObject::ObjectStatistics(ObjectStatistics { syntax })
+            }
+            SyntaxKind::OBJECT_SUBSCRIPTION => {
+                CommentObject::ObjectSubscription(ObjectSubscription { syntax })
+            }
+            SyntaxKind::OBJECT_TABLE => CommentObject::ObjectTable(ObjectTable { syntax }),
+            SyntaxKind::OBJECT_TABLESPACE => {
+                CommentObject::ObjectTablespace(ObjectTablespace { syntax })
+            }
+            SyntaxKind::OBJECT_TEXT_SEARCH => {
+                CommentObject::ObjectTextSearch(ObjectTextSearch { syntax })
+            }
+            SyntaxKind::OBJECT_TRANSFORM => {
+                CommentObject::ObjectTransform(ObjectTransform { syntax })
+            }
+            SyntaxKind::OBJECT_TRIGGER => CommentObject::ObjectTrigger(ObjectTrigger { syntax }),
+            SyntaxKind::OBJECT_TYPE => CommentObject::ObjectType(ObjectType { syntax }),
+            SyntaxKind::OBJECT_VIEW => CommentObject::ObjectView(ObjectView { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            CommentObject::ObjectAccessMethod(it) => &it.syntax,
+            CommentObject::ObjectAggregate(it) => &it.syntax,
+            CommentObject::ObjectCast(it) => &it.syntax,
+            CommentObject::ObjectCollation(it) => &it.syntax,
+            CommentObject::ObjectColumn(it) => &it.syntax,
+            CommentObject::ObjectConstraint(it) => &it.syntax,
+            CommentObject::ObjectConversion(it) => &it.syntax,
+            CommentObject::ObjectDatabase(it) => &it.syntax,
+            CommentObject::ObjectDomain(it) => &it.syntax,
+            CommentObject::ObjectEventTrigger(it) => &it.syntax,
+            CommentObject::ObjectExtension(it) => &it.syntax,
+            CommentObject::ObjectForeignDataWrapper(it) => &it.syntax,
+            CommentObject::ObjectForeignTable(it) => &it.syntax,
+            CommentObject::ObjectIndex(it) => &it.syntax,
+            CommentObject::ObjectLanguage(it) => &it.syntax,
+            CommentObject::ObjectLargeObject(it) => &it.syntax,
+            CommentObject::ObjectMaterializedView(it) => &it.syntax,
+            CommentObject::ObjectOperator(it) => &it.syntax,
+            CommentObject::ObjectPolicy(it) => &it.syntax,
+            CommentObject::ObjectPropertyGraph(it) => &it.syntax,
+            CommentObject::ObjectPublication(it) => &it.syntax,
+            CommentObject::ObjectRole(it) => &it.syntax,
+            CommentObject::ObjectRoutine(it) => &it.syntax,
+            CommentObject::ObjectRule(it) => &it.syntax,
+            CommentObject::ObjectSchema(it) => &it.syntax,
+            CommentObject::ObjectSequence(it) => &it.syntax,
+            CommentObject::ObjectServer(it) => &it.syntax,
+            CommentObject::ObjectStatistics(it) => &it.syntax,
+            CommentObject::ObjectSubscription(it) => &it.syntax,
+            CommentObject::ObjectTable(it) => &it.syntax,
+            CommentObject::ObjectTablespace(it) => &it.syntax,
+            CommentObject::ObjectTextSearch(it) => &it.syntax,
+            CommentObject::ObjectTransform(it) => &it.syntax,
+            CommentObject::ObjectTrigger(it) => &it.syntax,
+            CommentObject::ObjectType(it) => &it.syntax,
+            CommentObject::ObjectView(it) => &it.syntax,
+        }
+    }
+}
+impl From<ObjectAccessMethod> for CommentObject {
+    #[inline]
+    fn from(node: ObjectAccessMethod) -> CommentObject {
+        CommentObject::ObjectAccessMethod(node)
+    }
+}
+impl From<ObjectAggregate> for CommentObject {
+    #[inline]
+    fn from(node: ObjectAggregate) -> CommentObject {
+        CommentObject::ObjectAggregate(node)
+    }
+}
+impl From<ObjectCast> for CommentObject {
+    #[inline]
+    fn from(node: ObjectCast) -> CommentObject {
+        CommentObject::ObjectCast(node)
+    }
+}
+impl From<ObjectCollation> for CommentObject {
+    #[inline]
+    fn from(node: ObjectCollation) -> CommentObject {
+        CommentObject::ObjectCollation(node)
+    }
+}
+impl From<ObjectColumn> for CommentObject {
+    #[inline]
+    fn from(node: ObjectColumn) -> CommentObject {
+        CommentObject::ObjectColumn(node)
+    }
+}
+impl From<ObjectConstraint> for CommentObject {
+    #[inline]
+    fn from(node: ObjectConstraint) -> CommentObject {
+        CommentObject::ObjectConstraint(node)
+    }
+}
+impl From<ObjectConversion> for CommentObject {
+    #[inline]
+    fn from(node: ObjectConversion) -> CommentObject {
+        CommentObject::ObjectConversion(node)
+    }
+}
+impl From<ObjectDatabase> for CommentObject {
+    #[inline]
+    fn from(node: ObjectDatabase) -> CommentObject {
+        CommentObject::ObjectDatabase(node)
+    }
+}
+impl From<ObjectDomain> for CommentObject {
+    #[inline]
+    fn from(node: ObjectDomain) -> CommentObject {
+        CommentObject::ObjectDomain(node)
+    }
+}
+impl From<ObjectEventTrigger> for CommentObject {
+    #[inline]
+    fn from(node: ObjectEventTrigger) -> CommentObject {
+        CommentObject::ObjectEventTrigger(node)
+    }
+}
+impl From<ObjectExtension> for CommentObject {
+    #[inline]
+    fn from(node: ObjectExtension) -> CommentObject {
+        CommentObject::ObjectExtension(node)
+    }
+}
+impl From<ObjectForeignDataWrapper> for CommentObject {
+    #[inline]
+    fn from(node: ObjectForeignDataWrapper) -> CommentObject {
+        CommentObject::ObjectForeignDataWrapper(node)
+    }
+}
+impl From<ObjectForeignTable> for CommentObject {
+    #[inline]
+    fn from(node: ObjectForeignTable) -> CommentObject {
+        CommentObject::ObjectForeignTable(node)
+    }
+}
+impl From<ObjectIndex> for CommentObject {
+    #[inline]
+    fn from(node: ObjectIndex) -> CommentObject {
+        CommentObject::ObjectIndex(node)
+    }
+}
+impl From<ObjectLanguage> for CommentObject {
+    #[inline]
+    fn from(node: ObjectLanguage) -> CommentObject {
+        CommentObject::ObjectLanguage(node)
+    }
+}
+impl From<ObjectLargeObject> for CommentObject {
+    #[inline]
+    fn from(node: ObjectLargeObject) -> CommentObject {
+        CommentObject::ObjectLargeObject(node)
+    }
+}
+impl From<ObjectMaterializedView> for CommentObject {
+    #[inline]
+    fn from(node: ObjectMaterializedView) -> CommentObject {
+        CommentObject::ObjectMaterializedView(node)
+    }
+}
+impl From<ObjectOperator> for CommentObject {
+    #[inline]
+    fn from(node: ObjectOperator) -> CommentObject {
+        CommentObject::ObjectOperator(node)
+    }
+}
+impl From<ObjectPolicy> for CommentObject {
+    #[inline]
+    fn from(node: ObjectPolicy) -> CommentObject {
+        CommentObject::ObjectPolicy(node)
+    }
+}
+impl From<ObjectPropertyGraph> for CommentObject {
+    #[inline]
+    fn from(node: ObjectPropertyGraph) -> CommentObject {
+        CommentObject::ObjectPropertyGraph(node)
+    }
+}
+impl From<ObjectPublication> for CommentObject {
+    #[inline]
+    fn from(node: ObjectPublication) -> CommentObject {
+        CommentObject::ObjectPublication(node)
+    }
+}
+impl From<ObjectRole> for CommentObject {
+    #[inline]
+    fn from(node: ObjectRole) -> CommentObject {
+        CommentObject::ObjectRole(node)
+    }
+}
+impl From<ObjectRoutine> for CommentObject {
+    #[inline]
+    fn from(node: ObjectRoutine) -> CommentObject {
+        CommentObject::ObjectRoutine(node)
+    }
+}
+impl From<ObjectRule> for CommentObject {
+    #[inline]
+    fn from(node: ObjectRule) -> CommentObject {
+        CommentObject::ObjectRule(node)
+    }
+}
+impl From<ObjectSchema> for CommentObject {
+    #[inline]
+    fn from(node: ObjectSchema) -> CommentObject {
+        CommentObject::ObjectSchema(node)
+    }
+}
+impl From<ObjectSequence> for CommentObject {
+    #[inline]
+    fn from(node: ObjectSequence) -> CommentObject {
+        CommentObject::ObjectSequence(node)
+    }
+}
+impl From<ObjectServer> for CommentObject {
+    #[inline]
+    fn from(node: ObjectServer) -> CommentObject {
+        CommentObject::ObjectServer(node)
+    }
+}
+impl From<ObjectStatistics> for CommentObject {
+    #[inline]
+    fn from(node: ObjectStatistics) -> CommentObject {
+        CommentObject::ObjectStatistics(node)
+    }
+}
+impl From<ObjectSubscription> for CommentObject {
+    #[inline]
+    fn from(node: ObjectSubscription) -> CommentObject {
+        CommentObject::ObjectSubscription(node)
+    }
+}
+impl From<ObjectTable> for CommentObject {
+    #[inline]
+    fn from(node: ObjectTable) -> CommentObject {
+        CommentObject::ObjectTable(node)
+    }
+}
+impl From<ObjectTablespace> for CommentObject {
+    #[inline]
+    fn from(node: ObjectTablespace) -> CommentObject {
+        CommentObject::ObjectTablespace(node)
+    }
+}
+impl From<ObjectTextSearch> for CommentObject {
+    #[inline]
+    fn from(node: ObjectTextSearch) -> CommentObject {
+        CommentObject::ObjectTextSearch(node)
+    }
+}
+impl From<ObjectTransform> for CommentObject {
+    #[inline]
+    fn from(node: ObjectTransform) -> CommentObject {
+        CommentObject::ObjectTransform(node)
+    }
+}
+impl From<ObjectTrigger> for CommentObject {
+    #[inline]
+    fn from(node: ObjectTrigger) -> CommentObject {
+        CommentObject::ObjectTrigger(node)
+    }
+}
+impl From<ObjectType> for CommentObject {
+    #[inline]
+    fn from(node: ObjectType) -> CommentObject {
+        CommentObject::ObjectType(node)
+    }
+}
+impl From<ObjectView> for CommentObject {
+    #[inline]
+    fn from(node: ObjectView) -> CommentObject {
+        CommentObject::ObjectView(node)
+    }
+}
 impl AstNode for ConfigValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -38145,6 +39733,335 @@ impl From<TupleExpr> for Expr {
     #[inline]
     fn from(node: TupleExpr) -> Expr {
         Expr::TupleExpr(node)
+    }
+}
+impl AstNode for ExtensionMemberObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::OBJECT_ACCESS_METHOD
+                | SyntaxKind::OBJECT_AGGREGATE
+                | SyntaxKind::OBJECT_CAST
+                | SyntaxKind::OBJECT_COLLATION
+                | SyntaxKind::OBJECT_CONVERSION
+                | SyntaxKind::OBJECT_DATABASE
+                | SyntaxKind::OBJECT_DOMAIN
+                | SyntaxKind::OBJECT_EVENT_TRIGGER
+                | SyntaxKind::OBJECT_EXTENSION
+                | SyntaxKind::OBJECT_FOREIGN_DATA_WRAPPER
+                | SyntaxKind::OBJECT_FOREIGN_TABLE
+                | SyntaxKind::OBJECT_INDEX
+                | SyntaxKind::OBJECT_LANGUAGE
+                | SyntaxKind::OBJECT_MATERIALIZED_VIEW
+                | SyntaxKind::OBJECT_OPERATOR
+                | SyntaxKind::OBJECT_PUBLICATION
+                | SyntaxKind::OBJECT_ROLE
+                | SyntaxKind::OBJECT_ROUTINE
+                | SyntaxKind::OBJECT_SCHEMA
+                | SyntaxKind::OBJECT_SEQUENCE
+                | SyntaxKind::OBJECT_SERVER
+                | SyntaxKind::OBJECT_STATISTICS
+                | SyntaxKind::OBJECT_SUBSCRIPTION
+                | SyntaxKind::OBJECT_TABLE
+                | SyntaxKind::OBJECT_TABLESPACE
+                | SyntaxKind::OBJECT_TEXT_SEARCH
+                | SyntaxKind::OBJECT_TRANSFORM
+                | SyntaxKind::OBJECT_TYPE
+                | SyntaxKind::OBJECT_VIEW
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::OBJECT_ACCESS_METHOD => {
+                ExtensionMemberObject::ObjectAccessMethod(ObjectAccessMethod { syntax })
+            }
+            SyntaxKind::OBJECT_AGGREGATE => {
+                ExtensionMemberObject::ObjectAggregate(ObjectAggregate { syntax })
+            }
+            SyntaxKind::OBJECT_CAST => ExtensionMemberObject::ObjectCast(ObjectCast { syntax }),
+            SyntaxKind::OBJECT_COLLATION => {
+                ExtensionMemberObject::ObjectCollation(ObjectCollation { syntax })
+            }
+            SyntaxKind::OBJECT_CONVERSION => {
+                ExtensionMemberObject::ObjectConversion(ObjectConversion { syntax })
+            }
+            SyntaxKind::OBJECT_DATABASE => {
+                ExtensionMemberObject::ObjectDatabase(ObjectDatabase { syntax })
+            }
+            SyntaxKind::OBJECT_DOMAIN => {
+                ExtensionMemberObject::ObjectDomain(ObjectDomain { syntax })
+            }
+            SyntaxKind::OBJECT_EVENT_TRIGGER => {
+                ExtensionMemberObject::ObjectEventTrigger(ObjectEventTrigger { syntax })
+            }
+            SyntaxKind::OBJECT_EXTENSION => {
+                ExtensionMemberObject::ObjectExtension(ObjectExtension { syntax })
+            }
+            SyntaxKind::OBJECT_FOREIGN_DATA_WRAPPER => {
+                ExtensionMemberObject::ObjectForeignDataWrapper(ObjectForeignDataWrapper { syntax })
+            }
+            SyntaxKind::OBJECT_FOREIGN_TABLE => {
+                ExtensionMemberObject::ObjectForeignTable(ObjectForeignTable { syntax })
+            }
+            SyntaxKind::OBJECT_INDEX => ExtensionMemberObject::ObjectIndex(ObjectIndex { syntax }),
+            SyntaxKind::OBJECT_LANGUAGE => {
+                ExtensionMemberObject::ObjectLanguage(ObjectLanguage { syntax })
+            }
+            SyntaxKind::OBJECT_MATERIALIZED_VIEW => {
+                ExtensionMemberObject::ObjectMaterializedView(ObjectMaterializedView { syntax })
+            }
+            SyntaxKind::OBJECT_OPERATOR => {
+                ExtensionMemberObject::ObjectOperator(ObjectOperator { syntax })
+            }
+            SyntaxKind::OBJECT_PUBLICATION => {
+                ExtensionMemberObject::ObjectPublication(ObjectPublication { syntax })
+            }
+            SyntaxKind::OBJECT_ROLE => ExtensionMemberObject::ObjectRole(ObjectRole { syntax }),
+            SyntaxKind::OBJECT_ROUTINE => {
+                ExtensionMemberObject::ObjectRoutine(ObjectRoutine { syntax })
+            }
+            SyntaxKind::OBJECT_SCHEMA => {
+                ExtensionMemberObject::ObjectSchema(ObjectSchema { syntax })
+            }
+            SyntaxKind::OBJECT_SEQUENCE => {
+                ExtensionMemberObject::ObjectSequence(ObjectSequence { syntax })
+            }
+            SyntaxKind::OBJECT_SERVER => {
+                ExtensionMemberObject::ObjectServer(ObjectServer { syntax })
+            }
+            SyntaxKind::OBJECT_STATISTICS => {
+                ExtensionMemberObject::ObjectStatistics(ObjectStatistics { syntax })
+            }
+            SyntaxKind::OBJECT_SUBSCRIPTION => {
+                ExtensionMemberObject::ObjectSubscription(ObjectSubscription { syntax })
+            }
+            SyntaxKind::OBJECT_TABLE => ExtensionMemberObject::ObjectTable(ObjectTable { syntax }),
+            SyntaxKind::OBJECT_TABLESPACE => {
+                ExtensionMemberObject::ObjectTablespace(ObjectTablespace { syntax })
+            }
+            SyntaxKind::OBJECT_TEXT_SEARCH => {
+                ExtensionMemberObject::ObjectTextSearch(ObjectTextSearch { syntax })
+            }
+            SyntaxKind::OBJECT_TRANSFORM => {
+                ExtensionMemberObject::ObjectTransform(ObjectTransform { syntax })
+            }
+            SyntaxKind::OBJECT_TYPE => ExtensionMemberObject::ObjectType(ObjectType { syntax }),
+            SyntaxKind::OBJECT_VIEW => ExtensionMemberObject::ObjectView(ObjectView { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ExtensionMemberObject::ObjectAccessMethod(it) => &it.syntax,
+            ExtensionMemberObject::ObjectAggregate(it) => &it.syntax,
+            ExtensionMemberObject::ObjectCast(it) => &it.syntax,
+            ExtensionMemberObject::ObjectCollation(it) => &it.syntax,
+            ExtensionMemberObject::ObjectConversion(it) => &it.syntax,
+            ExtensionMemberObject::ObjectDatabase(it) => &it.syntax,
+            ExtensionMemberObject::ObjectDomain(it) => &it.syntax,
+            ExtensionMemberObject::ObjectEventTrigger(it) => &it.syntax,
+            ExtensionMemberObject::ObjectExtension(it) => &it.syntax,
+            ExtensionMemberObject::ObjectForeignDataWrapper(it) => &it.syntax,
+            ExtensionMemberObject::ObjectForeignTable(it) => &it.syntax,
+            ExtensionMemberObject::ObjectIndex(it) => &it.syntax,
+            ExtensionMemberObject::ObjectLanguage(it) => &it.syntax,
+            ExtensionMemberObject::ObjectMaterializedView(it) => &it.syntax,
+            ExtensionMemberObject::ObjectOperator(it) => &it.syntax,
+            ExtensionMemberObject::ObjectPublication(it) => &it.syntax,
+            ExtensionMemberObject::ObjectRole(it) => &it.syntax,
+            ExtensionMemberObject::ObjectRoutine(it) => &it.syntax,
+            ExtensionMemberObject::ObjectSchema(it) => &it.syntax,
+            ExtensionMemberObject::ObjectSequence(it) => &it.syntax,
+            ExtensionMemberObject::ObjectServer(it) => &it.syntax,
+            ExtensionMemberObject::ObjectStatistics(it) => &it.syntax,
+            ExtensionMemberObject::ObjectSubscription(it) => &it.syntax,
+            ExtensionMemberObject::ObjectTable(it) => &it.syntax,
+            ExtensionMemberObject::ObjectTablespace(it) => &it.syntax,
+            ExtensionMemberObject::ObjectTextSearch(it) => &it.syntax,
+            ExtensionMemberObject::ObjectTransform(it) => &it.syntax,
+            ExtensionMemberObject::ObjectType(it) => &it.syntax,
+            ExtensionMemberObject::ObjectView(it) => &it.syntax,
+        }
+    }
+}
+impl From<ObjectAccessMethod> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectAccessMethod) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectAccessMethod(node)
+    }
+}
+impl From<ObjectAggregate> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectAggregate) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectAggregate(node)
+    }
+}
+impl From<ObjectCast> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectCast) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectCast(node)
+    }
+}
+impl From<ObjectCollation> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectCollation) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectCollation(node)
+    }
+}
+impl From<ObjectConversion> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectConversion) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectConversion(node)
+    }
+}
+impl From<ObjectDatabase> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectDatabase) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectDatabase(node)
+    }
+}
+impl From<ObjectDomain> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectDomain) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectDomain(node)
+    }
+}
+impl From<ObjectEventTrigger> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectEventTrigger) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectEventTrigger(node)
+    }
+}
+impl From<ObjectExtension> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectExtension) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectExtension(node)
+    }
+}
+impl From<ObjectForeignDataWrapper> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectForeignDataWrapper) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectForeignDataWrapper(node)
+    }
+}
+impl From<ObjectForeignTable> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectForeignTable) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectForeignTable(node)
+    }
+}
+impl From<ObjectIndex> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectIndex) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectIndex(node)
+    }
+}
+impl From<ObjectLanguage> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectLanguage) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectLanguage(node)
+    }
+}
+impl From<ObjectMaterializedView> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectMaterializedView) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectMaterializedView(node)
+    }
+}
+impl From<ObjectOperator> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectOperator) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectOperator(node)
+    }
+}
+impl From<ObjectPublication> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectPublication) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectPublication(node)
+    }
+}
+impl From<ObjectRole> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectRole) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectRole(node)
+    }
+}
+impl From<ObjectRoutine> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectRoutine) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectRoutine(node)
+    }
+}
+impl From<ObjectSchema> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectSchema) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectSchema(node)
+    }
+}
+impl From<ObjectSequence> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectSequence) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectSequence(node)
+    }
+}
+impl From<ObjectServer> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectServer) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectServer(node)
+    }
+}
+impl From<ObjectStatistics> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectStatistics) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectStatistics(node)
+    }
+}
+impl From<ObjectSubscription> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectSubscription) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectSubscription(node)
+    }
+}
+impl From<ObjectTable> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectTable) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectTable(node)
+    }
+}
+impl From<ObjectTablespace> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectTablespace) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectTablespace(node)
+    }
+}
+impl From<ObjectTextSearch> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectTextSearch) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectTextSearch(node)
+    }
+}
+impl From<ObjectTransform> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectTransform) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectTransform(node)
+    }
+}
+impl From<ObjectType> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectType) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectType(node)
+    }
+}
+impl From<ObjectView> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectView) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectView(node)
     }
 }
 impl AstNode for FrameBound {
@@ -39318,6 +41235,134 @@ impl From<Values> for PreparableStmt {
         PreparableStmt::Values(node)
     }
 }
+impl AstNode for PrivilegeObjects {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PRIVILEGE_ALL_IN_SCHEMA
+                | SyntaxKind::PRIVILEGE_DEFAULT
+                | SyntaxKind::PRIVILEGE_FOREIGN
+                | SyntaxKind::PRIVILEGE_LARGE_OBJECT
+                | SyntaxKind::PRIVILEGE_NAME
+                | SyntaxKind::PRIVILEGE_PARAMETER
+                | SyntaxKind::PRIVILEGE_PROPERTY_GRAPH
+                | SyntaxKind::PRIVILEGE_ROUTINE
+                | SyntaxKind::PRIVILEGE_TABLE
+                | SyntaxKind::PRIVILEGE_TYPE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PRIVILEGE_ALL_IN_SCHEMA => {
+                PrivilegeObjects::PrivilegeAllInSchema(PrivilegeAllInSchema { syntax })
+            }
+            SyntaxKind::PRIVILEGE_DEFAULT => {
+                PrivilegeObjects::PrivilegeDefault(PrivilegeDefault { syntax })
+            }
+            SyntaxKind::PRIVILEGE_FOREIGN => {
+                PrivilegeObjects::PrivilegeForeign(PrivilegeForeign { syntax })
+            }
+            SyntaxKind::PRIVILEGE_LARGE_OBJECT => {
+                PrivilegeObjects::PrivilegeLargeObject(PrivilegeLargeObject { syntax })
+            }
+            SyntaxKind::PRIVILEGE_NAME => PrivilegeObjects::PrivilegeName(PrivilegeName { syntax }),
+            SyntaxKind::PRIVILEGE_PARAMETER => {
+                PrivilegeObjects::PrivilegeParameter(PrivilegeParameter { syntax })
+            }
+            SyntaxKind::PRIVILEGE_PROPERTY_GRAPH => {
+                PrivilegeObjects::PrivilegePropertyGraph(PrivilegePropertyGraph { syntax })
+            }
+            SyntaxKind::PRIVILEGE_ROUTINE => {
+                PrivilegeObjects::PrivilegeRoutine(PrivilegeRoutine { syntax })
+            }
+            SyntaxKind::PRIVILEGE_TABLE => {
+                PrivilegeObjects::PrivilegeTable(PrivilegeTable { syntax })
+            }
+            SyntaxKind::PRIVILEGE_TYPE => PrivilegeObjects::PrivilegeType(PrivilegeType { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PrivilegeObjects::PrivilegeAllInSchema(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeDefault(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeForeign(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeLargeObject(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeName(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeParameter(it) => &it.syntax,
+            PrivilegeObjects::PrivilegePropertyGraph(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeRoutine(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeTable(it) => &it.syntax,
+            PrivilegeObjects::PrivilegeType(it) => &it.syntax,
+        }
+    }
+}
+impl From<PrivilegeAllInSchema> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeAllInSchema) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeAllInSchema(node)
+    }
+}
+impl From<PrivilegeDefault> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeDefault) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeDefault(node)
+    }
+}
+impl From<PrivilegeForeign> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeForeign) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeForeign(node)
+    }
+}
+impl From<PrivilegeLargeObject> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeLargeObject) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeLargeObject(node)
+    }
+}
+impl From<PrivilegeName> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeName) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeName(node)
+    }
+}
+impl From<PrivilegeParameter> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeParameter) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeParameter(node)
+    }
+}
+impl From<PrivilegePropertyGraph> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegePropertyGraph) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegePropertyGraph(node)
+    }
+}
+impl From<PrivilegeRoutine> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeRoutine) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeRoutine(node)
+    }
+}
+impl From<PrivilegeTable> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeTable) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeTable(node)
+    }
+}
+impl From<PrivilegeType> for PrivilegeObjects {
+    #[inline]
+    fn from(node: PrivilegeType) -> PrivilegeObjects {
+        PrivilegeObjects::PrivilegeType(node)
+    }
+}
 impl AstNode for RefAction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -39560,6 +41605,223 @@ impl From<Grant> for SchemaElement {
     #[inline]
     fn from(node: Grant) -> SchemaElement {
         SchemaElement::Grant(node)
+    }
+}
+impl AstNode for SecurityLabelObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::OBJECT_AGGREGATE
+                | SyntaxKind::OBJECT_COLUMN
+                | SyntaxKind::OBJECT_DATABASE
+                | SyntaxKind::OBJECT_DOMAIN
+                | SyntaxKind::OBJECT_EVENT_TRIGGER
+                | SyntaxKind::OBJECT_FOREIGN_TABLE
+                | SyntaxKind::OBJECT_LANGUAGE
+                | SyntaxKind::OBJECT_LARGE_OBJECT
+                | SyntaxKind::OBJECT_MATERIALIZED_VIEW
+                | SyntaxKind::OBJECT_PUBLICATION
+                | SyntaxKind::OBJECT_ROLE
+                | SyntaxKind::OBJECT_ROUTINE
+                | SyntaxKind::OBJECT_SCHEMA
+                | SyntaxKind::OBJECT_SEQUENCE
+                | SyntaxKind::OBJECT_SUBSCRIPTION
+                | SyntaxKind::OBJECT_TABLE
+                | SyntaxKind::OBJECT_TABLESPACE
+                | SyntaxKind::OBJECT_TYPE
+                | SyntaxKind::OBJECT_VIEW
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::OBJECT_AGGREGATE => {
+                SecurityLabelObject::ObjectAggregate(ObjectAggregate { syntax })
+            }
+            SyntaxKind::OBJECT_COLUMN => SecurityLabelObject::ObjectColumn(ObjectColumn { syntax }),
+            SyntaxKind::OBJECT_DATABASE => {
+                SecurityLabelObject::ObjectDatabase(ObjectDatabase { syntax })
+            }
+            SyntaxKind::OBJECT_DOMAIN => SecurityLabelObject::ObjectDomain(ObjectDomain { syntax }),
+            SyntaxKind::OBJECT_EVENT_TRIGGER => {
+                SecurityLabelObject::ObjectEventTrigger(ObjectEventTrigger { syntax })
+            }
+            SyntaxKind::OBJECT_FOREIGN_TABLE => {
+                SecurityLabelObject::ObjectForeignTable(ObjectForeignTable { syntax })
+            }
+            SyntaxKind::OBJECT_LANGUAGE => {
+                SecurityLabelObject::ObjectLanguage(ObjectLanguage { syntax })
+            }
+            SyntaxKind::OBJECT_LARGE_OBJECT => {
+                SecurityLabelObject::ObjectLargeObject(ObjectLargeObject { syntax })
+            }
+            SyntaxKind::OBJECT_MATERIALIZED_VIEW => {
+                SecurityLabelObject::ObjectMaterializedView(ObjectMaterializedView { syntax })
+            }
+            SyntaxKind::OBJECT_PUBLICATION => {
+                SecurityLabelObject::ObjectPublication(ObjectPublication { syntax })
+            }
+            SyntaxKind::OBJECT_ROLE => SecurityLabelObject::ObjectRole(ObjectRole { syntax }),
+            SyntaxKind::OBJECT_ROUTINE => {
+                SecurityLabelObject::ObjectRoutine(ObjectRoutine { syntax })
+            }
+            SyntaxKind::OBJECT_SCHEMA => SecurityLabelObject::ObjectSchema(ObjectSchema { syntax }),
+            SyntaxKind::OBJECT_SEQUENCE => {
+                SecurityLabelObject::ObjectSequence(ObjectSequence { syntax })
+            }
+            SyntaxKind::OBJECT_SUBSCRIPTION => {
+                SecurityLabelObject::ObjectSubscription(ObjectSubscription { syntax })
+            }
+            SyntaxKind::OBJECT_TABLE => SecurityLabelObject::ObjectTable(ObjectTable { syntax }),
+            SyntaxKind::OBJECT_TABLESPACE => {
+                SecurityLabelObject::ObjectTablespace(ObjectTablespace { syntax })
+            }
+            SyntaxKind::OBJECT_TYPE => SecurityLabelObject::ObjectType(ObjectType { syntax }),
+            SyntaxKind::OBJECT_VIEW => SecurityLabelObject::ObjectView(ObjectView { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            SecurityLabelObject::ObjectAggregate(it) => &it.syntax,
+            SecurityLabelObject::ObjectColumn(it) => &it.syntax,
+            SecurityLabelObject::ObjectDatabase(it) => &it.syntax,
+            SecurityLabelObject::ObjectDomain(it) => &it.syntax,
+            SecurityLabelObject::ObjectEventTrigger(it) => &it.syntax,
+            SecurityLabelObject::ObjectForeignTable(it) => &it.syntax,
+            SecurityLabelObject::ObjectLanguage(it) => &it.syntax,
+            SecurityLabelObject::ObjectLargeObject(it) => &it.syntax,
+            SecurityLabelObject::ObjectMaterializedView(it) => &it.syntax,
+            SecurityLabelObject::ObjectPublication(it) => &it.syntax,
+            SecurityLabelObject::ObjectRole(it) => &it.syntax,
+            SecurityLabelObject::ObjectRoutine(it) => &it.syntax,
+            SecurityLabelObject::ObjectSchema(it) => &it.syntax,
+            SecurityLabelObject::ObjectSequence(it) => &it.syntax,
+            SecurityLabelObject::ObjectSubscription(it) => &it.syntax,
+            SecurityLabelObject::ObjectTable(it) => &it.syntax,
+            SecurityLabelObject::ObjectTablespace(it) => &it.syntax,
+            SecurityLabelObject::ObjectType(it) => &it.syntax,
+            SecurityLabelObject::ObjectView(it) => &it.syntax,
+        }
+    }
+}
+impl From<ObjectAggregate> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectAggregate) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectAggregate(node)
+    }
+}
+impl From<ObjectColumn> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectColumn) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectColumn(node)
+    }
+}
+impl From<ObjectDatabase> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectDatabase) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectDatabase(node)
+    }
+}
+impl From<ObjectDomain> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectDomain) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectDomain(node)
+    }
+}
+impl From<ObjectEventTrigger> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectEventTrigger) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectEventTrigger(node)
+    }
+}
+impl From<ObjectForeignTable> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectForeignTable) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectForeignTable(node)
+    }
+}
+impl From<ObjectLanguage> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectLanguage) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectLanguage(node)
+    }
+}
+impl From<ObjectLargeObject> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectLargeObject) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectLargeObject(node)
+    }
+}
+impl From<ObjectMaterializedView> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectMaterializedView) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectMaterializedView(node)
+    }
+}
+impl From<ObjectPublication> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectPublication) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectPublication(node)
+    }
+}
+impl From<ObjectRole> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectRole) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectRole(node)
+    }
+}
+impl From<ObjectRoutine> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectRoutine) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectRoutine(node)
+    }
+}
+impl From<ObjectSchema> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectSchema) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectSchema(node)
+    }
+}
+impl From<ObjectSequence> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectSequence) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectSequence(node)
+    }
+}
+impl From<ObjectSubscription> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectSubscription) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectSubscription(node)
+    }
+}
+impl From<ObjectTable> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectTable) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectTable(node)
+    }
+}
+impl From<ObjectTablespace> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectTablespace) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectTablespace(node)
+    }
+}
+impl From<ObjectType> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectType) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectType(node)
+    }
+}
+impl From<ObjectView> for SecurityLabelObject {
+    #[inline]
+    fn from(node: ObjectView) -> SecurityLabelObject {
+        SecurityLabelObject::ObjectView(node)
     }
 }
 impl AstNode for SelectVariant {

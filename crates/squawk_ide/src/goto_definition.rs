@@ -968,6 +968,92 @@ drop sequence s$0;
     }
 
     #[test]
+    fn goto_drop_constraint() {
+        assert_snapshot!(goto("
+create table t(id int constraint id_positive check (id > 0));
+alter table t drop constraint id_positive$0;
+"), @"
+          ╭▸ 
+        2 │ create table t(id int constraint id_positive check (id > 0));
+          │                                  ─────────── 2. destination
+        3 │ alter table t drop constraint id_positive;
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_constraint() {
+        assert_snapshot!(goto("
+create table t(id int constraint id_positive check (id > 0));
+comment on constraint id_positive$0 on t is 'positive id';
+"), @"
+          ╭▸ 
+        2 │ create table t(id int constraint id_positive check (id > 0));
+          │                                  ─────────── 2. destination
+        3 │ comment on constraint id_positive on t is 'positive id';
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_constraint_table() {
+        assert_snapshot!(goto("
+create table t(id int constraint id_positive check (id > 0));
+comment on constraint id_positive on t$0 is 'positive id';
+"), @"
+          ╭▸ 
+        2 │ create table t(id int constraint id_positive check (id > 0));
+          │              ─ 2. destination
+        3 │ comment on constraint id_positive on t is 'positive id';
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_constraint_with_same_name_on_multiple_tables() {
+        assert_snapshot!(goto("
+create table t(id int constraint id_positive check (id > 0));
+create table u(id int constraint id_positive check (id > 0));
+alter table u drop constraint id_positive$0;
+"), @"
+          ╭▸ 
+        3 │ create table u(id int constraint id_positive check (id > 0));
+          │                                  ─────────── 2. destination
+        4 │ alter table u drop constraint id_positive;
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_add_constraint() {
+        assert_snapshot!(goto("
+create table t(id int);
+alter table t add constraint id_positive check (id > 0);
+comment on constraint id_positive$0 on t is 'positive id';
+"), @"
+          ╭▸ 
+        3 │ alter table t add constraint id_positive check (id > 0);
+          │                              ─────────── 2. destination
+        4 │ comment on constraint id_positive on t is 'positive id';
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_on_conflict_constraint() {
+        assert_snapshot!(goto("
+create table t(id int constraint t_id_key unique);
+insert into t values (1) on conflict on constraint t_id_key$0 do nothing;
+"), @"
+          ╭▸ 
+        2 │ create table t(id int constraint t_id_key unique);
+          │                                  ──────── 2. destination
+        3 │ insert into t values (1) on conflict on constraint t_id_key do nothing;
+          ╰╴                                                          ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_trigger() {
         assert_snapshot!(goto("
 create trigger tr before insert on t for each row execute function f();
@@ -1580,6 +1666,48 @@ create trigger tr before insert on foo for each row when (new$0.id > 0) execute 
     }
 
     #[test]
+    fn goto_create_rule_old_column() {
+        assert_snapshot!(goto("
+create table t(id int);
+create rule r as on update to t where old.id$0 = new.id do instead nothing;
+"), @"
+          ╭▸ 
+        2 │ create table t(id int);
+          │                ── 2. destination
+        3 │ create rule r as on update to t where old.id = new.id do instead nothing;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_rule_new_column() {
+        assert_snapshot!(goto("
+create table t(id int);
+create rule r as on update to t where old.id = new.id$0 do instead nothing;
+"), @"
+          ╭▸ 
+        2 │ create table t(id int);
+          │                ── 2. destination
+        3 │ create rule r as on update to t where old.id = new.id do instead nothing;
+          ╰╴                                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_rule_old_table() {
+        assert_snapshot!(goto("
+create table t(id int);
+create rule r as on update to t where old$0.id = new.id do instead nothing;
+"), @"
+          ╭▸ 
+        2 │ create table t(id int);
+          │              ─ 2. destination
+        3 │ create rule r as on update to t where old.id = new.id do instead nothing;
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_trigger_update_of_column() {
         assert_snapshot!(goto("
 create table t(id int, updated_at timestamptz);
@@ -1844,6 +1972,50 @@ alter extension my$0ext update to '2.0';
           │                  ───── 2. destination
         3 │ alter extension myext update to '2.0';
           ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_extension_with_schema() {
+        assert_snapshot!(goto("
+create schema ext_schema;
+create extension hstore with schema ext_sche$0ma;
+"), @"
+          ╭▸ 
+        2 │ create schema ext_schema;
+          │               ────────── 2. destination
+        3 │ create extension hstore with schema ext_schema;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_extension_add_table() {
+        assert_snapshot!(goto("
+create extension e;
+create table t(id int);
+alter extension e add table t$0;
+"), @"
+          ╭▸ 
+        3 │ create table t(id int);
+          │              ─ 2. destination
+        4 │ alter extension e add table t;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_extension_add_foreign_table() {
+        assert_snapshot!(goto("
+create extension e;
+create foreign table t(id int) server s;
+alter extension e add foreign table t$0;
+"), @"
+          ╭▸ 
+        3 │ create foreign table t(id int) server s;
+          │                      ─ 2. destination
+        4 │ alter extension e add foreign table t;
+          ╰╴                                    ─ 1. source
         ");
     }
 
@@ -11016,6 +11188,36 @@ create operator ||| (leftarg = int, rightarg = int, procedure = f$0);
           │                 ─ 2. destination
         3 │ create operator ||| (leftarg = int, rightarg = int, procedure = f);
           ╰╴                                                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_cast_function_ref() {
+        assert_snapshot!(goto("
+create type a as enum ('x');
+create type b as enum ('x');
+create function a_to_b(a) returns b language sql as $$ select 'x'::b $$;
+create cast (a as b) with function a_to_b$0(a);
+"), @"
+          ╭▸ 
+        4 │ create function a_to_b(a) returns b language sql as $$ select 'x'::b $$;
+          │                 ────── 2. destination
+        5 │ create cast (a as b) with function a_to_b(a);
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_type_range_subtype_diff_function_ref() {
+        assert_snapshot!(goto("
+create function int_diff(int, int) returns float8 language sql as $$ select 0::float8 $$;
+create type int_range as range (subtype = int, subtype_diff = int_diff$0);
+"), @"
+          ╭▸ 
+        2 │ create function int_diff(int, int) returns float8 language sql as $$ select 0::float8 $$;
+          │                 ──────── 2. destination
+        3 │ create type int_range as range (subtype = int, subtype_diff = int_diff);
+          ╰╴                                                                     ─ 1. source
         ");
     }
 

@@ -241,12 +241,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "r"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "param"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "param"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_all"
@@ -260,9 +261,10 @@ SOURCE_FILE
       NAME_REF
         IDENT "r"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ALL_KW "all"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- in_database"
@@ -323,8 +325,9 @@ SOURCE_FILE
     WHITESPACE " "
     ALL_KW "all"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ALL_KW "all"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
