@@ -6287,20 +6287,12 @@ impl CreateStatistics {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_refs(&self) -> AstChildren<NameRef> {
-        support::children(&self.syntax)
-    }
-    #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    pub fn stat_types(&self) -> Option<StatTypes> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
@@ -19751,6 +19743,25 @@ impl SplitPartition {
     #[inline]
     pub fn split_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SPLIT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct StatTypes {
+    pub(crate) syntax: SyntaxNode,
+}
+impl StatTypes {
+    #[inline]
+    pub fn name_refs(&self) -> AstChildren<NameRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -34491,6 +34502,24 @@ impl AstNode for SplitPartition {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SPLIT_PARTITION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for StatTypes {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::STAT_TYPES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

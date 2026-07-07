@@ -18,6 +18,7 @@ pub(crate) enum SymbolKind {
     Procedure,
     PropertyGraph,
     Role,
+    Rule,
     Schema,
     Sequence,
     Server,

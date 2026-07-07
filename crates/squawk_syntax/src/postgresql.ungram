@@ -2963,9 +2963,12 @@ CreateServer =
 
 CreateStatistics =
   'create' 'statistics' IfNotExists? Path?
-  ('(' (NameRef (',' NameRef)*) ')')?
+  StatTypes?
   ('on' (Expr (',' Expr)*))?
   FromTable ';'?
+
+StatTypes =
+  '(' (NameRef (',' NameRef)*) ')'
 
 CreateSubscription =
   'create' 'subscription' Name

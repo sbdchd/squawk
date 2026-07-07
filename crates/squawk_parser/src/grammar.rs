@@ -10173,7 +10173,7 @@ fn create_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.at(L_PAREN) && !p.at(ON_KW) {
         path_name(p);
     }
-    opt_paren_name_ref_list(p);
+    opt_stat_types(p);
     if p.eat(ON_KW) {
         if !opt_expr_list(p) {
             p.error("expected expression")
@@ -10182,6 +10182,15 @@ fn create_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     from_table(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_STATISTICS)
+}
+
+fn opt_stat_types(p: &mut Parser<'_>) {
+    if !p.at(L_PAREN) {
+        return;
+    }
+    let m = p.start();
+    opt_paren_name_ref_list(p);
+    m.complete(p, STAT_TYPES);
 }
 
 fn opt_paren_name_ref_list(p: &mut Parser<'_>) -> bool {

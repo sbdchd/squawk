@@ -28,6 +28,7 @@ pub enum LocationKind {
     Procedure,
     PropertyGraph,
     Role,
+    Rule,
     Schema,
     Sequence,
     Server,
