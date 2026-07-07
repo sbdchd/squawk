@@ -264,6 +264,8 @@ fn bind_file(b: &mut Binder, file: &ast::SourceFile) {
 
 fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
     match stmt {
+        ast::Stmt::AlterDomain(alter_domain) => bind_alter_domain(b, alter_domain),
+        ast::Stmt::AlterTable(alter_table) => bind_alter_table(b, alter_table),
         ast::Stmt::CreateTable(create_table) => bind_create_table(b, create_table),
         ast::Stmt::CreateTableAs(create_table_as) => bind_create_table_as(b, create_table_as),
         ast::Stmt::SelectInto(select_into) => bind_select_into(b, select_into),
@@ -332,13 +334,47 @@ fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
     let type_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Type,
         ptr: name_ptr,
-        schema: Some(schema),
+        schema: Some(schema.clone()),
         params: None,
         table: None,
     });
 
     b.scope.insert(table_name.clone(), table_id);
-    b.scope.insert(table_name, type_id);
+    b.scope.insert(table_name.clone(), type_id);
+    bind_create_table_constraints(b, &create_table, &schema, &table_name);
+}
+
+fn bind_create_table_constraints(
+    b: &mut Binder,
+    create_table: &impl ast::HasCreateTable,
+    schema: &Schema,
+    table_name: &Name,
+) {
+    let Some(table_arg_list) = create_table.table_arg_list() else {
+        return;
+    };
+
+    for arg in table_arg_list.args() {
+        match arg {
+            ast::TableArg::Column(column) => {
+                for constraint in column.constraints() {
+                    if let Some(constraint_name) = constraint.constraint_name()
+                        && let Some(name) = constraint_name.name()
+                    {
+                        bind_constraint_name_node(b, name, schema, table_name);
+                    }
+                }
+            }
+            ast::TableArg::TableConstraint(constraint) => {
+                if let Some(constraint_name) = constraint.constraint_name()
+                    && let Some(name) = constraint_name.name()
+                {
+                    bind_constraint_name_node(b, name, schema, table_name);
+                }
+            }
+            ast::TableArg::LikeClause(_) => (),
+        }
+    }
 }
 
 fn bind_create_table_as(b: &mut Binder, create_table_as: ast::CreateTableAs) {
@@ -629,12 +665,103 @@ fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
     let type_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Type,
         ptr: name_ptr,
-        schema: Some(schema),
+        schema: Some(schema.clone()),
         params: None,
         table: None,
     });
 
-    b.scope.insert(domain_name, type_id);
+    b.scope.insert(domain_name.clone(), type_id);
+
+    for constraint in create_domain.constraints() {
+        if let Some(constraint_name) = constraint.constraint_name()
+            && let Some(name) = constraint_name.name()
+        {
+            bind_constraint_name_node(b, name, &schema, &domain_name);
+        }
+    }
+}
+
+fn bind_alter_table(b: &mut Binder, alter_table: ast::AlterTable) {
+    let Some(path) = alter_table.relation_name().and_then(|r| r.path()) else {
+        return;
+    };
+    let Some(table_name) = item_name(&path) else {
+        return;
+    };
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    for action in alter_table.actions() {
+        match action {
+            ast::AlterTableAction::AddColumn(add_column) => {
+                for constraint in add_column.constraints() {
+                    if let Some(constraint_name) = constraint.constraint_name()
+                        && let Some(name) = constraint_name.name()
+                    {
+                        bind_constraint_name_node(b, name, &schema, &table_name);
+                    }
+                }
+            }
+            ast::AlterTableAction::AddConstraint(add_constraint) => {
+                if let Some(constraint) = add_constraint.constraint()
+                    && let Some(constraint_name) = constraint.constraint_name()
+                    && let Some(name) = constraint_name.name()
+                {
+                    bind_constraint_name_node(b, name, &schema, &table_name);
+                }
+            }
+            ast::AlterTableAction::RenameConstraint(rename_constraint) => {
+                if let Some(name) = rename_constraint.name() {
+                    bind_constraint_name_node(b, name, &schema, &table_name);
+                }
+            }
+            _ => (),
+        }
+    }
+}
+
+fn bind_alter_domain(b: &mut Binder, alter_domain: ast::AlterDomain) {
+    let Some(path) = alter_domain.path() else {
+        return;
+    };
+    let Some(domain_name) = item_name(&path) else {
+        return;
+    };
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    match alter_domain.action() {
+        Some(ast::AlterDomainAction::AddConstraint(add_constraint)) => {
+            if let Some(constraint) = add_constraint.constraint()
+                && let Some(constraint_name) = constraint.constraint_name()
+                && let Some(name) = constraint_name.name()
+            {
+                bind_constraint_name_node(b, name, &schema, &domain_name);
+            }
+        }
+        Some(ast::AlterDomainAction::RenameConstraint(rename_constraint)) => {
+            if let Some(name) = rename_constraint.name() {
+                bind_constraint_name_node(b, name, &schema, &domain_name);
+            }
+        }
+        _ => (),
+    }
+}
+
+fn bind_constraint_name_node(b: &mut Binder, name: ast::Name, schema: &Schema, owner_name: &Name) {
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let constraint_name = Name::from_node(&name);
+    let constraint_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Constraint,
+        ptr: name_ptr,
+        schema: Some(schema.clone()),
+        params: None,
+        table: Some(owner_name.clone()),
+    });
+
+    b.scope.insert(constraint_name, constraint_id);
 }
 
 fn multirange_type_from_range(

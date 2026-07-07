@@ -2014,7 +2014,7 @@ AlterStatistics =
     OwnerTo
   | RenameTo
   | SetSchema
-  | 'set' 'statistics' ('default' | Literal)
+  | SetStatistics
   ) ';'?
 
 AlterServer =
@@ -2036,7 +2036,8 @@ AlterSequence =
   'alter' 'sequence' IfExists? Path
   (
     SetSchema
-  | 'set' ('logged' | 'unlogged')
+  | SetLogged
+  | SetUnlogged
   | OwnerTo
   | RenameTo
   | SequenceOption SequenceOption*
@@ -2067,7 +2068,7 @@ AlterRole =
   (
     RenameTo
   | ('in' 'database' NameRef)? SetConfigParam
-  | ('in' 'database' NameRef)? 'reset' ('all' | Path)
+  | ('in' 'database' NameRef)? ResetConfigParam
   | RoleOptionList
   )? ';'?
 
@@ -2249,31 +2250,143 @@ AlterEventTrigger =
 AlterExtension =
   'alter' 'extension' NameRef
   (
-    'update' ('to' ('#ident' | Literal))?
+    AlterExtensionUpdate
   | SetSchema
-  | ('add' | 'drop')
-    (
-      ('schema' | 'domain' | 'table' | 'type' | 'extension' | 'publication'
-        | 'server' | 'database' | 'role' | 'subscription' | 'tablespace') NameRef
-    | ('collation' | 'conversion' | 'sequence' | 'view' | 'index' | 'statistics') Path
-    | 'access' 'method' NameRef
-    | 'aggregate' Aggregate
-    | 'cast' CastSig
-    | 'event' 'trigger' NameRef
-    | 'foreign' ('data' 'wrapper' NameRef | 'table' Path)
-    | ('function' | 'procedure' | 'routine') FunctionSig
-    | 'materialized' 'view' Path
-    | 'operator'
-      (
-        'class' NameRef 'using' NameRef
-      | 'family' NameRef 'using' NameRef
-      | Op '(' Type ',' Type ')'
-      )
-    | 'procedural'? 'language' NameRef
-    | 'text' 'search' ('configuration' | 'dictionary' | 'parser' | 'template') Path
-    | 'transform' 'for' NameRef 'language' NameRef
-    )
+  | AlterExtensionAdd
+  | AlterExtensionDrop
   )? ';'?
+
+AlterExtensionUpdate =
+  'update' ('to' ('#ident' | Literal))?
+
+AlterExtensionAdd =
+  'add' ExtensionMemberObject
+
+AlterExtensionDrop =
+  'drop' ExtensionMemberObject
+
+ExtensionMemberObject =
+  ObjectAccessMethod
+| ObjectAggregate
+| ObjectCast
+| ObjectCollation
+| ObjectConversion
+| ObjectDatabase
+| ObjectDomain
+| ObjectEventTrigger
+| ObjectExtension
+| ObjectForeignDataWrapper
+| ObjectForeignTable
+| ObjectIndex
+| ObjectLanguage
+| ObjectMaterializedView
+| ObjectOperator
+| ObjectPublication
+| ObjectRole
+| ObjectRoutine
+| ObjectSchema
+| ObjectSequence
+| ObjectServer
+| ObjectStatistics
+| ObjectSubscription
+| ObjectTable
+| ObjectTablespace
+| ObjectTextSearch
+| ObjectTransform
+| ObjectType
+| ObjectView
+
+ObjectCollation =
+  'collation' Path
+
+ObjectConversion =
+  'conversion' Path
+
+ObjectDatabase =
+  'database' Path
+
+ObjectDomain =
+  'domain' Path
+
+ObjectExtension =
+  'extension' Path
+
+ObjectIndex =
+  'index' Path
+
+ObjectPublication =
+  'publication' Path
+
+ObjectRole =
+  'role' Path
+
+ObjectSchema =
+  'schema' Path
+
+ObjectSequence =
+  'sequence' Path
+
+ObjectServer =
+  'server' Path
+
+ObjectStatistics =
+  'statistics' Path
+
+ObjectSubscription =
+  'subscription' Path
+
+ObjectTable =
+  'table' Path
+
+ObjectTablespace =
+  'tablespace' Path
+
+ObjectType =
+  'type' Path
+
+ObjectView =
+  'view' Path
+
+ObjectAccessMethod =
+  'access' 'method' NameRef
+
+ObjectAggregate =
+  'aggregate' Aggregate
+
+ObjectCast =
+  'cast' CastSig
+
+ObjectEventTrigger =
+  'event' 'trigger' NameRef
+
+ObjectForeignDataWrapper =
+  'foreign' 'data' 'wrapper' NameRef
+
+ObjectForeignTable =
+  'foreign' 'table' Path
+
+ObjectRoutine =
+  ('function' | 'procedure' | 'routine') FunctionSig
+
+ObjectMaterializedView =
+  'materialized' 'view' Path
+
+ObjectOperator =
+  'operator'
+  (
+    Op '(' Type ',' Type ')'
+  | 'class' Path UsingMethod
+  | 'family' Path UsingMethod
+  )
+
+ObjectLanguage =
+  'procedural'? 'language' NameRef
+
+ObjectTextSearch =
+  'text' 'search' ('configuration' | 'dictionary' | 'parser' | 'template') Path
+
+ObjectTransform =
+  'transform' 'for' Type 'language' NameRef
 
 AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
@@ -2388,7 +2501,7 @@ AlterSystem =
   'alter' 'system'
   (
     SetConfigParam
-  | 'reset' ('all' | Path)
+  | ResetConfigParam
   ) ';'?
 
 AlterTablespace =
@@ -2493,7 +2606,7 @@ AlterUser =
     RoleOptionList
   | RenameTo
   | ('in' 'database' NameRef)? SetConfigParam
-  | ('in' 'database' NameRef)? 'reset' ('all' | NameRef)
+  | ('in' 'database' NameRef)? ResetConfigParam
   )? ';'?
 
 AlterUserMapping =
@@ -2519,53 +2632,68 @@ Analyze =
 // suffix it with `On` to avoid conflicting with comment nodes
 CommentOn =
   'comment' 'on'
-  (
-    'access' 'method' Path
-  | 'aggregate' Aggregate
-  | 'cast' CastSig
-  | 'collation' Path
-  | 'column' Path
-  | 'constraint' NameRef 'on' 'domain'? Path
-  | 'conversion' Path
-  | 'database' Path
-  | 'domain' Path
-  | 'event' 'trigger' Path
-  | 'extension' Path
-  | 'foreign' 'data' 'wrapper' Path
-  | 'foreign' 'table' Path
-  | 'function' FunctionSig
-  | 'index' Path
-  | 'large' 'object' Literal
-  | 'materialized' 'view' Path
-  | 'operator' Op '(' Type ',' Type ')'
-  | 'operator' 'class' Path UsingMethod
-  | 'operator' 'family' Path UsingMethod
-  | 'policy' NameRef 'on' Path
-  | 'property' 'graph' Path
-  | 'procedural'? 'language' Path
-  | 'procedure' FunctionSig
-  | 'publication' Path
-  | 'role' Path
-  | 'routine' FunctionSig
-  | 'rule' NameRef 'on' Path
-  | 'schema' Path
-  | 'sequence' Path
-  | 'server' Path
-  | 'statistics' Path
-  | 'subscription' Path
-  | 'table' Path
-  | 'tablespace' Path
-  | 'text' 'search' 'configuration' Path
-  | 'text' 'search' 'dictionary' Path
-  | 'text' 'search' 'parser' Path
-  | 'text' 'search' 'template' Path
-  | 'transform' 'for' Type 'language' NameRef
-  | 'trigger' NameRef 'on' Path
-  | 'type' Path
-  | 'view' Path
-  )
+  CommentObject
   'is'
   ('null' | Literal) ';'?
+
+CommentObject =
+  ObjectAccessMethod
+| ObjectAggregate
+| ObjectCast
+| ObjectCollation
+| ObjectConversion
+| ObjectDatabase
+| ObjectDomain
+| ObjectEventTrigger
+| ObjectExtension
+| ObjectForeignDataWrapper
+| ObjectForeignTable
+| ObjectIndex
+| ObjectLanguage
+| ObjectMaterializedView
+| ObjectPublication
+| ObjectRole
+| ObjectRoutine
+| ObjectSchema
+| ObjectSequence
+| ObjectServer
+| ObjectStatistics
+| ObjectSubscription
+| ObjectTable
+| ObjectTablespace
+| ObjectTextSearch
+| ObjectType
+| ObjectView
+| ObjectColumn
+| ObjectConstraint
+| ObjectLargeObject
+| ObjectOperator
+| ObjectPolicy
+| ObjectPropertyGraph
+| ObjectRule
+| ObjectTransform
+| ObjectTrigger
+
+ObjectColumn =
+  'column' Path
+
+ObjectConstraint =
+  'constraint' NameRef 'on' 'domain'? Path
+
+ObjectLargeObject =
+  'large' 'object' Literal
+
+ObjectPolicy =
+  'policy' NameRef 'on' Path
+
+ObjectPropertyGraph =
+  'property' 'graph' Path
+
+ObjectRule =
+  'rule' NameRef 'on' Path
+
+ObjectTrigger =
+  'trigger' NameRef 'on' Path
 
 Cluster =
   'cluster'
@@ -3300,17 +3428,47 @@ GrantRoleOption =
   Name ('option' | 'true' | 'false')
 
 PrivilegeObjects =
+  PrivilegeAllInSchema
+| PrivilegeDefault
+| PrivilegeForeign
+| PrivilegeLargeObject
+| PrivilegeName
+| PrivilegeParameter
+| PrivilegePropertyGraph
+| PrivilegeRoutine
+| PrivilegeTable
+| PrivilegeType
+
+PrivilegeAllInSchema =
   'all' ('tables' | 'sequences' | 'functions' | 'procedures' | 'routines')
-    'in' 'schema' (NameRef (',' NameRef)*)
-| 'parameter' (Path (',' Path)*)
-| ('function' | 'procedure' | 'routine') FunctionSigList
-| 'type' (Type (',' Type)*)
-| ('database' | 'tablespace' | 'schema' | 'language') (NameRef (',' NameRef)*)
-| ('table' | 'sequence' | 'domain') (Path (',' Path)*)
-| 'foreign' ('data' 'wrapper' | 'server') (NameRef (',' NameRef)*)
-| 'large' 'object' (Literal (',' Literal)*)
-| 'property' 'graph' (Path (',' Path)*)
-| (Path (',' Path)*)
+  'in' 'schema' (NameRef (',' NameRef)*)
+
+PrivilegeParameter =
+  'parameter' (Path (',' Path)*)
+
+PrivilegeRoutine =
+  ('function' | 'procedure' | 'routine') FunctionSigList
+
+PrivilegeType =
+  'type' (Type (',' Type)*)
+
+PrivilegeName =
+  ('database' | 'tablespace' | 'schema' | 'language') (NameRef (',' NameRef)*)
+
+PrivilegeTable =
+  ('table' | 'sequence' | 'domain') (Path (',' Path)*)
+
+PrivilegeForeign =
+  'foreign' ('data' 'wrapper' | 'server') (NameRef (',' NameRef)*)
+
+PrivilegeLargeObject =
+  'large' 'object' (Literal (',' Literal)*)
+
+PrivilegePropertyGraph =
+  'property' 'graph' (Path (',' Path)*)
+
+PrivilegeDefault =
+  Path (',' Path)*
 
 RevokeCommandList =
   (RevokeCommand (',' RevokeCommand)*)
@@ -3325,31 +3483,30 @@ SecurityLabel =
   'security' 'label'
   ForProvider?
   'on'
-  (
-    'table' Path
-  | 'column' Path
-  | 'database' Path
-  | 'domain' Path
-  | 'publication' Path
-  | 'role' Path
-  | 'schema' Path
-  | 'sequence' Path
-  | 'subscription' Path
-  | 'tablespace' Path
-  | 'type' Path
-  | 'view'  Path
-  | 'event' 'trigger' Path
-  | 'foreign' 'table' Path
-  | 'procedural'? 'language' Path
-  | 'large' 'object' Literal
-  | 'materialized' 'view' Path
-  | 'function' FunctionSig
-  | 'procedure' FunctionSig
-  | 'routine' FunctionSig
-  | 'aggregate' Aggregate
-  )
+  SecurityLabelObject
   'is'
   ('null' | Literal) ';'?
+
+SecurityLabelObject =
+  ObjectAggregate
+| ObjectDatabase
+| ObjectDomain
+| ObjectEventTrigger
+| ObjectForeignTable
+| ObjectLanguage
+| ObjectMaterializedView
+| ObjectPublication
+| ObjectRole
+| ObjectRoutine
+| ObjectSchema
+| ObjectSequence
+| ObjectSubscription
+| ObjectTable
+| ObjectTablespace
+| ObjectType
+| ObjectView
+| ObjectColumn
+| ObjectLargeObject
 
 ForProvider =
   'for' (Literal | NameRef)

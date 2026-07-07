@@ -147,9 +147,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    LOGGED_KW "logged"
+    SET_LOGGED
+      SET_KW "set"
+      WHITESPACE " "
+      LOGGED_KW "logged"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_SEQUENCE
@@ -162,9 +163,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    UNLOGGED_KW "unlogged"
+    SET_UNLOGGED
+      SET_KW "set"
+      WHITESPACE " "
+      UNLOGGED_KW "unlogged"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"

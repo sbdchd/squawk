@@ -16,6 +16,7 @@ pub enum LocationKind {
     Column,
     CommitBegin,
     CommitEnd,
+    Constraint,
     Cursor,
     Database,
     EventTrigger,

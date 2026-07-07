@@ -267,10 +267,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "u"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
@@ -282,9 +285,10 @@ SOURCE_FILE
       NAME_REF
         IDENT "u"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    ALL_KW "all"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_USER
@@ -303,9 +307,12 @@ SOURCE_FILE
     NAME_REF
       IDENT "d"
     WHITESPACE " "
-    RESET_KW "reset"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n\n"
