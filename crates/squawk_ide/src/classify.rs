@@ -609,10 +609,6 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         {
             return Some(NameRefClass::AlterColumn);
         }
-        // COMMENT ON / SECURITY LABEL / ALTER EXTENSION object kinds are wrapped
-        // in per-kind nodes (Extension* and Comment*). Match on the node variant
-        // rather than re-sniffing the leading keywords. Kinds shared with other
-        // statements (Index, Type, View, Sequence, ...) are handled further down.
         if ast::ObjectColumn::can_cast(ancestor.kind()) {
             return Some(NameRefClass::QualifiedColumn);
         }
@@ -1124,11 +1120,8 @@ fn classify_privilege_object(privilege_objects: &ast::PrivilegeObjects) -> Optio
             None
         }
         ast::PrivilegeObjects::PrivilegePropertyGraph(_) => Some(NameRefClass::PropertyGraph),
-        // the only name is the schema being granted in
         ast::PrivilegeObjects::PrivilegeAllInSchema(_) => Some(NameRefClass::Schema),
-        // bare relation name list
         ast::PrivilegeObjects::PrivilegeDefault(_) => Some(NameRefClass::PrivilegeObjectTable),
-        // parameter / large object have no resolvable name
         ast::PrivilegeObjects::PrivilegeParameter(_)
         | ast::PrivilegeObjects::PrivilegeLargeObject(_) => None,
     }
