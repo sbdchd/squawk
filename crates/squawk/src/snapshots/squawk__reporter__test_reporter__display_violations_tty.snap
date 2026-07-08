@@ -2,7 +2,7 @@
 source: crates/squawk/src/reporter.rs
 expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
 ---
-warning[]8;;https://squawkhq.com/docs/require-timeout-settings\require-timeout-settings]8;;\]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+warning[]8;;https://squawkhq.com/docs/require-lock-timeout\require-lock-timeout]8;;\]: Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
   ╭▸ main.sql:2:4
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
@@ -12,7 +12,7 @@ warning[]8;;https://squawkhq.com/docs/require-timeout-settings\require-timeout
   ╭╴
 2 +    set lock_timeout = '1s';
   ╰╴
-warning[]8;;https://squawkhq.com/docs/require-timeout-settings\require-timeout-settings]8;;\]: Missing `set statement_timeout` before potentially slow operations
+warning[]8;;https://squawkhq.com/docs/require-statement-timeout\require-statement-timeout]8;;\]: Missing `set statement_timeout` before potentially slow operations
   ╭▸ main.sql:2:4
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;

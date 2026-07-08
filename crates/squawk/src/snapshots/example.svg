@@ -106,7 +106,7 @@
 </tspan>
     <tspan x="10px" y="766px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan><tspan>             </tspan><tspan class="fg-bright-green">++++++++++++</tspan>
 </tspan>
-    <tspan x="10px" y="784px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-timeout-settings">require-timeout-settings</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set lock_timeout` before potentially slow SHARE lock operations</tspan>
+    <tspan x="10px" y="784px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-lock-timeout">require-lock-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set lock_timeout` before potentially slow SHARE lock operations</tspan>
 </tspan>
     <tspan x="10px" y="802px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:10:1</tspan>
 </tspan>
@@ -126,7 +126,7 @@
 </tspan>
     <tspan x="10px" y="946px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="964px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-timeout-settings">require-timeout-settings</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set statement_timeout` before potentially slow operations</tspan>
+    <tspan x="10px" y="964px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/require-statement-timeout">require-statement-timeout</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: Missing `set statement_timeout` before potentially slow operations</tspan>
 </tspan>
     <tspan x="10px" y="982px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:10:1</tspan>
 </tspan>

@@ -193,9 +193,14 @@ const rules = [
     description: "Truncate cascade will recursively truncate all related tables!",
   },
   {
-    name: "require-timeout-settings",
+    name: "require-lock-timeout",
     tags: ["locking"],
-    description: "Require lock and statement timeouts",
+    description: "Require a lock timeout",
+  },
+  {
+    name: "require-statement-timeout",
+    tags: ["locking"],
+    description: "Require a statement timeout",
   },
   {
     name: "ban-uncommitted-transaction",
