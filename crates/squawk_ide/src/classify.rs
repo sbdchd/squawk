@@ -123,6 +123,11 @@ fn classify_ddl_function_option_value(ty_node: &SyntaxNode) -> Option<NameRefCla
         .syntax()
         .parent()
         .and_then(|attribute_list| attribute_list.parent())?;
+    let ddl_node = if ast::CreateTypeKind::can_cast(ddl_node.kind()) {
+        ddl_node.parent()?
+    } else {
+        ddl_node
+    };
 
     if ast::CreateOperator::can_cast(ddl_node.kind())
         && is_create_operator_function_option(&attr_name)
@@ -497,7 +502,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             && function_sig
                 .syntax()
                 .parent()
-                .is_some_and(|parent| ast::CreateCast::can_cast(parent.kind()))
+                .is_some_and(|parent| ast::WithFunction::can_cast(parent.kind()))
             && function_sig
                 .path()
                 .is_some_and(|path| path.syntax().text_range().contains_range(node.text_range()))
@@ -982,7 +987,9 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         {
             return Some(NameRefClass::SelectOrderByAliasOrColumn);
         }
-        if ast::ColumnList::can_cast(ancestor.kind()) {
+        if ast::ColumnList::can_cast(ancestor.kind())
+            || ast::ColumnRefList::can_cast(ancestor.kind())
+        {
             in_column_list = true;
         }
         if ast::ConstraintExclusionList::can_cast(ancestor.kind()) {

@@ -20,7 +20,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "u"
         WHITESPACE " "
@@ -42,7 +42,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "a"
         WHITESPACE " "
@@ -63,7 +63,7 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         JOIN_EXPR
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "a"
           WHITESPACE " "

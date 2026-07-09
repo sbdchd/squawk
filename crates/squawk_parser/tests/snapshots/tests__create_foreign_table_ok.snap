@@ -152,22 +152,23 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          ALWAYS_KW "always"
-          WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          L_PAREN "("
-          BIN_EXPR
-            NAME_REF
-              IDENT "x"
+          GENERATED_STORED
+            ALWAYS_KW "always"
             WHITESPACE " "
-            PLUS "+"
+            AS_KW "as"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "2"
-          R_PAREN ")"
-          WHITESPACE " "
-          STORED_KW "stored"
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "x"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+            R_PAREN ")"
+            WHITESPACE " "
+            STORED_KW "stored"
       COMMA ","
       WHITESPACE "\n  "
       CHECK_CONSTRAINT

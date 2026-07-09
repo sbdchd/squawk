@@ -72,9 +72,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -127,9 +128,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -156,9 +158,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -180,9 +183,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -224,19 +228,19 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         SELECT_KW "select"
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           R_PAREN ")"
@@ -264,19 +268,19 @@ SOURCE_FILE
         ROLE_REF
           NAME_REF
             INSERT_KW "insert"
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           R_PAREN ")"
@@ -304,19 +308,19 @@ SOURCE_FILE
         ROLE_REF
           NAME_REF
             UPDATE_KW "update"
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           R_PAREN ")"
@@ -342,19 +346,19 @@ SOURCE_FILE
     REVOKE_COMMAND_LIST
       REVOKE_COMMAND
         REFERENCES_KW "references"
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           R_PAREN ")"
@@ -377,15 +381,16 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      R_PAREN ")"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
+      COLUMN_REF_LIST
+        L_PAREN "("
+        COLUMN_REF
+          NAME_REF
+            IDENT "a"
+        R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -405,13 +410,14 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "a"
-      R_PAREN ")"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      COLUMN_REF_LIST
+        L_PAREN "("
+        COLUMN_REF
+          NAME_REF
+            IDENT "a"
+        R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -550,7 +556,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -576,9 +583,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -691,7 +699,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -758,9 +767,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -782,9 +792,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -856,9 +867,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -925,9 +937,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1084,7 +1097,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1108,7 +1122,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1142,7 +1157,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1168,7 +1184,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1194,9 +1211,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1298,7 +1316,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1326,9 +1345,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1392,9 +1412,10 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    PRIVILEGES_KW "privileges"
+    ALL_PRIVILEGES
+      ALL_KW "all"
+      WHITESPACE " "
+      PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1492,7 +1513,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1662,7 +1684,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1722,7 +1745,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1793,7 +1817,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1816,7 +1841,8 @@ SOURCE_FILE
   GRANT
     GRANT_KW "grant"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL_PRIVILEGES
+      ALL_KW "all"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1961,14 +1987,14 @@ SOURCE_FILE
         ROLE_REF
           NAME_REF
             IDENT "t"
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           R_PAREN ")"

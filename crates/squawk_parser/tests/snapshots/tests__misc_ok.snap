@@ -63,19 +63,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "sensors"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "ts"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "sensorid"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           VALUE_KW "value"
       R_PAREN ")"
@@ -91,7 +91,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        FUNCTION_FROM_ITEM
           CALL_EXPR
             NAME_REF
               IDENT "unnest"
@@ -161,19 +161,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "sensors"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "sensorid"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "ts"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           VALUE_KW "value"
       R_PAREN ")"
@@ -245,7 +245,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "embedding"
           WHITESPACE " "
@@ -356,12 +356,12 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "movies"
       COMMA ","
       WHITESPACE " "
-      FROM_ITEM
+      FUNCTION_FROM_ITEM
         CALL_EXPR
           NAME_REF
             IDENT "plainto_tsquery"
@@ -589,12 +589,12 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "movies"
       COMMA ","
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "query_embedding"
     WHITESPACE "\n"
@@ -679,7 +679,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      FUNCTION_FROM_ITEM
         CALL_EXPR
           NAME_REF
             IDENT "jsonb_to_recordset"
@@ -1168,7 +1168,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE "\n    "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "input_data"
     WHITESPACE "\n"
@@ -1302,9 +1302,9 @@ SOURCE_FILE
         NAME_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -1378,9 +1378,9 @@ SOURCE_FILE
         NAME_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -1416,7 +1416,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         FIELD_EXPR
           NAME_REF
             IDENT "partman_test"
@@ -1575,19 +1575,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "clean_default_temp"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col1"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col2"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -1614,7 +1614,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "partition_data"
     SEMICOLON ";"
@@ -1715,19 +1715,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col1"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col2"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "col3"
       R_PAREN ")"
@@ -1754,7 +1754,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "partition_data"
     SEMICOLON ";"
@@ -1785,7 +1785,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         FIELD_EXPR
           NAME_REF
             IDENT "partman_test"
@@ -1806,7 +1806,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         FIELD_EXPR
           NAME_REF
             IDENT "partman_test"
@@ -1826,7 +1826,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         FIELD_EXPR
           NAME_REF
             IDENT "partman_test"
@@ -1847,7 +1847,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      FUNCTION_FROM_ITEM
         CALL_EXPR
           FIELD_EXPR
             NAME_REF
@@ -1871,7 +1871,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      FUNCTION_FROM_ITEM
         CALL_EXPR
           FIELD_EXPR
             NAME_REF
@@ -1898,7 +1898,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         FIELD_EXPR
           NAME_REF
             IDENT "partman_test"
@@ -1957,7 +1957,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      FUNCTION_FROM_ITEM
         CALL_EXPR
           FIELD_EXPR
             NAME_REF
@@ -2043,29 +2043,31 @@ SOURCE_FILE
   COPY
     COPY_KW "COPY"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "tng"
-    WHITESPACE " "
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "title"
-      COMMA ","
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tng"
       WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "plot"
-      R_PAREN ")"
+      COLUMN_REF_LIST
+        L_PAREN "("
+        COLUMN_REF
+          NAME_REF
+            IDENT "title"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN_REF
+          NAME_REF
+            IDENT "plot"
+        R_PAREN ")"
     WHITESPACE "\n    "
-    FROM_KW "FROM"
-    WHITESPACE " "
-    PROGRAM_KW "PROGRAM"
-    WHITESPACE " "
-    LITERAL
-      STRING "'curl https://raw.githubusercontent.com/pramsey/pgsql-openai/refs/heads/main/examples/rag/tng.txt'"
+    COPY_FROM
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PROGRAM_KW "PROGRAM"
+      WHITESPACE " "
+      LITERAL
+        STRING "'curl https://raw.githubusercontent.com/pramsey/pgsql-openai/refs/heads/main/examples/rag/tng.txt'"
     WHITESPACE "\n    "
     WITH_KW "WITH"
     WHITESPACE " "
@@ -2144,7 +2146,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "vec"
           WHITESPACE " "
@@ -2203,7 +2205,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "tng"
     WHITESPACE "\n"
@@ -2439,17 +2441,18 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              DAY_KW "day"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "user_id"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                DAY_KW "day"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "user_id"
+            R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2494,19 +2497,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "events"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "event_time"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "user_id"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "response_time"
       R_PAREN ")"
@@ -2551,7 +2554,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        FROM_ITEM
+        FUNCTION_FROM_ITEM
           CALL_EXPR
             NAME_REF
               IDENT "generate_series"
@@ -2631,7 +2634,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "view_counts"
     WHITESPACE " "
@@ -2717,13 +2720,14 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          BY_KW "by"
-          WHITESPACE " "
-          DEFAULT_KW "default"
-          WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          IDENTITY_KW "identity"
+          GENERATED_IDENTITY
+            BY_KW "by"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            IDENTITY_KW "identity"
       COMMA ","
       WHITESPACE " "
       COLUMN
@@ -2844,12 +2848,13 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              HOUR_KW "hour"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                HOUR_KW "hour"
+            R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2935,7 +2940,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "user_counts"
     WHITESPACE " "
@@ -3200,7 +3205,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           FIELD_EXPR
             NAME_REF
               IDENT "cron"
@@ -3212,7 +3217,7 @@ SOURCE_FILE
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             FIELD_EXPR
               NAME_REF
                 IDENT "cron"
@@ -3223,9 +3228,9 @@ SOURCE_FILE
           JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "jobid"
               R_PAREN ")"
@@ -3370,8 +3375,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME
-      IDENT "cal"
+    NAMED_SCHEMA
+      NAME
+        IDENT "cal"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -3558,7 +3564,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           FIELD_EXPR
             NAME_REF
               IDENT "cal"
@@ -3577,7 +3583,7 @@ SOURCE_FILE
             JOIN_KW "join"
           WHITESPACE " "
           JOIN_EXPR
-            FROM_ITEM
+            FUNCTION_FROM_ITEM
               CALL_EXPR
                 NAME_REF
                   IDENT "json_array_elements"
@@ -3616,7 +3622,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 JOIN_KW "join"
               WHITESPACE " "
-              FROM_ITEM
+              FUNCTION_FROM_ITEM
                 CALL_EXPR
                   NAME_REF
                     IDENT "json_array_elements"
@@ -3738,7 +3744,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           FIELD_EXPR
             NAME_REF
               IDENT "cal"
@@ -3756,7 +3762,7 @@ SOURCE_FILE
             WHITESPACE " "
             JOIN_KW "join"
           WHITESPACE " "
-          FROM_ITEM
+          FUNCTION_FROM_ITEM
             CALL_EXPR
               NAME_REF
                 IDENT "json_array_elements"
@@ -3806,9 +3812,9 @@ SOURCE_FILE
       PATH_SEGMENT
         NAME_REF
           IDENT "bookings"
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "attrs"
       R_PAREN ")"
@@ -3917,7 +3923,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "events"
       WHITESPACE " "
@@ -4006,7 +4012,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      RANGE_KW "RANGE"
+      PARTITION_STRATEGY
+        RANGE_KW "RANGE"
       WHITESPACE " "
       PARTITION_ITEM_LIST
         L_PAREN "("
@@ -4130,6 +4137,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -4193,7 +4201,8 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-        WHITESPACE " "
+          WHITESPACE " "
+          INDEX_PARAMETERS
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
@@ -4254,7 +4263,8 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-        WHITESPACE " "
+          WHITESPACE " "
+          INDEX_PARAMETERS
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
@@ -4340,7 +4350,7 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         JOIN_EXPR
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "events_core"
             WHITESPACE " "
@@ -4354,7 +4364,7 @@ SOURCE_FILE
               WHITESPACE " "
               JOIN_KW "JOIN"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "events_metadata"
               WHITESPACE " "
@@ -4388,7 +4398,7 @@ SOURCE_FILE
             WHITESPACE " "
             JOIN_KW "JOIN"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "events_payload"
             WHITESPACE " "
@@ -4783,7 +4793,7 @@ SOURCE_FILE
               FROM_CLAUSE
                 FROM_KW "FROM"
                 WHITESPACE " "
-                FROM_ITEM
+                RELATION_FROM_ITEM
                   NAME_REF
                     IDENT "monthly_revenues"
                   WHITESPACE " "
@@ -4852,7 +4862,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "monthly_revenues"
         WHITESPACE " "
@@ -4935,7 +4945,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "monthly_revenues"
     SEMICOLON ";"
@@ -5055,7 +5065,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "transactions"
     WHITESPACE "\n"
@@ -5157,7 +5167,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "events"
           WHITESPACE " \n  "
@@ -5274,7 +5284,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "users"
         WHITESPACE "\n"
@@ -5339,7 +5349,7 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "events"
           WHITESPACE " "
@@ -5351,7 +5361,7 @@ SOURCE_FILE
           JOIN_INNER
             JOIN_KW "JOIN"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "user_segments"
             WHITESPACE " "
@@ -5466,7 +5476,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "events"
       WHITESPACE "\n"
@@ -5486,15 +5496,16 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "max_parallel_workers_per_gather"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "4"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "max_parallel_workers_per_gather"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
     SEMICOLON ";"
   WHITESPACE "  "
   COMMENT "-- Workers per query"
@@ -5502,15 +5513,16 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "parallel_setup_cost"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_setup_cost"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
     SEMICOLON ";"
   WHITESPACE "             "
   COMMENT "-- Lower = more parallelism"
@@ -5518,15 +5530,16 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "parallel_tuple_cost"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      NUMERIC_NUMBER "0.001"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_tuple_cost"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        NUMERIC_NUMBER "0.001"
     SEMICOLON ";"
   WHITESPACE "          "
   COMMENT "-- Lower = more parallelism"
@@ -5534,15 +5547,16 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "min_parallel_table_scan_size"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'8MB'"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "min_parallel_table_scan_size"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        STRING "'8MB'"
     SEMICOLON ";"
   WHITESPACE " "
   COMMENT "-- Table size threshold"
@@ -5605,7 +5619,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           WHITESPACE "\n  "
@@ -5624,7 +5638,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "events"
             WHITESPACE " \n  "
@@ -5679,7 +5693,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           WHITESPACE "\n  "
@@ -5698,7 +5712,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "events"
           WHITESPACE "\n"
@@ -5738,7 +5752,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "user_status"
     WHITESPACE "\n"
@@ -5785,7 +5799,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "user_status"
             WHITESPACE "\n  "
@@ -5831,7 +5845,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "user_status"
     WHITESPACE "\n"
@@ -5997,7 +6011,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "event_logs"
     SEMICOLON ";"
@@ -6058,7 +6072,7 @@ SOURCE_FILE
         WHITESPACE "\n    "
         JOIN_EXPR
           JOIN_EXPR
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "products"
               WHITESPACE " "
@@ -6070,7 +6084,7 @@ SOURCE_FILE
               JOIN_INNER
                 JOIN_KW "JOIN"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "product_orders"
                 WHITESPACE " "
@@ -6102,7 +6116,7 @@ SOURCE_FILE
             JOIN_INNER
               JOIN_KW "JOIN"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "orders"
               WHITESPACE " "
@@ -6481,7 +6495,7 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "solar_panel_metrics"
         WHITESPACE "\n"
@@ -6489,7 +6503,7 @@ SOURCE_FILE
           JOIN_INNER
             JOIN_KW "JOIN"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "panel_specifications"
           WHITESPACE " "
@@ -6626,7 +6640,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "turbine_metrics"
           WHITESPACE "\n  "
@@ -6734,7 +6748,7 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "turbine_metrics"
           WHITESPACE " "
@@ -6746,7 +6760,7 @@ SOURCE_FILE
           JOIN_INNER
             JOIN_KW "JOIN"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "baseline_stats"
             WHITESPACE " "
@@ -6757,9 +6771,9 @@ SOURCE_FILE
           JOIN_USING_CLAUSE
             USING_KW "USING"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "turbine_id"
               R_PAREN ")"
@@ -6898,7 +6912,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "vpp_resources"
     WHITESPACE "\n"
@@ -7054,7 +7068,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "energy_prices"
           WHITESPACE "\n  "
@@ -7171,7 +7185,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "price_analysis"
     WHITESPACE "\n"

@@ -107,9 +107,12 @@ pub(crate) fn schema_name(path: &ast::Path) -> Option<Schema> {
 pub(crate) fn schema_and_table_from_from_item(
     from_item: &ast::FromItem,
 ) -> Option<(Option<Schema>, Name)> {
-    if let Some(name_ref_node) = from_item.name_ref() {
+    let ast::FromItem::RelationFromItem(relation) = from_item else {
+        return None;
+    };
+    if let Some(name_ref_node) = relation.name_ref() {
         Some((None, Name::from_node(&name_ref_node)))
-    } else if let Some(from_field_expr) = from_item.field_expr() {
+    } else if let Some(from_field_expr) = relation.field_expr() {
         let table_name = Name::from_node(&from_field_expr.field()?);
         let ast::Expr::NameRef(schema_name_ref) = from_field_expr.base()? else {
             return None;

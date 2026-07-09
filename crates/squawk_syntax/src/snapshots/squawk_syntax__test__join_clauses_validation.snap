@@ -17,7 +17,7 @@ SOURCE_FILE@0..523
       FROM_KW@17..21 "from"
       WHITESPACE@21..22 " "
       JOIN_EXPR@22..30
-        FROM_ITEM@22..23
+        RELATION_FROM_ITEM@22..23
           NAME_REF@22..23
             IDENT@22..23 "t"
         WHITESPACE@23..24 " "
@@ -25,7 +25,7 @@ SOURCE_FILE@0..523
           JOIN_INNER@24..28
             JOIN_KW@24..28 "join"
           WHITESPACE@28..29 " "
-          FROM_ITEM@29..30
+          RELATION_FROM_ITEM@29..30
             NAME_REF@29..30
               IDENT@29..30 "u"
     SEMICOLON@30..31 ";"
@@ -42,7 +42,7 @@ SOURCE_FILE@0..523
       FROM_KW@42..46 "from"
       WHITESPACE@46..47 " "
       JOIN_EXPR@47..60
-        FROM_ITEM@47..48
+        RELATION_FROM_ITEM@47..48
           NAME_REF@47..48
             IDENT@47..48 "t"
         WHITESPACE@48..49 " "
@@ -52,7 +52,7 @@ SOURCE_FILE@0..523
             WHITESPACE@53..54 " "
             JOIN_KW@54..58 "join"
           WHITESPACE@58..59 " "
-          FROM_ITEM@59..60
+          RELATION_FROM_ITEM@59..60
             NAME_REF@59..60
               IDENT@59..60 "u"
     SEMICOLON@60..61 ";"
@@ -69,7 +69,7 @@ SOURCE_FILE@0..523
       FROM_KW@72..76 "from"
       WHITESPACE@76..77 " "
       JOIN_EXPR@77..91
-        FROM_ITEM@77..78
+        RELATION_FROM_ITEM@77..78
           NAME_REF@77..78
             IDENT@77..78 "t"
         WHITESPACE@78..79 " "
@@ -79,7 +79,7 @@ SOURCE_FILE@0..523
             WHITESPACE@84..85 " "
             JOIN_KW@85..89 "join"
           WHITESPACE@89..90 " "
-          FROM_ITEM@90..91
+          RELATION_FROM_ITEM@90..91
             NAME_REF@90..91
               IDENT@90..91 "u"
     SEMICOLON@91..92 ";"
@@ -96,7 +96,7 @@ SOURCE_FILE@0..523
       FROM_KW@103..107 "from"
       WHITESPACE@107..108 " "
       JOIN_EXPR@108..121
-        FROM_ITEM@108..109
+        RELATION_FROM_ITEM@108..109
           NAME_REF@108..109
             IDENT@108..109 "t"
         WHITESPACE@109..110 " "
@@ -106,7 +106,7 @@ SOURCE_FILE@0..523
             WHITESPACE@114..115 " "
             JOIN_KW@115..119 "join"
           WHITESPACE@119..120 " "
-          FROM_ITEM@120..121
+          RELATION_FROM_ITEM@120..121
             NAME_REF@120..121
               IDENT@120..121 "u"
     SEMICOLON@121..122 ";"
@@ -125,7 +125,7 @@ SOURCE_FILE@0..523
       FROM_KW@181..185 "from"
       WHITESPACE@185..186 " "
       JOIN_EXPR@186..213
-        FROM_ITEM@186..187
+        RELATION_FROM_ITEM@186..187
           NAME_REF@186..187
             IDENT@186..187 "t"
         WHITESPACE@187..188 " "
@@ -135,16 +135,16 @@ SOURCE_FILE@0..523
           JOIN_INNER@196..200
             JOIN_KW@196..200 "join"
           WHITESPACE@200..201 " "
-          FROM_ITEM@201..202
+          RELATION_FROM_ITEM@201..202
             NAME_REF@201..202
               IDENT@201..202 "u"
           WHITESPACE@202..203 " "
           JOIN_USING_CLAUSE@203..213
             USING_KW@203..208 "using"
             WHITESPACE@208..209 " "
-            COLUMN_LIST@209..213
+            COLUMN_REF_LIST@209..213
               L_PAREN@209..210 "("
-              COLUMN@210..212
+              COLUMN_REF@210..212
                 NAME_REF@210..212
                   IDENT@210..212 "id"
               R_PAREN@212..213 ")"
@@ -164,7 +164,7 @@ SOURCE_FILE@0..523
       FROM_KW@271..275 "from"
       WHITESPACE@275..276 " "
       JOIN_EXPR@276..301
-        FROM_ITEM@276..277
+        RELATION_FROM_ITEM@276..277
           NAME_REF@276..277
             IDENT@276..277 "t"
         WHITESPACE@277..278 " "
@@ -174,16 +174,16 @@ SOURCE_FILE@0..523
             WHITESPACE@283..284 " "
             JOIN_KW@284..288 "join"
           WHITESPACE@288..289 " "
-          FROM_ITEM@289..290
+          RELATION_FROM_ITEM@289..290
             NAME_REF@289..290
               IDENT@289..290 "u"
           WHITESPACE@290..291 " "
           JOIN_USING_CLAUSE@291..301
             USING_KW@291..296 "using"
             WHITESPACE@296..297 " "
-            COLUMN_LIST@297..301
+            COLUMN_REF_LIST@297..301
               L_PAREN@297..298 "("
-              COLUMN@298..300
+              COLUMN_REF@298..300
                 NAME_REF@298..300
                   IDENT@298..300 "id"
               R_PAREN@300..301 ")"
@@ -203,7 +203,7 @@ SOURCE_FILE@0..523
       FROM_KW@319..323 "from"
       WHITESPACE@323..324 " "
       JOIN_EXPR@324..340
-        FROM_ITEM@324..325
+        RELATION_FROM_ITEM@324..325
           NAME_REF@324..325
             IDENT@324..325 "t"
         WHITESPACE@325..326 " "
@@ -213,7 +213,7 @@ SOURCE_FILE@0..523
           JOIN_INNER@334..338
             JOIN_KW@334..338 "join"
           WHITESPACE@338..339 " "
-          FROM_ITEM@339..340
+          RELATION_FROM_ITEM@339..340
             NAME_REF@339..340
               IDENT@339..340 "u"
     SEMICOLON@340..341 ";"
@@ -230,7 +230,7 @@ SOURCE_FILE@0..523
       FROM_KW@352..356 "from"
       WHITESPACE@356..357 " "
       JOIN_EXPR@357..371
-        FROM_ITEM@357..358
+        RELATION_FROM_ITEM@357..358
           NAME_REF@357..358
             IDENT@357..358 "t"
         WHITESPACE@358..359 " "
@@ -240,13 +240,13 @@ SOURCE_FILE@0..523
             WHITESPACE@364..365 " "
             JOIN_KW@365..369 "join"
           WHITESPACE@369..370 " "
-          FROM_ITEM@370..371
+          RELATION_FROM_ITEM@370..371
             NAME_REF@370..371
               IDENT@370..371 "u"
       COMMA@371..372 ","
       WHITESPACE@372..373 " "
       JOIN_EXPR@373..391
-        FROM_ITEM@373..374
+        RELATION_FROM_ITEM@373..374
           NAME_REF@373..374
             IDENT@373..374 "b"
         WHITESPACE@374..375 " "
@@ -254,15 +254,15 @@ SOURCE_FILE@0..523
           JOIN_INNER@375..379
             JOIN_KW@375..379 "join"
           WHITESPACE@379..380 " "
-          FROM_ITEM@380..381
+          RELATION_FROM_ITEM@380..381
             NAME_REF@380..381
               IDENT@380..381 "c"
           WHITESPACE@381..382 " "
           JOIN_USING_CLAUSE@382..391
             USING_KW@382..387 "using"
-            COLUMN_LIST@387..391
+            COLUMN_REF_LIST@387..391
               L_PAREN@387..388 "("
-              COLUMN@388..390
+              COLUMN_REF@388..390
                 NAME_REF@388..390
                   IDENT@388..390 "id"
               R_PAREN@390..391 ")"
@@ -280,7 +280,7 @@ SOURCE_FILE@0..523
       FROM_KW@403..407 "from"
       WHITESPACE@407..408 " "
       JOIN_EXPR@408..431
-        FROM_ITEM@408..409
+        RELATION_FROM_ITEM@408..409
           NAME_REF@408..409
             IDENT@408..409 "t"
         WHITESPACE@409..410 " "
@@ -288,7 +288,7 @@ SOURCE_FILE@0..523
           JOIN_INNER@410..414
             JOIN_KW@410..414 "join"
           WHITESPACE@414..415 " "
-          FROM_ITEM@415..416
+          RELATION_FROM_ITEM@415..416
             NAME_REF@415..416
               IDENT@415..416 "u"
           WHITESPACE@416..417 " "
@@ -325,7 +325,7 @@ SOURCE_FILE@0..523
       FROM_KW@442..446 "from"
       WHITESPACE@446..447 " "
       JOIN_EXPR@447..463
-        FROM_ITEM@447..448
+        RELATION_FROM_ITEM@447..448
           NAME_REF@447..448
             IDENT@447..448 "t"
         WHITESPACE@448..449 " "
@@ -333,7 +333,7 @@ SOURCE_FILE@0..523
           JOIN_INNER@449..453
             JOIN_KW@449..453 "join"
           WHITESPACE@453..454 " "
-          FROM_ITEM@454..455
+          RELATION_FROM_ITEM@454..455
             NAME_REF@454..455
               IDENT@454..455 "u"
           WHITESPACE@455..456 " "
@@ -357,7 +357,7 @@ SOURCE_FILE@0..523
       WHITESPACE@479..480 " "
       JOIN_EXPR@480..521
         JOIN_EXPR@480..501
-          FROM_ITEM@480..481
+          RELATION_FROM_ITEM@480..481
             NAME_REF@480..481
               IDENT@480..481 "t"
           WHITESPACE@481..484 "\n  "
@@ -365,16 +365,16 @@ SOURCE_FILE@0..523
             JOIN_INNER@484..488
               JOIN_KW@484..488 "join"
             WHITESPACE@488..489 " "
-            FROM_ITEM@489..490
+            RELATION_FROM_ITEM@489..490
               NAME_REF@489..490
                 IDENT@489..490 "u"
             WHITESPACE@490..491 " "
             JOIN_USING_CLAUSE@491..501
               USING_KW@491..496 "using"
               WHITESPACE@496..497 " "
-              COLUMN_LIST@497..501
+              COLUMN_REF_LIST@497..501
                 L_PAREN@497..498 "("
-                COLUMN@498..500
+                COLUMN_REF@498..500
                   NAME_REF@498..500
                     IDENT@498..500 "id"
                 R_PAREN@500..501 ")"
@@ -383,16 +383,16 @@ SOURCE_FILE@0..523
           JOIN_INNER@504..508
             JOIN_KW@504..508 "join"
           WHITESPACE@508..509 " "
-          FROM_ITEM@509..510
+          RELATION_FROM_ITEM@509..510
             NAME_REF@509..510
               IDENT@509..510 "c"
           WHITESPACE@510..511 " "
           JOIN_USING_CLAUSE@511..521
             USING_KW@511..516 "using"
             WHITESPACE@516..517 " "
-            COLUMN_LIST@517..521
+            COLUMN_REF_LIST@517..521
               L_PAREN@517..518 "("
-              COLUMN@518..520
+              COLUMN_REF@518..520
                 NAME_REF@518..520
                   IDENT@518..520 "id"
               R_PAREN@520..521 ")"

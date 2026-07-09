@@ -110,7 +110,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "users"
           WHITESPACE " "
@@ -119,7 +119,7 @@ SOURCE_FILE
               IDENT "u"
         COMMA ","
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "logs"
           WHITESPACE " "
@@ -215,7 +215,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "t"
     SEMICOLON ";"
@@ -244,7 +244,7 @@ SOURCE_FILE
         WHITESPACE " "
         SET_COLUMN_LIST
           SET_SINGLE_COLUMN
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "x"
             WHITESPACE " "
@@ -325,7 +325,7 @@ SOURCE_FILE
       USING_ON_CLAUSE
         USING_KW "using"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "t2"
         WHITESPACE " "

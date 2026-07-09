@@ -137,12 +137,12 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "bar"
     WHITESPACE "\n  "
@@ -182,7 +182,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "foo"
         WHITESPACE " "
@@ -191,7 +191,7 @@ SOURCE_FILE
             IDENT "f"
       COMMA ","
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "b"
         WHITESPACE " "
@@ -215,7 +215,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "order_items"
           WHITESPACE " "
@@ -229,7 +229,7 @@ SOURCE_FILE
             WHITESPACE " "
             JOIN_KW "join"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "orders"
             WHITESPACE " "
@@ -276,7 +276,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "users"
         WHITESPACE " "
@@ -285,7 +285,7 @@ SOURCE_FILE
             IDENT "u"
       COMMA ","
       WHITESPACE "\n  "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           SELECT
@@ -318,7 +318,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "from"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "login_history"
             WHITESPACE "\n  "
@@ -416,7 +416,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "from"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "departments"
             WHITESPACE " \n  "
@@ -573,7 +573,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "q"
         WHITESPACE " "
@@ -648,7 +648,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "q"
         WHITESPACE " "
@@ -726,7 +726,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "from"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "t"
         WHITESPACE "\n"
@@ -745,7 +745,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t2"
     SEMICOLON ";"
@@ -798,7 +798,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "producers"
     WHITESPACE "\n  "
@@ -869,7 +869,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "producers"
             WHITESPACE " "
@@ -1004,7 +1004,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "user_logs"
               WHITESPACE " "
@@ -1077,7 +1077,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "delete_batch"
         WHITESPACE " "

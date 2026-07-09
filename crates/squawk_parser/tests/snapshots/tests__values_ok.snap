@@ -196,7 +196,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "films"
         WHITESPACE " "
@@ -205,7 +205,7 @@ SOURCE_FILE
             IDENT "f"
       COMMA ","
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           VALUES
@@ -308,7 +308,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "salary"
           WHITESPACE " "
@@ -331,7 +331,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           VALUES
@@ -444,7 +444,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "machines"
     WHITESPACE "\n"

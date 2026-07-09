@@ -494,7 +494,7 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::CopyColumn => {
             let column_name = Name::from_node(name_ref);
             let copy = name_ref.syntax().ancestors().find_map(ast::Copy::cast)?;
-            let path = copy.path()?;
+            let path = copy.copy_table()?.path()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::StatisticsColumn => {
@@ -1089,8 +1089,8 @@ fn resolve_property_graph_column_ptr(
     let column_name = Name::from_node(column_name_ref);
     let parent = column_name_ref.syntax().parent()?;
 
-    if let Some(column) = ast::Column::cast(parent.clone())
-        && let Some(column_list) = ast::ColumnList::cast(column.syntax().parent()?)
+    if let Some(column_ref) = ast::ColumnRef::cast(parent.clone())
+        && let Some(column_list) = ast::ColumnRefList::cast(column_ref.syntax().parent()?)
     {
         if let Some(references_table) = ast::ReferencesTable::cast(column_list.syntax().parent()?) {
             let table_name = Name::from_node(&references_table.name_ref()?);
@@ -1186,7 +1186,8 @@ fn resolve_select_qualified_column_table_name_ptr(
         )]);
     }
 
-    if let Some(call_expr) = from_item.call_expr()
+    if let ast::FromItem::FunctionFromItem(func) = &from_item
+        && let Some(call_expr) = func.call_expr()
         && let Some((function_schema, function_name)) = name::schema_and_func_name(&call_expr)
         && function_name == table_name
         && function_schema == explicit_schema
@@ -1278,7 +1279,8 @@ fn resolve_select_qualified_column_ptr(
                     &column_table_name,
                 )?;
 
-                if let Some(call_expr) = from_item.call_expr()
+                if let ast::FromItem::FunctionFromItem(func) = &from_item
+                    && let Some(call_expr) = func.call_expr()
                     && let Some(ptr) = resolve_column_from_call_expr_return_table(
                         db,
                         InFile::new(file, &call_expr),
@@ -1296,23 +1298,25 @@ fn resolve_select_qualified_column_ptr(
                     && let Some(alias_name) = alias.name()
                     && Name::from_node(&alias_name) == column_table_name
                 {
-                    if let Some(paren_select) = from_item.paren_select() {
-                        return resolve_subquery_column_ptr(
-                            db,
-                            InFile::new(file, &paren_select),
-                            column_name_ref,
-                            &column_name,
-                            Some(&alias),
-                        );
-                    }
+                    if let ast::FromItem::ParenFromItem(paren) = &from_item {
+                        if let Some(paren_select) = paren.paren_select() {
+                            return resolve_subquery_column_ptr(
+                                db,
+                                InFile::new(file, &paren_select),
+                                column_name_ref,
+                                &column_name,
+                                Some(&alias),
+                            );
+                        }
 
-                    if let Some(paren_expr) = from_item.paren_expr() {
-                        return resolve_column_from_paren_expr(
-                            db,
-                            InFile::new(file, &paren_expr),
-                            column_name_ref,
-                            &column_name,
-                        );
+                        if let Some(paren_expr) = paren.paren_expr() {
+                            return resolve_column_from_paren_expr(
+                                db,
+                                InFile::new(file, &paren_expr),
+                                column_name_ref,
+                                &column_name,
+                            );
+                        }
                     }
 
                     // `from t as u(a, b, c)`
@@ -1334,7 +1338,9 @@ fn resolve_select_qualified_column_ptr(
                         // select b from t as u(x);
                         //        ^
                         // ```
-                        if let Some(name_ref_node) = from_item.name_ref() {
+                        if let ast::FromItem::RelationFromItem(relation) = &from_item
+                            && let Some(name_ref_node) = relation.name_ref()
+                        {
                             let cte_name = Name::from_node(&name_ref_node);
                             return resolve_cte_column(
                                 db,
@@ -1516,8 +1522,9 @@ fn resolve_merge_alias(name_ref: &ast::NameRef, table_name: &Name) -> Option<Nam
     })?;
     if let Some(alias_name) = from_item.alias().and_then(|x| x.name())
         && Name::from_node(&alias_name) == *table_name
+        && let ast::FromItem::RelationFromItem(relation) = &from_item
     {
-        let table_name = Name::from_node(&from_item.name_ref()?);
+        let table_name = Name::from_node(&relation.name_ref()?);
         return Some(table_name);
     }
     None
@@ -1552,7 +1559,9 @@ fn resolve_from_item_column_by_name_after_index(
     let from_item = from_item.value;
     let original_skip = skip_column_count;
 
-    if let Some(paren_select) = from_item.paren_select() {
+    if let ast::FromItem::ParenFromItem(paren) = from_item
+        && let Some(paren_select) = paren.paren_select()
+    {
         let alias = from_item.alias();
         if let Some(ptr) = resolve_subquery_column_ptr_with_skip(
             db,
@@ -1577,7 +1586,9 @@ fn resolve_from_item_column_by_name_after_index(
         return None;
     }
 
-    if let Some(paren_expr) = from_item.paren_expr() {
+    if let ast::FromItem::ParenFromItem(paren) = from_item
+        && let Some(paren_expr) = paren.paren_expr()
+    {
         let (alias_len, alias_column) = resolve_column_list_column(
             file,
             from_item.alias().and_then(|x| x.column_list()),
@@ -1637,7 +1648,8 @@ fn resolve_from_item_column_by_name_after_index(
     }
     let skip_column_count = skip_column_count.max(alias_len);
 
-    if let Some(call_expr) = from_item.call_expr()
+    if let ast::FromItem::FunctionFromItem(func) = from_item
+        && let Some(call_expr) = func.call_expr()
         && let Some(ptr) = resolve_column_from_call_expr_return_table(
             db,
             InFile::new(file, &call_expr),
@@ -2166,27 +2178,22 @@ fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
         return Name::from_node(&alias_name) == *qualifier;
     }
 
-    if let Some((_schema, function_name)) = from_item
-        .call_expr()
-        .and_then(|x| name::schema_and_func_name(&x))
-        && function_name == *qualifier
-    {
-        return true;
+    match from_item {
+        ast::FromItem::FunctionFromItem(func) => func
+            .call_expr()
+            .and_then(|x| name::schema_and_func_name(&x))
+            .is_some_and(|(_schema, function_name)| function_name == *qualifier),
+        ast::FromItem::RelationFromItem(relation) => {
+            if let Some(name_ref) = relation.name_ref() {
+                Name::from_node(&name_ref) == *qualifier
+            } else if let Some(field) = relation.field_expr().and_then(|x| x.field()) {
+                Name::from_node(&field) == *qualifier
+            } else {
+                false
+            }
+        }
+        _ => false,
     }
-
-    if let Some(name_ref) = from_item.name_ref()
-        && Name::from_node(&name_ref) == *qualifier
-    {
-        return true;
-    }
-
-    if let Some(field) = from_item.field_expr().and_then(|x| x.field())
-        && Name::from_node(&field) == *qualifier
-    {
-        return true;
-    }
-
-    false
 }
 
 pub(crate) fn find_from_item_in_from_clause(
@@ -2210,7 +2217,12 @@ fn find_from_item_for_select_qualified_name_ref(
     }
 
     if let Some(lateral_from_item) = name_ref.syntax().ancestors().find_map(|ancestor| {
-        ast::FromItem::cast(ancestor).filter(|from_item| from_item.lateral_token().is_some())
+        ast::FromItem::cast(ancestor).filter(|from_item| {
+            from_item
+                .syntax()
+                .children_with_tokens()
+                .any(|it| it.kind() == SyntaxKind::LATERAL_KW)
+        })
     }) {
         let lateral_start = lateral_from_item.syntax().text_range().start();
 
@@ -2708,8 +2720,11 @@ fn relation_name_ref_from_table(table: &ast::Table) -> Option<ast::NameRef> {
 }
 
 fn relation_name_ref_from_from_item(from_item: &ast::FromItem) -> Option<ast::NameRef> {
-    from_item.name_ref().or_else(|| {
-        from_item
+    let ast::FromItem::RelationFromItem(relation) = from_item else {
+        return None;
+    };
+    relation.name_ref().or_else(|| {
+        relation
             .field_expr()
             .and_then(|field_expr| field_expr.field())
     })
@@ -3348,7 +3363,9 @@ pub(crate) fn table_ptrs_from_clause(
             continue;
         }
 
-        if let Some(paren_select) = from_item.paren_select() {
+        if let ast::FromItem::ParenFromItem(paren) = &from_item
+            && let Some(paren_select) = paren.paren_select()
+        {
             results.push(SyntaxNodePtr::new(paren_select.syntax()));
             continue;
         }
@@ -3357,7 +3374,10 @@ pub(crate) fn table_ptrs_from_clause(
             continue;
         };
 
-        let name_ref = from_item.name_ref();
+        let name_ref = match &from_item {
+            ast::FromItem::RelationFromItem(relation) => relation.name_ref(),
+            _ => None,
+        };
         let position = from_item.syntax().text_range().start();
         let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
         if let Some((table_like_ptr, _kind)) =
@@ -3376,16 +3396,20 @@ pub(crate) fn table_ptr_from_from_item(
 ) -> Option<SyntaxNodePtr> {
     let file = from_item.file_id;
     let from_item = from_item.value;
-    if let Some(paren_select) = from_item.paren_select() {
-        return Some(SyntaxNodePtr::new(paren_select.syntax()));
-    }
-
-    if let Some(paren_expr) = from_item.paren_expr() {
-        return table_ptr_from_paren_expr(db, InFile::new(file, &paren_expr));
+    if let ast::FromItem::ParenFromItem(paren) = from_item {
+        if let Some(paren_select) = paren.paren_select() {
+            return Some(SyntaxNodePtr::new(paren_select.syntax()));
+        }
+        if let Some(paren_expr) = paren.paren_expr() {
+            return table_ptr_from_paren_expr(db, InFile::new(file, &paren_expr));
+        }
     }
 
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
-    let name_ref = from_item.name_ref();
+    let name_ref = match from_item {
+        ast::FromItem::RelationFromItem(relation) => relation.name_ref(),
+        _ => None,
+    };
     let position = from_item.syntax().text_range().start();
     let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
 
@@ -3765,7 +3789,10 @@ fn resolve_composite_type_field_ptr(
     let type_node = type_name_ptr.to_node(root);
 
     let create_type = type_node.ancestors().find_map(ast::CreateType::cast)?;
-    for column in create_type.column_list()?.columns() {
+    let ast::CreateTypeKind::CompositeType(composite) = create_type.kind()? else {
+        return None;
+    };
+    for column in composite.column_list()?.columns() {
         if let Some(col_name) = column.name()
             && Name::from_node(&col_name) == field_name
         {
@@ -3854,7 +3881,8 @@ fn resolve_from_item_table_name_ptr(
         return None;
     }
 
-    if let Some(call_expr) = from_item.call_expr()
+    if let ast::FromItem::FunctionFromItem(func) = from_item
+        && let Some(call_expr) = func.call_expr()
         && let Some((function_schema, function_name)) = name::schema_and_func_name(&call_expr)
         && function_name == *table_name
     {
@@ -3964,7 +3992,9 @@ fn resolve_delete_table_name_ptr(
                         LocationKind::Table
                     )]);
                 }
-            } else if let Some(item_name_ref) = from_item.name_ref() {
+            } else if let ast::FromItem::RelationFromItem(relation) = &from_item
+                && let Some(item_name_ref) = relation.name_ref()
+            {
                 let item_name = Name::from_node(&item_name_ref);
                 if item_name == table_name {
                     let position = table_name_ref.syntax().text_range().start();
@@ -4090,7 +4120,9 @@ fn resolve_merge_table_name_ptr(
                     LocationKind::Table
                 )]);
             }
-        } else if let Some(item_name_ref) = from_item.name_ref() {
+        } else if let ast::FromItem::RelationFromItem(relation) = &from_item
+            && let Some(item_name_ref) = relation.name_ref()
+        {
             let item_name = Name::from_node(&item_name_ref);
             if item_name == table_name {
                 let position = table_name_ref.syntax().text_range().start();

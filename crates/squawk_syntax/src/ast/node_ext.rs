@@ -90,6 +90,30 @@ impl ast::Constraint {
     }
 }
 
+impl ast::CreateSchema {
+    pub fn schema_name(&self) -> Option<ast::Name> {
+        match self.create_schema_target()? {
+            ast::CreateSchemaTarget::NamedSchema(named) => named.name(),
+            ast::CreateSchemaTarget::AuthorizationSchema(auth) => auth.role()?.name(),
+        }
+    }
+}
+
+impl ast::FromItem {
+    pub fn alias(&self) -> Option<ast::Alias> {
+        match self {
+            ast::FromItem::ExprFromItem(it) => it.alias(),
+            ast::FromItem::FunctionFromItem(it) => it.alias(),
+            ast::FromItem::GraphTableFromItem(it) => it.alias(),
+            ast::FromItem::JsonTableFromItem(it) => it.alias(),
+            ast::FromItem::ParenFromItem(it) => it.alias(),
+            ast::FromItem::RelationFromItem(it) => it.alias(),
+            ast::FromItem::RowsFromItem(it) => it.alias(),
+            ast::FromItem::XmlTableFromItem(it) => it.alias(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinOp {
     And(SyntaxToken),
@@ -359,11 +383,11 @@ impl ast::RenameColumn {
 
 impl ast::ForeignKeyConstraint {
     #[inline]
-    pub fn from_columns(&self) -> Option<ast::ColumnList> {
+    pub fn from_columns(&self) -> Option<ast::ColumnRefList> {
         support::children(&self.syntax).nth(0)
     }
     #[inline]
-    pub fn to_columns(&self) -> Option<ast::ColumnList> {
+    pub fn to_columns(&self) -> Option<ast::ColumnRefList> {
         support::children(&self.syntax).nth(1)
     }
 }

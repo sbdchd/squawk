@@ -15,7 +15,8 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    DISABLE_KW "disable"
+    DISABLE
+      DISABLE_KW "disable"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable"
@@ -30,7 +31,8 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    ENABLE_KW "enable"
+    ENABLE
+      ENABLE_KW "enable"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable_replica"
@@ -45,9 +47,10 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    ENABLE_KW "enable"
-    WHITESPACE " "
-    REPLICA_KW "replica"
+    ENABLE_REPLICA
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      REPLICA_KW "replica"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable_always"
@@ -62,9 +65,10 @@ SOURCE_FILE
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    ENABLE_KW "enable"
-    WHITESPACE " "
-    ALWAYS_KW "always"
+    ENABLE_ALWAYS
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      ALWAYS_KW "always"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

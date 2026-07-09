@@ -14,7 +14,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      GRAPH_TABLE_FROM_ITEM
         GRAPH_TABLE_FN
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("

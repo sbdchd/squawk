@@ -55,14 +55,14 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           R_PAREN ")"

@@ -2213,7 +2213,7 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "from"
                     WHITESPACE " "
-                    FROM_ITEM
+                    RELATION_FROM_ITEM
                       NAME_REF
                         IDENT "t"
               R_PAREN ")"
@@ -2463,7 +2463,7 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "from"
                   WHITESPACE " "
-                  FROM_ITEM
+                  RELATION_FROM_ITEM
                     NAME_REF
                       IDENT "t"
                 WHITESPACE " "
@@ -2636,7 +2636,7 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "from"
                   WHITESPACE " "
-                  FROM_ITEM
+                  RELATION_FROM_ITEM
                     NAME_REF
                       IDENT "t"
               R_PAREN ")"
@@ -2679,7 +2679,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -3366,7 +3366,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "vals"
     SEMICOLON ";"
@@ -3407,7 +3407,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "vals"
     SEMICOLON ";"
@@ -3448,7 +3448,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -3489,7 +3489,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "\"table\""
     SEMICOLON ";"
@@ -3522,7 +3522,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -3560,7 +3560,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "vals"
     SEMICOLON ";"
@@ -3603,7 +3603,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -3643,7 +3643,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -3705,7 +3705,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      FUNCTION_FROM_ITEM
         CALL_EXPR
           NAME_REF
             IDENT "generate_series"
@@ -3990,7 +3990,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -4022,7 +4022,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -4040,7 +4040,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -4106,12 +4106,12 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE "\n "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "my_films"
       COMMA ","
       WHITESPACE "\n "
-      FROM_ITEM
+      JSON_TABLE_FROM_ITEM
         JSON_TABLE
           JSON_TABLE_KW "JSON_TABLE"
           WHITESPACE " "
@@ -4223,12 +4223,12 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE "\n "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "my_films"
       COMMA ","
       WHITESPACE "\n "
-      FROM_ITEM
+      JSON_TABLE_FROM_ITEM
         JSON_TABLE
           JSON_TABLE_KW "JSON_TABLE"
           WHITESPACE " "
@@ -4372,12 +4372,12 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE "\n "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "my_films"
       COMMA ","
       WHITESPACE "\n "
-      FROM_ITEM
+      JSON_TABLE_FROM_ITEM
         JSON_TABLE
           JSON_TABLE_KW "JSON_TABLE"
           WHITESPACE " "
@@ -4505,7 +4505,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      JSON_TABLE_FROM_ITEM
         JSON_TABLE
           JSON_TABLE_KW "JSON_TABLE"
           WHITESPACE " "

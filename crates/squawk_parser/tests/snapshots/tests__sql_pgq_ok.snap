@@ -8,29 +8,31 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "statement_timeout"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'5s'"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "statement_timeout"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        STRING "'5s'"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "lock_timeout"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'1s'"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "lock_timeout"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        STRING "'1s'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -68,6 +70,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -118,6 +121,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -165,6 +169,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -207,6 +212,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -297,6 +303,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -451,7 +458,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      GRAPH_TABLE_FROM_ITEM
         GRAPH_TABLE_FN
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
@@ -558,7 +565,7 @@ SOURCE_FILE
       WHITESPACE " "
       JOIN_EXPR
         JOIN_EXPR
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "customers"
           WHITESPACE " "
@@ -566,16 +573,16 @@ SOURCE_FILE
             JOIN_INNER
               JOIN_KW "JOIN"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "customer_orders"
             WHITESPACE " "
             JOIN_USING_CLAUSE
               USING_KW "USING"
               WHITESPACE " "
-              COLUMN_LIST
+              COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "customer_id"
                 R_PAREN ")"
@@ -584,16 +591,16 @@ SOURCE_FILE
           JOIN_INNER
             JOIN_KW "JOIN"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "orders"
           WHITESPACE " "
           JOIN_USING_CLAUSE
             USING_KW "USING"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "order_id"
               R_PAREN ")"
@@ -644,9 +651,9 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "product_no"
           R_PAREN ")"
@@ -660,9 +667,9 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "customer_id"
           R_PAREN ")"
@@ -676,9 +683,9 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "order_id"
           R_PAREN ")"
@@ -700,9 +707,9 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "order_items_id"
           R_PAREN ")"
@@ -712,9 +719,9 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "order_id"
             R_PAREN ")"
@@ -725,9 +732,9 @@ SOURCE_FILE
             NAME_REF
               IDENT "orders"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "order_id"
               R_PAREN ")"
@@ -737,9 +744,9 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "product_no"
             R_PAREN ")"
@@ -750,9 +757,9 @@ SOURCE_FILE
             NAME_REF
               IDENT "products"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "product_no"
               R_PAREN ")"
@@ -766,9 +773,9 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "customer_orders_id"
           R_PAREN ")"
@@ -778,9 +785,9 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "customer_id"
             R_PAREN ")"
@@ -791,9 +798,9 @@ SOURCE_FILE
             NAME_REF
               IDENT "customers"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "customer_id"
               R_PAREN ")"
@@ -803,9 +810,9 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "order_id"
             R_PAREN ")"
@@ -816,9 +823,9 @@ SOURCE_FILE
             NAME_REF
               IDENT "orders"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "order_id"
               R_PAREN ")"
@@ -961,7 +968,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      GRAPH_TABLE_FROM_ITEM
         GRAPH_TABLE_FN
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
@@ -1059,7 +1066,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE "\n"
-      FROM_ITEM
+      GRAPH_TABLE_FROM_ITEM
         GRAPH_TABLE_FN
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
@@ -1193,6 +1200,7 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1253,6 +1261,7 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1294,6 +1303,7 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1373,6 +1383,7 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1555,10 +1566,10 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "from_account"
             WHITESPACE " "
@@ -1570,10 +1581,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "Accounts"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
               WHITESPACE " "
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "number"
               WHITESPACE " "
@@ -1584,10 +1595,10 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "to_account"
             WHITESPACE " "
@@ -1599,10 +1610,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "Accounts"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
               WHITESPACE " "
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "number"
               WHITESPACE " "
@@ -1644,10 +1655,10 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "number"
             WHITESPACE " "
@@ -1659,10 +1670,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "Accounts"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
               WHITESPACE " "
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "number"
               WHITESPACE " "
@@ -1703,10 +1714,10 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "number"
             WHITESPACE " "
@@ -1718,10 +1729,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "Accounts"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
               WHITESPACE " "
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "number"
               WHITESPACE " "
@@ -1762,10 +1773,10 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "KEY"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "id"
             WHITESPACE " "
@@ -1777,10 +1788,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "Persons"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
               WHITESPACE " "
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "id"
               WHITESPACE " "
@@ -1830,7 +1841,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      GRAPH_TABLE_FROM_ITEM
         GRAPH_TABLE_FN
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "

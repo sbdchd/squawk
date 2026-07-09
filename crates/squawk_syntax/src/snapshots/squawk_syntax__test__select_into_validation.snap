@@ -374,7 +374,7 @@ SOURCE_FILE@0..858
     FROM_CLAUSE@471..477
       FROM_KW@471..475 "from"
       WHITESPACE@475..476 " "
-      FROM_ITEM@476..477
+      RELATION_FROM_ITEM@476..477
         NAME_REF@476..477
           IDENT@476..477 "t"
     SEMICOLON@477..478 ";"
@@ -430,7 +430,7 @@ SOURCE_FILE@0..858
     FROM_CLAUSE@531..537
       FROM_KW@531..535 "from"
       WHITESPACE@535..536 " "
-      FROM_ITEM@536..537
+      RELATION_FROM_ITEM@536..537
         NAME_REF@536..537
           IDENT@536..537 "t"
     SEMICOLON@537..538 ";"
@@ -448,7 +448,7 @@ SOURCE_FILE@0..858
     FROM_CLAUSE@566..572
       FROM_KW@566..570 "from"
       WHITESPACE@570..571 " "
-      FROM_ITEM@571..572
+      RELATION_FROM_ITEM@571..572
         NAME_REF@571..572
           IDENT@571..572 "u"
     WHITESPACE@572..575 "\n  "
@@ -512,7 +512,7 @@ SOURCE_FILE@0..858
                   FROM_CLAUSE@639..645
                     FROM_KW@639..643 "from"
                     WHITESPACE@643..644 " "
-                    FROM_ITEM@644..645
+                    RELATION_FROM_ITEM@644..645
                       NAME_REF@644..645
                         IDENT@644..645 "u"
               R_PAREN@645..646 ")"
