@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- linter: split `require-timeout-settings` into `require-lock-timeout` and `require-statement-timeout` so each check can be enabled or disabled individually. `require-timeout-settings` still works as an alias for both rules in configuration and `squawk-ignore` comments. (#1231)
-
 ## v2.59.0 - 2026-06-27
 
 ### Added
