@@ -31,7 +31,7 @@ SOURCE_FILE
           USING_ON_CLAUSE
             USING_KW "using"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "u"
             WHITESPACE " "
@@ -65,7 +65,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -106,7 +106,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -148,7 +148,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -204,7 +204,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -284,7 +284,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -327,7 +327,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -372,7 +372,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -442,7 +442,7 @@ SOURCE_FILE
               FROM_CLAUSE
                 FROM_KW "from"
                 WHITESPACE " "
-                FROM_ITEM
+                RELATION_FROM_ITEM
                   NAME_REF
                     IDENT "t"
             WHITESPACE "\n"
@@ -516,7 +516,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
@@ -562,7 +562,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
@@ -571,7 +571,7 @@ SOURCE_FILE
                     IDENT "t"
               COMMA ","
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "search_tree"
                 WHITESPACE " "
@@ -630,7 +630,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "search_tree"
     WHITESPACE " "
@@ -712,7 +712,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
@@ -758,7 +758,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
@@ -767,7 +767,7 @@ SOURCE_FILE
                     IDENT "t"
               COMMA ","
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "search_tree"
                 WHITESPACE " "
@@ -826,7 +826,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "search_tree"
     WHITESPACE " "
@@ -918,7 +918,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   GRAPH_KW "graph"
                 WHITESPACE " "
@@ -979,7 +979,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   GRAPH_KW "graph"
                 WHITESPACE " "
@@ -988,7 +988,7 @@ SOURCE_FILE
                     IDENT "g"
               COMMA ","
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "search_graph"
                 WHITESPACE " "
@@ -1047,7 +1047,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "search_graph"
     SEMICOLON ";"
@@ -1146,7 +1146,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "search_graph"
     SEMICOLON ";"
@@ -1206,12 +1206,12 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
       COMMA ","
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "b"
     SEMICOLON ";"
@@ -1253,7 +1253,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -1303,7 +1303,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "from"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "t"
         WHITESPACE "\n"
@@ -1319,7 +1319,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t2"
     SEMICOLON ";"
@@ -1364,7 +1364,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -1407,7 +1407,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
     SEMICOLON ";"
@@ -1479,7 +1479,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               FIELD_EXPR
                 NAME_REF
                   IDENT "public"
@@ -1519,7 +1519,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "dismissed_at"
           WHITESPACE " "
@@ -1553,7 +1553,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "ranked_notifications"
             WHITESPACE " "
@@ -1632,7 +1632,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "from"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "t"
           WHITESPACE " "
@@ -1655,7 +1655,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "x"
     SEMICOLON ";"

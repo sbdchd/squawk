@@ -19,7 +19,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -78,7 +78,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "bar"
         WHITESPACE " "
@@ -137,7 +137,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      ROWS_FROM_ITEM
         ROWS_KW "rows"
         WHITESPACE " "
         FROM_KW "from"
@@ -198,7 +198,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "bar"
         WHITESPACE " "
@@ -257,7 +257,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -312,7 +312,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -367,7 +367,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           SELECT
@@ -382,7 +382,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "from"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "bar"
           R_PAREN ")"
@@ -436,7 +436,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           SELECT
@@ -452,7 +452,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               JOIN_EXPR
-                FROM_ITEM
+                RELATION_FROM_ITEM
                   NAME_REF
                     IDENT "bar"
                 WHITESPACE " "
@@ -460,7 +460,7 @@ SOURCE_FILE
                   JOIN_INNER
                     JOIN_KW "join"
                   WHITESPACE " "
-                  FROM_ITEM
+                  RELATION_FROM_ITEM
                     NAME_REF
                       IDENT "foo"
                     WHITESPACE " "
@@ -546,7 +546,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           SELECT
@@ -561,7 +561,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "from"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "bar"
           R_PAREN ")"
@@ -619,7 +619,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -684,7 +684,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -769,7 +769,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE " "
@@ -873,7 +873,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -965,7 +965,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -1094,7 +1094,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -1151,7 +1151,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -1187,19 +1187,19 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "insert"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           R_PAREN ")"
@@ -1231,7 +1231,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -1328,7 +1328,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -1367,7 +1367,7 @@ SOURCE_FILE
           WHITESPACE "\n      "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "a"
               WHITESPACE " "
@@ -1378,7 +1378,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "b"
               WHITESPACE " "
@@ -1390,7 +1390,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "c"
               WHITESPACE " "
@@ -1402,7 +1402,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "e"
               WHITESPACE " "
@@ -1423,7 +1423,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n      "
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "h"
               WHITESPACE " "
@@ -1457,7 +1457,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "foo"
               WHITESPACE " "
@@ -1484,7 +1484,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "u"
       WHITESPACE "\n    "
@@ -1581,7 +1581,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t"
       WHITESPACE "\n    "
@@ -1638,7 +1638,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "recent_transactions"
         WHITESPACE " "
@@ -1681,7 +1681,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "balance"
               WHITESPACE " "
@@ -1709,14 +1709,14 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "INSERT"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "customer_id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "balance"
           R_PAREN ")"
@@ -1764,7 +1764,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
           SELECT
@@ -1784,7 +1784,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "recent_transactions"
           R_PAREN ")"
@@ -1830,7 +1830,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "balance"
               WHITESPACE " "
@@ -1858,14 +1858,14 @@ SOURCE_FILE
       MERGE_INSERT
         INSERT_KW "INSERT"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "customer_id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "balance"
           R_PAREN ")"
@@ -1913,7 +1913,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "wine_stock_changes"
         WHITESPACE " "
@@ -2029,7 +2029,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "stock"
               WHITESPACE " "
@@ -2104,7 +2104,7 @@ SOURCE_FILE
     USING_ON_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "new_wine_list"
         WHITESPACE " "
@@ -2203,7 +2203,7 @@ SOURCE_FILE
           WHITESPACE " "
           SET_COLUMN_LIST
             SET_SINGLE_COLUMN
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "stock"
               WHITESPACE " "
@@ -2251,7 +2251,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "u"
         WHITESPACE " "
@@ -2261,7 +2261,7 @@ SOURCE_FILE
             WHITESPACE " "
             JOIN_KW "join"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "v"
       WHITESPACE "\n  "
@@ -2315,7 +2315,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       JOIN_EXPR
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "u"
         WHITESPACE " "
@@ -2325,7 +2325,7 @@ SOURCE_FILE
           JOIN_INNER
             JOIN_KW "join"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "v"
       WHITESPACE "\n  "

@@ -45,19 +45,19 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "bar"
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           R_PAREN ")"
@@ -108,19 +108,19 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 IDENT "bar"
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           R_PAREN ")"

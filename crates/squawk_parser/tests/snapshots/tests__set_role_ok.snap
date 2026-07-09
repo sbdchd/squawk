@@ -53,7 +53,7 @@ SOURCE_FILE
       STRING "'fooo'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_ROLE
+  RESET_ROLE
     RESET_KW "RESET"
     WHITESPACE " "
     ROLE_KW "ROLE"

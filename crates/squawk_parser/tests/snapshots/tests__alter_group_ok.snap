@@ -14,12 +14,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "g"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
+    ADD_USERS
+      ADD_KW "add"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_multiple"
@@ -33,20 +34,21 @@ SOURCE_FILE
       NAME_REF
         IDENT "g"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "v"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "w"
+    ADD_USERS
+      ADD_KW "add"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "v"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "w"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop"
@@ -60,12 +62,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "g"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
+    DROP_USERS
+      DROP_KW "drop"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_multiple"
@@ -79,20 +82,21 @@ SOURCE_FILE
       NAME_REF
         IDENT "g"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "v"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "w"
+    DROP_USERS
+      DROP_KW "drop"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "v"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "w"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -125,12 +129,13 @@ SOURCE_FILE
     ROLE_REF
       CURRENT_ROLE_KW "current_role"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
+    ADD_USERS
+      ADD_KW "add"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_user"
@@ -143,12 +148,13 @@ SOURCE_FILE
     ROLE_REF
       CURRENT_USER_KW "current_user"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
+    DROP_USERS
+      DROP_KW "drop"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- session_user"
@@ -161,11 +167,12 @@ SOURCE_FILE
     ROLE_REF
       SESSION_USER_KW "session_user"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE " "
-    USER_KW "user"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
+    ADD_USERS
+      ADD_KW "add"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -16,7 +16,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      XML_TABLE_FROM_ITEM
         XML_TABLE
           XMLTABLE_KW "xmltable"
           L_PAREN "("

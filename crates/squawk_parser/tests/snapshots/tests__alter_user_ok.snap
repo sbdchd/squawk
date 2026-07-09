@@ -213,12 +213,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "u"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    DATABASE_KW "database"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "d"
+    IN_DATABASE
+      IN_KW "in"
+      WHITESPACE " "
+      DATABASE_KW "database"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "d"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -300,12 +301,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "u"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    DATABASE_KW "database"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "d"
+    IN_DATABASE
+      IN_KW "in"
+      WHITESPACE " "
+      DATABASE_KW "database"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "d"
     WHITESPACE " "
     RESET_CONFIG_PARAM
       RESET_KW "reset"

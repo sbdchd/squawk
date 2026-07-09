@@ -26,7 +26,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "t"
     SEMICOLON ";"

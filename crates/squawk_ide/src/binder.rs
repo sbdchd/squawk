@@ -562,17 +562,11 @@ fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure)
 }
 
 fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
-    let (schema_name, name_ptr) = if let Some(schema_name_node) = create_schema.name() {
-        let schema_name = Name::from_node(&schema_name_node);
-        let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
-        (schema_name, name_ptr)
-    } else if let Some(name) = create_schema.role().and_then(|role| role.name()) {
-        let schema_name = Name::from_node(&name);
-        let name_ptr = SyntaxNodePtr::new(name.syntax());
-        (schema_name, name_ptr)
-    } else {
+    let Some(schema_name_node) = create_schema.schema_name() else {
         return;
     };
+    let schema_name = Name::from_node(&schema_name_node);
+    let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
 
     let schema = Schema(schema_name.clone());
 
@@ -631,9 +625,9 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
 
     b.scope.insert(type_name.clone(), type_id);
 
-    if create_type.range_token().is_some() {
+    if let Some(ast::CreateTypeKind::RangeType(range_type)) = create_type.kind() {
         if let Some((multirange_name, multirange_ptr, multirange_schema)) =
-            multirange_type_from_range(b, create_type, type_name, schema, name_ptr)
+            multirange_type_from_range(b, &range_type, type_name, schema, name_ptr)
         {
             let multirange_id = b.symbols.alloc(Symbol {
                 kind: SymbolKind::Type,
@@ -766,12 +760,12 @@ fn bind_constraint_name_node(b: &mut Binder, name: ast::Name, schema: &Schema, o
 
 fn multirange_type_from_range(
     b: &Binder,
-    create_type: ast::CreateType,
+    range_type: &ast::RangeType,
     type_name: Name,
     schema: Schema,
     fallback_ptr: SyntaxNodePtr,
 ) -> Option<(Name, SyntaxNodePtr, Schema)> {
-    if let Some(attribute_list) = create_type.attribute_list() {
+    if let Some(attribute_list) = range_type.attribute_list() {
         let multirange_key = Name::from_string("multirange_type_name");
         for option in attribute_list.attribute_options() {
             let Some(name) = option.name() else {
@@ -1237,20 +1231,27 @@ fn schema_name(b: &Binder, path: &ast::Path, is_temp: bool) -> Option<Schema> {
 fn bind_set(b: &mut Binder, set: ast::Set) {
     let position = set.syntax().text_range().start();
 
-    // `set schema` is an alternative to `set search_path`
-    if set.schema_token().is_some() {
-        if let Some(literal) = set.literal()
-            && let Some(string_value) = extract_string_literal(&literal)
-        {
-            b.search_path_changes.push(SearchPathChange {
-                position,
-                search_path: vec![Schema::new(string_value)],
-            });
+    match set.set_target() {
+        // `set schema` is an alternative to `set search_path`
+        Some(ast::SetTarget::SetSchemaValue(set_schema)) => {
+            if let Some(literal) = set_schema.literal()
+                && let Some(string_value) = extract_string_literal(&literal)
+            {
+                b.search_path_changes.push(SearchPathChange {
+                    position,
+                    search_path: vec![Schema::new(string_value)],
+                });
+            }
         }
-        return;
+        Some(ast::SetTarget::SetConfig(set_config)) => bind_set_config(b, set_config, position),
+        _ => (),
     }
+}
 
-    let Some(path) = set.path() else { return };
+fn bind_set_config(b: &mut Binder, set_config: ast::SetConfig, position: TextSize) {
+    let Some(path) = set_config.path() else {
+        return;
+    };
 
     if path.qualifier().is_some() {
         return;
@@ -1271,7 +1272,7 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
     }
 
     // `set search_path`
-    if set.default_token().is_some() {
+    if set_config.default_token().is_some() {
         b.search_path_changes.push(SearchPathChange {
             position,
             search_path: vec![
@@ -1282,7 +1283,7 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
         });
     } else {
         let mut search_path = vec![];
-        for config_value in set.config_values() {
+        for config_value in set_config.config_values() {
             match config_value {
                 ast::ConfigValue::Literal(literal) => {
                     if let Some(string_value) = extract_string_literal(&literal) {

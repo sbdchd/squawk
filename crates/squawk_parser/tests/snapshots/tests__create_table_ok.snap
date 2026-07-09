@@ -481,7 +481,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      RANGE_KW "range"
+      PARTITION_STRATEGY
+        RANGE_KW "range"
       WHITESPACE " "
       PARTITION_ITEM_LIST
         L_PAREN "("
@@ -575,7 +576,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      IDENT "hash"
+      PARTITION_STRATEGY
+        IDENT "hash"
       WHITESPACE " "
       PARTITION_ITEM_LIST
         L_PAREN "("
@@ -615,7 +617,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      IDENT "list"
+      PARTITION_STRATEGY
+        IDENT "list"
       WHITESPACE " "
       PARTITION_ITEM_LIST
         L_PAREN "("
@@ -1065,6 +1068,7 @@ SOURCE_FILE
         WHITESPACE " "
         UNIQUE_CONSTRAINT
           UNIQUE_KW "unique"
+          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1080,12 +1084,13 @@ SOURCE_FILE
         UNIQUE_CONSTRAINT
           UNIQUE_KW "unique"
           WHITESPACE " "
-          NULLS_NOT_DISTINCT
-            NULLS_KW "nulls"
-            WHITESPACE " "
-            NOT_KW "not"
-            WHITESPACE " "
-            DISTINCT_KW "distinct"
+          INDEX_PARAMETERS
+            NULLS_NOT_DISTINCT
+              NULLS_KW "nulls"
+              WHITESPACE " "
+              NOT_KW "not"
+              WHITESPACE " "
+              DISTINCT_KW "distinct"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1101,63 +1106,64 @@ SOURCE_FILE
         UNIQUE_CONSTRAINT
           UNIQUE_KW "unique"
           WHITESPACE " "
-          WITH_PARAMS
-            WITH_KW "with"
-            WHITESPACE " "
-            ATTRIBUTE_LIST
-              L_PAREN "("
-              WHITESPACE "\n    "
-              ATTRIBUTE_OPTION
-                NAME
-                  IDENT "fillfactor"
-              COMMA ","
-              WHITESPACE "\n    "
-              ATTRIBUTE_OPTION
-                NAME
-                  IDENT "toast_tuple_target"
-                WHITESPACE " "
-                EQ "="
-                WHITESPACE " "
-                ATTRIBUTE_VALUE
-                  LITERAL
-                    INT_NUMBER "100"
-              COMMA ","
-              WHITESPACE "\n    "
-              ATTRIBUTE_OPTION
-                NAME
-                  IDENT "parallel_workers"
-                WHITESPACE " "
-                EQ "="
-                WHITESPACE " "
-                ATTRIBUTE_VALUE
-                  LITERAL
-                    INT_NUMBER "5"
-              COMMA ","
-              WHITESPACE "\n    "
-              ATTRIBUTE_OPTION
-                NAME
-                  IDENT "autovacuum_enabled"
-                WHITESPACE " "
-                EQ "="
-                WHITESPACE " "
-                ATTRIBUTE_VALUE
-                  LITERAL
-                    FALSE_KW "false"
-              COMMA ","
-              WHITESPACE "\n    "
-              ATTRIBUTE_OPTION
-                NAME
-                  IDENT "autovacuum_vacuum_cost_delay"
-                WHITESPACE " "
-                EQ "="
-                WHITESPACE " "
-                ATTRIBUTE_VALUE
-                  LITERAL
-                    NUMERIC_NUMBER "10.1"
-              WHITESPACE "\n    "
-              COMMENT "-- others omitted"
-              WHITESPACE "\n  "
-              R_PAREN ")"
+          INDEX_PARAMETERS
+            WITH_PARAMS
+              WITH_KW "with"
+              WHITESPACE " "
+              ATTRIBUTE_LIST
+                L_PAREN "("
+                WHITESPACE "\n    "
+                ATTRIBUTE_OPTION
+                  NAME
+                    IDENT "fillfactor"
+                COMMA ","
+                WHITESPACE "\n    "
+                ATTRIBUTE_OPTION
+                  NAME
+                    IDENT "toast_tuple_target"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  ATTRIBUTE_VALUE
+                    LITERAL
+                      INT_NUMBER "100"
+                COMMA ","
+                WHITESPACE "\n    "
+                ATTRIBUTE_OPTION
+                  NAME
+                    IDENT "parallel_workers"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  ATTRIBUTE_VALUE
+                    LITERAL
+                      INT_NUMBER "5"
+                COMMA ","
+                WHITESPACE "\n    "
+                ATTRIBUTE_OPTION
+                  NAME
+                    IDENT "autovacuum_enabled"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  ATTRIBUTE_VALUE
+                    LITERAL
+                      FALSE_KW "false"
+                COMMA ","
+                WHITESPACE "\n    "
+                ATTRIBUTE_OPTION
+                  NAME
+                    IDENT "autovacuum_vacuum_cost_delay"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  ATTRIBUTE_VALUE
+                    LITERAL
+                      NUMERIC_NUMBER "10.1"
+                WHITESPACE "\n    "
+                COMMENT "-- others omitted"
+                WHITESPACE "\n  "
+                R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1173,15 +1179,16 @@ SOURCE_FILE
         UNIQUE_CONSTRAINT
           UNIQUE_KW "unique"
           WHITESPACE " "
-          CONSTRAINT_INDEX_TABLESPACE
-            USING_KW "using"
-            WHITESPACE " "
-            INDEX_KW "index"
-            WHITESPACE " "
-            TABLESPACE_KW "tablespace"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "foo"
+          INDEX_PARAMETERS
+            CONSTRAINT_INDEX_TABLESPACE
+              USING_KW "using"
+              WHITESPACE " "
+              INDEX_KW "index"
+              WHITESPACE " "
+              TABLESPACE_KW "tablespace"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "foo"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -1328,17 +1335,18 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
-          WITH_PARAMS
-            WITH_KW "with"
-            WHITESPACE " "
-            ATTRIBUTE_LIST
-              L_PAREN "("
+          INDEX_PARAMETERS
+            WITH_PARAMS
+              WITH_KW "with"
               WHITESPACE " "
-              ATTRIBUTE_OPTION
-                NAME
-                  IDENT "autovacuum_enabled"
-              WHITESPACE " "
-              R_PAREN ")"
+              ATTRIBUTE_LIST
+                L_PAREN "("
+                WHITESPACE " "
+                ATTRIBUTE_OPTION
+                  NAME
+                    IDENT "autovacuum_enabled"
+                WHITESPACE " "
+                R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1355,7 +1363,8 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
-      WHITESPACE "\n"
+          WHITESPACE "\n"
+          INDEX_PARAMETERS
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1618,24 +1627,25 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          ALWAYS_KW "always"
-          WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          L_PAREN "("
-          WHITESPACE "\n    "
-          BIN_EXPR
-            NAME_REF
-              IDENT "a"
+          GENERATED_STORED
+            ALWAYS_KW "always"
             WHITESPACE " "
-            STAR "*"
+            AS_KW "as"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "2"
-          WHITESPACE "\n  "
-          R_PAREN ")"
-          WHITESPACE " "
-          STORED_KW "stored"
+            L_PAREN "("
+            WHITESPACE "\n    "
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              STAR "*"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+            WHITESPACE "\n  "
+            R_PAREN ")"
+            WHITESPACE " "
+            STORED_KW "stored"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -1679,22 +1689,23 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          ALWAYS_KW "always"
-          WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          L_PAREN "("
-          BIN_EXPR
-            NAME_REF
-              IDENT "a"
+          GENERATED_STORED
+            ALWAYS_KW "always"
             WHITESPACE " "
-            PLUS "+"
+            AS_KW "as"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
-          R_PAREN ")"
-          WHITESPACE " "
-          VIRTUAL_KW "virtual"
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+            R_PAREN ")"
+            WHITESPACE " "
+            VIRTUAL_KW "virtual"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1710,20 +1721,21 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          ALWAYS_KW "always"
-          WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          L_PAREN "("
-          BIN_EXPR
-            NAME_REF
-              IDENT "a"
+          GENERATED_STORED
+            ALWAYS_KW "always"
             WHITESPACE " "
-            PLUS "+"
+            AS_KW "as"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
-          R_PAREN ")"
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+            R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -1889,42 +1901,43 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        NULLS_NOT_DISTINCT
-          NULLS_KW "nulls"
+        INDEX_PARAMETERS
+          NULLS_NOT_DISTINCT
+            NULLS_KW "nulls"
+            WHITESPACE " "
+            NOT_KW "not"
+            WHITESPACE " "
+            DISTINCT_KW "distinct"
           WHITESPACE " "
-          NOT_KW "not"
-          WHITESPACE " "
-          DISTINCT_KW "distinct"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "b"
-          R_PAREN ")"
-        WHITESPACE " "
-        WITH_PARAMS
-          WITH_KW "with"
-          WHITESPACE " "
-          ATTRIBUTE_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            COMMA ","
             WHITESPACE " "
-            ATTRIBUTE_OPTION
-              NAME
-                IDENT "bar"
-              WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              ATTRIBUTE_VALUE
-                LITERAL
-                  FALSE_KW "false"
-            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "b"
             R_PAREN ")"
+          WHITESPACE " "
+          WITH_PARAMS
+            WITH_KW "with"
+            WHITESPACE " "
+            ATTRIBUTE_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              ATTRIBUTE_OPTION
+                NAME
+                  IDENT "bar"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                ATTRIBUTE_VALUE
+                  LITERAL
+                    FALSE_KW "false"
+              WHITESPACE " "
+              R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -1969,12 +1982,13 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
       WHITESPACE " "
       DEFERRABLE_CONSTRAINT_OPTION
         DEFERRABLE_KW "deferrable"
@@ -2029,27 +2043,28 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "b"
+            R_PAREN ")"
+          WHITESPACE " "
+          CONSTRAINT_INDEX_TABLESPACE
+            USING_KW "using"
+            WHITESPACE " "
+            INDEX_KW "index"
+            WHITESPACE " "
+            TABLESPACE_KW "tablespace"
+            WHITESPACE " "
             NAME_REF
-              IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "b"
-          R_PAREN ")"
-        WHITESPACE " "
-        CONSTRAINT_INDEX_TABLESPACE
-          USING_KW "using"
-          WHITESPACE " "
-          INDEX_KW "index"
-          WHITESPACE " "
-          TABLESPACE_KW "tablespace"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "bar"
+              IDENT "bar"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -2316,14 +2331,14 @@ SOURCE_FILE
         CONSTRAINT_INCLUDE_CLAUSE
           INCLUDE_KW "include"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "a"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "b"
             R_PAREN ")"
@@ -2435,15 +2450,15 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           WHITESPACE " "
@@ -2461,15 +2476,15 @@ SOURCE_FILE
             NAME_REF
               IDENT "bar"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           WHITESPACE " "
@@ -2559,42 +2574,43 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        NULLS_NOT_DISTINCT
-          NULLS_KW "nulls"
+        INDEX_PARAMETERS
+          NULLS_NOT_DISTINCT
+            NULLS_KW "nulls"
+            WHITESPACE " "
+            NOT_KW "not"
+            WHITESPACE " "
+            DISTINCT_KW "distinct"
           WHITESPACE " "
-          NOT_KW "not"
-          WHITESPACE " "
-          DISTINCT_KW "distinct"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "b"
-          R_PAREN ")"
-        WHITESPACE " "
-        WITH_PARAMS
-          WITH_KW "with"
-          WHITESPACE " "
-          ATTRIBUTE_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            COMMA ","
             WHITESPACE " "
-            ATTRIBUTE_OPTION
-              NAME
-                IDENT "bar"
-              WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              ATTRIBUTE_VALUE
-                LITERAL
-                  FALSE_KW "false"
-            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "b"
             R_PAREN ")"
+          WHITESPACE " "
+          WITH_PARAMS
+            WITH_KW "with"
+            WHITESPACE " "
+            ATTRIBUTE_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              ATTRIBUTE_OPTION
+                NAME
+                  IDENT "bar"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                ATTRIBUTE_VALUE
+                  LITERAL
+                    FALSE_KW "false"
+              WHITESPACE " "
+              R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       PRIMARY_KEY_CONSTRAINT
@@ -2602,27 +2618,28 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "b"
+            R_PAREN ")"
+          WHITESPACE " "
+          CONSTRAINT_INDEX_TABLESPACE
+            USING_KW "using"
+            WHITESPACE " "
+            INDEX_KW "index"
+            WHITESPACE " "
+            TABLESPACE_KW "tablespace"
+            WHITESPACE " "
             NAME_REF
-              IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "b"
-          R_PAREN ")"
-        WHITESPACE " "
-        CONSTRAINT_INDEX_TABLESPACE
-          USING_KW "using"
-          WHITESPACE " "
-          INDEX_KW "index"
-          WHITESPACE " "
-          TABLESPACE_KW "tablespace"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "bar"
+              IDENT "bar"
       COMMA ","
       WHITESPACE "\n  "
       EXCLUDE_CONSTRAINT
@@ -2677,15 +2694,15 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           WHITESPACE " "
@@ -2703,15 +2720,15 @@ SOURCE_FILE
             NAME_REF
               IDENT "bar"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           WHITESPACE " "
@@ -2721,12 +2738,13 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
       WHITESPACE " "
       DEFERRABLE_CONSTRAINT_OPTION
         DEFERRABLE_KW "deferrable"
@@ -3279,22 +3297,23 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          ALWAYS_KW "always"
-          WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          L_PAREN "("
-          BIN_EXPR
-            NAME_REF
-              IDENT "b"
+          GENERATED_STORED
+            ALWAYS_KW "always"
             WHITESPACE " "
-            STAR "*"
+            AS_KW "as"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "2"
-          R_PAREN ")"
-          WHITESPACE " "
-          STORED_KW "stored"
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              STAR "*"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+            R_PAREN ")"
+            WHITESPACE " "
+            STORED_KW "stored"
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
@@ -3643,15 +3662,15 @@ SOURCE_FILE
               WHITESPACE " "
               NULL_KW "null"
               WHITESPACE " "
-              COLUMN_LIST
+              COLUMN_REF_LIST
                 L_PAREN "("
                 WHITESPACE " "
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "a"
                 COMMA ","
                 WHITESPACE " "
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "b"
                 WHITESPACE " "
@@ -3688,13 +3707,14 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          BY_KW "BY"
-          WHITESPACE " "
-          DEFAULT_KW "DEFAULT"
-          WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          IDENTITY_KW "IDENTITY"
+          GENERATED_IDENTITY
+            BY_KW "BY"
+            WHITESPACE " "
+            DEFAULT_KW "DEFAULT"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            IDENTITY_KW "IDENTITY"
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -3751,15 +3771,15 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "address_id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             PERIOD_KW "PERIOD"
             WHITESPACE " "
             NAME_REF
@@ -3774,15 +3794,15 @@ SOURCE_FILE
             NAME_REF
               IDENT "addresses"
         WHITESPACE " "
-        COLUMN_LIST
+        COLUMN_REF_LIST
           L_PAREN "("
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "id"
           COMMA ","
           WHITESPACE " "
-          COLUMN
+          COLUMN_REF
             PERIOD_KW "PERIOD"
             WHITESPACE " "
             NAME_REF
@@ -3833,16 +3853,17 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          WHITESPACE " "
-          WITHOUT_KW "without"
-          WHITESPACE " "
-          OVERLAPS_KW "overlaps"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            WITHOUT_KW "without"
+            WHITESPACE " "
+            OVERLAPS_KW "overlaps"
+            R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -3906,26 +3927,27 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "key"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "b"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "c"
-          WHITESPACE " "
-          WITHOUT_KW "without"
-          WHITESPACE " "
-          OVERLAPS_KW "overlaps"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "b"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "c"
+            WHITESPACE " "
+            WITHOUT_KW "without"
+            WHITESPACE " "
+            OVERLAPS_KW "overlaps"
+            R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -3958,13 +3980,14 @@ SOURCE_FILE
         GENERATED_CONSTRAINT
           GENERATED_KW "generated"
           WHITESPACE " "
-          BY_KW "BY"
-          WHITESPACE " "
-          DEFAULT_KW "DEFAULT"
-          WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          IDENTITY_KW "IDENTITY"
+          GENERATED_IDENTITY
+            BY_KW "BY"
+            WHITESPACE " "
+            DEFAULT_KW "DEFAULT"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            IDENTITY_KW "IDENTITY"
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -4031,21 +4054,22 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "id"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "valid_range"
-          WHITESPACE " "
-          WITHOUT_KW "WITHOUT"
-          WHITESPACE " "
-          OVERLAPS_KW "OVERLAPS"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "id"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "valid_range"
+            WHITESPACE " "
+            WITHOUT_KW "WITHOUT"
+            WHITESPACE " "
+            OVERLAPS_KW "OVERLAPS"
+            R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -4116,27 +4140,28 @@ SOURCE_FILE
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "symbol"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              PERIOD_KW "period"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              YEAR_KW "year"
-          COMMA ","
-          WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "quarter"
-          R_PAREN ")"
+        INDEX_PARAMETERS
+          COLUMN_REF_LIST
+            L_PAREN "("
+            COLUMN_REF
+              NAME_REF
+                IDENT "symbol"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                PERIOD_KW "period"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                YEAR_KW "year"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_REF
+              NAME_REF
+                IDENT "quarter"
+            R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -4174,6 +4199,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
+          INDEX_PARAMETERS
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -4200,7 +4226,8 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-        WHITESPACE " "
+          WHITESPACE " "
+          INDEX_PARAMETERS
         COLLATE
           COLLATE_KW "COLLATE"
           WHITESPACE " "
@@ -4245,6 +4272,7 @@ SOURCE_FILE
         WHITESPACE " "
         UNIQUE_CONSTRAINT
           UNIQUE_KW "UNIQUE"
+          INDEX_PARAMETERS
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

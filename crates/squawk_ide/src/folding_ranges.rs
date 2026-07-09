@@ -125,6 +125,7 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::BEGIN_FUNC_OPTION_LIST
         | SyntaxKind::CHECKPOINT_OPTION_LIST
         | SyntaxKind::COLUMN_LIST
+        | SyntaxKind::COLUMN_REF_LIST
         | SyntaxKind::CONFLICT_INDEX_ITEM_LIST
         | SyntaxKind::CONSTRAINT_EXCLUSION_LIST
         | SyntaxKind::COPY_OPTION_LIST

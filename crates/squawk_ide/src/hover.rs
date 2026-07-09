@@ -652,7 +652,10 @@ fn format_alias_with_column_list(db: &dyn Db, alias: InFile<ast::Alias>) -> Opti
     let Some(column_list) = alias.column_list() else {
         let name = Name::from_node(&alias.name()?);
         let from_item = alias.syntax().ancestors().find_map(ast::FromItem::cast)?;
-        let paren_select = from_item.paren_select()?;
+        let ast::FromItem::ParenFromItem(paren) = from_item else {
+            return None;
+        };
+        let paren_select = paren.paren_select()?;
         return format_subquery_table(name, paren_select);
     };
 
@@ -726,7 +729,9 @@ fn target_has_schema_qualified_from_item(target: &ast::Target) -> bool {
     };
 
     for from_item in from_clause.from_items() {
-        if from_item.field_expr().is_some() {
+        if let ast::FromItem::RelationFromItem(relation) = from_item
+            && relation.field_expr().is_some()
+        {
             return true;
         }
     }
@@ -1505,17 +1510,24 @@ fn format_create_type(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
     let path = create_type.path()?;
     let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(file, &path))?;
 
-    let snippet = if let Some(variant_list) = create_type.variant_list() {
-        let variants = variant_list.syntax().text().to_string();
-        format!("type {schema}.{type_name} as enum {variants}")
-    } else if let Some(column_list) = create_type.column_list() {
-        let columns = column_list.syntax().text().to_string();
-        format!("type {schema}.{type_name} as {columns}")
-    } else if let Some(attribute_list) = create_type.attribute_list() {
-        let attributes = attribute_list.syntax().text().to_string();
-        format!("type {schema}.{type_name} {attributes}")
-    } else {
-        format!("type {schema}.{type_name}")
+    let snippet = match create_type.kind() {
+        Some(ast::CreateTypeKind::EnumType(enum_type)) => {
+            let variants = enum_type.variant_list()?.syntax().text().to_string();
+            format!("type {schema}.{type_name} as enum {variants}")
+        }
+        Some(ast::CreateTypeKind::CompositeType(composite_type)) => {
+            let columns = composite_type.column_list()?.syntax().text().to_string();
+            format!("type {schema}.{type_name} as {columns}")
+        }
+        Some(ast::CreateTypeKind::RangeType(range_type)) => {
+            let attributes = range_type.attribute_list()?.syntax().text().to_string();
+            format!("type {schema}.{type_name} {attributes}")
+        }
+        Some(ast::CreateTypeKind::BaseType(base_type)) => {
+            let attributes = base_type.attribute_list()?.syntax().text().to_string();
+            format!("type {schema}.{type_name} {attributes}")
+        }
+        None => format!("type {schema}.{type_name}"),
     };
 
     Some(hover_with_preceding_comment(snippet, create_type.syntax()))
@@ -1530,13 +1542,8 @@ fn hover_schema(db: &dyn Db, def: Location) -> Option<Hover> {
 }
 
 fn create_schema_name(create_schema: ast::CreateSchema) -> Option<String> {
-    if let Some(schema_name) = create_schema.name() {
-        return Some(schema_name.syntax().text().to_string());
-    }
-
     create_schema
-        .role()
-        .and_then(|r| r.name())
+        .schema_name()
         .map(|n| n.syntax().text().to_string())
 }
 
@@ -1724,7 +1731,10 @@ fn qualified_star_table_ptr(
 
             let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
 
-            let name_ref = from_item.name_ref();
+            let name_ref = match &from_item {
+                ast::FromItem::RelationFromItem(relation) => relation.name_ref(),
+                _ => None,
+            };
             let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
             if let Some((table_like_ptr, _kind)) =
                 resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)

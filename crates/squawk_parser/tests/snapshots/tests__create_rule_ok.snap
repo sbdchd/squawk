@@ -18,7 +18,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      SELECT_KW "select"
+      RULE_EVENT
+        SELECT_KW "select"
       WHITESPACE "\n  "
       TO_KW "to"
       WHITESPACE " "
@@ -54,7 +55,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      SELECT_KW "select"
+      RULE_EVENT
+        SELECT_KW "select"
       WHITESPACE "\n  "
       TO_KW "to"
       WHITESPACE " "
@@ -190,7 +192,7 @@ SOURCE_FILE
             WHITESPACE " "
             SET_COLUMN_LIST
               SET_SINGLE_COLUMN
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "foo"
                 WHITESPACE " "
@@ -226,7 +228,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -269,7 +272,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -312,7 +316,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -363,7 +368,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -422,7 +428,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -471,7 +478,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -524,7 +532,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -561,7 +570,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "on"
       WHITESPACE " "
-      INSERT_KW "insert"
+      RULE_EVENT
+        INSERT_KW "insert"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
@@ -604,7 +614,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "ON"
       WHITESPACE " "
-      SELECT_KW "SELECT"
+      RULE_EVENT
+        SELECT_KW "SELECT"
       WHITESPACE " "
       TO_KW "TO"
       WHITESPACE " "
@@ -629,7 +640,7 @@ SOURCE_FILE
         FROM_CLAUSE
           FROM_KW "FROM"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "t2"
     SEMICOLON ";"
@@ -647,7 +658,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "ON"
       WHITESPACE " "
-      SELECT_KW "SELECT"
+      RULE_EVENT
+        SELECT_KW "SELECT"
       WHITESPACE " "
       TO_KW "TO"
       WHITESPACE " "
@@ -672,7 +684,7 @@ SOURCE_FILE
         FROM_CLAUSE
           FROM_KW "FROM"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "t1"
     SEMICOLON ";"
@@ -688,7 +700,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t1"
     SEMICOLON ";"
@@ -708,7 +720,8 @@ SOURCE_FILE
     RULE_ON
       ON_KW "ON"
       WHITESPACE " "
-      UPDATE_KW "UPDATE"
+      RULE_EVENT
+        UPDATE_KW "UPDATE"
       WHITESPACE " "
       TO_KW "TO"
       WHITESPACE " "
@@ -743,7 +756,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               NAME_KW "name"
           WHITESPACE " "

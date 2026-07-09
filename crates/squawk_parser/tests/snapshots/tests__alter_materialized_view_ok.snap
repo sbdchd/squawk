@@ -227,21 +227,23 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
-    WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
+    ALL_IN_TABLESPACE
+      ALL_KW "all"
+      WHITESPACE " "
+      IN_KW "in"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+      WHITESPACE "\n  "
+      SET_TABLESPACE
+        SET_KW "set"
+        WHITESPACE " "
+        TABLESPACE_KW "tablespace"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -251,37 +253,39 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
-    WHITESPACE "\n  "
-    OWNED_BY_ROLES
-      OWNED_KW "owned"
+    ALL_IN_TABLESPACE
+      ALL_KW "all"
       WHITESPACE " "
-      BY_KW "by"
+      IN_KW "in"
       WHITESPACE " "
-      ROLE_REF_LIST
-        ROLE_REF
-          CURRENT_USER_KW "current_user"
-        COMMA ","
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+      WHITESPACE "\n  "
+      OWNED_BY_ROLES
+        OWNED_KW "owned"
         WHITESPACE " "
-        ROLE_REF
-          NAME_REF
-            IDENT "u"
-    WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME
-      IDENT "n"
-    WHITESPACE " "
-    NOWAIT_KW "nowait"
+        BY_KW "by"
+        WHITESPACE " "
+        ROLE_REF_LIST
+          ROLE_REF
+            CURRENT_USER_KW "current_user"
+          COMMA ","
+          WHITESPACE " "
+          ROLE_REF
+            NAME_REF
+              IDENT "u"
+      WHITESPACE "\n  "
+      SET_TABLESPACE
+        SET_KW "set"
+        WHITESPACE " "
+        TABLESPACE_KW "tablespace"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "n"
+      WHITESPACE " "
+      NOWAIT_KW "nowait"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_stats"

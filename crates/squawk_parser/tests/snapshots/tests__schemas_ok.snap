@@ -10,93 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME
-      IDENT "myschema"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  CREATE_SCHEMA
-    CREATE_KW "create"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME
-      IDENT "s"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE_REF
-      NAME_REF
-        IDENT "foo"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  CREATE_SCHEMA
-    CREATE_KW "create"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME
-      IDENT "s"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE_REF
-      CURRENT_ROLE_KW "current_role"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  CREATE_SCHEMA
-    CREATE_KW "create"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME
-      IDENT "s"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE_REF
-      CURRENT_USER_KW "current_user"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  CREATE_SCHEMA
-    CREATE_KW "create"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    NAME
-      IDENT "s"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE_REF
-      SESSION_USER_KW "session_user"
-    SEMICOLON ";"
-  WHITESPACE "\n\n"
-  CREATE_SCHEMA
-    CREATE_KW "create"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE
+    NAMED_SCHEMA
       NAME
-        IDENT "foo"
-    SEMICOLON ";"
-  WHITESPACE "\n\n"
-  CREATE_SCHEMA
-    CREATE_KW "create"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    IF_NOT_EXISTS
-      IF_KW "if"
-      WHITESPACE " "
-      NOT_KW "not"
-      WHITESPACE " "
-      EXISTS_KW "exists"
-    WHITESPACE " "
-    NAME
-      IDENT "s"
+        IDENT "myschema"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -104,40 +20,60 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    IF_NOT_EXISTS
-      IF_KW "if"
-      WHITESPACE " "
-      NOT_KW "not"
-      WHITESPACE " "
-      EXISTS_KW "exists"
-    WHITESPACE " "
-    NAME
-      IDENT "s"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE_REF
-      NAME_REF
-        IDENT "bar"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  CREATE_SCHEMA
-    CREATE_KW "create"
-    WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    IF_NOT_EXISTS
-      IF_KW "if"
-      WHITESPACE " "
-      NOT_KW "not"
-      WHITESPACE " "
-      EXISTS_KW "exists"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE
+    NAMED_SCHEMA
       NAME
-        IDENT "bar"
+        IDENT "s"
+      WHITESPACE " "
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE_REF
+        NAME_REF
+          IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
+      WHITESPACE " "
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE_REF
+        CURRENT_ROLE_KW "current_role"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
+      WHITESPACE " "
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE_REF
+        CURRENT_USER_KW "current_user"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
+      WHITESPACE " "
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE_REF
+        SESSION_USER_KW "session_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -145,8 +81,82 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME
-      IDENT "s"
+    AUTHORIZATION_SCHEMA
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE
+        NAME
+          IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
+      WHITESPACE " "
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE_REF
+        NAME_REF
+          IDENT "bar"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    AUTHORIZATION_SCHEMA
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE
+        NAME
+          IDENT "bar"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
     WHITESPACE "\n  "
     CREATE_TABLE
       CREATE_KW "create"
@@ -304,14 +314,15 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME
-      IDENT "schema_name"
-    WHITESPACE " "
-    AUTHORIZATION_KW "authorization"
-    WHITESPACE " "
-    ROLE_REF
-      NAME_REF
-        IDENT "user_name"
+    NAMED_SCHEMA
+      NAME
+        IDENT "schema_name"
+      WHITESPACE " "
+      AUTHORIZATION_KW "authorization"
+      WHITESPACE " "
+      ROLE_REF
+        NAME_REF
+          IDENT "user_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_schema_with_sequence"
@@ -321,8 +332,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME
-      IDENT "s"
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
     WHITESPACE "\n  "
     CREATE_SEQUENCE
       CREATE_KW "create"
@@ -342,8 +354,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME
-      IDENT "s"
+    NAMED_SCHEMA
+      NAME
+        IDENT "s"
     WHITESPACE "\n  "
     CREATE_TRIGGER
       CREATE_KW "create"
@@ -394,75 +407,81 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "search_path"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "myschema"
-    COMMA ","
-    NAME_REF
-      IDENT "public"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "search_path"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "myschema"
+      COMMA ","
+      NAME_REF
+        IDENT "public"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "search_path"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "myschema"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "search_path"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "myschema"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    NAME_REF
-      IDENT "bar"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    SCHEMA_KW "schema"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
+    SET_SCHEMA_VALUE
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      LITERAL
+        STRING "'foo'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    XML_KW "xml"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    DOCUMENT_KW "document"
+    SET_XML_OPTION
+      XML_KW "xml"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      DOCUMENT_KW "document"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    XML_KW "xml"
-    WHITESPACE " "
-    OPTION_KW "option"
-    WHITESPACE " "
-    CONTENT_KW "content"
+    SET_XML_OPTION
+      XML_KW "xml"
+      WHITESPACE " "
+      OPTION_KW "option"
+      WHITESPACE " "
+      CONTENT_KW "content"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET_ROLE
@@ -478,123 +497,131 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    TIME_KW "time"
-    WHITESPACE " "
-    ZONE_KW "zone"
-    WHITESPACE " "
-    LITERAL
-      STRING "'America/Los_Angeles'"
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      LITERAL
+        STRING "'America/Los_Angeles'"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    TIME_KW "time"
-    WHITESPACE " "
-    ZONE_KW "zone"
-    WHITESPACE " "
-    DEFAULT_KW "default"
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    TIME_KW "time"
-    WHITESPACE " "
-    ZONE_KW "zone"
-    WHITESPACE " "
-    LOCAL_KW "local"
+    SET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
+      WHITESPACE " "
+      LOCAL_KW "local"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    CURRENT_KW "current"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SET
-    SET_KW "set"
-    WHITESPACE " "
-    PATH
+    SET_CONFIG
       PATH
         PATH_SEGMENT
           NAME_REF
             IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      CURRENT_KW "current"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    CURRENT_KW "current"
+    SET_CONFIG
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      CURRENT_KW "current"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    DEFAULT_KW "default"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      NUMERIC_NUMBER "10.0"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NUMERIC_NUMBER "10.0"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'foo'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
     SEMICOLON ";"
   WHITESPACE "\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    DEFAULT_KW "default"
+    SET_CONFIG
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- operator"
@@ -729,9 +756,10 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    CATALOG_KW "catalog"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
+    SET_CATALOG
+      CATALOG_KW "catalog"
+      WHITESPACE " "
+      LITERAL
+        STRING "'foo'"
     SEMICOLON ";"
   WHITESPACE "\n"

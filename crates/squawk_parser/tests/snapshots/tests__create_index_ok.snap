@@ -282,14 +282,14 @@ SOURCE_FILE
     CONSTRAINT_INCLUDE_CLAUSE
       INCLUDE_KW "include"
       WHITESPACE " "
-      COLUMN_LIST
+      COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN
+        COLUMN_REF
           NAME_REF
             IDENT "a"
         COMMA ","
         WHITESPACE " "
-        COLUMN
+        COLUMN_REF
           NAME_REF
             IDENT "b"
         R_PAREN ")"
@@ -469,14 +469,14 @@ SOURCE_FILE
     CONSTRAINT_INCLUDE_CLAUSE
       INCLUDE_KW "INCLUDE"
       WHITESPACE " "
-      COLUMN_LIST
+      COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN
+        COLUMN_REF
           NAME_REF
             IDENT "director"
         COMMA ","
         WHITESPACE " "
-        COLUMN
+        COLUMN_REF
           NAME_REF
             IDENT "rating"
         R_PAREN ")"

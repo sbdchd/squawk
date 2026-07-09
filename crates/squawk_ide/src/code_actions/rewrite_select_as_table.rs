@@ -22,9 +22,12 @@ pub(super) fn rewrite_select_as_table(
     let from_clause = select.from_clause()?;
     let from_item = from_clause.from_items().next()?;
 
-    let table_name = if let Some(name_ref) = from_item.name_ref() {
+    let ast::FromItem::RelationFromItem(relation) = from_item else {
+        return None;
+    };
+    let table_name = if let Some(name_ref) = relation.name_ref() {
         name_ref.syntax().text().to_string()
-    } else if let Some(field_expr) = from_item.field_expr() {
+    } else if let Some(field_expr) = relation.field_expr() {
         field_expr.syntax().text().to_string()
     } else {
         return None;
@@ -100,22 +103,18 @@ fn can_transform_select_to_table(select: &ast::Select) -> bool {
         return false;
     }
 
-    if from_item.alias().is_some()
-        || from_item.tablesample_clause().is_some()
-        || from_item.only_token().is_some()
-        || from_item.lateral_token().is_some()
-        || from_item.star_token().is_some()
-        || from_item.call_expr().is_some()
-        || from_item.paren_select().is_some()
-        || from_item.json_table().is_some()
-        || from_item.xml_table().is_some()
-        || from_item.cast_expr().is_some()
+    let ast::FromItem::RelationFromItem(relation) = from_item else {
+        return false;
+    };
+    if relation.alias().is_some()
+        || relation.tablesample_clause().is_some()
+        || relation.only_token().is_some()
+        || relation.star_token().is_some()
     {
         return false;
     }
 
-    // only want table refs
-    from_item.name_ref().is_some() || from_item.field_expr().is_some()
+    relation.name_ref().is_some() || relation.field_expr().is_some()
 }
 
 #[cfg(test)]

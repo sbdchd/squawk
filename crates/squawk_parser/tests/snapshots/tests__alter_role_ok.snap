@@ -278,12 +278,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "r"
     WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    DATABASE_KW "database"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "d"
+    IN_DATABASE
+      IN_KW "in"
+      WHITESPACE " "
+      DATABASE_KW "database"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "d"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"

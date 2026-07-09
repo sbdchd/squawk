@@ -145,14 +145,14 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "c"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "k"
             R_PAREN ")"
@@ -166,14 +166,14 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "l"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "u"
             R_PAREN ")"
@@ -202,14 +202,14 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "x"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "y"
             R_PAREN ")"
@@ -219,9 +219,9 @@ SOURCE_FILE
             WHITESPACE " "
             KEY_KW "key"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "s"
               R_PAREN ")"
@@ -232,9 +232,9 @@ SOURCE_FILE
               NAME_REF
                 IDENT "k"
               WHITESPACE " "
-              COLUMN_LIST
+              COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "id"
                 R_PAREN ")"
@@ -244,9 +244,9 @@ SOURCE_FILE
             WHITESPACE " "
             KEY_KW "key"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "d"
               R_PAREN ")"
@@ -257,9 +257,9 @@ SOURCE_FILE
               NAME_REF
                 IDENT "k"
               WHITESPACE " "
-              COLUMN_LIST
+              COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "id"
                 R_PAREN ")"
@@ -358,9 +358,9 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "l"
             R_PAREN ")"
@@ -391,14 +391,14 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "x"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "y"
             R_PAREN ")"
@@ -408,9 +408,9 @@ SOURCE_FILE
             WHITESPACE " "
             KEY_KW "key"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "s"
               R_PAREN ")"
@@ -421,9 +421,9 @@ SOURCE_FILE
               NAME_REF
                 IDENT "k"
               WHITESPACE " "
-              COLUMN_LIST
+              COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "id"
                 R_PAREN ")"
@@ -433,9 +433,9 @@ SOURCE_FILE
             WHITESPACE " "
             KEY_KW "key"
             WHITESPACE " "
-            COLUMN_LIST
+            COLUMN_REF_LIST
               L_PAREN "("
-              COLUMN
+              COLUMN_REF
                 NAME_REF
                   IDENT "d"
               R_PAREN ")"
@@ -446,9 +446,9 @@ SOURCE_FILE
               NAME_REF
                 IDENT "k"
               WHITESPACE " "
-              COLUMN_LIST
+              COLUMN_REF_LIST
                 L_PAREN "("
-                COLUMN
+                COLUMN_REF
                   NAME_REF
                     IDENT "id"
                 R_PAREN ")"

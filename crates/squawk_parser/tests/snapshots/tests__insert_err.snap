@@ -15,18 +15,18 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "b"
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "c"
       R_PAREN ")"
@@ -72,15 +72,15 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "a"
       COMMA ","
       ERROR
         COMMA ","
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "c"
       ERROR
@@ -128,19 +128,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    COLUMN_LIST
+    COLUMN_REF_LIST
       L_PAREN "("
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "b"
       COMMA ","
       WHITESPACE " "
-      COLUMN
+      COLUMN_REF
         NAME_REF
           IDENT "c"
       R_PAREN ")"
