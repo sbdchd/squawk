@@ -106,6 +106,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                         }
                         if let Ok(violation_name) = Rule::try_from(x.trim()) {
                             set.insert(violation_name);
+                            set.extend(violation_name.expands_to());
                         } else {
                             let without_start = x.trim_start();
                             let trim_start_size = x.len() - without_start.len();
@@ -301,7 +302,7 @@ create table users (
         assert_debug_snapshot!(errors, @r#"
         [
             Violation {
-                code: RequireTimeoutSettings,
+                code: RequireLockTimeout,
                 message: "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
                 text_range: 0..32,
                 help: Some(
@@ -322,7 +323,7 @@ create table users (
                 ),
             },
             Violation {
-                code: RequireTimeoutSettings,
+                code: RequireStatementTimeout,
                 message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 0..32,
                 help: Some(
@@ -382,6 +383,36 @@ create table users (
             },
         ]
         "#);
+    }
+
+    #[test]
+    fn ignore_timeout_settings_alias_covers_granular_rules() {
+        let sql = r#"
+-- squawk-ignore require-timeout-settings
+alter table t add column c boolean;
+        "#;
+        let parse = squawk_syntax::SourceFile::parse(sql);
+
+        let mut linter = Linter::from([Rule::RequireLockTimeout, Rule::RequireStatementTimeout]);
+        let errors = linter.lint(&parse, sql);
+        assert_eq!(errors, vec![]);
+    }
+
+    #[test]
+    fn ignore_granular_timeout_rule() {
+        let sql = r#"
+-- squawk-ignore require-lock-timeout
+alter table t add column c boolean;
+        "#;
+        let parse = squawk_syntax::SourceFile::parse(sql);
+
+        let mut linter = Linter::from([Rule::RequireLockTimeout, Rule::RequireStatementTimeout]);
+        let errors: Vec<_> = linter
+            .lint(&parse, sql)
+            .into_iter()
+            .map(|x| x.code)
+            .collect();
+        assert_eq!(errors, vec![Rule::RequireStatementTimeout]);
     }
 
     #[test]
@@ -512,10 +543,10 @@ alter table t2 drop column c2 cascade;
             .map(|x| x.code)
             .collect();
 
-        assert_debug_snapshot!(errors, @r"
+        assert_debug_snapshot!(errors, @"
         [
-            RequireTimeoutSettings,
-            RequireTimeoutSettings,
+            RequireLockTimeout,
+            RequireStatementTimeout,
             PreferRobustStmts,
             PreferRobustStmts,
         ]
@@ -538,10 +569,10 @@ alter table t2 drop column c2 cascade;
             .map(|x| x.code)
             .collect();
 
-        assert_debug_snapshot!(errors, @r"
+        assert_debug_snapshot!(errors, @"
         [
-            RequireTimeoutSettings,
-            RequireTimeoutSettings,
+            RequireLockTimeout,
+            RequireStatementTimeout,
             PreferRobustStmts,
             PreferRobustStmts,
         ]
@@ -568,11 +599,11 @@ alter table t2 drop column c2 cascade;
                 "unknown name ban-ban-ban-drop-column ignore-something hmm",
             ),
             (
-                RequireTimeoutSettings,
+                RequireLockTimeout,
                 "Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations",
             ),
             (
-                RequireTimeoutSettings,
+                RequireStatementTimeout,
                 "Missing `set statement_timeout` before potentially slow operations",
             ),
             (
@@ -613,8 +644,8 @@ alter table t2 drop column c2 cascade;
 
         assert_debug_snapshot!(errors, @"
         [
-            RequireTimeoutSettings,
-            RequireTimeoutSettings,
+            RequireLockTimeout,
+            RequireStatementTimeout,
             PreferRobustStmts,
             PreferRobustStmts,
         ]
@@ -638,8 +669,8 @@ alter table t drop column c cascade;
 
         assert_debug_snapshot!(errors, @"
         [
-            RequireTimeoutSettings,
-            RequireTimeoutSettings,
+            RequireLockTimeout,
+            RequireStatementTimeout,
         ]
         ");
     }

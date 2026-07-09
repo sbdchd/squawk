@@ -103,6 +103,8 @@ pub enum Rule {
     IdentifierTooLong,
     RequireConcurrentPartitionDetach,
     RequireConcurrentReindex,
+    RequireLockTimeout,
+    RequireStatementTimeout,
     // xtask:new-rule:error-name
 }
 
@@ -110,7 +112,21 @@ impl Rule {
     /// Rules that are opt-in are not enabled by default.
     /// They must be explicitly included via configuration.
     pub fn is_opt_in(&self) -> bool {
-        matches!(self, Rule::RequireTableSchema)
+        // require-timeout-settings is an alias, see `Rule::expands_to`
+        matches!(
+            self,
+            Rule::RequireTableSchema | Rule::RequireTimeoutSettings
+        )
+    }
+
+    /// Rules that are deprecated aliases for other rules.
+    pub fn expands_to(&self) -> &[Rule] {
+        match self {
+            Rule::RequireTimeoutSettings => {
+                &[Rule::RequireLockTimeout, Rule::RequireStatementTimeout]
+            }
+            _ => &[],
+        }
     }
 }
 
@@ -159,6 +175,8 @@ impl TryFrom<&str> for Rule {
             "identifier-too-long" => Ok(Rule::IdentifierTooLong),
             "require-concurrent-partition-detach" => Ok(Rule::RequireConcurrentPartitionDetach),
             "require-concurrent-reindex" => Ok(Rule::RequireConcurrentReindex),
+            "require-lock-timeout" => Ok(Rule::RequireLockTimeout),
+            "require-statement-timeout" => Ok(Rule::RequireStatementTimeout),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -227,6 +245,8 @@ impl fmt::Display for Rule {
             Rule::IdentifierTooLong => "identifier-too-long",
             Rule::RequireConcurrentPartitionDetach => "require-concurrent-partition-detach",
             Rule::RequireConcurrentReindex => "require-concurrent-reindex",
+            Rule::RequireLockTimeout => "require-lock-timeout",
+            Rule::RequireStatementTimeout => "require-statement-timeout",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -455,7 +475,9 @@ impl Linter {
         if self.rules.contains(&Rule::BanTruncateCascade) {
             ban_truncate_cascade(self, file);
         }
-        if self.rules.contains(&Rule::RequireTimeoutSettings) {
+        if self.rules.contains(&Rule::RequireLockTimeout)
+            || self.rules.contains(&Rule::RequireStatementTimeout)
+        {
             require_timeout_settings(self, file);
         }
         if self.rules.contains(&Rule::BanUncommittedTransaction) {
@@ -515,20 +537,32 @@ impl Linter {
 
         for rule in include {
             default_rules.insert(*rule);
+            default_rules.extend(rule.expands_to());
         }
 
         for rule in exclude {
             default_rules.remove(rule);
+            for expanded in rule.expands_to() {
+                default_rules.remove(expanded);
+            }
         }
+
+        // drop aliases so `Linter::from` doesn't expand them again and re-add
+        // excluded rules
+        default_rules.retain(|rule| rule.expands_to().is_empty());
 
         Linter::from(default_rules)
     }
 
     pub fn from(rules: impl IntoIterator<Item = Rule>) -> Self {
+        let mut rules: FxHashSet<Rule> = rules.into_iter().collect();
+        for rule in rules.clone() {
+            rules.extend(rule.expands_to());
+        }
         Self {
             errors: vec![],
             ignores: vec![],
-            rules: rules.into_iter().collect(),
+            rules,
             settings: Default::default(),
         }
     }
@@ -576,5 +610,36 @@ mod tests {
     fn with_rules_exclude_removes_default_rule() {
         let linter = Linter::with_rules(&[], &[Rule::BanDropTable]);
         assert!(!linter.rules.contains(&Rule::BanDropTable));
+    }
+
+    #[test]
+    fn require_timeout_settings_expands_to_granular_rules() {
+        let linter = Linter::from([Rule::RequireTimeoutSettings]);
+        assert!(linter.rules.contains(&Rule::RequireLockTimeout));
+        assert!(linter.rules.contains(&Rule::RequireStatementTimeout));
+    }
+
+    #[test]
+    fn with_rules_exclude_timeout_settings_removes_granular_rules() {
+        let linter = Linter::with_rules(&[], &[Rule::RequireTimeoutSettings]);
+        assert!(!linter.rules.contains(&Rule::RequireLockTimeout));
+        assert!(!linter.rules.contains(&Rule::RequireStatementTimeout));
+    }
+
+    #[test]
+    fn with_rules_exclude_granular_timeout_rule_keeps_other() {
+        let linter = Linter::with_rules(&[], &[Rule::RequireStatementTimeout]);
+        assert!(linter.rules.contains(&Rule::RequireLockTimeout));
+        assert!(!linter.rules.contains(&Rule::RequireStatementTimeout));
+    }
+
+    #[test]
+    fn with_rules_exclude_granular_rule_wins_over_included_alias() {
+        let linter = Linter::with_rules(
+            &[Rule::RequireTimeoutSettings],
+            &[Rule::RequireStatementTimeout],
+        );
+        assert!(linter.rules.contains(&Rule::RequireLockTimeout));
+        assert!(!linter.rules.contains(&Rule::RequireStatementTimeout));
     }
 }
