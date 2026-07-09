@@ -301,13 +301,16 @@ fn validate_set_single_column(it: ast::SetSingleColumn, acc: &mut Vec<SyntaxErro
     if set_expr.default_token().is_none() {
         return;
     }
-    let Some(column) = it.column() else {
+    let Some(column_ref) = it.column_ref() else {
         return;
     };
-    if column.index_expr().is_some() || column.field_expr().is_some() {
+    if column_ref.index_expr().is_some()
+        || column_ref.field_expr().is_some()
+        || column_ref.slice_expr().is_some()
+    {
         acc.push(SyntaxError::new(
             "DEFAULT may only assign to a simple column name",
-            column.syntax().text_range(),
+            column_ref.syntax().text_range(),
         ));
     }
 }

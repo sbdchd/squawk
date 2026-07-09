@@ -262,16 +262,9 @@ fn create_cte_table_symbol(with_table: ast::WithTable) -> Option<DocumentSymbol>
 }
 
 fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymbol> {
-    let (name, focus_range) = if let Some(name_node) = create_schema.name() {
-        (
-            name_node.syntax().text().to_string(),
-            name_node.syntax().text_range(),
-        )
-    } else if let Some(name) = create_schema.role().and_then(|r| r.name()) {
-        (name.syntax().text().to_string(), name.syntax().text_range())
-    } else {
-        return None;
-    };
+    let name_node = create_schema.schema_name()?;
+    let name = name_node.syntax().text().to_string();
+    let focus_range = name_node.syntax().text_range();
 
     let full_range = create_schema.syntax().text_range();
 
@@ -749,24 +742,32 @@ fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Opti
     let focus_range = name_node.syntax().text_range();
 
     let mut children = vec![];
-    if let Some(variant_list) = create_type.variant_list() {
-        for variant in variant_list.variants() {
-            if let Some(variant_symbol) = create_variant_symbol(variant) {
-                children.push(variant_symbol);
+    match create_type.kind() {
+        Some(ast::CreateTypeKind::EnumType(enum_type)) => {
+            if let Some(variant_list) = enum_type.variant_list() {
+                for variant in variant_list.variants() {
+                    if let Some(variant_symbol) = create_variant_symbol(variant) {
+                        children.push(variant_symbol);
+                    }
+                }
             }
         }
-    } else if let Some(column_list) = create_type.column_list() {
-        for column in column_list.columns() {
-            if let Some(column_symbol) = create_column_symbol(column) {
-                children.push(column_symbol);
+        Some(ast::CreateTypeKind::CompositeType(composite_type)) => {
+            if let Some(column_list) = composite_type.column_list() {
+                for column in column_list.columns() {
+                    if let Some(column_symbol) = create_column_symbol(column) {
+                        children.push(column_symbol);
+                    }
+                }
             }
         }
+        _ => (),
     }
 
     Some(DocumentSymbol {
         name,
         detail: None,
-        kind: if create_type.variant_list().is_some() {
+        kind: if matches!(create_type.kind(), Some(ast::CreateTypeKind::EnumType(_))) {
             DocumentSymbolKind::Enum
         } else {
             DocumentSymbolKind::Type

@@ -117,10 +117,10 @@ fn inlay_hint_insert(
     });
 
     let columns: Vec<(Name, Option<InFile<TextRange>>)> =
-        if let Some(column_list) = insert.column_list() {
+        if let Some(column_list) = insert.column_ref_list() {
             // `insert into t(a, b, c) values (1, 2, 3)`
             column_list
-                .columns()
+                .column_refs()
                 .filter_map(|col| {
                     let col_name = col.name_ref().map(|x| Name::from_node(&x))?;
                     let target = create_table

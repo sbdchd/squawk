@@ -24,7 +24,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "films"
     WHITESPACE " "
@@ -73,7 +73,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t2"
     SEMICOLON ";"

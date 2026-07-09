@@ -677,19 +677,22 @@ CompressionMethod =
   'compression' ('#ident' | 'default')
 
 Column =
-  (
-    Name WithOptions? constraints:ColumnConstraint*
-      DeferrableConstraintOption? NotDeferrableConstraintOption?
-      InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
-      NotEnforced? Enforced?
-  | Name Type Storage? CompressionMethod? Collate? constraints:ColumnConstraint*
-      DeferrableConstraintOption? NotDeferrableConstraintOption?
-      InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
-      NotEnforced? Enforced?
-  | 'period'? NameRef
-  | IndexExpr
-  | FieldExpr
-  )
+  Name
+  WithOptions?
+  Type?
+  Storage?
+  CompressionMethod?
+  Collate?
+  constraints:ColumnConstraint*
+  DeferrableConstraintOption? NotDeferrableConstraintOption?
+  InitiallyDeferredConstraintOption? InitiallyImmediateConstraintOption?
+  NotEnforced? Enforced?
+
+ColumnRef =
+  'period'? NameRef
+| FieldExpr
+| IndexExpr
+| SliceExpr
 ColumnConstraint =
   CheckConstraint
 | DefaultConstraint
@@ -710,30 +713,25 @@ NullsNotDistinct =
 UniqueConstraint =
   ConstraintName?
   'unique'
-  (
-    UsingIndex
-  | (NullsNotDistinct | NullsDistinct)? ColumnList?
-      ConstraintIncludeClause?
-      WithParams?
-      ConstraintIndexTablespace?
-  )
+  (UsingIndex | IndexParameters)
 
 PrimaryKeyConstraint =
   ConstraintName?
   'primary' 'key'
-  (
-    UsingIndex
-  | ColumnList?
-      ConstraintIncludeClause?
-      WithParams?
-      ConstraintIndexTablespace?
-  )
+  (UsingIndex | IndexParameters)
+
+IndexParameters =
+  (NullsNotDistinct | NullsDistinct)?
+  ColumnRefList?
+  ConstraintIncludeClause?
+  WithParams?
+  ConstraintIndexTablespace?
 
 SetNullColumns =
-  'set' 'null' ColumnList?
+  'set' 'null' ColumnRefList?
 
 SetDefaultColumns =
-  'set' 'default' ColumnList?
+  'set' 'default' ColumnRefList?
 
 Cascade =
   'cascade'
@@ -775,7 +773,7 @@ MatchType =
 
 ForeignKeyConstraint =
   ConstraintName?
-  'foreign' 'key' from_columns:ColumnList 'references' Path to_columns:ColumnList?
+  'foreign' 'key' from_columns:ColumnRefList 'references' Path to_columns:ColumnRefList?
   MatchType?
   OnDeleteAction?
   OnUpdateAction?
@@ -815,7 +813,13 @@ DefaultConstraint =
 GeneratedConstraint =
   ConstraintName?
   'generated'
-  ('always' 'as' '(' Expr ')' ('stored' | 'virtual')? | ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList? )
+  (GeneratedIdentity | GeneratedStored)
+
+GeneratedIdentity =
+  ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList?
+
+GeneratedStored =
+  ('always' | 'by' 'default') 'as' '(' Expr ')' ('stored' | 'virtual')?
 
 ReferencesConstraint =
   ConstraintName?
@@ -1025,8 +1029,11 @@ SequenceOption =
 ColumnList =
   '(' (Column (',' Column)*) ')'
 
+ColumnRefList =
+  '(' (ColumnRef (',' ColumnRef)*) ')'
+
 ConstraintIncludeClause =
-  'include' ColumnList
+  'include' ColumnRefList
 
 WithParams =
   'with' AttributeList
@@ -1060,7 +1067,7 @@ OnClause =
   'on' Expr
 
 JoinUsingClause =
-  'using' ColumnList Alias?
+  'using' ColumnRefList Alias?
 
 Join =
   'natural'? JoinType FromItem (using_clause:JoinUsingClause | OnClause)?
@@ -1200,10 +1207,11 @@ UsingMethod =
   'using' NameRef
 
 PartitionBy =
-  'partition' 'by' (
-      'range'
-      | '#ident'  // list | hash
-  ) PartitionItemList
+  'partition' 'by' PartitionStrategy PartitionItemList
+
+PartitionStrategy =
+  'range'
+| '#ident'  // list | hash
 
 CreateTable =
   'create'
@@ -1348,9 +1356,12 @@ AlterDomain =
 AlterTable =
   'alter' 'table'
   (
-    'all' 'in' 'tablespace' RelationName OwnedByRoles? SetTablespace 'nowait'?
+    AllInTablespace
   | IfExists? RelationName actions:AlterTableAction*
   ) ';'?
+
+AllInTablespace =
+  'all' 'in' 'tablespace' NameRef OwnedByRoles? SetTablespace 'nowait'?
 
 Revoke =
   'revoke' (('admin' | 'inherit' | 'grant' | 'set') 'option' 'for')?
@@ -1385,7 +1396,7 @@ Table =
 
 Insert =
   WithClause?
-  'insert' 'into' Path Alias? ColumnList?
+  'insert' 'into' Path Alias? ColumnRefList?
   ('overriding' ('system' | 'user') 'value')?
   ('default' 'values' | SelectVariant)
   OnConflictClause?
@@ -1435,12 +1446,12 @@ SetColumn =
 | SetMultipleColumns
 
 SetSingleColumn =
-  Column
+  ColumnRef
   '='
   SetExpr
 
 SetMultipleColumns =
-  ColumnList
+  ColumnRefList
   '='
   (SetExprList | ParenSelect)
 
@@ -1518,7 +1529,7 @@ MergeUpdate =
   'update' 'set' SetClause
 
 MergeInsert =
-  'insert' ColumnList?
+  'insert' ColumnRefList?
   ('overriding' ('system' | 'user'))?
   (Values | 'default' 'values')
 
@@ -1907,13 +1918,38 @@ TablesampleClause =
   'tablesample' CallExpr RepeatableClause?
 
 FromItem =
+  ExprFromItem
+| FunctionFromItem
+| GraphTableFromItem
+| JsonTableFromItem
+| ParenFromItem
+| RelationFromItem
+| RowsFromItem
+| XmlTableFromItem
+
+RelationFromItem =
   'only'? (NameRef | FieldExpr) '*'? Alias? TablesampleClause?
-| 'lateral'? (ParenSelect | ParenExpr) Alias?
-| 'lateral'? CallExpr ('with' 'ordinality')? Alias?
-| 'lateral'? JsonTable Alias?
-| 'lateral'? XmlTable Alias?
-| 'lateral'? CastExpr Alias?
-| 'lateral'? 'rows' 'from' '(' CallExpr ')' ('with' 'ordinality')? Alias?
+
+FunctionFromItem =
+  'lateral'? CallExpr ('with' 'ordinality')? Alias?
+
+ParenFromItem =
+  'lateral'? (ParenSelect | ParenExpr) Alias?
+
+JsonTableFromItem =
+  'lateral'? JsonTable Alias?
+
+GraphTableFromItem =
+  'lateral'? GraphTableFn Alias?
+
+XmlTableFromItem =
+  'lateral'? XmlTable Alias?
+
+ExprFromItem =
+  'lateral'? (CastExpr | CollationForFn) Alias?
+
+RowsFromItem =
+  'lateral'? 'rows' 'from' '(' (CallExpr (',' CallExpr)*) ')' ('with' 'ordinality')? Alias?
 
 FromClause =
   'from'
@@ -2022,8 +2058,11 @@ AlterServer =
   (
     OwnerTo
   | RenameTo
-  | ('version' Literal)? AlterOptionList?
+  | SetVersion? AlterOptionList?
   ) ';'?
+
+SetVersion =
+  'version' Literal
 
 AlterOptionList =
   'options' '(' (AlterOption (',' AlterOption)*)? ')'
@@ -2067,21 +2106,37 @@ AlterRole =
   'alter' 'role' ('all' | RoleRef)
   (
     RenameTo
-  | ('in' 'database' NameRef)? SetConfigParam
-  | ('in' 'database' NameRef)? ResetConfigParam
+  | InDatabase? SetConfigParam
+  | InDatabase? ResetConfigParam
   | RoleOptionList
   )? ';'?
+
+InDatabase =
+  'in' 'database' NameRef
 
 AlterPublication =
   'alter' 'publication' NameRef
   (
-    ('add' | 'drop') (PublicationObject (',' PublicationObject)*)
+    AddPublicationObjects
+  | DropPublicationObjects
   | SetOptions
-  | 'set' 'all' ('tables' | 'sequences') ExceptTableClause?
-  | 'set' (PublicationObject (',' PublicationObject)*)
+  | SetAllPublicationObjects
+  | SetPublicationObjects
   | OwnerTo
   | RenameTo
   ) ';'?
+
+AddPublicationObjects =
+  'add' (PublicationObject (',' PublicationObject)*)
+
+DropPublicationObjects =
+  'drop' (PublicationObject (',' PublicationObject)*)
+
+SetAllPublicationObjects =
+  'set' 'all' ('tables' | 'sequences') ExceptTableClause?
+
+SetPublicationObjects =
+  'set' (PublicationObject (',' PublicationObject)*)
 
 AlterProcedure =
   'alter' 'procedure' FunctionSig
@@ -2097,12 +2152,12 @@ AlterProcedure =
 
 AlterPolicy =
   'alter' 'policy' NameRef OnTable
-  (RenameTo
-  | (
-    ('to' RoleRefList)?
-    UsingExprClause?
-    WithCheckExprClause?
-  )) ';'?
+  (RenameTo | AlterPolicyTo) ';'?
+
+AlterPolicyTo =
+  ('to' RoleRefList)?
+  UsingExprClause?
+  WithCheckExprClause?
 
 
 AlterOperatorFamily =
@@ -2166,7 +2221,7 @@ DependsOnExtension =
 AlterMaterializedView =
   'alter' 'materialized' 'view'
   (
-    'all' 'in' 'tablespace' NameRef OwnedByRoles? 'set' 'tablespace' Name 'nowait'?
+    AllInTablespace
   | IfExists? Path action:AlterMaterializedViewAction*
   ) ';'?
 
@@ -2179,7 +2234,7 @@ AlterLanguage =
 
 AlterIndex =
   'alter' 'index' (
-  'all' 'in' 'tablespace' Path OwnedByRoles? 'set' 'tablespace' NameRef 'nowait'?
+  AllInTablespace
 | IfExists? Path AlterIndexAction
 ) ';'?
 
@@ -2199,10 +2254,16 @@ AlterIndexAction =
 AlterGroup =
   'alter' 'group' RoleRef
   (
-  'add' 'user' (NameRef (',' NameRef)*)
-  | 'drop' 'user' (NameRef (',' NameRef)*)
+    AddUsers
+  | DropUsers
   | RenameTo
   ) ';'?
+
+AddUsers =
+  'add' 'user' (NameRef (',' NameRef)*)
+
+DropUsers =
+  'drop' 'user' (NameRef (',' NameRef)*)
 
 AlterFunction =
   'alter' 'function' FunctionSig
@@ -2245,7 +2306,26 @@ FdwOption =
 
 AlterEventTrigger =
   'alter' 'event' 'trigger' NameRef
-  ('disable' | 'enable' | 'enable' 'replica' | 'enable' 'always' | OwnerTo | RenameTo)? ';'?
+  (
+    Disable
+  | Enable
+  | EnableAlways
+  | EnableReplica
+  | OwnerTo
+  | RenameTo
+  )? ';'?
+
+Disable =
+  'disable'
+
+Enable =
+  'enable'
+
+EnableAlways =
+  'enable' 'always'
+
+EnableReplica =
+  'enable' 'replica'
 
 AlterExtension =
   'alter' 'extension' NameRef
@@ -2404,8 +2484,8 @@ RevokeDefaultPrivileges =
   'revoke' ('grant' 'option' 'for')? Privileges 'on' PrivilegeTarget 'from' RoleRefList ('cascade' | 'restrict')?
 
 Privileges =
-  'all' 'privileges'? ColumnList?
-| RevokeCommandList ColumnList?
+  'all' 'privileges'? ColumnRefList?
+| RevokeCommandList
 
 PrivilegeTarget  =
   'large' 'objects'
@@ -2482,20 +2562,48 @@ AlterAggregate =
   ) ';'?
 
 AlterSubscription =
-  'alter' 'subscription' NameRef
-  (
-    'connection' Literal
-  | 'server' NameRef
-  | SetOptions
-  | ('set' | 'add') 'publication' (Name (',' Name)*) ('with' AttributeList)?
-  | 'drop' 'publication' (NameRef (',' NameRef)*) ('with' AttributeList)?
-  | 'refresh' 'publication' ('with' AttributeList)?
-  | 'enable'
-  | 'disable'
-  | 'skip' AttributeList
-  | OwnerTo
-  | RenameTo
-  ) ';'?
+  'alter' 'subscription' NameRef action:AlterSubscriptionAction ';'?
+
+AlterSubscriptionAction =
+  SetConnection
+| SetServer
+| SetOptions
+| AddPublication
+| SetPublication
+| DropSubscriptionPublication
+| RefreshPublication
+| EnableSubscription
+| DisableSubscription
+| SkipSubscription
+| OwnerTo
+| RenameTo
+
+SetConnection =
+  'connection' Literal
+
+SetServer =
+  'server' NameRef
+
+AddPublication =
+  'add' 'publication' (Name (',' Name)*) ('with' AttributeList)?
+
+SetPublication =
+  'set' 'publication' (Name (',' Name)*) ('with' AttributeList)?
+
+DropSubscriptionPublication =
+  'drop' 'publication' (NameRef (',' NameRef)*) ('with' AttributeList)?
+
+RefreshPublication =
+  'refresh' 'publication' ('with' AttributeList)?
+
+EnableSubscription =
+  'enable'
+
+DisableSubscription =
+  'disable'
+
+SkipSubscription =
+  'skip' AttributeList
 
 AlterSystem =
   'alter' 'system'
@@ -2529,18 +2637,27 @@ AlterTextSearchDictionary =
 AlterTextSearchConfiguration =
   'alter' 'text' 'search' 'configuration' Path
   (
-    'add' 'mapping' 'for' (NameRef (',' NameRef)*) 'with' (Path (',' Path)*)
-  | 'alter' 'mapping'
-    (
-      'for' (NameRef (',' NameRef)*)
-        ('with' (Path (',' Path)*) | 'replace' Path 'with' Path)
-    | 'replace' Path 'with' Path
-    )
-  | 'drop' 'mapping' IfExists? 'for' (NameRef (',' NameRef)*)
+    AddMapping
+  | AlterMapping
+  | DropMapping
   | RenameTo
   | OwnerTo
   | SetSchema
   ) ';'?
+
+AddMapping =
+  'add' 'mapping' 'for' (NameRef (',' NameRef)*) 'with' (Path (',' Path)*)
+
+AlterMapping =
+  'alter' 'mapping'
+  (
+    'for' (NameRef (',' NameRef)*)
+      ('with' (Path (',' Path)*) | 'replace' Path 'with' Path)
+  | 'replace' Path 'with' Path
+  )
+
+DropMapping =
+  'drop' 'mapping' IfExists? 'for' (NameRef (',' NameRef)*)
 
 AlterTextSearchTemplate =
   'alter' 'text' 'search' 'template' Path
@@ -2605,8 +2722,8 @@ AlterUser =
   (
     RoleOptionList
   | RenameTo
-  | ('in' 'database' NameRef)? SetConfigParam
-  | ('in' 'database' NameRef)? ResetConfigParam
+  | InDatabase? SetConfigParam
+  | InDatabase? ResetConfigParam
   )? ';'?
 
 AlterUserMapping =
@@ -2615,14 +2732,17 @@ AlterUserMapping =
 AlterView =
   'alter' 'view' IfExists? Path
   (
-    'alter' 'column'? NameRef (('set' 'default' Expr) | ('drop' 'default'))
+    AlterViewColumn
   | OwnerTo
   | RenameTo
-  | 'rename' 'column'? NameRef 'to' Name
+  | RenameColumn
   | SetSchema
   | SetOptions
   | ResetOptions
   ) ';'?
+
+AlterViewColumn =
+  'alter' 'column'? NameRef (SetDefault | DropDefault)
 
 Analyze =
   ('analyze' | 'analyse')
@@ -2739,7 +2859,7 @@ VertexTables =
 VertexTableDef =
   Path
   ('as' Name)?
-  ('key' '(' ColumnList ')')?
+  ('key' ColumnRefList)?
   ElementTableLabelAndProperties?
 
 ElementTableLabelAndProperties =
@@ -2776,22 +2896,22 @@ EdgeTables =
 EdgeTableDef =
   Path
   ('as' Name)?
-  ('key' '(' ColumnList ')')?
+  ('key' ColumnRefList)?
   SourceVertexTable
   DestVertexTable
   ElementTableLabelAndProperties?
 
 SourceVertexTable =
   'source' NameRef
-| 'source' 'key' '(' ColumnList ')' ReferencesTable
+| 'source' 'key' ColumnRefList ReferencesTable
 
 
 ReferencesTable =
-  'references' NameRef '(' ColumnList ')'
+  'references' NameRef ColumnRefList
 
 DestVertexTable =
   'destination' NameRef
-| 'destination' 'key' '(' ColumnList ')' ReferencesTable
+| 'destination' 'key' ColumnRefList ReferencesTable
 
 AlterPropertyGraph =
   'alter' 'property' 'graph' IfExists? Path
@@ -2903,12 +3023,17 @@ HandlerClause =
 
 CreateCast =
   'create' 'cast' CastSig
-  (
-    'with' 'function' FunctionSig
-  | 'without' 'function'
-  | 'with' 'inout'
-  )
+  (WithFunction | WithInout | WithoutFunction)
   ('as' 'assignment' | 'as' 'implicit')? ';'?
+
+WithFunction =
+  'with' 'function' FunctionSig
+
+WithInout =
+  'with' 'inout'
+
+WithoutFunction =
+  'without' 'function'
 
 CreateCollation =
   'create' 'collation' IfNotExists? Path
@@ -3024,11 +3149,14 @@ CreatePublication =
   (
     'for'
     (
-      'all' ('tables' | 'sequences') ExceptTableClause?
+      ForAllPublicationObjects
     | (PublicationObject (',' PublicationObject)*)
     )
   )?
   WithParams? ';'?
+
+ForAllPublicationObjects =
+  'all' ('tables' | 'sequences') ExceptTableClause?
 
 ExceptTableClause =
   'except' '(' 'table' ( ExceptTableName (',' ExceptTableName)*) ')'
@@ -3038,7 +3166,7 @@ ExceptTableName =
   RelationName
 
 PublicationObject  =
-  'table' 'only'? (Path | '(' Path ')') '*'? ColumnList?  WhereConditionClause?
+  'table' 'only'? (Path | '(' Path ')') '*'? ColumnRefList?  WhereConditionClause?
 | 'tables' 'in' 'schema' ('current_schema' | NameRef) WhereConditionClause?
 | 'current_schema'
 
@@ -3052,8 +3180,15 @@ CreateRule =
   ';'?
 
 RuleOn =
-  'on' ('#ident' | 'select' | 'insert' | 'update' | 'delete')
+  'on' RuleEvent
   'to' Path WhereClause?
+
+RuleEvent =
+  '#ident'
+| 'select'
+| 'insert'
+| 'update'
+| 'delete'
 
 RuleDo =
   'do' ('also' | 'instead')?
@@ -3405,14 +3540,14 @@ Refresh =
 
 Grant =
   'grant'
-  (
-    'all' 'privileges'? ColumnList?
-  | RevokeCommandList
-  )?
+  (AllPrivileges | RevokeCommandList)?
   ('on' PrivilegeObjects)?
   'to' RoleRefList
   GrantWithClause?
   ('granted' 'by' RoleRef)? ';'?
+
+AllPrivileges =
+  'all' 'privileges'? ColumnRefList?
 
 GrantWithClause =
   'with'
@@ -3477,7 +3612,7 @@ RevokeCommand =
 ( RoleRef
 | 'alter' 'system'
 | ('select' | 'insert' | 'update' | 'delete' | 'truncate' | 'references' | 'trigger' | '#ident' | 'all' | 'alter' | 'create' | 'temporary' | 'temp' | 'execute')
-)
+) ColumnRefList?
 
 SecurityLabel =
   'security' 'label'
@@ -3518,7 +3653,9 @@ SetConstraints =
 
 SetRole =
   'set' ('session' | 'local')? 'role' (RoleRef | 'none')? ';'?
-| 'reset' 'role' ';'?
+
+ResetRole =
+  'reset' 'role' ';'?
 
 SetSessionAuth =
   'set' ('session' | 'local')? 'session' 'authorization' (RoleRef | Literal | 'default') ';'?
@@ -3529,10 +3666,19 @@ ResetSessionAuth =
 SetTransaction =
   'set'
   (
-    'session' 'characteristics' 'as' 'transaction' TransactionModeList
-  | 'transaction' 'snapshot' Literal
-  | 'transaction' TransactionModeList
+    SessionCharacteristics
+  | TransactionModes
+  | TransactionSnapshot
   ) ';'?
+
+SessionCharacteristics =
+  'session' 'characteristics' 'as' 'transaction' TransactionModeList
+
+TransactionModes =
+  'transaction' TransactionModeList
+
+TransactionSnapshot =
+  'transaction' 'snapshot' Literal
 
 Reindex =
   'reindex' ReindexOptionList? ('table' | 'index' | 'schema' | 'database' | 'system')? 'concurrently'? Path? ';'?
@@ -3586,14 +3732,19 @@ Listen =
   'listen' Name ';'?
 
 Reset =
-  'reset'
-  (
-    'all'
-  | 'session' 'authorization'
-  | 'transaction' 'isolation' 'level'
-  | 'time' 'zone'
-  | Path
-  ) ';'?
+  'reset' ResetTarget? ';'?
+
+ResetTarget =
+  All
+| Path
+| ResetTimeZone
+| ResetTransactionIsolation
+
+ResetTimeZone =
+  'time' 'zone'
+
+ResetTransactionIsolation =
+  'transaction' 'isolation' 'level'
 
 Discard =
   'discard' ('all' | 'temp' | 'temporary' | 'plans' | 'sequences') ';'?
@@ -3676,7 +3827,7 @@ TableAndColumnsList =
   TableAndColumns (',' TableAndColumns)*
 
 TableAndColumns =
-  RelationName ColumnList?
+  RelationName ColumnRefList?
 
 VacuumOption =
   Name VacuumOptionValue?
@@ -3690,14 +3841,23 @@ VacuumOptionValue =
 
 Copy =
   'copy'
-  ('(' PreparableStmt ')' | 'binary'? Path ColumnList?)
-  (
-    ('from' ('stdin' | 'stdout' | 'program'? Literal))
-    | ('to' ('stdout' | 'program'? Literal))
-  )?
+  (CopyQuery | CopyTable)
+  (CopyFrom | CopyTo)?
   'with'?
   (CopyOptionList | CopyLegacyOption*)?
   WhereClause? ';'?
+
+CopyQuery =
+  '(' PreparableStmt ')'
+
+CopyTable =
+  'binary'? Path ColumnRefList?
+
+CopyFrom =
+  'from' ('stdin' | 'stdout' | 'program'? Literal)
+
+CopyTo =
+  'to' ('stdout' | 'program'? Literal)
 
 CopyOptionList =
   '(' (CopyOption (',' CopyOption)*)? ')'
@@ -3768,10 +3928,17 @@ DropSchema =
   ('cascade' | 'restrict')? ';'?
 
 CreateSchema =
-  'create' 'schema' Name ('authorization' RoleRef)? SchemaElement* ';'?
-| 'create' 'schema' 'authorization' Role SchemaElement* ';'?
-| 'create' 'schema' IfNotExists Name ('authorization' RoleRef)? ';'?
-| 'create' 'schema' IfNotExists 'authorization' Role ';'?
+  'create' 'schema' IfNotExists? CreateSchemaTarget SchemaElement* ';'?
+
+CreateSchemaTarget =
+  AuthorizationSchema
+| NamedSchema
+
+NamedSchema =
+  Name ('authorization' RoleRef)?
+
+AuthorizationSchema =
+  'authorization' Role
 
 SchemaElement =
   CreateTable
@@ -3800,12 +3967,25 @@ PartitionItemList =
   '(' (PartitionItem (',' PartitionItem)*) ')'
 
 CreateType =
-  'create' 'type' Path
+  'create' 'type' Path kind:CreateTypeKind? ';'?
 
-  ('as' 'enum' VariantList
-| 'as' 'range' AttributeList
-| 'as' ColumnList
-| AttributeList)? ';'?
+CreateTypeKind =
+  BaseType
+| CompositeType
+| EnumType
+| RangeType
+
+BaseType =
+  AttributeList
+
+CompositeType =
+  'as' ColumnList
+
+EnumType =
+  'as' 'enum' VariantList
+
+RangeType =
+  'as' 'range' AttributeList
 
 VariantList =
   '('
@@ -3825,14 +4005,32 @@ CreateExtension =
 Set =
   'set'
   ('session' | 'local')?
-  ( 'xml' 'option' ('document' | 'content')
-  | 'time' 'zone' (ConfigValue | 'default' | 'local')?
-  | ('catalog' | 'schema') Literal
-  | Path (
-      'from' 'current'
-    | (('to' | '=') (ConfigValue* | 'default') )
-    )
-  ) ';'?
+  SetTarget? ';'?
+
+SetTarget =
+  SetCatalog
+| SetConfig
+| SetSchemaValue
+| SetTimeZone
+| SetXmlOption
+
+SetXmlOption =
+  'xml' 'option' ('document' | 'content')
+
+SetTimeZone =
+  'time' 'zone' (ConfigValue | 'default' | 'local')?
+
+SetCatalog =
+  'catalog' Literal
+
+SetSchemaValue =
+  'schema' Literal
+
+SetConfig =
+  Path (
+    'from' 'current'
+  | (('to' | '=') (ConfigValue* | 'default'))
+  )
 
 ConfigValue =
   Literal
@@ -4304,6 +4502,7 @@ Stmt =
 | SetConstraints
 | SetRole
 | SetSessionAuth
+| ResetRole
 | ResetSessionAuth
 | SetTransaction
 | Show

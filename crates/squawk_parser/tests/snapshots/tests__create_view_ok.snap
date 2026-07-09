@@ -85,7 +85,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "films"
       WHITESPACE "\n    "
@@ -125,7 +125,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "comedies"
       WHITESPACE "\n    "
@@ -173,7 +173,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "comedies"
       WHITESPACE "\n    "
@@ -271,7 +271,7 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "FROM"
                   WHITESPACE " "
-                  FROM_ITEM
+                  RELATION_FROM_ITEM
                     NAME_REF
                       IDENT "user_ratings"
                     WHITESPACE " "
@@ -309,7 +309,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "films"
           WHITESPACE " "
@@ -391,7 +391,7 @@ SOURCE_FILE
         FROM_CLAUSE
           FROM_KW "FROM"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "nums_1_100"
         WHITESPACE " "
@@ -567,7 +567,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "foo"
     SEMICOLON ";"
@@ -842,7 +842,7 @@ SOURCE_FILE
         FROM_CLAUSE
           FROM_KW "from"
           WHITESPACE " "
-          FROM_ITEM
+          RELATION_FROM_ITEM
             NAME_REF
               IDENT "x"
       R_PAREN ")"

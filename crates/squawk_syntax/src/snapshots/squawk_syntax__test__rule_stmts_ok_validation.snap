@@ -16,7 +16,8 @@ SOURCE_FILE@0..209
     RULE_ON@17..31
       ON_KW@17..19 "on"
       WHITESPACE@19..20 " "
-      UPDATE_KW@20..26 "update"
+      RULE_EVENT@20..26
+        UPDATE_KW@20..26 "update"
       WHITESPACE@26..27 " "
       TO_KW@27..29 "to"
       WHITESPACE@29..30 " "
@@ -90,7 +91,8 @@ SOURCE_FILE@0..209
     RULE_ON@122..136
       ON_KW@122..124 "on"
       WHITESPACE@124..125 " "
-      UPDATE_KW@125..131 "update"
+      RULE_EVENT@125..131
+        UPDATE_KW@125..131 "update"
       WHITESPACE@131..132 " "
       TO_KW@132..134 "to"
       WHITESPACE@134..135 " "

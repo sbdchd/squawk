@@ -17,13 +17,13 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "j"
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "k"
             R_PAREN ")"
@@ -59,7 +59,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           WHITESPACE " "
@@ -70,7 +70,7 @@ SOURCE_FILE
               INT_NUMBER "1"
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           WHITESPACE " "

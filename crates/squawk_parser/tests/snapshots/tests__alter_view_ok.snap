@@ -15,17 +15,19 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    ALTER_KW "alter"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    DEFAULT_KW "default"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "42"
+    ALTER_VIEW_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      SET_DEFAULT
+        SET_KW "set"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "42"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_VIEW
@@ -43,19 +45,21 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    ALTER_KW "alter"
-    WHITESPACE " "
-    COLUMN_KW "column"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    DEFAULT_KW "default"
-    WHITESPACE " "
-    NAME_REF
-      CURRENT_TIMESTAMP_KW "current_timestamp"
+    ALTER_VIEW_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      SET_DEFAULT
+        SET_KW "set"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+        WHITESPACE " "
+        NAME_REF
+          CURRENT_TIMESTAMP_KW "current_timestamp"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column_drop_default"
@@ -70,16 +74,18 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    ALTER_KW "alter"
-    WHITESPACE " "
-    COLUMN_KW "column"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    DEFAULT_KW "default"
+    ALTER_VIEW_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      DROP_DEFAULT
+        DROP_KW "drop"
+        WHITESPACE " "
+        DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
@@ -210,17 +216,18 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    COLUMN_KW "column"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "b"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_VIEW
@@ -233,15 +240,16 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE " "
-    RENAME_KW "rename"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
-    WHITESPACE " "
-    TO_KW "to"
-    WHITESPACE " "
-    NAME
-      IDENT "b"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"

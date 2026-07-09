@@ -21,7 +21,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "price"
           WHITESPACE " "
@@ -60,7 +60,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "price"
           WHITESPACE " "
@@ -93,7 +93,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "a"
           WHITESPACE " "
@@ -105,7 +105,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "b"
           WHITESPACE " "
@@ -117,7 +117,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "c"
           WHITESPACE " "
@@ -156,9 +156,9 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "z"
             R_PAREN ")"
@@ -216,7 +216,7 @@ SOURCE_FILE
       WHITESPACE " \n  "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "foo"
           WHITESPACE " "
@@ -228,7 +228,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "t1"
     WHITESPACE " "
@@ -279,7 +279,7 @@ SOURCE_FILE
       WHITESPACE " \n  "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "bar"
           WHITESPACE " "
@@ -297,7 +297,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "foo"
           WHITESPACE " "
@@ -308,9 +308,9 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "a"
             R_PAREN ")"
@@ -326,14 +326,14 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "b"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "c"
             R_PAREN ")"
@@ -354,9 +354,9 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n  "
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "z"
             R_PAREN ")"
@@ -378,12 +378,12 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "a"
       COMMA ","
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "b"
     WHITESPACE "\n"
@@ -440,7 +440,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "kind"
           WHITESPACE " "
@@ -477,7 +477,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "temp_lo"
           WHITESPACE " "
@@ -493,7 +493,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "temp_hi"
           WHITESPACE " "
@@ -509,7 +509,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "prcp"
           WHITESPACE " "
@@ -557,7 +557,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "temp_lo"
           WHITESPACE " "
@@ -573,7 +573,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "temp_hi"
           WHITESPACE " "
@@ -589,7 +589,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "prcp"
           WHITESPACE " "
@@ -655,19 +655,19 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "temp_lo"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "temp_hi"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "prcp"
             R_PAREN ")"
@@ -737,7 +737,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "sales_count"
           WHITESPACE " "
@@ -756,7 +756,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "accounts"
     WHITESPACE "\n  "
@@ -811,7 +811,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "sales_count"
           WHITESPACE " "
@@ -850,7 +850,7 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              FROM_ITEM
+              RELATION_FROM_ITEM
                 NAME_REF
                   IDENT "accounts"
             WHITESPACE " "
@@ -882,14 +882,14 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "contact_first_name"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "contact_last_name"
             R_PAREN ")"
@@ -915,7 +915,7 @@ SOURCE_FILE
               FROM_CLAUSE
                 FROM_KW "FROM"
                 WHITESPACE " "
-                FROM_ITEM
+                RELATION_FROM_ITEM
                   NAME_REF
                     IDENT "employees"
               WHITESPACE "\n     "
@@ -955,7 +955,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "contact_first_name"
           WHITESPACE " "
@@ -967,7 +967,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n                    "
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "contact_last_name"
           WHITESPACE " "
@@ -980,7 +980,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "employees"
     WHITESPACE " "
@@ -1023,24 +1023,24 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_MULTIPLE_COLUMNS
-          COLUMN_LIST
+          COLUMN_REF_LIST
             L_PAREN "("
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "sum_x"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "sum_y"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "avg_x"
             COMMA ","
             WHITESPACE " "
-            COLUMN
+            COLUMN_REF
               NAME_REF
                 IDENT "avg_y"
             R_PAREN ")"
@@ -1104,7 +1104,7 @@ SOURCE_FILE
               FROM_CLAUSE
                 FROM_KW "FROM"
                 WHITESPACE " "
-                FROM_ITEM
+                RELATION_FROM_ITEM
                   NAME_REF
                     DATA_KW "data"
                   WHITESPACE " "
@@ -1198,7 +1198,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "stock"
           WHITESPACE " "
@@ -1247,7 +1247,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "kind"
           WHITESPACE " "
@@ -1296,7 +1296,7 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FROM_ITEM
+            RELATION_FROM_ITEM
               NAME_REF
                 IDENT "work_item"
               WHITESPACE " "
@@ -1379,7 +1379,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "status"
           WHITESPACE " "
@@ -1392,7 +1392,7 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
+      RELATION_FROM_ITEM
         NAME_REF
           IDENT "exceeded_max_retries"
         WHITESPACE " "
@@ -1439,7 +1439,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "quantity"
           WHITESPACE " "
@@ -1562,7 +1562,7 @@ SOURCE_FILE
       WHITESPACE " "
       SET_COLUMN_LIST
         SET_SINGLE_COLUMN
-          COLUMN
+          COLUMN_REF
             NAME_REF
               IDENT "x"
           WHITESPACE " "

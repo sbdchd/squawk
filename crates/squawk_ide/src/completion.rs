@@ -720,7 +720,9 @@ fn table_name_from_from_item(from_item: &ast::FromItem) -> Option<Name> {
     {
         return Some(Name::from_node(&alias_name));
     }
-    if let Some(name_ref) = from_item.name_ref() {
+    if let ast::FromItem::RelationFromItem(relation) = from_item
+        && let Some(name_ref) = relation.name_ref()
+    {
         return Some(Name::from_node(&name_ref));
     }
     None

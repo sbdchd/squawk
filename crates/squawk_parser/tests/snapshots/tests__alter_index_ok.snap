@@ -411,23 +411,23 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    ALL_IN_TABLESPACE
+      ALL_KW "all"
+      WHITESPACE " "
+      IN_KW "in"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+      WHITESPACE " \n  "
+      SET_TABLESPACE
+        SET_KW "set"
+        WHITESPACE " "
+        TABLESPACE_KW "tablespace"
+        WHITESPACE " "
         NAME_REF
-          IDENT "t"
-    WHITESPACE " \n  "
-    SET_KW "set"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "n"
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -435,38 +435,39 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    IN_KW "in"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-    WHITESPACE " \n  "
-    OWNED_KW "owned"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    ROLE_REF_LIST
-      ROLE_REF
-        NAME_REF
-          IDENT "r"
-      COMMA ","
+    ALL_IN_TABLESPACE
+      ALL_KW "all"
       WHITESPACE " "
-      ROLE_REF
+      IN_KW "in"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+      WHITESPACE " \n  "
+      OWNED_BY_ROLES
+        OWNED_KW "owned"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        ROLE_REF_LIST
+          ROLE_REF
+            NAME_REF
+              IDENT "r"
+          COMMA ","
+          WHITESPACE " "
+          ROLE_REF
+            NAME_REF
+              IDENT "s"
+      WHITESPACE "\n  "
+      SET_TABLESPACE
+        SET_KW "set"
+        WHITESPACE " "
+        TABLESPACE_KW "tablespace"
+        WHITESPACE " "
         NAME_REF
-          IDENT "s"
-    WHITESPACE "\n  "
-    SET_KW "set"
-    WHITESPACE " "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "n"
-    WHITESPACE "\n  "
-    NOWAIT_KW "nowait"
+          IDENT "n"
+      WHITESPACE "\n  "
+      NOWAIT_KW "nowait"
     SEMICOLON ";"
   WHITESPACE "\n\n"

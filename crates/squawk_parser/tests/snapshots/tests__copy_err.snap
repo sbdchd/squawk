@@ -8,26 +8,28 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "x"
-    WHITESPACE " "
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "i"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "x"
       WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "y"
-      R_PAREN ")"
+      COLUMN_REF_LIST
+        L_PAREN "("
+        COLUMN_REF
+          NAME_REF
+            IDENT "i"
+        WHITESPACE " "
+        COLUMN_REF
+          NAME_REF
+            IDENT "y"
+        R_PAREN ")"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'/tmp/input.file'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'/tmp/input.file'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -50,15 +52,17 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'s'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'s'"
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
@@ -68,15 +72,17 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'s'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'s'"
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
@@ -88,15 +94,17 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'s'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'s'"
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "

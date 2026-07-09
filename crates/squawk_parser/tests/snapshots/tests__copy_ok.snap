@@ -8,15 +8,17 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "copytest"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "copytest"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'/tmp/copy.data'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'/tmp/copy.data'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- copy_to"
@@ -24,14 +26,16 @@ SOURCE_FILE
   COPY
     COPY_KW "COPY"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "country"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "country"
     WHITESPACE " "
-    TO_KW "TO"
-    WHITESPACE " "
-    STDOUT_KW "STDOUT"
+    COPY_TO
+      TO_KW "TO"
+      WHITESPACE " "
+      STDOUT_KW "STDOUT"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -49,15 +53,17 @@ SOURCE_FILE
   COPY
     COPY_KW "COPY"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "country"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "country"
     WHITESPACE " "
-    FROM_KW "FROM"
-    WHITESPACE " "
-    LITERAL
-      STRING "'/usr1/proj/bray/sql/country_data'"
+    COPY_FROM
+      FROM_KW "FROM"
+      WHITESPACE " "
+      LITERAL
+        STRING "'/usr1/proj/bray/sql/country_data'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- copy_to_file"
@@ -65,39 +71,41 @@ SOURCE_FILE
   COPY
     COPY_KW "COPY"
     WHITESPACE " "
-    L_PAREN "("
-    SELECT
-      SELECT_CLAUSE
-        SELECT_KW "SELECT"
-        WHITESPACE " "
-        TARGET_LIST
-          TARGET
-            STAR "*"
-      WHITESPACE " "
-      FROM_CLAUSE
-        FROM_KW "FROM"
-        WHITESPACE " "
-        FROM_ITEM
-          NAME_REF
-            IDENT "country"
-      WHITESPACE " "
-      WHERE_CLAUSE
-        WHERE_KW "WHERE"
-        WHITESPACE " "
-        BIN_EXPR
-          NAME_REF
-            IDENT "country_name"
+    COPY_QUERY
+      L_PAREN "("
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
           WHITESPACE " "
-          LIKE_KW "LIKE"
+          TARGET_LIST
+            TARGET
+              STAR "*"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
           WHITESPACE " "
-          LITERAL
-            STRING "'A%'"
-    R_PAREN ")"
+          RELATION_FROM_ITEM
+            NAME_REF
+              IDENT "country"
+        WHITESPACE " "
+        WHERE_CLAUSE
+          WHERE_KW "WHERE"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "country_name"
+            WHITESPACE " "
+            LIKE_KW "LIKE"
+            WHITESPACE " "
+            LITERAL
+              STRING "'A%'"
+      R_PAREN ")"
     WHITESPACE " "
-    TO_KW "TO"
-    WHITESPACE " "
-    LITERAL
-      STRING "'/usr1/proj/bray/sql/a_list_countries.copy'"
+    COPY_TO
+      TO_KW "TO"
+      WHITESPACE " "
+      LITERAL
+        STRING "'/usr1/proj/bray/sql/a_list_countries.copy'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- copy_to_compress_filed"
@@ -105,17 +113,19 @@ SOURCE_FILE
   COPY
     COPY_KW "COPY"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "country"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "country"
     WHITESPACE " "
-    TO_KW "TO"
-    WHITESPACE " "
-    PROGRAM_KW "PROGRAM"
-    WHITESPACE " "
-    LITERAL
-      STRING "'gzip > /usr1/proj/bray/sql/country_data.gz'"
+    COPY_TO
+      TO_KW "TO"
+      WHITESPACE " "
+      PROGRAM_KW "PROGRAM"
+      WHITESPACE " "
+      LITERAL
+        STRING "'gzip > /usr1/proj/bray/sql/country_data.gz'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- log_setting"
@@ -123,27 +133,29 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "x"
-    WHITESPACE " "
-    COLUMN_LIST
-      L_PAREN "("
-      COLUMN
-        NAME_REF
-          IDENT "i"
-      COMMA ","
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "x"
       WHITESPACE " "
-      COLUMN
-        NAME_REF
-          IDENT "y"
-      R_PAREN ")"
+      COLUMN_REF_LIST
+        L_PAREN "("
+        COLUMN_REF
+          NAME_REF
+            IDENT "i"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN_REF
+          NAME_REF
+            IDENT "y"
+        R_PAREN ")"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'/tmp/input.file'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'/tmp/input.file'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -169,15 +181,17 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "copytest"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "copytest"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'/tmp/copy.data'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'/tmp/copy.data'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("
@@ -196,15 +210,17 @@ SOURCE_FILE
   COPY
     COPY_KW "copy"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    COPY_TABLE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
-    FROM_KW "from"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
+    COPY_FROM
+      FROM_KW "from"
+      WHITESPACE " "
+      LITERAL
+        STRING "'foo'"
     WHITESPACE " "
     COPY_OPTION_LIST
       L_PAREN "("

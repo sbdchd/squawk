@@ -17,7 +17,8 @@ SOURCE_FILE
   RESET
     RESET_KW "reset"
     WHITESPACE " "
-    ALL_KW "all"
+    ALL
+      ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   RESET
@@ -42,19 +43,21 @@ SOURCE_FILE
   RESET
     RESET_KW "reset"
     WHITESPACE " "
-    TIME_KW "time"
-    WHITESPACE " "
-    ZONE_KW "zone"
+    RESET_TIME_ZONE
+      TIME_KW "time"
+      WHITESPACE " "
+      ZONE_KW "zone"
     SEMICOLON ";"
   WHITESPACE "\n"
   RESET
     RESET_KW "reset"
     WHITESPACE " "
-    TRANSACTION_KW "transaction"
-    WHITESPACE " "
-    ISOLATION_KW "isolation"
-    WHITESPACE " "
-    LEVEL_KW "level"
+    RESET_TRANSACTION_ISOLATION
+      TRANSACTION_KW "transaction"
+      WHITESPACE " "
+      ISOLATION_KW "isolation"
+      WHITESPACE " "
+      LEVEL_KW "level"
     SEMICOLON ";"
   WHITESPACE "\n"
   RESET_SESSION_AUTH

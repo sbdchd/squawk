@@ -31,10 +31,10 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        FROM_ITEM
+        PAREN_FROM_ITEM
           PAREN_EXPR
             L_PAREN "("
-            FROM_ITEM
+            PAREN_FROM_ITEM
               PAREN_SELECT
                 L_PAREN "("
                 WHITESPACE " "
@@ -50,7 +50,7 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "from"
                     WHITESPACE " "
-                    FROM_ITEM
+                    RELATION_FROM_ITEM
                       NAME_REF
                         IDENT "bar"
                 WHITESPACE " "

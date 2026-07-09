@@ -27,7 +27,7 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "FROM"
                     WHITESPACE " "
-                    FROM_ITEM
+                    RELATION_FROM_ITEM
                       NAME_REF
                         IDENT "code_categories"
                   WHITESPACE " "
@@ -94,7 +94,7 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "FROM"
                     WHITESPACE " "
-                    FROM_ITEM
+                    RELATION_FROM_ITEM
                       NAME_REF
                         IDENT "code_categories"
                   WHITESPACE " "
@@ -165,7 +165,7 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "FROM"
                     WHITESPACE " "
-                    FROM_ITEM
+                    RELATION_FROM_ITEM
                       NAME_REF
                         IDENT "code_categories"
                   WHITESPACE " "
@@ -230,7 +230,7 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "FROM"
                   WHITESPACE " "
-                  FROM_ITEM
+                  RELATION_FROM_ITEM
                     NAME_REF
                       IDENT "code_categories"
                 WHITESPACE " "
@@ -286,7 +286,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "t"
     WHITESPACE " "
@@ -383,7 +383,7 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        FROM_ITEM
+        RELATION_FROM_ITEM
           NAME_REF
             IDENT "t2"
     WHITESPACE " "
@@ -488,21 +488,21 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_EXPR
           L_PAREN "("
-          FROM_ITEM
+          PAREN_FROM_ITEM
             PAREN_SELECT
               COMPOUND_SELECT
                 PAREN_SELECT
                   L_PAREN "("
-                  FROM_ITEM
+                  PAREN_FROM_ITEM
                     PAREN_EXPR
                       L_PAREN "("
-                      FROM_ITEM
+                      PAREN_FROM_ITEM
                         PAREN_EXPR
                           L_PAREN "("
-                          FROM_ITEM
+                          PAREN_FROM_ITEM
                             PAREN_SELECT
                               L_PAREN "("
                               SELECT
@@ -542,13 +542,13 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
+      PAREN_FROM_ITEM
         PAREN_SELECT
           L_PAREN "("
-          FROM_ITEM
+          PAREN_FROM_ITEM
             PAREN_EXPR
               L_PAREN "("
-              FROM_ITEM
+              PAREN_FROM_ITEM
                 COMPOUND_SELECT
                   PAREN_SELECT
                     L_PAREN "("

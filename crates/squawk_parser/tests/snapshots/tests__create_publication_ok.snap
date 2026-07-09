@@ -26,9 +26,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    TABLES_KW "tables"
+    FOR_ALL_PUBLICATION_OBJECTS
+      ALL_KW "all"
+      WHITESPACE " "
+      TABLES_KW "tables"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -120,19 +121,19 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "foo"
-      COLUMN_LIST
+      COLUMN_REF_LIST
         L_PAREN "("
-        COLUMN
+        COLUMN_REF
           NAME_REF
             IDENT "a"
         COMMA ","
         WHITESPACE " "
-        COLUMN
+        COLUMN_REF
           NAME_REF
             IDENT "b"
         COMMA ","
         WHITESPACE " "
-        COLUMN
+        COLUMN_REF
           NAME_REF
             IDENT "c"
         R_PAREN ")"
@@ -280,25 +281,26 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE " "
-    EXCEPT_TABLE_CLAUSE
-      EXCEPT_KW "except"
+    FOR_ALL_PUBLICATION_OBJECTS
+      ALL_KW "all"
       WHITESPACE " "
-      L_PAREN "("
-      EXCEPT_TABLE_NAME
-        TABLE_KW "table"
+      TABLES_KW "tables"
+      WHITESPACE " "
+      EXCEPT_TABLE_CLAUSE
+        EXCEPT_KW "except"
         WHITESPACE " "
-        RELATION_NAME
-          ONLY_KW "only"
+        L_PAREN "("
+        EXCEPT_TABLE_NAME
+          TABLE_KW "table"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
-      R_PAREN ")"
+          RELATION_NAME
+            ONLY_KW "only"
+            WHITESPACE " "
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PUBLICATION
@@ -311,40 +313,41 @@ SOURCE_FILE
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
-    ALL_KW "all"
-    WHITESPACE " "
-    TABLES_KW "tables"
-    WHITESPACE " "
-    EXCEPT_TABLE_CLAUSE
-      EXCEPT_KW "except"
+    FOR_ALL_PUBLICATION_OBJECTS
+      ALL_KW "all"
       WHITESPACE " "
-      L_PAREN "("
-      EXCEPT_TABLE_NAME
-        TABLE_KW "table"
+      TABLES_KW "tables"
+      WHITESPACE " "
+      EXCEPT_TABLE_CLAUSE
+        EXCEPT_KW "except"
         WHITESPACE " "
-        RELATION_NAME
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
-      COMMA ","
-      WHITESPACE " "
-      EXCEPT_TABLE_NAME
-        RELATION_NAME
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "u"
-      COMMA ","
-      WHITESPACE " "
-      EXCEPT_TABLE_NAME
-        TABLE_KW "table"
+        L_PAREN "("
+        EXCEPT_TABLE_NAME
+          TABLE_KW "table"
+          WHITESPACE " "
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+        COMMA ","
         WHITESPACE " "
-        RELATION_NAME
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "k"
-      R_PAREN ")"
+        EXCEPT_TABLE_NAME
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "u"
+        COMMA ","
+        WHITESPACE " "
+        EXCEPT_TABLE_NAME
+          TABLE_KW "table"
+          WHITESPACE " "
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "k"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

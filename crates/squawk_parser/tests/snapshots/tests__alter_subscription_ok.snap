@@ -13,10 +13,11 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    CONNECTION_KW "connection"
-    WHITESPACE " "
-    LITERAL
-      STRING "'host=localhost port=5432'"
+    SET_CONNECTION
+      CONNECTION_KW "connection"
+      WHITESPACE " "
+      LITERAL
+        STRING "'host=localhost port=5432'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_publication"
@@ -29,12 +30,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    NAME
-      IDENT "p"
+    SET_PUBLICATION
+      SET_KW "set"
+      WHITESPACE " "
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      NAME
+        IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -45,40 +47,41 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    NAME
-      IDENT "p"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "q"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "r"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "a"
+    SET_PUBLICATION
+      SET_KW "set"
+      WHITESPACE " "
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      NAME
+        IDENT "p"
       COMMA ","
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "b"
+      NAME
+        IDENT "q"
+      COMMA ","
+      WHITESPACE " "
+      NAME
+        IDENT "r"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "a"
+        COMMA ","
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        ATTRIBUTE_VALUE
-          LITERAL
-            TRUE_KW "true"
-      R_PAREN ")"
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "b"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              TRUE_KW "true"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_publication"
@@ -91,12 +94,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    NAME
-      IDENT "p"
+    ADD_PUBLICATION
+      ADD_KW "add"
+      WHITESPACE " "
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      NAME
+        IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -107,40 +111,41 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    ADD_KW "add"
-    WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    NAME
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "c"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "a"
+    ADD_PUBLICATION
+      ADD_KW "add"
+      WHITESPACE " "
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      NAME
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "b"
+      NAME
+        IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      NAME
+        IDENT "c"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "a"
+        COMMA ","
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        ATTRIBUTE_VALUE
-          LITERAL
-            INT_NUMBER "1"
-      R_PAREN ")"
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "b"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "1"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_publication"
@@ -153,12 +158,13 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    DROP_SUBSCRIPTION_PUBLICATION
+      DROP_KW "drop"
+      WHITESPACE " "
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -169,40 +175,41 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "a"
+    DROP_SUBSCRIPTION_PUBLICATION
+      DROP_KW "drop"
+      WHITESPACE " "
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "b"
+      NAME_REF
+        IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "a"
+        COMMA ","
         WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        ATTRIBUTE_VALUE
-          LITERAL
-            INT_NUMBER "1"
-      R_PAREN ")"
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "b"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              INT_NUMBER "1"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
@@ -215,24 +222,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    REFRESH_KW "refresh"
-    WHITESPACE " "
-    PUBLICATION_KW "publication"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          IDENT "copy_data"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        ATTRIBUTE_VALUE
-          LITERAL
-            FALSE_KW "false"
-      R_PAREN ")"
+    REFRESH_PUBLICATION
+      REFRESH_KW "refresh"
+      WHITESPACE " "
+      PUBLICATION_KW "publication"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "copy_data"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              FALSE_KW "false"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable"
@@ -245,7 +253,8 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    ENABLE_KW "enable"
+    ENABLE_SUBSCRIPTION
+      ENABLE_KW "enable"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- disable"
@@ -258,7 +267,8 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    DISABLE_KW "disable"
+    DISABLE_SUBSCRIPTION
+      DISABLE_KW "disable"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_parameters"
@@ -309,20 +319,21 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE " "
-    SKIP_KW "skip"
-    WHITESPACE " "
-    ATTRIBUTE_LIST
-      L_PAREN "("
-      ATTRIBUTE_OPTION
-        NAME
-          LSN_KW "lsn"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        ATTRIBUTE_VALUE
-          LITERAL
-            STRING "'0/12345678'"
-      R_PAREN ")"
+    SKIP_SUBSCRIPTION
+      SKIP_KW "skip"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
+            LSN_KW "lsn"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            LITERAL
+              STRING "'0/12345678'"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

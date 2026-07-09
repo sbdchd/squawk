@@ -21,8 +21,8 @@ pub(super) fn add_schema(
             }
             return Some(path.syntax().text_range());
         }
-        if let Some(from_item) = ast::FromItem::cast(node.clone()) {
-            let name_ref = from_item.name_ref()?;
+        if let Some(ast::FromItem::RelationFromItem(relation)) = ast::FromItem::cast(node.clone()) {
+            let name_ref = relation.name_ref()?;
             return Some(name_ref.syntax().text_range());
         }
         if let Some(call_expr) = ast::CallExpr::cast(node) {
