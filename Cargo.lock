@@ -2819,9 +2819,9 @@ dependencies = [
 
 [[package]]
 name = "tiny_pretty"
-version = "0.4.0"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01ddaca72c626914165b5a0faf5fde225949dad80e52ff4c9f12ec5226fc36cc"
+checksum = "5c6f118a569adc26e8a9a377130f181a461770225e588c73a00c8636b8680b6c"
 
 [[package]]
 name = "tinystr"
