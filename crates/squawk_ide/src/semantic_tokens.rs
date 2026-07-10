@@ -198,6 +198,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             LocationKind::Type => Ok(SemanticTokenType::Type),
             LocationKind::CaseExpr
             | LocationKind::Channel
+            | LocationKind::Collation
             | LocationKind::CommitBegin
             | LocationKind::CommitEnd
             | LocationKind::Constraint
@@ -205,12 +206,16 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::Database
             | LocationKind::EventTrigger
             | LocationKind::Extension
+            | LocationKind::ForeignDataWrapper
             | LocationKind::Index
+            | LocationKind::Language
             | LocationKind::Policy
             | LocationKind::PreparedStatement
+            | LocationKind::Publication
             | LocationKind::Role
             | LocationKind::Rule
             | LocationKind::Server
+            | LocationKind::Subscription
             | LocationKind::Tablespace
             | LocationKind::Trigger
             | LocationKind::Window => Err(kind),

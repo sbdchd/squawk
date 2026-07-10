@@ -3294,6 +3294,13 @@ FunctionSigList =
 FunctionSig =
   Path ParamList?
 
+HasParamList =
+  Aggregate
+| CreateAggregate
+| CreateFunction
+| CreateProcedure
+| FunctionSig
+
 DropForeignDataWrapper =
   'drop' 'foreign' 'data' 'wrapper' IfExists? (NameRef (',' NameRef)*)
   ('cascade' | 'restrict')? ';'?

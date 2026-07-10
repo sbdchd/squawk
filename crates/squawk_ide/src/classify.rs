@@ -10,6 +10,7 @@ pub(crate) enum NameRefClass {
     AlterColumn,
     CallProcedure,
     Channel,
+    Collation,
     CompositeTypeField,
     Constraint,
     ConstraintColumn,
@@ -21,6 +22,7 @@ pub(crate) enum NameRefClass {
     DeleteQualifiedColumnTable,
     EventTrigger,
     Extension,
+    ForeignDataWrapper,
     ForeignKeyColumn,
     ForeignKeyTable,
     FromTable,
@@ -32,10 +34,12 @@ pub(crate) enum NameRefClass {
     InsertQualifiedColumnTable,
     InsertTable,
     JoinUsingColumn,
+    Language,
     LikeTable,
     MergeColumn,
     MergeQualifiedColumnTable,
     NamedArgParameter,
+    ParamDefault,
     Policy,
     PolicyColumn,
     PolicyQualifiedColumnTable,
@@ -46,6 +50,7 @@ pub(crate) enum NameRefClass {
     ProcedureCall,
     PropertyGraph,
     PropertyGraphColumn,
+    Publication,
     PublicationColumn,
     QualifiedColumn,
     Role,
@@ -63,6 +68,7 @@ pub(crate) enum NameRefClass {
     Sequence,
     Server,
     StatisticsColumn,
+    Subscription,
     Table,
     TableAndColumnsColumn,
     Tablespace,
@@ -641,7 +647,9 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         if ast::ObjectAggregate::can_cast(ancestor.kind()) {
             return Some(NameRefClass::Aggregate);
         }
-        if ast::ObjectSchema::can_cast(ancestor.kind()) {
+        if ast::ObjectSchema::can_cast(ancestor.kind())
+            || ast::AlterDefaultPrivileges::can_cast(ancestor.kind())
+        {
             return Some(NameRefClass::Schema);
         }
         if ast::ObjectTable::can_cast(ancestor.kind())
@@ -734,11 +742,37 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
         if ast::DropServer::can_cast(ancestor.kind())
             || ast::AlterServer::can_cast(ancestor.kind())
-            || ast::CreateServer::can_cast(ancestor.kind())
             || ast::ServerName::can_cast(ancestor.kind())
             || ast::ObjectServer::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::Server);
+        }
+        if ast::CreateServer::can_cast(ancestor.kind())
+            || ast::DropForeignDataWrapper::can_cast(ancestor.kind())
+            || ast::AlterForeignDataWrapper::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::ForeignDataWrapper);
+        }
+        if ast::DropPublication::can_cast(ancestor.kind())
+            || ast::AlterPublication::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Publication);
+        }
+        if ast::DropSubscription::can_cast(ancestor.kind())
+            || ast::AlterSubscription::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Subscription);
+        }
+        if ast::DropLanguage::can_cast(ancestor.kind())
+            || ast::AlterLanguage::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Language);
+        }
+        if ast::Collate::can_cast(ancestor.kind())
+            || ast::DropCollation::can_cast(ancestor.kind())
+            || ast::AlterCollation::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Collation);
         }
         if let Some(create_extension) = ast::CreateExtension::cast(ancestor.clone())
             && create_extension.schema_token().is_some()
@@ -938,6 +972,12 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
         if ast::DefaultConstraint::can_cast(ancestor.kind()) && in_function_name {
             return Some(NameRefClass::FunctionCall);
+        }
+        if ast::ParamDefault::can_cast(ancestor.kind()) {
+            if in_function_name {
+                return Some(NameRefClass::FunctionCall);
+            }
+            return Some(NameRefClass::ParamDefault);
         }
         if ast::OnClause::can_cast(ancestor.kind()) {
             in_on_clause = true;
@@ -1202,6 +1242,21 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         }
         if ast::CreateServer::can_cast(ancestor.kind()) {
             return Some(LocationKind::Server);
+        }
+        if ast::CreateForeignDataWrapper::can_cast(ancestor.kind()) {
+            return Some(LocationKind::ForeignDataWrapper);
+        }
+        if ast::CreatePublication::can_cast(ancestor.kind()) {
+            return Some(LocationKind::Publication);
+        }
+        if ast::CreateSubscription::can_cast(ancestor.kind()) {
+            return Some(LocationKind::Subscription);
+        }
+        if ast::CreateLanguage::can_cast(ancestor.kind()) {
+            return Some(LocationKind::Language);
+        }
+        if ast::CreateCollation::can_cast(ancestor.kind()) {
+            return Some(LocationKind::Collation);
         }
         if ast::CreateExtension::can_cast(ancestor.kind()) {
             return Some(LocationKind::Extension);

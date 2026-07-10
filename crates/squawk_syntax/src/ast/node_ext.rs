@@ -730,8 +730,16 @@ impl ast::SelectVariant {
     }
 }
 
-impl ast::HasParamList for ast::FunctionSig {}
-impl ast::HasParamList for ast::Aggregate {}
+impl ast::HasParamList {
+    #[inline]
+    pub fn param_list(&self) -> Option<ast::ParamList> {
+        support::child(self.syntax())
+    }
+    #[inline]
+    pub fn path(&self) -> Option<ast::Path> {
+        support::child(self.syntax())
+    }
+}
 
 impl ast::NameLike for ast::Name {
     #[inline]

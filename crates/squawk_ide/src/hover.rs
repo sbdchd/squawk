@@ -247,21 +247,26 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Column => hover_name_column(db, def),
         LocationKind::Constraint => hover_constraint(db, def),
         LocationKind::Cursor => hover_cursor(db, def),
+        LocationKind::Collation => hover_collation(db, def),
         LocationKind::Database => hover_database(db, def),
         LocationKind::EventTrigger => hover_event_trigger(db, def),
         LocationKind::Extension => hover_extension(db, def),
+        LocationKind::ForeignDataWrapper => hover_foreign_data_wrapper(db, def),
         LocationKind::Function => hover_function(db, def),
         LocationKind::Index => hover_index(db, def),
+        LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
         LocationKind::Policy => hover_policy(db, def),
         LocationKind::PreparedStatement => hover_prepared_statement(db, def),
         LocationKind::Procedure => hover_procedure(db, def),
         LocationKind::PropertyGraph => hover_property_graph(db, def),
+        LocationKind::Publication => hover_publication(db, def),
         LocationKind::Role => hover_role(db, def),
         LocationKind::Rule => hover_rule(db, def),
         LocationKind::Schema => hover_schema(db, def),
         LocationKind::Sequence => hover_sequence(db, def),
         LocationKind::Server => hover_server(db, def),
+        LocationKind::Subscription => hover_subscription(db, def),
         LocationKind::Table => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
         LocationKind::View => {
@@ -324,11 +329,13 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             // Finally try as table (handles case like `select t from t;` where t is the table)
             hover_table(db, def)
         }
+        LocationKind::Collation => hover_collation(db, def),
         LocationKind::Constraint => hover_constraint(db, def),
         LocationKind::Cursor => hover_cursor(db, def),
         LocationKind::Database => hover_database(db, def),
         LocationKind::EventTrigger => hover_event_trigger(db, def),
         LocationKind::Extension => hover_extension(db, def),
+        LocationKind::ForeignDataWrapper => hover_foreign_data_wrapper(db, def),
         LocationKind::Function => {
             if let Some(result) = hover_function(db, def) {
                 return Some(result);
@@ -339,16 +346,19 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
             hover_column(db, &definitions)
         }
         LocationKind::Index => hover_index(db, def),
+        LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
         LocationKind::Policy => hover_policy(db, def),
         LocationKind::PreparedStatement => hover_prepared_statement(db, def),
         LocationKind::Procedure => hover_procedure(db, def),
         LocationKind::PropertyGraph => hover_property_graph(db, def),
+        LocationKind::Publication => hover_publication(db, def),
         LocationKind::Role => hover_role(db, def),
         LocationKind::Rule => hover_rule(db, def),
         LocationKind::Schema => hover_schema(db, def),
         LocationKind::Sequence => hover_sequence(db, def),
         LocationKind::Server => hover_server(db, def),
+        LocationKind::Subscription => hover_subscription(db, def),
         LocationKind::Table | LocationKind::View => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
         LocationKind::Trigger => hover_trigger(db, def),
@@ -1200,6 +1210,34 @@ fn hover_extension(db: &dyn Db, def: Location) -> Option<Hover> {
         return format_create_extension(create_extension);
     }
     Some(Hover::snippet(format!("extension {}", def_node.text())))
+}
+
+fn hover_foreign_data_wrapper(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!(
+        "foreign data wrapper {}",
+        def_node.text()
+    )))
+}
+
+fn hover_publication(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!("publication {}", def_node.text())))
+}
+
+fn hover_subscription(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!("subscription {}", def_node.text())))
+}
+
+fn hover_language(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!("language {}", def_node.text())))
+}
+
+fn hover_collation(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!("collation {}", def_node.text())))
 }
 
 fn hover_role(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -5329,10 +5367,76 @@ alter extension my$0ext update to '2.0';
     }
 
     #[test]
+    fn hover_publication_on_alter() {
+        assert_snapshot!(check_hover("
+create table t(id int);
+create publication pub for table t;
+alter publication p$0ub add table t;
+"), @"
+        hover: publication pub
+          ╭▸ 
+        4 │ alter publication pub add table t;
+          ╰╴                  ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_subscription_on_alter() {
+        assert_snapshot!(check_hover("
+create subscription sub connection $$host=localhost$$ publication pub;
+alter subscription s$0ub refresh publication;
+"), @"
+        hover: subscription sub
+          ╭▸ 
+        3 │ alter subscription sub refresh publication;
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_language_on_drop() {
+        assert_snapshot!(check_hover("
+create language plpythonu;
+drop language plpyth$0onu;
+"), @"
+        hover: language plpythonu
+          ╭▸ 
+        3 │ drop language plpythonu;
+          ╰╴                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_collation_on_collate() {
+        assert_snapshot!(check_hover("
+create collation mycoll (locale = 'C');
+create table t(name text collate myc$0oll);
+"), @"
+        hover: collation mycoll
+          ╭▸ 
+        3 │ create table t(name text collate mycoll);
+          ╰╴                                   ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_foreign_data_wrapper_on_create_server() {
+        assert_snapshot!(check_hover("
+create foreign data wrapper fdw;
+create server srv foreign data wrapper f$0dw;
+"), @"
+        hover: foreign data wrapper fdw
+          ╭▸ 
+        3 │ create server srv foreign data wrapper fdw;
+          ╰╴                                       ─ hover
+        ");
+    }
+
+    #[test]
     fn hover_role_on_create() {
         assert_snapshot!(check_hover("
 create role read$0er;
-"), @r"
+"), @"
         hover: role reader
           ╭▸ 
         2 │ create role reader;
