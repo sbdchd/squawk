@@ -108,6 +108,7 @@ pub(crate) fn resolve_name_ref(
                 LocationKind::NamedArgParameter
             )])
         }
+        NameRefClass::ParamDefault => resolve_enclosing_function_param(InFile::new(file, name_ref)),
         NameRefClass::Cursor => {
             let cursor_name = &Name::from_node(name_ref);
             let ptr = binder.lookup(cursor_name, SymbolKind::Cursor)?;
@@ -402,6 +403,58 @@ pub(crate) fn resolve_name_ref(
                 LocationKind::Extension
             )])
         }
+        NameRefClass::ForeignDataWrapper => {
+            let fdw_name = Name::from_node(name_ref);
+            let binder = bind(db, file);
+            let ptr = binder.lookup(&fdw_name, SymbolKind::ForeignDataWrapper)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::ForeignDataWrapper
+            )])
+        }
+        NameRefClass::Publication => {
+            let publication_name = Name::from_node(name_ref);
+            let binder = bind(db, file);
+            let ptr = binder.lookup(&publication_name, SymbolKind::Publication)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Publication
+            )])
+        }
+        NameRefClass::Subscription => {
+            let subscription_name = Name::from_node(name_ref);
+            let binder = bind(db, file);
+            let ptr = binder.lookup(&subscription_name, SymbolKind::Subscription)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Subscription
+            )])
+        }
+        NameRefClass::Language => {
+            let language_name = Name::from_node(name_ref);
+            let binder = bind(db, file);
+            let ptr = binder.lookup(&language_name, SymbolKind::Language)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Language
+            )])
+        }
+        NameRefClass::Collation => {
+            let (schema, collation_name) = name::schema_and_name(name_ref);
+            let position = name_ref.syntax().text_range().start();
+            let binder = bind(db, file);
+            let schemas = binder.resolved_schemas(position, schema.as_ref());
+            let ptr = binder.lookup_with(&collation_name, SymbolKind::Collation, &schemas)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Collation
+            )])
+        }
         NameRefClass::Role => {
             let role_name = Name::from_node(name_ref);
             let binder = bind(db, file);
@@ -577,7 +630,7 @@ pub(crate) fn resolve_name_ref(
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
-                .find_map(ast::FunctionSig::cast)?;
+                .find_map(ast::HasParamList::cast)?;
             let path = function_sig.path()?;
             let (schema, function_name) = name::schema_and_name_path(&path)?;
             let params = param_signature(&function_sig);
@@ -589,7 +642,7 @@ pub(crate) fn resolve_name_ref(
             let aggregate = name_ref
                 .syntax()
                 .ancestors()
-                .find_map(ast::Aggregate::cast)?;
+                .find_map(ast::HasParamList::cast)?;
             let path = aggregate.path()?;
             let (schema, aggregate_name) = name::schema_and_name_path(&path)?;
             let params = param_signature(&aggregate);
@@ -601,7 +654,7 @@ pub(crate) fn resolve_name_ref(
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
-                .find_map(ast::FunctionSig::cast)?;
+                .find_map(ast::HasParamList::cast)?;
             let path = function_sig.path()?;
             let (schema, procedure_name) = name::schema_and_name_path(&path)?;
             let params = param_signature(&function_sig);
@@ -613,7 +666,7 @@ pub(crate) fn resolve_name_ref(
             let function_sig = name_ref
                 .syntax()
                 .ancestors()
-                .find_map(ast::FunctionSig::cast)?;
+                .find_map(ast::HasParamList::cast)?;
             let path = function_sig.path()?;
             let (schema, routine_name) = name::schema_and_name_path(&path)?;
             let params = param_signature(&function_sig);
@@ -1974,6 +2027,36 @@ fn resolve_select_column_ptr(
             SyntaxKind::DELETE => return resolve_delete_column_ptr(db, in_file),
             SyntaxKind::MERGE => return resolve_merge_column_ptr(db, in_file),
             _ => (),
+        }
+    }
+
+    resolve_enclosing_function_param(in_file)
+}
+
+fn resolve_enclosing_function_param(
+    name_ref: InFile<&ast::NameRef>,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = name_ref.file_id;
+    let name_ref = name_ref.value;
+    let param_name = Name::from_node(name_ref);
+
+    for ancestor in name_ref.syntax().ancestors() {
+        let Some(has_param_list) = ast::HasParamList::cast(ancestor) else {
+            continue;
+        };
+        let Some(param_list) = has_param_list.param_list() else {
+            continue;
+        };
+        for param in param_list.params() {
+            if let Some(name) = param.name()
+                && Name::from_node(&name) == param_name
+            {
+                return Some(smallvec![Location::new(
+                    file,
+                    name.syntax().text_range(),
+                    LocationKind::NamedArgParameter
+                )]);
+            }
         }
     }
 
@@ -3731,7 +3814,7 @@ fn resolve_symbol_info(
     binder.lookup_info(&name, kind, &schemas)
 }
 
-fn param_signature(node: &impl ast::HasParamList) -> Option<Vec<Name>> {
+fn param_signature(node: &ast::HasParamList) -> Option<Vec<Name>> {
     let mut params = vec![];
     for param in node.param_list()?.params() {
         if let Some(ast::Type::PathType(path_type)) = param.ty()

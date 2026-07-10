@@ -35,9 +35,3 @@ pub trait HasWithClause: AstNode {
         support::child(self.syntax())
     }
 }
-
-pub trait HasParamList: AstNode {
-    fn param_list(&self) -> Option<ast::ParamList> {
-        support::child(self.syntax())
-    }
-}
