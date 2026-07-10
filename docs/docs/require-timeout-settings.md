@@ -3,6 +3,13 @@ id: require-timeout-settings
 title: require-timeout-settings
 ---
 
+:::note Deprecated
+
+This rule has been split into [`require-lock-timeout`](./require-lock-timeout.md) and [`require-statement-timeout`](./require-statement-timeout.md), which can be enabled and disabled individually.
+
+`require-timeout-settings` still works as an alias for both rules in configuration files and `squawk-ignore` comments.
+:::
+
 ## problem
 
 You must configure a `lock_timeout` to safely apply migrations. See ["Safety requirements"](./safe_migrations.md#safety-requirements)

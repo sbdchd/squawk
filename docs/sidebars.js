@@ -33,6 +33,8 @@ module.exports = {
       "ban-truncate-cascade",
       "syntax-error",
       "require-timeout-settings",
+      "require-lock-timeout",
+      "require-statement-timeout",
       "ban-uncommitted-transaction",
       "require-enum-value-ordering",
       "require-table-schema",

@@ -16,7 +16,7 @@ CheckReport {
             help: Some(
                 "Configure a `lock_timeout` before this statement. Statement requires: ACCESS EXCLUSIVE lock; blocking: reads, writes, schema changes.",
             ),
-            rule_name: "require-timeout-settings",
+            rule_name: "require-lock-timeout",
             column_end: 63,
             line_end: 2,
             fix: Some(
@@ -43,7 +43,7 @@ CheckReport {
             help: Some(
                 "Configure a `statement_timeout` before this statement",
             ),
-            rule_name: "require-timeout-settings",
+            rule_name: "require-statement-timeout",
             column_end: 63,
             line_end: 2,
             fix: Some(
