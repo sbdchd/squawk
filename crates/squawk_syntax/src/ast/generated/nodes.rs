@@ -23286,6 +23286,15 @@ pub enum GroupBy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum HasParamList {
+    Aggregate(Aggregate),
+    CreateAggregate(CreateAggregate),
+    CreateFunction(CreateFunction),
+    CreateProcedure(CreateProcedure),
+    FunctionSig(FunctionSig),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoinType {
     JoinCross(JoinCross),
     JoinFull(JoinFull),
@@ -42771,6 +42780,77 @@ impl From<GroupingSets> for GroupBy {
     #[inline]
     fn from(node: GroupingSets) -> GroupBy {
         GroupBy::GroupingSets(node)
+    }
+}
+impl AstNode for HasParamList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::AGGREGATE
+                | SyntaxKind::CREATE_AGGREGATE
+                | SyntaxKind::CREATE_FUNCTION
+                | SyntaxKind::CREATE_PROCEDURE
+                | SyntaxKind::FUNCTION_SIG
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::AGGREGATE => HasParamList::Aggregate(Aggregate { syntax }),
+            SyntaxKind::CREATE_AGGREGATE => {
+                HasParamList::CreateAggregate(CreateAggregate { syntax })
+            }
+            SyntaxKind::CREATE_FUNCTION => HasParamList::CreateFunction(CreateFunction { syntax }),
+            SyntaxKind::CREATE_PROCEDURE => {
+                HasParamList::CreateProcedure(CreateProcedure { syntax })
+            }
+            SyntaxKind::FUNCTION_SIG => HasParamList::FunctionSig(FunctionSig { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            HasParamList::Aggregate(it) => &it.syntax,
+            HasParamList::CreateAggregate(it) => &it.syntax,
+            HasParamList::CreateFunction(it) => &it.syntax,
+            HasParamList::CreateProcedure(it) => &it.syntax,
+            HasParamList::FunctionSig(it) => &it.syntax,
+        }
+    }
+}
+impl From<Aggregate> for HasParamList {
+    #[inline]
+    fn from(node: Aggregate) -> HasParamList {
+        HasParamList::Aggregate(node)
+    }
+}
+impl From<CreateAggregate> for HasParamList {
+    #[inline]
+    fn from(node: CreateAggregate) -> HasParamList {
+        HasParamList::CreateAggregate(node)
+    }
+}
+impl From<CreateFunction> for HasParamList {
+    #[inline]
+    fn from(node: CreateFunction) -> HasParamList {
+        HasParamList::CreateFunction(node)
+    }
+}
+impl From<CreateProcedure> for HasParamList {
+    #[inline]
+    fn from(node: CreateProcedure) -> HasParamList {
+        HasParamList::CreateProcedure(node)
+    }
+}
+impl From<FunctionSig> for HasParamList {
+    #[inline]
+    fn from(node: FunctionSig) -> HasParamList {
+        HasParamList::FunctionSig(node)
     }
 }
 impl AstNode for JoinType {

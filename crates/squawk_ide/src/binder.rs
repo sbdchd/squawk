@@ -1,7 +1,7 @@
 /// Loosely based on TypeScript's binder
 /// see: typescript-go/internal/binder/binder.go
 use la_arena::Arena;
-use rowan::TextSize;
+use rowan::{TextRange, TextSize};
 use smallvec::SmallVec;
 use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 
@@ -46,6 +46,9 @@ pub(crate) struct Binder {
     // When binding objects nested inside `create schema ...`, they default to
     // the schema being created instead of the current search path.
     default_schema_override: Option<Schema>,
+    // If we have a `create schema foo` command then commands nested inside that
+    // get `foo` for their schema.
+    schema_regions: Vec<(TextRange, Schema)>,
 }
 
 impl Binder {
@@ -62,6 +65,7 @@ impl Binder {
                 ],
             }],
             default_schema_override: None,
+            schema_regions: vec![],
         }
     }
 
@@ -91,6 +95,14 @@ impl Binder {
         let pg_temp = Schema::new("pg_temp");
         let search_path = self.search_path_at(position);
         let mut list = Schemas::new();
+        // Usually empty unless someone is using `create schema`
+        if let Some((_, schema)) = self
+            .schema_regions
+            .iter()
+            .find(|(range, _)| range.contains(position))
+        {
+            list.push(schema.clone());
+        }
         if search_path.contains(&pg_temp) {
             list.push(pg_temp.clone());
         }
@@ -293,6 +305,17 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         }
         ast::Stmt::CreateDatabase(create_database) => bind_create_database(b, create_database),
         ast::Stmt::CreateServer(create_server) => bind_create_server(b, create_server),
+        ast::Stmt::CreateForeignDataWrapper(create_fdw) => {
+            bind_create_foreign_data_wrapper(b, create_fdw)
+        }
+        ast::Stmt::CreatePublication(create_publication) => {
+            bind_create_publication(b, create_publication)
+        }
+        ast::Stmt::CreateSubscription(create_subscription) => {
+            bind_create_subscription(b, create_subscription)
+        }
+        ast::Stmt::CreateLanguage(create_language) => bind_create_language(b, create_language),
+        ast::Stmt::CreateCollation(create_collation) => bind_create_collation(b, create_collation),
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
         ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role),
         ast::Stmt::Declare(declare) => bind_declare_cursor(b, declare),
@@ -579,6 +602,9 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
     });
 
     b.scope.insert(schema_name, schema_id);
+
+    b.schema_regions
+        .push((create_schema.syntax().text_range(), schema.clone()));
 
     let prev_override = b.default_schema_override.replace(schema);
     for element in create_schema.schema_elements() {
@@ -1090,6 +1116,106 @@ fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
     });
 
     b.scope.insert(server_name, server_id);
+}
+
+fn bind_create_foreign_data_wrapper(b: &mut Binder, create_fdw: ast::CreateForeignDataWrapper) {
+    let Some(name) = create_fdw.name() else {
+        return;
+    };
+
+    let fdw_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let fdw_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::ForeignDataWrapper,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(fdw_name, fdw_id);
+}
+
+fn bind_create_publication(b: &mut Binder, create_publication: ast::CreatePublication) {
+    let Some(name) = create_publication.name() else {
+        return;
+    };
+
+    let publication_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let publication_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Publication,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(publication_name, publication_id);
+}
+
+fn bind_create_subscription(b: &mut Binder, create_subscription: ast::CreateSubscription) {
+    let Some(name) = create_subscription.name() else {
+        return;
+    };
+
+    let subscription_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let subscription_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Subscription,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(subscription_name, subscription_id);
+}
+
+fn bind_create_language(b: &mut Binder, create_language: ast::CreateLanguage) {
+    let Some(name) = create_language.name() else {
+        return;
+    };
+
+    let language_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let language_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Language,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(language_name, language_id);
+}
+
+fn bind_create_collation(b: &mut Binder, create_collation: ast::CreateCollation) {
+    let Some(path) = create_collation.path() else {
+        return;
+    };
+
+    let Some(collation_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let collation_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Collation,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(collation_name, collation_id);
 }
 
 fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension) {

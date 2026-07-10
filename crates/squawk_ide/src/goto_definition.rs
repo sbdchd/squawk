@@ -1246,6 +1246,51 @@ create policy p on t
     }
 
     #[test]
+    fn goto_function_param_in_begin_atomic_body() {
+        assert_snapshot!(goto("
+create function f(a int) returns int
+begin atomic
+  select a$0;
+end;
+"), @"
+          ╭▸ 
+        2 │ create function f(a int) returns int
+          │                   ─ 2. destination
+        3 │ begin atomic
+        4 │   select a;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_begin_atomic_predicate() {
+        assert_snapshot!(goto("
+create table t (id int);
+create function f(x int) returns int begin atomic
+  select id from t where id = x$0;
+end;
+"), @"
+          ╭▸ 
+        3 │ create function f(x int) returns int begin atomic
+          │                   ─ 2. destination
+        4 │   select id from t where id = x;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_function_param_in_later_param_default() {
+        assert_snapshot!(goto("
+create function f(a int default 1, b int default a$0) returns int
+begin atomic select 1; end;
+"), @"
+          ╭▸ 
+        2 │ create function f(a int default 1, b int default a) returns int
+          ╰╴                  ─ 2. destination               ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_alter_policy_qualified_column_table() {
         assert_snapshot!(goto("
 create table t(c int, d int);
@@ -2020,6 +2065,94 @@ alter extension e add foreign table t$0;
     }
 
     #[test]
+    fn goto_alter_default_privileges_in_schema() {
+        assert_snapshot!(goto("
+create schema myschema;
+create role bob;
+alter default privileges in schema myschema$0
+  grant select on tables to bob;
+"), @"
+          ╭▸ 
+        2 │ create schema myschema;
+          │               ──────── 2. destination
+        3 │ create role bob;
+        4 │ alter default privileges in schema myschema
+          ╰╴                                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_publication() {
+        assert_snapshot!(goto("
+create table t(id int);
+create publication pub for table t;
+alter publication pub$0 add table t;
+"), @"
+          ╭▸ 
+        3 │ create publication pub for table t;
+          │                    ─── 2. destination
+        4 │ alter publication pub add table t;
+          ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_subscription() {
+        assert_snapshot!(goto("
+create subscription sub connection $$host=localhost$$ publication pub;
+alter subscription sub$0 refresh publication;
+"), @"
+          ╭▸ 
+        2 │ create subscription sub connection $$host=localhost$$ publication pub;
+          │                     ─── 2. destination
+        3 │ alter subscription sub refresh publication;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_language() {
+        assert_snapshot!(goto("
+create language plpythonu;
+drop language plpythonu$0;
+"), @"
+          ╭▸ 
+        2 │ create language plpythonu;
+          │                 ───────── 2. destination
+        3 │ drop language plpythonu;
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_collate_in_column() {
+        assert_snapshot!(goto("
+create collation mycoll (locale = 'C');
+create table t(name text collate mycoll$0);
+"), @"
+          ╭▸ 
+        2 │ create collation mycoll (locale = 'C');
+          │                  ────── 2. destination
+        3 │ create table t(name text collate mycoll);
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_server_foreign_data_wrapper() {
+        assert_snapshot!(goto("
+create foreign data wrapper fdw;
+create server srv foreign data wrapper fdw$0;
+"), @"
+          ╭▸ 
+        2 │ create foreign data wrapper fdw;
+          │                             ─── 2. destination
+        3 │ create server srv foreign data wrapper fdw;
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_alter_sequence() {
         assert_snapshot!(goto("
 create sequence s;
@@ -2129,6 +2262,40 @@ alter schema app$0 rename to app2;
           │               ─── 2. destination
         3 │ alter schema app rename to app2;
           ╰╴               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_schema_element_unqualified_table_ref() {
+        assert_snapshot!(goto("
+create schema app
+  create table users(id int)
+  create view v as
+    select id from users$0;
+"), @"
+          ╭▸ 
+        3 │   create table users(id int)
+          │                ───── 2. destination
+        4 │   create view v as
+        5 │     select id from users;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_schema_element_unqualified_column_ref() {
+        assert_snapshot!(goto("
+create schema app
+  create table users(id int)
+  create view v as
+    select id$0 from users;
+"), @"
+          ╭▸ 
+        3 │   create table users(id int)
+          │                      ── 2. destination
+        4 │   create view v as
+        5 │     select id from users;
+          ╰╴            ─ 1. source
         ");
     }
 
