@@ -5025,12 +5025,13 @@ SOURCE_FILE
               L_PAREN "("
               WHITESPACE "\n    "
               WINDOW_SPEC
-                PARTITION_KW "PARTITION"
-                WHITESPACE " "
-                BY_KW "BY"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "customer_segment"
+                PARTITION_BY_CLAUSE
+                  PARTITION_KW "PARTITION"
+                  WHITESPACE " "
+                  BY_KW "BY"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "customer_segment"
                 WHITESPACE "\n    "
                 ORDER_BY_CLAUSE
                   ORDER_KW "ORDER"

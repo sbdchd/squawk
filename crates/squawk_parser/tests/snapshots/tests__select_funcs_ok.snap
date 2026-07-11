@@ -3973,12 +3973,13 @@ SOURCE_FILE
               WHITESPACE " "
               L_PAREN "("
               WINDOW_SPEC
-                PARTITION_KW "partition"
-                WHITESPACE " "
-                BY_KW "by"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "b"
+                PARTITION_BY_CLAUSE
+                  PARTITION_KW "partition"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "b"
               R_PAREN ")"
           WHITESPACE " "
           AS_NAME

@@ -1450,16 +1450,17 @@ SOURCE_FILE
                     L_PAREN "("
                     WHITESPACE "\n      "
                     WINDOW_SPEC
-                      PARTITION_KW "PARTITION"
-                      WHITESPACE " "
-                      BY_KW "BY"
-                      WHITESPACE " "
-                      NAME_REF
-                        IDENT "user_id"
-                      COMMA ","
-                      WHITESPACE " "
-                      NAME_REF
-                        IDENT "board_id"
+                      PARTITION_BY_CLAUSE
+                        PARTITION_KW "PARTITION"
+                        WHITESPACE " "
+                        BY_KW "BY"
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "user_id"
+                        COMMA ","
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "board_id"
                       WHITESPACE " "
                       ORDER_BY_CLAUSE
                         ORDER_KW "ORDER"

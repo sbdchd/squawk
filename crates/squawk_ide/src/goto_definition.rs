@@ -712,6 +712,104 @@ cross join ((((select u$0.n * 10 as val)))) x;
     }
 
     #[test]
+    fn goto_aliased_join_expr_qualified_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, c int);
+select j.b$0 from (t join u using(a)) as j;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                       ─ 2. destination
+        3 │ create table u(a int, c int);
+        4 │ select j.b from (t join u using(a)) as j;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_aliased_join_expr_qualified_merged_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, c int);
+select j.a$0 from (t join u using(a)) as j;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create table u(a int, c int);
+        4 │ select j.a from (t join u using(a)) as j;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_aliased_join_expr_qualified_right_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, c int);
+select j.c$0 from (t join u using(a)) as j;
+"), @"
+          ╭▸ 
+        3 │ create table u(a int, c int);
+          │                       ─ 2. destination
+        4 │ select j.c from (t join u using(a)) as j;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_ambiguous_unqualified_column_comma_join() {
+        assert_snapshot!(goto("
+create table t(a int);
+create table u(a int);
+select a$0 from t, u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ create table u(a int);
+          │                ─ 3. destination
+        4 │ select a from t, u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_using_output_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, c int);
+select a$0 from t join u using(a);
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create table u(a int, c int);
+          │                ─ 3. destination
+        4 │ select a from t join u using(a);
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_natural_join_output_column() {
+        assert_snapshot!(goto("
+create table t(a int, b int);
+create table u(a int, c int);
+select a$0 from t natural join u;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int, b int);
+          │                ─ 2. destination
+        3 │ create table u(a int, c int);
+          │                ─ 3. destination
+        4 │ select a from t natural join u;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_lateral_cte_ref_after_lateral_not_found() {
         // c is defined after the lateral it isn't visible to the subquery
         // Query 1 ERROR at Line 10: : ERROR:  missing FROM-clause entry for table "c"
@@ -1108,6 +1206,68 @@ alter rule r$0 on t rename to r2;
           │             ─ 2. destination
         4 │ alter rule r on t rename to r2;
           ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_enable_trigger() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function f() returns trigger language plpgsql as $$ begin return new; end $$;
+create trigger tr before insert on t for each row execute function f();
+alter table t enable trigger tr$0;
+"), @"
+          ╭▸ 
+        4 │ create trigger tr before insert on t for each row execute function f();
+          │                ── 2. destination
+        5 │ alter table t enable trigger tr;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_disable_trigger() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function f() returns trigger language plpgsql as $$ begin return new; end $$;
+create trigger tr before insert on t for each row execute function f();
+alter table t disable trigger tr$0;
+"), @"
+          ╭▸ 
+        4 │ create trigger tr before insert on t for each row execute function f();
+          │                ── 2. destination
+        5 │ alter table t disable trigger tr;
+          ╰╴                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_enable_rule() {
+        assert_snapshot!(goto("
+create table t(a int);
+create rule r as on insert to t do instead nothing;
+alter table t enable rule r$0;
+"), @"
+          ╭▸ 
+        3 │ create rule r as on insert to t do instead nothing;
+          │             ─ 2. destination
+        4 │ alter table t enable rule r;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_table_disable_rule() {
+        assert_snapshot!(goto("
+create table t(a int);
+create rule r as on insert to t do instead nothing;
+alter table t disable rule r$0;
+"), @"
+          ╭▸ 
+        3 │ create rule r as on insert to t do instead nothing;
+          │             ─ 2. destination
+        4 │ alter table t disable rule r;
+          ╰╴                           ─ 1. source
         ");
     }
 
@@ -5495,6 +5655,86 @@ select f2$0 from dup(42) as u(x, y);
     }
 
     #[test]
+    fn goto_select_column_from_function_returns_setof_table() {
+        assert_snapshot!(goto("
+create table users (id int, name text);
+create function f() returns setof users
+  language sql begin atomic select * from users; end;
+select id$0 from f();
+"), @"
+          ╭▸ 
+        2 │ create table users (id int, name text);
+          │                     ── 2. destination
+          ‡
+        5 │ select id from f();
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_returns_setof_table_qualified() {
+        assert_snapshot!(goto("
+create table users (id int, name text);
+create function f() returns setof users
+  language sql begin atomic select * from users; end;
+select f.id$0 from f();
+"), @"
+          ╭▸ 
+        2 │ create table users (id int, name text);
+          │                     ── 2. destination
+          ‡
+        5 │ select f.id from f();
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_returns_setof_composite_type() {
+        assert_snapshot!(goto("
+create type pt as (x int, y int);
+create function f() returns setof pt language sql begin atomic select 1, 2; end;
+select x$0 from f();
+"), @"
+          ╭▸ 
+        2 │ create type pt as (x int, y int);
+          │                    ─ 2. destination
+        3 │ create function f() returns setof pt language sql begin atomic select 1, 2; end;
+        4 │ select x from f();
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_function_out_param() {
+        assert_snapshot!(goto("
+create function f(out id int, out nm text) returns setof record
+  language sql begin atomic select 1, 2; end;
+select id$0 from f();
+"), @"
+          ╭▸ 
+        2 │ create function f(out id int, out nm text) returns setof record
+          │                       ── 2. destination
+        3 │   language sql begin atomic select 1, 2; end;
+        4 │ select id from f();
+          ╰╴        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_rows_from() {
+        assert_snapshot!(goto("
+create function f() returns table(a int) language sql begin atomic select 1; end;
+select a$0 from rows from (f());
+"), @"
+          ╭▸ 
+        2 │ create function f() returns table(a int) language sql begin atomic select 1; end;
+          │                                   ─ 2. destination
+        3 │ select a from rows from (f());
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_fn_call_column_from_cte() {
         assert_snapshot!(goto("
 with cte as (select 1 as a)
@@ -6149,6 +6389,24 @@ merge into t
   when matched then do nothing;
 ",
         );
+    }
+
+    #[test]
+    fn goto_merge_using_subquery_source_column() {
+        assert_snapshot!(goto("
+create table t(id int, val int);
+merge into t
+  using (select 1 as id, 2 as val) as s
+    on t.id = s.id$0
+  when not matched then
+    insert (id, val) values (s.id, s.val);
+"), @"
+          ╭▸ 
+        4 │   using (select 1 as id, 2 as val) as s
+          │                      ── 2. destination
+        5 │     on t.id = s.id
+          ╰╴                 ─ 1. source
+        ");
     }
 
     #[test]
@@ -11503,6 +11761,37 @@ window w as (
        13 │ from tbl
        14 │ window w as (
           ╰╴       ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_window_base_name_in_inline_over() {
+        assert_snapshot!(goto("
+create table t(a int);
+select row_number() over (w1$0 order by a)
+from t
+window w1 as (partition by a);
+"), @"
+          ╭▸ 
+        3 │ select row_number() over (w1 order by a)
+          │                            ─ 1. source
+        4 │ from t
+        5 │ window w1 as (partition by a);
+          ╰╴       ── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_window_base_name_in_window_def() {
+        assert_snapshot!(goto("
+create table t(a int);
+select row_number() over w2
+from t
+window w1 as (partition by a), w2 as (w1$0 order by a);
+"), @"
+          ╭▸ 
+        5 │ window w1 as (partition by a), w2 as (w1 order by a);
+          ╰╴       ── 2. destination               ─ 1. source
         ");
     }
 

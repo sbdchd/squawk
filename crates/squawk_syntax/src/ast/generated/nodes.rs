@@ -16203,6 +16203,10 @@ impl ParenExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn join_expr(&self) -> Option<JoinExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn select(&self) -> Option<Select> {
         support::child(&self.syntax)
     }
@@ -16320,6 +16324,25 @@ impl PartitionBy {
     #[inline]
     pub fn partition_strategy(&self) -> Option<PartitionStrategy> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn by_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BY_KW)
+    }
+    #[inline]
+    pub fn partition_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARTITION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionByClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionByClause {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn by_token(&self) -> Option<SyntaxToken> {
@@ -22090,11 +22113,11 @@ pub struct WindowSpec {
 }
 impl WindowSpec {
     #[inline]
-    pub fn exprs(&self) -> AstChildren<Expr> {
-        support::children(&self.syntax)
+    pub fn frame_clause(&self) -> Option<FrameClause> {
+        support::child(&self.syntax)
     }
     #[inline]
-    pub fn frame_clause(&self) -> Option<FrameClause> {
+    pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -22102,16 +22125,8 @@ impl WindowSpec {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn by_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::BY_KW)
-    }
-    #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
-    }
-    #[inline]
-    pub fn partition_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PARTITION_KW)
+    pub fn partition_by_clause(&self) -> Option<PartitionByClause> {
+        support::child(&self.syntax)
     }
 }
 
@@ -34372,6 +34387,24 @@ impl AstNode for PartitionBy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PARTITION_BY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PartitionByClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_BY_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
