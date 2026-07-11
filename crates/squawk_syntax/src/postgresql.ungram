@@ -1607,7 +1607,7 @@ ReleaseSavepoint =
   'release' 'savepoint' NameRef ';'?
 
 ParenExpr =
-  '(' (Expr | Select | FromItem) ')'
+  '(' (Expr | Select | FromItem | JoinExpr) ')'
 
 TupleExpr =
   '(' (Expr (',' Expr)*) ')'
@@ -2042,7 +2042,10 @@ NoOthers =
   'no' 'others'
 
 WindowSpec =
-  '#ident'? ('partition' 'by' (Expr (',' Expr)*))? OrderByClause? FrameClause?
+  NameRef? PartitionByClause? OrderByClause? FrameClause?
+
+PartitionByClause =
+  'partition' 'by' (Expr (',' Expr)*)
 
 AlterStatistics =
   'alter' 'statistics' Path

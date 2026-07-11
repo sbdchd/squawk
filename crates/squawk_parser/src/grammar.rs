@@ -4748,16 +4748,26 @@ fn window_spec(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    opt_ident(p);
-    if p.eat(PARTITION_KW) {
-        p.expect(BY_KW);
-        if !opt_expr_list(p) {
-            p.error("expected expression")
-        }
+    if p.at(IDENT) {
+        opt_name_ref(p);
     }
+    opt_window_partition_by(p);
     opt_order_by_clause(p);
     opt_frame_clause(p);
     Some(m.complete(p, WINDOW_SPEC))
+}
+
+fn opt_window_partition_by(p: &mut Parser<'_>) {
+    if !p.at(PARTITION_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump(PARTITION_KW);
+    p.expect(BY_KW);
+    if !opt_expr_list(p) {
+        p.error("expected expression")
+    }
+    m.complete(p, PARTITION_BY_CLAUSE);
 }
 
 fn opt_frame_clause(p: &mut Parser<'_>) {

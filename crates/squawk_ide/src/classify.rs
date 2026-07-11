@@ -590,6 +590,20 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         {
             return Some(NameRefClass::Constraint);
         }
+        if ast::EnableTrigger::can_cast(ancestor.kind())
+            || ast::DisableTrigger::can_cast(ancestor.kind())
+            || ast::EnableAlwaysTrigger::can_cast(ancestor.kind())
+            || ast::EnableReplicaTrigger::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Trigger);
+        }
+        if ast::EnableRule::can_cast(ancestor.kind())
+            || ast::DisableRule::can_cast(ancestor.kind())
+            || ast::EnableAlwaysRule::can_cast(ancestor.kind())
+            || ast::EnableReplicaRule::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::Rule);
+        }
         if ast::DropTable::can_cast(ancestor.kind())
             || ast::DropForeignTable::can_cast(ancestor.kind())
             || ast::Truncate::can_cast(ancestor.kind())
@@ -951,6 +965,13 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
         if ast::ArgList::can_cast(ancestor.kind()) {
             in_arg_list = true;
+        }
+        if let Some(window_spec) = ast::WindowSpec::cast(ancestor.clone())
+            && window_spec
+                .name_ref()
+                .is_some_and(|name_ref| name_ref.syntax() == node)
+        {
+            return Some(NameRefClass::Window);
         }
         if ast::OverClause::can_cast(ancestor.kind()) && !in_function_name {
             if node
