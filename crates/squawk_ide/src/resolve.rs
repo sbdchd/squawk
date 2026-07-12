@@ -13,7 +13,8 @@ use crate::location::{Location, LocationKind};
 use crate::name::{self, Name, Schema};
 use crate::symbols::SymbolKind;
 use crate::{
-    classify::{NameRefClass, classify_name_ref},
+    binder::extract_string_literal,
+    classify::{NameRefClass, classify_literal, classify_name_ref},
     db::{bind, parse},
 };
 use salsa::Database as Db;
@@ -533,6 +534,42 @@ pub(crate) fn resolve_name_ref(
                 LocationKind::Conversion
             )])
         }
+        NameRefClass::AccessMethod => {
+            let access_method_name = Name::from_node(name_ref);
+            let binder = bind(db, file);
+            let ptr = binder.lookup(&access_method_name, SymbolKind::AccessMethod)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::AccessMethod
+            )])
+        }
+        NameRefClass::OperatorFamily => {
+            let (schema, operator_family_name) = name::schema_and_name(name_ref);
+            let position = name_ref.syntax().text_range().start();
+            let binder = bind(db, file);
+            let schemas = binder.resolved_schemas(position, schema.as_ref());
+            let ptr =
+                binder.lookup_with(&operator_family_name, SymbolKind::OperatorFamily, &schemas)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::OperatorFamily
+            )])
+        }
+        NameRefClass::TextSearchDictionary => {
+            let (schema, dictionary_name) = name::schema_and_name(name_ref);
+            let position = name_ref.syntax().text_range().start();
+            let binder = bind(db, file);
+            let schemas = binder.resolved_schemas(position, schema.as_ref());
+            let ptr =
+                binder.lookup_with(&dictionary_name, SymbolKind::TextSearchDictionary, &schemas)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::TextSearchDictionary
+            )])
+        }
         NameRefClass::Role => {
             let role_name = Name::from_node(name_ref);
             let binder = bind(db, file);
@@ -547,7 +584,25 @@ pub(crate) fn resolve_name_ref(
             let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
             let column_name = Name::from_node(name_ref);
             let table_path = path.qualifier()?;
-            resolve_column_for_path(db, InFile::new(file, &table_path), column_name)
+            if let Some(ptr) =
+                resolve_column_for_path(db, InFile::new(file, &table_path), column_name.clone())
+            {
+                return Some(ptr);
+            }
+            resolve_composite_type_field_for_path(db, InFile::new(file, &table_path), &column_name)
+        }
+        NameRefClass::CompositeTypeAttribute => {
+            let attribute_name = Name::from_node(name_ref);
+            let alter_type = name_ref
+                .syntax()
+                .ancestors()
+                .find_map(ast::AlterType::cast)?;
+            let type_path = alter_type.path()?;
+            resolve_composite_type_field_for_path(
+                db,
+                InFile::new(file, &type_path),
+                &attribute_name,
+            )
         }
         NameRefClass::TableAndColumnsColumn => {
             let column_name = Name::from_node(name_ref);
@@ -932,6 +987,35 @@ pub(crate) fn resolve_name_ref(
         }
     }
     .or_else(|| resolve_special_keyword_as_function(db, InFile::new(file, name_ref)))
+}
+
+/// Resolves a string literal to its definition(s), e.g. the schema name in
+/// `set schema 'app'` or `set search_path to 'app'`.
+pub(crate) fn resolve_literal(
+    db: &dyn Db,
+    literal: InFile<&ast::Literal>,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = literal.file_id;
+    let literal = literal.value;
+    let context = classify_literal(literal.syntax())?;
+
+    match context {
+        NameRefClass::Schema => {
+            let string_value = extract_string_literal(literal)?;
+            if string_value.is_empty() {
+                return None;
+            }
+            let schema_name = Name::from_string(string_value);
+            let binder = bind(db, file);
+            let ptr = binder.lookup(&schema_name, SymbolKind::Schema)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Schema
+            )])
+        }
+        _ => None,
+    }
 }
 
 fn resolve_table_name_ptr(
@@ -1844,18 +1928,18 @@ fn resolve_from_item_column_by_name_after_index(
         return Some(ptr);
     }
 
-    let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
-    let scope_name_ref = relation_name_ref_from_from_item(from_item)?;
-
-    if let Some(ptr) = resolve_column_from_table_or_view_or_cte_impl(
-        db,
-        InFile::new(file, &scope_name_ref),
-        &table_name,
-        schema.as_ref(),
-        column_name,
-        0,
-        skip_column_count,
-    ) {
+    if let Some((schema, table_name)) = name::schema_and_table_from_from_item(from_item)
+        && let Some(scope_name_ref) = relation_name_ref_from_from_item(from_item)
+        && let Some(ptr) = resolve_column_from_table_or_view_or_cte_impl(
+            db,
+            InFile::new(file, &scope_name_ref),
+            &table_name,
+            schema.as_ref(),
+            column_name,
+            0,
+            skip_column_count,
+        )
+    {
         return Some(ptr);
     }
 
@@ -1866,6 +1950,20 @@ fn resolve_from_item_column_by_name_after_index(
         return Some(smallvec![Location::new(
             file,
             alias_name.syntax().text_range(),
+            LocationKind::Table
+        )]);
+    }
+
+    if original_skip == 0
+        && from_item.alias().is_none()
+        && let ast::FromItem::FunctionFromItem(func) = from_item
+        && let Some(call_expr) = func.call_expr()
+        && let Some(ast::Expr::NameRef(func_name_ref)) = call_expr.expr()
+        && Name::from_node(&func_name_ref) == *column_name
+    {
+        return Some(smallvec![Location::new(
+            file,
+            func_name_ref.syntax().text_range(),
             LocationKind::Table
         )]);
     }
@@ -4419,8 +4517,25 @@ fn resolve_merge_column_ptr(
         .ancestors()
         .find_map(ast::Merge::cast)?;
 
-    // Try resolving in source table first
-    if let Some(from_item) = merge.using_on_clause().and_then(|x| x.from_item())
+    let mut in_set_clause = false;
+    let mut in_set_expr = false;
+    let mut in_insert_column_list = false;
+    for ancestor in column_name_ref.syntax().ancestors() {
+        if ast::SetClause::can_cast(ancestor.kind()) {
+            in_set_clause = true;
+        }
+        if ast::SetExpr::can_cast(ancestor.kind()) {
+            in_set_expr = true;
+        }
+        if ast::ColumnRefList::can_cast(ancestor.kind()) {
+            in_insert_column_list = true;
+        }
+    }
+    let is_set_target = in_set_clause && !in_set_expr;
+
+    if !is_set_target
+        && !in_insert_column_list
+        && let Some(from_item) = merge.using_on_clause().and_then(|x| x.from_item())
         && let Some(ptr) =
             resolve_from_item_column_ptr(db, InFile::new(file, &from_item), column_name_ref)
     {

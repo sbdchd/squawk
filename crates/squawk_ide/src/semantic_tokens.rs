@@ -196,7 +196,8 @@ impl TryFrom<LocationKind> for SemanticTokenType {
                 Ok(SemanticTokenType::Table)
             }
             LocationKind::Type => Ok(SemanticTokenType::Type),
-            LocationKind::CaseExpr
+            LocationKind::AccessMethod
+            | LocationKind::CaseExpr
             | LocationKind::Channel
             | LocationKind::Collation
             | LocationKind::CommitBegin
@@ -210,6 +211,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::ForeignDataWrapper
             | LocationKind::Index
             | LocationKind::Language
+            | LocationKind::OperatorFamily
             | LocationKind::Policy
             | LocationKind::PreparedStatement
             | LocationKind::Publication
@@ -220,6 +222,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::Statistics
             | LocationKind::Subscription
             | LocationKind::Tablespace
+            | LocationKind::TextSearchDictionary
             | LocationKind::Trigger
             | LocationKind::Window => Err(kind),
         }

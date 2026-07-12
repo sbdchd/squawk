@@ -6,11 +6,13 @@ use squawk_syntax::{
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum NameRefClass {
+    AccessMethod,
     Aggregate,
     AlterColumn,
     CallProcedure,
     Channel,
     Collation,
+    CompositeTypeAttribute,
     CompositeTypeField,
     Constraint,
     ConstraintColumn,
@@ -40,6 +42,7 @@ pub(crate) enum NameRefClass {
     MergeColumn,
     MergeQualifiedColumnTable,
     NamedArgParameter,
+    OperatorFamily,
     ParamDefault,
     Policy,
     PolicyColumn,
@@ -75,6 +78,7 @@ pub(crate) enum NameRefClass {
     Table,
     TableAndColumnsColumn,
     Tablespace,
+    TextSearchDictionary,
     Trigger,
     TriggerEventColumn,
     TriggerWhenColumn,
@@ -154,6 +158,19 @@ fn classify_ddl_function_option_value(ty_node: &SyntaxNode) -> Option<NameRefCla
     None
 }
 
+fn is_search_path_set_config(set_config: &ast::SetConfig) -> bool {
+    let path = set_config.path();
+    let Some(path) = path else {
+        return false;
+    };
+    if path.qualifier().is_some() {
+        return false;
+    }
+    path.segment()
+        .and_then(|segment| segment.name_ref())
+        .is_some_and(|name_ref| Name::from_node(&name_ref).0.as_str() == "search_path")
+}
+
 fn is_rule_old_new_ref(name_ref: &ast::NameRef) -> bool {
     name_ref
         .syntax()
@@ -227,6 +244,22 @@ fn classify_object_column_path(node: &SyntaxNode) -> Option<NameRefClass> {
     } else {
         Some(NameRefClass::Schema)
     }
+}
+
+pub(crate) fn classify_literal(node: &SyntaxNode) -> Option<NameRefClass> {
+    let parent = node.parent()?;
+    if ast::SetSchemaValue::can_cast(parent.kind()) {
+        return Some(NameRefClass::Schema);
+    }
+    if let Some(set_config) = ast::SetConfig::cast(parent)
+        && is_search_path_set_config(&set_config)
+        && set_config
+            .config_values()
+            .any(|config_value| config_value.syntax() == node)
+    {
+        return Some(NameRefClass::Schema);
+    }
+    None
 }
 
 pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
@@ -539,6 +572,14 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         return Some(NameRefClass::PropertyGraphColumn);
     }
 
+    if let Some(parent) = node.parent()
+        && let Some(bin_expr) = ast::BinExpr::cast(parent)
+        && matches!(bin_expr.op(), Some(ast::BinOp::Collate(_)))
+        && bin_expr.rhs().is_some_and(|rhs| rhs.syntax() == node)
+    {
+        return Some(NameRefClass::Collation);
+    }
+
     let mut in_type = false;
     for ancestor in node.ancestors() {
         if let Some(privilege_objects) = ast::PrivilegeObjects::cast(ancestor.clone()) {
@@ -589,6 +630,14 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         }
         if ast::SetConstraints::can_cast(ancestor.kind()) {
             return Some(NameRefClass::Constraint);
+        }
+        if let Some(set_config) = ast::SetConfig::cast(ancestor.clone())
+            && is_search_path_set_config(&set_config)
+            && set_config
+                .config_values()
+                .any(|config_value| config_value.syntax() == node)
+        {
+            return Some(NameRefClass::Schema);
         }
         if in_column_list
             && (ast::VertexTableDef::can_cast(ancestor.kind())
@@ -695,6 +744,12 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             || ast::RenameColumn::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::AlterColumn);
+        }
+        if ast::RenameAttribute::can_cast(ancestor.kind())
+            || ast::DropAttribute::can_cast(ancestor.kind())
+            || ast::AlterAttribute::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::CompositeTypeAttribute);
         }
         if ast::ObjectColumn::can_cast(ancestor.kind()) {
             return Some(NameRefClass::QualifiedColumn);
@@ -893,6 +948,27 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             || ast::ObjectConversion::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::Conversion);
+        }
+        if ast::DropAccessMethod::can_cast(ancestor.kind())
+            || ast::ObjectAccessMethod::can_cast(ancestor.kind())
+            || ast::SetAccessMethod::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::AccessMethod);
+        }
+        if ast::DropOperatorFamily::can_cast(ancestor.kind())
+            || ast::AlterOperatorFamily::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::OperatorFamily);
+        }
+        if let Some(object_text_search) = ast::ObjectTextSearch::cast(ancestor.clone())
+            && object_text_search.dictionary_token().is_some()
+        {
+            return Some(NameRefClass::TextSearchDictionary);
+        }
+        if ast::DropTextSearchDict::can_cast(ancestor.kind())
+            || ast::AlterTextSearchDictionary::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::TextSearchDictionary);
         }
         if let Some(create_extension) = ast::CreateExtension::cast(ancestor.clone())
             && create_extension.schema_token().is_some()
@@ -1404,6 +1480,15 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         }
         if ast::CreateConversion::can_cast(ancestor.kind()) {
             return Some(LocationKind::Conversion);
+        }
+        if ast::CreateAccessMethod::can_cast(ancestor.kind()) {
+            return Some(LocationKind::AccessMethod);
+        }
+        if ast::CreateOperatorFamily::can_cast(ancestor.kind()) {
+            return Some(LocationKind::OperatorFamily);
+        }
+        if ast::CreateTextSearchDictionary::can_cast(ancestor.kind()) {
+            return Some(LocationKind::TextSearchDictionary);
         }
         if ast::CreateExtension::can_cast(ancestor.kind()) {
             return Some(LocationKind::Extension);

@@ -325,6 +325,15 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
             bind_create_conversion(b, create_conversion)
         }
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
+        ast::Stmt::CreateAccessMethod(create_access_method) => {
+            bind_create_access_method(b, create_access_method)
+        }
+        ast::Stmt::CreateOperatorFamily(create_operator_family) => {
+            bind_create_operator_family(b, create_operator_family)
+        }
+        ast::Stmt::CreateTextSearchDictionary(create_text_search_dictionary) => {
+            bind_create_text_search_dictionary(b, create_text_search_dictionary)
+        }
         ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role.name()),
         ast::Stmt::CreateUser(create_user) => bind_create_role(b, create_user.name()),
         ast::Stmt::CreateGroup(create_group) => bind_create_role(b, create_group.name()),
@@ -1278,6 +1287,77 @@ fn bind_create_conversion(b: &mut Binder, create_conversion: ast::CreateConversi
     });
 
     b.scope.insert(conversion_name, conversion_id);
+}
+
+fn bind_create_access_method(b: &mut Binder, create_access_method: ast::CreateAccessMethod) {
+    let Some(path) = create_access_method.name() else {
+        return;
+    };
+
+    let Some(access_method_name) = item_name(&path) else {
+        return;
+    };
+
+    let access_method_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::AccessMethod,
+        ptr: path_to_ptr(&path),
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(access_method_name, access_method_id);
+}
+
+fn bind_create_operator_family(b: &mut Binder, create_operator_family: ast::CreateOperatorFamily) {
+    let Some(path) = create_operator_family.path() else {
+        return;
+    };
+
+    let Some(operator_family_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let operator_family_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::OperatorFamily,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(operator_family_name, operator_family_id);
+}
+
+fn bind_create_text_search_dictionary(
+    b: &mut Binder,
+    create_text_search_dictionary: ast::CreateTextSearchDictionary,
+) {
+    let Some(path) = create_text_search_dictionary.path() else {
+        return;
+    };
+
+    let Some(dictionary_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let dictionary_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::TextSearchDictionary,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(dictionary_name, dictionary_id);
 }
 
 fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension) {

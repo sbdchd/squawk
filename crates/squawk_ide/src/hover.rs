@@ -241,6 +241,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
     let name = name.value;
     let def = Location::from_node(file, name.syntax())?;
     match def.kind {
+        LocationKind::AccessMethod => hover_access_method(db, def),
         LocationKind::Aggregate => hover_aggregate(db, def),
         LocationKind::CaseExpr | LocationKind::CommitBegin | LocationKind::CommitEnd => None,
         LocationKind::Channel => hover_channel(db, def),
@@ -257,6 +258,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Index => hover_index(db, def),
         LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
+        LocationKind::OperatorFamily => hover_operator_family(db, def),
         LocationKind::Policy => hover_policy(db, def),
         LocationKind::PreparedStatement => hover_prepared_statement(db, def),
         LocationKind::Procedure => hover_procedure(db, def),
@@ -272,6 +274,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Subscription => hover_subscription(db, def),
         LocationKind::Table => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
+        LocationKind::TextSearchDictionary => hover_text_search_dictionary(db, def),
         LocationKind::View => {
             if let Some(hover) = format_create_view(db, def) {
                 return Some(hover);
@@ -315,6 +318,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
     let definitions = goto_definition::goto_definition(db, position);
     let def = *definitions.first()?;
     match def.kind {
+        LocationKind::AccessMethod => hover_access_method(db, def),
         LocationKind::Aggregate => hover_aggregate(db, def),
         LocationKind::CaseExpr | LocationKind::CommitBegin | LocationKind::CommitEnd => None,
         LocationKind::Channel => hover_channel(db, def),
@@ -352,6 +356,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         LocationKind::Index => hover_index(db, def),
         LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
+        LocationKind::OperatorFamily => hover_operator_family(db, def),
         LocationKind::Policy => hover_policy(db, def),
         LocationKind::PreparedStatement => hover_prepared_statement(db, def),
         LocationKind::Procedure => hover_procedure(db, def),
@@ -367,6 +372,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         LocationKind::Subscription => hover_subscription(db, def),
         LocationKind::Table | LocationKind::View => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
+        LocationKind::TextSearchDictionary => hover_text_search_dictionary(db, def),
         LocationKind::Trigger => hover_trigger(db, def),
         LocationKind::Type => hover_type(db, def),
         LocationKind::Window => hover_window(db, def),
@@ -1257,6 +1263,27 @@ fn hover_collation(db: &dyn Db, def: Location) -> Option<Hover> {
 fn hover_conversion(db: &dyn Db, def: Location) -> Option<Hover> {
     let def_node = def.to_node(db)?;
     Some(Hover::snippet(format!("conversion {}", def_node.text())))
+}
+
+fn hover_access_method(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!("access method {}", def_node.text())))
+}
+
+fn hover_operator_family(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!(
+        "operator family {}",
+        def_node.text()
+    )))
+}
+
+fn hover_text_search_dictionary(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!(
+        "text search dictionary {}",
+        def_node.text()
+    )))
 }
 
 fn hover_role(db: &dyn Db, def: Location) -> Option<Hover> {

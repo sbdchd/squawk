@@ -5,6 +5,7 @@ pub(crate) use crate::name::{Name, Schema};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub(crate) enum SymbolKind {
+    AccessMethod,
     Aggregate,
     Channel,
     Collation,
@@ -18,6 +19,7 @@ pub(crate) enum SymbolKind {
     Function,
     Index,
     Language,
+    OperatorFamily,
     Policy,
     PreparedStatement,
     Procedure,
@@ -33,6 +35,7 @@ pub(crate) enum SymbolKind {
     Subscription,
     Table,
     Tablespace,
+    TextSearchDictionary,
     Trigger,
     Type,
     View,

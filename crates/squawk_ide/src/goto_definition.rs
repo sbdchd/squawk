@@ -77,6 +77,16 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
         }
     }
 
+    if let Some(literal) = ast::Literal::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_literal(db, InFile::new(definition_file, &literal))
+            {
+                return locations;
+            }
+        }
+    }
+
     let type_node = ast::Type::cast(parent.clone()).or_else(|| {
         // special case if we're at the timezone clause inside a timezone type
         if ast::Timezone::can_cast(parent.kind()) {
@@ -2427,6 +2437,38 @@ create table t(name text collate mycoll$0);
     }
 
     #[test]
+    fn goto_collate_in_order_by() {
+        assert_snapshot!(goto("
+create collation c from \"C\";
+create table t(a text);
+select a from t order by a collate c$0;
+"), @r#"
+          ╭▸ 
+        2 │ create collation c from "C";
+          │                  ─ 2. destination
+        3 │ create table t(a text);
+        4 │ select a from t order by a collate c;
+          ╰╴                                   ─ 1. source
+        "#);
+    }
+
+    #[test]
+    fn goto_collate_in_index_expr() {
+        assert_snapshot!(goto("
+create collation c from \"C\";
+create table t(a text);
+create index idx on t (a collate c$0);
+"), @r#"
+          ╭▸ 
+        2 │ create collation c from "C";
+          │                  ─ 2. destination
+        3 │ create table t(a text);
+        4 │ create index idx on t (a collate c);
+          ╰╴                                 ─ 1. source
+        "#);
+    }
+
+    #[test]
     fn goto_create_server_foreign_data_wrapper() {
         assert_snapshot!(goto("
 create foreign data wrapper fdw;
@@ -3900,6 +3942,48 @@ select (member).name$0 from users;
     }
 
     #[test]
+    fn goto_alter_type_drop_attribute() {
+        assert_snapshot!(goto("
+create type address as (city text, zip text);
+alter type address drop attribute city$0;
+"), @"
+          ╭▸ 
+        2 │ create type address as (city text, zip text);
+          │                         ──── 2. destination
+        3 │ alter type address drop attribute city;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_type_rename_attribute() {
+        assert_snapshot!(goto("
+create type address as (city text, zip text);
+alter type address rename attribute city$0 to town;
+"), @"
+          ╭▸ 
+        2 │ create type address as (city text, zip text);
+          │                         ──── 2. destination
+        3 │ alter type address rename attribute city to town;
+          ╰╴                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_type_alter_attribute() {
+        assert_snapshot!(goto("
+create type address as (city text, zip text);
+alter type address alter attribute city$0 set data type varchar;
+"), @"
+          ╭▸ 
+        2 │ create type address as (city text, zip text);
+          │                         ──── 2. destination
+        3 │ alter type address alter attribute city set data type varchar;
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_type_range() {
         assert_snapshot!(goto("
 create type int4_range as range (subtype = int4);
@@ -5285,6 +5369,86 @@ drop table t$0;
     }
 
     #[test]
+    fn goto_search_path_schema_name() {
+        assert_snapshot!(goto("
+create schema app;
+set search_path to app$0;
+"), @"
+          ╭▸ 
+        2 │ create schema app;
+          │               ─── 2. destination
+        3 │ set search_path to app;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_search_path_schema_name_quoted() {
+        assert_snapshot!(goto(r#"
+create schema app;
+set search_path to "app$0";
+"#), @r#"
+          ╭▸ 
+        2 │ create schema app;
+          │               ─── 2. destination
+        3 │ set search_path to "app";
+          ╰╴                      ─ 1. source
+        "#);
+    }
+
+    #[test]
+    fn goto_search_path_schema_name_string_literal() {
+        assert_snapshot!(goto(r#"
+create schema app;
+set search_path to 'app$0';
+"#), @"
+          ╭▸ 
+        2 │ create schema app;
+          │               ─── 2. destination
+        3 │ set search_path to 'app';
+          ╰╴                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_search_path_schema_name_second_item() {
+        assert_snapshot!(goto("
+create schema app;
+set search_path to public, app$0;
+"), @"
+          ╭▸ 
+        2 │ create schema app;
+          │               ─── 2. destination
+        3 │ set search_path to public, app;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_search_path_schema_name_not_the_param_name() {
+        goto_not_found(
+            "
+create schema search_path;
+set search_path$0 to app;
+",
+        );
+    }
+
+    #[test]
+    fn goto_set_schema_literal() {
+        assert_snapshot!(goto("
+create schema app;
+set schema 'app$0';
+"), @"
+          ╭▸ 
+        2 │ create schema app;
+          │               ─── 2. destination
+        3 │ set schema 'app';
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_with_search_path_changed_twice() {
         assert_snapshot!(goto("
 set search_path to foo;
@@ -6003,6 +6167,44 @@ select x$0 from f();
         3 │ create function f() returns setof pt language sql begin atomic select 1, 2; end;
         4 │ select x from f();
           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_scalar_setof_function_alias() {
+        assert_snapshot!(goto("
+create function nums() returns setof int language sql as $$ values (1) $$;
+select n$0 from nums() as n;
+"), @"
+          ╭▸ 
+        3 │ select n from nums() as n;
+          ╰╴       ─ 1. source      ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_scalar_setof_function_no_alias() {
+        assert_snapshot!(goto("
+create function nums() returns setof int language sql as $$ values (1) $$;
+select nums$0 from nums();
+"), @"
+          ╭▸ 
+        3 │ select nums from nums();
+          │           ┬      ──── 2. destination
+          │           │
+          ╰╴          1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_scalar_setof_function_alias_with_column_list() {
+        assert_snapshot!(goto("
+create function nums() returns setof int language sql as $$ values (1) $$;
+select x$0 from nums() as n(x);
+"), @"
+          ╭▸ 
+        3 │ select x from nums() as n(x);
+          ╰╴       ─ 1. source        ─ 2. destination
         ");
     }
 
@@ -10307,6 +10509,20 @@ comment on column t$0.id is '';
     }
 
     #[test]
+    fn goto_comment_on_column_composite_type_attribute() {
+        assert_snapshot!(goto("
+create type address as (city text, zip text);
+comment on column address.city$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create type address as (city text, zip text);
+          │                         ──── 2. destination
+        3 │ comment on column address.city is 'x';
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_comment_on_view() {
         assert_snapshot!(goto("
 create view v as select 1;
@@ -10540,6 +10756,90 @@ comment on conversion con$0v is 'x';
           │                   ──── 2. destination
         3 │ comment on conversion conv is 'x';
           ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_text_search_dictionary() {
+        assert_snapshot!(goto("
+create text search dictionary english_stem (template = snowball, language = english);
+drop text search dictionary english_st$0em;
+"), @"
+          ╭▸ 
+        2 │ create text search dictionary english_stem (template = snowball, language = english);
+          │                               ──────────── 2. destination
+        3 │ drop text search dictionary english_stem;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_text_search_dictionary() {
+        assert_snapshot!(goto("
+create text search dictionary english_stem (template = snowball, language = english);
+alter text search dictionary english_st$0em rename to stemmer;
+"), @"
+          ╭▸ 
+        2 │ create text search dictionary english_stem (template = snowball, language = english);
+          │                               ──────────── 2. destination
+        3 │ alter text search dictionary english_stem rename to stemmer;
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_access_method() {
+        assert_snapshot!(goto("
+create access method heap2 type table handler heap_tableam_handler;
+drop access method hea$0p2;
+"), @"
+          ╭▸ 
+        2 │ create access method heap2 type table handler heap_tableam_handler;
+          │                      ───── 2. destination
+        3 │ drop access method heap2;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_set_access_method() {
+        assert_snapshot!(goto("
+create access method heap2 type table handler heap_tableam_handler;
+alter table t set access method hea$0p2;
+"), @"
+          ╭▸ 
+        2 │ create access method heap2 type table handler heap_tableam_handler;
+          │                      ───── 2. destination
+        3 │ alter table t set access method heap2;
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_operator_family() {
+        assert_snapshot!(goto("
+create operator family my_family using btree;
+drop operator family my_fami$0ly using btree;
+"), @"
+          ╭▸ 
+        2 │ create operator family my_family using btree;
+          │                        ───────── 2. destination
+        3 │ drop operator family my_family using btree;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_operator_family() {
+        assert_snapshot!(goto("
+create operator family my_family using btree;
+alter operator family my_fami$0ly using btree owner to someone;
+"), @"
+          ╭▸ 
+        2 │ create operator family my_family using btree;
+          │                        ───────── 2. destination
+        3 │ alter operator family my_family using btree owner to someone;
+          ╰╴                            ─ 1. source
         ");
     }
 
@@ -11309,6 +11609,60 @@ merge into x
           ‡
         7 │   when matched and a = c
           ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_update_set_target_column() {
+        assert_snapshot!(goto("
+create table target(id int, val int);
+create table source(id int, val int);
+merge into target using source on target.id = source.id
+  when matched then update set val$0 = source.val;
+"
+        ), @"
+          ╭▸ 
+        2 │ create table target(id int, val int);
+          │                             ─── 2. destination
+          ‡
+        5 │   when matched then update set val = source.val;
+          ╰╴                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_update_set_source_expr_column() {
+        assert_snapshot!(goto("
+create table target(id int, val int);
+create table source(id int, val int);
+merge into target using source on target.id = source.id
+  when matched then update set val = source.val$0;
+"
+        ), @"
+          ╭▸ 
+        3 │ create table source(id int, val int);
+          │                             ─── 2. destination
+        4 │ merge into target using source on target.id = source.id
+        5 │   when matched then update set val = source.val;
+          ╰╴                                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_merge_insert_column_list_target_column() {
+        assert_snapshot!(goto("
+create table target(id int, val int);
+create table source(id int, val int);
+merge into target using source on target.id = source.id
+  when not matched then insert (val$0) values(source.val);
+"
+        ), @"
+          ╭▸ 
+        2 │ create table target(id int, val int);
+          │                             ─── 2. destination
+          ‡
+        5 │   when not matched then insert (val) values(source.val);
+          ╰╴                                  ─ 1. source
         ");
     }
 

@@ -10,6 +10,7 @@ use crate::{
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LocationKind {
+    AccessMethod,
     Aggregate,
     CaseExpr,
     Channel,
@@ -28,6 +29,7 @@ pub enum LocationKind {
     Index,
     Language,
     NamedArgParameter,
+    OperatorFamily,
     Policy,
     PreparedStatement,
     Procedure,
@@ -43,6 +45,7 @@ pub enum LocationKind {
     Subscription,
     Table,
     Tablespace,
+    TextSearchDictionary,
     Trigger,
     Type,
     View,
