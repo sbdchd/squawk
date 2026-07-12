@@ -685,6 +685,7 @@ fn convert_document_symbol(
             squawk_ide::document_symbols::DocumentSymbolKind::Index => "index",
             squawk_ide::document_symbols::DocumentSymbolKind::Domain => "domain",
             squawk_ide::document_symbols::DocumentSymbolKind::Sequence => "sequence",
+            squawk_ide::document_symbols::DocumentSymbolKind::Statistics => "statistics",
             squawk_ide::document_symbols::DocumentSymbolKind::Trigger => "trigger",
             squawk_ide::document_symbols::DocumentSymbolKind::Tablespace => "tablespace",
             squawk_ide::document_symbols::DocumentSymbolKind::Database => "database",
@@ -697,6 +698,7 @@ fn convert_document_symbol(
                 "prepared_statement"
             }
             squawk_ide::document_symbols::DocumentSymbolKind::Channel => "channel",
+            squawk_ide::document_symbols::DocumentSymbolKind::Savepoint => "savepoint",
         }
         .to_string(),
         start_line: full_start_wide.line,

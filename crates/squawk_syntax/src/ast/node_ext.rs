@@ -381,6 +381,17 @@ impl ast::RenameColumn {
     }
 }
 
+impl ast::RenameValue {
+    #[inline]
+    pub fn from(&self) -> Option<ast::Literal> {
+        support::children(&self.syntax).nth(0)
+    }
+    #[inline]
+    pub fn to(&self) -> Option<ast::Literal> {
+        support::children(&self.syntax).nth(1)
+    }
+}
+
 impl ast::ForeignKeyConstraint {
     #[inline]
     pub fn from_columns(&self) -> Option<ast::ColumnRefList> {

@@ -7,7 +7,7 @@ use crate::db::{File, parse};
 use crate::file::InFile;
 use crate::resolve::{
     resolve_aggregate_info, resolve_function_info, resolve_procedure_info, resolve_sequence_info,
-    resolve_table_info, resolve_type_info, resolve_view_info,
+    resolve_statistics_info, resolve_table_info, resolve_type_info, resolve_view_info,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,6 +29,7 @@ pub enum DocumentSymbolKind {
     Index,
     Domain,
     Sequence,
+    Statistics,
     Trigger,
     Tablespace,
     Database,
@@ -39,6 +40,7 @@ pub enum DocumentSymbolKind {
     Cursor,
     PreparedStatement,
     Channel,
+    Savepoint,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -115,6 +117,13 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::CreateSequence(create_sequence) => {
                 if let Some(symbol) = create_sequence_symbol(db, InFile::new(file, create_sequence))
+                {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::CreateStatistics(create_statistics) => {
+                if let Some(symbol) =
+                    create_statistics_symbol(db, InFile::new(file, create_statistics))
                 {
                     symbols.push(symbol);
                 }
@@ -213,6 +222,11 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
             }
             ast::Stmt::Listen(listen) => {
                 if let Some(symbol) = create_listen_symbol(listen) {
+                    symbols.push(symbol);
+                }
+            }
+            ast::Stmt::Savepoint(savepoint) => {
+                if let Some(symbol) = create_savepoint_symbol(savepoint) {
                     symbols.push(symbol);
                 }
             }
@@ -553,6 +567,31 @@ fn create_sequence_symbol(
     })
 }
 
+fn create_statistics_symbol(
+    db: &dyn Db,
+    create_statistics: InFile<ast::CreateStatistics>,
+) -> Option<DocumentSymbol> {
+    let file = create_statistics.file_id;
+    let create_statistics = create_statistics.value;
+    let path = create_statistics.path()?;
+    let name_node = path.segment()?.name()?;
+
+    let (schema, statistics_name) = resolve_statistics_info(db, InFile::new(file, &path))?;
+    let name = format!("{}.{}", schema.0, statistics_name);
+
+    let full_range = create_statistics.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Statistics,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentSymbol> {
     let name_node = create_trigger.name()?;
     let name = name_node.syntax().text().to_string();
@@ -865,6 +904,23 @@ fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
     })
 }
 
+fn create_savepoint_symbol(savepoint: ast::Savepoint) -> Option<DocumentSymbol> {
+    let name_node = savepoint.name()?;
+    let name = name_node.syntax().text().to_string();
+
+    let full_range = savepoint.syntax().text_range();
+    let focus_range = name_node.syntax().text_range();
+
+    Some(DocumentSymbol {
+        name,
+        detail: None,
+        kind: DocumentSymbolKind::Savepoint,
+        full_range,
+        focus_range,
+        children: vec![],
+    })
+}
+
 fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
     let name_node = notify.name_ref()?;
     let name = name_node.syntax().text().to_string();
@@ -956,6 +1012,7 @@ mod tests {
             DocumentSymbolKind::Index => "index",
             DocumentSymbolKind::Domain => "domain",
             DocumentSymbolKind::Sequence => "sequence",
+            DocumentSymbolKind::Statistics => "statistics",
             DocumentSymbolKind::Trigger => "trigger",
             DocumentSymbolKind::Tablespace => "tablespace",
             DocumentSymbolKind::Database => "database",
@@ -966,6 +1023,7 @@ mod tests {
             DocumentSymbolKind::Cursor => "cursor",
             DocumentSymbolKind::PreparedStatement => "prepared statement",
             DocumentSymbolKind::Channel => "channel",
+            DocumentSymbolKind::Savepoint => "savepoint",
         };
 
         let title = if let Some(detail) = &symbol.detail {

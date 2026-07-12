@@ -5,6 +5,8 @@ use rowan::{TextRange, TextSize};
 use smallvec::SmallVec;
 use squawk_syntax::{SyntaxNodePtr, ast, ast::AstNode};
 
+use crate::literals::literal_string_value;
+use crate::name::schema_and_func_name;
 use crate::scope::Scope;
 use crate::symbols::{Name, Schema, Symbol, SymbolKind};
 
@@ -296,6 +298,9 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
             bind_create_materialized_view(b, create_view)
         }
         ast::Stmt::CreateSequence(create_sequence) => bind_create_sequence(b, create_sequence),
+        ast::Stmt::CreateStatistics(create_statistics) => {
+            bind_create_statistics(b, create_statistics)
+        }
         ast::Stmt::CreateTrigger(create_trigger) => bind_create_trigger(b, create_trigger),
         ast::Stmt::CreateEventTrigger(create_event_trigger) => {
             bind_create_event_trigger(b, create_event_trigger)
@@ -316,11 +321,18 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         }
         ast::Stmt::CreateLanguage(create_language) => bind_create_language(b, create_language),
         ast::Stmt::CreateCollation(create_collation) => bind_create_collation(b, create_collation),
+        ast::Stmt::CreateConversion(create_conversion) => {
+            bind_create_conversion(b, create_conversion)
+        }
         ast::Stmt::CreateExtension(create_extension) => bind_create_extension(b, create_extension),
-        ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role),
+        ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role.name()),
+        ast::Stmt::CreateUser(create_user) => bind_create_role(b, create_user.name()),
+        ast::Stmt::CreateGroup(create_group) => bind_create_role(b, create_group.name()),
         ast::Stmt::Declare(declare) => bind_declare_cursor(b, declare),
         ast::Stmt::Prepare(prepare) => bind_prepare(b, prepare),
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
+        ast::Stmt::Savepoint(savepoint) => bind_savepoint(b, savepoint),
+        ast::Stmt::Select(select) => bind_select(b, select),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
         ast::Stmt::CreateRule(create_rule) => bind_create_rule(b, create_rule),
@@ -926,6 +938,32 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
     b.scope.insert(sequence_name, sequence_id);
 }
 
+fn bind_create_statistics(b: &mut Binder, create_statistics: ast::CreateStatistics) {
+    let Some(path) = create_statistics.path() else {
+        return;
+    };
+
+    let Some(statistics_name) = item_name(&path) else {
+        return;
+    };
+
+    let name_ptr = path_to_ptr(&path);
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let statistics_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Statistics,
+        ptr: name_ptr,
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(statistics_name, statistics_id);
+}
+
 fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
     let Some(name) = create_trigger.name() else {
         return;
@@ -1218,6 +1256,30 @@ fn bind_create_collation(b: &mut Binder, create_collation: ast::CreateCollation)
     b.scope.insert(collation_name, collation_id);
 }
 
+fn bind_create_conversion(b: &mut Binder, create_conversion: ast::CreateConversion) {
+    let Some(path) = create_conversion.path() else {
+        return;
+    };
+
+    let Some(conversion_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let conversion_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Conversion,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(conversion_name, conversion_id);
+}
+
 fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension) {
     let Some(name) = create_extension.name() else {
         return;
@@ -1237,8 +1299,8 @@ fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension)
     b.scope.insert(extension_name, extension_id);
 }
 
-fn bind_create_role(b: &mut Binder, create_role: ast::CreateRole) {
-    let Some(name) = create_role.name() else {
+fn bind_create_role(b: &mut Binder, name: Option<ast::Name>) {
+    let Some(name) = name else {
         return;
     };
 
@@ -1311,6 +1373,25 @@ fn bind_listen(b: &mut Binder, listen: ast::Listen) {
     });
 
     b.scope.insert(channel_name, channel_id);
+}
+
+fn bind_savepoint(b: &mut Binder, savepoint: ast::Savepoint) {
+    let Some(name) = savepoint.name() else {
+        return;
+    };
+
+    let savepoint_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
+
+    let savepoint_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Savepoint,
+        ptr: name_ptr,
+        schema: None,
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(savepoint_name, savepoint_id);
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
@@ -1432,6 +1513,86 @@ fn bind_set_config(b: &mut Binder, set_config: ast::SetConfig, position: TextSiz
             search_path,
         });
     }
+}
+
+fn bind_select(b: &mut Binder, select: ast::Select) {
+    let position = select.syntax().text_range().start();
+    bind_select_set_config(b, &select, position);
+}
+
+// `select set_config('search_path', 'foo, public', false)` is the functional
+// equivalent of `set search_path to foo, public`.
+fn bind_select_set_config(b: &mut Binder, select: &ast::Select, position: TextSize) {
+    if select.from_clause().is_some() {
+        return;
+    }
+
+    let mut targets = select
+        .select_clause()
+        .and_then(|select_clause| select_clause.target_list())
+        .into_iter()
+        .flat_map(|target_list| target_list.targets());
+
+    let Some(target) = targets.next() else {
+        return;
+    };
+    if targets.next().is_some() {
+        return;
+    }
+
+    let Some(ast::Expr::CallExpr(call_expr)) = target.expr() else {
+        return;
+    };
+
+    let Some((schema, func_name)) = schema_and_func_name(&call_expr) else {
+        return;
+    };
+    if func_name != Name::from_string("set_config") {
+        return;
+    }
+    if let Some(schema) = &schema
+        && *schema != Schema::new("pg_catalog")
+    {
+        return;
+    }
+
+    let schemas = b.resolved_schemas(position, schema.as_ref());
+    if let Some((resolved_schema, _)) = b.lookup_info(&func_name, SymbolKind::Function, &schemas)
+        && resolved_schema != Schema::new("pg_catalog")
+    {
+        return;
+    }
+
+    let mut args = call_expr.arg_list().into_iter().flat_map(|al| al.args());
+
+    let Some(ast::Expr::Literal(setting_name_literal)) = args.next().and_then(|a| a.expr()) else {
+        return;
+    };
+    let Some(setting_name) = literal_string_value(&setting_name_literal) else {
+        return;
+    };
+    if !setting_name.eq_ignore_ascii_case("search_path") {
+        return;
+    }
+
+    let Some(ast::Expr::Literal(new_value_literal)) = args.next().and_then(|a| a.expr()) else {
+        return;
+    };
+    let Some(new_value) = literal_string_value(&new_value_literal) else {
+        return;
+    };
+
+    let search_path = new_value
+        .split(',')
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(Schema::new)
+        .collect();
+
+    b.search_path_changes.push(SearchPathChange {
+        position,
+        search_path,
+    });
 }
 
 pub(crate) fn extract_string_literal(literal: &ast::Literal) -> Option<String> {

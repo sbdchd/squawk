@@ -2,7 +2,7 @@ use crate::ast_nav;
 use crate::collect;
 use crate::column_name::ColumnName;
 use crate::comments::preceding_comment;
-use crate::db::{bind, list_files, parse};
+use crate::db::{File, bind, list_files, parse};
 use crate::file::InFile;
 use crate::infer::{infer_type_from_expr, infer_type_from_literal};
 use crate::literals::binary_digits_to_hex;
@@ -246,6 +246,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Channel => hover_channel(db, def),
         LocationKind::Column => hover_name_column(db, def),
         LocationKind::Constraint => hover_constraint(db, def),
+        LocationKind::Conversion => hover_conversion(db, def),
         LocationKind::Cursor => hover_cursor(db, def),
         LocationKind::Collation => hover_collation(db, def),
         LocationKind::Database => hover_database(db, def),
@@ -263,9 +264,11 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Publication => hover_publication(db, def),
         LocationKind::Role => hover_role(db, def),
         LocationKind::Rule => hover_rule(db, def),
+        LocationKind::Savepoint => hover_savepoint(db, def),
         LocationKind::Schema => hover_schema(db, def),
         LocationKind::Sequence => hover_sequence(db, def),
         LocationKind::Server => hover_server(db, def),
+        LocationKind::Statistics => hover_statistics(db, def),
         LocationKind::Subscription => hover_subscription(db, def),
         LocationKind::Table => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
@@ -331,6 +334,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         }
         LocationKind::Collation => hover_collation(db, def),
         LocationKind::Constraint => hover_constraint(db, def),
+        LocationKind::Conversion => hover_conversion(db, def),
         LocationKind::Cursor => hover_cursor(db, def),
         LocationKind::Database => hover_database(db, def),
         LocationKind::EventTrigger => hover_event_trigger(db, def),
@@ -355,9 +359,11 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         LocationKind::Publication => hover_publication(db, def),
         LocationKind::Role => hover_role(db, def),
         LocationKind::Rule => hover_rule(db, def),
+        LocationKind::Savepoint => hover_savepoint(db, def),
         LocationKind::Schema => hover_schema(db, def),
         LocationKind::Sequence => hover_sequence(db, def),
         LocationKind::Server => hover_server(db, def),
+        LocationKind::Statistics => hover_statistics(db, def),
         LocationKind::Subscription => hover_subscription(db, def),
         LocationKind::Table | LocationKind::View => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
@@ -1139,6 +1145,14 @@ fn hover_sequence(db: &dyn Db, def: Location) -> Option<Hover> {
     format_create_sequence(db, InFile::new(def.file, create_sequence))
 }
 
+fn hover_statistics(db: &dyn Db, def: Location) -> Option<Hover> {
+    let create_statistics = def
+        .to_node(db)?
+        .ancestors()
+        .find_map(ast::CreateStatistics::cast)?;
+    format_create_statistics(db, InFile::new(def.file, create_statistics))
+}
+
 fn hover_trigger(db: &dyn Db, def: Location) -> Option<Hover> {
     let create_trigger = def
         .to_node(db)?
@@ -1240,6 +1254,11 @@ fn hover_collation(db: &dyn Db, def: Location) -> Option<Hover> {
     Some(Hover::snippet(format!("collation {}", def_node.text())))
 }
 
+fn hover_conversion(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!("conversion {}", def_node.text())))
+}
+
 fn hover_role(db: &dyn Db, def: Location) -> Option<Hover> {
     let def_node = def.to_node(db)?;
     if let Some(create_role) = def_node.ancestors().find_map(ast::CreateRole::cast) {
@@ -1261,6 +1280,14 @@ fn hover_prepared_statement(db: &dyn Db, def: Location) -> Option<Hover> {
 fn hover_channel(db: &dyn Db, def: Location) -> Option<Hover> {
     let listen = def.to_node(db)?.ancestors().find_map(ast::Listen::cast)?;
     format_listen(listen)
+}
+
+fn hover_savepoint(db: &dyn Db, def: Location) -> Option<Hover> {
+    let savepoint = def
+        .to_node(db)?
+        .ancestors()
+        .find_map(ast::Savepoint::cast)?;
+    format_savepoint(savepoint)
 }
 
 fn hover_window(db: &dyn Db, def: Location) -> Option<Hover> {
@@ -1306,6 +1333,14 @@ fn format_prepare(prepare: ast::Prepare) -> Option<Hover> {
 fn format_listen(listen: ast::Listen) -> Option<Hover> {
     let name = listen.name()?;
     Some(Hover::snippet(format!("listen {}", name.syntax().text())))
+}
+
+fn format_savepoint(savepoint: ast::Savepoint) -> Option<Hover> {
+    let name = savepoint.name()?;
+    Some(Hover::snippet(format!(
+        "savepoint {}",
+        name.syntax().text()
+    )))
 }
 
 fn format_create_table(
@@ -1455,6 +1490,24 @@ fn format_create_sequence(
     let (schema, sequence_name) = resolve::resolve_sequence_info(db, InFile::new(file, &path))?;
 
     Some(Hover::snippet(format!("sequence {schema}.{sequence_name}")))
+}
+
+fn format_create_statistics(
+    db: &dyn Db,
+    create_statistics: InFile<ast::CreateStatistics>,
+) -> Option<Hover> {
+    let file = create_statistics.file_id;
+    let create_statistics = create_statistics.value;
+    let path = create_statistics.path()?;
+    let (schema, statistics_name) = resolve::resolve_statistics_info(db, InFile::new(file, &path))?;
+    let table_path = create_statistics.from_table()?.path()?;
+    let (table_schema, table_name) =
+        resolve::resolve_table_info(db, InFile::new(file, &table_path))?;
+
+    Some(hover_with_preceding_comment(
+        format!("statistics {schema}.{statistics_name} on {table_schema}.{table_name}"),
+        create_statistics.syntax(),
+    ))
 }
 
 fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>) -> Option<Hover> {
@@ -1743,6 +1796,32 @@ fn hover_routine(db: &dyn Db, def: Location) -> Option<Hover> {
     None
 }
 
+fn qualified_star_from_clause_table_ptr(
+    db: &dyn Db,
+    file: File,
+    position: TextSize,
+    from_clause: ast::FromClause,
+    table_name: &Name,
+) -> Option<SyntaxNodePtr> {
+    let from_item = resolve::find_from_item_in_from_clause(&from_clause, table_name)?;
+
+    if let Some(alias) = from_item.alias()
+        && alias.column_list().is_some()
+    {
+        return Some(SyntaxNodePtr::new(alias.syntax()));
+    }
+
+    let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
+
+    let name_ref = match &from_item {
+        ast::FromItem::RelationFromItem(relation) => relation.name_ref(),
+        _ => None,
+    };
+    let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+    resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
+        .map(|(table_like_ptr, _kind)| table_like_ptr)
+}
+
 fn qualified_star_table_ptr(
     db: &dyn Db,
     field_expr: InFile<ast::FieldExpr>,
@@ -1758,29 +1837,22 @@ fn qualified_star_table_ptr(
 
     let path = match ast_nav::target_parent_query(target)? {
         ast_nav::ParentQuery::Select(select) => {
-            let from_clause = select.from_clause()?;
-            let from_item = resolve::find_from_item_in_from_clause(&from_clause, &table_name)?;
-
-            if let Some(alias) = from_item.alias()
-                && alias.column_list().is_some()
-            {
-                return Some(SyntaxNodePtr::new(alias.syntax()));
-            }
-
-            let (schema, table_name) = name::schema_and_table_from_from_item(&from_item)?;
-
-            let name_ref = match &from_item {
-                ast::FromItem::RelationFromItem(relation) => relation.name_ref(),
-                _ => None,
-            };
-            let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
-            if let Some((table_like_ptr, _kind)) =
-                resolve::resolve_table_like(db, name_ref.as_ref(), &table_name, &schemas, file)
-            {
-                return Some(table_like_ptr);
-            }
-
-            return None;
+            return qualified_star_from_clause_table_ptr(
+                db,
+                file,
+                position,
+                select.from_clause()?,
+                &table_name,
+            );
+        }
+        ast_nav::ParentQuery::SelectInto(select_into) => {
+            return qualified_star_from_clause_table_ptr(
+                db,
+                file,
+                position,
+                select_into.from_clause()?,
+                &table_name,
+            );
         }
         ast_nav::ParentQuery::Update(update) => update.relation_name()?.path()?,
         ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path()?,
@@ -1828,6 +1900,14 @@ fn unqualified_star_table_ptrs(
     let path = match ast_nav::target_parent_query(target.clone())? {
         ast_nav::ParentQuery::Select(select) => {
             let from_clause = select.from_clause()?;
+            let results = resolve::table_ptrs_from_clause(db, InFile::new(file, &from_clause));
+            if results.is_empty() {
+                return None;
+            }
+            return Some(results);
+        }
+        ast_nav::ParentQuery::SelectInto(select_into) => {
+            let from_clause = select_into.from_clause()?;
             let results = resolve::table_ptrs_from_clause(db, InFile::new(file, &from_clause));
             if results.is_empty() {
                 return None;
@@ -1922,6 +2002,20 @@ create index idx_email on users(email$0);
           ╭▸ 
         3 │ create index idx_email on users(email);
           ╰╴                                    ─ hover
+        ");
+    }
+
+    #[test]
+    fn hover_drop_statistics() {
+        assert_snapshot!(check_hover("
+create table t(a int);
+create statistics s on a from t;
+drop statistics s$0;
+"), @"
+        hover: statistics public.s on public.t
+          ╭▸ 
+        4 │ drop statistics s;
+          ╰╴                ─ hover
         ");
     }
 

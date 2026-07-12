@@ -490,6 +490,36 @@ unlisten updates$0;
     }
 
     #[test]
+    fn goto_rollback_to_savepoint() {
+        assert_snapshot!(goto("
+begin;
+savepoint sp;
+rollback to savepoint sp$0;
+"), @"
+          ╭▸ 
+        3 │ savepoint sp;
+          │           ── 2. destination
+        4 │ rollback to savepoint sp;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_release_savepoint() {
+        assert_snapshot!(goto("
+begin;
+savepoint sp;
+release savepoint sp$0;
+"), @"
+          ╭▸ 
+        3 │ savepoint sp;
+          │           ── 2. destination
+        4 │ release savepoint sp;
+          ╰╴                   ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_delete_where_current_of_cursor() {
         assert_snapshot!(goto("
 declare c scroll cursor for select * from t;
@@ -755,6 +785,104 @@ select j.c$0 from (t join u using(a)) as j;
           │                       ─ 2. destination
         4 │ select j.c from (t join u using(a)) as j;
           ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_unaliased_paren_join_qualified_column_target_list() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (b int);
+select t.a$0 from (t join u on t.a = u.b);
+"), @"
+          ╭▸ 
+        2 │ create table t (a int);
+          │                 ─ 2. destination
+        3 │ create table u (b int);
+        4 │ select t.a from (t join u on t.a = u.b);
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_unaliased_paren_join_qualified_column_where_clause() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (b int);
+select 1 from (t join u on t.a = u.b) where t.a$0 = 1;
+"), @"
+          ╭▸ 
+        2 │ create table t (a int);
+          │                 ─ 2. destination
+        3 │ create table u (b int);
+        4 │ select 1 from (t join u on t.a = u.b) where t.a = 1;
+          ╰╴                                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_unaliased_paren_join_qualified_column_own_on_clause() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (b int);
+select 1 from (t join u on t.a$0 = u.b);
+"), @"
+          ╭▸ 
+        2 │ create table t (a int);
+          │                 ─ 2. destination
+        3 │ create table u (b int);
+        4 │ select 1 from (t join u on t.a = u.b);
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_unaliased_paren_join_qualified_column_outer_on_clause() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (b int);
+create table v (c int);
+select 1 from (t join u on t.a = u.b) join v on t.a$0 = v.c;
+"), @"
+          ╭▸ 
+        2 │ create table t (a int);
+          │                 ─ 2. destination
+          ‡
+        5 │ select 1 from (t join u on t.a = u.b) join v on t.a = v.c;
+          ╰╴                                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_fully_wrapped_paren_join_qualified_column_left() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (b int);
+create table v (c int);
+select 1 from ((t join u on t.a = u.b) join v on v.c = t.a$0);
+"), @"
+          ╭▸ 
+        2 │ create table t (a int);
+          │                 ─ 2. destination
+          ‡
+        5 │ select 1 from ((t join u on t.a = u.b) join v on v.c = t.a);
+          ╰╴                                                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_fully_wrapped_paren_join_qualified_column_right() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table u (b int);
+create table v (c int);
+select 1 from ((t join u on t.a = u.b) join v on v.c$0 = t.a);
+"), @"
+          ╭▸ 
+        4 │ create table v (c int);
+          │                 ─ 2. destination
+        5 │ select 1 from ((t join u on t.a = u.b) join v on v.c = t.a);
+          ╰╴                                                   ─ 1. source
         ");
     }
 
@@ -3160,6 +3288,43 @@ select a$0 from part_2026_01_02;
     }
 
     #[test]
+    fn goto_partition_table_qualified_column() {
+        assert_snapshot!(goto("
+create table part (
+  a int,
+  inserted_at timestamptz not null default now()
+) partition by range (inserted_at);
+create table part_2026_01_02 partition of part
+    for values from ('2026-01-02') to ('2026-01-03');
+select part_2026_01_02.a$0 from part_2026_01_02;
+"), @"
+          ╭▸ 
+        3 │   a int,
+          │   ─ 2. destination
+          ‡
+        8 │ select part_2026_01_02.a from part_2026_01_02;
+          ╰╴                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_partition_table_qualified_column_multi_level() {
+        assert_snapshot!(goto("
+create table p (a int) partition by list (a);
+create table m partition of p for values in (1) partition by list (a);
+create table c partition of m for values in (2);
+select c.a$0 from c;
+"), @"
+          ╭▸ 
+        2 │ create table p (a int) partition by list (a);
+          │                 ─ 2. destination
+          ‡
+        5 │ select c.a from c;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_alter_index_attach_partition() {
         assert_snapshot!(goto("
 create table t (
@@ -4003,6 +4168,62 @@ select a$0 from u;
         3 │ select * into u from t;
         4 │ select a from u;
           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_into_source_table() {
+        assert_snapshot!(goto("
+create table t(a int);
+select a into u from t$0;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │              ─ 2. destination
+        3 │ select a into u from t;
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_into_target_list_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+select a$0 into u from t;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ select a into u from t;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_into_where_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+select a into u from t where a$0 > 0;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ select a into u from t where a > 0;
+          ╰╴                             ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_into_qualified_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+select t.a$0 into u from t;
+"), @"
+          ╭▸ 
+        2 │ create table t(a int);
+          │                ─ 2. destination
+        3 │ select t.a into u from t;
+          ╰╴         ─ 1. source
         ");
     }
 
@@ -4870,6 +5091,87 @@ drop table foo.t$0;
     }
 
     #[test]
+    fn goto_with_search_path_via_set_config() {
+        assert_snapshot!(goto(r#"
+select set_config('search_path', 'foo, public', false);
+create table foo.t();
+drop table t$0;
+"#), @"
+          ╭▸ 
+        3 │ create table foo.t();
+          │                  ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_search_path_via_set_config_unrelated_setting() {
+        goto_not_found(
+            r#"
+select set_config('work_mem', '64MB', false);
+create table foo.t();
+drop table t$0;
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_with_search_path_via_set_config_user_defined_function() {
+        goto_not_found(
+            r#"
+create function set_config(text, text, boolean) returns text as $$ select $2 $$ language sql;
+select set_config('search_path', 'foo', false);
+create table foo.t();
+drop table t$0;
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_with_search_path_via_set_config_user_defined_function_outside_search_path() {
+        assert_snapshot!(goto(r#"
+create schema other;
+create function other.set_config(text, text, boolean) returns text as $$ select $2 $$ language sql;
+select set_config('search_path', 'foo', false);
+create table foo.t();
+drop table t$0;
+"#), @"
+          ╭▸ 
+        5 │ create table foo.t();
+          │                  ─ 2. destination
+        6 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_search_path_via_set_config_pg_catalog_qualified() {
+        assert_snapshot!(goto(r#"
+select pg_catalog.set_config('search_path', 'foo', false);
+create table foo.t();
+drop table t$0;
+"#), @"
+          ╭▸ 
+        3 │ create table foo.t();
+          │                  ─ 2. destination
+        4 │ drop table t;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_search_path_via_set_config_non_pg_catalog_qualified() {
+        goto_not_found(
+            r#"
+select public.set_config('search_path', 'foo', false);
+create table foo.t();
+drop table t$0;
+"#,
+        );
+    }
+
+    #[test]
     fn goto_column_not_in_cte_but_in_table() {
         // we shouldn't navigate up to the table of the same name
         goto_not_found(
@@ -5731,6 +6033,96 @@ select a$0 from rows from (f());
           │                                   ─ 2. destination
         3 │ select a from rows from (f());
           ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_xmltable() {
+        assert_snapshot!(goto("
+create table t (x xml);
+select b$0 from t, xmltable(
+  '/r' passing x
+  columns b int
+);
+"), @"
+          ╭▸ 
+        3 │ select b from t, xmltable(
+          │        ─ 1. source
+        4 │   '/r' passing x
+        5 │   columns b int
+          ╰╴          ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_xmltable_aliased() {
+        assert_snapshot!(goto("
+create table t (x xml);
+select xt.b$0 from t, xmltable(
+  '/r' passing x
+  columns b int
+) as xt;
+"), @"
+          ╭▸ 
+        3 │ select xt.b from t, xmltable(
+          │           ─ 1. source
+        4 │   '/r' passing x
+        5 │   columns b int
+          ╰╴          ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_xmltable_passing_clause_qualified_column() {
+        assert_snapshot!(goto("
+create table t (x xml);
+select 1 from t, xmltable(
+  '/r' passing t.x$0
+  columns b int
+);
+"), @"
+          ╭▸ 
+        2 │ create table t (x xml);
+          │                 ─ 2. destination
+        3 │ select 1 from t, xmltable(
+        4 │   '/r' passing t.x
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_select_column_from_json_table() {
+        assert_snapshot!(goto("
+create table t (j jsonb);
+select b$0 from t, json_table(
+  t.j, '$[*]'
+  columns (b int path '$')
+);
+"), @"
+          ╭▸ 
+        3 │ select b from t, json_table(
+          │        ─ 1. source
+        4 │   t.j, '$[*]'
+        5 │   columns (b int path '$')
+          ╰╴           ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_json_table_context_item_qualified_column() {
+        assert_snapshot!(goto("
+create table t (j jsonb);
+select 1 from t, json_table(
+  t.j$0, '$[*]'
+  columns (b int path '$')
+);
+"), @"
+          ╭▸ 
+        2 │ create table t (j jsonb);
+          │                 ─ 2. destination
+        3 │ select 1 from t, json_table(
+        4 │   t.j, '$[*]'
+          ╰╴    ─ 1. source
         ");
     }
 
@@ -9785,6 +10177,48 @@ alter table t set tablespace t$0s;
     }
 
     #[test]
+    fn goto_create_database_owner() {
+        assert_snapshot!(goto("
+create role r;
+create database d owner r$0;
+"), @"
+          ╭▸ 
+        2 │ create role r;
+          │             ─ 2. destination
+        3 │ create database d owner r;
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_database_template() {
+        assert_snapshot!(goto("
+create database tmpl;
+create database d template tmpl$0;
+"), @"
+          ╭▸ 
+        2 │ create database tmpl;
+          │                 ──── 2. destination
+        3 │ create database d template tmpl;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_database_tablespace() {
+        assert_snapshot!(goto("
+create tablespace ts location '/tmp';
+create database d tablespace ts$0;
+"), @"
+          ╭▸ 
+        2 │ create tablespace ts location '/tmp';
+          │                   ── 2. destination
+        3 │ create database d tablespace ts;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_alter_table_set_schema() {
         assert_snapshot!(goto("
 create schema foo;
@@ -9855,6 +10289,20 @@ comment on column t.id$0 is '';
           │                ── 2. destination
         3 │ comment on column t.id is '';
           ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_column_table_qualifier() {
+        assert_snapshot!(goto("
+create table t(id int);
+comment on column t$0.id is '';
+"), @"
+          ╭▸ 
+        2 │ create table t(id int);
+          │              ─ 2. destination
+        3 │ comment on column t.id is '';
+          ╰╴                  ─ 1. source
         ");
     }
 
@@ -9944,6 +10392,158 @@ comment on index i$0 is '';
     }
 
     #[test]
+    fn goto_comment_on_trigger() {
+        assert_snapshot!(goto("
+create table t(a int);
+create function f() returns trigger language plpgsql as $$
+begin
+  return new;
+end
+$$;
+create trigger tr
+  before insert on t
+  for each row
+  execute function f();
+comment on trigger tr$0 on t is 'x';
+"), @"
+           ╭▸ 
+         8 │ create trigger tr
+           │                ── 2. destination
+           ‡
+        12 │ comment on trigger tr on t is 'x';
+           ╰╴                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_policy() {
+        assert_snapshot!(goto("
+create table t(a int);
+create policy p on t using (a > 0);
+comment on policy p$0 on t is 'x';
+"), @"
+          ╭▸ 
+        3 │ create policy p on t using (a > 0);
+          │               ─ 2. destination
+        4 │ comment on policy p on t is 'x';
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_rule() {
+        assert_snapshot!(goto("
+create table t(a int);
+create rule r as on select to t do instead nothing;
+comment on rule r$0 on t is 'x';
+"), @"
+          ╭▸ 
+        3 │ create rule r as on select to t do instead nothing;
+          │             ─ 2. destination
+        4 │ comment on rule r on t is 'x';
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_publication() {
+        assert_snapshot!(goto("
+create publication pub;
+comment on publication pub$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create publication pub;
+          │                    ─── 2. destination
+        3 │ comment on publication pub is 'x';
+          ╰╴                         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_subscription() {
+        assert_snapshot!(goto("
+create subscription sub connection $$host=localhost$$ publication pub;
+comment on subscription sub$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create subscription sub connection $$host=localhost$$ publication pub;
+          │                     ─── 2. destination
+        3 │ comment on subscription sub is 'x';
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_foreign_data_wrapper() {
+        assert_snapshot!(goto("
+create foreign data wrapper fdw;
+comment on foreign data wrapper fdw$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create foreign data wrapper fdw;
+          │                             ─── 2. destination
+        3 │ comment on foreign data wrapper fdw is 'x';
+          ╰╴                                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_language() {
+        assert_snapshot!(goto("
+create language plfoo;
+comment on language plfoo$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create language plfoo;
+          │                 ───── 2. destination
+        3 │ comment on language plfoo is 'x';
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_collation() {
+        assert_snapshot!(goto("
+create collation mycoll (locale = 'C');
+comment on collation mycoll$0 is 'x';
+"), @"
+          ╭▸ 
+        2 │ create collation mycoll (locale = 'C');
+          │                  ────── 2. destination
+        3 │ comment on collation mycoll is 'x';
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_conversion() {
+        assert_snapshot!(goto("
+create conversion conv for 'UTF8' to 'LATIN1' from utf8_to_latin1;
+drop conversion con$0v;
+"), @"
+          ╭▸ 
+        2 │ create conversion conv for 'UTF8' to 'LATIN1' from utf8_to_latin1;
+          │                   ──── 2. destination
+        3 │ drop conversion conv;
+          ╰╴                  ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_conversion() {
+        assert_snapshot!(goto("
+create conversion conv for 'UTF8' to 'LATIN1' from utf8_to_latin1;
+comment on conversion con$0v is 'x';
+"), @"
+          ╭▸ 
+        2 │ create conversion conv for 'UTF8' to 'LATIN1' from utf8_to_latin1;
+          │                   ──── 2. destination
+        3 │ comment on conversion conv is 'x';
+          ╰╴                        ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_security_label_table() {
         assert_snapshot!(goto("
 create table foo(id int);
@@ -9968,6 +10568,20 @@ security label on column foo.id$0 is 'x';
           │                  ── 2. destination
         3 │ security label on column foo.id is 'x';
           ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_security_label_column_table_qualifier() {
+        assert_snapshot!(goto("
+create table foo(id int);
+security label on column foo$0.id is 'x';
+"), @"
+          ╭▸ 
+        2 │ create table foo(id int);
+          │              ─── 2. destination
+        3 │ security label on column foo.id is 'x';
+          ╰╴                           ─ 1. source
         ");
     }
 
@@ -12503,6 +13117,51 @@ create statistics st on a, b from s.t$0;
           │                ─ 2. destination
         4 │ create statistics st on a, b from s.t;
           ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_statistics() {
+        assert_snapshot!(goto("
+create table t(a int);
+create statistics s on a from t;
+drop statistics s$0;
+"), @"
+          ╭▸ 
+        3 │ create statistics s on a from t;
+          │                   ─ 2. destination
+        4 │ drop statistics s;
+          ╰╴                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_statistics() {
+        assert_snapshot!(goto("
+create table t(a int);
+create statistics s on a from t;
+alter statistics s$0 set statistics 100;
+"), @"
+          ╭▸ 
+        3 │ create statistics s on a from t;
+          │                   ─ 2. destination
+        4 │ alter statistics s set statistics 100;
+          ╰╴                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_statistics() {
+        assert_snapshot!(goto("
+create table t(a int);
+create statistics s on a from t;
+comment on statistics s$0 is '';
+"), @"
+          ╭▸ 
+        3 │ create statistics s on a from t;
+          │                   ─ 2. destination
+        4 │ comment on statistics s is '';
+          ╰╴                      ─ 1. source
         ");
     }
 

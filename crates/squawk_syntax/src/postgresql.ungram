@@ -2522,7 +2522,7 @@ DatabaseOption =
 | 'tablespace'
 | 'connection' 'limit')
   '='?
-  (Literal | 'default')
+  (Literal | 'default' | NameRef)
 
 SetConfigParam =
   'set' Path
@@ -2691,7 +2691,7 @@ RenameAttribute =
   'rename' 'attribute' NameRef 'to' Name (Cascade | Restrict)?
 
 RenameValue =
-  'rename' 'value' Literal 'to' Literal
+  'rename' 'value' from:Literal 'to' to:Literal
 
 AlterTypeAction =
   AddAttribute
