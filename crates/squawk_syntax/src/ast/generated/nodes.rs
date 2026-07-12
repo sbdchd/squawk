@@ -6875,6 +6875,10 @@ impl DatabaseOption {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn eq_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EQ)
     }
@@ -17890,10 +17894,6 @@ pub struct RenameValue {
     pub(crate) syntax: SyntaxNode,
 }
 impl RenameValue {
-    #[inline]
-    pub fn literal(&self) -> Option<Literal> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn rename_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RENAME_KW)

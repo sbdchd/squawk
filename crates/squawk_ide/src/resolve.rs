@@ -138,6 +138,15 @@ pub(crate) fn resolve_name_ref(
                 LocationKind::Channel
             )])
         }
+        NameRefClass::Savepoint => {
+            let savepoint_name = &Name::from_node(name_ref);
+            let ptr = binder.lookup(savepoint_name, SymbolKind::Savepoint)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Savepoint
+            )])
+        }
         NameRefClass::FromTable => {
             let (schema, table_name) = name::schema_and_name(name_ref);
             let position = name_ref.syntax().text_range().start();
@@ -206,6 +215,17 @@ pub(crate) fn resolve_name_ref(
                 LocationKind::Sequence
             )])
         }
+        NameRefClass::Statistics => {
+            let (schema, statistics_name) = name::schema_and_table_name(name_ref)?;
+            let position = name_ref.syntax().text_range().start();
+            let schemas = binder.resolved_schemas(position, schema.as_ref());
+            let ptr = binder.lookup_with(&statistics_name, SymbolKind::Statistics, &schemas)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Statistics
+            )])
+        }
         NameRefClass::Trigger => {
             let (mut schema, trigger_name, on_table_path) =
                 name_ref.syntax().ancestors().find_map(|a| {
@@ -224,6 +244,12 @@ pub(crate) fn resolve_name_ref(
                             alter_trigger
                                 .on_table()
                                 .and_then(|on_table| on_table.path()),
+                        ))
+                    } else if let Some(object_trigger) = ast::ObjectTrigger::cast(a.clone()) {
+                        Some((
+                            None,
+                            Name::from_node(&object_trigger.name_ref()?),
+                            object_trigger.path(),
                         ))
                     } else {
                         ast::AlterTable::cast(a).map(|alter_table| {
@@ -291,15 +317,23 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::Policy => {
-            let (policy_name, on_table) = name_ref.syntax().ancestors().find_map(|a| {
+            let (policy_name, on_table_path) = name_ref.syntax().ancestors().find_map(|a| {
                 if let Some(policy) = ast::DropPolicy::cast(a.clone()) {
-                    Some((policy.name_ref(), policy.on_table()))
+                    Some((
+                        policy.name_ref(),
+                        policy.on_table().and_then(|on_table| on_table.path()),
+                    ))
+                } else if let Some(policy) = ast::AlterPolicy::cast(a.clone()) {
+                    Some((
+                        policy.name_ref(),
+                        policy.on_table().and_then(|on_table| on_table.path()),
+                    ))
                 } else {
-                    ast::AlterPolicy::cast(a).map(|policy| (policy.name_ref(), policy.on_table()))
+                    ast::ObjectPolicy::cast(a).map(|policy| (policy.name_ref(), policy.path()))
                 }
             })?;
             let policy_name = Name::from_node(&policy_name?);
-            let on_table_path = on_table.and_then(|on_table| on_table.path())?;
+            let on_table_path = on_table_path?;
             let (schema, table_name) = name::schema_and_name_path(&on_table_path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -327,6 +361,8 @@ pub(crate) fn resolve_name_ref(
                         alter_rule.name_ref(),
                         alter_rule.on_table().and_then(|on_table| on_table.path()),
                     ))
+                } else if let Some(object_rule) = ast::ObjectRule::cast(a.clone()) {
+                    Some((object_rule.name_ref(), object_rule.path()))
                 } else {
                     ast::AlterTable::cast(a).map(|alter_table| {
                         (
@@ -483,6 +519,18 @@ pub(crate) fn resolve_name_ref(
                 file,
                 ptr.text_range(),
                 LocationKind::Collation
+            )])
+        }
+        NameRefClass::Conversion => {
+            let (schema, conversion_name) = name::schema_and_name(name_ref);
+            let position = name_ref.syntax().text_range().start();
+            let binder = bind(db, file);
+            let schemas = binder.resolved_schemas(position, schema.as_ref());
+            let ptr = binder.lookup_with(&conversion_name, SymbolKind::Conversion, &schemas)?;
+            Some(smallvec![Location::new(
+                file,
+                ptr.text_range(),
+                LocationKind::Conversion
             )])
         }
         NameRefClass::Role => {
@@ -1356,7 +1404,7 @@ fn resolve_select_qualified_column_ptr(
         (Some(schema), column_table_name)
     } else {
         match ast_nav::node_parent_query(column_name_ref.syntax())? {
-            ast_nav::ParentQuery::Select(_select) => {
+            ast_nav::ParentQuery::Select(_) | ast_nav::ParentQuery::SelectInto(_) => {
                 let from_item = find_from_item_for_select_qualified_name_ref(
                     column_name_ref,
                     &column_table_name,
@@ -1371,6 +1419,23 @@ fn resolve_select_qualified_column_ptr(
                         &column_name,
                         0,
                     )
+                {
+                    return Some(ptr);
+                }
+
+                if let ast::FromItem::XmlTableFromItem(xml_table_from) = &from_item
+                    && let Some(xml_table) = xml_table_from.xml_table()
+                    && let Some(ptr) = resolve_xml_table_column(&xml_table, &column_name, file, 0)
+                {
+                    return Some(ptr);
+                }
+
+                if let ast::FromItem::JsonTableFromItem(json_table_from) = &from_item
+                    && let Some(column_list) = json_table_from
+                        .json_table()
+                        .and_then(|json_table| json_table.json_table_column_list())
+                    && let Some(ptr) =
+                        resolve_json_table_column(&column_list, &column_name, file, 0)
                 {
                     return Some(ptr);
                 }
@@ -1761,6 +1826,24 @@ fn resolve_from_item_column_by_name_after_index(
         }
     }
 
+    if let ast::FromItem::XmlTableFromItem(xml_table_from) = from_item
+        && let Some(xml_table) = xml_table_from.xml_table()
+        && let Some(ptr) =
+            resolve_xml_table_column(&xml_table, column_name, file, skip_column_count)
+    {
+        return Some(ptr);
+    }
+
+    if let ast::FromItem::JsonTableFromItem(json_table_from) = from_item
+        && let Some(column_list) = json_table_from
+            .json_table()
+            .and_then(|json_table| json_table.json_table_column_list())
+        && let Some(ptr) =
+            resolve_json_table_column(&column_list, column_name, file, skip_column_count)
+    {
+        return Some(ptr);
+    }
+
     let (schema, table_name) = name::schema_and_table_from_from_item(from_item)?;
     let scope_name_ref = relation_name_ref_from_from_item(from_item)?;
 
@@ -1899,26 +1982,6 @@ fn resolve_column_from_table_or_view_or_cte_impl_inner(
                     return Some(cols);
                 }
 
-                // check if this is a partitioned table
-                if skip_column_count == 0
-                    && let Some(parent_path) = ast::CreateTable::cast(create_table.syntax().clone())
-                        .and_then(|x| x.partition_of())
-                        .and_then(|x| x.path())
-                {
-                    let (parent_schema, parent_table_name) =
-                        name::schema_and_name_path(&parent_path)?;
-                    return resolve_column_from_table_or_view_or_cte_impl_inner(
-                        db,
-                        InFile::new(file, name_ref),
-                        &parent_table_name,
-                        parent_schema.as_ref(),
-                        column_name,
-                        depth + 1,
-                        skip_column_count,
-                        allow_whole_row_fallback,
-                    );
-                }
-
                 // For example, in:
                 // ```sql
                 // create table t(a int);
@@ -2048,12 +2111,8 @@ fn resolve_select_column_ptr(
     // Walk up through enclosing selects so a column in a correlated subquery
     // resolves against an outer query's from clause:
     // `select (select (select a)) from foo`
-    for select in column_name_ref
-        .syntax()
-        .ancestors()
-        .filter_map(ast::Select::cast)
-    {
-        let Some(from_clause) = select.from_clause() else {
+    for ancestor in column_name_ref.syntax().ancestors() {
+        let Some(from_clause) = select_like_from_clause(&ancestor) else {
             continue;
         };
         // In the case of ambiguous columns, we'll have multiple matches.
@@ -2332,21 +2391,60 @@ fn is_from_item_match(from_item: &ast::FromItem, qualifier: &Name) -> bool {
     }
 }
 
+fn find_from_item_matching_qualifier(
+    from_item: &ast::FromItem,
+    qualifier: &Name,
+) -> Option<ast::FromItem> {
+    if is_from_item_match(from_item, qualifier) {
+        return Some(from_item.clone());
+    }
+
+    if from_item.alias().is_none()
+        && let ast::FromItem::ParenFromItem(paren) = from_item
+        && let Some(paren_expr) = paren.paren_expr()
+    {
+        if let Some(join_expr) = paren_expr.join_expr() {
+            for inner in ast_nav::iter_join_expr(&join_expr) {
+                if let Some(found) = find_from_item_matching_qualifier(&inner, qualifier) {
+                    return Some(found);
+                }
+            }
+        }
+        if let Some(inner) = paren_expr.from_item() {
+            return find_from_item_matching_qualifier(&inner, qualifier);
+        }
+    }
+
+    None
+}
+
 pub(crate) fn find_from_item_in_from_clause(
     from_clause: &ast::FromClause,
     qualifier: &Name,
 ) -> Option<ast::FromItem> {
     ast_nav::iter_from_clause(from_clause)
-        .find(|from_item| is_from_item_match(from_item, qualifier))
+        .find_map(|from_item| find_from_item_matching_qualifier(&from_item, qualifier))
+}
+
+fn select_like_from_clause(node: &SyntaxNode) -> Option<ast::FromClause> {
+    if let Some(select) = ast::Select::cast(node.clone()) {
+        select.from_clause()
+    } else if let Some(select_into) = ast::SelectInto::cast(node.clone()) {
+        select_into.from_clause()
+    } else {
+        None
+    }
 }
 
 fn find_from_item_for_select_qualified_name_ref(
     name_ref: &ast::NameRef,
     table_name: &Name,
 ) -> Option<ast::FromItem> {
-    let select = name_ref.syntax().ancestors().find_map(ast::Select::cast)?;
+    let select = name_ref.syntax().ancestors().find(|ancestor| {
+        ast::Select::can_cast(ancestor.kind()) || ast::SelectInto::can_cast(ancestor.kind())
+    })?;
 
-    if let Some(from_clause) = select.from_clause()
+    if let Some(from_clause) = select_like_from_clause(&select)
         && let Some(from_item) = find_from_item_in_from_clause(&from_clause, table_name)
     {
         return Some(from_item);
@@ -2366,15 +2464,15 @@ fn find_from_item_for_select_qualified_name_ref(
             if let Some(from_clause) = ast::Select::cast(ancestor).and_then(|x| x.from_clause())
                 && let Some(outer_from_item) = ast_nav::iter_from_clause(&from_clause)
                     .filter(|item| item.syntax().text_range().start() < lateral_start)
-                    .find(|item| is_from_item_match(item, table_name))
+                    .find_map(|item| find_from_item_matching_qualifier(&item, table_name))
             {
                 return Some(outer_from_item);
             }
         }
     }
 
-    let inner_select_start = select.syntax().text_range().start();
-    for ancestor in select.syntax().ancestors().skip(1) {
+    let inner_select_start = select.text_range().start();
+    for ancestor in select.ancestors().skip(1) {
         if let Some(outer_from_clause) = ast::Select::cast(ancestor).and_then(|x| x.from_clause()) {
             if outer_from_clause
                 .syntax()
@@ -2394,7 +2492,7 @@ fn find_from_item_for_select_qualified_name_ref(
 
 pub(crate) fn find_column_in_create_table(
     db: &dyn Db,
-    create_table: InFile<&impl ast::HasCreateTable>,
+    create_table: InFile<&ast::CreateTableLike>,
     column_name: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
     find_column_in_create_table_impl(db, create_table, column_name, 0, 0)
@@ -2402,7 +2500,7 @@ pub(crate) fn find_column_in_create_table(
 
 fn find_column_in_create_table_impl(
     db: &dyn Db,
-    create_table: InFile<&impl ast::HasCreateTable>,
+    create_table: InFile<&ast::CreateTableLike>,
     column_name: &Name,
     depth: usize,
     skip_column_count: usize,
@@ -2458,6 +2556,19 @@ fn find_column_in_create_table_impl(
                 }
             }
             ast_nav::CreateTableArg::TableConstraint(_) => (),
+        }
+    }
+
+    if skip_column_count == 0
+        && let Some(parent_path) = create_table.partition_of().and_then(|p| p.path())
+    {
+        let (schema, table_name) = name::schema_and_name_path(&parent_path)?;
+        let position = parent_path.syntax().text_range().start();
+        let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
+        if let Some(resolved) = resolve_table_name(db, &table_name, &schemas, file)
+            && let Some(ptr) = find_column_in_resolved(db, resolved, column_name, depth + 1)
+        {
+            return Some(ptr);
         }
     }
 
@@ -3782,6 +3893,57 @@ fn resolve_column_from_paren_expr_with_skip(
     None
 }
 
+fn resolve_xml_table_column(
+    xml_table: &ast::XmlTable,
+    column_name: &Name,
+    file: File,
+    min_index: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    let column_list = xml_table.xml_table_column_list()?;
+    for (index, column) in column_list.xml_table_columns().enumerate() {
+        if let Some(name) = column.name()
+            && Name::from_node(&name) == *column_name
+            && index >= min_index
+        {
+            return Some(smallvec![Location::new(
+                file,
+                name.syntax().text_range(),
+                LocationKind::Column
+            )]);
+        }
+    }
+    None
+}
+
+fn resolve_json_table_column(
+    column_list: &ast::JsonTableColumnList,
+    column_name: &Name,
+    file: File,
+    min_index: usize,
+) -> Option<SmallVec<[Location; 1]>> {
+    let mut index = 0usize;
+    for column in column_list.json_table_columns() {
+        if let Some(nested_list) = column.json_table_column_list() {
+            if let Some(ptr) = resolve_json_table_column(&nested_list, column_name, file, 0) {
+                return Some(ptr);
+            }
+            continue;
+        }
+        if let Some(name) = column.name()
+            && Name::from_node(&name) == *column_name
+            && index >= min_index
+        {
+            return Some(smallvec![Location::new(
+                file,
+                name.syntax().text_range(),
+                LocationKind::Column
+            )]);
+        }
+        index += 1;
+    }
+    None
+}
+
 fn resolve_column_from_call_expr_return_table(
     db: &dyn Db,
     call_expr: InFile<&ast::CallExpr>,
@@ -3913,6 +4075,13 @@ pub(crate) fn resolve_sequence_info(
     resolve_symbol_info(db, path, SymbolKind::Sequence)
 }
 
+pub(crate) fn resolve_statistics_info(
+    db: &dyn Db,
+    path: InFile<&ast::Path>,
+) -> Option<(Schema, String)> {
+    resolve_symbol_info(db, path, SymbolKind::Statistics)
+}
+
 fn resolve_symbol_info(
     db: &dyn Db,
     path: InFile<&ast::Path>,
@@ -3969,10 +4138,12 @@ fn resolve_composite_type_field_ptr(
 
     let base_name_ref = ast_nav::unwrap_paren_expr(base.clone()).find_map(|e| match e {
         ast::Expr::NameRef(nr) => Some(nr),
+        ast::Expr::FieldExpr(field_expr) => field_expr.field(),
         _ => None,
     })?;
 
-    let column_locs = resolve_select_column_ptr(db, InFile::new(file, &base_name_ref))?;
+    let column_locs = resolve_select_column_ptr(db, InFile::new(file, &base_name_ref))
+        .or_else(|| resolve_name_ref(db, InFile::new(file, &base_name_ref)))?;
     let column_node = column_locs.first()?.to_node(db)?;
 
     let (schema, type_name) = resolve_composite_type_from_column_node(&column_node)

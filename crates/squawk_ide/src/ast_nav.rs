@@ -55,6 +55,7 @@ pub(crate) fn iter_values_columns(values: &ast::Values) -> impl Iterator<Item = 
 #[derive(Debug)]
 pub(crate) enum ParentQuery {
     Select(ast::Select),
+    SelectInto(ast::SelectInto),
     Update(ast::Update),
     Delete(ast::Delete),
     Insert(ast::Insert),
@@ -71,6 +72,8 @@ pub(crate) fn node_parent_query(node: &SyntaxNode) -> Option<ParentQuery> {
     for ancestor in node.ancestors() {
         let result = if let Some(select) = ast::Select::cast(ancestor.clone()) {
             Select(select)
+        } else if let Some(select_into) = ast::SelectInto::cast(ancestor.clone()) {
+            SelectInto(select_into)
         } else if let Some(update) = ast::Update::cast(ancestor.clone()) {
             Update(update)
         } else if let Some(insert) = ast::Insert::cast(ancestor.clone()) {

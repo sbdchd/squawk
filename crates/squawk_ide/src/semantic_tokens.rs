@@ -202,6 +202,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::CommitBegin
             | LocationKind::CommitEnd
             | LocationKind::Constraint
+            | LocationKind::Conversion
             | LocationKind::Cursor
             | LocationKind::Database
             | LocationKind::EventTrigger
@@ -214,7 +215,9 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::Publication
             | LocationKind::Role
             | LocationKind::Rule
+            | LocationKind::Savepoint
             | LocationKind::Server
+            | LocationKind::Statistics
             | LocationKind::Subscription
             | LocationKind::Tablespace
             | LocationKind::Trigger

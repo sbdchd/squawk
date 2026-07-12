@@ -25,6 +25,10 @@ impl CreateTableLike {
     pub fn inherits(&self) -> Option<ast::Inherits> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn partition_of(&self) -> Option<ast::PartitionOf> {
+        support::child(&self.syntax)
+    }
 }
 impl AstNode for CreateTableLike {
     #[inline]

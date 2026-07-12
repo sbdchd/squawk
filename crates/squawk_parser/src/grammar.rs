@@ -4118,25 +4118,6 @@ fn opt_like_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-// index_elem:
-//  | ColId index_elem_options
-//  | func_expr_windowless index_elem_options
-//  | '(' a_expr ')' index_elem_options
-fn opt_index_elem(p: &mut Parser<'_>) -> bool {
-    if !p.at(L_PAREN) && !p.at_ts(EXPR_FIRST) {
-        return false;
-    }
-    if p.eat(L_PAREN) {
-        expr(p);
-        p.expect(R_PAREN);
-    } else {
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-    }
-    true
-}
-
 fn opt_operator(p: &mut Parser<'_>) -> bool {
     let (power, kind, _) = current_op(p, &Restrictions::default());
     if power == 0 {
@@ -4317,7 +4298,7 @@ const CONSTRAINT_EXCLUSION_FIRST: TokenSet = EXPR_FIRST.union(TokenSet::new(&[L_
 
 fn opt_constraint_exclusion(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
-    if !opt_index_elem(p) {
+    if opt_expr(p).is_none() {
         m.abandon(p);
         return None;
     }
@@ -9557,6 +9538,24 @@ fn opt_option_value(p: &mut Parser<'_>) -> bool {
     true
 }
 
+fn opt_database_option_value(p: &mut Parser<'_>) -> bool {
+    if opt_numeric_literal(p).is_none()
+        && opt_string_literal(p).is_none()
+        && !opt_bool_literal(p)
+        && !p.eat(DEFAULT_KW)
+    {
+        if p.at_ts(NON_RESERVED_WORD) {
+            let m = p.start();
+            p.bump_any();
+            m.complete(p, NAME_REF);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    true
+}
+
 fn opt_database_option(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     // option name
@@ -9574,7 +9573,7 @@ fn opt_database_option(p: &mut Parser<'_>) -> bool {
         }
     }
     p.eat(EQ);
-    if !opt_option_value(p) {
+    if !opt_database_option_value(p) {
         p.error("expected create database option value");
         m.complete(p, DATABASE_OPTION);
         return false;
