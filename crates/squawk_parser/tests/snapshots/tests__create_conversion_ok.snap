@@ -29,7 +29,7 @@ SOURCE_FILE
     WHITESPACE " "
     PATH
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -76,7 +76,7 @@ SOURCE_FILE
             IDENT "foo"
       DOT "."
       PATH_SEGMENT
-        NAME
+        NAME_REF
           IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"

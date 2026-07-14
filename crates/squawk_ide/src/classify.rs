@@ -42,6 +42,7 @@ pub(crate) enum NameRefClass {
     MergeColumn,
     MergeQualifiedColumnTable,
     NamedArgParameter,
+    OperatorClass,
     OperatorFamily,
     ParamDefault,
     Policy,
@@ -78,7 +79,10 @@ pub(crate) enum NameRefClass {
     Table,
     TableAndColumnsColumn,
     Tablespace,
+    TextSearchConfiguration,
     TextSearchDictionary,
+    TextSearchParser,
+    TextSearchTemplate,
     Trigger,
     TriggerEventColumn,
     TriggerWhenColumn,
@@ -591,13 +595,25 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             return Some(NameRefClass::PrivilegeColumn);
         }
         if let Some(function_sig) = ast::FunctionSig::cast(ancestor.clone())
-            && function_sig
-                .syntax()
-                .parent()
-                .is_some_and(|parent| ast::WithFunction::can_cast(parent.kind()))
+            && function_sig.syntax().parent().is_some_and(|parent| {
+                ast::WithFunction::can_cast(parent.kind())
+                    || ast::OpClassOption::can_cast(parent.kind())
+                    || ast::TransformFromFunc::can_cast(parent.kind())
+                    || ast::TransformToFunc::can_cast(parent.kind())
+            })
             && function_sig
                 .path()
                 .is_some_and(|path| path.syntax().text_range().contains_range(node.text_range()))
+        {
+            return Some(NameRefClass::Function);
+        }
+        if ast::HandlerClause::can_cast(ancestor.kind())
+            || ast::CreateLanguage::can_cast(ancestor.kind())
+            || ast::CreateConversion::can_cast(ancestor.kind())
+            || (ast::FdwOption::can_cast(ancestor.kind())
+                && ast::FdwOption::cast(ancestor.clone()).is_some_and(|opt| {
+                    opt.handler_token().is_some() || opt.validator_token().is_some()
+                }))
         {
             return Some(NameRefClass::Function);
         }
@@ -740,6 +756,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             return Some(NameRefClass::Table);
         }
         if ast::AlterColumn::can_cast(ancestor.kind())
+            || ast::AlterViewColumn::can_cast(ancestor.kind())
             || ast::DropColumn::can_cast(ancestor.kind())
             || ast::RenameColumn::can_cast(ancestor.kind())
         {
@@ -940,6 +957,7 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
             || ast::DropCollation::can_cast(ancestor.kind())
             || ast::AlterCollation::can_cast(ancestor.kind())
             || ast::ObjectCollation::can_cast(ancestor.kind())
+            || ast::CollationFrom::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::Collation);
         }
@@ -952,23 +970,94 @@ pub(crate) fn classify_name_ref(node: &SyntaxNode) -> Option<NameRefClass> {
         if ast::DropAccessMethod::can_cast(ancestor.kind())
             || ast::ObjectAccessMethod::can_cast(ancestor.kind())
             || ast::SetAccessMethod::can_cast(ancestor.kind())
+            || ast::UsingMethod::can_cast(ancestor.kind())
+            || ast::ConstraintIndexMethod::can_cast(ancestor.kind())
+            || ast::CreateOperatorClass::can_cast(ancestor.kind())
+            || ast::CreateOperatorFamily::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::AccessMethod);
         }
-        if ast::DropOperatorFamily::can_cast(ancestor.kind())
-            || ast::AlterOperatorFamily::can_cast(ancestor.kind())
-        {
-            return Some(NameRefClass::OperatorFamily);
+        if let Some(drop_operator_family) = ast::DropOperatorFamily::cast(ancestor.clone()) {
+            let is_access_method = drop_operator_family
+                .name_ref()
+                .is_some_and(|name_ref| name_ref.syntax() == node);
+            return Some(if is_access_method {
+                NameRefClass::AccessMethod
+            } else {
+                NameRefClass::OperatorFamily
+            });
         }
-        if let Some(object_text_search) = ast::ObjectTextSearch::cast(ancestor.clone())
-            && object_text_search.dictionary_token().is_some()
-        {
-            return Some(NameRefClass::TextSearchDictionary);
+        if let Some(alter_operator_family) = ast::AlterOperatorFamily::cast(ancestor.clone()) {
+            let is_access_method = alter_operator_family
+                .name_ref()
+                .is_some_and(|name_ref| name_ref.syntax() == node);
+            return Some(if is_access_method {
+                NameRefClass::AccessMethod
+            } else {
+                NameRefClass::OperatorFamily
+            });
+        }
+        if let Some(drop_operator_class) = ast::DropOperatorClass::cast(ancestor.clone()) {
+            let is_access_method = drop_operator_class
+                .name_ref()
+                .is_some_and(|name_ref| name_ref.syntax() == node);
+            return Some(if is_access_method {
+                NameRefClass::AccessMethod
+            } else {
+                NameRefClass::OperatorClass
+            });
+        }
+        if let Some(alter_operator_class) = ast::AlterOperatorClass::cast(ancestor.clone()) {
+            let is_access_method = alter_operator_class
+                .name_ref()
+                .is_some_and(|name_ref| name_ref.syntax() == node);
+            return Some(if is_access_method {
+                NameRefClass::AccessMethod
+            } else {
+                NameRefClass::OperatorClass
+            });
+        }
+        if let Some(object_operator) = ast::ObjectOperator::cast(ancestor.clone()) {
+            if object_operator.family_token().is_some() {
+                return Some(NameRefClass::OperatorFamily);
+            }
+            if object_operator.class_token().is_some() {
+                return Some(NameRefClass::OperatorClass);
+            }
+        }
+        if let Some(object_text_search) = ast::ObjectTextSearch::cast(ancestor.clone()) {
+            if object_text_search.configuration_token().is_some() {
+                return Some(NameRefClass::TextSearchConfiguration);
+            }
+            if object_text_search.dictionary_token().is_some() {
+                return Some(NameRefClass::TextSearchDictionary);
+            }
+            if object_text_search.parser_token().is_some() {
+                return Some(NameRefClass::TextSearchParser);
+            }
+            if object_text_search.template_token().is_some() {
+                return Some(NameRefClass::TextSearchTemplate);
+            }
         }
         if ast::DropTextSearchDict::can_cast(ancestor.kind())
             || ast::AlterTextSearchDictionary::can_cast(ancestor.kind())
         {
             return Some(NameRefClass::TextSearchDictionary);
+        }
+        if ast::DropTextSearchConfig::can_cast(ancestor.kind())
+            || ast::AlterTextSearchConfiguration::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::TextSearchConfiguration);
+        }
+        if ast::DropTextSearchParser::can_cast(ancestor.kind())
+            || ast::AlterTextSearchParser::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::TextSearchParser);
+        }
+        if ast::DropTextSearchTemplate::can_cast(ancestor.kind())
+            || ast::AlterTextSearchTemplate::can_cast(ancestor.kind())
+        {
+            return Some(NameRefClass::TextSearchTemplate);
         }
         if let Some(create_extension) = ast::CreateExtension::cast(ancestor.clone())
             && create_extension.schema_token().is_some()
@@ -1487,8 +1576,20 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         if ast::CreateOperatorFamily::can_cast(ancestor.kind()) {
             return Some(LocationKind::OperatorFamily);
         }
+        if ast::CreateOperatorClass::can_cast(ancestor.kind()) {
+            return Some(LocationKind::OperatorClass);
+        }
         if ast::CreateTextSearchDictionary::can_cast(ancestor.kind()) {
             return Some(LocationKind::TextSearchDictionary);
+        }
+        if ast::CreateTextSearchConfiguration::can_cast(ancestor.kind()) {
+            return Some(LocationKind::TextSearchConfiguration);
+        }
+        if ast::CreateTextSearchParser::can_cast(ancestor.kind()) {
+            return Some(LocationKind::TextSearchParser);
+        }
+        if ast::CreateTextSearchTemplate::can_cast(ancestor.kind()) {
+            return Some(LocationKind::TextSearchTemplate);
         }
         if ast::CreateExtension::can_cast(ancestor.kind()) {
             return Some(LocationKind::Extension);

@@ -112,6 +112,14 @@ impl ast::FromItem {
             ast::FromItem::XmlTableFromItem(it) => it.alias(),
         }
     }
+
+    pub fn ordinality_token(&self) -> Option<SyntaxToken> {
+        match self {
+            ast::FromItem::FunctionFromItem(it) => it.ordinality_token(),
+            ast::FromItem::RowsFromItem(it) => it.ordinality_token(),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
