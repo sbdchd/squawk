@@ -2469,6 +2469,20 @@ create index idx on t (a collate c$0);
     }
 
     #[test]
+    fn goto_create_collation_from() {
+        assert_snapshot!(goto("
+create collation c1 (locale = 'C');
+create collation c2 from c1$0;
+"), @"
+          ╭▸ 
+        2 │ create collation c1 (locale = 'C');
+          │                  ── 2. destination
+        3 │ create collation c2 from c1;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_server_foreign_data_wrapper() {
         assert_snapshot!(goto("
 create foreign data wrapper fdw;
@@ -4499,6 +4513,46 @@ select * from v$0;
         3 │     select col1 from v;
           ╰╴              ─ 1. source
         ");
+    }
+
+    #[test]
+    fn goto_create_table_as_with_explicit_column_list() {
+        assert_snapshot!(goto("
+create table t (a int);
+create table t2 (x) as select a from t;
+select x$0 from t2;
+"), @"
+          ╭▸ 
+        3 │ create table t2 (x) as select a from t;
+          │                  ─ 2. destination
+        4 │ select x from t2;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_explicit_column_list_shorter_than_select() {
+        assert_snapshot!(goto("
+create table t2 (x) as select 1 a, 2 b;
+select b$0 from t2;
+"), @"
+          ╭▸ 
+        2 │ create table t2 (x) as select 1 a, 2 b;
+          │                                      ─ 2. destination
+        3 │ select b from t2;
+          ╰╴       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_as_explicit_column_list_shadows_select_column() {
+        goto_not_found(
+            "
+create table t (a int);
+create table t2 (x) as select a from t;
+select a$0 from t2;
+",
+        );
     }
 
     #[test]
@@ -7257,6 +7311,66 @@ select * from nums;
     }
 
     #[test]
+    fn goto_cte_search_clause_set_column() {
+        assert_snapshot!(goto("
+with recursive r as (select 1 as id)
+  search depth first by id set ord
+select ord$0 from r;
+"), @"
+          ╭▸ 
+        3 │   search depth first by id set ord
+          │                                ─── 2. destination
+        4 │ select ord from r;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_search_clause_set_column_qualified() {
+        assert_snapshot!(goto("
+with recursive r as (select 1 as id)
+  search depth first by id set ord
+select r.ord$0 from r;
+"), @"
+          ╭▸ 
+        3 │   search depth first by id set ord
+          │                                ─── 2. destination
+        4 │ select r.ord from r;
+          ╰╴           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_cycle_clause_set_column() {
+        assert_snapshot!(goto("
+with recursive r as (select 1 as id)
+  cycle id set is_cycle using path
+select is_cycle$0 from r;
+"), @"
+          ╭▸ 
+        3 │   cycle id set is_cycle using path
+          │                ──────── 2. destination
+        4 │ select is_cycle from r;
+          ╰╴              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_cte_cycle_clause_path_column() {
+        assert_snapshot!(goto("
+with recursive r as (select 1 as id)
+  cycle id set is_cycle using path
+select path$0 from r;
+"), @"
+          ╭▸ 
+        3 │   cycle id set is_cycle using path
+          │                               ──── 2. destination
+        4 │ select path from r;
+          ╰╴          ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_cte_with_column_list() {
         assert_snapshot!(goto("
 with t(a) as (select 1)
@@ -9708,6 +9822,36 @@ select * from t join u using (a$0);
     }
 
     #[test]
+    fn goto_join_using_alias_column() {
+        assert_snapshot!(goto("
+create table a(x int);
+create table b(x int);
+select j.x$0 from a join b using (x) as j;
+"), @"
+          ╭▸ 
+        2 │ create table a(x int);
+          │                ─ 2. destination
+        3 │ create table b(x int);
+          │                ─ 3. destination
+        4 │ select j.x from a join b using (x) as j;
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_join_using_alias_table() {
+        assert_snapshot!(goto("
+create table a(x int);
+create table b(x int);
+select j$0.x from a join b using (x) as j;
+"), @"
+          ╭▸ 
+        4 │ select j.x from a join b using (x) as j;
+          ╰╴       ─ 1. source                    ─ 2. destination
+        ");
+    }
+
+    #[test]
     fn goto_insert_select_cte_column() {
         assert_snapshot!(goto("
 create table users(id int, email text);
@@ -10290,6 +10434,51 @@ alter table users rename column email$0 to email_address;
     }
 
     #[test]
+    fn goto_alter_view_alter_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create view v as select a from t;
+alter view v alter column a$0 set default 1;
+"), @"
+          ╭▸ 
+        3 │ create view v as select a from t;
+          │                         ─ 2. destination
+        4 │ alter view v alter column a set default 1;
+          ╰╴                          ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_view_rename_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create view v as select a from t;
+alter view v rename column a$0 to b;
+"), @"
+          ╭▸ 
+        3 │ create view v as select a from t;
+          │                         ─ 2. destination
+        4 │ alter view v rename column a to b;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_materialized_view_rename_column() {
+        assert_snapshot!(goto("
+create table t(a int);
+create materialized view mv as select a from t;
+alter materialized view mv rename column a$0 to b;
+"), @"
+          ╭▸ 
+        3 │ create materialized view mv as select a from t;
+          │                                       ─ 2. destination
+        4 │ alter materialized view mv rename column a to b;
+          ╰╴                                         ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_alter_table_add_column() {
         assert_snapshot!(goto("
 create table users(id int);
@@ -10760,6 +10949,20 @@ comment on conversion con$0v is 'x';
     }
 
     #[test]
+    fn goto_create_conversion_from_function() {
+        assert_snapshot!(goto("
+create function my_conv(integer, integer, cstring, internal, integer) returns void language c as $$x$$;
+create conversion my_conv_obj for 'UTF8' to 'LATIN1' from my_co$0nv;
+"), @"
+          ╭▸ 
+        2 │ create function my_conv(integer, integer, cstring, internal, integer) returns void language c as $$x$$;
+          │                 ─────── 2. destination
+        3 │ create conversion my_conv_obj for 'UTF8' to 'LATIN1' from my_conv;
+          ╰╴                                                              ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_drop_text_search_dictionary() {
         assert_snapshot!(goto("
 create text search dictionary english_stem (template = snowball, language = english);
@@ -10784,6 +10987,90 @@ alter text search dictionary english_st$0em rename to stemmer;
           │                               ──────────── 2. destination
         3 │ alter text search dictionary english_stem rename to stemmer;
           ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_text_search_configuration() {
+        assert_snapshot!(goto("
+create text search configuration my_config (parser = pg_catalog.default);
+drop text search configuration my_conf$0ig;
+"), @"
+          ╭▸ 
+        2 │ create text search configuration my_config (parser = pg_catalog.default);
+          │                                  ───────── 2. destination
+        3 │ drop text search configuration my_config;
+          ╰╴                                     ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_text_search_configuration() {
+        assert_snapshot!(goto("
+create text search configuration my_config (parser = pg_catalog.default);
+alter text search configuration my_conf$0ig rename to my_config2;
+"), @"
+          ╭▸ 
+        2 │ create text search configuration my_config (parser = pg_catalog.default);
+          │                                  ───────── 2. destination
+        3 │ alter text search configuration my_config rename to my_config2;
+          ╰╴                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_text_search_parser() {
+        assert_snapshot!(goto("
+create text search parser my_parser (start = prsd_start, gettoken = prsd_nexttoken, end = prsd_end, lextypes = prsd_lextype);
+drop text search parser my_pars$0er;
+"), @"
+          ╭▸ 
+        2 │ create text search parser my_parser (start = prsd_start, gettoken = prsd_nexttoken, end = prsd_end, lextypes = prsd_lextype);
+          │                           ───────── 2. destination
+        3 │ drop text search parser my_parser;
+          ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_text_search_parser() {
+        assert_snapshot!(goto("
+create text search parser my_parser (start = prsd_start, gettoken = prsd_nexttoken, end = prsd_end, lextypes = prsd_lextype);
+alter text search parser my_pars$0er rename to my_parser2;
+"), @"
+          ╭▸ 
+        2 │ create text search parser my_parser (start = prsd_start, gettoken = prsd_nexttoken, end = prsd_end, lextypes = prsd_lextype);
+          │                           ───────── 2. destination
+        3 │ alter text search parser my_parser rename to my_parser2;
+          ╰╴                               ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_text_search_template() {
+        assert_snapshot!(goto("
+create text search template my_template (init = dsimple_init, lexize = dsimple_lexize);
+drop text search template my_temp$0late;
+"), @"
+          ╭▸ 
+        2 │ create text search template my_template (init = dsimple_init, lexize = dsimple_lexize);
+          │                             ─────────── 2. destination
+        3 │ drop text search template my_template;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_text_search_template() {
+        assert_snapshot!(goto("
+create text search template my_template (init = dsimple_init, lexize = dsimple_lexize);
+alter text search template my_temp$0late rename to my_template2;
+"), @"
+          ╭▸ 
+        2 │ create text search template my_template (init = dsimple_init, lexize = dsimple_lexize);
+          │                             ─────────── 2. destination
+        3 │ alter text search template my_template rename to my_template2;
+          ╰╴                                 ─ 1. source
         ");
     }
 
@@ -10840,6 +11127,172 @@ alter operator family my_fami$0ly using btree owner to someone;
           │                        ───────── 2. destination
         3 │ alter operator family my_family using btree owner to someone;
           ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_operator_family() {
+        assert_snapshot!(goto("
+create operator family my_family using btree;
+comment on operator family my_fami$0ly using btree is 'hi';
+"), @"
+          ╭▸ 
+        2 │ create operator family my_family using btree;
+          │                        ───────── 2. destination
+        3 │ comment on operator family my_family using btree is 'hi';
+          ╰╴                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_comment_on_operator_class() {
+        assert_snapshot!(goto("
+create operator class my_opclass for type int using btree as operator 1 < (int, int);
+comment on operator class my_opcla$0ss using btree is 'hi';
+"), @"
+          ╭▸ 
+        2 │ create operator class my_opclass for type int using btree as operator 1 < (int, int);
+          │                       ────────── 2. destination
+        3 │ comment on operator class my_opclass using btree is 'hi';
+          ╰╴                                 ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_operator_class() {
+        assert_snapshot!(goto("
+create operator class my_opclass for type int using btree as operator 1 < (int, int);
+drop operator class my_opcla$0ss using btree;
+"), @"
+          ╭▸ 
+        2 │ create operator class my_opclass for type int using btree as operator 1 < (int, int);
+          │                       ────────── 2. destination
+        3 │ drop operator class my_opclass using btree;
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_operator_class() {
+        assert_snapshot!(goto("
+create operator class my_opclass for type int using btree as operator 1 < (int, int);
+alter operator class my_opcla$0ss using btree owner to someone;
+"), @"
+          ╭▸ 
+        2 │ create operator class my_opclass for type int using btree as operator 1 < (int, int);
+          │                       ────────── 2. destination
+        3 │ alter operator class my_opclass using btree owner to someone;
+          ╰╴                            ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_index_using_access_method() {
+        assert_snapshot!(goto("
+create function my_handler(internal) returns index_am_handler language c as $$x$$;
+create access method my_am type index handler my_handler;
+create table t(id int);
+create index on t using my_a$0m (id);
+"), @"
+          ╭▸ 
+        3 │ create access method my_am type index handler my_handler;
+          │                      ───── 2. destination
+        4 │ create table t(id int);
+        5 │ create index on t using my_am (id);
+          ╰╴                           ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_table_using_access_method() {
+        assert_snapshot!(goto("
+create function my_handler(internal) returns table_am_handler language c as $$x$$;
+create access method my_am type table handler my_handler;
+create table t(id int) using my_a$0m;
+"), @"
+          ╭▸ 
+        3 │ create access method my_am type table handler my_handler;
+          │                      ───── 2. destination
+        4 │ create table t(id int) using my_am;
+          ╰╴                                ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_operator_family_using_access_method() {
+        assert_snapshot!(goto("
+create function my_handler(internal) returns index_am_handler language c as $$x$$;
+create access method my_am type index handler my_handler;
+create operator family fam using my_a$0m;
+"), @"
+          ╭▸ 
+        3 │ create access method my_am type index handler my_handler;
+          │                      ───── 2. destination
+        4 │ create operator family fam using my_am;
+          ╰╴                                    ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_create_operator_class_using_access_method() {
+        assert_snapshot!(goto("
+create function my_handler(internal) returns index_am_handler language c as $$x$$;
+create access method my_am type index handler my_handler;
+create operator class my_opclass for type int using my_a$0m as storage int;
+"), @"
+          ╭▸ 
+        3 │ create access method my_am type index handler my_handler;
+          │                      ───── 2. destination
+        4 │ create operator class my_opclass for type int using my_am as storage int;
+          ╰╴                                                       ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_alter_operator_family_using_access_method() {
+        assert_snapshot!(goto("
+create function my_handler(internal) returns index_am_handler language c as $$x$$;
+create access method my_am type index handler my_handler;
+create operator family fam using my_am;
+alter operator family fam using my_a$0m owner to someone;
+"), @"
+          ╭▸ 
+        3 │ create access method my_am type index handler my_handler;
+          │                      ───── 2. destination
+        4 │ create operator family fam using my_am;
+        5 │ alter operator family fam using my_am owner to someone;
+          ╰╴                                   ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_drop_operator_class_using_access_method() {
+        assert_snapshot!(goto("
+create function my_handler(internal) returns index_am_handler language c as $$x$$;
+create access method my_am type index handler my_handler;
+create operator class my_opclass for type int using my_am as storage int;
+drop operator class my_opclass using my_a$0m;
+"), @"
+          ╭▸ 
+        3 │ create access method my_am type index handler my_handler;
+          │                      ───── 2. destination
+        4 │ create operator class my_opclass for type int using my_am as storage int;
+        5 │ drop operator class my_opclass using my_am;
+          ╰╴                                        ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_operator_class_function_option() {
+        assert_snapshot!(goto("
+create function my_cmp(int, int) returns int language sql as $$select 0$$;
+create operator class my_opclass for type int using btree as function 1 my_cm$0p(int, int);
+"), @"
+          ╭▸ 
+        2 │ create function my_cmp(int, int) returns int language sql as $$select 0$$;
+          │                 ────── 2. destination
+        3 │ create operator class my_opclass for type int using btree as function 1 my_cmp(int, int);
+          ╰╴                                                                            ─ 1. source
         ");
     }
 
@@ -13572,6 +14025,50 @@ select count(*) filter (where a$0 > 0) from t;
           │                 ─ 2. destination
         3 │ select count(*) filter (where a > 0) from t;
           ╰╴                              ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_with_ordinality_implicit_column() {
+        assert_snapshot!(goto("
+select ordinality$0 from unnest(array[1,2]) with ordinality;
+"), @"
+          ╭▸ 
+        2 │ select ordinality from unnest(array[1,2]) with ordinality;
+          ╰╴                ─ 1. source                    ────────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_with_ordinality_qualified_implicit_column() {
+        assert_snapshot!(goto("
+select u.ordinality$0 from unnest(array[1,2]) with ordinality as u;
+"), @"
+          ╭▸ 
+        2 │ select u.ordinality from unnest(array[1,2]) with ordinality as u;
+          ╰╴                  ─ 1. source                    ────────── 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_with_ordinality_explicit_alias_column() {
+        assert_snapshot!(goto("
+select o$0 from unnest(array[1,2]) with ordinality as u(x, o);
+"), @"
+          ╭▸ 
+        2 │ select o from unnest(array[1,2]) with ordinality as u(x, o);
+          ╰╴       ─ 1. source                                       ─ 2. destination
+        ");
+    }
+
+    #[test]
+    fn goto_rows_from_with_ordinality_implicit_column() {
+        assert_snapshot!(goto("
+select ordinality$0 from rows from (unnest(array[1,2])) with ordinality;
+"), @"
+          ╭▸ 
+        2 │ select ordinality from rows from (unnest(array[1,2])) with ordinality;
+          ╰╴                ─ 1. source                                ────────── 2. destination
         ");
     }
 }

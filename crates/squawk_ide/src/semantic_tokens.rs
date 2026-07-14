@@ -211,6 +211,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::ForeignDataWrapper
             | LocationKind::Index
             | LocationKind::Language
+            | LocationKind::OperatorClass
             | LocationKind::OperatorFamily
             | LocationKind::Policy
             | LocationKind::PreparedStatement
@@ -222,7 +223,10 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::Statistics
             | LocationKind::Subscription
             | LocationKind::Tablespace
+            | LocationKind::TextSearchConfiguration
             | LocationKind::TextSearchDictionary
+            | LocationKind::TextSearchParser
+            | LocationKind::TextSearchTemplate
             | LocationKind::Trigger
             | LocationKind::Window => Err(kind),
         }

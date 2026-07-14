@@ -331,8 +331,20 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateOperatorFamily(create_operator_family) => {
             bind_create_operator_family(b, create_operator_family)
         }
+        ast::Stmt::CreateOperatorClass(create_operator_class) => {
+            bind_create_operator_class(b, create_operator_class)
+        }
         ast::Stmt::CreateTextSearchDictionary(create_text_search_dictionary) => {
             bind_create_text_search_dictionary(b, create_text_search_dictionary)
+        }
+        ast::Stmt::CreateTextSearchConfiguration(create_text_search_configuration) => {
+            bind_create_text_search_configuration(b, create_text_search_configuration)
+        }
+        ast::Stmt::CreateTextSearchParser(create_text_search_parser) => {
+            bind_create_text_search_parser(b, create_text_search_parser)
+        }
+        ast::Stmt::CreateTextSearchTemplate(create_text_search_template) => {
+            bind_create_text_search_template(b, create_text_search_template)
         }
         ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role.name()),
         ast::Stmt::CreateUser(create_user) => bind_create_role(b, create_user.name()),
@@ -1358,6 +1370,111 @@ fn bind_create_text_search_dictionary(
     });
 
     b.scope.insert(dictionary_name, dictionary_id);
+}
+
+fn bind_create_text_search_configuration(
+    b: &mut Binder,
+    create_text_search_configuration: ast::CreateTextSearchConfiguration,
+) {
+    let Some(path) = create_text_search_configuration.path() else {
+        return;
+    };
+
+    let Some(configuration_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let configuration_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::TextSearchConfiguration,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(configuration_name, configuration_id);
+}
+
+fn bind_create_text_search_parser(
+    b: &mut Binder,
+    create_text_search_parser: ast::CreateTextSearchParser,
+) {
+    let Some(path) = create_text_search_parser.path() else {
+        return;
+    };
+
+    let Some(parser_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let parser_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::TextSearchParser,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(parser_name, parser_id);
+}
+
+fn bind_create_text_search_template(
+    b: &mut Binder,
+    create_text_search_template: ast::CreateTextSearchTemplate,
+) {
+    let Some(path) = create_text_search_template.path() else {
+        return;
+    };
+
+    let Some(template_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let template_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::TextSearchTemplate,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(template_name, template_id);
+}
+
+fn bind_create_operator_class(b: &mut Binder, create_operator_class: ast::CreateOperatorClass) {
+    let Some(path) = create_operator_class.path() else {
+        return;
+    };
+
+    let Some(operator_class_name) = item_name(&path) else {
+        return;
+    };
+
+    let Some(schema) = schema_name(b, &path, false) else {
+        return;
+    };
+
+    let operator_class_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::OperatorClass,
+        ptr: path_to_ptr(&path),
+        schema: Some(schema),
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(operator_class_name, operator_class_id);
 }
 
 fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension) {

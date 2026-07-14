@@ -259,6 +259,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
         LocationKind::OperatorFamily => hover_operator_family(db, def),
+        LocationKind::OperatorClass => hover_operator_class(db, def),
         LocationKind::Policy => hover_policy(db, def),
         LocationKind::PreparedStatement => hover_prepared_statement(db, def),
         LocationKind::Procedure => hover_procedure(db, def),
@@ -275,6 +276,9 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Table => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
         LocationKind::TextSearchDictionary => hover_text_search_dictionary(db, def),
+        LocationKind::TextSearchConfiguration => hover_text_search_configuration(db, def),
+        LocationKind::TextSearchParser => hover_text_search_parser(db, def),
+        LocationKind::TextSearchTemplate => hover_text_search_template(db, def),
         LocationKind::View => {
             if let Some(hover) = format_create_view(db, def) {
                 return Some(hover);
@@ -357,6 +361,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
         LocationKind::OperatorFamily => hover_operator_family(db, def),
+        LocationKind::OperatorClass => hover_operator_class(db, def),
         LocationKind::Policy => hover_policy(db, def),
         LocationKind::PreparedStatement => hover_prepared_statement(db, def),
         LocationKind::Procedure => hover_procedure(db, def),
@@ -373,6 +378,9 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         LocationKind::Table | LocationKind::View => hover_table(db, def),
         LocationKind::Tablespace => hover_tablespace(db, def),
         LocationKind::TextSearchDictionary => hover_text_search_dictionary(db, def),
+        LocationKind::TextSearchConfiguration => hover_text_search_configuration(db, def),
+        LocationKind::TextSearchParser => hover_text_search_parser(db, def),
+        LocationKind::TextSearchTemplate => hover_text_search_template(db, def),
         LocationKind::Trigger => hover_trigger(db, def),
         LocationKind::Type => hover_type(db, def),
         LocationKind::Window => hover_window(db, def),
@@ -1278,10 +1286,42 @@ fn hover_operator_family(db: &dyn Db, def: Location) -> Option<Hover> {
     )))
 }
 
+fn hover_operator_class(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!(
+        "operator class {}",
+        def_node.text()
+    )))
+}
+
 fn hover_text_search_dictionary(db: &dyn Db, def: Location) -> Option<Hover> {
     let def_node = def.to_node(db)?;
     Some(Hover::snippet(format!(
         "text search dictionary {}",
+        def_node.text()
+    )))
+}
+
+fn hover_text_search_configuration(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!(
+        "text search configuration {}",
+        def_node.text()
+    )))
+}
+
+fn hover_text_search_parser(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!(
+        "text search parser {}",
+        def_node.text()
+    )))
+}
+
+fn hover_text_search_template(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!(
+        "text search template {}",
         def_node.text()
     )))
 }

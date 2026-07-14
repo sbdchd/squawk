@@ -9350,7 +9350,7 @@ fn create_access_method(p: &mut Parser<'_>) -> CompletedMarker {
 fn handler_clause(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(HANDLER_KW);
-    path_name(p);
+    path_name_ref(p);
     m.complete(p, HANDLER_CLAUSE);
 }
 
@@ -9517,7 +9517,7 @@ fn create_conversion(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(TO_KW);
     string_literal(p);
     p.expect(FROM_KW);
-    path_name(p);
+    path_name_ref(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_CONVERSION)
 }
