@@ -12,10 +12,9 @@ SOURCE_FILE
     WHITESPACE " "
     METHOD_KW "method"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "m"
+    ACCESS_METHOD
+      NAME
+        IDENT "m"
     WHITESPACE "\n  "
     TYPE_KW "type"
     WHITESPACE " "
@@ -24,8 +23,8 @@ SOURCE_FILE
     HANDLER_CLAUSE
       HANDLER_KW "handler"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
     SEMICOLON ";"
@@ -39,10 +38,9 @@ SOURCE_FILE
     WHITESPACE " "
     METHOD_KW "method"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "m"
+    ACCESS_METHOD
+      NAME
+        IDENT "m"
     WHITESPACE "\n  "
     TYPE_KW "type"
     WHITESPACE " "
@@ -51,13 +49,13 @@ SOURCE_FILE
     HANDLER_CLAUSE
       HANDLER_KW "handler"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
     SEMICOLON ";"

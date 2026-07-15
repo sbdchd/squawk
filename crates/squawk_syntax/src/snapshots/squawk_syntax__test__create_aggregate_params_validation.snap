@@ -11,8 +11,8 @@ SOURCE_FILE@0..91
     AGGREGATE_KW@45..54 "aggregate"
     WHITESPACE@54..55 " "
     AGGREGATE@55..70
-      PATH@55..56
-        PATH_SEGMENT@55..56
+      PATH_REF@55..56
+        PATH_SEGMENT_REF@55..56
           NAME_REF@55..56
             IDENT@55..56 "a"
       WHITESPACE@56..57 " "
@@ -23,8 +23,8 @@ SOURCE_FILE@0..91
             IN_KW@58..60 "in"
           WHITESPACE@60..61 " "
           PATH_TYPE@61..62
-            PATH@61..62
-              PATH_SEGMENT@61..62
+            PATH_REF@61..62
+              PATH_SEGMENT_REF@61..62
                 NAME_REF@61..62
                   IDENT@61..62 "t"
         COMMA@62..63 ","
@@ -34,8 +34,8 @@ SOURCE_FILE@0..91
             OUT_KW@64..67 "out"
           WHITESPACE@67..68 " "
           PATH_TYPE@68..69
-            PATH@68..69
-              PATH_SEGMENT@68..69
+            PATH_REF@68..69
+              PATH_SEGMENT_REF@68..69
                 NAME_REF@68..69
                   IDENT@68..69 "u"
         R_PAREN@69..70 ")"

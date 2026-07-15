@@ -21,8 +21,8 @@ SOURCE_FILE@0..103
       WHITESPACE@26..27 " "
       TO_KW@27..29 "to"
       WHITESPACE@29..30 " "
-      PATH@30..31
-        PATH_SEGMENT@30..31
+      PATH_REF@30..31
+        PATH_SEGMENT_REF@30..31
           NAME_REF@30..31
             IDENT@30..31 "t"
     WHITESPACE@31..32 " "
@@ -39,8 +39,8 @@ SOURCE_FILE@0..103
           WHITESPACE@53..54 " "
           INTO_KW@54..58 "into"
           WHITESPACE@58..59 " "
-          PATH@59..60
-            PATH_SEGMENT@59..60
+          PATH_REF@59..60
+            PATH_SEGMENT_REF@59..60
               NAME_REF@59..60
                 IDENT@59..60 "t"
           WHITESPACE@60..61 " "
@@ -59,8 +59,8 @@ SOURCE_FILE@0..103
           WHITESPACE@80..81 " "
           INTO_KW@81..85 "into"
           WHITESPACE@85..86 " "
-          PATH@86..87
-            PATH_SEGMENT@86..87
+          PATH_REF@86..87
+            PATH_SEGMENT_REF@86..87
               NAME_REF@86..87
                 IDENT@86..87 "t"
           WHITESPACE@87..88 " "

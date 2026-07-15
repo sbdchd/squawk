@@ -19,8 +19,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
     SEMICOLON ";"
@@ -39,8 +39,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t1"
       COMMA ","
@@ -48,8 +48,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t2"
         WHITESPACE " "
@@ -73,8 +73,8 @@ SOURCE_FILE
         WHITESPACE " "
         ONLY_KW "only"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       COMMA ","
@@ -82,8 +82,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
         WHITESPACE " "
@@ -161,8 +161,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
     SEMICOLON ";"
@@ -181,8 +181,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t1"
       COMMA ","
@@ -190,8 +190,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t2"
         WHITESPACE " "
@@ -215,8 +215,8 @@ SOURCE_FILE
         WHITESPACE " "
         ONLY_KW "only"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       COMMA ","
@@ -224,8 +224,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
         WHITESPACE " "
@@ -270,8 +270,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     VALUE_KW "value"
         R_PAREN ")"
@@ -293,8 +293,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
     SEMICOLON ";"
@@ -313,8 +313,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t1"
       COMMA ","
@@ -322,8 +322,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t2"
         WHITESPACE " "
@@ -347,8 +347,8 @@ SOURCE_FILE
         WHITESPACE " "
         ONLY_KW "only"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       COMMA ","
@@ -356,8 +356,8 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
         WHITESPACE " "
@@ -453,16 +453,16 @@ SOURCE_FILE
           TABLE_KW "table"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
         COMMA ","
@@ -471,8 +471,8 @@ SOURCE_FILE
           TABLE_KW "table"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "k"
         R_PAREN ")"

@@ -14,8 +14,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -31,8 +31,8 @@ SOURCE_FILE
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "d"
     SEMICOLON ";"
@@ -46,13 +46,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -72,24 +72,24 @@ SOURCE_FILE
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "d"
       COMMA ","
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "e"
     SEMICOLON ";"
@@ -105,8 +105,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -122,8 +122,8 @@ SOURCE_FILE
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "d"
     SEMICOLON ";"
@@ -137,13 +137,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -159,13 +159,13 @@ SOURCE_FILE
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "f"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "d"
     SEMICOLON ";"
@@ -181,8 +181,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -193,15 +193,15 @@ SOURCE_FILE
       WHITESPACE " "
       REPLACE_KW "replace"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "n"
     SEMICOLON ";"
@@ -215,13 +215,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -232,25 +232,25 @@ SOURCE_FILE
       WHITESPACE " "
       REPLACE_KW "replace"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "f"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "f"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "n"
     SEMICOLON ";"
@@ -266,8 +266,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -283,15 +283,15 @@ SOURCE_FILE
       WHITESPACE " "
       REPLACE_KW "replace"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "n"
     SEMICOLON ";"
@@ -305,13 +305,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -327,25 +327,25 @@ SOURCE_FILE
       WHITESPACE " "
       REPLACE_KW "replace"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "f"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "o"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "f"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "n"
     SEMICOLON ";"
@@ -361,8 +361,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -386,13 +386,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE "\n    "
@@ -427,8 +427,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE " "
@@ -450,13 +450,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE " "
@@ -480,8 +480,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE " "
@@ -504,13 +504,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE " "
@@ -534,8 +534,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE " "
@@ -557,13 +557,13 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "n"
     WHITESPACE " "

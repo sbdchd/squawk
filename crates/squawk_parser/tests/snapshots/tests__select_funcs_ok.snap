@@ -1337,8 +1337,8 @@ SOURCE_FILE
               AS_KW "as"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
               WHITESPACE " "
@@ -1364,8 +1364,8 @@ SOURCE_FILE
               AS_KW "as"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
               WHITESPACE " "
@@ -1843,8 +1843,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
               R_PAREN ")"
@@ -1873,8 +1873,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                 WHITESPACE " "
@@ -2052,8 +2052,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         TEXT_KW "text"
                 WHITESPACE " "
@@ -2112,8 +2112,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                 WHITESPACE " "
@@ -2147,8 +2147,8 @@ SOURCE_FILE
               JSON_EXPR_FORMAT
                 CAST_EXPR
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           JSON_KW "json"
                   WHITESPACE " "
@@ -2299,8 +2299,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         TEXT_KW "text"
                 WHITESPACE " "
@@ -2335,8 +2335,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         TEXT_KW "text"
                 WHITESPACE " "
@@ -2389,8 +2389,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         TEXT_KW "text"
               R_PAREN ")"
@@ -2410,8 +2410,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         TEXT_KW "text"
                 WHITESPACE " "
@@ -2587,8 +2587,8 @@ SOURCE_FILE
                   TABLE_KW "table"
                   WHITESPACE " "
                   RELATION_NAME
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "t"
                 R_PAREN ")"
@@ -3032,8 +3032,8 @@ SOURCE_FILE
               WHITESPACE " "
               CAST_EXPR
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "timestamptz"
                 WHITESPACE " "
@@ -3104,8 +3104,8 @@ SOURCE_FILE
               WHITESPACE " "
               CAST_EXPR
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "date"
                 WHITESPACE " "
@@ -3130,8 +3130,8 @@ SOURCE_FILE
               WHITESPACE " "
               CAST_EXPR
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "date"
                 WHITESPACE " "
@@ -3852,8 +3852,8 @@ SOURCE_FILE
                     COLON ":"
                   ARRAY_TYPE
                     PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                      PATH_REF
+                        PATH_SEGMENT_REF
                           NAME_REF
                             NUMERIC_KW "numeric"
                     L_BRACK "["
@@ -4143,8 +4143,8 @@ SOURCE_FILE
                 IDENT "kind"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -4160,8 +4160,8 @@ SOURCE_FILE
                 IDENT "title"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -4182,8 +4182,8 @@ SOURCE_FILE
                 IDENT "director"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -4273,8 +4273,8 @@ SOURCE_FILE
                 IDENT "kind"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -4303,8 +4303,8 @@ SOURCE_FILE
                     IDENT "title"
                   WHITESPACE " "
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           TEXT_KW "text"
                   WHITESPACE " "
@@ -4330,8 +4330,8 @@ SOURCE_FILE
                     IDENT "director"
                   WHITESPACE " "
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           TEXT_KW "text"
                   WHITESPACE " "
@@ -4410,8 +4410,8 @@ SOURCE_FILE
                 IDENT "kind"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -4440,8 +4440,8 @@ SOURCE_FILE
                     IDENT "title"
                   WHITESPACE " "
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           TEXT_KW "text"
                   WHITESPACE " "
@@ -4467,8 +4467,8 @@ SOURCE_FILE
                     IDENT "director"
                   WHITESPACE " "
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           TEXT_KW "text"
                   WHITESPACE " "
@@ -4519,8 +4519,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     JSON_KW "json"
           COMMA ","
@@ -4567,8 +4567,8 @@ SOURCE_FILE
                     IDENT "mname"
                   WHITESPACE " "
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           TEXT_KW "text"
                   WHITESPACE " "
@@ -4584,8 +4584,8 @@ SOURCE_FILE
                     IDENT "director"
                   WHITESPACE " "
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           TEXT_KW "text"
                 R_PAREN ")"
@@ -4616,8 +4616,8 @@ SOURCE_FILE
                     IDENT "bname"
                   WHITESPACE " "
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           TEXT_KW "text"
                   WHITESPACE " "
@@ -4653,8 +4653,8 @@ SOURCE_FILE
                         IDENT "author_name"
                       WHITESPACE " "
                       PATH_TYPE
-                        PATH
-                          PATH_SEGMENT
+                        PATH_REF
+                          PATH_SEGMENT_REF
                             NAME_REF
                               TEXT_KW "text"
                       WHITESPACE " "
@@ -4849,8 +4849,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
               R_PAREN ")"
@@ -4878,8 +4878,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                 WHITESPACE " "
@@ -4965,8 +4965,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         TEXT_KW "text"
                 WHITESPACE " \n  "
@@ -5100,8 +5100,8 @@ SOURCE_FILE
               L_PAREN "("
               CAST_EXPR
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "jsonb"
                 WHITESPACE " "
@@ -5138,8 +5138,8 @@ SOURCE_FILE
               L_PAREN "("
               CAST_EXPR
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "jsonb"
                 WHITESPACE " "
@@ -5172,8 +5172,8 @@ SOURCE_FILE
               L_PAREN "("
               CAST_EXPR
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "jsonb"
                 WHITESPACE " "
@@ -5254,8 +5254,8 @@ SOURCE_FILE
                 RETURNING_KW "returning"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                 WHITESPACE " "

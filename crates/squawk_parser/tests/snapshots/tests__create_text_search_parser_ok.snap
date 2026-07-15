@@ -30,8 +30,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "start_function"
       COMMA ","
@@ -44,8 +44,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "gettoken_function"
       COMMA ","
@@ -58,8 +58,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "end_function"
       COMMA ","
@@ -72,8 +72,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "lextypes_function"
       WHITESPACE "\n"
@@ -92,8 +92,8 @@ SOURCE_FILE
     PARSER_KW "parser"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -112,8 +112,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "start_function"
       COMMA ","
@@ -126,8 +126,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "gettoken_function"
       COMMA ","
@@ -140,8 +140,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "end_function"
       COMMA ","
@@ -154,8 +154,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "lextypes_function"
       COMMA ","
@@ -168,8 +168,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "headline_function"
       WHITESPACE "\n"

@@ -14,8 +14,8 @@ SOURCE_FILE
     WHITESPACE " "
     TEMPLATE_KW "template"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -39,13 +39,13 @@ SOURCE_FILE
     WHITESPACE " "
     TEMPLATE_KW "template"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "

@@ -53,8 +53,8 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
         WHITESPACE " "
@@ -73,8 +73,8 @@ SOURCE_FILE
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -87,8 +87,8 @@ SOURCE_FILE
       WHITESPACE "\n  "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -115,13 +115,13 @@ SOURCE_FILE
         TYPE_KW "type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "foo"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "t"
         COMMA ","
@@ -131,8 +131,8 @@ SOURCE_FILE
         TYPE_KW "type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       WHITESPACE "\n"
@@ -164,8 +164,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           WHITESPACE " "
@@ -178,8 +178,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -192,8 +192,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "buzz"
           WHITESPACE " "

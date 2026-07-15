@@ -758,6 +758,10 @@ impl ast::HasParamList {
     pub fn path(&self) -> Option<ast::Path> {
         support::child(self.syntax())
     }
+    #[inline]
+    pub fn path_ref(&self) -> Option<ast::PathRef> {
+        support::child(self.syntax())
+    }
 }
 
 impl ast::NameLike for ast::Name {

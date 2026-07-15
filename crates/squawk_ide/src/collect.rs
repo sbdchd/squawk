@@ -64,7 +64,7 @@ fn columns_from_create_table_impl(
                 }
             }
             ast_nav::CreateTableArg::LikeClause(like_clause) => {
-                if let Some(path) = like_clause.path()
+                if let Some(path) = like_clause.path_ref()
                     && let Some((schema, table_name)) = name::schema_and_name_path(&path)
                 {
                     let position = path.syntax().text_range().start();
@@ -166,7 +166,7 @@ fn table_columns_impl(
                 }
             }
             ast_nav::CreateTableArg::LikeClause(like_clause) => {
-                if let Some(path) = like_clause.path()
+                if let Some(path) = like_clause.path_ref()
                     && let Some((schema, table_name)) = name::schema_and_name_path(&path)
                 {
                     let position = path.syntax().text_range().start();
@@ -334,7 +334,7 @@ fn table_query_columns_with_types(
     file: File,
     table: &ast::Table,
 ) -> Vec<(Name, Option<Type>)> {
-    let Some(path) = table.relation_name().and_then(|r| r.path()) else {
+    let Some(path) = table.relation_name().and_then(|r| r.path_ref()) else {
         return vec![];
     };
     let Some((schema, table_name)) = name::schema_and_name_path(&path) else {
@@ -380,14 +380,18 @@ fn columns_from_returning_clause_with_types(
     query: &ast::WithQuery,
 ) -> Option<Vec<(Name, Option<Type>)>> {
     let (returning_clause, path) = match query {
-        ast::WithQuery::Delete(delete) => {
-            (delete.returning_clause(), delete.relation_name()?.path()?)
+        ast::WithQuery::Delete(delete) => (
+            delete.returning_clause(),
+            delete.relation_name()?.path_ref()?,
+        ),
+        ast::WithQuery::Insert(insert) => (insert.returning_clause(), insert.path_ref()?),
+        ast::WithQuery::Merge(merge) => {
+            (merge.returning_clause(), merge.relation_name()?.path_ref()?)
         }
-        ast::WithQuery::Insert(insert) => (insert.returning_clause(), insert.path()?),
-        ast::WithQuery::Merge(merge) => (merge.returning_clause(), merge.relation_name()?.path()?),
-        ast::WithQuery::Update(update) => {
-            (update.returning_clause(), update.relation_name()?.path()?)
-        }
+        ast::WithQuery::Update(update) => (
+            update.returning_clause(),
+            update.relation_name()?.path_ref()?,
+        ),
         ast::WithQuery::Select(_)
         | ast::WithQuery::CompoundSelect(_)
         | ast::WithQuery::Table(_)
@@ -413,7 +417,7 @@ fn columns_from_returning_clause_with_types(
 fn returning_target_list_columns_with_types(
     db: &dyn Db,
     file: File,
-    path: &ast::Path,
+    path: &ast::PathRef,
     target_list: &ast::TargetList,
 ) -> Vec<(Name, Option<Type>)> {
     let mut columns = vec![];

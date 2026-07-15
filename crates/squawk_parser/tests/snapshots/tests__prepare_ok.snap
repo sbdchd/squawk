@@ -15,32 +15,32 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bool"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 NUMERIC_KW "numeric"
       R_PAREN ")"
@@ -52,8 +52,8 @@ SOURCE_FILE
       WHITESPACE " "
       INTO_KW "INTO"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       WHITESPACE " "
@@ -91,8 +91,8 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       R_PAREN ")"
@@ -234,8 +234,8 @@ SOURCE_FILE
       UPDATE_KW "update"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
       WHITESPACE " "
@@ -283,8 +283,8 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
       WHITESPACE " "
@@ -317,8 +317,8 @@ SOURCE_FILE
       INTO_KW "into"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t1"
       WHITESPACE "\n  "

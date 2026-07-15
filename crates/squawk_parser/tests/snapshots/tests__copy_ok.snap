@@ -9,8 +9,8 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "copytest"
     WHITESPACE " "
@@ -27,8 +27,8 @@ SOURCE_FILE
     COPY_KW "COPY"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "country"
     WHITESPACE " "
@@ -54,8 +54,8 @@ SOURCE_FILE
     COPY_KW "COPY"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "country"
     WHITESPACE " "
@@ -114,8 +114,8 @@ SOURCE_FILE
     COPY_KW "COPY"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "country"
     WHITESPACE " "
@@ -134,8 +134,8 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "x"
       WHITESPACE " "
@@ -182,8 +182,8 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "copytest"
     WHITESPACE " "
@@ -211,8 +211,8 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "

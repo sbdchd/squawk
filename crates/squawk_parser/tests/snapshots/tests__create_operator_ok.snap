@@ -24,8 +24,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
       WHITESPACE "\n"
@@ -54,8 +54,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "p"
       WHITESPACE "\n"
@@ -70,18 +70,18 @@ SOURCE_FILE
     OPERATOR_KW "operator"
     WHITESPACE " "
     OP
-      PATH
-        PATH
-          PATH
-            PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
       CUSTOM_OP
         R_ANGLE ">"
         R_ANGLE ">"
@@ -99,18 +99,18 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH
-                PATH
-                  PATH_SEGMENT
+            PATH_REF
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
               DOT "."
-              PATH_SEGMENT
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
       COMMA ","
@@ -140,13 +140,13 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH
-                PATH_SEGMENT
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "foo"
               DOT "."
-              PATH_SEGMENT
+              PATH_SEGMENT_REF
                 NAME_REF
                   BIGINT_KW "bigint"
       COMMA ","
@@ -186,8 +186,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "r"
       COMMA ","
@@ -200,8 +200,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "j"
       COMMA ","

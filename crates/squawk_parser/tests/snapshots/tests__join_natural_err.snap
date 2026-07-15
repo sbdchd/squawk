@@ -11,8 +11,8 @@ SOURCE_FILE
     INTO_KW "into"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "

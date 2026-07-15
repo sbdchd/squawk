@@ -10,8 +10,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "my_index"
     SEMICOLON ";"
@@ -21,8 +21,8 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "my_table"
     SEMICOLON ";"
@@ -34,8 +34,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "CONCURRENTLY"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "my_broken_table"
     SEMICOLON ";"
@@ -72,10 +72,9 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "concurrently"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    DATABASE_REF
+      NAME_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
@@ -98,8 +97,8 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     SEMICOLON ";"
@@ -109,10 +108,9 @@ SOURCE_FILE
     WHITESPACE " "
     SYSTEM_KW "system"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    DATABASE_REF
+      NAME_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -120,8 +118,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     SEMICOLON ";"
@@ -131,8 +129,8 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     SEMICOLON ";"
@@ -142,8 +140,8 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     SEMICOLON ";"

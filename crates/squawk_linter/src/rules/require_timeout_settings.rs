@@ -330,7 +330,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
         match stmt {
             ast::Stmt::Set(set) => {
                 if let Some(ast::SetTarget::SetConfig(set_config)) = set.set_target()
-                    && let Some(path) = set_config.path()
+                    && let Some(path) = set_config.path_ref()
                 {
                     // only want to check for `set lock_timeout = '1s'`, not `set foo.lock_timeout = '1s'`
                     if path.qualifier().is_some() {

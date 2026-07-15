@@ -23,17 +23,17 @@ SOURCE_FILE
           FALSE_KW "false"
       R_PAREN ")"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE " "
-    USING_METHOD
+    CLUSTER_USING_INDEX
       USING_KW "using"
       WHITESPACE " "
       NAME_REF
@@ -62,17 +62,17 @@ SOURCE_FILE
     WHITESPACE " "
     VERBOSE_KW "verbose"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE " "
-    USING_METHOD
+    CLUSTER_USING_INDEX
       USING_KW "using"
       WHITESPACE " "
       NAME_REF
@@ -94,21 +94,21 @@ SOURCE_FILE
     WHITESPACE " "
     VERBOSE_KW "verbose"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "f"
     WHITESPACE " "
     ON_PATH
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
     SEMICOLON ";"

@@ -1,4 +1,5 @@
 use crate::{ast_nav, db::list_files};
+use rowan::TextSize;
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
@@ -86,7 +87,7 @@ pub(crate) fn resolve_name_ref(
                 if let Some(call_expr) = ast::CallExpr::cast(a.clone()) {
                     name::schema_and_func_name(&call_expr)
                 } else if let Some(call) = ast::Call::cast(a) {
-                    name::schema_and_name_path(&call.path()?)
+                    name::schema_and_name_path(&call.path_ref()?)
                 } else {
                     None
                 }
@@ -232,11 +233,13 @@ pub(crate) fn resolve_name_ref(
                 name_ref.syntax().ancestors().find_map(|a| {
                     if let Some(drop_trigger) = ast::DropTrigger::cast(a.clone()) {
                         let (schema, trigger_name) =
-                            name::schema_and_name_path(&drop_trigger.path()?)?;
+                            name::schema_and_name_path(&drop_trigger.path_ref()?)?;
                         Some((
                             schema,
                             trigger_name,
-                            drop_trigger.on_table().and_then(|on_table| on_table.path()),
+                            drop_trigger
+                                .on_table()
+                                .and_then(|on_table| on_table.path_ref()),
                         ))
                     } else if let Some(alter_trigger) = ast::AlterTrigger::cast(a.clone()) {
                         Some((
@@ -244,13 +247,13 @@ pub(crate) fn resolve_name_ref(
                             Name::from_node(name_ref),
                             alter_trigger
                                 .on_table()
-                                .and_then(|on_table| on_table.path()),
+                                .and_then(|on_table| on_table.path_ref()),
                         ))
                     } else if let Some(object_trigger) = ast::ObjectTrigger::cast(a.clone()) {
                         Some((
                             None,
                             Name::from_node(&object_trigger.name_ref()?),
-                            object_trigger.path(),
+                            object_trigger.path_ref(),
                         ))
                     } else {
                         ast::AlterTable::cast(a).map(|alter_table| {
@@ -259,7 +262,7 @@ pub(crate) fn resolve_name_ref(
                                 Name::from_node(name_ref),
                                 alter_table
                                     .relation_name()
-                                    .and_then(|relation| relation.path()),
+                                    .and_then(|relation| relation.path_ref()),
                             )
                         })
                     }
@@ -289,7 +292,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::CreateTrigger::cast)?;
-            let path = create_trigger.on_table()?.path()?;
+            let path = create_trigger.on_table()?.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::TriggerWhenColumn => {
@@ -298,7 +301,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::CreateTrigger::cast)?;
-            let path = create_trigger.on_table()?.path()?;
+            let path = create_trigger.on_table()?.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::TriggerWhenColumnTable => {
@@ -306,7 +309,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::CreateTrigger::cast)?;
-            let path = create_trigger.on_table()?.path()?;
+            let path = create_trigger.on_table()?.path_ref()?;
             let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -322,15 +325,15 @@ pub(crate) fn resolve_name_ref(
                 if let Some(policy) = ast::DropPolicy::cast(a.clone()) {
                     Some((
                         policy.name_ref(),
-                        policy.on_table().and_then(|on_table| on_table.path()),
+                        policy.on_table().and_then(|on_table| on_table.path_ref()),
                     ))
                 } else if let Some(policy) = ast::AlterPolicy::cast(a.clone()) {
                     Some((
                         policy.name_ref(),
-                        policy.on_table().and_then(|on_table| on_table.path()),
+                        policy.on_table().and_then(|on_table| on_table.path_ref()),
                     ))
                 } else {
-                    ast::ObjectPolicy::cast(a).map(|policy| (policy.name_ref(), policy.path()))
+                    ast::ObjectPolicy::cast(a).map(|policy| (policy.name_ref(), policy.path_ref()))
                 }
             })?;
             let policy_name = Name::from_node(&policy_name?);
@@ -355,22 +358,26 @@ pub(crate) fn resolve_name_ref(
                 if let Some(drop_rule) = ast::DropRule::cast(a.clone()) {
                     Some((
                         drop_rule.name_ref(),
-                        drop_rule.on_table().and_then(|on_table| on_table.path()),
+                        drop_rule
+                            .on_table()
+                            .and_then(|on_table| on_table.path_ref()),
                     ))
                 } else if let Some(alter_rule) = ast::AlterRule::cast(a.clone()) {
                     Some((
                         alter_rule.name_ref(),
-                        alter_rule.on_table().and_then(|on_table| on_table.path()),
+                        alter_rule
+                            .on_table()
+                            .and_then(|on_table| on_table.path_ref()),
                     ))
                 } else if let Some(object_rule) = ast::ObjectRule::cast(a.clone()) {
-                    Some((object_rule.name_ref(), object_rule.path()))
+                    Some((object_rule.name_ref(), object_rule.path_ref()))
                 } else {
                     ast::AlterTable::cast(a).map(|alter_table| {
                         (
                             Some(name_ref.clone()),
                             alter_table
                                 .relation_name()
-                                .and_then(|relation| relation.path()),
+                                .and_then(|relation| relation.path_ref()),
                         )
                     })
                 }
@@ -398,7 +405,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::CreateRule::cast)?;
-            let path = create_rule.rule_on()?.path()?;
+            let path = create_rule.rule_on()?.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::RulePseudoColumnTable => {
@@ -406,7 +413,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::CreateRule::cast)?;
-            let path = create_rule.rule_on()?.path()?;
+            let path = create_rule.rule_on()?.path_ref()?;
             let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -428,7 +435,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::PropertyGraph => {
-            let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
+            let path = name_ref.syntax().ancestors().find_map(ast::PathRef::cast)?;
             let (schema, property_graph_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -635,7 +642,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::QualifiedColumn => {
-            let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
+            let path = name_ref.syntax().ancestors().find_map(ast::PathRef::cast)?;
             let column_name = Name::from_node(name_ref);
             let table_path = path.qualifier()?;
             if let Some(ptr) =
@@ -651,7 +658,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::AlterType::cast)?;
-            let type_path = alter_type.path()?;
+            let type_path = alter_type.path_ref()?;
             resolve_composite_type_field_for_path(
                 db,
                 InFile::new(file, &type_path),
@@ -664,7 +671,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::TableAndColumns::cast)?;
-            let path = table_and_columns.relation_name()?.path()?;
+            let path = table_and_columns.relation_name()?.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::Tablespace => {
@@ -678,7 +685,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::ForeignKeyTable => {
-            let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
+            let path = name_ref.syntax().ancestors().find_map(ast::PathRef::cast)?;
             let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -696,7 +703,7 @@ pub(crate) fn resolve_name_ref(
                 .ancestors()
                 .find_map(ast::ForeignKeyConstraint::cast)
             {
-                foreign_key.path()?
+                foreign_key.path_ref()?
             } else if let Some(references_constraint) = name_ref
                 .syntax()
                 .ancestors()
@@ -721,7 +728,7 @@ pub(crate) fn resolve_name_ref(
                     );
                 }
                 if let Some(alter_table) = ast::AlterTable::cast(ancestor) {
-                    let table_path = alter_table.relation_name()?.path()?;
+                    let table_path = alter_table.relation_name()?.path_ref()?;
                     return resolve_column_for_path(
                         db,
                         InFile::new(file, &table_path),
@@ -734,7 +741,7 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::CopyColumn => {
             let column_name = Name::from_node(name_ref);
             let copy = name_ref.syntax().ancestors().find_map(ast::Copy::cast)?;
-            let path = copy.copy_table()?.path()?;
+            let path = copy.copy_table()?.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::StatisticsColumn => {
@@ -743,7 +750,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::CreateStatistics::cast)?;
-            let path = create_statistics.from_table()?.path()?;
+            let path = create_statistics.from_table()?.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::PublicationColumn => {
@@ -752,15 +759,15 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::PublicationObject::cast)?;
-            let path = publication_object.path()?;
+            let path = publication_object.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::PolicyColumn => {
             let on_table_path = name_ref.syntax().ancestors().find_map(|n| {
                 if let Some(create_policy) = ast::CreatePolicy::cast(n.clone()) {
-                    create_policy.on_table()?.path()
+                    create_policy.on_table()?.path_ref()
                 } else if let Some(alter_policy) = ast::AlterPolicy::cast(n) {
-                    alter_policy.on_table()?.path()
+                    alter_policy.on_table()?.path_ref()
                 } else {
                     None
                 }
@@ -771,9 +778,9 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::PolicyQualifiedColumnTable => {
             let on_table_path = name_ref.syntax().ancestors().find_map(|n| {
                 if let Some(create_policy) = ast::CreatePolicy::cast(n.clone()) {
-                    create_policy.on_table()?.path()
+                    create_policy.on_table()?.path_ref()
                 } else if let Some(alter_policy) = ast::AlterPolicy::cast(n) {
-                    alter_policy.on_table()?.path()
+                    alter_policy.on_table()?.path_ref()
                 } else {
                     None
                 }
@@ -793,7 +800,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::LikeClause::cast)?;
-            let path = like_clause.path()?;
+            let path = like_clause.path_ref()?;
             let (schema, table_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -818,7 +825,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::HasParamList::cast)
-                && let Some(sig_path) = function_sig.path()
+                && let Some(sig_path) = function_sig.path_ref()
                 && sig_path
                     .syntax()
                     .text_range()
@@ -827,7 +834,7 @@ pub(crate) fn resolve_name_ref(
                 let params = param_signature(&function_sig);
                 (sig_path, params)
             } else {
-                let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
+                let path = name_ref.syntax().ancestors().find_map(ast::PathRef::cast)?;
                 (path, None)
             };
             let (schema, function_name) = name::schema_and_name_path(&path)?;
@@ -840,7 +847,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::HasParamList::cast)?;
-            let path = aggregate.path()?;
+            let path = aggregate.path_ref()?;
             let (schema, aggregate_name) = name::schema_and_name_path(&path)?;
             let params = param_signature(&aggregate);
             let position = name_ref.syntax().text_range().start();
@@ -852,7 +859,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::HasParamList::cast)?;
-            let path = function_sig.path()?;
+            let path = function_sig.path_ref()?;
             let (schema, procedure_name) = name::schema_and_name_path(&path)?;
             let params = param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
@@ -864,7 +871,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::HasParamList::cast)?;
-            let path = function_sig.path()?;
+            let path = function_sig.path_ref()?;
             let (schema, routine_name) = name::schema_and_name_path(&path)?;
             let params = param_signature(&function_sig);
             let position = name_ref.syntax().text_range().start();
@@ -886,7 +893,7 @@ pub(crate) fn resolve_name_ref(
         }
         NameRefClass::CallProcedure => {
             let call = name_ref.syntax().ancestors().find_map(ast::Call::cast)?;
-            let path = call.path()?;
+            let path = call.path_ref()?;
             let (schema, procedure_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -919,7 +926,7 @@ pub(crate) fn resolve_name_ref(
             let path = privilege_objects
                 .syntax()
                 .children()
-                .find_map(ast::Path::cast)?;
+                .find_map(ast::PathRef::cast)?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::FunctionCall => {
@@ -939,7 +946,7 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::PathType::cast)?;
-            let path = path_type.path()?;
+            let path = path_type.path_ref()?;
             let (schema, function_name) = name::schema_and_name_path(&path)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -995,12 +1002,12 @@ pub(crate) fn resolve_name_ref(
         NameRefClass::InsertColumn => {
             let column_name = Name::from_node(name_ref);
             let insert = name_ref.syntax().ancestors().find_map(ast::Insert::cast)?;
-            let path = insert.path()?;
+            let path = insert.path_ref()?;
             resolve_column_for_path(db, InFile::new(file, &path), column_name)
         }
         NameRefClass::InsertQualifiedColumnTable => {
             let insert = name_ref.syntax().ancestors().find_map(ast::Insert::cast)?;
-            let path = insert.path()?;
+            let path = insert.path_ref()?;
             resolve_table_in_returning_clause(
                 db,
                 InFile::new(file, name_ref),
@@ -1086,7 +1093,7 @@ pub(crate) fn resolve_custom_op(
         .syntax()
         .parent()
         .filter(|parent| parent.kind() == SyntaxKind::OP)
-        .and_then(|op| op.children().find_map(ast::Path::cast))
+        .and_then(|op| op.children().find_map(ast::PathRef::cast))
         .and_then(|path| name::schema_name(&path));
 
     let position = custom_op.syntax().text_range().start();
@@ -1263,28 +1270,28 @@ fn constraint_owner(name_ref: &ast::NameRef) -> Option<(Option<Schema>, Option<N
     let mut fallback_schema = None;
 
     for ancestor in name_ref.syntax().ancestors() {
-        if let Some(path) = ast::Path::cast(ancestor.clone()) {
+        if let Some(path) = ast::PathRef::cast(ancestor.clone()) {
             fallback_schema = name::schema_name(&path);
         }
 
         if let Some(alter_table) = ast::AlterTable::cast(ancestor.clone()) {
-            let path = alter_table.relation_name()?.path()?;
+            let path = alter_table.relation_name()?.path_ref()?;
             let (schema, table_name) = name::schema_and_name_path(&path)?;
             return Some((schema, Some(table_name)));
         }
 
         if let Some(alter_domain) = ast::AlterDomain::cast(ancestor.clone()) {
-            let (schema, domain_name) = name::schema_and_name_path(&alter_domain.path()?)?;
+            let (schema, domain_name) = name::schema_and_name_path(&alter_domain.path_ref()?)?;
             return Some((schema, Some(domain_name)));
         }
 
         if let Some(comment_constraint) = ast::ObjectConstraint::cast(ancestor.clone()) {
-            let (schema, owner_name) = name::schema_and_name_path(&comment_constraint.path()?)?;
+            let (schema, owner_name) = name::schema_and_name_path(&comment_constraint.path_ref()?)?;
             return Some((schema, Some(owner_name)));
         }
 
         if let Some(insert) = ast::Insert::cast(ancestor) {
-            let (schema, table_name) = name::schema_and_name_path(&insert.path()?)?;
+            let (schema, table_name) = name::schema_and_name_path(&insert.path_ref()?)?;
             return Some((schema, Some(table_name)));
         }
     }
@@ -1403,7 +1410,7 @@ fn resolve_create_index_column_ptr(
         .syntax()
         .ancestors()
         .find_map(ast::CreateIndex::cast)?;
-    let path = create_index.relation_name()?.path()?;
+    let path = create_index.relation_name()?.path_ref()?;
 
     resolve_column_for_path(db, InFile::new(file, &path), column_name)
 }
@@ -1432,7 +1439,7 @@ fn resolve_property_graph_column_ptr(
         {
             return resolve_column_for_path(
                 db,
-                InFile::new(file, &edge_table_def.path()?),
+                InFile::new(file, &edge_table_def.path_ref()?),
                 column_name,
             );
         } else if let Some(vertex_table_def) =
@@ -1440,7 +1447,7 @@ fn resolve_property_graph_column_ptr(
         {
             return resolve_column_for_path(
                 db,
-                InFile::new(file, &vertex_table_def.path()?),
+                InFile::new(file, &vertex_table_def.path_ref()?),
                 column_name,
             );
         }
@@ -1450,39 +1457,43 @@ fn resolve_property_graph_column_ptr(
     {
         let parent = properties.syntax().parent()?;
         if let Some(edge) = ast::EdgeTableDef::cast(parent.clone()) {
-            return resolve_column_for_path(db, InFile::new(file, &edge.path()?), column_name);
+            return resolve_column_for_path(db, InFile::new(file, &edge.path_ref()?), column_name);
         } else if let Some(vertex) = ast::VertexTableDef::cast(parent) {
-            return resolve_column_for_path(db, InFile::new(file, &vertex.path()?), column_name);
+            return resolve_column_for_path(
+                db,
+                InFile::new(file, &vertex.path_ref()?),
+                column_name,
+            );
         }
     }
 
     None
 }
 
-fn resolve_alter_column_relation_path(name_ref: &ast::NameRef) -> Option<ast::Path> {
+fn resolve_alter_column_relation_path(name_ref: &ast::NameRef) -> Option<ast::PathRef> {
     if let Some(alter_table) = name_ref
         .syntax()
         .ancestors()
         .find_map(ast::AlterTable::cast)
     {
-        return alter_table.relation_name()?.path();
+        return alter_table.relation_name()?.path_ref();
     }
     if let Some(alter_view) = name_ref.syntax().ancestors().find_map(ast::AlterView::cast) {
-        return alter_view.path();
+        return alter_view.path_ref();
     }
     if let Some(alter_materialized_view) = name_ref
         .syntax()
         .ancestors()
         .find_map(ast::AlterMaterializedView::cast)
     {
-        return alter_materialized_view.path();
+        return alter_materialized_view.path_ref();
     }
     None
 }
 
 fn resolve_column_for_path(
     db: &dyn Db,
-    path: InFile<&ast::Path>,
+    path: InFile<&ast::PathRef>,
     column_name: Name,
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = path.file_id;
@@ -1746,15 +1757,15 @@ fn resolve_select_qualified_column_ptr(
                 name::schema_and_table_from_from_item(&from_item)?
             }
             ast_nav::ParentQuery::Update(update) => {
-                let path = update.relation_name()?.path()?;
+                let path = update.relation_name()?.path_ref()?;
                 name::schema_and_name_path(&path)?
             }
             ast_nav::ParentQuery::Delete(delete) => {
-                let path = delete.relation_name()?.path()?;
+                let path = delete.relation_name()?.path_ref()?;
                 name::schema_and_name_path(&path)?
             }
             ast_nav::ParentQuery::Insert(insert) => {
-                let path = insert.path()?;
+                let path = insert.path_ref()?;
                 name::schema_and_name_path(&path)?
             }
             ast_nav::ParentQuery::Merge(merge) => {
@@ -1785,7 +1796,7 @@ fn resolve_select_qualified_column_ptr(
                     }
                 }
 
-                let path = merge.relation_name()?.path()?;
+                let path = merge.relation_name()?.path_ref()?;
                 name::schema_and_name_path(&path)?
             }
         }
@@ -2559,7 +2570,7 @@ fn resolve_column_from_table_query_with_skip(
     column_name: &Name,
     skip_column_count: usize,
 ) -> Option<SmallVec<[Location; 1]>> {
-    let path = table.relation_name()?.path()?;
+    let path = table.relation_name()?.path_ref()?;
     let (schema, table_name) = name::schema_and_name_path(&path)?;
     let table_name_ref = relation_name_ref_from_table(table)?;
 
@@ -2880,7 +2891,7 @@ fn find_column_in_create_table_impl(
             }
             ast_nav::CreateTableArg::LikeClause(like_clause) => {
                 if skip_column_count == 0 {
-                    let path = like_clause.path()?;
+                    let path = like_clause.path_ref()?;
                     let (schema, table_name) = name::schema_and_name_path(&path)?;
                     let position = path.syntax().text_range().start();
                     let schemas = bind(db, file).resolved_schemas(position, schema.as_ref());
@@ -2897,7 +2908,7 @@ fn find_column_in_create_table_impl(
     }
 
     if skip_column_count == 0
-        && let Some(parent_path) = create_table.partition_of().and_then(|p| p.path())
+        && let Some(parent_path) = create_table.partition_of().and_then(|p| p.path_ref())
     {
         let (schema, table_name) = name::schema_and_name_path(&parent_path)?;
         let position = parent_path.syntax().text_range().start();
@@ -3347,7 +3358,7 @@ fn find_column_in_select_into_with_skip(
 }
 
 fn relation_name_ref_from_table(table: &ast::Table) -> Option<ast::NameRef> {
-    table.relation_name()?.path()?.segment()?.name_ref()
+    table.relation_name()?.path_ref()?.segment()?.name_ref()
 }
 
 fn relation_name_ref_from_from_item(from_item: &ast::FromItem) -> Option<ast::NameRef> {
@@ -3366,7 +3377,7 @@ fn resolve_cte_table(name_ref: &ast::NameRef, cte_name: &Name) -> Option<SyntaxN
     Some(SyntaxNodePtr::new(with_table.name()?.syntax()))
 }
 
-fn count_columns_for_path(db: &dyn Db, path: InFile<&ast::Path>) -> Option<usize> {
+fn count_columns_for_path(db: &dyn Db, path: InFile<&ast::PathRef>) -> Option<usize> {
     let file = path.file_id;
     let path = path.value;
     let (schema, table_name) = name::schema_and_name_path(path)?;
@@ -3516,7 +3527,7 @@ fn count_columns_for_target_list(target_list: &ast::TargetList) -> usize {
 }
 
 fn count_columns_for_table_query(db: &dyn Db, file: File, table: &ast::Table) -> Option<usize> {
-    let path = table.relation_name()?.path()?;
+    let path = table.relation_name()?.path_ref()?;
     let (schema, table_name) = name::schema_and_name_path(&path)?;
     let table_name_ref = relation_name_ref_from_table(table)?;
     let position = table_name_ref.syntax().text_range().start();
@@ -3836,20 +3847,22 @@ fn column_in_with_query(
         ast::WithQuery::Delete(delete) => (
             delete.returning_clause(),
             delete.alias(),
-            delete.relation_name()?.path()?,
+            delete.relation_name()?.path_ref()?,
         ),
-        ast::WithQuery::Insert(insert) => {
-            (insert.returning_clause(), insert.alias(), insert.path()?)
-        }
+        ast::WithQuery::Insert(insert) => (
+            insert.returning_clause(),
+            insert.alias(),
+            insert.path_ref()?,
+        ),
         ast::WithQuery::Merge(merge) => (
             merge.returning_clause(),
             merge.alias(),
-            merge.relation_name()?.path()?,
+            merge.relation_name()?.path_ref()?,
         ),
         ast::WithQuery::Update(update) => (
             update.returning_clause(),
             update.alias(),
-            update.relation_name()?.path()?,
+            update.relation_name()?.path_ref()?,
         ),
         ast::WithQuery::Select(_)
         | ast::WithQuery::CompoundSelect(_)
@@ -4469,7 +4482,7 @@ fn resolve_column_from_call_expr_return_table(
 
     // `returns setof <table>` or `returns setof <composite type>`
     if let Some(ast::Type::PathType(path_type)) = create_function.ret_type().and_then(|r| r.ty())
-        && let Some(path) = path_type.path()
+        && let Some(path) = path_type.path_ref()
     {
         if let Some(ptr) =
             resolve_column_for_path(db, InFile::new(file, &path), column_name.clone())
@@ -4491,6 +4504,13 @@ pub(crate) fn resolve_table_info(
     path: InFile<&ast::Path>,
 ) -> Option<(Schema, String)> {
     resolve_symbol_info(db, path, SymbolKind::Table)
+}
+
+pub(crate) fn resolve_table_ref_info(
+    db: &dyn Db,
+    path: InFile<&ast::PathRef>,
+) -> Option<(Schema, String)> {
+    resolve_symbol_ref_info(db, path, SymbolKind::Table)
 }
 
 pub(crate) fn resolve_function_info(
@@ -4548,10 +4568,40 @@ fn resolve_symbol_info(
     path: InFile<&ast::Path>,
     kind: SymbolKind,
 ) -> Option<(Schema, String)> {
-    let binder = bind(db, path.file_id);
-    let name = name::table_name(path.value)?;
-    let schema = name::schema_name(path.value);
-    let position = path.value.syntax().text_range().start();
+    resolve_symbol_info_from_parts(
+        db,
+        path.file_id,
+        name::table_definition_name(path.value)?,
+        name::schema_definition_name(path.value),
+        path.value.syntax().text_range().start(),
+        kind,
+    )
+}
+
+fn resolve_symbol_ref_info(
+    db: &dyn Db,
+    path: InFile<&ast::PathRef>,
+    kind: SymbolKind,
+) -> Option<(Schema, String)> {
+    resolve_symbol_info_from_parts(
+        db,
+        path.file_id,
+        name::table_name(path.value)?,
+        name::schema_name(path.value),
+        path.value.syntax().text_range().start(),
+        kind,
+    )
+}
+
+fn resolve_symbol_info_from_parts(
+    db: &dyn Db,
+    file: File,
+    name: Name,
+    schema: Option<Schema>,
+    position: TextSize,
+    kind: SymbolKind,
+) -> Option<(Schema, String)> {
+    let binder = bind(db, file);
     let schemas = binder.resolved_schemas(position, schema.as_ref());
     binder.lookup_info(&name, kind, &schemas)
 }
@@ -4561,7 +4611,7 @@ fn param_signature(node: &ast::HasParamList) -> Option<Vec<Name>> {
     for param in node.param_list()?.params() {
         if let Some(ast::Type::PathType(path_type)) = param.ty()
             && let Some(name_ref) = path_type
-                .path()
+                .path_ref()
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
         {
@@ -4620,7 +4670,7 @@ fn resolve_composite_type_field_ptr(
 
 fn resolve_composite_type_field_for_path(
     db: &dyn Db,
-    path: InFile<&ast::Path>,
+    path: InFile<&ast::PathRef>,
     field_name: &Name,
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = path.file_id;
@@ -4702,7 +4752,7 @@ fn resolve_update_table_name_ptr(
         }
     }
 
-    let path = update.relation_name()?.path()?;
+    let path = update.relation_name()?.path_ref()?;
     resolve_table_in_returning_clause(
         db,
         InFile::new(file, table_name_ref),
@@ -4791,7 +4841,7 @@ fn resolve_update_column_ptr(
     }
 
     // `update t set a = b`
-    let path = update.relation_name()?.path()?;
+    let path = update.relation_name()?.path_ref()?;
     resolve_column_for_path(db, InFile::new(file, &path), column_name)
 }
 
@@ -4817,7 +4867,7 @@ fn resolve_delete_column_ptr(
         }
     }
 
-    let path = delete.relation_name()?.path()?;
+    let path = delete.relation_name()?.path_ref()?;
     resolve_column_for_path(db, InFile::new(file, &path), column_name)
 }
 
@@ -4858,7 +4908,7 @@ fn resolve_delete_table_name_ptr(
         }
     }
 
-    let path = delete.relation_name()?.path()?;
+    let path = delete.relation_name()?.path_ref()?;
     resolve_table_in_returning_clause(
         db,
         InFile::new(file, table_name_ref),
@@ -4905,7 +4955,7 @@ fn resolve_merge_column_ptr(
         return Some(ptr);
     }
 
-    let path = merge.relation_name()?.path()?;
+    let path = merge.relation_name()?.path_ref()?;
     resolve_column_for_path(db, InFile::new(file, &path), column_name)
 }
 
@@ -4915,7 +4965,7 @@ fn resolve_table_in_returning_clause(
     db: &dyn Db,
     table_name_ref: InFile<&ast::NameRef>,
     alias: Option<ast::Alias>,
-    path: &ast::Path,
+    path: &ast::PathRef,
     returning_clause: Option<ast::ReturningClause>,
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = table_name_ref.file_id;
@@ -4975,7 +5025,7 @@ fn resolve_merge_table_name_ptr(
         .ancestors()
         .find_map(ast::Merge::cast)?;
 
-    let path = merge.relation_name()?.path()?;
+    let path = merge.relation_name()?.path_ref()?;
 
     // Check USING clause for the source table - MERGE-specific.
     // A source alias hides the underlying table name.

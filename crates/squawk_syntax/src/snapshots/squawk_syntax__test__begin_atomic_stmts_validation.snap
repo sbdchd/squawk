@@ -20,8 +20,8 @@ SOURCE_FILE@0..239
       RETURNS_KW@20..27 "returns"
       WHITESPACE@27..28 " "
       PATH_TYPE@28..32
-        PATH@28..32
-          PATH_SEGMENT@28..32
+        PATH_REF@28..32
+          PATH_SEGMENT_REF@28..32
             NAME_REF@28..32
               IDENT@28..32 "void"
     WHITESPACE@32..33 "\n"
@@ -42,8 +42,8 @@ SOURCE_FILE@0..239
           WHITESPACE@67..68 " "
           INTO_KW@68..72 "into"
           WHITESPACE@72..73 " "
-          PATH@73..74
-            PATH_SEGMENT@73..74
+          PATH_REF@73..74
+            PATH_SEGMENT_REF@73..74
               NAME_REF@73..74
                 IDENT@73..74 "t"
           WHITESPACE@74..75 " "
@@ -63,8 +63,8 @@ SOURCE_FILE@0..239
           WHITESPACE@95..96 " "
           INTO_KW@96..100 "into"
           WHITESPACE@100..101 " "
-          PATH@101..102
-            PATH_SEGMENT@101..102
+          PATH_REF@101..102
+            PATH_SEGMENT_REF@101..102
               NAME_REF@101..102
                 IDENT@101..102 "t"
           WHITESPACE@102..103 " "
@@ -98,8 +98,8 @@ SOURCE_FILE@0..239
       RETURNS_KW@140..147 "returns"
       WHITESPACE@147..148 " "
       PATH_TYPE@148..152
-        PATH@148..152
-          PATH_SEGMENT@148..152
+        PATH_REF@148..152
+          PATH_SEGMENT_REF@148..152
             NAME_REF@148..152
               IDENT@148..152 "void"
     WHITESPACE@152..153 "\n"
@@ -120,8 +120,8 @@ SOURCE_FILE@0..239
           WHITESPACE@187..188 " "
           INTO_KW@188..192 "into"
           WHITESPACE@192..193 " "
-          PATH@193..194
-            PATH_SEGMENT@193..194
+          PATH_REF@193..194
+            PATH_SEGMENT_REF@193..194
               NAME_REF@193..194
                 IDENT@193..194 "t"
           WHITESPACE@194..195 " "
@@ -140,8 +140,8 @@ SOURCE_FILE@0..239
           WHITESPACE@214..215 " "
           INTO_KW@215..219 "into"
           WHITESPACE@219..220 " "
-          PATH@220..221
-            PATH_SEGMENT@220..221
+          PATH_REF@220..221
+            PATH_SEGMENT_REF@220..221
               NAME_REF@220..221
                 IDENT@220..221 "t"
           WHITESPACE@221..222 " "

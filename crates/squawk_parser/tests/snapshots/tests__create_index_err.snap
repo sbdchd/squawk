@@ -16,8 +16,8 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "

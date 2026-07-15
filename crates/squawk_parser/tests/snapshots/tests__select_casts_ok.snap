@@ -13,8 +13,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     NUMERIC_KW "numeric"
             WHITESPACE " "
@@ -35,8 +35,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     NUMERIC_KW "numeric"
     SEMICOLON ";"
@@ -56,8 +56,8 @@ SOURCE_FILE
             AS_KW "as"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     NUMERIC_KW "numeric"
             R_PAREN ")"
@@ -154,8 +154,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INTEGER_KW "integer"
     SEMICOLON ";"
@@ -174,13 +174,13 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH
-                    PATH_SEGMENT
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       VARCHAR_KW "varchar"
                 ARG_LIST
@@ -207,8 +207,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INT_KW "int"
               L_BRACK "["
@@ -228,8 +228,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INT_KW "int"
     SEMICOLON ";"
@@ -248,8 +248,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       NUMERIC_KW "numeric"
               L_BRACK "["
@@ -274,8 +274,8 @@ SOURCE_FILE
                 WHITESPACE " "
                 ARRAY_TYPE
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           INT_KW "int"
                   L_BRACK "["
@@ -287,8 +287,8 @@ SOURCE_FILE
               WHITESPACE " "
               ARRAY_TYPE
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "int8"
                 L_BRACK "["
@@ -300,8 +300,8 @@ SOURCE_FILE
             WHITESPACE " "
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       NUMERIC_KW "numeric"
               L_BRACK "["
@@ -326,8 +326,8 @@ SOURCE_FILE
                   COLON ":"
                 ARRAY_TYPE
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           INT_KW "int"
                   L_BRACK "["
@@ -337,8 +337,8 @@ SOURCE_FILE
                 COLON ":"
               ARRAY_TYPE
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "int8"
                 L_BRACK "["
@@ -348,8 +348,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       NUMERIC_KW "numeric"
               L_BRACK "["
@@ -377,8 +377,8 @@ SOURCE_FILE
             PATH_TYPE
               SETOF_KW "setof"
               WHITESPACE " "
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INT_KW "int"
             R_PAREN ")"
@@ -399,8 +399,8 @@ SOURCE_FILE
             PATH_TYPE
               SETOF_KW "setof"
               WHITESPACE " "
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INT_KW "int"
     SEMICOLON ";"
@@ -1571,8 +1571,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     JSON_KW "json"
     SEMICOLON ";"
@@ -1593,8 +1593,8 @@ SOURCE_FILE
                 COLON ":"
                 COLON ":"
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "jsonb"
             WHITESPACE " "
@@ -1609,8 +1609,8 @@ SOURCE_FILE
                 COLON ":"
                 COLON ":"
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "jsonb"
     SEMICOLON ";"
@@ -1630,13 +1630,13 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH
-                  PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
     SEMICOLON ";"
@@ -1654,13 +1654,13 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH
-                  PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
               ARG_LIST
@@ -1774,8 +1774,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
                 ARG_LIST
@@ -1801,13 +1801,13 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH
-                  PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "buzz"
               ARG_LIST
@@ -1832,18 +1832,18 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH
-                    PATH
-                      PATH_SEGMENT
+                PATH_REF
+                  PATH_REF
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "bar"
                     DOT "."
-                    PATH_SEGMENT
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "buzz"
               L_BRACK "["
@@ -1866,18 +1866,18 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH
-                    PATH
-                      PATH_SEGMENT
+                PATH_REF
+                  PATH_REF
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "bar"
                     DOT "."
-                    PATH_SEGMENT
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "buzz"
                 ARG_LIST
@@ -1905,8 +1905,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INT_KW "int"
     SEMICOLON ";"
@@ -1924,8 +1924,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INTEGER_KW "integer"
     SEMICOLON ";"
@@ -1943,8 +1943,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     SMALLINT_KW "smallint"
     SEMICOLON ";"
@@ -1962,8 +1962,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     BIGINT_KW "bigint"
     SEMICOLON ";"
@@ -1981,8 +1981,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     FLOAT_KW "float"
     SEMICOLON ";"
@@ -2000,8 +2000,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     FLOAT_KW "float"
               ARG_LIST
@@ -2043,8 +2043,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     DECIMAL_KW "decimal"
     SEMICOLON ";"
@@ -2062,8 +2062,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     DECIMAL_KW "decimal"
               ARG_LIST
@@ -2097,8 +2097,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     DEC_KW "dec"
     SEMICOLON ";"
@@ -2116,8 +2116,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     DEC_KW "dec"
               ARG_LIST
@@ -2151,8 +2151,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     NUMERIC_KW "numeric"
     SEMICOLON ";"
@@ -2170,8 +2170,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     NUMERIC_KW "numeric"
               ARG_LIST
@@ -2200,8 +2200,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     BOOLEAN_KW "boolean"
     SEMICOLON ";"
@@ -2220,8 +2220,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       NUMERIC_KW "numeric"
                 ARG_LIST
@@ -2643,8 +2643,8 @@ SOURCE_FILE
                 AS_KW "as"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "b"
                 R_PAREN ")"
@@ -2678,8 +2678,8 @@ SOURCE_FILE
             WHITESPACE " "
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
               WHITESPACE " "
@@ -2707,8 +2707,8 @@ SOURCE_FILE
             WHITESPACE " "
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "int8"
               WHITESPACE " "
@@ -2732,8 +2732,8 @@ SOURCE_FILE
             WHITESPACE " "
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INT_KW "int"
               L_BRACK "["
@@ -2759,8 +2759,8 @@ SOURCE_FILE
             WHITESPACE " "
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
               L_BRACK "["
@@ -2788,8 +2788,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
               L_BRACK "["
@@ -2828,8 +2828,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INT_KW "int"
               WHITESPACE " "
@@ -2856,8 +2856,8 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
               L_BRACK "["
@@ -2968,8 +2968,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INTEGER_KW "integer"
     SEMICOLON ";"
@@ -2989,13 +2989,13 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH
-                  PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "pg_catalog"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "int8"
     SEMICOLON ";"
@@ -3014,13 +3014,13 @@ SOURCE_FILE
               COLON ":"
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH
-                    PATH_SEGMENT
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "int8"
               L_BRACK "["
@@ -3044,13 +3044,13 @@ SOURCE_FILE
             AS_KW "as"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH
-                  PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
             R_PAREN ")"
@@ -3072,13 +3072,13 @@ SOURCE_FILE
             WHITESPACE " "
             ARRAY_TYPE
               PATH_TYPE
-                PATH
-                  PATH
-                    PATH_SEGMENT
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       VARCHAR_KW "varchar"
                 ARG_LIST
@@ -3109,13 +3109,13 @@ SOURCE_FILE
             AS_KW "as"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH
-                  PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "b"
             R_PAREN ")"
@@ -3136,8 +3136,8 @@ SOURCE_FILE
             AS_KW "as"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     NUMERIC_KW "numeric"
             R_PAREN ")"
@@ -3153,8 +3153,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     JSON_KW "json"
             WHITESPACE " "
@@ -3729,8 +3729,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INT_KW "int"
             WHITESPACE " "
@@ -3746,8 +3746,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INTEGER_KW "integer"
             WHITESPACE " "
@@ -3763,8 +3763,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     SMALLINT_KW "smallint"
             WHITESPACE " "
@@ -3780,8 +3780,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     BIGINT_KW "bigint"
             WHITESPACE " "
@@ -3797,8 +3797,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     REAL_KW "real"
             WHITESPACE " "
@@ -3814,8 +3814,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     FLOAT_KW "float"
             WHITESPACE " "
@@ -3894,8 +3894,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     DECIMAL_KW "decimal"
             WHITESPACE " "
@@ -3937,8 +3937,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     DEC_KW "dec"
             WHITESPACE " "
@@ -3980,8 +3980,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     NUMERIC_KW "numeric"
             WHITESPACE " "
@@ -3997,8 +3997,8 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     BOOLEAN_KW "boolean"
             WHITESPACE " "

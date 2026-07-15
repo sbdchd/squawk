@@ -23,8 +23,8 @@ SOURCE_FILE
           INTO_KW "into"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
           WHITESPACE "\n    "
@@ -1505,13 +1505,13 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "public"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "notification"
     WHITESPACE "\n"

@@ -13,8 +13,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "products"
     WHITESPACE " "
@@ -39,8 +39,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "products"
     SEMICOLON ";"
@@ -55,8 +55,8 @@ SOURCE_FILE
     RELATION_NAME
       ONLY_KW "only"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     SEMICOLON ";"
@@ -69,8 +69,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
       WHITESPACE " "
@@ -85,8 +85,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "
@@ -103,8 +103,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "
@@ -123,8 +123,8 @@ SOURCE_FILE
     RELATION_NAME
       ONLY_KW "only"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "
@@ -174,8 +174,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " \n"
@@ -206,8 +206,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n"
@@ -264,8 +264,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "user_sessions"
     WHITESPACE " "
@@ -346,8 +346,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -379,8 +379,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "employees"
     WHITESPACE " "
@@ -473,8 +473,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "invoices"
     WHITESPACE " \n"
@@ -497,8 +497,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " \n"
@@ -559,8 +559,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "
@@ -634,8 +634,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "
@@ -737,8 +737,8 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "
@@ -767,8 +767,8 @@ SOURCE_FILE
           FROM_KW "from"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "k"
         R_PAREN ")"
@@ -790,8 +790,8 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "films"
     WHITESPACE " "
@@ -841,8 +841,8 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "films"
     WHITESPACE "\n  "
@@ -893,8 +893,8 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "films"
     WHITESPACE " "
@@ -917,8 +917,8 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "films"
     SEMICOLON ";"
@@ -929,8 +929,8 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "tasks"
     WHITESPACE " "
@@ -960,8 +960,8 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "tasks"
     WHITESPACE " "
@@ -1063,8 +1063,8 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "user_logs"
     WHITESPACE " "

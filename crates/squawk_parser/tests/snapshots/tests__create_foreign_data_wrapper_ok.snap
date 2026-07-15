@@ -36,13 +36,13 @@ SOURCE_FILE
       FDW_OPTION
         HANDLER_KW "handler"
         WHITESPACE " "
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
       WHITESPACE "\n  "
@@ -54,13 +54,13 @@ SOURCE_FILE
       FDW_OPTION
         VALIDATOR_KW "validator"
         WHITESPACE " "
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "f"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
       WHITESPACE "\n  "

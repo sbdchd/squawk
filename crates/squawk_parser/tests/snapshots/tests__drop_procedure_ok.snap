@@ -12,8 +12,8 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_SIG_LIST
       FUNCTION_SIG
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "s"
     SEMICOLON ";"
@@ -32,36 +32,36 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_SIG_LIST
       FUNCTION_SIG
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "a"
       COMMA ","
       WHITESPACE " "
       FUNCTION_SIG
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
         PARAM_LIST
           L_PAREN "("
           PARAM
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     TEXT_KW "text"
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
       FUNCTION_SIG
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "c"
         PARAM_LIST
@@ -74,16 +74,16 @@ SOURCE_FILE
               IDENT "f"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     INT_KW "int"
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
       FUNCTION_SIG
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
         PARAM_LIST
@@ -93,8 +93,8 @@ SOURCE_FILE
               OUT_KW "out"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     TEXT_KW "text"
           R_PAREN ")"
@@ -114,8 +114,8 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_SIG_LIST
       FUNCTION_SIG
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "a"
     WHITESPACE " "

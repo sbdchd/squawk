@@ -18,8 +18,8 @@ SOURCE_FILE
     COLLATION_FROM
       FROM_KW "from"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "d"
     SEMICOLON ";"
@@ -39,8 +39,8 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -51,13 +51,13 @@ SOURCE_FILE
     COLLATION_FROM
       FROM_KW "from"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "d"
     SEMICOLON ";"
@@ -77,8 +77,8 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -152,8 +152,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "r"
       COMMA ","

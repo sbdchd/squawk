@@ -646,7 +646,7 @@ fn create_tablespace_symbol(create_tablespace: ast::CreateTablespace) -> Option<
 }
 
 fn create_database_symbol(create_database: ast::CreateDatabase) -> Option<DocumentSymbol> {
-    let name_node = create_database.name()?;
+    let name_node = create_database.database()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_database.syntax().text_range();

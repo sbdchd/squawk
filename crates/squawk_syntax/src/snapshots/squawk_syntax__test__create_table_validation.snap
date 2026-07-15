@@ -21,8 +21,8 @@ SOURCE_FILE@0..75
           IDENT@19..20 "x"
         WHITESPACE@20..21 " "
         PATH_TYPE@21..24
-          PATH@21..24
-            PATH_SEGMENT@21..24
+          PATH_REF@21..24
+            PATH_SEGMENT_REF@21..24
               NAME_REF@21..24
                 INT_KW@21..24 "int"
       COMMA@24..25 ","

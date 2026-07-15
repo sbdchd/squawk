@@ -13,8 +13,8 @@ SOURCE_FILE
     FOR_KW "for"
     WHITESPACE " "
     PATH_TYPE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             TEXT_KW "text"
     WHITESPACE " "
@@ -39,8 +39,8 @@ SOURCE_FILE
     FOR_KW "for"
     WHITESPACE " "
     PATH_TYPE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "

@@ -235,7 +235,7 @@ fn api_walkthrough() {
         ast::Type::PathType(r) => r,
         _ => unreachable!(),
     };
-    let type_path: ast::Path = type_.path().unwrap();
+    let type_path: ast::PathRef = type_.path_ref().unwrap();
     assert_eq!(type_path.syntax().to_string(), "int");
 
     // params

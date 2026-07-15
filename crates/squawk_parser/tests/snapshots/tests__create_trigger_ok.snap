@@ -23,8 +23,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "ON"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "core_recipe"
     WHITESPACE "\n"
@@ -78,18 +78,18 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH
-            PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "buzz"
     WHITESPACE "\n"
@@ -209,8 +209,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
     WHITESPACE "\n"
@@ -266,8 +266,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
     WHITESPACE "\n"
@@ -339,8 +339,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "buzz"
     WHITESPACE "\n"

@@ -11,8 +11,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -29,8 +29,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -51,8 +51,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -73,8 +73,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -95,8 +95,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -117,8 +117,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -143,8 +143,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -169,8 +169,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "f"
       PARAM_LIST
@@ -183,8 +183,8 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         COMMA ","
@@ -197,8 +197,8 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INT_KW "int"
         R_PAREN ")"
@@ -218,8 +218,8 @@ SOURCE_FILE
     ROUTINE_KW "routine"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "r"
     WHITESPACE "\n  "
@@ -296,8 +296,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "c"
           WHITESPACE " "
@@ -310,8 +310,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "c"
           WHITESPACE " "
@@ -323,8 +323,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "c"
           WHITESPACE " "
@@ -336,8 +336,8 @@ SOURCE_FILE
       RESET_FUNC_OPTION
         RESET_KW "reset"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "c"
       WHITESPACE "\n  "

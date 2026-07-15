@@ -17,8 +17,8 @@ SOURCE_FILE@0..389
       EXISTS_KW@30..36 "exists"
     WHITESPACE@36..42 " \n    "
     AGGREGATE@42..46
-      PATH@42..43
-        PATH_SEGMENT@42..43
+      PATH_REF@42..43
+        PATH_SEGMENT_REF@42..43
           NAME_REF@42..43
             IDENT@42..43 "a"
       PARAM_LIST@43..46
@@ -28,13 +28,13 @@ SOURCE_FILE@0..389
     COMMA@46..47 ","
     WHITESPACE@47..53 " \n    "
     AGGREGATE@53..63
-      PATH@53..60
-        PATH@53..56
-          PATH_SEGMENT@53..56
+      PATH_REF@53..60
+        PATH_REF@53..56
+          PATH_SEGMENT_REF@53..56
             NAME_REF@53..56
               IDENT@53..56 "foo"
         DOT@56..57 "."
-        PATH_SEGMENT@57..60
+        PATH_SEGMENT_REF@57..60
           NAME_REF@57..60
             IDENT@57..60 "bar"
       PARAM_LIST@60..63
@@ -44,13 +44,13 @@ SOURCE_FILE@0..389
     COMMA@63..64 ","
     WHITESPACE@64..70 " \n    "
     AGGREGATE@70..146
-      PATH@70..77
-        PATH@70..73
-          PATH_SEGMENT@70..73
+      PATH_REF@70..77
+        PATH_REF@70..73
+          PATH_SEGMENT_REF@70..73
             NAME_REF@70..73
               IDENT@70..73 "foo"
         DOT@73..74 "."
-        PATH_SEGMENT@74..77
+        PATH_SEGMENT_REF@74..77
           NAME_REF@74..77
             IDENT@74..77 "bar"
       PARAM_LIST@77..146
@@ -64,8 +64,8 @@ SOURCE_FILE@0..389
             IDENT@90..93 "foo"
           WHITESPACE@93..94 " "
           PATH_TYPE@94..101
-            PATH@94..101
-              PATH_SEGMENT@94..101
+            PATH_REF@94..101
+              PATH_SEGMENT_REF@94..101
                 NAME_REF@94..101
                   INTEGER_KW@94..101 "integer"
         COMMA@101..102 ","
@@ -78,16 +78,16 @@ SOURCE_FILE@0..389
             IDENT@115..118 "bar"
           WHITESPACE@118..119 " "
           PATH_TYPE@119..126
-            PATH@119..126
-              PATH_SEGMENT@119..126
+            PATH_REF@119..126
+              PATH_SEGMENT_REF@119..126
                 NAME_REF@119..126
                   INTEGER_KW@119..126 "integer"
         COMMA@126..127 ","
         WHITESPACE@127..136 "\n        "
         PARAM@136..140
           PATH_TYPE@136..140
-            PATH@136..140
-              PATH_SEGMENT@136..140
+            PATH_REF@136..140
+              PATH_SEGMENT_REF@136..140
                 NAME_REF@136..140
                   TEXT_KW@136..140 "text"
         WHITESPACE@140..145 "\n    "
@@ -95,8 +95,8 @@ SOURCE_FILE@0..389
     COMMA@146..147 ","
     WHITESPACE@147..153 " \n    "
     AGGREGATE@153..157
-      PATH@153..154
-        PATH_SEGMENT@153..154
+      PATH_REF@153..154
+        PATH_SEGMENT_REF@153..154
           NAME_REF@153..154
             IDENT@153..154 "c"
       PARAM_LIST@154..157
@@ -115,8 +115,8 @@ SOURCE_FILE@0..389
     AGGREGATE_KW@188..197 "aggregate"
     WHITESPACE@197..198 " "
     AGGREGATE@198..290
-      PATH@198..199
-        PATH_SEGMENT@198..199
+      PATH_REF@198..199
+        PATH_SEGMENT_REF@198..199
           NAME_REF@198..199
             IDENT@198..199 "a"
       PARAM_LIST@199..290
@@ -124,24 +124,24 @@ SOURCE_FILE@0..389
         WHITESPACE@200..203 "\n  "
         PARAM@203..210
           PATH_TYPE@203..210
-            PATH@203..210
-              PATH_SEGMENT@203..210
+            PATH_REF@203..210
+              PATH_SEGMENT_REF@203..210
                 NAME_REF@203..210
                   INTEGER_KW@203..210 "integer"
         COMMA@210..211 ","
         WHITESPACE@211..214 "\n  "
         PARAM@214..218
           PATH_TYPE@214..218
-            PATH@214..218
-              PATH_SEGMENT@214..218
+            PATH_REF@214..218
+              PATH_SEGMENT_REF@214..218
                 NAME_REF@214..218
                   TEXT_KW@214..218 "text"
         COMMA@218..219 ","
         WHITESPACE@219..222 "\n  "
         PARAM@222..229
           PATH_TYPE@222..229
-            PATH@222..229
-              PATH_SEGMENT@222..229
+            PATH_REF@222..229
+              PATH_SEGMENT_REF@222..229
                 NAME_REF@222..229
                   NUMERIC_KW@222..229 "numeric"
         WHITESPACE@229..232 "\n  "
@@ -168,16 +168,16 @@ SOURCE_FILE@0..389
             IDENT@269..270 "b"
           WHITESPACE@270..271 " "
           PATH_TYPE@271..278
-            PATH@271..278
-              PATH_SEGMENT@271..278
+            PATH_REF@271..278
+              PATH_SEGMENT_REF@271..278
                 NAME_REF@271..278
                   NUMERIC_KW@271..278 "numeric"
         COMMA@278..279 ","
         WHITESPACE@279..284 "\n    "
         PARAM@284..288
           PATH_TYPE@284..288
-            PATH@284..288
-              PATH_SEGMENT@284..288
+            PATH_REF@284..288
+              PATH_SEGMENT_REF@284..288
                 NAME_REF@284..288
                   TEXT_KW@284..288 "text"
         WHITESPACE@288..289 "\n"
@@ -192,13 +192,13 @@ SOURCE_FILE@0..389
     AGGREGATE_KW@307..316 "aggregate"
     WHITESPACE@316..317 " "
     AGGREGATE@317..386
-      PATH@317..324
-        PATH@317..320
-          PATH_SEGMENT@317..320
+      PATH_REF@317..324
+        PATH_REF@317..320
+          PATH_SEGMENT_REF@317..320
             NAME_REF@317..320
               IDENT@317..320 "foo"
         DOT@320..321 "."
-        PATH_SEGMENT@321..324
+        PATH_SEGMENT_REF@321..324
           NAME_REF@321..324
             IDENT@321..324 "bar"
       PARAM_LIST@324..386
@@ -227,16 +227,16 @@ SOURCE_FILE@0..389
             IDENT@365..366 "b"
           WHITESPACE@366..367 " "
           PATH_TYPE@367..374
-            PATH@367..374
-              PATH_SEGMENT@367..374
+            PATH_REF@367..374
+              PATH_SEGMENT_REF@367..374
                 NAME_REF@367..374
                   NUMERIC_KW@367..374 "numeric"
         COMMA@374..375 ","
         WHITESPACE@375..380 "\n    "
         PARAM@380..384
           PATH_TYPE@380..384
-            PATH@380..384
-              PATH_SEGMENT@380..384
+            PATH_REF@380..384
+              PATH_SEGMENT_REF@380..384
                 NAME_REF@380..384
                   TEXT_KW@380..384 "text"
         WHITESPACE@384..385 "\n"

@@ -11,13 +11,13 @@ SOURCE_FILE@0..470
     TABLE_KW@73..78 "table"
     WHITESPACE@78..79 " "
     RELATION_NAME@79..92
-      PATH@79..92
-        PATH@79..85
-          PATH_SEGMENT@79..85
+      PATH_REF@79..92
+        PATH_REF@79..85
+          PATH_SEGMENT_REF@79..85
             NAME_REF@79..85
               IDENT@79..85 "public"
         DOT@85..86 "."
-        PATH_SEGMENT@86..92
+        PATH_SEGMENT_REF@86..92
           NAME_REF@86..92
             IDENT@86..92 "widget"
     WHITESPACE@92..95 "\n  "
@@ -52,13 +52,13 @@ SOURCE_FILE@0..470
                   COLON@187..188 ":"
                   COLON@188..189 ":"
                 PATH_TYPE@189..220
-                  PATH@189..220
-                    PATH@189..201
-                      PATH_SEGMENT@189..201
+                  PATH_REF@189..220
+                    PATH_REF@189..201
+                      PATH_SEGMENT_REF@189..201
                         NAME_REF@189..201
                           IDENT@189..201 "custom_types"
                     DOT@201..202 "."
-                    PATH_SEGMENT@202..220
+                    PATH_SEGMENT_REF@202..220
                       NAME_REF@202..220
                         IDENT@202..220 "widget_schema_type"
             COMMA@220..221 ","
@@ -82,13 +82,13 @@ SOURCE_FILE@0..470
     TABLE_KW@252..257 "table"
     WHITESPACE@257..258 " "
     RELATION_NAME@258..280
-      PATH@258..280
-        PATH@258..264
-          PATH_SEGMENT@258..264
+      PATH_REF@258..280
+        PATH_REF@258..264
+          PATH_SEGMENT_REF@258..264
             NAME_REF@258..264
               IDENT@258..264 "public"
         DOT@264..265 "."
-        PATH_SEGMENT@265..280
+        PATH_SEGMENT_REF@265..280
           NAME_REF@265..280
             IDENT@265..280 "widget_instance"
     WHITESPACE@280..283 "\n  "
@@ -123,13 +123,13 @@ SOURCE_FILE@0..470
                   COLON@403..404 ":"
                   COLON@404..405 ":"
                 PATH_TYPE@405..436
-                  PATH@405..436
-                    PATH@405..417
-                      PATH_SEGMENT@405..417
+                  PATH_REF@405..436
+                    PATH_REF@405..417
+                      PATH_SEGMENT_REF@405..417
                         NAME_REF@405..417
                           IDENT@405..417 "custom_types"
                     DOT@417..418 "."
-                    PATH_SEGMENT@418..436
+                    PATH_SEGMENT_REF@418..436
                       NAME_REF@418..436
                         IDENT@418..436 "widget_schema_type"
             COMMA@436..437 ","

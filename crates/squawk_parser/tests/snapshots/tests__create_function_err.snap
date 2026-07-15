@@ -30,8 +30,8 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         WHITESPACE "  "
@@ -40,8 +40,8 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INT_KW "int"
         R_PAREN ")"
@@ -76,8 +76,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 FLOAT_KW "float"
         WHITESPACE " "
@@ -89,8 +89,8 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
         WHITESPACE " "
@@ -107,8 +107,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"

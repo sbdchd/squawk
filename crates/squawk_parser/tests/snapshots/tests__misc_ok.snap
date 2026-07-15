@@ -23,8 +23,8 @@ SOURCE_FILE
           IDENT "sensorid"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "TEXT"
       COMMA ","
@@ -34,8 +34,8 @@ SOURCE_FILE
           IDENT "ts"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "TIMESTAMPTZ"
       COMMA ","
@@ -45,8 +45,8 @@ SOURCE_FILE
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "FLOAT8"
       WHITESPACE "\n"
@@ -58,8 +58,8 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "sensors"
     WHITESPACE " "
@@ -107,8 +107,8 @@ SOURCE_FILE
                     COLON ":"
                   ARRAY_TYPE
                     PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                      PATH_REF
+                        PATH_SEGMENT_REF
                           NAME_REF
                             IDENT "timestamptz"
                     L_BRACK "["
@@ -124,8 +124,8 @@ SOURCE_FILE
                     COLON ":"
                   ARRAY_TYPE
                     PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                      PATH_REF
+                        PATH_SEGMENT_REF
                           NAME_REF
                             TEXT_KW "text"
                     L_BRACK "["
@@ -141,8 +141,8 @@ SOURCE_FILE
                     COLON ":"
                   ARRAY_TYPE
                     PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                      PATH_REF
+                        PATH_SEGMENT_REF
                           NAME_REF
                             IDENT "float8"
                     L_BRACK "["
@@ -156,8 +156,8 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "sensors"
     WHITESPACE " "
@@ -235,8 +235,8 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "movies"
     WHITESPACE "\n"
@@ -720,8 +720,8 @@ SOURCE_FILE
                           COLON ":"
                           COLON ":"
                         PATH_TYPE
-                          PATH
-                            PATH_SEGMENT
+                          PATH_REF
+                            PATH_SEGMENT_REF
                               NAME_REF
                                 IDENT "jsonb"
                     COMMA ","
@@ -768,8 +768,8 @@ SOURCE_FILE
                 IDENT "\"index\""
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INT_KW "int"
             COMMA ","
@@ -779,8 +779,8 @@ SOURCE_FILE
                 IDENT "\"document\""
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "jsonb"
             COMMA ","
@@ -790,8 +790,8 @@ SOURCE_FILE
                 IDENT "relevance_score"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "float8"
             R_PAREN ")"
@@ -839,8 +839,8 @@ SOURCE_FILE
         WHITESPACE " "
         ARRAY_TYPE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "int8"
           L_BRACK "["
@@ -855,8 +855,8 @@ SOURCE_FILE
           IDENT "p_hour"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
       COMMA ","
@@ -869,8 +869,8 @@ SOURCE_FILE
           IDENT "p_count"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
       WHITESPACE " "
@@ -881,8 +881,8 @@ SOURCE_FILE
       WHITESPACE " "
       ARRAY_TYPE
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
         L_BRACK "["
@@ -945,16 +945,16 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
       WHITESPACE " "
@@ -971,8 +971,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "sum_per_hour"
       COMMA ","
@@ -986,8 +986,8 @@ SOURCE_FILE
         ATTRIBUTE_VALUE
           ARRAY_TYPE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "int8"
             L_BRACK "["
@@ -1072,8 +1072,8 @@ SOURCE_FILE
                     COLON ":"
                     COLON ":"
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "int4"
               COMMA ","
@@ -1132,8 +1132,8 @@ SOURCE_FILE
                     COLON ":"
                     COLON ":"
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "int4"
               COMMA ","
@@ -1235,8 +1235,8 @@ SOURCE_FILE
         WHITESPACE " "
         ARRAY_TYPE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "int8"
           L_BRACK "["
@@ -1252,8 +1252,8 @@ SOURCE_FILE
         WHITESPACE " "
         ARRAY_TYPE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "int8"
           L_BRACK "["
@@ -1266,8 +1266,8 @@ SOURCE_FILE
       WHITESPACE " "
       ARRAY_TYPE
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
         L_BRACK "["
@@ -1294,13 +1294,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman_test"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
@@ -1324,8 +1324,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "date"
           R_PAREN ")"
@@ -1337,8 +1337,8 @@ SOURCE_FILE
     TABLE_KW "TABLE"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman_test"
       DOT "."
@@ -1351,13 +1351,13 @@ SOURCE_FILE
       WHITESPACE " "
       OF_KW "OF"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "partman_test"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "time_taptest_table"
     WHITESPACE " "
@@ -1370,13 +1370,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman_test"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
@@ -1400,8 +1400,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "date"
           R_PAREN ")"
@@ -1431,8 +1431,8 @@ SOURCE_FILE
     TABLE_KW "Table"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "\"partman_test.time_taptest_table_p20241124\""
     SEMICOLON ";"
@@ -1441,8 +1441,8 @@ SOURCE_FILE
     TABLE_KW "Table"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "\"partman_test.time_taptest_table_default\""
     SEMICOLON ";"
@@ -1453,8 +1453,8 @@ SOURCE_FILE
     TABLE_KW "TABLE"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman_test"
       DOT "."
@@ -1467,13 +1467,13 @@ SOURCE_FILE
       WHITESPACE " "
       OF_KW "OF"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "partman_test"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "time_taptest_table"
     WHITESPACE " "
@@ -1519,13 +1519,13 @@ SOURCE_FILE
       LIKE_CLAUSE
         LIKE_KW "LIKE"
         WHITESPACE " "
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "partman_test"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "time_taptest_table_default"
       R_PAREN ")"
@@ -1549,13 +1549,13 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH
-                PATH_SEGMENT
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "partman_test"
               DOT "."
-              PATH_SEGMENT
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "time_taptest_table_default"
           WHITESPACE " "
@@ -1572,8 +1572,8 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "clean_default_temp"
     WHITESPACE " "
@@ -1627,8 +1627,8 @@ SOURCE_FILE
     TABLE_KW "TABLE"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman_test"
       DOT "."
@@ -1641,13 +1641,13 @@ SOURCE_FILE
       WHITESPACE " "
       OF_KW "OF"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "partman_test"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "time_taptest_table"
     WHITESPACE " "
@@ -1689,8 +1689,8 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "clean_default_temp"
           WHITESPACE " "
@@ -1707,13 +1707,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman_test"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "time_taptest_table"
     WHITESPACE " "
@@ -1766,8 +1766,8 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "clean_default_temp"
     SEMICOLON ";"
@@ -1912,13 +1912,13 @@ SOURCE_FILE
   CALL
     CALL_KW "CALL"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "partition_data_proc"
     ARG_LIST
@@ -1937,13 +1937,13 @@ SOURCE_FILE
     TABLE_AND_COLUMNS_LIST
       TABLE_AND_COLUMNS
         RELATION_NAME
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "partman_test"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "time_taptest_table"
     SEMICOLON ";"
@@ -2023,8 +2023,8 @@ SOURCE_FILE
           IDENT "title"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -2034,8 +2034,8 @@ SOURCE_FILE
           IDENT "plot"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       WHITESPACE "\n    "
@@ -2046,8 +2046,8 @@ SOURCE_FILE
     COPY_KW "COPY"
     WHITESPACE " "
     COPY_TABLE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "tng"
       WHITESPACE " "
@@ -2112,8 +2112,8 @@ SOURCE_FILE
     TABLE_KW "TABLE"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "tng"
     WHITESPACE "\n    "
@@ -2126,8 +2126,8 @@ SOURCE_FILE
         IDENT "vec"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "vector"
     SEMICOLON ";"
@@ -2138,8 +2138,8 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "tng"
     WHITESPACE "\n    "
@@ -2189,8 +2189,8 @@ SOURCE_FILE
                 COLON ":"
                 COLON ":"
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "vector"
     SEMICOLON ";"
@@ -2253,8 +2253,8 @@ SOURCE_FILE
                           COLON ":"
                           COLON ":"
                         PATH_TYPE
-                          PATH
-                            PATH_SEGMENT
+                          PATH_REF
+                            PATH_SEGMENT_REF
                               NAME_REF
                                 IDENT "vector"
               R_PAREN ")"
@@ -2287,8 +2287,8 @@ SOURCE_FILE
           IDENT "query_text"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "TEXT"
       R_PAREN ")"
@@ -2297,8 +2297,8 @@ SOURCE_FILE
       RETURNS_KW "RETURNS"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               TEXT_KW "TEXT"
     WHITESPACE "\n    "
@@ -2354,8 +2354,8 @@ SOURCE_FILE
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bigserial"
       COMMA ","
@@ -2365,8 +2365,8 @@ SOURCE_FILE
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -2376,8 +2376,8 @@ SOURCE_FILE
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
       COMMA ","
@@ -2410,8 +2410,8 @@ SOURCE_FILE
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -2421,8 +2421,8 @@ SOURCE_FILE
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
       COMMA ","
@@ -2432,8 +2432,8 @@ SOURCE_FILE
           IDENT "count"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
       COMMA ","
@@ -2468,16 +2468,17 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "events"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "brin"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -2494,8 +2495,8 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "events"
     WHITESPACE " "
@@ -2660,8 +2661,8 @@ SOURCE_FILE
             COLON ":"
             COLON ":"
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "date"
     WHITESPACE " "
@@ -2714,8 +2715,8 @@ SOURCE_FILE
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -2737,8 +2738,8 @@ SOURCE_FILE
           IDENT "payload"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "jsonb"
       R_PAREN ")"
@@ -2752,16 +2753,17 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "events_json"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "brin"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -2828,8 +2830,8 @@ SOURCE_FILE
           HOUR_KW "hour"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -2839,8 +2841,8 @@ SOURCE_FILE
           IDENT "user_count"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
       COMMA ","
@@ -2870,16 +2872,17 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "events"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "brin"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -2980,8 +2983,8 @@ SOURCE_FILE
           IDENT "start_time"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -2991,8 +2994,8 @@ SOURCE_FILE
           IDENT "end_time"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       R_PAREN ")"
@@ -3001,8 +3004,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE " "
@@ -3117,8 +3120,8 @@ SOURCE_FILE
           PATH_KW "path"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       R_PAREN ")"
@@ -3127,8 +3130,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE " "
@@ -3289,16 +3292,16 @@ SOURCE_FILE
       FDW_OPTION
         HANDLER_KW "handler"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "wasm_fdw_handler"
       WHITESPACE "\n  "
       FDW_OPTION
         VALIDATOR_KW "validator"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "wasm_fdw_validator"
     SEMICOLON ";"
@@ -3392,8 +3395,8 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "cal"
       DOT "."
@@ -3409,8 +3412,8 @@ SOURCE_FILE
           IDENT "attrs"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "jsonb"
       WHITESPACE "\n"
@@ -3445,8 +3448,8 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "cal"
       DOT "."
@@ -3462,8 +3465,8 @@ SOURCE_FILE
           IDENT "attrs"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "jsonb"
       WHITESPACE "\n"
@@ -3610,8 +3613,8 @@ SOURCE_FILE
                         COLON ":"
                         COLON ":"
                       PATH_TYPE
-                        PATH
-                          PATH_SEGMENT
+                        PATH_REF
+                          PATH_SEGMENT_REF
                             NAME_REF
                               JSON_KW "json"
                   R_PAREN ")"
@@ -3649,8 +3652,8 @@ SOURCE_FILE
                           COLON ":"
                           COLON ":"
                         PATH_TYPE
-                          PATH
-                            PATH_SEGMENT
+                          PATH_REF
+                            PATH_SEGMENT_REF
                               NAME_REF
                                 JSON_KW "json"
                     R_PAREN ")"
@@ -3789,8 +3792,8 @@ SOURCE_FILE
                       COLON ":"
                       COLON ":"
                     PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                      PATH_REF
+                        PATH_SEGMENT_REF
                           NAME_REF
                             JSON_KW "json"
                 R_PAREN ")"
@@ -3807,13 +3810,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "cal"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bookings"
     COLUMN_REF_LIST
@@ -3837,8 +3840,8 @@ SOURCE_FILE
               COLON ":"
               COLON ":"
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "jsonb"
           WHITESPACE "\n"
@@ -3952,8 +3955,8 @@ SOURCE_FILE
     ON_KW "ON"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "hourly_stats"
     PARTITION_ITEM_LIST
@@ -3982,8 +3985,8 @@ SOURCE_FILE
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -3993,8 +3996,8 @@ SOURCE_FILE
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
@@ -4004,8 +4007,8 @@ SOURCE_FILE
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       WHITESPACE "\n"
@@ -4047,8 +4050,8 @@ SOURCE_FILE
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -4058,8 +4061,8 @@ SOURCE_FILE
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
@@ -4069,8 +4072,8 @@ SOURCE_FILE
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -4082,8 +4085,8 @@ SOURCE_FILE
           IDENT "user_agent"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -4093,8 +4096,8 @@ SOURCE_FILE
           IDENT "ip_address"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "inet"
       COMMA ","
@@ -4106,8 +4109,8 @@ SOURCE_FILE
           IDENT "event_data"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "jsonb"
       WHITESPACE "\n"
@@ -4132,8 +4135,8 @@ SOURCE_FILE
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bigserial"
         WHITESPACE " "
@@ -4149,8 +4152,8 @@ SOURCE_FILE
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -4160,8 +4163,8 @@ SOURCE_FILE
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
@@ -4171,8 +4174,8 @@ SOURCE_FILE
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       R_PAREN ")"
@@ -4196,8 +4199,8 @@ SOURCE_FILE
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -4210,8 +4213,8 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "events_core"
       COMMA ","
@@ -4221,8 +4224,8 @@ SOURCE_FILE
           IDENT "user_agent"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -4232,8 +4235,8 @@ SOURCE_FILE
           IDENT "ip_address"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "inet"
       WHITESPACE "\n"
@@ -4258,8 +4261,8 @@ SOURCE_FILE
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -4272,8 +4275,8 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "events_core"
       COMMA ","
@@ -4283,8 +4286,8 @@ SOURCE_FILE
           IDENT "event_data"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "jsonb"
       WHITESPACE "\n"
@@ -4508,8 +4511,8 @@ SOURCE_FILE
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "date"
       COMMA ","
@@ -4519,8 +4522,8 @@ SOURCE_FILE
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -4530,8 +4533,8 @@ SOURCE_FILE
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 NUMERIC_KW "numeric"
       R_PAREN ")"
@@ -4583,8 +4586,8 @@ SOURCE_FILE
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "date"
       COMMA ","
@@ -4594,8 +4597,8 @@ SOURCE_FILE
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -4605,8 +4608,8 @@ SOURCE_FILE
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 NUMERIC_KW "numeric"
       WHITESPACE "\n"
@@ -4658,8 +4661,8 @@ SOURCE_FILE
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "date"
       COMMA ","
@@ -4669,8 +4672,8 @@ SOURCE_FILE
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -4680,8 +4683,8 @@ SOURCE_FILE
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 NUMERIC_KW "numeric"
       WHITESPACE "\n"
@@ -4690,8 +4693,9 @@ SOURCE_FILE
     USING_METHOD
       USING_KW "USING"
       WHITESPACE " "
-      NAME_REF
-        IDENT "duckdb"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "duckdb"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -4721,8 +4725,8 @@ SOURCE_FILE
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "date"
       COMMA ","
@@ -4732,8 +4736,8 @@ SOURCE_FILE
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -4743,8 +4747,8 @@ SOURCE_FILE
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 NUMERIC_KW "numeric"
       WHITESPACE "\n"
@@ -4753,8 +4757,9 @@ SOURCE_FILE
     USING_METHOD
       USING_KW "USING"
       WHITESPACE " "
-      NAME_REF
-        IDENT "columnstore"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "columnstore"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Instead of this complex self-join"
@@ -5502,8 +5507,8 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "max_parallel_workers_per_gather"
       WHITESPACE " "
@@ -5519,8 +5524,8 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "parallel_setup_cost"
       WHITESPACE " "
@@ -5536,8 +5541,8 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "parallel_tuple_cost"
       WHITESPACE " "
@@ -5553,8 +5558,8 @@ SOURCE_FILE
     SET_KW "SET"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "min_parallel_table_scan_size"
       WHITESPACE " "
@@ -5884,8 +5889,8 @@ SOURCE_FILE
     ON_KW "ON"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "events"
     WHITESPACE " "
@@ -5922,16 +5927,17 @@ SOURCE_FILE
     ON_KW "ON"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "event_logs"
     WHITESPACE "\n"
     USING_METHOD
       USING_KW "USING"
       WHITESPACE " "
-      NAME_REF
-        IDENT "brin"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "brin"
     PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
@@ -5976,16 +5982,16 @@ SOURCE_FILE
                       COLON ":"
                       COLON ":"
                     PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                      PATH_REF
+                        PATH_SEGMENT_REF
                           NAME_REF
                             TEXT_KW "text"
                   COLON_COLON
                     COLON ":"
                     COLON ":"
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "float8"
               COMMA ","
@@ -5999,16 +6005,16 @@ SOURCE_FILE
                       COLON ":"
                       COLON ":"
                     PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
+                      PATH_REF
+                        PATH_SEGMENT_REF
                           NAME_REF
                             TEXT_KW "text"
                   COLON_COLON
                     COLON ":"
                     COLON ":"
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "float8"
               R_PAREN ")"
@@ -6204,8 +6210,8 @@ SOURCE_FILE
     ON_KW "ON"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "recent_product_sales"
     WHITESPACE " "
@@ -6224,8 +6230,8 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "recent_product_sales"
     SEMICOLON ";"
@@ -6243,8 +6249,8 @@ SOURCE_FILE
     ON_KW "ON"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "recent_product_sales"
     PARTITION_ITEM_LIST
@@ -6260,8 +6266,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "sku_index"
     SEMICOLON ";"
@@ -6275,8 +6281,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "CONCURRENTLY"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "recent_product_sales"
     SEMICOLON ";"
@@ -6303,8 +6309,8 @@ SOURCE_FILE
           TIME_KW "time"
         WHITESPACE "        "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "TIMESTAMPTZ"
         WHITESPACE " "
@@ -6319,8 +6325,8 @@ SOURCE_FILE
           IDENT "panel_id"
         WHITESPACE "    "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "TEXT"
       COMMA ","

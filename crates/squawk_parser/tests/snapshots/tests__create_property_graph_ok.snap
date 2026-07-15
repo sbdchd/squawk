@@ -136,8 +136,8 @@ SOURCE_FILE
     GRAPH_KW "graph"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -156,8 +156,8 @@ SOURCE_FILE
     GRAPH_KW "graph"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -172,13 +172,13 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       VERTEX_TABLE_DEF
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "buzz"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "boo"
         WHITESPACE " "
@@ -214,13 +214,13 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       EDGE_TABLE_DEF
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         WHITESPACE " "
@@ -341,8 +341,8 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "e"
         WHITESPACE "\n    "
@@ -384,8 +384,8 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "e"
         WHITESPACE "\n    "
@@ -438,8 +438,8 @@ SOURCE_FILE
     GRAPH_KW "graph"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -454,8 +454,8 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "boo"
       R_PAREN ")"
@@ -468,8 +468,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         WHITESPACE "\n      "
@@ -510,8 +510,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "e"
         WHITESPACE "\n      "
@@ -552,8 +552,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "e"
         WHITESPACE "\n      "
@@ -582,8 +582,8 @@ SOURCE_FILE
     GRAPH_KW "graph"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -598,15 +598,15 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "boo"
       COMMA ","
       WHITESPACE " "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "buzz"
       R_PAREN ")"
@@ -619,8 +619,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         WHITESPACE "\n      "
@@ -638,8 +638,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         WHITESPACE "\n      "

@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     DATABASE_KW "database"
     WHITESPACE " "
-    NAME
-      IDENT "d"
+    DATABASE
+      NAME
+        IDENT "d"
     DATABASE_OPTION_LIST
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -22,8 +23,9 @@ SOURCE_FILE
     WHITESPACE " "
     DATABASE_KW "database"
     WHITESPACE " "
-    NAME
-      IDENT "d"
+    DATABASE
+      NAME
+        IDENT "d"
     WHITESPACE "\n  "
     DATABASE_OPTION_LIST
       WITH_KW "with"

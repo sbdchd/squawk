@@ -11788,6 +11788,36 @@ create operator class ops for type int using btree family fa$0m as operator 1 <;
     }
 
     #[test]
+    fn goto_create_operator_class_for_order_by_family() {
+        assert_snapshot!(goto("
+create operator family sort_fam using btree;
+create operator class ops for type int using gist as operator 1 <-> for order by sort_f$0am;
+"), @"
+          ╭▸ 
+        2 │ create operator family sort_fam using btree;
+          │                        ──────── 2. destination
+        3 │ create operator class ops for type int using gist as operator 1 <-> for order by sort_fam;
+          ╰╴                                                                                      ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_insert_on_conflict_operator_class() {
+        assert_snapshot!(goto("
+create operator class my_ops for type int using btree as operator 1 <;
+create table t(a int);
+insert into t values (1) on conflict (a my_o$0ps) do nothing;
+"), @"
+          ╭▸ 
+        2 │ create operator class my_ops for type int using btree as operator 1 <;
+          │                       ────── 2. destination
+        3 │ create table t(a int);
+        4 │ insert into t values (1) on conflict (a my_ops) do nothing;
+          ╰╴                                           ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_create_index_operator_class() {
         assert_snapshot!(goto("
 create operator class public.my_ops for type int using btree as operator 1 <, function 1 btint4cmp(int,int);

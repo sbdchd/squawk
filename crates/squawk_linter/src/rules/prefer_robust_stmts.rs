@@ -169,7 +169,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropIndex(drop_index)
                 if drop_index.if_exists().is_none() && !inside_transaction =>
             {
-                let fix = drop_index.paths().next().map(|first_index| {
+                let fix = drop_index.path_refs().next().map(|first_index| {
                     let at = first_index.syntax().text_range().start();
                     let edit = Edit::insert("if exists ", at);
                     Fix::new("Insert `if exists`", vec![edit])

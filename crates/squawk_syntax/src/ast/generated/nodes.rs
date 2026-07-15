@@ -38,6 +38,28 @@ impl AccessExclusive {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AccessMethod {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AccessMethod {
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AccessMethodRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AccessMethodRef {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AccessShare {
     pub(crate) syntax: SyntaxNode,
 }
@@ -245,7 +267,7 @@ impl AddMapping {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -472,7 +494,7 @@ impl Aggregate {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
 }
@@ -699,7 +721,7 @@ impl AlterCollation {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -800,7 +822,7 @@ impl AlterConversion {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -835,7 +857,7 @@ impl AlterDatabase {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn database_ref(&self) -> Option<DatabaseRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -945,7 +967,7 @@ impl AlterDomain {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1299,7 +1321,7 @@ impl AlterIndex {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1396,11 +1418,11 @@ impl AlterMapping {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -1443,7 +1465,7 @@ impl AlterMaterializedView {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1505,15 +1527,11 @@ pub struct AlterOperatorClass {
 }
 impl AlterOperatorClass {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn op_class_ref(&self) -> Option<OpClassRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn owner_to(&self) -> Option<OwnerTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1522,6 +1540,10 @@ impl AlterOperatorClass {
     }
     #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_method(&self) -> Option<UsingMethod> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1540,10 +1562,6 @@ impl AlterOperatorClass {
     pub fn operator_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
     }
-    #[inline]
-    pub fn using_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USING_KW)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1560,15 +1578,11 @@ impl AlterOperatorFamily {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn op_family_ref(&self) -> Option<OpFamilyRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn owner_to(&self) -> Option<OwnerTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1577,6 +1591,10 @@ impl AlterOperatorFamily {
     }
     #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_method(&self) -> Option<UsingMethod> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1594,10 +1612,6 @@ impl AlterOperatorFamily {
     #[inline]
     pub fn operator_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
-    }
-    #[inline]
-    pub fn using_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USING_KW)
     }
 }
 
@@ -1774,7 +1788,7 @@ impl AlterPropertyGraph {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2024,7 +2038,7 @@ impl AlterSequence {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2141,7 +2155,7 @@ impl AlterStatistics {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2269,7 +2283,7 @@ impl AlterTablespace {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2320,7 +2334,7 @@ impl AlterTextSearchConfiguration {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2367,7 +2381,7 @@ impl AlterTextSearchDictionary {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2406,7 +2420,7 @@ pub struct AlterTextSearchParser {
 }
 impl AlterTextSearchParser {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2445,7 +2459,7 @@ pub struct AlterTextSearchTemplate {
 }
 impl AlterTextSearchTemplate {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2535,7 +2549,7 @@ impl AlterType {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2719,7 +2733,7 @@ impl AlterView {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3062,7 +3076,7 @@ impl AttachPartition {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3332,7 +3346,7 @@ impl Call {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3740,6 +3754,10 @@ pub struct Cluster {
 }
 impl Cluster {
     #[inline]
+    pub fn cluster_using_index(&self) -> Option<ClusterUsingIndex> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn on_path(&self) -> Option<OnPath> {
         support::child(&self.syntax)
     }
@@ -3748,11 +3766,7 @@ impl Cluster {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn using_method(&self) -> Option<UsingMethod> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3789,12 +3803,27 @@ impl ClusterOn {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ClusterUsingIndex {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ClusterUsingIndex {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Collate {
     pub(crate) syntax: SyntaxNode,
 }
 impl Collate {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3836,7 +3865,7 @@ pub struct CollationFrom {
 }
 impl CollationFrom {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4241,7 +4270,7 @@ impl ConflictIndexItem {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn op_class_ref(&self) -> Option<OpClassRef> {
         support::child(&self.syntax)
     }
 }
@@ -4358,7 +4387,7 @@ pub struct ConstraintIndexMethod {
 }
 impl ConstraintIndexMethod {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn access_method_ref(&self) -> Option<AccessMethodRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4637,7 +4666,7 @@ impl CopyTable {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4690,11 +4719,11 @@ pub struct CreateAccessMethod {
 }
 impl CreateAccessMethod {
     #[inline]
-    pub fn handler_clause(&self) -> Option<HandlerClause> {
+    pub fn access_method(&self) -> Option<AccessMethod> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Path> {
+    pub fn handler_clause(&self) -> Option<HandlerClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4858,6 +4887,10 @@ impl CreateConversion {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SEMICOLON)
     }
@@ -4893,11 +4926,11 @@ pub struct CreateDatabase {
 }
 impl CreateDatabase {
     #[inline]
-    pub fn database_option_list(&self) -> Option<DatabaseOptionList> {
+    pub fn database(&self) -> Option<Database> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn database_option_list(&self) -> Option<DatabaseOptionList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5312,7 +5345,7 @@ impl CreateLanguage {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5426,7 +5459,7 @@ impl CreateOperator {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5449,7 +5482,7 @@ pub struct CreateOperatorClass {
 }
 impl CreateOperatorClass {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn op_class_name(&self) -> Option<OpClassName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5461,11 +5494,11 @@ impl CreateOperatorClass {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn ty(&self) -> Option<Type> {
+    pub fn using_method(&self) -> Option<UsingMethod> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5500,10 +5533,6 @@ impl CreateOperatorClass {
     pub fn type_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TYPE_KW)
     }
-    #[inline]
-    pub fn using_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USING_KW)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -5512,11 +5541,11 @@ pub struct CreateOperatorFamily {
 }
 impl CreateOperatorFamily {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn op_family_name(&self) -> Option<OpFamilyName> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn using_method(&self) -> Option<UsingMethod> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5534,10 +5563,6 @@ impl CreateOperatorFamily {
     #[inline]
     pub fn operator_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
-    }
-    #[inline]
-    pub fn using_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USING_KW)
     }
 }
 
@@ -6866,10 +6891,25 @@ impl CycleSetColumn {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Database {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Database {
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DatabaseOption {
     pub(crate) syntax: SyntaxNode,
 }
 impl DatabaseOption {
+    #[inline]
+    pub fn database_ref(&self) -> Option<DatabaseRef> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
@@ -6928,6 +6968,17 @@ impl DatabaseOptionList {
     #[inline]
     pub fn with_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WITH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DatabaseRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DatabaseRef {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
     }
 }
 
@@ -7184,7 +7235,7 @@ pub struct DetachPartition {
 }
 impl DetachPartition {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7421,11 +7472,11 @@ pub struct DropAccessMethod {
 }
 impl DropAccessMethod {
     #[inline]
-    pub fn if_exists(&self) -> Option<IfExists> {
+    pub fn access_method_ref(&self) -> Option<AccessMethodRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7565,7 +7616,7 @@ impl DropCollation {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -7662,7 +7713,7 @@ impl DropConversion {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7693,11 +7744,11 @@ pub struct DropDatabase {
 }
 impl DropDatabase {
     #[inline]
-    pub fn if_exists(&self) -> Option<IfExists> {
+    pub fn database_ref(&self) -> Option<DatabaseRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7739,7 +7790,7 @@ impl DropDomain {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -7953,7 +8004,7 @@ impl DropForeignTable {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -8073,7 +8124,7 @@ impl DropIndex {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -8178,7 +8229,7 @@ impl DropMaterializedView {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -8320,11 +8371,11 @@ impl DropOperatorClass {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn op_class_ref(&self) -> Option<OpClassRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn using_method(&self) -> Option<UsingMethod> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8351,10 +8402,6 @@ impl DropOperatorClass {
     pub fn restrict_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
-    #[inline]
-    pub fn using_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USING_KW)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -8367,11 +8414,11 @@ impl DropOperatorFamily {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn op_family_ref(&self) -> Option<OpFamilyRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn using_method(&self) -> Option<UsingMethod> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8397,10 +8444,6 @@ impl DropOperatorFamily {
     #[inline]
     pub fn restrict_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
-    }
-    #[inline]
-    pub fn using_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USING_KW)
     }
 }
 
@@ -8523,7 +8566,7 @@ impl DropPropertyGraph {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8748,7 +8791,7 @@ impl DropSequence {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -8818,7 +8861,7 @@ impl DropStatistics {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -8915,7 +8958,7 @@ impl DropTable {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -8977,7 +9020,7 @@ impl DropTextSearchConfig {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9020,7 +9063,7 @@ impl DropTextSearchDict {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9063,7 +9106,7 @@ impl DropTextSearchParser {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9106,7 +9149,7 @@ impl DropTextSearchTemplate {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9200,7 +9243,7 @@ impl DropTrigger {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9235,7 +9278,7 @@ impl DropType {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -9516,7 +9559,7 @@ impl DropView {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -9664,7 +9707,7 @@ impl EdgeTableDef {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -10462,7 +10505,7 @@ impl FdwOption {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -10843,7 +10886,7 @@ impl ForeignKeyConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -10977,7 +11020,7 @@ pub struct FromTable {
 }
 impl FromTable {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11034,7 +11077,7 @@ impl FunctionSig {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
 }
@@ -11331,11 +11374,11 @@ impl GraphTableFn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_pattern_list(&self) -> Option<PathPatternList> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path_pattern_list(&self) -> Option<PathPatternList> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11537,7 +11580,7 @@ pub struct HandlerClause {
 }
 impl HandlerClause {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11667,7 +11710,7 @@ pub struct InDatabase {
 }
 impl InDatabase {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn database_ref(&self) -> Option<DatabaseRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11732,7 +11775,7 @@ pub struct Inherit {
 }
 impl Inherit {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11747,7 +11790,7 @@ pub struct InheritTable {
 }
 impl InheritTable {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11762,7 +11805,7 @@ pub struct Inherits {
 }
 impl Inherits {
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -11827,7 +11870,7 @@ impl Insert {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13500,7 +13543,7 @@ impl LikeClause {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13921,7 +13964,7 @@ impl MergePartitions {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path_list(&self) -> Option<PathList> {
+    pub fn path_ref_list(&self) -> Option<PathRefList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14336,7 +14379,7 @@ pub struct NoInheritTable {
 }
 impl NoInheritTable {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14694,7 +14737,7 @@ pub struct ObjectAccessMethod {
 }
 impl ObjectAccessMethod {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn access_method_ref(&self) -> Option<AccessMethodRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14743,7 +14786,7 @@ pub struct ObjectCollation {
 }
 impl ObjectCollation {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14758,7 +14801,7 @@ pub struct ObjectColumn {
 }
 impl ObjectColumn {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14777,7 +14820,7 @@ impl ObjectConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14800,7 +14843,7 @@ pub struct ObjectConversion {
 }
 impl ObjectConversion {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14815,7 +14858,7 @@ pub struct ObjectDatabase {
 }
 impl ObjectDatabase {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn database_ref(&self) -> Option<DatabaseRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14830,7 +14873,7 @@ pub struct ObjectDomain {
 }
 impl ObjectDomain {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14864,7 +14907,7 @@ pub struct ObjectExtension {
 }
 impl ObjectExtension {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14902,7 +14945,7 @@ pub struct ObjectForeignTable {
 }
 impl ObjectForeignTable {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14921,7 +14964,7 @@ pub struct ObjectIndex {
 }
 impl ObjectIndex {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14974,7 +15017,7 @@ pub struct ObjectMaterializedView {
 }
 impl ObjectMaterializedView {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14997,7 +15040,11 @@ impl ObjectOperator {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn op_class_ref(&self) -> Option<OpClassRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn op_family_ref(&self) -> Option<OpFamilyRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15044,7 +15091,7 @@ impl ObjectPolicy {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15063,7 +15110,7 @@ pub struct ObjectPropertyGraph {
 }
 impl ObjectPropertyGraph {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15082,7 +15129,7 @@ pub struct ObjectPublication {
 }
 impl ObjectPublication {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15097,7 +15144,7 @@ pub struct ObjectRole {
 }
 impl ObjectRole {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15139,7 +15186,7 @@ impl ObjectRule {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15158,7 +15205,7 @@ pub struct ObjectSchema {
 }
 impl ObjectSchema {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15173,7 +15220,7 @@ pub struct ObjectSequence {
 }
 impl ObjectSequence {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15188,7 +15235,7 @@ pub struct ObjectServer {
 }
 impl ObjectServer {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15203,7 +15250,7 @@ pub struct ObjectStatistics {
 }
 impl ObjectStatistics {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15218,7 +15265,7 @@ pub struct ObjectSubscription {
 }
 impl ObjectSubscription {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15233,7 +15280,7 @@ pub struct ObjectTable {
 }
 impl ObjectTable {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15248,7 +15295,7 @@ pub struct ObjectTablespace {
 }
 impl ObjectTablespace {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15263,7 +15310,7 @@ pub struct ObjectTextSearch {
 }
 impl ObjectTextSearch {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15329,7 +15376,7 @@ impl ObjectTrigger {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15348,7 +15395,7 @@ pub struct ObjectType {
 }
 impl ObjectType {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15363,7 +15410,7 @@ pub struct ObjectView {
 }
 impl ObjectView {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15492,7 +15539,7 @@ pub struct OnPath {
 }
 impl OnPath {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15507,7 +15554,7 @@ pub struct OnTable {
 }
 impl OnTable {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15751,6 +15798,17 @@ impl Op {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpClassName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OpClassName {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OpClassOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15768,11 +15826,11 @@ impl OpClassOption {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn param_list(&self) -> Option<ParamList> {
+    pub fn op_family_ref(&self) -> Option<OpFamilyRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn param_list(&self) -> Option<ParamList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15818,6 +15876,39 @@ impl OpClassOption {
     #[inline]
     pub fn storage_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STORAGE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpClassRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OpClassRef {
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpFamilyName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OpFamilyName {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpFamilyRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OpFamilyRef {
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
     }
 }
 
@@ -15869,7 +15960,7 @@ impl OperatorCall {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -15907,7 +15998,7 @@ pub struct OperatorFamilyClause {
 }
 impl OperatorFamilyClause {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn op_family_ref(&self) -> Option<OpFamilyRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16322,7 +16413,7 @@ impl Partition {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16515,7 +16606,7 @@ impl PartitionItem {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn op_class_ref(&self) -> Option<OpClassRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16576,7 +16667,7 @@ pub struct PartitionOf {
 }
 impl PartitionOf {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16610,7 +16701,7 @@ pub struct Path {
 }
 impl Path {
     #[inline]
-    pub fn qualifier(&self) -> Option<Path> {
+    pub fn qualifier(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16635,25 +16726,6 @@ impl PathFactor {
     #[inline]
     pub fn path_primary(&self) -> Option<PathPrimary> {
         support::child(&self.syntax)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PathList {
-    pub(crate) syntax: SyntaxNode,
-}
-impl PathList {
-    #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -16684,6 +16756,44 @@ impl PathPatternList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PathRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PathRef {
+    #[inline]
+    pub fn qualifier(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn segment(&self) -> Option<PathSegmentRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn dot_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PathRefList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PathRefList {
+    #[inline]
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathSegment {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16692,6 +16802,13 @@ impl PathSegment {
     pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PathSegmentRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PathSegmentRef {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -16708,7 +16825,7 @@ impl PathType {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16723,7 +16840,7 @@ pub struct PercentType {
 }
 impl PercentType {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16956,7 +17073,7 @@ pub struct PrivilegeDefault {
 }
 impl PrivilegeDefault {
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
 }
@@ -17013,6 +17130,10 @@ pub struct PrivilegeName {
 }
 impl PrivilegeName {
     #[inline]
+    pub fn database_refs(&self) -> AstChildren<DatabaseRef> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn name_refs(&self) -> AstChildren<NameRef> {
         support::children(&self.syntax)
     }
@@ -17040,7 +17161,7 @@ pub struct PrivilegeParameter {
 }
 impl PrivilegeParameter {
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -17055,7 +17176,7 @@ pub struct PrivilegePropertyGraph {
 }
 impl PrivilegePropertyGraph {
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -17097,7 +17218,7 @@ pub struct PrivilegeTable {
 }
 impl PrivilegeTable {
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -17228,7 +17349,7 @@ impl PublicationObject {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17429,7 +17550,7 @@ impl ReferencesConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn table(&self) -> Option<Path> {
+    pub fn table(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17513,7 +17634,7 @@ pub struct Refresh {
 }
 impl Refresh {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17609,7 +17730,11 @@ pub struct Reindex {
 }
 impl Reindex {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn database_ref(&self) -> Option<DatabaseRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17745,7 +17870,7 @@ pub struct RelationName {
 }
 impl RelationName {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18068,7 +18193,7 @@ pub struct ResetConfigParam {
 }
 impl ResetConfigParam {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18935,7 +19060,7 @@ pub struct RuleOn {
 }
 impl RuleOn {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19280,7 +19405,7 @@ impl SequenceOption {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19485,7 +19610,7 @@ pub struct SetAccessMethod {
 }
 impl SetAccessMethod {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn access_method_ref(&self) -> Option<AccessMethodRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19603,7 +19728,7 @@ impl SetConfig {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19642,7 +19767,7 @@ impl SetConfigParam {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -19696,7 +19821,7 @@ pub struct SetConstraints {
 }
 impl SetConstraints {
     #[inline]
-    pub fn paths(&self) -> AstChildren<Path> {
+    pub fn path_refs(&self) -> AstChildren<PathRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -20234,7 +20359,7 @@ pub struct SetTablespace {
 }
 impl SetTablespace {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20474,7 +20599,7 @@ impl Show {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -20833,7 +20958,7 @@ pub struct SupportFuncOption {
 }
 impl SupportFuncOption {
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21627,7 +21752,7 @@ pub struct UsingMethod {
 }
 impl UsingMethod {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn access_method_ref(&self) -> Option<AccessMethodRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -21892,7 +22017,7 @@ impl VertexTableDef {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -23462,7 +23587,7 @@ pub enum RefAction {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResetTarget {
     All(All),
-    Path(Path),
+    PathRef(PathRef),
     ResetTimeZone(ResetTimeZone),
     ResetTransactionIsolation(ResetTransactionIsolation),
 }
@@ -23818,6 +23943,42 @@ impl AstNode for AccessExclusive {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ACCESS_EXCLUSIVE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AccessMethod {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ACCESS_METHOD
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AccessMethodRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ACCESS_METHOD_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -25920,6 +26081,24 @@ impl AstNode for ClusterOn {
         &self.syntax
     }
 }
+impl AstNode for ClusterUsingIndex {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CLUSTER_USING_INDEX
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Collate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -27486,6 +27665,24 @@ impl AstNode for CycleSetColumn {
         &self.syntax
     }
 }
+impl AstNode for Database {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DATABASE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for DatabaseOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -27508,6 +27705,24 @@ impl AstNode for DatabaseOptionList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::DATABASE_OPTION_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for DatabaseRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DATABASE_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -33930,10 +34145,82 @@ impl AstNode for Op {
         &self.syntax
     }
 }
+impl AstNode for OpClassName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OP_CLASS_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for OpClassOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::OP_CLASS_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OpClassRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OP_CLASS_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OpFamilyName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OP_FAMILY_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OpFamilyRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OP_FAMILY_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -34650,24 +34937,6 @@ impl AstNode for PathFactor {
         &self.syntax
     }
 }
-impl AstNode for PathList {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PATH_LIST
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for PathPattern {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -34704,10 +34973,64 @@ impl AstNode for PathPatternList {
         &self.syntax
     }
 }
+impl AstNode for PathRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PATH_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PathRefList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PATH_REF_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PathSegment {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PATH_SEGMENT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PathSegmentRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PATH_SEGMENT_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -43974,7 +44297,7 @@ impl AstNode for ResetTarget {
         matches!(
             kind,
             SyntaxKind::ALL
-                | SyntaxKind::PATH
+                | SyntaxKind::PATH_REF
                 | SyntaxKind::RESET_TIME_ZONE
                 | SyntaxKind::RESET_TRANSACTION_ISOLATION
         )
@@ -43983,7 +44306,7 @@ impl AstNode for ResetTarget {
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::ALL => ResetTarget::All(All { syntax }),
-            SyntaxKind::PATH => ResetTarget::Path(Path { syntax }),
+            SyntaxKind::PATH_REF => ResetTarget::PathRef(PathRef { syntax }),
             SyntaxKind::RESET_TIME_ZONE => ResetTarget::ResetTimeZone(ResetTimeZone { syntax }),
             SyntaxKind::RESET_TRANSACTION_ISOLATION => {
                 ResetTarget::ResetTransactionIsolation(ResetTransactionIsolation { syntax })
@@ -43998,7 +44321,7 @@ impl AstNode for ResetTarget {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             ResetTarget::All(it) => &it.syntax,
-            ResetTarget::Path(it) => &it.syntax,
+            ResetTarget::PathRef(it) => &it.syntax,
             ResetTarget::ResetTimeZone(it) => &it.syntax,
             ResetTarget::ResetTransactionIsolation(it) => &it.syntax,
         }
@@ -44010,10 +44333,10 @@ impl From<All> for ResetTarget {
         ResetTarget::All(node)
     }
 }
-impl From<Path> for ResetTarget {
+impl From<PathRef> for ResetTarget {
     #[inline]
-    fn from(node: Path) -> ResetTarget {
-        ResetTarget::Path(node)
+    fn from(node: PathRef) -> ResetTarget {
+        ResetTarget::PathRef(node)
     }
 }
 impl From<ResetTimeZone> for ResetTarget {
