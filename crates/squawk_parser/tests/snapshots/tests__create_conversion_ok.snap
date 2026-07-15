@@ -27,8 +27,8 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "f"
     SEMICOLON ";"
@@ -43,13 +43,13 @@ SOURCE_FILE
     CONVERSION_KW "conversion"
     WHITESPACE " "
     PATH
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       DOT "."
@@ -69,13 +69,13 @@ SOURCE_FILE
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     SEMICOLON ";"

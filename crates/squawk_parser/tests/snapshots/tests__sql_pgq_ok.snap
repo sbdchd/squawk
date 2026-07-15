@@ -9,8 +9,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "statement_timeout"
       WHITESPACE " "
@@ -24,8 +24,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "lock_timeout"
       WHITESPACE " "
@@ -61,8 +61,8 @@ SOURCE_FILE
           IDENT "product_no"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
@@ -86,8 +86,8 @@ SOURCE_FILE
           IDENT "price"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 NUMERIC_KW "numeric"
       WHITESPACE "\n"
@@ -112,8 +112,8 @@ SOURCE_FILE
           IDENT "customer_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
@@ -160,8 +160,8 @@ SOURCE_FILE
           IDENT "order_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
@@ -177,8 +177,8 @@ SOURCE_FILE
           IDENT "ordered_when"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "date"
       WHITESPACE "\n"
@@ -203,8 +203,8 @@ SOURCE_FILE
           IDENT "order_items_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
@@ -220,16 +220,16 @@ SOURCE_FILE
           IDENT "order_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "orders"
           WHITESPACE " "
@@ -244,16 +244,16 @@ SOURCE_FILE
           IDENT "product_no"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "products"
           WHITESPACE " "
@@ -268,8 +268,8 @@ SOURCE_FILE
           IDENT "quantity"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
       WHITESPACE "\n"
@@ -294,8 +294,8 @@ SOURCE_FILE
           IDENT "customer_orders_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
@@ -311,16 +311,16 @@ SOURCE_FILE
           IDENT "customer_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "customers"
           WHITESPACE " "
@@ -335,16 +335,16 @@ SOURCE_FILE
           IDENT "order_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "orders"
           WHITESPACE " "
@@ -376,22 +376,22 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "products"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "customers"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "orders"
       WHITESPACE "\n    "
@@ -405,8 +405,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "order_items"
         WHITESPACE " "
@@ -424,8 +424,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "customer_orders"
         WHITESPACE " "
@@ -463,8 +463,8 @@ SOURCE_FILE
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
           L_PAREN "("
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "myshop"
           WHITESPACE " "
@@ -644,8 +644,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "products"
         WHITESPACE " "
@@ -660,8 +660,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "customers"
         WHITESPACE " "
@@ -676,8 +676,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "orders"
         WHITESPACE " "
@@ -700,8 +700,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "order_items"
         WHITESPACE " "
@@ -766,8 +766,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "customer_orders"
         WHITESPACE " "
@@ -853,8 +853,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "products"
         WHITESPACE " "
@@ -867,8 +867,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "customers"
         WHITESPACE " "
@@ -881,8 +881,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "orders"
         WHITESPACE " "
@@ -903,8 +903,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "order_items"
         WHITESPACE " "
@@ -929,8 +929,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "customer_orders"
         WHITESPACE " "
@@ -973,8 +973,8 @@ SOURCE_FILE
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
           L_PAREN "("
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "myshop"
           WHITESPACE " "
@@ -1071,8 +1071,8 @@ SOURCE_FILE
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
           L_PAREN "("
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "mygraph"
           WHITESPACE " "
@@ -1191,8 +1191,8 @@ SOURCE_FILE
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -1208,8 +1208,8 @@ SOURCE_FILE
           NAME_KW "name"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -1219,16 +1219,16 @@ SOURCE_FILE
           IDENT "company_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "Companies"
       WHITESPACE "\n"
@@ -1252,8 +1252,8 @@ SOURCE_FILE
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -1269,8 +1269,8 @@ SOURCE_FILE
           NAME_KW "name"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       WHITESPACE "\n"
@@ -1294,8 +1294,8 @@ SOURCE_FILE
           IDENT "number"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -1311,8 +1311,8 @@ SOURCE_FILE
           IDENT "account_type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -1322,16 +1322,16 @@ SOURCE_FILE
           IDENT "person_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "Persons"
       COMMA ","
@@ -1341,16 +1341,16 @@ SOURCE_FILE
           IDENT "company_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "Companies"
       WHITESPACE "\n"
@@ -1374,8 +1374,8 @@ SOURCE_FILE
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
@@ -1391,16 +1391,16 @@ SOURCE_FILE
           IDENT "from_account"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "Accounts"
       COMMA ","
@@ -1410,16 +1410,16 @@ SOURCE_FILE
           IDENT "to_account"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "Accounts"
       COMMA ","
@@ -1429,8 +1429,8 @@ SOURCE_FILE
           IDENT "date"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "timestamptz"
       COMMA ","
@@ -1440,8 +1440,8 @@ SOURCE_FILE
           IDENT "amount"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
       WHITESPACE "\n"
@@ -1470,8 +1470,8 @@ SOURCE_FILE
       COMMENT "-- label that gets used in the query lang below, i.e., IS Person"
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "Persons"
         WHITESPACE " "
@@ -1496,8 +1496,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "Companies"
         WHITESPACE " "
@@ -1522,8 +1522,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "Accounts"
         WHITESPACE " "
@@ -1556,8 +1556,8 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "Transactions"
         WHITESPACE "\n      "
@@ -1640,8 +1640,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "Accounts"
         WHITESPACE " "
@@ -1699,8 +1699,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "Accounts"
         WHITESPACE " "
@@ -1758,8 +1758,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "Persons"
         WHITESPACE " "
@@ -1847,8 +1847,8 @@ SOURCE_FILE
           WHITESPACE " "
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "financial_transactions"
           WHITESPACE "\n  "

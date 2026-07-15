@@ -70,7 +70,7 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
     match ty {
         ast::Type::PathType(path_type) => {
             if let Some(name_ref) = path_type
-                .path()
+                .path_ref()
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
             {

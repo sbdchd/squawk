@@ -12,8 +12,8 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "order_summary"
     SEMICOLON ";"
@@ -25,8 +25,8 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "annual_statistics_basis"
     WHITESPACE " "
@@ -47,8 +47,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "concurrently"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "v"
     WHITESPACE " "

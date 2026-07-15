@@ -593,8 +593,8 @@ SOURCE_FILE
             AS_KW "as"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "t"
               ARG_LIST
@@ -772,8 +772,8 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE " "

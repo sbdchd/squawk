@@ -68,8 +68,8 @@ SOURCE_FILE
                 IDENT "book_id"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
               WHITESPACE " "
@@ -86,8 +86,8 @@ SOURCE_FILE
                 IDENT "title"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -104,8 +104,8 @@ SOURCE_FILE
                 IDENT "author"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -122,8 +122,8 @@ SOURCE_FILE
                 YEAR_KW "year"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
               WHITESPACE " "
@@ -140,8 +140,8 @@ SOURCE_FILE
                 IDENT "price"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       NUMERIC_KW "numeric"
                 ARG_LIST
@@ -174,8 +174,8 @@ SOURCE_FILE
                 IDENT "discount"
               WHITESPACE " "
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       NUMERIC_KW "numeric"
                 ARG_LIST

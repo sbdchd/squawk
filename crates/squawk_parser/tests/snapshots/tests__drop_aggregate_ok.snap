@@ -11,8 +11,8 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       PARAM_LIST
@@ -34,8 +34,8 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " \n    "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       PARAM_LIST
@@ -45,13 +45,13 @@ SOURCE_FILE
     COMMA ","
     WHITESPACE " \n    "
     AGGREGATE
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       PARAM_LIST
@@ -61,13 +61,13 @@ SOURCE_FILE
     COMMA ","
     WHITESPACE " \n    "
     AGGREGATE
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       PARAM_LIST
@@ -81,8 +81,8 @@ SOURCE_FILE
             IDENT "foo"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INTEGER_KW "integer"
         COMMA ","
@@ -92,16 +92,16 @@ SOURCE_FILE
             IDENT "bar"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INTEGER_KW "integer"
         COMMA ","
         WHITESPACE "\n        "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         WHITESPACE "\n    "
@@ -109,8 +109,8 @@ SOURCE_FILE
     COMMA ","
     WHITESPACE " \n    "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "c"
       PARAM_LIST
@@ -129,8 +129,8 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       PARAM_LIST
@@ -138,24 +138,24 @@ SOURCE_FILE
         WHITESPACE "\n  "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INTEGER_KW "integer"
         COMMA ","
         WHITESPACE "\n  "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         COMMA ","
         WHITESPACE "\n  "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   NUMERIC_KW "numeric"
         WHITESPACE "\n  "
@@ -179,16 +179,16 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   NUMERIC_KW "numeric"
         COMMA ","
         WHITESPACE "\n    "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         WHITESPACE "\n"
@@ -203,13 +203,13 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       PARAM_LIST
@@ -235,16 +235,16 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   NUMERIC_KW "numeric"
         COMMA ","
         WHITESPACE "\n    "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         WHITESPACE "\n"

@@ -116,8 +116,8 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "films"
     WHITESPACE " "
@@ -298,8 +298,8 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "employees"
     WHITESPACE " "
@@ -471,8 +471,8 @@ SOURCE_FILE
                     COLON ":"
                     COLON ":"
                   PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
+                    PATH_REF
+                      PATH_SEGMENT_REF
                         NAME_REF
                           IDENT "inet"
                 R_PAREN ")"

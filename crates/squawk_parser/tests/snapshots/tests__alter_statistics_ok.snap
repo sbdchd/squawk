@@ -10,8 +10,8 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE " "
@@ -30,13 +30,13 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE " "
@@ -56,8 +56,8 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE " "
@@ -77,8 +77,8 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE " "
@@ -98,8 +98,8 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE " "
@@ -117,8 +117,8 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE " "

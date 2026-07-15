@@ -10,8 +10,8 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "kinds"
     SEMICOLON ";"
@@ -28,20 +28,20 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     COMMA ","
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     COMMA ","
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "buzz"
     WHITESPACE " "
@@ -53,8 +53,8 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     WHITESPACE " "

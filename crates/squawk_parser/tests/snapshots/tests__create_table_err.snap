@@ -18,8 +18,8 @@ SOURCE_FILE
           IDENT "sensor_id"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "INTEGER"
       WHITESPACE "\n"
@@ -65,8 +65,8 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       ERROR
@@ -121,8 +121,8 @@ SOURCE_FILE
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
@@ -164,8 +164,8 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
@@ -175,16 +175,16 @@ SOURCE_FILE
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -201,16 +201,16 @@ SOURCE_FILE
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -230,16 +230,16 @@ SOURCE_FILE
           IDENT "d"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -259,16 +259,16 @@ SOURCE_FILE
           IDENT "e"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -325,8 +325,8 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
@@ -346,8 +346,8 @@ SOURCE_FILE
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
@@ -368,8 +368,8 @@ SOURCE_FILE
                 AS_KW "as"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         BIGINT_KW "bigint"
               WHITESPACE "\n    "
@@ -441,13 +441,13 @@ SOURCE_FILE
                 WHITESPACE " "
                 BY_KW "by"
                 WHITESPACE " "
-                PATH
-                  PATH
-                    PATH_SEGMENT
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "fooo"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "bar"
               WHITESPACE "\n    "
@@ -501,8 +501,8 @@ SOURCE_FILE
       WHITESPACE " "
       OF_KW "of"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "u"
     WHITESPACE "\n    "
@@ -549,8 +549,8 @@ SOURCE_FILE
       WHITESPACE " "
       OF_KW "of"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "u"
     WHITESPACE "\n    "
@@ -595,8 +595,8 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
@@ -606,8 +606,8 @@ SOURCE_FILE
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -618,8 +618,9 @@ SOURCE_FILE
         CONSTRAINT_INDEX_METHOD
           USING_KW "using"
           WHITESPACE " "
-          NAME_REF
-            IDENT "btree"
+          ACCESS_METHOD_REF
+            NAME_REF
+              IDENT "btree"
         WHITESPACE " "
         CONSTRAINT_EXCLUSION_LIST
           L_PAREN "("
@@ -631,13 +632,13 @@ SOURCE_FILE
             WITH_KW "with"
             WHITESPACE " "
             OP
-              PATH
-                PATH
-                  PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "buzz"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
               R_ANGLE ">"
           WHITESPACE " "
           CONSTRAINT_EXCLUSION
@@ -671,8 +672,8 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       WHITESPACE "\n"

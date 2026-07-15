@@ -30,8 +30,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
       WHITESPACE "\n"
@@ -50,8 +50,8 @@ SOURCE_FILE
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -70,8 +70,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
       COMMA ","
@@ -84,8 +84,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "bar"
       COMMA ","
@@ -98,8 +98,8 @@ SOURCE_FILE
         WHITESPACE " "
         ATTRIBUTE_VALUE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "b"
       WHITESPACE "\n"

@@ -254,7 +254,7 @@ pub(crate) fn parent_source(node: &SyntaxNode) -> Option<ParentSouce> {
 
 pub(crate) enum CreateTableArg {
     Column(ast::Column),
-    Inherits(ast::Path),
+    Inherits(ast::PathRef),
     LikeClause(ast::LikeClause),
     TableConstraint(#[expect(unused)] ast::TableConstraint),
 }
@@ -265,7 +265,7 @@ pub(crate) fn create_table_args(
     let inherits_iter = create_table
         .inherits()
         .into_iter()
-        .flat_map(|inherits| inherits.paths())
+        .flat_map(|inherits| inherits.path_refs())
         .map(CreateTableArg::Inherits);
 
     let args_iter = create_table

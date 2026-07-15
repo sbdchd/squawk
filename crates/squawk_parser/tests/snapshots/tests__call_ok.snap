@@ -8,8 +8,8 @@ SOURCE_FILE
   CALL
     CALL_KW "CALL"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "do_db_maintenance"
     ARG_LIST
@@ -22,13 +22,13 @@ SOURCE_FILE
   CALL
     CALL_KW "CALL"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "partman"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "partition_data_proc"
     ARG_LIST
@@ -44,8 +44,8 @@ SOURCE_FILE
   CALL
     CALL_KW "CALL"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "do_db_maintenance"
     ARG_LIST

@@ -1697,7 +1697,12 @@ fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
         m.abandon(p);
         return;
     }
-    m.complete(p, PATH_SEGMENT);
+    let kind = if kind == NAME_REF || p.at(DOT) {
+        PATH_SEGMENT_REF
+    } else {
+        PATH_SEGMENT
+    };
+    m.complete(p, kind);
 }
 
 const PATH_FIRST: TokenSet = NON_RESERVED_WORD;
@@ -1708,7 +1713,7 @@ fn opt_path(p: &mut Parser<'_>, kind: SyntaxKind) -> Option<CompletedMarker> {
     }
     let m = p.start();
     path_segment(p, kind);
-    let qual = m.complete(p, PATH);
+    let qual = m.complete(p, path_kind(p, kind));
     Some(path_for_qualifier(p, qual, kind))
 }
 
@@ -1732,6 +1737,14 @@ fn path_name_ref(p: &mut Parser<'_>) {
     }
 }
 
+fn path_kind(p: &Parser<'_>, kind: SyntaxKind) -> SyntaxKind {
+    if kind == NAME && !p.at(DOT) {
+        PATH
+    } else {
+        PATH_REF
+    }
+}
+
 fn path_for_qualifier(
     p: &mut Parser<'_>,
     mut qual: CompletedMarker,
@@ -1742,7 +1755,7 @@ fn path_for_qualifier(
             let path = qual.precede(p);
             p.bump(DOT);
             path_segment(p, kind);
-            let path = path.complete(p, PATH);
+            let path = path.complete(p, path_kind(p, kind));
             qual = path;
         } else {
             return qual;
@@ -2114,8 +2127,8 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         // Wrap expr in type.
         // TODO: can we unify types & exprs?
         let cm = if kind == NAME_REF {
-            let path_segment = cm.precede(p).complete(p, PATH_SEGMENT);
-            let path = path_segment.precede(p).complete(p, PATH);
+            let path_segment = cm.precede(p).complete(p, PATH_SEGMENT_REF);
+            let path = path_segment.precede(p).complete(p, PATH_REF);
             path.precede(p).complete(p, PATH_TYPE)
         } else {
             cm
@@ -4328,7 +4341,7 @@ fn opt_constraint_index_method(p: &mut Parser<'_>) {
     if p.at(USING_KW) {
         let m = p.start();
         p.bump(USING_KW);
-        name_ref(p);
+        access_method_ref(p);
         m.complete(p, CONSTRAINT_INDEX_METHOD);
     }
 }
@@ -5166,7 +5179,7 @@ fn opt_index_opclass(p: &mut Parser<'_>) {
     if p.at(NULLS_KW) && (p.nth_at(1, FIRST_KW) || p.nth_at(1, LAST_KW)) {
         return;
     }
-    opt_path_name_ref(p);
+    opt_op_class_ref(p);
 }
 
 // [ NULLS { FIRST | LAST } ]
@@ -5446,11 +5459,94 @@ fn opt_without_oids(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
+fn access_method(p: &mut Parser<'_>) {
+    let m = p.start();
+    name(p);
+    m.complete(p, ACCESS_METHOD);
+}
+
+fn access_method_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    name_ref(p);
+    m.complete(p, ACCESS_METHOD_REF);
+}
+
+fn database(p: &mut Parser<'_>) {
+    let m = p.start();
+    name(p);
+    m.complete(p, DATABASE);
+}
+
+fn opt_database_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    if opt_name_ref(p).is_some() {
+        Some(m.complete(p, DATABASE_REF))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn database_ref(p: &mut Parser<'_>) {
+    if opt_database_ref(p).is_none() {
+        p.error("expected database name");
+    }
+}
+
+fn op_family_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_name(p);
+    m.complete(p, OP_FAMILY_NAME);
+}
+
+fn op_family_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_name_ref(p);
+    m.complete(p, OP_FAMILY_REF);
+}
+
+fn op_class_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_name(p);
+    m.complete(p, OP_CLASS_NAME);
+}
+
+fn opt_op_class_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    if opt_path_name_ref(p).is_some() {
+        Some(m.complete(p, OP_CLASS_REF))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn op_class_ref(p: &mut Parser<'_>) {
+    if opt_op_class_ref(p).is_none() {
+        p.error("expected path name");
+    }
+}
+
+fn using_method(p: &mut Parser<'_>) {
+    if opt_using_method(p).is_none() {
+        p.error("expected USING");
+    }
+}
+
+fn opt_cluster_using_index(p: &mut Parser<'_>) {
+    if p.at(USING_KW) {
+        let m = p.start();
+        p.bump(USING_KW);
+        name_ref(p);
+        m.complete(p, CLUSTER_USING_INDEX);
+    }
+}
+
 fn opt_using_method(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     // [ USING method ]
     if p.eat(USING_KW) {
-        name_ref(p);
+        access_method_ref(p);
         Some(m.complete(p, USING_METHOD))
     } else {
         m.abandon(p);
@@ -6319,7 +6415,7 @@ fn opt_in_database(p: &mut Parser<'_>) {
     let m = p.start();
     p.bump(IN_KW);
     p.expect(DATABASE_KW);
-    name_ref(p);
+    database_ref(p);
     m.complete(p, IN_DATABASE);
 }
 
@@ -6516,9 +6612,8 @@ fn alter_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ALTER_KW);
     p.bump(OPERATOR_KW);
     p.bump(FAMILY_KW);
-    path_name_ref(p);
-    p.expect(USING_KW);
-    name_ref(p);
+    op_family_ref(p);
+    using_method(p);
     match p.current() {
         ADD_KW => {
             let m = p.start();
@@ -6580,9 +6675,8 @@ fn alter_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ALTER_KW);
     p.bump(OPERATOR_KW);
     p.bump(CLASS_KW);
-    path_name_ref(p);
-    p.expect(USING_KW);
-    name_ref(p);
+    op_class_ref(p);
+    using_method(p);
     match p.current() {
         RENAME_KW => {
             rename_to(p);
@@ -7176,8 +7270,8 @@ fn extension_member_object(p: &mut Parser<'_>) {
     let m = p.start();
     match p.current() {
         SCHEMA_KW | DOMAIN_KW | TABLE_KW | TYPE_KW | EXTENSION_KW | PUBLICATION_KW | SERVER_KW
-        | DATABASE_KW | ROLE_KW | SUBSCRIPTION_KW | TABLESPACE_KW | COLLATION_KW
-        | CONVERSION_KW | SEQUENCE_KW | VIEW_KW | INDEX_KW | STATISTICS_KW => {
+        | ROLE_KW | SUBSCRIPTION_KW | TABLESPACE_KW | COLLATION_KW | CONVERSION_KW
+        | SEQUENCE_KW | VIEW_KW | INDEX_KW | STATISTICS_KW => {
             let kind = match p.current() {
                 SCHEMA_KW => OBJECT_SCHEMA,
                 DOMAIN_KW => OBJECT_DOMAIN,
@@ -7186,7 +7280,6 @@ fn extension_member_object(p: &mut Parser<'_>) {
                 EXTENSION_KW => OBJECT_EXTENSION,
                 PUBLICATION_KW => OBJECT_PUBLICATION,
                 SERVER_KW => OBJECT_SERVER,
-                DATABASE_KW => OBJECT_DATABASE,
                 ROLE_KW => OBJECT_ROLE,
                 SUBSCRIPTION_KW => OBJECT_SUBSCRIPTION,
                 TABLESPACE_KW => OBJECT_TABLESPACE,
@@ -7202,10 +7295,15 @@ fn extension_member_object(p: &mut Parser<'_>) {
             path_name_ref(p);
             m.complete(p, kind);
         }
+        DATABASE_KW => {
+            p.bump(DATABASE_KW);
+            database_ref(p);
+            m.complete(p, OBJECT_DATABASE);
+        }
         ACCESS_KW => {
             p.bump(ACCESS_KW);
             p.expect(METHOD_KW);
-            name_ref(p);
+            access_method_ref(p);
             m.complete(p, OBJECT_ACCESS_METHOD);
         }
         AGGREGATE_KW => {
@@ -7250,8 +7348,12 @@ fn extension_member_object(p: &mut Parser<'_>) {
         }
         OPERATOR_KW if matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
             p.bump(OPERATOR_KW);
-            p.bump_any();
-            path_name_ref(p);
+            if p.eat(FAMILY_KW) {
+                op_family_ref(p);
+            } else {
+                p.bump(CLASS_KW);
+                op_class_ref(p);
+            }
             opt_using_method(p);
             m.complete(p, OBJECT_OPERATOR);
         }
@@ -7625,7 +7727,7 @@ fn alter_database(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(ALTER_KW);
     p.bump(DATABASE_KW);
-    name_ref(p);
+    database_ref(p);
     match p.current() {
         RENAME_KW => {
             rename_to(p);
@@ -8120,6 +8222,13 @@ fn name_ref_list(p: &mut Parser<'_>) {
     }
 }
 
+fn database_ref_list(p: &mut Parser<'_>) {
+    database_ref(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        database_ref(p);
+    }
+}
+
 fn path_name_ref_list(p: &mut Parser<'_>) {
     path_name_ref(p);
     while !p.at(EOF) && p.eat(COMMA) {
@@ -8127,7 +8236,7 @@ fn path_name_ref_list(p: &mut Parser<'_>) {
     }
 }
 
-fn path_list(p: &mut Parser<'_>) {
+fn path_ref_list(p: &mut Parser<'_>) {
     let m = p.start();
     delimited(
         p,
@@ -8138,7 +8247,7 @@ fn path_list(p: &mut Parser<'_>) {
         NAME_REF_FIRST,
         |p| opt_path_name_ref(p).is_some(),
     );
-    m.complete(p, PATH_LIST);
+    m.complete(p, PATH_REF_LIST);
 }
 
 // ALTER TEXT SEARCH TEMPLATE name RENAME TO new_name
@@ -8576,7 +8685,7 @@ fn comment_object(p: &mut Parser<'_>) {
         ACCESS_KW => {
             p.bump(ACCESS_KW);
             p.expect(METHOD_KW);
-            name_ref(p);
+            access_method_ref(p);
             m.complete(p, OBJECT_ACCESS_METHOD);
         }
         AGGREGATE_KW => {
@@ -8589,13 +8698,12 @@ fn comment_object(p: &mut Parser<'_>) {
             cast_sig(p);
             m.complete(p, OBJECT_CAST);
         }
-        COLLATION_KW | CONVERSION_KW | DATABASE_KW | DOMAIN_KW | EXTENSION_KW | INDEX_KW
-        | PUBLICATION_KW | ROLE_KW | SCHEMA_KW | SEQUENCE_KW | SERVER_KW | STATISTICS_KW
-        | SUBSCRIPTION_KW | TABLE_KW | TABLESPACE_KW | TYPE_KW | VIEW_KW => {
+        COLLATION_KW | CONVERSION_KW | DOMAIN_KW | EXTENSION_KW | INDEX_KW | PUBLICATION_KW
+        | ROLE_KW | SCHEMA_KW | SEQUENCE_KW | SERVER_KW | STATISTICS_KW | SUBSCRIPTION_KW
+        | TABLE_KW | TABLESPACE_KW | TYPE_KW | VIEW_KW => {
             let kind = match p.current() {
                 COLLATION_KW => OBJECT_COLLATION,
                 CONVERSION_KW => OBJECT_CONVERSION,
-                DATABASE_KW => OBJECT_DATABASE,
                 DOMAIN_KW => OBJECT_DOMAIN,
                 EXTENSION_KW => OBJECT_EXTENSION,
                 INDEX_KW => OBJECT_INDEX,
@@ -8615,6 +8723,11 @@ fn comment_object(p: &mut Parser<'_>) {
             p.bump_any();
             path_name_ref(p);
             m.complete(p, kind);
+        }
+        DATABASE_KW => {
+            p.bump(DATABASE_KW);
+            database_ref(p);
+            m.complete(p, OBJECT_DATABASE);
         }
         COLUMN_KW => {
             p.bump(COLUMN_KW);
@@ -8669,8 +8782,12 @@ fn comment_object(p: &mut Parser<'_>) {
         }
         OPERATOR_KW if matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
             p.bump(OPERATOR_KW);
-            p.bump_any();
-            path_name_ref(p);
+            if p.eat(FAMILY_KW) {
+                op_family_ref(p);
+            } else {
+                p.bump(CLASS_KW);
+                op_class_ref(p);
+            }
             opt_using_method(p);
             m.complete(p, OBJECT_OPERATOR);
         }
@@ -8774,7 +8891,7 @@ fn cluster(p: &mut Parser<'_>) -> CompletedMarker {
     if has_name {
         opt_on_path(p);
     }
-    opt_using_method(p);
+    opt_cluster_using_index(p);
     p.eat(SEMICOLON);
     m.complete(p, CLUSTER)
 }
@@ -9337,7 +9454,7 @@ fn create_access_method(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.expect(ACCESS_KW);
     p.expect(METHOD_KW);
-    path_name(p);
+    access_method(p);
     p.expect(TYPE_KW);
     if !p.eat(TABLE_KW) && !p.eat(INDEX_KW) {
         p.error("expected TABLE or INDEX");
@@ -9538,16 +9655,20 @@ fn opt_option_value(p: &mut Parser<'_>) -> bool {
     true
 }
 
-fn opt_database_option_value(p: &mut Parser<'_>) -> bool {
+fn opt_database_option_value(p: &mut Parser<'_>, is_database_ref: bool) -> bool {
     if opt_numeric_literal(p).is_none()
         && opt_string_literal(p).is_none()
         && !opt_bool_literal(p)
         && !p.eat(DEFAULT_KW)
     {
         if p.at_ts(NON_RESERVED_WORD) {
-            let m = p.start();
-            p.bump_any();
-            m.complete(p, NAME_REF);
+            if is_database_ref {
+                database_ref(p);
+            } else {
+                let m = p.start();
+                p.bump_any();
+                m.complete(p, NAME_REF);
+            }
             return true;
         } else {
             return false;
@@ -9558,6 +9679,7 @@ fn opt_database_option_value(p: &mut Parser<'_>) -> bool {
 
 fn opt_database_option(p: &mut Parser<'_>) -> bool {
     let m = p.start();
+    let is_database_ref = p.at(TEMPLATE_KW);
     // option name
     match p.current() {
         OWNER_KW | TEMPLATE_KW | ENCODING_KW | IDENT | TABLESPACE_KW => {
@@ -9573,7 +9695,7 @@ fn opt_database_option(p: &mut Parser<'_>) -> bool {
         }
     }
     p.eat(EQ);
-    if !opt_database_option_value(p) {
+    if !opt_database_option_value(p, is_database_ref) {
         p.error("expected create database option value");
         m.complete(p, DATABASE_OPTION);
         return false;
@@ -9605,7 +9727,7 @@ fn create_database(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(CREATE_KW);
     p.bump(DATABASE_KW);
-    name(p);
+    database(p);
     opt_database_option_list(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_DATABASE)
@@ -9945,13 +10067,12 @@ fn create_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(OPERATOR_KW);
     p.expect(CLASS_KW);
-    path_name(p);
+    op_class_name(p);
     p.eat(DEFAULT_KW);
     p.expect(FOR_KW);
     p.expect(TYPE_KW);
     type_name(p);
-    p.expect(USING_KW);
-    name_ref(p);
+    using_method(p);
     opt_operator_family(p);
     p.expect(AS_KW);
     operator_class_option_list(p);
@@ -9962,7 +10083,7 @@ fn create_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
 fn opt_operator_family(p: &mut Parser<'_>) {
     let m = p.start();
     if p.eat(FAMILY_KW) {
-        path_name_ref(p);
+        op_family_ref(p);
         m.complete(p, OPERATOR_FAMILY_CLAUSE);
     } else {
         m.abandon(p);
@@ -9990,7 +10111,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
             if p.eat(FOR_KW) {
                 if p.eat(ORDER_KW) {
                     p.expect(BY_KW);
-                    path_name_ref(p);
+                    op_family_ref(p);
                 } else if p.eat(SEARCH_KW) {
                     // pass
                 } else {
@@ -10044,9 +10165,8 @@ fn create_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(OPERATOR_KW);
     p.expect(FAMILY_KW);
-    path_name(p);
-    p.expect(USING_KW);
-    name_ref(p);
+    op_family_name(p);
+    using_method(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_OPERATOR_FAMILY)
 }
@@ -10862,7 +10982,7 @@ fn drop_access_method(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ACCESS_KW);
     p.expect(METHOD_KW);
     opt_if_exists(p);
-    name_ref(p);
+    access_method_ref(p);
     opt_cascade_or_restrict(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_ACCESS_METHOD)
@@ -11006,9 +11126,8 @@ fn drop_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(OPERATOR_KW);
     p.bump(FAMILY_KW);
     opt_if_exists(p);
-    path_name_ref(p);
-    p.expect(USING_KW);
-    name_ref(p); // index_method
+    op_family_ref(p);
+    using_method(p);
     opt_cascade_or_restrict(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_OPERATOR_FAMILY)
@@ -11058,9 +11177,8 @@ fn drop_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(OPERATOR_KW);
     p.bump(CLASS_KW);
     opt_if_exists(p);
-    path_name_ref(p);
-    p.expect(USING_KW);
-    name_ref(p); // index_method
+    op_class_ref(p);
+    using_method(p);
     opt_cascade_or_restrict(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_OPERATOR_CLASS)
@@ -11930,7 +12048,12 @@ fn privilege_target(p: &mut Parser<'_>) {
                 m.complete(p, PRIVILEGE_TYPE);
             }
             // no schema allowed for the name
-            DATABASE_KW | TABLESPACE_KW | SCHEMA_KW | LANGUAGE_KW => {
+            DATABASE_KW => {
+                p.bump(DATABASE_KW);
+                database_ref_list(p);
+                m.complete(p, PRIVILEGE_NAME);
+            }
+            TABLESPACE_KW | SCHEMA_KW | LANGUAGE_KW => {
                 p.bump_any();
                 name_ref_list(p);
                 m.complete(p, PRIVILEGE_NAME);
@@ -12181,10 +12304,9 @@ fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
 fn security_label_object(p: &mut Parser<'_>) {
     let m = p.start();
     match p.current() {
-        DATABASE_KW | DOMAIN_KW | PUBLICATION_KW | ROLE_KW | SCHEMA_KW | SEQUENCE_KW
-        | SUBSCRIPTION_KW | TABLE_KW | TABLESPACE_KW | TYPE_KW | VIEW_KW => {
+        DOMAIN_KW | PUBLICATION_KW | ROLE_KW | SCHEMA_KW | SEQUENCE_KW | SUBSCRIPTION_KW
+        | TABLE_KW | TABLESPACE_KW | TYPE_KW | VIEW_KW => {
             let kind = match p.current() {
-                DATABASE_KW => OBJECT_DATABASE,
                 DOMAIN_KW => OBJECT_DOMAIN,
                 PUBLICATION_KW => OBJECT_PUBLICATION,
                 ROLE_KW => OBJECT_ROLE,
@@ -12200,6 +12322,11 @@ fn security_label_object(p: &mut Parser<'_>) {
             p.bump_any();
             path_name_ref(p);
             m.complete(p, kind);
+        }
+        DATABASE_KW => {
+            p.bump(DATABASE_KW);
+            database_ref(p);
+            m.complete(p, OBJECT_DATABASE);
         }
         COLUMN_KW => {
             p.bump(COLUMN_KW);
@@ -12564,24 +12691,29 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
         );
         options.complete(p, REINDEX_OPTION_LIST);
     }
-    let name_required = match p.current() {
+    let (name_required, is_database_ref) = match p.current() {
         // { INDEX | TABLE | SCHEMA }
         INDEX_KW | TABLE_KW | SCHEMA_KW => {
             p.bump_any();
-            true
+            (true, false)
         }
         // { DATABASE | SYSTEM }
         DATABASE_KW | SYSTEM_KW => {
             p.bump_any();
-            false
+            (false, true)
         }
         _ => {
             p.error("expected INDEX, TABLE, SCHEMA, DATABASE, or SYSTEM");
-            true
+            (true, false)
         }
     };
     p.eat(CONCURRENTLY_KW);
-    if opt_path_name_ref(p).is_none() && name_required {
+    let name = if is_database_ref {
+        opt_database_ref(p)
+    } else {
+        opt_path_name_ref(p)
+    };
+    if name.is_none() && name_required {
         p.error("expected name");
     }
     p.eat(SEMICOLON);
@@ -14282,7 +14414,7 @@ fn drop_database(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DROP_KW);
     p.expect(DATABASE_KW);
     opt_if_exists(p);
-    name_ref(p);
+    database_ref(p);
     // [ [ WITH ] ( option [, ...] ) ]
     if p.at(L_PAREN) || p.eat(WITH_KW) {
         delimited(
@@ -15501,7 +15633,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             let m = p.start();
             p.bump(MERGE_KW);
             p.expect(PARTITIONS_KW);
-            path_list(p);
+            path_ref_list(p);
             p.eat(INTO_KW);
             path_name(p);
             m.complete(p, MERGE_PARTITIONS)
@@ -15622,7 +15754,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 if !p.eat(DEFAULT_KW) {
                     // TODO: I think this can be stricter
                     // name
-                    name_ref(p);
+                    access_method_ref(p);
                 }
                 SET_ACCESS_METHOD
             // SET { LOGGED | UNLOGGED }

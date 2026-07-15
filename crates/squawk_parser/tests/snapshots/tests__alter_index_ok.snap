@@ -10,8 +10,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -34,13 +34,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -60,8 +60,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -70,8 +70,8 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     SEMICOLON ";"
@@ -86,13 +86,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -101,8 +101,8 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     SEMICOLON ";"
@@ -114,8 +114,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -140,13 +140,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -181,8 +181,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -207,13 +207,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -240,8 +240,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -250,8 +250,8 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "p"
     SEMICOLON ";"
@@ -261,13 +261,13 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -276,13 +276,13 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "s"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "p"
     SEMICOLON ";"
@@ -294,8 +294,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -308,8 +308,8 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "e"
     SEMICOLON ";"
@@ -319,13 +319,13 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -336,8 +336,8 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "e"
     SEMICOLON ";"
@@ -349,8 +349,8 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "
@@ -378,13 +378,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "i"
     WHITESPACE " "

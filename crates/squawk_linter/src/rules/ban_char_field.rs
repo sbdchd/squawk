@@ -33,7 +33,7 @@ fn create_fix(range: TextRange, args: Option<ast::ArgList>) -> Fix {
 
 fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
     if let Some(name_ref) = path_type
-        .path()
+        .path_ref()
         .and_then(|x| x.segment())
         .and_then(|x| x.name_ref())
         && is_char_type(&name_ref.text())

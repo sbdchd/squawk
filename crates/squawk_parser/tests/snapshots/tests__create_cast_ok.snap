@@ -13,16 +13,16 @@ SOURCE_FILE
     CAST_SIG
       L_PAREN "("
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "u"
       R_PAREN ")"
@@ -43,16 +43,16 @@ SOURCE_FILE
     CAST_SIG
       L_PAREN "("
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "u"
       R_PAREN ")"
@@ -77,26 +77,26 @@ SOURCE_FILE
     CAST_SIG
       L_PAREN "("
       PATH_TYPE
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "u"
       R_PAREN ")"
@@ -107,13 +107,13 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         PARAM_LIST
@@ -126,8 +126,8 @@ SOURCE_FILE
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     TEXT_KW "text"
           COMMA ","
@@ -140,16 +140,16 @@ SOURCE_FILE
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     BIGINT_KW "bigint"
           COMMA ","
           WHITESPACE " "
           PARAM
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     TEXT_KW "text"
           R_PAREN ")"

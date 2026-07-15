@@ -55,8 +55,8 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       COMMA ","
@@ -66,13 +66,13 @@ SOURCE_FILE
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "foo"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         WHITESPACE " \n    "
@@ -99,8 +99,8 @@ SOURCE_FILE
         COLLATE
           COLLATE_KW "collate"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "\"fr_FR\""
         WHITESPACE "\n    "
@@ -197,19 +197,19 @@ SOURCE_FILE
       INHERITS_KW "inherits"
       WHITESPACE " "
       L_PAREN "("
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       R_PAREN ")"
@@ -259,8 +259,8 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "of"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "u"
     WHITESPACE "\n    "
@@ -299,13 +299,13 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "of"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "u"
     TABLE_ARG_LIST
@@ -425,8 +425,8 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "of"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "u"
     TABLE_ARG_LIST
@@ -488,8 +488,8 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "of"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "u"
     TABLE_ARG_LIST
@@ -570,8 +570,8 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "of"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "u"
     TABLE_ARG_LIST
@@ -618,8 +618,8 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "cal"
       DOT "."
@@ -635,8 +635,8 @@ SOURCE_FILE
           IDENT "attrs"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "jsonb"
       WHITESPACE "\n"
@@ -683,8 +683,8 @@ SOURCE_FILE
       LIKE_CLAUSE
         LIKE_KW "like"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE "\n"
@@ -717,8 +717,8 @@ SOURCE_FILE
       LIKE_CLAUSE
         LIKE_KW "like"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "local_users"
         WHITESPACE "\n    "

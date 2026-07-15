@@ -14,8 +14,8 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "p"
     WHITESPACE " "
@@ -39,8 +39,8 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "p"
     WHITESPACE " "
@@ -62,13 +62,13 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "p"
     WHITESPACE " "

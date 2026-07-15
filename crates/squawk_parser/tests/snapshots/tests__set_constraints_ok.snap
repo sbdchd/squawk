@@ -30,25 +30,25 @@ SOURCE_FILE
     WHITESPACE " "
     CONSTRAINTS_KW "constraints"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     COMMA ","
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     COMMA ","
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "b"
     WHITESPACE " "
@@ -60,8 +60,8 @@ SOURCE_FILE
     WHITESPACE " "
     CONSTRAINTS_KW "constraints"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE " "

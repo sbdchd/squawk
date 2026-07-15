@@ -45,13 +45,13 @@ SOURCE_FILE
     TABLE_AND_COLUMNS_LIST
       TABLE_AND_COLUMNS
         RELATION_NAME
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "foo"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
         WHITESPACE " "

@@ -16,8 +16,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     SEMICOLON ";"
@@ -35,8 +35,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -57,8 +57,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -81,13 +81,13 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -176,8 +176,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -197,8 +197,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -218,8 +218,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -239,8 +239,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "
@@ -260,8 +260,8 @@ SOURCE_FILE
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     WHITESPACE "\n  "

@@ -37,7 +37,7 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
 fn get_table_name(alter_table: &ast::AlterTable) -> Option<String> {
     alter_table
         .relation_name()?
-        .path()?
+        .path_ref()?
         .segment()?
         .name_ref()
         .map(|x| x.text())

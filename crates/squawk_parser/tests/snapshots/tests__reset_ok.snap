@@ -8,8 +8,8 @@ SOURCE_FILE
   RESET
     RESET_KW "reset"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "some_config_param"
     SEMICOLON ";"
@@ -24,18 +24,18 @@ SOURCE_FILE
   RESET
     RESET_KW "reset"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH
-          PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "buzz"
     SEMICOLON ";"

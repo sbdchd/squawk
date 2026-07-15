@@ -1543,8 +1543,8 @@ fn format_create_index(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> O
 
     let index_schema = index_schema(db, InFile::new(file, create_index.clone()))?;
 
-    let path = create_index.relation_name()?.path()?;
-    let (table_schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
+    let path = create_index.relation_name()?.path_ref()?;
+    let (table_schema, table_name) = resolve::resolve_table_ref_info(db, InFile::new(file, &path))?;
 
     let partition_item_list = create_index.partition_item_list()?;
     let columns = partition_item_list.syntax().text().to_string();
@@ -1574,9 +1574,9 @@ fn format_create_statistics(
     let create_statistics = create_statistics.value;
     let path = create_statistics.path()?;
     let (schema, statistics_name) = resolve::resolve_statistics_info(db, InFile::new(file, &path))?;
-    let table_path = create_statistics.from_table()?.path()?;
+    let table_path = create_statistics.from_table()?.path_ref()?;
     let (table_schema, table_name) =
-        resolve::resolve_table_info(db, InFile::new(file, &table_path))?;
+        resolve::resolve_table_ref_info(db, InFile::new(file, &table_path))?;
 
     Some(hover_with_preceding_comment(
         format!("statistics {schema}.{statistics_name} on {table_schema}.{table_name}"),
@@ -1588,9 +1588,10 @@ fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>
     let file = create_trigger.file_id;
     let create_trigger = create_trigger.value;
     let trigger_name = create_trigger.name()?.syntax().text().to_string();
-    let on_table_path = create_trigger.on_table()?.path()?;
+    let on_table_path = create_trigger.on_table()?.path_ref()?;
 
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
+    let (schema, table_name) =
+        resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
         "trigger {schema}.{trigger_name} on {schema}.{table_name}"
     )))
@@ -1600,9 +1601,10 @@ fn format_create_policy(db: &dyn Db, create_policy: InFile<ast::CreatePolicy>) -
     let file = create_policy.file_id;
     let create_policy = create_policy.value;
     let policy_name = create_policy.name()?.syntax().text().to_string();
-    let on_table_path = create_policy.on_table()?.path()?;
+    let on_table_path = create_policy.on_table()?.path_ref()?;
 
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
+    let (schema, table_name) =
+        resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
         "policy {schema}.{policy_name} on {schema}.{table_name}"
     )))
@@ -1612,9 +1614,10 @@ fn format_create_rule(db: &dyn Db, create_rule: InFile<ast::CreateRule>) -> Opti
     let file = create_rule.file_id;
     let create_rule = create_rule.value;
     let rule_name = create_rule.name()?.syntax().text().to_string();
-    let on_table_path = create_rule.rule_on()?.path()?;
+    let on_table_path = create_rule.rule_on()?.path_ref()?;
 
-    let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &on_table_path))?;
+    let (schema, table_name) =
+        resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
     Some(Hover::snippet(format!(
         "rule {rule_name} on {schema}.{table_name}"
     )))
@@ -1642,7 +1645,12 @@ fn format_create_tablespace(create_tablespace: ast::CreateTablespace) -> Option<
 }
 
 fn format_create_database(create_database: ast::CreateDatabase) -> Option<Hover> {
-    let name = create_database.name()?.syntax().text().to_string();
+    let name = create_database
+        .database()?
+        .name()?
+        .syntax()
+        .text()
+        .to_string();
     Some(Hover::snippet(format!("database {name}")))
 }
 
@@ -1928,10 +1936,10 @@ fn qualified_star_table_ptr(
                 &table_name,
             );
         }
-        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path()?,
-        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path()?,
-        ast_nav::ParentQuery::Insert(insert) => insert.path()?,
-        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path()?,
+        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path_ref()?,
+        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path_ref()?,
+        ast_nav::ParentQuery::Insert(insert) => insert.path_ref()?,
+        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path_ref()?,
     };
 
     table_or_view_or_cte_ptrs(db, InFile::new(file, &path), position)?
@@ -1941,7 +1949,7 @@ fn qualified_star_table_ptr(
 
 fn table_or_view_or_cte_ptrs(
     db: &dyn Db,
-    path: InFile<&ast::Path>,
+    path: InFile<&ast::PathRef>,
     position: TextSize,
 ) -> Option<Vec<SyntaxNodePtr>> {
     let file = path.file_id;
@@ -1988,10 +1996,10 @@ fn unqualified_star_table_ptrs(
             }
             return Some(results);
         }
-        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path(),
-        ast_nav::ParentQuery::Insert(insert) => insert.path(),
-        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path(),
-        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path(),
+        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path_ref(),
+        ast_nav::ParentQuery::Insert(insert) => insert.path_ref(),
+        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path_ref(),
+        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path_ref(),
     }?;
 
     let position = target.syntax().text_range().start();

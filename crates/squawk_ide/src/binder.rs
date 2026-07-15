@@ -515,8 +515,8 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
     let index_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let schema = match create_index.relation_name().and_then(|r| r.path()) {
-        Some(table_path) => schema_name(b, &table_path, false),
+    let schema = match create_index.relation_name().and_then(|r| r.path_ref()) {
+        Some(table_path) => schema_name_ref(b, &table_path, false),
         None => b.default_schema(),
     };
     let Some(schema) = schema else {
@@ -740,13 +740,13 @@ fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
 }
 
 fn bind_alter_table(b: &mut Binder, alter_table: ast::AlterTable) {
-    let Some(path) = alter_table.relation_name().and_then(|r| r.path()) else {
+    let Some(path) = alter_table.relation_name().and_then(|r| r.path_ref()) else {
         return;
     };
-    let Some(table_name) = item_name(&path) else {
+    let Some(table_name) = item_name_ref(&path) else {
         return;
     };
-    let Some(schema) = schema_name(b, &path, false) else {
+    let Some(schema) = schema_name_ref(b, &path, false) else {
         return;
     };
 
@@ -780,13 +780,13 @@ fn bind_alter_table(b: &mut Binder, alter_table: ast::AlterTable) {
 }
 
 fn bind_alter_domain(b: &mut Binder, alter_domain: ast::AlterDomain) {
-    let Some(path) = alter_domain.path() else {
+    let Some(path) = alter_domain.path_ref() else {
         return;
     };
-    let Some(domain_name) = item_name(&path) else {
+    let Some(domain_name) = item_name_ref(&path) else {
         return;
     };
-    let Some(schema) = schema_name(b, &path, false) else {
+    let Some(schema) = schema_name_ref(b, &path, false) else {
         return;
     };
 
@@ -846,11 +846,11 @@ fn multirange_type_from_range(
                     return Some((multirange_name, fallback_ptr, schema));
                 }
                 if let Some(ast::Type::PathType(path_type)) = attribute_value.ty()
-                    && let Some(path) = path_type.path()
-                    && let Some(multirange_name) = item_name(&path)
+                    && let Some(path) = path_type.path_ref()
+                    && let Some(multirange_name) = item_name_ref(&path)
                 {
                     let multirange_schema = if path.qualifier().is_some() {
-                        schema_name(b, &path, false)?
+                        schema_name_ref(b, &path, false)?
                     } else {
                         schema
                     };
@@ -998,15 +998,15 @@ fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
     let trigger_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let Some(table_path) = create_trigger.on_table().and_then(|on| on.path()) else {
+    let Some(table_path) = create_trigger.on_table().and_then(|on| on.path_ref()) else {
         return;
     };
 
-    let Some(table_name) = item_name(&table_path) else {
+    let Some(table_name) = item_name_ref(&table_path) else {
         return;
     };
 
-    let Some(schema) = schema_name(b, &table_path, false) else {
+    let Some(schema) = schema_name_ref(b, &table_path, false) else {
         return;
     };
 
@@ -1029,15 +1029,15 @@ fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
     let policy_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let Some(table_path) = create_policy.on_table().and_then(|on| on.path()) else {
+    let Some(table_path) = create_policy.on_table().and_then(|on| on.path_ref()) else {
         return;
     };
 
-    let Some(table_name) = item_name(&table_path) else {
+    let Some(table_name) = item_name_ref(&table_path) else {
         return;
     };
 
-    let Some(schema) = schema_name(b, &table_path, false) else {
+    let Some(schema) = schema_name_ref(b, &table_path, false) else {
         return;
     };
 
@@ -1060,15 +1060,15 @@ fn bind_create_rule(b: &mut Binder, create_rule: ast::CreateRule) {
     let rule_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let Some(table_path) = create_rule.rule_on().and_then(|on| on.path()) else {
+    let Some(table_path) = create_rule.rule_on().and_then(|on| on.path_ref()) else {
         return;
     };
 
-    let Some(table_name) = item_name(&table_path) else {
+    let Some(table_name) = item_name_ref(&table_path) else {
         return;
     };
 
-    let Some(schema) = schema_name(b, &table_path, false) else {
+    let Some(schema) = schema_name_ref(b, &table_path, false) else {
         return;
     };
 
@@ -1145,7 +1145,10 @@ fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespa
 }
 
 fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
-    let Some(name) = create_database.name() else {
+    let Some(name) = create_database
+        .database()
+        .and_then(|database| database.name())
+    else {
         return;
     };
 
@@ -1307,17 +1310,19 @@ fn bind_create_conversion(b: &mut Binder, create_conversion: ast::CreateConversi
 }
 
 fn bind_create_access_method(b: &mut Binder, create_access_method: ast::CreateAccessMethod) {
-    let Some(path) = create_access_method.name() else {
+    let Some(name) = create_access_method
+        .access_method()
+        .and_then(|name| name.name())
+    else {
         return;
     };
 
-    let Some(access_method_name) = item_name(&path) else {
-        return;
-    };
+    let access_method_name = Name::from_node(&name);
+    let name_ptr = SyntaxNodePtr::new(name.syntax());
 
     let access_method_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::AccessMethod,
-        ptr: path_to_ptr(&path),
+        ptr: name_ptr,
         schema: None,
         params: None,
         table: None,
@@ -1355,7 +1360,10 @@ fn bind_create_operator(b: &mut Binder, create_operator: ast::CreateOperator) {
 }
 
 fn bind_create_operator_family(b: &mut Binder, create_operator_family: ast::CreateOperatorFamily) {
-    let Some(path) = create_operator_family.path() else {
+    let Some(path) = create_operator_family
+        .op_family_name()
+        .and_then(|name| name.path())
+    else {
         return;
     };
 
@@ -1487,7 +1495,10 @@ fn bind_create_text_search_template(
 }
 
 fn bind_create_operator_class(b: &mut Binder, create_operator_class: ast::CreateOperatorClass) {
-    let Some(path) = create_operator_class.path() else {
+    let Some(path) = create_operator_class
+        .op_class_name()
+        .and_then(|name| name.path())
+    else {
         return;
     };
 
@@ -1625,33 +1636,36 @@ fn bind_savepoint(b: &mut Binder, savepoint: ast::Savepoint) {
 }
 
 fn item_name(path: &ast::Path) -> Option<Name> {
-    let segment = path.segment()?;
+    Some(Name::from_node(&path.segment()?.name()?))
+}
 
-    if let Some(name) = segment.name() {
-        return Some(Name::from_node(&name));
-    }
-    if let Some(name) = segment.name_ref() {
-        return Some(Name::from_node(&name));
-    }
-
-    None
+fn item_name_ref(path: &ast::PathRef) -> Option<Name> {
+    Some(Name::from_node(&path.segment()?.name_ref()?))
 }
 
 fn path_to_ptr(path: &ast::Path) -> SyntaxNodePtr {
-    if let Some(segment) = path.segment() {
-        if let Some(name) = segment.name() {
-            return SyntaxNodePtr::new(name.syntax());
-        }
-        if let Some(name_ref) = segment.name_ref() {
-            return SyntaxNodePtr::new(name_ref.syntax());
-        }
-    }
-    SyntaxNodePtr::new(path.syntax())
+    path.segment()
+        .and_then(|segment| segment.name())
+        .map_or_else(
+            || SyntaxNodePtr::new(path.syntax()),
+            |name| SyntaxNodePtr::new(name.syntax()),
+        )
 }
 
 fn schema_name(b: &Binder, path: &ast::Path, is_temp: bool) -> Option<Schema> {
-    if let Some(name_ref) = path
-        .qualifier()
+    schema_name_from_qualifier(b, path.qualifier(), is_temp)
+}
+
+fn schema_name_ref(b: &Binder, path: &ast::PathRef, is_temp: bool) -> Option<Schema> {
+    schema_name_from_qualifier(b, path.qualifier(), is_temp)
+}
+
+fn schema_name_from_qualifier(
+    b: &Binder,
+    qualifier: Option<ast::PathRef>,
+    is_temp: bool,
+) -> Option<Schema> {
+    if let Some(name_ref) = qualifier
         .and_then(|q| q.segment())
         .and_then(|s| s.name_ref())
     {
@@ -1713,7 +1727,7 @@ enum SearchPathOverride {
 fn search_path_from_set_config_param(
     set_config_param: &ast::SetConfigParam,
 ) -> Option<SearchPathOverride> {
-    let path = set_config_param.path()?;
+    let path = set_config_param.path_ref()?;
     if path.qualifier().is_some() {
         return None;
     }
@@ -1772,7 +1786,7 @@ fn bind_set(b: &mut Binder, set: ast::Set) {
 }
 
 fn bind_set_config(b: &mut Binder, set_config: ast::SetConfig, position: TextSize) {
-    let Some(path) = set_config.path() else {
+    let Some(path) = set_config.path_ref() else {
         return;
     };
 
@@ -1927,7 +1941,7 @@ fn extract_param_signature(param_list: Option<ast::ParamList>) -> Option<Vec<Nam
     for param in param_list.params() {
         if let Some(ty) = param.ty()
             && let ast::Type::PathType(path_type) = ty
-            && let Some(path) = path_type.path()
+            && let Some(path) = path_type.path_ref()
             && let Some(segment) = path.segment()
             && let Some(name_ref) = segment.name_ref()
         {

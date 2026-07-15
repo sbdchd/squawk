@@ -62,25 +62,28 @@ SOURCE_FILE
     WHITESPACE " "
     CLASS_KW "class"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "c"
+    OP_CLASS_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "c"
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
     PATH_TYPE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             INT_KW "int"
     WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "btree"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "btree"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -99,16 +102,16 @@ SOURCE_FILE
           R_PAREN ")"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INT_KW "int"
             R_PAREN ")"
@@ -121,15 +124,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "btree"
+          IDENT "btree"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -149,16 +155,16 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         INT_KW "int"
               R_PAREN ")"
@@ -171,15 +177,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "btree"
+          IDENT "btree"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"

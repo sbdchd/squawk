@@ -19,7 +19,7 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
         ast::Type::PercentType(_) => false,
         ast::Type::PathType(path_type) => {
             let Some(ty_name) = path_type
-                .path()
+                .path_ref()
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
                 .map(|x| x.text())

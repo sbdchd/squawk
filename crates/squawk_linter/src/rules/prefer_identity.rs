@@ -37,7 +37,7 @@ fn replace_serial(serial_type: &str) -> &'static str {
 fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
     let name = match ty {
         ast::Type::ArrayType(array_type) => return create_identity_fix(&array_type.ty()?),
-        ast::Type::PathType(path_type) => path_type.path()?.segment()?.name_ref()?,
+        ast::Type::PathType(path_type) => path_type.path_ref()?.segment()?.name_ref()?,
         ast::Type::BitType(_)
         | ast::Type::CharType(_)
         | ast::Type::DoubleType(_)

@@ -175,8 +175,8 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INT_KW "int"
         COMMA ","
@@ -186,8 +186,8 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         R_PAREN ")"
@@ -209,8 +209,8 @@ SOURCE_FILE
             IDENT "z"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "int8"
         R_PAREN ")"
@@ -220,13 +220,13 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               SCHEMA_KW "schema"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             TABLE_KW "table"
     SEMICOLON ";"
@@ -235,18 +235,18 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
-      PATH
-        PATH
-          PATH
-            PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 DATABASE_KW "database"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               SCHEMA_KW "schema"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             TABLE_KW "table"
     SEMICOLON ";"
@@ -376,8 +376,8 @@ SOURCE_FILE
       ON_TABLE
         ON_KW "on"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "u"
       WHITESPACE "\n    "
@@ -398,8 +398,8 @@ SOURCE_FILE
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "search_path"
     SEMICOLON ";"
@@ -408,8 +408,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "search_path"
       WHITESPACE " "
@@ -426,8 +426,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "search_path"
       WHITESPACE " "
@@ -441,8 +441,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       WHITESPACE " "
@@ -532,8 +532,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       WHITESPACE " "
@@ -546,13 +546,13 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       WHITESPACE " "
@@ -565,8 +565,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       WHITESPACE " "
@@ -579,8 +579,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       WHITESPACE " "
@@ -614,8 +614,8 @@ SOURCE_FILE
     SET_KW "set"
     WHITESPACE " "
     SET_CONFIG
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       WHITESPACE " "

@@ -14,8 +14,8 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "foo"
     SEMICOLON ";"
@@ -36,8 +36,8 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE " "
@@ -55,8 +55,8 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE " "

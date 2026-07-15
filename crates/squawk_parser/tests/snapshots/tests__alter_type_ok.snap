@@ -10,8 +10,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -30,8 +30,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -51,8 +51,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -72,8 +72,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -93,8 +93,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -119,13 +119,13 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -150,13 +150,13 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -183,8 +183,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -204,13 +204,13 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -241,13 +241,13 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -280,8 +280,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -306,8 +306,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -333,8 +333,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -373,8 +373,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -387,8 +387,8 @@ SOURCE_FILE
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
     SEMICOLON ";"
@@ -400,8 +400,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -414,16 +414,16 @@ SOURCE_FILE
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
       WHITESPACE " "
       COLLATE
         COLLATE_KW "collate"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "c"
     SEMICOLON ";"
@@ -435,8 +435,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -449,8 +449,8 @@ SOURCE_FILE
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               TEXT_KW "text"
       WHITESPACE " "
@@ -462,8 +462,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -494,8 +494,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -513,8 +513,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -539,8 +539,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -567,8 +567,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -583,8 +583,8 @@ SOURCE_FILE
       TYPE_KW "type"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
     SEMICOLON ";"
@@ -596,13 +596,13 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "s"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -632,8 +632,8 @@ SOURCE_FILE
       COLLATE
         COLLATE_KW "collate"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "c"
       WHITESPACE " "
@@ -645,8 +645,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -661,8 +661,8 @@ SOURCE_FILE
       TYPE_KW "type"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE " "
@@ -676,8 +676,8 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "t"
     WHITESPACE " "
@@ -690,8 +690,8 @@ SOURCE_FILE
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
     COMMA ","

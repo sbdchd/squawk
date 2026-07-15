@@ -475,16 +475,16 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       R_PAREN ")"
@@ -694,8 +694,8 @@ SOURCE_FILE
                 COLON ":"
                 COLON ":"
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
           WHITESPACE " "
@@ -714,8 +714,8 @@ SOURCE_FILE
                 COLON ":"
                 COLON ":"
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       INTEGER_KW "integer"
       WHITESPACE "\n    "
@@ -1138,8 +1138,8 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
     SEMICOLON ";"
@@ -1177,8 +1177,8 @@ SOURCE_FILE
       WHITESPACE " "
       INTO_KW "into"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
       WHITESPACE " "
@@ -1217,8 +1217,8 @@ SOURCE_FILE
       UPDATE_KW "update"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE " "
@@ -1261,8 +1261,8 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE " "
@@ -1290,8 +1290,8 @@ SOURCE_FILE
       INTO_KW "into"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "t"
       WHITESPACE "\n  "

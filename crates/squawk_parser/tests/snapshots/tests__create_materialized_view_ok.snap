@@ -46,8 +46,8 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -75,8 +75,9 @@ SOURCE_FILE
     USING_METHOD
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "u"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -165,8 +166,8 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "u"
     SEMICOLON ";"
@@ -219,8 +220,8 @@ SOURCE_FILE
     VIEW_KW "VIEW"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "\"public\""
       DOT "."

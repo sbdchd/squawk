@@ -44,16 +44,16 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "int8"
           WHITESPACE " "
           COLLATE
             COLLATE_KW "collate"
             WHITESPACE " "
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "\"fr_FR\""
         WHITESPACE "\n"
@@ -81,16 +81,16 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "int8"
           WHITESPACE " "
           COLLATE
             COLLATE_KW "collate"
             WHITESPACE " "
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "\"fr_FR\""
         COMMA ","
@@ -100,8 +100,8 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INT_KW "int"
         COMMA ","
@@ -111,8 +111,8 @@ SOURCE_FILE
             IDENT "c"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         WHITESPACE "\n"
@@ -225,8 +225,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     BIGINT_KW "bigint"
         WHITESPACE "\n"
@@ -241,8 +241,8 @@ SOURCE_FILE
     TYPE_KW "type"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "public"
       DOT "."
@@ -257,18 +257,18 @@ SOURCE_FILE
     TYPE_KW "type"
     WHITESPACE " "
     PATH
-      PATH
-        PATH
-          PATH
-            PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "a"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "c"
       DOT "."
@@ -312,18 +312,18 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH
-                  PATH
-                    PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "bar"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "func_name"
         COMMA ","
@@ -336,8 +336,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "func_name"
         WHITESPACE "\n"
@@ -366,18 +366,18 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH
-                  PATH
-                    PATH_SEGMENT
+              PATH_REF
+                PATH_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "foo"
                   DOT "."
-                  PATH_SEGMENT
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "bar"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "func_name"
         COMMA ","
@@ -390,8 +390,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "func_name"
         COMMA ","
@@ -404,8 +404,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "receive_function"
         COMMA ","
@@ -418,8 +418,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "send_function"
         COMMA ","
@@ -432,8 +432,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "type_modifier_input_function"
         COMMA ","
@@ -446,8 +446,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "type_modifier_output_function"
         COMMA ","
@@ -460,8 +460,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "analyze_function"
         COMMA ","
@@ -474,8 +474,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "subscript_function"
         COMMA ","
@@ -488,8 +488,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "variable"
         COMMA ","
@@ -520,8 +520,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "plain"
         COMMA ","
@@ -534,8 +534,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "like_type"
         COMMA ","
@@ -582,8 +582,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "float4"
         COMMA ","

@@ -645,7 +645,7 @@ fn delete_expr_completions(
     let binder = binder::bind(source_file);
     let mut completions = vec![];
 
-    let Some(path) = delete.relation_name().and_then(|r| r.path()) else {
+    let Some(path) = delete.relation_name().and_then(|r| r.path_ref()) else {
         return completions;
     };
 

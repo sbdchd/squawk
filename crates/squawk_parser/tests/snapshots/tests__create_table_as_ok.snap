@@ -101,8 +101,8 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "u"
     SEMICOLON ";"
@@ -144,8 +144,9 @@ SOURCE_FILE
     USING_METHOD
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "foo"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -233,8 +234,9 @@ SOURCE_FILE
     USING_METHOD
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      ACCESS_METHOD_REF
+        NAME_REF
+          IDENT "foo"
     WHITESPACE "\n  "
     WITHOUT_OIDS
       WITHOUT_KW "without"

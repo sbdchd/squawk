@@ -17,15 +17,15 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         R_PAREN ")"
@@ -41,41 +41,41 @@ SOURCE_FILE
     OP_SIG_LIST
       OP_SIG
         OP
-          PATH
-            PATH
-              PATH
-                PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "foo"
               DOT "."
-              PATH_SEGMENT
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "foo"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
           CARET "^"
         WHITESPACE " "
         L_PAREN "("
         PATH_TYPE
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 SMALLINT_KW "smallint"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "bar"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 SMALLINT_KW "smallint"
         R_PAREN ")"
@@ -131,15 +131,15 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         R_PAREN ")"
@@ -168,8 +168,8 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 BIGINT_KW "bigint"
         R_PAREN ")"
@@ -182,15 +182,15 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
         R_PAREN ")"
@@ -207,8 +207,8 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INTEGER_KW "integer"
         R_PAREN ")"
@@ -234,15 +234,15 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         R_PAREN ")"
@@ -288,15 +288,15 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         R_PAREN ")"
@@ -312,18 +312,18 @@ SOURCE_FILE
     OP_SIG_LIST
       OP_SIG
         OP
-          PATH
-            PATH
-              PATH
-                PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
               DOT "."
-              PATH_SEGMENT
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "bar"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
           CUSTOM_OP
             AT "@"
             AT "@"
@@ -345,15 +345,15 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         COMMA ","
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         R_PAREN ")"

@@ -12,15 +12,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -37,15 +40,15 @@ SOURCE_FILE
           WHITESPACE " "
           L_PAREN "("
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
           R_PAREN ")"
@@ -60,15 +63,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -87,15 +93,15 @@ SOURCE_FILE
           WHITESPACE " "
           L_PAREN "("
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
           R_PAREN ")"
@@ -108,8 +114,8 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
         COMMA ","
@@ -124,15 +130,15 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
             PARAM_LIST
@@ -145,8 +151,8 @@ SOURCE_FILE
                   IDENT "a"
                 WHITESPACE " "
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         TEXT_KW "text"
               R_PAREN ")"
@@ -162,8 +168,8 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             COMMA ","
@@ -180,8 +186,8 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
     SEMICOLON ";"
@@ -195,15 +201,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -220,15 +229,15 @@ SOURCE_FILE
           WHITESPACE " "
           L_PAREN "("
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
           R_PAREN ")"
@@ -247,15 +256,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -272,15 +284,15 @@ SOURCE_FILE
           WHITESPACE " "
           L_PAREN "("
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
           COMMA ","
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
           R_PAREN ")"
@@ -291,10 +303,11 @@ SOURCE_FILE
           WHITESPACE " "
           BY_KW "by"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "s"
+          OP_FAMILY_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_func"
@@ -306,15 +319,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -327,16 +343,16 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "t"
               R_PAREN ")"
@@ -351,15 +367,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -375,39 +394,39 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "u"
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "a"
               COMMA ","
               WHITESPACE " "
               PARAM
                 PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
+                  PATH_REF
+                    PATH_SEGMENT_REF
                       NAME_REF
                         IDENT "b"
               R_PAREN ")"
@@ -422,15 +441,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -446,16 +468,16 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "u"
             R_PAREN ")"
@@ -470,15 +492,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -494,8 +519,8 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
@@ -510,15 +535,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -534,16 +562,16 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "u"
             R_PAREN ")"
@@ -558,15 +586,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -582,8 +613,8 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
@@ -598,15 +629,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -622,16 +656,16 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             COMMA ","
             WHITESPACE " "
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "u"
             R_PAREN ")"
@@ -647,8 +681,8 @@ SOURCE_FILE
             L_PAREN "("
             PARAM
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "t"
             R_PAREN ")"
@@ -663,15 +697,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -691,15 +728,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -718,15 +758,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -746,20 +789,23 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"

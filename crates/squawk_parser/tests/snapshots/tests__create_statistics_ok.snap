@@ -21,8 +21,8 @@ SOURCE_FILE
     FROM_TABLE
       FROM_KW "from"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     SEMICOLON ";"
@@ -42,8 +42,8 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
@@ -96,13 +96,13 @@ SOURCE_FILE
     FROM_TABLE
       FROM_KW "from"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t"
     SEMICOLON ";"
@@ -137,8 +137,8 @@ SOURCE_FILE
     FROM_TABLE
       FROM_KW "FROM"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t1"
     SEMICOLON ";"
@@ -173,8 +173,8 @@ SOURCE_FILE
     FROM_TABLE
       FROM_KW "FROM"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t2"
     SEMICOLON ";"
@@ -233,8 +233,8 @@ SOURCE_FILE
     FROM_TABLE
       FROM_KW "FROM"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "t3"
     SEMICOLON ";"

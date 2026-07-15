@@ -10,8 +10,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -31,13 +31,13 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -54,8 +54,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -74,8 +74,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -94,8 +94,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -128,8 +128,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -161,8 +161,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -197,8 +197,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -218,8 +218,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -246,8 +246,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -272,8 +272,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -293,8 +293,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -313,8 +313,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -334,8 +334,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "
@@ -355,8 +355,8 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "d"
     WHITESPACE "\n  "

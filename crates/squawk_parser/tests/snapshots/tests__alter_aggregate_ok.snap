@@ -11,8 +11,8 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       WHITESPACE " "
@@ -38,8 +38,8 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       WHITESPACE " "
@@ -47,8 +47,8 @@ SOURCE_FILE
         L_PAREN "("
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
         R_PAREN ")"
@@ -70,8 +70,8 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       WHITESPACE " "
@@ -85,8 +85,8 @@ SOURCE_FILE
             IDENT "x"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         COMMA ","
@@ -96,8 +96,8 @@ SOURCE_FILE
             IDENT "y"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   NUMERIC_KW "numeric"
         R_PAREN ")"
@@ -119,8 +119,8 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "a"
       WHITESPACE " "
@@ -128,8 +128,8 @@ SOURCE_FILE
         L_PAREN "("
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "x"
         WHITESPACE " "
@@ -139,8 +139,8 @@ SOURCE_FILE
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "y"
         R_PAREN ")"
@@ -162,13 +162,13 @@ SOURCE_FILE
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
     AGGREGATE
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
       WHITESPACE " "
@@ -179,16 +179,16 @@ SOURCE_FILE
             IN_KW "in"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
         COMMA ","
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
         R_PAREN ")"

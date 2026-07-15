@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     DATABASE_KW "database"
     WHITESPACE " "
-    NAME_REF
-      IDENT "d"
+    DATABASE_REF
+      NAME_REF
+        IDENT "d"
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "

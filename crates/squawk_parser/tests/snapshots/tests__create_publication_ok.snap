@@ -44,8 +44,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
         COMMA ","
@@ -73,13 +73,13 @@ SOURCE_FILE
       WHITESPACE " "
       ONLY_KW "only"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "bar"
     COMMA ","
@@ -87,18 +87,18 @@ SOURCE_FILE
     PUBLICATION_OBJECT
       TABLE_KW "table"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH
-            PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "buzz"
       WHITESPACE " "
@@ -108,8 +108,8 @@ SOURCE_FILE
     PUBLICATION_OBJECT
       TABLE_KW "table"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
     COMMA ","
@@ -117,8 +117,8 @@ SOURCE_FILE
     PUBLICATION_OBJECT
       TABLE_KW "table"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       COLUMN_REF_LIST
@@ -171,8 +171,8 @@ SOURCE_FILE
       ONLY_KW "only"
       WHITESPACE " "
       L_PAREN "("
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       R_PAREN ")"
@@ -190,8 +190,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
         COMMA ","
@@ -226,15 +226,15 @@ SOURCE_FILE
     COMMA ","
     WHITESPACE " "
     PUBLICATION_OBJECT
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "b"
     COMMA ","
     WHITESPACE " "
     PUBLICATION_OBJECT
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "c"
     COMMA ","
@@ -258,15 +258,15 @@ SOURCE_FILE
     PUBLICATION_OBJECT
       TABLE_KW "table"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "chats"
     COMMA ","
     WHITESPACE " "
     PUBLICATION_OBJECT
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "users"
     SEMICOLON ";"
@@ -296,8 +296,8 @@ SOURCE_FILE
           RELATION_NAME
             ONLY_KW "only"
             WHITESPACE " "
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
         R_PAREN ")"
@@ -326,16 +326,16 @@ SOURCE_FILE
           TABLE_KW "table"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
         COMMA ","
@@ -344,8 +344,8 @@ SOURCE_FILE
           TABLE_KW "table"
           WHITESPACE " "
           RELATION_NAME
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "k"
         R_PAREN ")"

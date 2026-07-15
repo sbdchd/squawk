@@ -29,8 +29,8 @@ SOURCE_FILE
     TABLE_AND_COLUMNS_LIST
       TABLE_AND_COLUMNS
         RELATION_NAME
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "onek"
     SEMICOLON ";"
@@ -309,8 +309,8 @@ SOURCE_FILE
     TABLE_AND_COLUMNS_LIST
       TABLE_AND_COLUMNS
         RELATION_NAME
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "t1"
     SEMICOLON ";"
@@ -331,16 +331,16 @@ SOURCE_FILE
     TABLE_AND_COLUMNS_LIST
       TABLE_AND_COLUMNS
         RELATION_NAME
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
       COMMA ","
       WHITESPACE " "
       TABLE_AND_COLUMNS
         RELATION_NAME
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
         COLUMN_REF_LIST
@@ -358,8 +358,8 @@ SOURCE_FILE
       WHITESPACE " "
       TABLE_AND_COLUMNS
         RELATION_NAME
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "c"
     SEMICOLON ";"

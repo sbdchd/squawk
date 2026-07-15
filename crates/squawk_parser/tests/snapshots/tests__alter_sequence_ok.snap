@@ -15,13 +15,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
@@ -117,13 +117,13 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      PATH
-        PATH
-          PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "c"
     WHITESPACE "\n  "
@@ -142,8 +142,8 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
@@ -158,8 +158,8 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
@@ -176,8 +176,8 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
@@ -196,8 +196,8 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
@@ -217,8 +217,8 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "
@@ -238,8 +238,8 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "s"
     WHITESPACE "\n  "

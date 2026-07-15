@@ -8,8 +8,8 @@ SOURCE_FILE@0..170
     WHITESPACE@6..7 " "
     INTO_KW@7..11 "into"
     WHITESPACE@11..12 " "
-    PATH@12..13
-      PATH_SEGMENT@12..13
+    PATH_REF@12..13
+      PATH_SEGMENT_REF@12..13
         NAME_REF@12..13
           IDENT@12..13 "t"
     WHITESPACE@13..14 " "
@@ -35,8 +35,8 @@ SOURCE_FILE@0..170
     UPDATE_KW@38..44 "UPDATE"
     WHITESPACE@44..45 " "
     RELATION_NAME@45..46
-      PATH@45..46
-        PATH_SEGMENT@45..46
+      PATH_REF@45..46
+        PATH_SEGMENT_REF@45..46
           NAME_REF@45..46
             IDENT@45..46 "t"
     WHITESPACE@46..47 " "
@@ -64,8 +64,8 @@ SOURCE_FILE@0..170
     UPDATE_KW@70..76 "UPDATE"
     WHITESPACE@76..77 " "
     RELATION_NAME@77..78
-      PATH@77..78
-        PATH_SEGMENT@77..78
+      PATH_REF@77..78
+        PATH_SEGMENT_REF@77..78
           NAME_REF@77..78
             IDENT@77..78 "t"
     WHITESPACE@78..79 " "

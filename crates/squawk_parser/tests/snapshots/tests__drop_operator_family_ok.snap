@@ -12,15 +12,18 @@ SOURCE_FILE
     WHITESPACE " "
     FAMILY_KW "family"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "n"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "n"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -37,20 +40,23 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
+            IDENT "f"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -67,20 +73,23 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    OP_FAMILY_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "bar"
+        DOT "."
+        PATH_SEGMENT_REF
           NAME_REF
-            IDENT "bar"
-      DOT "."
-      PATH_SEGMENT
+            IDENT "b"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "b"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

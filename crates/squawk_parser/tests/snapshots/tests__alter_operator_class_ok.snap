@@ -12,15 +12,18 @@ SOURCE_FILE
     WHITESPACE " "
     CLASS_KW "class"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_CLASS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "c"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "m"
+          IDENT "m"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -38,20 +41,23 @@ SOURCE_FILE
     WHITESPACE " "
     CLASS_KW "class"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    OP_CLASS_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
+        PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT
+            IDENT "c"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "c"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "m"
+          IDENT "m"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -71,15 +77,18 @@ SOURCE_FILE
     WHITESPACE " "
     CLASS_KW "class"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_CLASS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "c"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "m"
+          IDENT "m"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -98,15 +107,18 @@ SOURCE_FILE
     WHITESPACE " "
     CLASS_KW "class"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_CLASS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "c"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "m"
+          IDENT "m"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -126,15 +138,18 @@ SOURCE_FILE
     WHITESPACE " "
     CLASS_KW "class"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    OP_CLASS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      ACCESS_METHOD_REF
         NAME_REF
-          IDENT "c"
-    WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "m"
+          IDENT "m"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"

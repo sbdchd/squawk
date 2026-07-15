@@ -47,8 +47,8 @@ SOURCE_FILE
           TARGET
             CAST_EXPR
               PATH_TYPE
-                PATH
-                  PATH_SEGMENT
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       TEXT_KW "text"
               WHITESPACE " "
@@ -342,8 +342,8 @@ SOURCE_FILE
     VIEW_KW "VIEW"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "public"
       DOT "."
@@ -460,8 +460,8 @@ SOURCE_FILE
           WHITESPACE " "
           ATTRIBUTE_VALUE
             PATH_TYPE
-              PATH
-                PATH_SEGMENT
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
         COMMA ","
@@ -727,8 +727,8 @@ SOURCE_FILE
         TABLE_KW "table"
         WHITESPACE " "
         RELATION_NAME
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "t"
       R_PAREN ")"

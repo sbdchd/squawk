@@ -17,13 +17,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE "\n  "
@@ -50,13 +50,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE "\n  "
@@ -84,13 +84,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE "\n  "
@@ -117,13 +117,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
+    PATH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "foo"
       DOT "."
-      PATH_SEGMENT
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "bar"
     WHITESPACE "\n  "
@@ -138,8 +138,8 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n    "
         VERTEX_TABLE_DEF
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "a"
           WHITESPACE " "
@@ -159,8 +159,8 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         VERTEX_TABLE_DEF
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "d"
           WHITESPACE " "
@@ -195,8 +195,8 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n    "
         EDGE_TABLE_DEF
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "a"
           WHITESPACE " "
@@ -335,8 +335,8 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
+    PATH_REF
+      PATH_SEGMENT_REF
         NAME_REF
           IDENT "g"
     WHITESPACE "\n  "
@@ -351,8 +351,8 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n    "
         VERTEX_TABLE_DEF
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "d"
           WHITESPACE " "
@@ -384,8 +384,8 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n    "
         EDGE_TABLE_DEF
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "a"
           WHITESPACE " "

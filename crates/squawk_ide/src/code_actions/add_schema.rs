@@ -15,10 +15,14 @@ pub(super) fn add_schema(
     let offset = position.value;
     let token = token_from_offset(db, position)?;
     let range = token.parent_ancestors().find_map(|node| {
-        if let Some(path) = ast::Path::cast(node.clone()) {
-            if path.qualifier().is_some() {
-                return None;
-            }
+        if let Some(path) = ast::Path::cast(node.clone())
+            && path.qualifier().is_none()
+        {
+            return Some(path.syntax().text_range());
+        }
+        if let Some(path) = ast::PathRef::cast(node.clone())
+            && path.qualifier().is_none()
+        {
             return Some(path.syntax().text_range());
         }
         if let Some(ast::FromItem::RelationFromItem(relation)) = ast::FromItem::cast(node.clone()) {
@@ -68,6 +72,15 @@ mod test {
             add_schema,
             "create table t$0(a text, b int);"),
             @"create table public.t(a text, b int);"
+        );
+    }
+
+    #[test]
+    fn add_schema_alter_table() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "alter table t$0 add column c text;"),
+            @"alter table public.t add column c text;"
         );
     }
 

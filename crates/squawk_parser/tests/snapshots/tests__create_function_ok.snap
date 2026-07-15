@@ -21,8 +21,8 @@ SOURCE_FILE
           IN_KW "in"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
@@ -35,8 +35,8 @@ SOURCE_FILE
           IDENT "f1"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       COMMA ","
@@ -49,8 +49,8 @@ SOURCE_FILE
           IDENT "f2"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "text"
       R_PAREN ")"
@@ -87,8 +87,8 @@ SOURCE_FILE
           IDENT "uname"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "TEXT"
       COMMA ","
@@ -98,8 +98,8 @@ SOURCE_FILE
           IDENT "pass"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 TEXT_KW "TEXT"
       R_PAREN ")"
@@ -108,8 +108,8 @@ SOURCE_FILE
       RETURNS_KW "RETURNS"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               BOOLEAN_KW "BOOLEAN"
     WHITESPACE " "
@@ -137,8 +137,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "SET"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "search_path"
           WHITESPACE " "
@@ -172,13 +172,13 @@ SOURCE_FILE
           IDENT "a"
         WHITESPACE " "
         PERCENT_TYPE
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "t"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "c"
           PERCENT_TYPE_CLAUSE
@@ -190,13 +190,13 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PERCENT_TYPE
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "t"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
         PERCENT_TYPE_CLAUSE
@@ -232,8 +232,8 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       R_PAREN ")"
@@ -244,13 +244,13 @@ SOURCE_FILE
       PATH_TYPE
         SETOF_KW "setof"
         WHITESPACE " "
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "b"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "foo"
     WHITESPACE "\n"
@@ -283,8 +283,8 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
       R_PAREN ")"
@@ -293,8 +293,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -349,8 +349,8 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "public"
       DOT "."
@@ -365,8 +365,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               INT_KW "int"
     WHITESPACE "\n"
@@ -390,18 +390,18 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     PATH
-      PATH
-        PATH
-          PATH
-            PATH_SEGMENT
+      PATH_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "a"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
         DOT "."
-        PATH_SEGMENT
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "c"
       DOT "."
@@ -416,8 +416,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               INT_KW "int"
     WHITESPACE "\n"
@@ -441,8 +441,8 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     PATH
-      PATH
-        PATH_SEGMENT
+      PATH_REF
+        PATH_SEGMENT_REF
           NAME_REF
             IDENT "public"
       DOT "."
@@ -458,8 +458,8 @@ SOURCE_FILE
       WHITESPACE " "
       ARRAY_TYPE
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 NUMERIC_KW "numeric"
         L_BRACK "["
@@ -506,8 +506,8 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
         COMMA ","
@@ -517,8 +517,8 @@ SOURCE_FILE
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   INT_KW "int"
         R_PAREN ")"
@@ -556,8 +556,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -570,8 +570,8 @@ SOURCE_FILE
         TYPE_KW "type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "t"
         COMMA ","
@@ -581,8 +581,8 @@ SOURCE_FILE
         TYPE_KW "type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "b"
       WHITESPACE "\n"
@@ -675,8 +675,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -716,8 +716,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -755,8 +755,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -794,8 +794,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -835,8 +835,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -876,8 +876,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -917,8 +917,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -962,8 +962,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1051,8 +1051,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1092,8 +1092,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1135,8 +1135,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1176,8 +1176,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1219,8 +1219,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1262,8 +1262,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1303,8 +1303,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1344,8 +1344,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1387,8 +1387,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1431,8 +1431,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1475,8 +1475,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1484,13 +1484,13 @@ SOURCE_FILE
       SUPPORT_FUNC_OPTION
         SUPPORT_KW "support"
         WHITESPACE " "
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
       WHITESPACE "\n"
@@ -1524,8 +1524,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1533,8 +1533,8 @@ SOURCE_FILE
       SUPPORT_FUNC_OPTION
         SUPPORT_KW "support"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
       WHITESPACE "\n"
@@ -1570,8 +1570,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1580,13 +1580,13 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "foo"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -1624,8 +1624,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1634,8 +1634,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -1674,8 +1674,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1684,8 +1684,8 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
@@ -1726,8 +1726,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1764,8 +1764,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1806,8 +1806,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1853,8 +1853,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1910,8 +1910,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -1963,8 +1963,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2035,8 +2035,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n  "
@@ -2055,8 +2055,8 @@ SOURCE_FILE
         TYPE_KW "type"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
       WHITESPACE "\n  "
@@ -2101,13 +2101,13 @@ SOURCE_FILE
       SUPPORT_FUNC_OPTION
         SUPPORT_KW "support"
         WHITESPACE " "
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "bar"
       WHITESPACE "\n  "
@@ -2115,13 +2115,13 @@ SOURCE_FILE
         SET_CONFIG_PARAM
           SET_KW "set"
           WHITESPACE " "
-          PATH
-            PATH
-              PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "a"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "b"
           WHITESPACE " "
@@ -2177,8 +2177,8 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2187,8 +2187,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               INT_KW "int"
     WHITESPACE "\n"
@@ -2235,8 +2235,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               BOOLEAN_KW "boolean"
     WHITESPACE "\n"
@@ -2272,8 +2272,8 @@ SOURCE_FILE
           IN_KW "in"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2282,8 +2282,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2317,8 +2317,8 @@ SOURCE_FILE
           OUT_KW "out"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2327,8 +2327,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2364,8 +2364,8 @@ SOURCE_FILE
           OUT_KW "out"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2374,8 +2374,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2409,8 +2409,8 @@ SOURCE_FILE
           INOUT_KW "inout"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2419,8 +2419,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2454,8 +2454,8 @@ SOURCE_FILE
           VARIADIC_KW "variadic"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2464,8 +2464,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2503,8 +2503,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2513,8 +2513,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2550,8 +2550,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 FLOAT_KW "float"
       COMMA ","
@@ -2561,8 +2561,8 @@ SOURCE_FILE
           IDENT "arg2"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
       R_PAREN ")"
@@ -2571,8 +2571,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2608,16 +2608,16 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 FLOAT_KW "float"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
       R_PAREN ")"
@@ -2626,8 +2626,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2665,8 +2665,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 FLOAT_KW "float"
         WHITESPACE " "
@@ -2679,8 +2679,8 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
         WHITESPACE " "
@@ -2695,8 +2695,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2732,8 +2732,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 FLOAT_KW "float"
         WHITESPACE " "
@@ -2746,8 +2746,8 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int4"
       R_PAREN ")"
@@ -2756,8 +2756,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2793,8 +2793,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
@@ -2809,8 +2809,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2846,8 +2846,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
@@ -2868,8 +2868,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2905,8 +2905,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 INT_KW "int"
         WHITESPACE " "
@@ -2927,8 +2927,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -2969,8 +2969,8 @@ SOURCE_FILE
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -2979,8 +2979,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -3016,8 +3016,8 @@ SOURCE_FILE
           IN_KW "in"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -3026,8 +3026,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -3066,8 +3066,8 @@ SOURCE_FILE
           IN_KW "in"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -3076,8 +3076,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -3113,8 +3113,8 @@ SOURCE_FILE
           IDENT "int8"
         WHITESPACE " "
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -3123,8 +3123,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -3157,8 +3157,8 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "int8"
       R_PAREN ")"
@@ -3167,8 +3167,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -3202,8 +3202,8 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "internal"
       COMMA ","
@@ -3211,8 +3211,8 @@ SOURCE_FILE
       PARAM
         ARRAY_TYPE
           PATH_TYPE
-            PATH
-              PATH_SEGMENT
+            PATH_REF
+              PATH_SEGMENT_REF
                 NAME_REF
                   TEXT_KW "text"
           L_BRACK "["
@@ -3221,8 +3221,8 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bool"
       R_PAREN ")"
@@ -3231,8 +3231,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -3266,23 +3266,23 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          PATH
-            PATH
-              PATH
-                PATH
-                  PATH_SEGMENT
+          PATH_REF
+            PATH_REF
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
                     NAME_REF
                       IDENT "foo"
                 DOT "."
-                PATH_SEGMENT
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "bar"
               DOT "."
-              PATH_SEGMENT
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "buzz"
             DOT "."
-            PATH_SEGMENT
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "boo"
       COMMA ","
@@ -3290,13 +3290,13 @@ SOURCE_FILE
       PARAM
         ARRAY_TYPE
           PATH_TYPE
-            PATH
-              PATH
-                PATH_SEGMENT
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
                   NAME_REF
                     IDENT "t"
               DOT "."
-              PATH_SEGMENT
+              PATH_SEGMENT_REF
                 NAME_REF
                   IDENT "u"
           L_BRACK "["
@@ -3305,8 +3305,8 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          PATH
-            PATH_SEGMENT
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bool"
       R_PAREN ")"
@@ -3315,8 +3315,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "void"
     WHITESPACE "\n"
@@ -3353,8 +3353,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "int8"
     WHITESPACE " "
@@ -3391,8 +3391,8 @@ SOURCE_FILE
       RETURNS_KW "returns"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "int8"
     WHITESPACE " "

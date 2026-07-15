@@ -13,16 +13,16 @@ SOURCE_FILE
     CAST_SIG
       L_PAREN "("
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               TEXT_KW "text"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               INT_KW "int"
       R_PAREN ")"
@@ -43,16 +43,16 @@ SOURCE_FILE
     CAST_SIG
       L_PAREN "("
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "a"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH_SEGMENT
+        PATH_REF
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
       R_PAREN ")"
@@ -73,26 +73,26 @@ SOURCE_FILE
     CAST_SIG
       L_PAREN "("
       PATH_TYPE
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "foo"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "a"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
       PATH_TYPE
-        PATH
-          PATH
-            PATH_SEGMENT
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
               NAME_REF
                 IDENT "bar"
           DOT "."
-          PATH_SEGMENT
+          PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
       R_PAREN ")"
