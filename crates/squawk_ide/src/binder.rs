@@ -328,6 +328,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateAccessMethod(create_access_method) => {
             bind_create_access_method(b, create_access_method)
         }
+        ast::Stmt::CreateOperator(create_operator) => bind_create_operator(b, create_operator),
         ast::Stmt::CreateOperatorFamily(create_operator_family) => {
             bind_create_operator_family(b, create_operator_family)
         }
@@ -559,6 +560,8 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
     });
 
     b.scope.insert(function_name, function_id);
+
+    bind_routine_body_search_path(b, create_function.option_list());
 }
 
 fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate) {
@@ -615,6 +618,8 @@ fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure)
     });
 
     b.scope.insert(procedure_name, procedure_id);
+
+    bind_routine_body_search_path(b, create_procedure.option_list());
 }
 
 fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
@@ -1321,6 +1326,34 @@ fn bind_create_access_method(b: &mut Binder, create_access_method: ast::CreateAc
     b.scope.insert(access_method_name, access_method_id);
 }
 
+fn bind_create_operator(b: &mut Binder, create_operator: ast::CreateOperator) {
+    let Some(op) = create_operator.op() else {
+        return;
+    };
+
+    let Some(custom_op) = op.custom_op() else {
+        return;
+    };
+
+    let operator_name = Name::from_string(custom_op.syntax().text().to_string());
+
+    let path = op.syntax().children().find_map(ast::Path::cast);
+    let schema = match &path {
+        Some(path) => schema_name(b, path, false),
+        None => b.default_schema(),
+    };
+
+    let operator_id = b.symbols.alloc(Symbol {
+        kind: SymbolKind::Operator,
+        ptr: SyntaxNodePtr::new(op.syntax()),
+        schema,
+        params: None,
+        table: None,
+    });
+
+    b.scope.insert(operator_name, operator_id);
+}
+
 fn bind_create_operator_family(b: &mut Binder, create_operator_family: ast::CreateOperatorFamily) {
     let Some(path) = create_operator_family.path() else {
         return;
@@ -1630,6 +1663,92 @@ fn schema_name(b: &Binder, path: &ast::Path, is_temp: bool) -> Option<Schema> {
     }
 
     b.default_schema()
+}
+
+fn bind_routine_body_search_path(b: &mut Binder, option_list: Option<ast::FuncOptionList>) {
+    let Some(option_list) = option_list else {
+        return;
+    };
+
+    let mut search_path = None;
+    let mut body_range = None;
+    for option in option_list.options() {
+        match option {
+            ast::FuncOption::SetFuncOption(set_func_option) => {
+                if let Some(set_config_param) = set_func_option.set_config_param() {
+                    search_path = search_path_from_set_config_param(&set_config_param);
+                }
+            }
+            ast::FuncOption::BeginFuncOptionList(begin_func_option_list) => {
+                body_range = Some(begin_func_option_list.syntax().text_range());
+            }
+            _ => (),
+        }
+    }
+
+    let (Some(search_path), Some(body_range)) = (search_path, body_range) else {
+        return;
+    };
+
+    let previous_search_path = b.current_search_path().to_vec();
+    let search_path = match search_path {
+        SearchPathOverride::Explicit(search_path) => search_path,
+        SearchPathOverride::FromCurrent => previous_search_path.clone(),
+    };
+    b.search_path_changes.push(SearchPathChange {
+        position: body_range.start(),
+        search_path,
+    });
+    b.search_path_changes.push(SearchPathChange {
+        position: body_range.end(),
+        search_path: previous_search_path,
+    });
+}
+
+enum SearchPathOverride {
+    Explicit(Vec<Schema>),
+    FromCurrent,
+}
+
+fn search_path_from_set_config_param(
+    set_config_param: &ast::SetConfigParam,
+) -> Option<SearchPathOverride> {
+    let path = set_config_param.path()?;
+    if path.qualifier().is_some() {
+        return None;
+    }
+
+    let segment = path.segment()?;
+    let param_name = segment.name_ref()?.syntax().text().to_string();
+    if !param_name.eq_ignore_ascii_case("search_path") {
+        return None;
+    }
+
+    if set_config_param.current_token().is_some() {
+        return Some(SearchPathOverride::FromCurrent);
+    }
+
+    if set_config_param.default_token().is_some() {
+        return Some(SearchPathOverride::Explicit(vec![
+            Schema::new("public"),
+            Schema::new("pg_temp"),
+            Schema::new("pg_catalog"),
+        ]));
+    }
+
+    let mut search_path = vec![];
+    for literal in set_config_param.literals() {
+        if let Some(string_value) = extract_string_literal(&literal)
+            && !string_value.is_empty()
+        {
+            search_path.push(Schema::new(string_value));
+        }
+    }
+    for name_ref in set_config_param.name_refs() {
+        search_path.push(Schema::new(name_ref.syntax().text().to_string()));
+    }
+
+    Some(SearchPathOverride::Explicit(search_path))
 }
 
 fn bind_set(b: &mut Binder, set: ast::Set) {

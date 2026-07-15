@@ -5457,6 +5457,10 @@ impl CreateOperatorClass {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn operator_family_clause(&self) -> Option<OperatorFamilyClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
@@ -5483,10 +5487,6 @@ impl CreateOperatorClass {
     #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
-    }
-    #[inline]
-    pub fn family_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FAMILY_KW)
     }
     #[inline]
     pub fn for_token(&self) -> Option<SyntaxToken> {
@@ -15898,6 +15898,21 @@ impl OperatorClassOptionList {
     #[inline]
     pub fn op_class_options(&self) -> AstChildren<OpClassOption> {
         support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OperatorFamilyClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OperatorFamilyClause {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn family_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FAMILY_KW)
     }
 }
 
@@ -33991,6 +34006,24 @@ impl AstNode for OperatorClassOptionList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::OPERATOR_CLASS_OPTION_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OperatorFamilyClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OPERATOR_FAMILY_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

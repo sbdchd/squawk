@@ -29,6 +29,7 @@ pub enum LocationKind {
     Index,
     Language,
     NamedArgParameter,
+    Operator,
     OperatorClass,
     OperatorFamily,
     Policy,

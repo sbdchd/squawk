@@ -211,6 +211,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
             | LocationKind::ForeignDataWrapper
             | LocationKind::Index
             | LocationKind::Language
+            | LocationKind::Operator
             | LocationKind::OperatorClass
             | LocationKind::OperatorFamily
             | LocationKind::Policy
