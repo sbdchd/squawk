@@ -29,7 +29,8 @@ SOURCE_FILE@0..239
       LANGUAGE_FUNC_OPTION@33..45
         LANGUAGE_KW@33..41 "language"
         WHITESPACE@41..42 " "
-        SQL_KW@42..45 "sql"
+        NAME_REF@42..45
+          SQL_KW@42..45 "sql"
       WHITESPACE@45..46 "\n"
       BEGIN_FUNC_OPTION_LIST@46..117
         BEGIN_KW@46..51 "begin"
@@ -106,7 +107,8 @@ SOURCE_FILE@0..239
       LANGUAGE_FUNC_OPTION@153..165
         LANGUAGE_KW@153..161 "language"
         WHITESPACE@161..162 " "
-        SQL_KW@162..165 "sql"
+        NAME_REF@162..165
+          SQL_KW@162..165 "sql"
       WHITESPACE@165..166 "\n"
       BEGIN_FUNC_OPTION_LIST@166..237
         BEGIN_KW@166..171 "begin"

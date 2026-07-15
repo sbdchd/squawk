@@ -258,6 +258,7 @@ fn hover_name(db: &dyn Db, name: InFile<ast::Name>) -> Option<Hover> {
         LocationKind::Index => hover_index(db, def),
         LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
+        LocationKind::Operator => hover_operator(db, def),
         LocationKind::OperatorFamily => hover_operator_family(db, def),
         LocationKind::OperatorClass => hover_operator_class(db, def),
         LocationKind::Policy => hover_policy(db, def),
@@ -360,6 +361,7 @@ fn hover_name_ref(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
         LocationKind::Index => hover_index(db, def),
         LocationKind::Language => hover_language(db, def),
         LocationKind::NamedArgParameter => hover_named_arg_parameter(db, def),
+        LocationKind::Operator => hover_operator(db, def),
         LocationKind::OperatorFamily => hover_operator_family(db, def),
         LocationKind::OperatorClass => hover_operator_class(db, def),
         LocationKind::Policy => hover_policy(db, def),
@@ -1276,6 +1278,11 @@ fn hover_conversion(db: &dyn Db, def: Location) -> Option<Hover> {
 fn hover_access_method(db: &dyn Db, def: Location) -> Option<Hover> {
     let def_node = def.to_node(db)?;
     Some(Hover::snippet(format!("access method {}", def_node.text())))
+}
+
+fn hover_operator(db: &dyn Db, def: Location) -> Option<Hover> {
+    let def_node = def.to_node(db)?;
+    Some(Hover::snippet(format!("operator {}", def_node.text())))
 }
 
 fn hover_operator_family(db: &dyn Db, def: Location) -> Option<Hover> {

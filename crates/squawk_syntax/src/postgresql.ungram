@@ -3117,9 +3117,12 @@ CreateOperator =
 
 CreateOperatorClass =
   'create' 'operator' 'class' Path 'default'? 'for' 'type' Type
-  'using' NameRef ('family' Path)?
+  'using' NameRef OperatorFamilyClause?
   'as'
   OperatorClassOptionList ';'?
+
+OperatorFamilyClause =
+  'family' Path
 
 OperatorClassOptionList =
   (OpClassOption (',' OpClassOption)*)

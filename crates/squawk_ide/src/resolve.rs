@@ -1,7 +1,7 @@
 use crate::{ast_nav, db::list_files};
 use smallvec::{SmallVec, smallvec};
 use squawk_syntax::{
-    SyntaxKind, SyntaxNode, SyntaxNodePtr,
+    SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode},
 };
 
@@ -511,7 +511,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::Collation => {
-            let (schema, collation_name) = name::schema_and_name(name_ref);
+            let (schema, collation_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -523,7 +523,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::Conversion => {
-            let (schema, conversion_name) = name::schema_and_name(name_ref);
+            let (schema, conversion_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -545,7 +545,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::OperatorFamily => {
-            let (schema, operator_family_name) = name::schema_and_name(name_ref);
+            let (schema, operator_family_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -558,7 +558,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::OperatorClass => {
-            let (schema, operator_class_name) = name::schema_and_name(name_ref);
+            let (schema, operator_class_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -571,7 +571,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::TextSearchDictionary => {
-            let (schema, dictionary_name) = name::schema_and_name(name_ref);
+            let (schema, dictionary_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -584,7 +584,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::TextSearchConfiguration => {
-            let (schema, configuration_name) = name::schema_and_name(name_ref);
+            let (schema, configuration_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -600,7 +600,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::TextSearchParser => {
-            let (schema, parser_name) = name::schema_and_name(name_ref);
+            let (schema, parser_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -612,7 +612,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::TextSearchTemplate => {
-            let (schema, template_name) = name::schema_and_name(name_ref);
+            let (schema, template_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let binder = bind(db, file);
             let schemas = binder.resolved_schemas(position, schema.as_ref());
@@ -818,10 +818,14 @@ pub(crate) fn resolve_name_ref(
                 .syntax()
                 .ancestors()
                 .find_map(ast::HasParamList::cast)
+                && let Some(sig_path) = function_sig.path()
+                && sig_path
+                    .syntax()
+                    .text_range()
+                    .contains_range(name_ref.syntax().text_range())
             {
-                let path = function_sig.path()?;
                 let params = param_signature(&function_sig);
-                (path, params)
+                (sig_path, params)
             } else {
                 let path = name_ref.syntax().ancestors().find_map(ast::Path::cast)?;
                 (path, None)
@@ -899,7 +903,7 @@ pub(crate) fn resolve_name_ref(
             )])
         }
         NameRefClass::PrivilegeObjectTable => {
-            let (schema, table_name) = name::schema_and_name(name_ref);
+            let (schema, table_name) = name::schema_and_table_name(name_ref)?;
             let position = name_ref.syntax().text_range().start();
             let schemas = binder.resolved_schemas(position, schema.as_ref());
             let (ptr, kind) = resolve_table_like(db, Some(name_ref), &table_name, &schemas, file)?;
@@ -1044,6 +1048,11 @@ pub(crate) fn resolve_literal(
 ) -> Option<SmallVec<[Location; 1]>> {
     let file = literal.file_id;
     let literal = literal.value;
+
+    if let Some(ast::LitKind::PositionalParam(token)) = literal.kind() {
+        return resolve_positional_param(file, literal, &token);
+    }
+
     let context = classify_literal(literal.syntax())?;
 
     match context {
@@ -1063,6 +1072,63 @@ pub(crate) fn resolve_literal(
         }
         _ => None,
     }
+}
+
+pub(crate) fn resolve_custom_op(
+    db: &dyn Db,
+    custom_op: InFile<&ast::CustomOp>,
+) -> Option<SmallVec<[Location; 1]>> {
+    let file = custom_op.file_id;
+    let custom_op = custom_op.value;
+
+    let operator_name = Name::from_string(custom_op.syntax().text().to_string());
+    let schema = custom_op
+        .syntax()
+        .parent()
+        .filter(|parent| parent.kind() == SyntaxKind::OP)
+        .and_then(|op| op.children().find_map(ast::Path::cast))
+        .and_then(|path| name::schema_name(&path));
+
+    let position = custom_op.syntax().text_range().start();
+    let binder = bind(db, file);
+    let schemas = binder.resolved_schemas(position, schema.as_ref());
+    let ptr = binder.lookup_with(&operator_name, SymbolKind::Operator, &schemas)?;
+    Some(smallvec![Location::new(
+        file,
+        ptr.text_range(),
+        LocationKind::Operator
+    )])
+}
+
+fn resolve_positional_param(
+    file: File,
+    literal: &ast::Literal,
+    token: &SyntaxToken,
+) -> Option<SmallVec<[Location; 1]>> {
+    let index = token.text().strip_prefix('$')?.parse::<usize>().ok()?;
+    let index = index.checked_sub(1)?;
+
+    for ancestor in literal.syntax().ancestors() {
+        let Some(has_param_list) = ast::HasParamList::cast(ancestor) else {
+            continue;
+        };
+        let Some(param_list) = has_param_list.param_list() else {
+            continue;
+        };
+        if let Some(param) = param_list.params().nth(index) {
+            let range = param
+                .name()
+                .map(|name| name.syntax().text_range())
+                .unwrap_or_else(|| param.syntax().text_range());
+            return Some(smallvec![Location::new(
+                file,
+                range,
+                LocationKind::NamedArgParameter
+            )]);
+        }
+    }
+
+    None
 }
 
 fn resolve_table_name_ptr(
@@ -4243,6 +4309,22 @@ fn resolve_column_from_paren_expr_with_skip(
             column_name,
             skip_column_count,
         );
+    }
+
+    if let Some(ast::Expr::NameRef(base_name_ref)) = paren_expr.expr() {
+        let table_name = Name::from_node(&base_name_ref);
+        if let Some(from_item) =
+            find_from_item_for_select_qualified_name_ref(&base_name_ref, &table_name)
+            && let Some(result) = resolve_from_item_column_by_name_after_index(
+                db,
+                InFile::new(file, &from_item),
+                name_ref,
+                column_name,
+                skip_column_count,
+            )
+        {
+            return Some(result);
+        }
     }
 
     if let Some(from_item) = paren_expr.from_item() {

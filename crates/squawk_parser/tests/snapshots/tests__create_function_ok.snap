@@ -65,7 +65,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- security_definer"
@@ -122,7 +123,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
-        IDENT "plpgsql"
+        NAME_REF
+          IDENT "plpgsql"
       WHITESPACE "\n    "
       SECURITY_FUNC_OPTION
         SECURITY_KW "SECURITY"
@@ -211,7 +213,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        IDENT "plpgsql"
+        NAME_REF
+          IDENT "plpgsql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- setof return"
@@ -261,7 +264,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- void return"
@@ -304,7 +308,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- omitted return"
@@ -528,7 +533,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- transform"
@@ -589,7 +595,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- transform with type with args"
@@ -645,7 +652,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- window"
@@ -685,7 +693,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- immutable, stable, volatile"
@@ -725,7 +734,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -763,7 +773,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -801,7 +812,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- [ not ] leakproof"
@@ -843,7 +855,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -881,7 +894,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT"
@@ -927,7 +941,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -973,7 +988,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression"
@@ -1014,7 +1030,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1052,7 +1069,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- [ EXTERNAL ] SECURITY INVOKER | [ EXTERNAL ] SECURITY DEFINER"
@@ -1096,7 +1114,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1136,7 +1155,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1178,7 +1198,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1218,7 +1239,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- parallel"
@@ -1260,7 +1282,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1300,7 +1323,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1340,7 +1364,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- cost"
@@ -1383,7 +1408,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rows"
@@ -1426,7 +1452,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- suport"
@@ -1476,7 +1503,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1519,7 +1547,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set configuration_parameter"
@@ -1574,7 +1603,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1623,7 +1653,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -1672,7 +1703,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- as def"
@@ -1709,7 +1741,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- as 'object_file', 'link_symbol'"
@@ -1750,7 +1783,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        IDENT "foo"
+        NAME_REF
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- return"
@@ -1781,7 +1815,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
       WHITESPACE "\n"
       RETURN_FUNC_OPTION
         RETURN_KW "return"
@@ -1827,7 +1862,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
       WHITESPACE "\n"
       BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"
@@ -1883,7 +1919,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
       WHITESPACE "\n"
       BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"
@@ -1935,7 +1972,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
       WHITESPACE "\n"
       BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"
@@ -2006,7 +2044,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
       WHITESPACE "\n  "
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
@@ -2163,7 +2202,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -2210,7 +2250,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- argmode"
@@ -2256,7 +2297,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -2300,7 +2342,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -2346,7 +2389,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -2390,7 +2434,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -2434,7 +2479,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_arg_names"
@@ -2482,7 +2528,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi args"
@@ -2539,7 +2586,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- named and unnamed"
@@ -2593,7 +2641,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- default"
@@ -2661,7 +2710,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not a parser error but something to warn about"
@@ -2721,7 +2771,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- default"
@@ -2773,7 +2824,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- expr w/ default"
@@ -2831,7 +2883,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- expr w/ ="
@@ -2889,7 +2942,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- param_type_order"
@@ -2940,7 +2994,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- mode type"
@@ -2986,7 +3041,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- name mode type"
@@ -3035,7 +3091,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- name type"
@@ -3081,7 +3138,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- type"
@@ -3124,7 +3182,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- array type"
@@ -3187,7 +3246,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- path type"
@@ -3270,7 +3330,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- overlaps doesn't need quoting"
@@ -3307,7 +3368,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- like doesn't need quoting"
@@ -3344,6 +3406,7 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"

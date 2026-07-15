@@ -14,6 +14,12 @@ fn is_reference_node(node: &SyntaxNode) -> bool {
         return true;
     }
 
+    if let Some(literal) = ast::Literal::cast(node.clone())
+        && matches!(literal.kind(), Some(ast::LitKind::PositionalParam(_)))
+    {
+        return true;
+    }
+
     if let Some(ty) = ast::Type::cast(node.clone()) {
         return match ty {
             ast::Type::BitType(_)
@@ -458,6 +464,20 @@ create function pg_catalog.bit(integer, integer) returns bit
            ‡
         10 │ create function pg_catalog.bit(integer, integer) returns bit
            ╰╴                                                         ─── 5. reference
+        ");
+    }
+
+    #[test]
+    fn positional_param_and_named_param() {
+        assert_snapshot!(find_refs("
+create function f(x$0 int) returns int language sql return x + $1;
+"), @"
+          ╭▸ 
+        2 │ create function f(x int) returns int language sql return x + $1;
+          │                   ┬                                      ┬   ── 3. reference
+          │                   │                                      │
+          │                   0. query                               2. reference
+          ╰╴                  1. reference
         ");
     }
 

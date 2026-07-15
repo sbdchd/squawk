@@ -22,7 +22,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -103,7 +104,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
       WHITESPACE "\n"
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
@@ -252,7 +254,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        SQL_KW "sql"
+        NAME_REF
+          SQL_KW "sql"
       WHITESPACE "\n"
       BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"

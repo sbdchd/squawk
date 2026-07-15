@@ -892,7 +892,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
-        IDENT "plpgsql"
+        NAME_REF
+          IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "AS"
@@ -1282,7 +1283,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
-        IDENT "plpgsql"
+        NAME_REF
+          IDENT "plpgsql"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/postgres-partitioning-with-a-default-partition"
@@ -3008,7 +3010,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        IDENT "plpgsql"
+        NAME_REF
+          IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"
@@ -3133,7 +3136,8 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        IDENT "plpgsql"
+        NAME_REF
+          IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"

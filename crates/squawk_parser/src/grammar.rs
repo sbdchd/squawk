@@ -9952,13 +9952,21 @@ fn create_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     type_name(p);
     p.expect(USING_KW);
     name_ref(p);
-    if p.eat(FAMILY_KW) {
-        path_name_ref(p);
-    }
+    opt_operator_family(p);
     p.expect(AS_KW);
     operator_class_option_list(p);
     p.eat(SEMICOLON);
     m.complete(p, CREATE_OPERATOR_CLASS)
+}
+
+fn opt_operator_family(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.eat(FAMILY_KW) {
+        path_name_ref(p);
+        m.complete(p, OPERATOR_FAMILY_CLAUSE);
+    } else {
+        m.abandon(p);
+    }
 }
 
 // | OPERATOR strategy_number operator_name [ ( op_type, op_type ) ] [ FOR SEARCH | FOR ORDER BY sort_family_name ]
@@ -14535,9 +14543,11 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
             // string for language is deprecated but let's support it
             if opt_string_literal(p).is_none() {
                 if p.at_ts(UNRESERVED_KEYWORDS) || p.at(IDENT) {
+                    let m = p.start();
                     if !opt_ident(p) {
                         p.bump_any();
                     }
+                    m.complete(p, NAME_REF);
                 } else {
                     p.error(format!("expected a language name, got {:?}", p.current()));
                 }

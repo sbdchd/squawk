@@ -19,6 +19,7 @@ pub(crate) enum SymbolKind {
     Function,
     Index,
     Language,
+    Operator,
     OperatorClass,
     OperatorFamily,
     Policy,
