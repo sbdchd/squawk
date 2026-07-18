@@ -45,8 +45,9 @@ SOURCE_FILE@0..91
       WHITESPACE@79..80 " "
       SCHEMA_KW@80..86 "schema"
       WHITESPACE@86..87 " "
-      NAME_REF@87..88
-        IDENT@87..88 "s"
+      SCHEMA_REF@87..88
+        NAME_REF@87..88
+          IDENT@87..88 "s"
     SEMICOLON@88..89 ";"
   WHITESPACE@89..91 "\n\n"
 

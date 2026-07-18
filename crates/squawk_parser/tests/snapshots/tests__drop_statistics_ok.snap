@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -28,27 +29,30 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    PATH_REF
+    STATISTICS_REF
       PATH_REF
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+            IDENT "a"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "c"
+    STATISTICS_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -63,22 +67,25 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "a"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "a"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "b"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "c"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

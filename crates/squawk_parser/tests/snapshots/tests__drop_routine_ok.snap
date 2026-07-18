@@ -10,12 +10,13 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG_LIST
-      FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+    ROUTINE_SIG_LIST
+      ROUTINE_SIG
+        ROUTINE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -30,19 +31,21 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    FUNCTION_SIG_LIST
-      FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+    ROUTINE_SIG_LIST
+      ROUTINE_SIG
+        ROUTINE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
       COMMA ","
       WHITESPACE " "
-      FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+      ROUTINE_SIG
+        ROUTINE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -54,16 +57,17 @@ SOURCE_FILE
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      FUNCTION_SIG
-        PATH_REF
+      ROUTINE_SIG
+        ROUTINE_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "foo"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+                IDENT "c"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -81,11 +85,12 @@ SOURCE_FILE
           R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+      ROUTINE_SIG
+        ROUTINE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -112,12 +117,13 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    FUNCTION_SIG_LIST
-      FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+    ROUTINE_SIG_LIST
+      ROUTINE_SIG
+        ROUTINE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

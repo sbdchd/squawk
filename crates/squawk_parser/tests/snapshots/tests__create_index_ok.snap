@@ -14,11 +14,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -46,18 +47,22 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME
-      IDENT "i"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "i"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
+    TABLE_RELATION_NAME
       ONLY_KW "only"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n  "
     USING_METHOD
       USING_KW "using"
@@ -83,23 +88,27 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
-        BIN_EXPR
+        COLLATE
           NAME_REF
             IDENT "c"
           WHITESPACE " "
           COLLATE_KW "collate"
           WHITESPACE " "
-          NAME_REF
-            IDENT "\"fr_FR\""
+          COLLATION_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "\"fr_FR\""
         WHITESPACE " "
         SORT_ASC
           ASC_KW "asc"
@@ -118,11 +127,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -149,11 +159,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -225,11 +236,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -269,11 +281,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -328,11 +341,12 @@ SOURCE_FILE
             IDENT "buzz"
         R_PAREN ")"
     WHITESPACE "\n  "
-    TABLESPACE
+    TABLESPACE_CLAUSE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "space"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "space"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -354,11 +368,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -397,16 +412,17 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "public"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "public"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -425,16 +441,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "title_idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "title_idx"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -451,16 +471,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "title_idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "title_idx"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -490,16 +514,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "title_idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "title_idx"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -532,11 +560,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -561,28 +590,35 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "title_idx_german"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "title_idx_german"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
-        BIN_EXPR
+        COLLATE
           NAME_REF
             IDENT "title"
           WHITESPACE " "
           COLLATE_KW "COLLATE"
           WHITESPACE " "
-          NAME_REF
-            IDENT "\"de_DE\""
+          COLLATION_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "\"de_DE\""
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -591,16 +627,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "title_idx_nulls_low"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "title_idx_nulls_low"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -622,16 +662,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "title_idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "title_idx"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -662,16 +706,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "gin_idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "gin_idx"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "documents_table"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "documents_table"
     WHITESPACE " "
     USING_METHOD
       USING_KW "USING"
@@ -709,16 +757,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "code_idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "code_idx"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -727,11 +779,12 @@ SOURCE_FILE
           IDENT "code"
       R_PAREN ")"
     WHITESPACE " "
-    TABLESPACE
+    TABLESPACE_CLAUSE
       TABLESPACE_KW "TABLESPACE"
       WHITESPACE " "
-      NAME_REF
-        IDENT "indexspace"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "indexspace"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -739,16 +792,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "pointloc"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "pointloc"
     WHITESPACE "\n    "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "points"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "points"
     WHITESPACE " "
     USING_METHOD
       USING_KW "USING"
@@ -783,16 +840,20 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "CONCURRENTLY"
     WHITESPACE " "
-    NAME
-      IDENT "sales_quantity_index"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "sales_quantity_index"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "sales_table"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "sales_table"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -807,16 +868,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    NAME
-      IDENT "idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "idx"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -843,16 +908,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    NAME
-      IDENT "idx"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "idx"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -887,21 +956,25 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "index_name"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "index_name"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "public"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "public"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "table_name"
+              IDENT "table_name"
     WHITESPACE " "
     USING_METHOD
       USING_KW "USING"

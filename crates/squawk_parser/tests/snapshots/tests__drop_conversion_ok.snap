@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     CONVERSION_KW "conversion"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    CONVERSION_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -28,15 +29,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    CONVERSION_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+            IDENT "b"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -51,15 +53,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    CONVERSION_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "buzz"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "buzz"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+            IDENT "b"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

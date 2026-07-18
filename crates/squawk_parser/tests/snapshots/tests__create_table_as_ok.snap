@@ -13,10 +13,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     ON_COMMIT
       ON_KW "on"
@@ -31,8 +32,9 @@ SOURCE_FILE
     EXECUTE
       EXECUTE_KW "execute"
       WHITESPACE " "
-      NAME_REF
-        IDENT "f"
+      PREPARED_STATEMENT_REF
+        NAME_REF
+          IDENT "f"
       ARG_LIST
         L_PAREN "("
         ARG
@@ -48,10 +50,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -90,10 +93,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -101,10 +105,11 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "u"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- more fields"
@@ -119,10 +124,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " \n  "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -179,11 +185,12 @@ SOURCE_FILE
         WHITESPACE " "
         ROWS_KW "rows"
     WHITESPACE "\n  "
-    TABLESPACE
+    TABLESPACE_CLAUSE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "bar"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -219,10 +226,11 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " \n  "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "u"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "u"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -253,11 +261,12 @@ SOURCE_FILE
         WHITESPACE " "
         ROWS_KW "rows"
     WHITESPACE "\n  "
-    TABLESPACE
+    TABLESPACE_CLAUSE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "foo"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -288,10 +297,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "u"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "u"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -315,10 +325,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -341,10 +352,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "

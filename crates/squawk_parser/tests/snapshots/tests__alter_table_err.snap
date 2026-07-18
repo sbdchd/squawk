@@ -26,19 +26,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_CONSTRAINT
       ALTER_KW "alter"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       NOT_DEFERRABLE_CONSTRAINT_OPTION
         NOT_KW "not"
@@ -56,27 +60,34 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n"
     VALIDATE_CONSTRAINT
       VALIDATE_KW "validate"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
     WHITESPACE " "
     VALIDATE_CONSTRAINT
       VALIDATE_KW "validate"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "b"
     WHITESPACE " "
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -89,26 +100,28 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "public"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "public"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "copy_2"
+              IDENT "copy_2"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       NOT_NULL_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "id_not_null"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "id_not_null"
         WHITESPACE " "
         NOT_KW "not"
         WHITESPACE " "
@@ -132,11 +145,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -174,11 +188,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"

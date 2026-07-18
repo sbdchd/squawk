@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_KW "role"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    ROLE_REF
+      NAME_REF
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -26,16 +27,19 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    ROLE_REF
+      NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    ROLE_REF
+      NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    ROLE_REF
+      NAME_REF
+        IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_ROLE
@@ -48,15 +52,18 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    ROLE_REF
+      NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    ROLE_REF
+      NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    ROLE_REF
+      NAME_REF
+        IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"

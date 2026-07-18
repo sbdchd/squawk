@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     GRAPH_KW "graph"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "g"
+    PROPERTY_GRAPH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "g"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_PROPERTY_GRAPH
@@ -28,15 +29,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    PROPERTY_GRAPH_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -48,10 +50,11 @@ SOURCE_FILE
     WHITESPACE " "
     GRAPH_KW "graph"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "g"
+    PROPERTY_GRAPH_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "g"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

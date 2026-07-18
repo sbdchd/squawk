@@ -22,11 +22,12 @@ SOURCE_FILE
           WHITESPACE " "
           INTO_KW "into"
           WHITESPACE " "
-          RELATION_NAME
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+          TABLE_RELATION_NAME
+            TABLE_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t"
           WHITESPACE "\n    "
           USING_ON_CLAUSE
             USING_KW "using"
@@ -1505,15 +1506,16 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "public"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "public"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "notification"
+              IDENT "notification"
     WHITESPACE "\n"
     SET_CLAUSE
       SET_KW "SET"

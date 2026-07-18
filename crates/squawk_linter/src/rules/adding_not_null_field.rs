@@ -36,7 +36,8 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
 
 fn get_table_name(alter_table: &ast::AlterTable) -> Option<String> {
     alter_table
-        .relation_name()?
+        .table_relation_name()?
+        .table_name_ref()?
         .path_ref()?
         .segment()?
         .name_ref()
@@ -68,8 +69,10 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                     {
                         if let Some(ast::Constraint::CheckConstraint(check)) =
                             add_constraint.constraint()
-                            && let Some(constraint_name) =
-                                check.constraint_name().and_then(|c| c.name())
+                            && let Some(constraint_name) = check
+                                .constraint_name_clause()
+                                .and_then(|clause| clause.constraint_name())
+                                .and_then(|name| name.name())
                             && let Some(expr) = check.expr()
                             && let Some(column) = is_not_null_check(&expr)
                         {
@@ -86,8 +89,12 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                     ast::AlterTableAction::ValidateConstraint(validate_constraint)
                         if is_pg12_plus =>
                     {
-                        if let Some(constraint_name) =
-                            validate_constraint.name_ref().map(|x| x.text())
+                        if let Some(constraint_name) = validate_constraint
+                            .constraint_name_ref()
+                            .and_then(|constraint| constraint.path_ref())
+                            .and_then(|path| path.segment())
+                            .and_then(|segment| segment.name_ref())
+                            .map(|name| name.text())
                         {
                             if let Some(table_column) = not_null_constraints.get(&constraint_name)
                                 && table_column.table == table

@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     USER_KW "user"
     WHITESPACE " "
-    NAME
-      IDENT "u"
+    ROLE
+      NAME
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -21,8 +22,9 @@ SOURCE_FILE
     WHITESPACE " "
     USER_KW "user"
     WHITESPACE " "
-    NAME
-      IDENT "u"
+    ROLE
+      NAME
+        IDENT "u"
     WHITESPACE "\n   "
     ROLE_OPTION_LIST
       WITH_KW "with"

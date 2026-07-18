@@ -10,16 +10,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    NAME
-      IDENT "i"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "i"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("

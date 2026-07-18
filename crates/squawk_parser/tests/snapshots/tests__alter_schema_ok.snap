@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -29,8 +30,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -47,8 +49,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"

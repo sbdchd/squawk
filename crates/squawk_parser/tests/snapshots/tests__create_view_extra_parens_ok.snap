@@ -8,10 +8,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "foo"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "foo"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " \n  "

@@ -6,7 +6,7 @@ use squawk_syntax::{
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
 fn concurrently_fix(detach_partition: &ast::DetachPartition) -> Option<Fix> {
-    let path = detach_partition.path_ref()?;
+    let path = detach_partition.table_name_ref()?.path_ref()?;
     let at = path.syntax().text_range().end();
     let edit = Edit::insert(" concurrently", at);
     Some(Fix::new("Add `concurrently`", vec![edit]))

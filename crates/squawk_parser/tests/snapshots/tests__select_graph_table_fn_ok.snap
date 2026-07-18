@@ -22,10 +22,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -65,10 +66,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -156,10 +158,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -200,10 +203,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -291,10 +295,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -335,10 +340,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -411,10 +417,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -454,10 +461,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -516,10 +524,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -588,10 +597,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -637,10 +647,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -685,10 +696,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -735,10 +747,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -785,10 +798,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE " "
@@ -851,10 +865,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
           WHITESPACE "\n  "
           MATCH_KW "match"
           WHITESPACE " "
@@ -966,10 +981,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1188,10 +1204,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1371,10 +1388,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1558,10 +1576,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1762,10 +1781,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "
@@ -1934,10 +1954,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "graph_table"
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "match"
           WHITESPACE "\n    "

@@ -56,6 +56,9 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
                 false
             }
         }
+        ast::Expr::Collate(collate) => collate
+            .expr()
+            .is_some_and(|expr| is_non_volatile_or_const(&expr)),
         // current_timestamp is the same as calling now()
         ast::Expr::NameRef(name_ref) => {
             if let Some(child) = name_ref.syntax().first_child_or_token() {

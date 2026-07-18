@@ -11,10 +11,11 @@ SOURCE_FILE
     UPDATE_KW "update"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "set"
@@ -50,10 +51,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -83,10 +85,11 @@ SOURCE_FILE
     UPDATE_KW "update"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "mytable"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "mytable"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "set"
@@ -146,10 +149,11 @@ SOURCE_FILE
     UPDATE_KW "update"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "set"
@@ -206,10 +210,11 @@ SOURCE_FILE
     UPDATE_KW "update"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t2"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t2"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "set"
@@ -263,10 +268,11 @@ SOURCE_FILE
     RELATION_NAME
       ONLY_KW "only"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALIAS
       AS_KW "as"
@@ -430,10 +436,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -467,10 +474,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "weather"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "weather"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -547,10 +555,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "weather"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "weather"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -645,10 +654,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "weather"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "weather"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -727,10 +737,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "employees"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "employees"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -801,10 +812,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "employees"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "employees"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -872,10 +884,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "accounts"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "accounts"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -945,10 +958,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "accounts"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "accounts"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -1009,10 +1023,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "summary"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "summary"
     WHITESPACE " "
     ALIAS
       NAME
@@ -1140,11 +1155,12 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- other operations"
   WHITESPACE "\n"
-  SAVEPOINT
+  SAVEPOINT_CREATE
     SAVEPOINT_KW "SAVEPOINT"
     WHITESPACE " "
-    NAME
-      IDENT "sp1"
+    SAVEPOINT
+      NAME
+        IDENT "sp1"
     SEMICOLON ";"
   WHITESPACE "\n"
   INSERT
@@ -1152,10 +1168,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "wines"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "wines"
     WHITESPACE " "
     VALUES
       VALUES_KW "VALUES"
@@ -1180,18 +1197,20 @@ SOURCE_FILE
     WHITESPACE " "
     TO_KW "TO"
     WHITESPACE " "
-    NAME_REF
-      IDENT "sp1"
+    SAVEPOINT_REF
+      NAME_REF
+        IDENT "sp1"
     SEMICOLON ";"
   WHITESPACE "\n"
   UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "wines"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "wines"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -1237,10 +1256,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "films"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "films"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -1264,8 +1284,9 @@ SOURCE_FILE
       WHITESPACE " "
       OF_KW "OF"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c_films"
+      CURSOR_REF
+        NAME_REF
+          IDENT "c_films"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
@@ -1369,10 +1390,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "work_item"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "work_item"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "SET"
@@ -1429,10 +1451,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "inventory"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "inventory"
     WHITESPACE "\n"
     SET_CLAUSE
       SET_KW "SET"
@@ -1552,10 +1575,11 @@ SOURCE_FILE
     UPDATE_KW "update"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_CLAUSE
       SET_KW "set"

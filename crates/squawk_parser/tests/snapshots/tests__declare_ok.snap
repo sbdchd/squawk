@@ -8,8 +8,9 @@ SOURCE_FILE
   DECLARE
     DECLARE_KW "DECLARE"
     WHITESPACE " "
-    NAME
-      IDENT "cursor_name"
+    CURSOR
+      NAME
+        IDENT "cursor_name"
     WHITESPACE " "
     CURSOR_KW "CURSOR"
     WHITESPACE " "
@@ -36,8 +37,9 @@ SOURCE_FILE
   DECLARE
     DECLARE_KW "declare"
     WHITESPACE " "
-    NAME
-      IDENT "c"
+    CURSOR
+      NAME
+        IDENT "c"
     WHITESPACE " "
     BINARY_KW "binary"
     WHITESPACE " "
@@ -68,8 +70,9 @@ SOURCE_FILE
   DECLARE
     DECLARE_KW "declare"
     WHITESPACE " "
-    NAME
-      IDENT "c"
+    CURSOR
+      NAME
+        IDENT "c"
     WHITESPACE " \n"
     BINARY_KW "binary"
     WHITESPACE " \n"
@@ -98,8 +101,9 @@ SOURCE_FILE
   DECLARE
     DECLARE_KW "declare"
     WHITESPACE " "
-    NAME
-      IDENT "c"
+    CURSOR
+      NAME
+        IDENT "c"
     WHITESPACE " "
     CURSOR_KW "cursor"
     WHITESPACE " "
@@ -120,8 +124,9 @@ SOURCE_FILE
   DECLARE
     DECLARE_KW "declare"
     WHITESPACE " "
-    NAME
-      IDENT "c"
+    CURSOR
+      NAME
+        IDENT "c"
     WHITESPACE " "
     CURSOR_KW "cursor"
     WHITESPACE " "
@@ -143,8 +148,9 @@ SOURCE_FILE
   DECLARE
     DECLARE_KW "declare"
     WHITESPACE " "
-    NAME
-      IDENT "c"
+    CURSOR
+      NAME
+        IDENT "c"
     WHITESPACE " "
     CURSOR_KW "cursor"
     WHITESPACE " "
@@ -180,8 +186,9 @@ SOURCE_FILE
   DECLARE
     DECLARE_KW "declare"
     WHITESPACE " "
-    NAME
-      IDENT "c"
+    CURSOR
+      NAME
+        IDENT "c"
     WHITESPACE " "
     CURSOR_KW "cursor"
     WHITESPACE " "

@@ -114,10 +114,11 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+            FUNCTION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "f"
         COMMA ","
         WHITESPACE "\n  "
         OP_CLASS_OPTION
@@ -137,10 +138,11 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+            FUNCTION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
@@ -186,10 +188,11 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+            FUNCTION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_search"
@@ -343,10 +346,11 @@ SOURCE_FILE
             INT_NUMBER "1"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+            FUNCTION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
@@ -409,10 +413,11 @@ SOURCE_FILE
             R_PAREN ")"
           WHITESPACE " "
           FUNCTION_SIG
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "f"
+            FUNCTION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "f"
             PARAM_LIST
               L_PAREN "("
               PARAM
@@ -812,7 +817,8 @@ SOURCE_FILE
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

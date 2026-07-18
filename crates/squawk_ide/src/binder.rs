@@ -347,13 +347,13 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
         ast::Stmt::CreateTextSearchTemplate(create_text_search_template) => {
             bind_create_text_search_template(b, create_text_search_template)
         }
-        ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role.name()),
-        ast::Stmt::CreateUser(create_user) => bind_create_role(b, create_user.name()),
-        ast::Stmt::CreateGroup(create_group) => bind_create_role(b, create_group.name()),
+        ast::Stmt::CreateRole(create_role) => bind_create_role(b, create_role.role()),
+        ast::Stmt::CreateUser(create_user) => bind_create_role(b, create_user.role()),
+        ast::Stmt::CreateGroup(create_group) => bind_create_role(b, create_group.role()),
         ast::Stmt::Declare(declare) => bind_declare_cursor(b, declare),
         ast::Stmt::Prepare(prepare) => bind_prepare(b, prepare),
         ast::Stmt::Listen(listen) => bind_listen(b, listen),
-        ast::Stmt::Savepoint(savepoint) => bind_savepoint(b, savepoint),
+        ast::Stmt::SavepointCreate(savepoint) => bind_savepoint(b, savepoint),
         ast::Stmt::Select(select) => bind_select(b, select),
         ast::Stmt::Set(set) => bind_set(b, set),
         ast::Stmt::CreatePolicy(create_policy) => bind_create_policy(b, create_policy),
@@ -366,7 +366,7 @@ fn bind_stmt(b: &mut Binder, stmt: ast::Stmt) {
 }
 
 fn bind_create_table(b: &mut Binder, create_table: impl ast::HasCreateTable) {
-    let Some(path) = create_table.path() else {
+    let Some(path) = create_table.table_name().and_then(|table| table.path()) else {
         return;
     };
     let Some(table_name) = item_name(&path) else {
@@ -435,7 +435,7 @@ fn bind_create_table_constraints(
 }
 
 fn bind_create_table_as(b: &mut Binder, create_table_as: ast::CreateTableAs) {
-    let Some(path) = create_table_as.path() else {
+    let Some(path) = create_table_as.table_name().and_then(|table| table.path()) else {
         return;
     };
     let Some(table_name) = item_name(&path) else {
@@ -473,7 +473,7 @@ fn bind_select_into(b: &mut Binder, select_into: ast::SelectInto) {
     let Some(into_clause) = select_into.into_clause() else {
         return;
     };
-    let Some(path) = into_clause.path() else {
+    let Some(path) = into_clause.table_name().and_then(|table| table.path()) else {
         return;
     };
     let Some(table_name) = item_name(&path) else {
@@ -508,14 +508,20 @@ fn bind_select_into(b: &mut Binder, select_into: ast::SelectInto) {
 }
 
 fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
-    let Some(name) = create_index.name() else {
+    let Some(path) = create_index.index().and_then(|index| index.path()) else {
         return;
     };
 
-    let index_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let Some(index_name) = item_name(&path) else {
+        return;
+    };
+    let name_ptr = path_to_ptr(&path);
 
-    let schema = match create_index.relation_name().and_then(|r| r.path_ref()) {
+    let schema = match create_index
+        .table_relation_name()
+        .and_then(|relation| relation.table_name_ref())
+        .and_then(|table| table.path_ref())
+    {
         Some(table_path) => schema_name_ref(b, &table_path, false),
         None => b.default_schema(),
     };
@@ -535,7 +541,7 @@ fn bind_create_index(b: &mut Binder, create_index: ast::CreateIndex) {
 }
 
 fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
-    let Some(path) = create_function.path() else {
+    let Some(path) = create_function.name().and_then(|name| name.path()) else {
         return;
     };
 
@@ -593,7 +599,7 @@ fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate)
 }
 
 fn bind_create_procedure(b: &mut Binder, create_procedure: ast::CreateProcedure) {
-    let Some(path) = create_procedure.path() else {
+    let Some(path) = create_procedure.name().and_then(|name| name.path()) else {
         return;
     };
 
@@ -665,7 +671,10 @@ fn bind_schema_element(b: &mut Binder, element: ast::SchemaElement) {
 }
 
 fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
-    let Some(path) = create_type.path() else {
+    let Some(path) = create_type
+        .type_name()
+        .and_then(|type_name| type_name.path())
+    else {
         return;
     };
 
@@ -706,7 +715,7 @@ fn bind_create_type(b: &mut Binder, create_type: ast::CreateType) {
 }
 
 fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
-    let Some(path) = create_domain.path() else {
+    let Some(path) = create_domain.domain().and_then(|domain| domain.path()) else {
         return;
     };
 
@@ -740,7 +749,11 @@ fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
 }
 
 fn bind_alter_table(b: &mut Binder, alter_table: ast::AlterTable) {
-    let Some(path) = alter_table.relation_name().and_then(|r| r.path_ref()) else {
+    let Some(path) = alter_table
+        .table_relation_name()
+        .and_then(|relation| relation.table_name_ref())
+        .and_then(|table| table.path_ref())
+    else {
         return;
     };
     let Some(table_name) = item_name_ref(&path) else {
@@ -770,7 +783,10 @@ fn bind_alter_table(b: &mut Binder, alter_table: ast::AlterTable) {
                 }
             }
             ast::AlterTableAction::RenameConstraint(rename_constraint) => {
-                if let Some(name) = rename_constraint.name() {
+                if let Some(name) = rename_constraint
+                    .constraint_name()
+                    .and_then(|constraint| constraint.name())
+                {
                     bind_constraint_name_node(b, name, &schema, &table_name);
                 }
             }
@@ -780,7 +796,10 @@ fn bind_alter_table(b: &mut Binder, alter_table: ast::AlterTable) {
 }
 
 fn bind_alter_domain(b: &mut Binder, alter_domain: ast::AlterDomain) {
-    let Some(path) = alter_domain.path_ref() else {
+    let Some(path) = alter_domain
+        .domain_ref()
+        .and_then(|domain| domain.path_ref())
+    else {
         return;
     };
     let Some(domain_name) = item_name_ref(&path) else {
@@ -800,7 +819,10 @@ fn bind_alter_domain(b: &mut Binder, alter_domain: ast::AlterDomain) {
             }
         }
         Some(ast::AlterDomainAction::RenameConstraint(rename_constraint)) => {
-            if let Some(name) = rename_constraint.name() {
+            if let Some(name) = rename_constraint
+                .constraint_name()
+                .and_then(|constraint| constraint.name())
+            {
                 bind_constraint_name_node(b, name, &schema, &domain_name);
             }
         }
@@ -880,7 +902,7 @@ fn derive_multirange_name(range_name: Name) -> Name {
 }
 
 fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
-    let Some(path) = create_view.path() else {
+    let Some(path) = create_view.view().and_then(|view| view.path()) else {
         return;
     };
 
@@ -910,7 +932,7 @@ fn bind_create_view(b: &mut Binder, create_view: ast::CreateView) {
 
 // TODO: combine with create_view
 fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMaterializedView) {
-    let Some(path) = create_view.path() else {
+    let Some(path) = create_view.view().and_then(|view| view.path()) else {
         return;
     };
 
@@ -936,7 +958,10 @@ fn bind_create_materialized_view(b: &mut Binder, create_view: ast::CreateMateria
 }
 
 fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
-    let Some(path) = create_sequence.path() else {
+    let Some(path) = create_sequence
+        .sequence()
+        .and_then(|sequence| sequence.path())
+    else {
         return;
     };
 
@@ -965,7 +990,10 @@ fn bind_create_sequence(b: &mut Binder, create_sequence: ast::CreateSequence) {
 }
 
 fn bind_create_statistics(b: &mut Binder, create_statistics: ast::CreateStatistics) {
-    let Some(path) = create_statistics.path() else {
+    let Some(path) = create_statistics
+        .statistics()
+        .and_then(|statistics| statistics.path())
+    else {
         return;
     };
 
@@ -991,14 +1019,18 @@ fn bind_create_statistics(b: &mut Binder, create_statistics: ast::CreateStatisti
 }
 
 fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
-    let Some(name) = create_trigger.name() else {
+    let Some(name) = create_trigger.trigger().and_then(|trigger| trigger.name()) else {
         return;
     };
 
     let trigger_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let Some(table_path) = create_trigger.on_table().and_then(|on| on.path_ref()) else {
+    let Some(table_path) = create_trigger
+        .on_relation()
+        .and_then(|on| on.relation_name_ref())
+        .and_then(|relation| relation.path_ref())
+    else {
         return;
     };
 
@@ -1022,14 +1054,18 @@ fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
 }
 
 fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
-    let Some(name) = create_policy.name() else {
+    let Some(name) = create_policy.policy().and_then(|policy| policy.name()) else {
         return;
     };
 
     let policy_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let Some(table_path) = create_policy.on_table().and_then(|on| on.path_ref()) else {
+    let Some(table_path) = create_policy
+        .on_table()
+        .and_then(|on| on.table_name_ref())
+        .and_then(|table| table.path_ref())
+    else {
         return;
     };
 
@@ -1053,14 +1089,18 @@ fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
 }
 
 fn bind_create_rule(b: &mut Binder, create_rule: ast::CreateRule) {
-    let Some(name) = create_rule.name() else {
+    let Some(name) = create_rule.rule().and_then(|rule| rule.name()) else {
         return;
     };
 
     let rule_name = Name::from_node(&name);
     let name_ptr = SyntaxNodePtr::new(name.syntax());
 
-    let Some(table_path) = create_rule.rule_on().and_then(|on| on.path_ref()) else {
+    let Some(table_path) = create_rule
+        .rule_on()
+        .and_then(|on| on.relation_name_ref())
+        .and_then(|relation| relation.path_ref())
+    else {
         return;
     };
 
@@ -1084,7 +1124,10 @@ fn bind_create_rule(b: &mut Binder, create_rule: ast::CreateRule) {
 }
 
 fn bind_create_property_graph(b: &mut Binder, create_property_graph: ast::CreatePropertyGraph) {
-    let Some(path) = create_property_graph.path() else {
+    let Some(path) = create_property_graph
+        .property_graph()
+        .and_then(|property_graph| property_graph.path())
+    else {
         return;
     };
     let Some(property_graph_name) = item_name(&path) else {
@@ -1107,7 +1150,10 @@ fn bind_create_property_graph(b: &mut Binder, create_property_graph: ast::Create
 }
 
 fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEventTrigger) {
-    let Some(name) = create_event_trigger.name() else {
+    let Some(name) = create_event_trigger
+        .event_trigger()
+        .and_then(|event_trigger| event_trigger.name())
+    else {
         return;
     };
 
@@ -1126,7 +1172,10 @@ fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEv
 }
 
 fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespace) {
-    let Some(name) = create_tablespace.name() else {
+    let Some(name) = create_tablespace
+        .tablespace()
+        .and_then(|tablespace| tablespace.name())
+    else {
         return;
     };
 
@@ -1167,7 +1216,7 @@ fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
 }
 
 fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
-    let Some(name) = create_server.name() else {
+    let Some(name) = create_server.server().and_then(|server| server.name()) else {
         return;
     };
 
@@ -1186,7 +1235,10 @@ fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
 }
 
 fn bind_create_foreign_data_wrapper(b: &mut Binder, create_fdw: ast::CreateForeignDataWrapper) {
-    let Some(name) = create_fdw.name() else {
+    let Some(name) = create_fdw
+        .foreign_data_wrapper()
+        .and_then(|foreign_data_wrapper| foreign_data_wrapper.name())
+    else {
         return;
     };
 
@@ -1205,7 +1257,10 @@ fn bind_create_foreign_data_wrapper(b: &mut Binder, create_fdw: ast::CreateForei
 }
 
 fn bind_create_publication(b: &mut Binder, create_publication: ast::CreatePublication) {
-    let Some(name) = create_publication.name() else {
+    let Some(name) = create_publication
+        .publication()
+        .and_then(|publication| publication.name())
+    else {
         return;
     };
 
@@ -1224,7 +1279,10 @@ fn bind_create_publication(b: &mut Binder, create_publication: ast::CreatePublic
 }
 
 fn bind_create_subscription(b: &mut Binder, create_subscription: ast::CreateSubscription) {
-    let Some(name) = create_subscription.name() else {
+    let Some(name) = create_subscription
+        .subscription()
+        .and_then(|subscription| subscription.name())
+    else {
         return;
     };
 
@@ -1243,7 +1301,10 @@ fn bind_create_subscription(b: &mut Binder, create_subscription: ast::CreateSubs
 }
 
 fn bind_create_language(b: &mut Binder, create_language: ast::CreateLanguage) {
-    let Some(name) = create_language.name() else {
+    let Some(name) = create_language
+        .language()
+        .and_then(|language| language.name())
+    else {
         return;
     };
 
@@ -1262,7 +1323,10 @@ fn bind_create_language(b: &mut Binder, create_language: ast::CreateLanguage) {
 }
 
 fn bind_create_collation(b: &mut Binder, create_collation: ast::CreateCollation) {
-    let Some(path) = create_collation.path() else {
+    let Some(path) = create_collation
+        .collation()
+        .and_then(|collation| collation.path())
+    else {
         return;
     };
 
@@ -1286,7 +1350,10 @@ fn bind_create_collation(b: &mut Binder, create_collation: ast::CreateCollation)
 }
 
 fn bind_create_conversion(b: &mut Binder, create_conversion: ast::CreateConversion) {
-    let Some(path) = create_conversion.path() else {
+    let Some(path) = create_conversion
+        .conversion()
+        .and_then(|conversion| conversion.path())
+    else {
         return;
     };
 
@@ -1390,7 +1457,10 @@ fn bind_create_text_search_dictionary(
     b: &mut Binder,
     create_text_search_dictionary: ast::CreateTextSearchDictionary,
 ) {
-    let Some(path) = create_text_search_dictionary.path() else {
+    let Some(path) = create_text_search_dictionary
+        .text_search_dictionary()
+        .and_then(|dictionary| dictionary.path())
+    else {
         return;
     };
 
@@ -1417,7 +1487,10 @@ fn bind_create_text_search_configuration(
     b: &mut Binder,
     create_text_search_configuration: ast::CreateTextSearchConfiguration,
 ) {
-    let Some(path) = create_text_search_configuration.path() else {
+    let Some(path) = create_text_search_configuration
+        .text_search_configuration()
+        .and_then(|configuration| configuration.path())
+    else {
         return;
     };
 
@@ -1444,7 +1517,10 @@ fn bind_create_text_search_parser(
     b: &mut Binder,
     create_text_search_parser: ast::CreateTextSearchParser,
 ) {
-    let Some(path) = create_text_search_parser.path() else {
+    let Some(path) = create_text_search_parser
+        .text_search_parser()
+        .and_then(|parser| parser.path())
+    else {
         return;
     };
 
@@ -1471,7 +1547,10 @@ fn bind_create_text_search_template(
     b: &mut Binder,
     create_text_search_template: ast::CreateTextSearchTemplate,
 ) {
-    let Some(path) = create_text_search_template.path() else {
+    let Some(path) = create_text_search_template
+        .text_search_template()
+        .and_then(|template| template.path())
+    else {
         return;
     };
 
@@ -1522,7 +1601,10 @@ fn bind_create_operator_class(b: &mut Binder, create_operator_class: ast::Create
 }
 
 fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension) {
-    let Some(name) = create_extension.name() else {
+    let Some(name) = create_extension
+        .extension()
+        .and_then(|extension| extension.name())
+    else {
         return;
     };
 
@@ -1540,8 +1622,8 @@ fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension)
     b.scope.insert(extension_name, extension_id);
 }
 
-fn bind_create_role(b: &mut Binder, name: Option<ast::Name>) {
-    let Some(name) = name else {
+fn bind_create_role(b: &mut Binder, role: Option<ast::Role>) {
+    let Some(name) = role.and_then(|role| role.name()) else {
         return;
     };
 
@@ -1560,7 +1642,7 @@ fn bind_create_role(b: &mut Binder, name: Option<ast::Name>) {
 }
 
 fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
-    let Some(name) = declare.name() else {
+    let Some(name) = declare.cursor().and_then(|cursor| cursor.name()) else {
         return;
     };
 
@@ -1579,7 +1661,10 @@ fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
 }
 
 fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
-    let Some(name) = prepare.name() else {
+    let Some(name) = prepare
+        .prepared_statement()
+        .and_then(|statement| statement.name())
+    else {
         return;
     };
 
@@ -1598,7 +1683,7 @@ fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
 }
 
 fn bind_listen(b: &mut Binder, listen: ast::Listen) {
-    let Some(name) = listen.name() else {
+    let Some(name) = listen.channel().and_then(|channel| channel.name()) else {
         return;
     };
 
@@ -1616,8 +1701,8 @@ fn bind_listen(b: &mut Binder, listen: ast::Listen) {
     b.scope.insert(channel_name, channel_id);
 }
 
-fn bind_savepoint(b: &mut Binder, savepoint: ast::Savepoint) {
-    let Some(name) = savepoint.name() else {
+fn bind_savepoint(b: &mut Binder, savepoint: ast::SavepointCreate) {
+    let Some(name) = savepoint.savepoint().and_then(|savepoint| savepoint.name()) else {
         return;
     };
 

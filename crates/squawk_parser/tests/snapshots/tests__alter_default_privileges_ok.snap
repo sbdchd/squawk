@@ -59,16 +59,19 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "s2"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s2"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "s3"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s3"
     WHITESPACE "\n  "
     GRANT_DEFAULT_PRIVILEGES
       GRANT_KW "grant"
@@ -110,8 +113,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s"
     WHITESPACE "\n  "
     GRANT_DEFAULT_PRIVILEGES
       GRANT_KW "grant"

@@ -12,10 +12,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_SIG_LIST
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "s"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -32,17 +33,19 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_SIG_LIST
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
       COMMA ","
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -55,15 +58,16 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
+        FUNCTION_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "foo"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+                IDENT "c"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -82,10 +86,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -114,10 +119,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_SIG_LIST
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

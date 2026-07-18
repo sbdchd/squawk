@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "p"
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "p"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -22,8 +23,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          SQL_KW "sql"
+        LANGUAGE_REF
+          NAME_REF
+            SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -38,10 +40,11 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "p"
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "p"
     PARAM_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -104,8 +107,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          SQL_KW "sql"
+        LANGUAGE_REF
+          NAME_REF
+            SQL_KW "sql"
       WHITESPACE "\n"
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
@@ -242,10 +246,11 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "p"
+    PROCEDURE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "p"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -254,8 +259,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          SQL_KW "sql"
+        LANGUAGE_REF
+          NAME_REF
+            SQL_KW "sql"
       WHITESPACE "\n"
       BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"

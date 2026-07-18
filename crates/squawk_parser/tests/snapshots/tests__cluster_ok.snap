@@ -23,21 +23,25 @@ SOURCE_FILE
           FALSE_KW "false"
       R_PAREN ")"
     WHITESPACE " "
-    PATH_REF
+    TABLE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE " "
     CLUSTER_USING_INDEX
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "idx"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options_only"
@@ -62,21 +66,25 @@ SOURCE_FILE
     WHITESPACE " "
     VERBOSE_KW "verbose"
     WHITESPACE " "
-    PATH_REF
+    TABLE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE " "
     CLUSTER_USING_INDEX
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "idx"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_17"
@@ -94,22 +102,25 @@ SOURCE_FILE
     WHITESPACE " "
     VERBOSE_KW "verbose"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "f"
-    WHITESPACE " "
-    ON_PATH
-      ON_KW "on"
-      WHITESPACE " "
-      PATH_REF
+    CLUSTER_LEGACY
+      INDEX_REF
         PATH_REF
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "bar"
+              IDENT "f"
+      WHITESPACE " "
+      ON_PATH
+        ON_KW "on"
+        WHITESPACE " "
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"

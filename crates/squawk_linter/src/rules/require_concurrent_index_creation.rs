@@ -20,8 +20,9 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
     for stmt in file.stmts() {
         if let ast::Stmt::CreateIndex(create_index) = stmt {
             if let Some(table_name) = create_index
-                .relation_name()
-                .and_then(|x| x.path_ref())
+                .table_relation_name()
+                .and_then(|relation| relation.table_name_ref())
+                .and_then(|table| table.path_ref())
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
             {

@@ -28,7 +28,7 @@ pub(super) fn rewrite_select_into_as_create_table_as(
     let create_prefix = format!(
         "create {}table {} as ",
         persistence,
-        into_clause.path()?.syntax()
+        into_clause.table_name()?.path()?.syntax()
     );
     let stmt_start = {
         let mut start = select_into.syntax().text_range().start();

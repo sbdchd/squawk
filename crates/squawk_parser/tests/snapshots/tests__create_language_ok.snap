@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME
-      IDENT "l"
+    LANGUAGE
+      NAME
+        IDENT "l"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -30,43 +31,47 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME
-      IDENT "l"
+    LANGUAGE
+      NAME
+        IDENT "l"
     WHITESPACE "\n  "
     HANDLER_KW "handler"
     WHITESPACE " "
-    PATH_REF
+    FUNCTION_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE "\n  "
     INLINE_KW "inline"
     WHITESPACE " "
-    PATH_REF
+    FUNCTION_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "f"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+            IDENT "b"
     WHITESPACE "\n  "
     VALIDATOR_KW "validator"
     WHITESPACE " "
-    PATH_REF
+    FUNCTION_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "x"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "x"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "y"
+            IDENT "y"
     SEMICOLON ";"
   WHITESPACE "\n\n"

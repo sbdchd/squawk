@@ -24,8 +24,11 @@ SOURCE_FILE
       WHITESPACE " "
       INDEX_KW "index"
       WHITESPACE " "
-      NAME_REF
-        IDENT "idx"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -44,16 +47,17 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_AND_COLUMNS_LIST
       TABLE_AND_COLUMNS
-        RELATION_NAME
-          PATH_REF
+        TABLE_RELATION_NAME
+          TABLE_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+                  IDENT "bar"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -72,7 +76,10 @@ SOURCE_FILE
       WHITESPACE " "
       INDEX_KW "index"
       WHITESPACE " "
-      NAME_REF
-        IDENT "idx"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "idx"
     SEMICOLON ";"
   WHITESPACE "\n\n"

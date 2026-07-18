@@ -14,7 +14,7 @@ pub struct CreateTableLike {
 }
 impl CreateTableLike {
     #[inline]
-    pub fn path(&self) -> Option<ast::Path> {
+    pub fn table_name(&self) -> Option<ast::TableName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -62,7 +62,7 @@ impl CreateViewLike {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<ast::Path> {
+    pub fn view(&self) -> Option<ast::View> {
         support::child(&self.syntax)
     }
     #[inline]

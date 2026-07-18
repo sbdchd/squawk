@@ -2307,20 +2307,21 @@ SOURCE_FILE
               COLLATE
                 COLLATE_KW "collate"
                 WHITESPACE " "
-                PATH_REF
+                COLLATION_REF
                   PATH_REF
                     PATH_REF
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          NAME_REF
+                            IDENT "foo"
+                      DOT "."
                       PATH_SEGMENT_REF
                         NAME_REF
-                          IDENT "foo"
+                          IDENT "bar"
                     DOT "."
                     PATH_SEGMENT_REF
                       NAME_REF
-                        IDENT "bar"
-                  DOT "."
-                  PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "buzz"
+                        IDENT "buzz"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -2372,10 +2373,11 @@ SOURCE_FILE
               COLLATE
                 COLLATE_KW "collate"
                 WHITESPACE " "
-                PATH_REF
-                  PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "\"bar\""
+                COLLATION_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      NAME_REF
+                        IDENT "\"bar\""
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3649,8 +3651,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3673,8 +3676,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3707,8 +3711,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3738,8 +3743,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3769,8 +3775,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3802,8 +3809,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3841,8 +3849,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3878,8 +3887,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -3915,8 +3925,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w"
+        WINDOW
+          NAME
+            IDENT "w"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -5423,10 +5434,11 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only"
@@ -5437,10 +5449,11 @@ SOURCE_FILE
     RELATION_NAME
       ONLY_KW "only"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- star"
@@ -5449,10 +5462,11 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
       WHITESPACE " "
       STAR "*"
     SEMICOLON ";"
@@ -5471,10 +5485,11 @@ SOURCE_FILE
               TABLE_KW "table"
               WHITESPACE " "
               RELATION_NAME
-                PATH_REF
-                  PATH_SEGMENT_REF
-                    NAME_REF
-                      IDENT "t"
+                RELATION_NAME_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      NAME_REF
+                        IDENT "t"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

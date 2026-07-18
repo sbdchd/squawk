@@ -12,10 +12,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "order_summary"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "order_summary"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REFRESH
@@ -25,10 +26,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "annual_statistics_basis"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "annual_statistics_basis"
     WHITESPACE " "
     WITH_NO_DATA
       WITH_KW "WITH"
@@ -47,10 +49,11 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "concurrently"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     WITH_DATA
       WITH_KW "with"

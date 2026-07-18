@@ -15,15 +15,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    SEQUENCE_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+            IDENT "s"
     WHITESPACE "\n  "
     SEQUENCE_OPTION
       AS_KW "as"
@@ -142,10 +143,11 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE "\n  "
     SET_LOGGED
       SET_KW "set"
@@ -158,10 +160,11 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE "\n  "
     SET_UNLOGGED
       SET_KW "set"
@@ -176,10 +179,11 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -196,10 +200,11 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -217,10 +222,11 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -238,17 +244,19 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    SEQUENCE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "x"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "x"
     SEMICOLON ";"
   WHITESPACE "\n\n"

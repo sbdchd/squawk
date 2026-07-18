@@ -4441,6 +4441,25 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
+          COLLATE
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "foo"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
           BIN_EXPR
             NAME_REF
               IDENT "a"
@@ -4449,14 +4468,17 @@ SOURCE_FILE
             WHITESPACE " "
             PAREN_EXPR
               L_PAREN "("
-              BIN_EXPR
+              COLLATE
                 LITERAL
                   STRING "'foo'"
                 WHITESPACE " "
                 COLLATE_KW "collate"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "\"fr_FR\""
+                COLLATION_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      NAME_REF
+                        IDENT "\"fr_FR\""
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -4479,14 +4501,17 @@ SOURCE_FILE
             WHITESPACE " "
             L_ANGLE "<"
             WHITESPACE " "
-            BIN_EXPR
+            COLLATE
               NAME_REF
                 IDENT "b"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"de_DE\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"de_DE\""
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"
@@ -4508,14 +4533,17 @@ SOURCE_FILE
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            BIN_EXPR
+            COLLATE
               LITERAL
                 STRING "'A'"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "ignore_accent_case"
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "ignore_accent_case"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -4525,14 +4553,17 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           BIN_EXPR
-            BIN_EXPR
+            COLLATE
               NAME_REF
                 IDENT "a"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"de_DE\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"de_DE\""
             WHITESPACE " "
             L_ANGLE "<"
             WHITESPACE " "
@@ -4554,25 +4585,31 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           BIN_EXPR
-            BIN_EXPR
+            COLLATE
               NAME_REF
                 IDENT "a"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"C\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"C\""
             WHITESPACE " "
             L_ANGLE "<"
             WHITESPACE " "
-            BIN_EXPR
+            COLLATE
               NAME_REF
                 IDENT "b"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"POSIX\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"POSIX\""
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"
@@ -4612,14 +4649,17 @@ SOURCE_FILE
               PIPE "|"
               PIPE "|"
             WHITESPACE " "
-            BIN_EXPR
+            COLLATE
               NAME_REF
                 IDENT "b"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"fr_FR\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"fr_FR\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -4632,14 +4672,17 @@ SOURCE_FILE
             CUSTOM_OP
               BANG "!"
               BANG "!"
-            BIN_EXPR
+            COLLATE
               NAME_REF
                 IDENT "a"
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"C\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"C\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -4648,7 +4691,7 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          COLLATE
             PREFIX_EXPR
               MINUS "-"
               NAME_REF
@@ -4656,8 +4699,11 @@ SOURCE_FILE
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
-            NAME_REF
-              IDENT "\"C\""
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "\"C\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -4666,7 +4712,7 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          COLLATE
             PREFIX_EXPR
               PLUS "+"
               NAME_REF
@@ -4674,8 +4720,11 @@ SOURCE_FILE
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
-            NAME_REF
-              IDENT "\"C\""
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "\"C\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -4684,7 +4733,7 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          COLLATE
             PREFIX_EXPR
               MINUS "-"
               INDEX_EXPR
@@ -4701,8 +4750,11 @@ SOURCE_FILE
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
-            NAME_REF
-              IDENT "\"C\""
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "\"C\""
     SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -4711,7 +4763,7 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          COLLATE
             PREFIX_EXPR
               MINUS "-"
               CAST_EXPR
@@ -4732,8 +4784,11 @@ SOURCE_FILE
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
-            NAME_REF
-              IDENT "\"C\""
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "\"C\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cube_operators"

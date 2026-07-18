@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "vista"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "vista"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE " "
@@ -32,10 +33,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "vista"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "vista"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE " "
@@ -67,10 +69,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "comedies"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -107,10 +110,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "universal_comedies"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "universal_comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -155,10 +159,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "pg_comedies"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "pg_comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -203,10 +208,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "comedies"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "comedies"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -341,15 +347,16 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "public"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "nums_1_100"
+    VIEW
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "public"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "nums_1_100"
     WHITESPACE " "
     COLUMN_LIST
       L_PAREN "("
@@ -425,10 +432,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "foo"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "foo"
     WHITESPACE " "
     COLUMN_LIST
       L_PAREN "("
@@ -501,10 +509,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "foo"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "foo"
     WHITESPACE "\n"
     AS_KW "as"
     WHITESPACE " "
@@ -548,10 +557,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "my_view"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "my_view"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n"
@@ -579,10 +589,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -604,10 +615,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -630,10 +642,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -667,10 +680,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -714,10 +728,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -727,10 +742,11 @@ SOURCE_FILE
         TABLE_KW "table"
         WHITESPACE " "
         RELATION_NAME
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -739,10 +755,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -774,10 +791,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -802,10 +820,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "v"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "v"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "

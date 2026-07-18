@@ -19,7 +19,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    IDENT "plpgsql"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "plpgsql"
     WHITESPACE " "
     LITERAL
       STRING "'select 1'"

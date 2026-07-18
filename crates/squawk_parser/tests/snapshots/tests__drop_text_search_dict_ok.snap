@@ -14,10 +14,11 @@ SOURCE_FILE
     WHITESPACE " "
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "foo"
+    TEXT_SEARCH_DICTIONARY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -36,10 +37,11 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
+    TEXT_SEARCH_DICTIONARY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "bar"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -55,10 +57,11 @@ SOURCE_FILE
     WHITESPACE " "
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
+    TEXT_SEARCH_DICTIONARY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "bar"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

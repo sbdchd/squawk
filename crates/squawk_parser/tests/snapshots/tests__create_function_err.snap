@@ -8,10 +8,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "f"
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "f"
     PARAM_LIST
       L_PAREN "("
       R_PAREN ")"
@@ -56,8 +57,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          SQL_KW "sql"
+        LANGUAGE_REF
+          NAME_REF
+            SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -65,10 +67,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "foo"
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "foo"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -122,8 +125,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          SQL_KW "sql"
+        LANGUAGE_REF
+          NAME_REF
+            SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression partial definition"
@@ -132,7 +136,8 @@ SOURCE_FILE
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
-  WHITESPACE "\n\n"
+    WHITESPACE "\n\n"
+    FUNCTION_NAME
 ---
 error[syntax-error]: expected COMMA
   ╭▸ 
@@ -144,13 +149,9 @@ error[syntax-error]: expected COMMA
   ╰╴                                 ━
 error[syntax-error]: expected path name
    ╭▸ 
-13 │   create function
-   │ ┏━━━━━━━━━━━━━━━━┛
-14 │ ┃
-   ╰╴┗━┛
+14 │
+   ╰╴━
 error[syntax-error]: expected param list
    ╭▸ 
-13 │   create function
-   │ ┏━━━━━━━━━━━━━━━━┛
-14 │ ┃
-   ╰╴┗━┛
+14 │
+   ╰╴━

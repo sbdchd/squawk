@@ -12,10 +12,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -38,15 +39,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    VIEW_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+            IDENT "v"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -66,10 +68,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     RENAME_COLUMN
       RENAME_KW "rename"
@@ -95,15 +98,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    VIEW_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+            IDENT "v"
     WHITESPACE " \n  "
     RENAME_COLUMN
       RENAME_KW "rename"
@@ -128,18 +132,20 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -154,18 +160,20 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends_extension"
@@ -177,10 +185,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     DEPENDS_ON_EXTENSION
       DEPENDS_KW "depends"
@@ -189,8 +198,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      NAME_REF
-        IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -200,10 +210,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"
@@ -214,8 +225,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      NAME_REF
-        IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"
@@ -234,16 +246,18 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "t"
       WHITESPACE "\n  "
       SET_TABLESPACE
         SET_KW "set"
         WHITESPACE " "
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME_REF
-          IDENT "n"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -260,8 +274,9 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "t"
       WHITESPACE "\n  "
       OWNED_BY_ROLES
         OWNED_KW "owned"
@@ -282,8 +297,9 @@ SOURCE_FILE
         WHITESPACE " "
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME_REF
-          IDENT "n"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "n"
       WHITESPACE " "
       NOWAIT_KW "nowait"
     SEMICOLON ";"
@@ -297,10 +313,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " \n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -324,10 +341,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -355,10 +373,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -385,10 +404,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -422,10 +442,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -470,10 +491,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -499,10 +521,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -537,10 +560,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -564,10 +588,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -591,10 +616,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -618,10 +644,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -645,15 +672,16 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
+    VIEW_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+            IDENT "v"
     WHITESPACE " \n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -678,10 +706,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -705,10 +734,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -736,18 +766,22 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     CLUSTER_ON
       CLUSTER_KW "cluster"
       WHITESPACE " "
       ON_KW "on"
       WHITESPACE " "
-      NAME_REF
-        IDENT "i"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_set_without_cluster"
@@ -759,10 +793,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "view"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "v"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "v"
     WHITESPACE "\n  "
     SET_WITHOUT_CLUSTER
       SET_KW "set"

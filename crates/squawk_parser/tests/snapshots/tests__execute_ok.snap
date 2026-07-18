@@ -8,8 +8,9 @@ SOURCE_FILE
   EXECUTE
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
-    NAME_REF
-      IDENT "fooplan"
+    PREPARED_STATEMENT_REF
+      NAME_REF
+        IDENT "fooplan"
     ARG_LIST
       L_PAREN "("
       ARG
@@ -36,8 +37,9 @@ SOURCE_FILE
   EXECUTE
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
-    NAME_REF
-      IDENT "usrrptplan"
+    PREPARED_STATEMENT_REF
+      NAME_REF
+        IDENT "usrrptplan"
     ARG_LIST
       L_PAREN "("
       ARG
@@ -54,7 +56,8 @@ SOURCE_FILE
   EXECUTE
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foo"
+    PREPARED_STATEMENT_REF
+      NAME_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"

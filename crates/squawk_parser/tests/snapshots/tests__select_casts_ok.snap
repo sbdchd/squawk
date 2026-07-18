@@ -2558,7 +2558,7 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          COLLATE
             CAST_EXPR
               LITERAL
                 STRING "''"
@@ -2576,8 +2576,11 @@ SOURCE_FILE
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
-            NAME_REF
-              IDENT "\"C\""
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "\"C\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2587,7 +2590,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           BIN_EXPR
-            BIN_EXPR
+            COLLATE
               CAST_EXPR
                 LITERAL
                   STRING "'a '"
@@ -2605,8 +2608,11 @@ SOURCE_FILE
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"C\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"C\""
             WHITESPACE " "
             L_ANGLE "<"
             WHITESPACE " "
@@ -2633,7 +2639,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           BIN_EXPR
-            BIN_EXPR
+            COLLATE
               CAST_EXPR
                 CAST_KW "cast"
                 L_PAREN "("
@@ -2651,8 +2657,11 @@ SOURCE_FILE
               WHITESPACE " "
               COLLATE_KW "collate"
               WHITESPACE " "
-              NAME_REF
-                IDENT "\"C\""
+              COLLATION_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "\"C\""
             WHITESPACE " "
             R_ANGLE ">"
             WHITESPACE " "

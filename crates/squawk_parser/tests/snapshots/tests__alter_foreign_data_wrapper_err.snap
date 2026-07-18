@@ -14,8 +14,9 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "wrapper"
     WHITESPACE " "
-    NAME_REF
-      IDENT "w"
+    FOREIGN_DATA_WRAPPER_REF
+      NAME_REF
+        IDENT "w"
     SEMICOLON ";"
   WHITESPACE "\n"
 ---

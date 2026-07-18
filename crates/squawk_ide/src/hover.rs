@@ -485,7 +485,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         //        ^
         ast_nav::ParentSouce::CreateView(create_view) => {
             let column_name = collect::column_name_from_node(def_node)?;
-            let path = create_view.path()?;
+            let path = create_view.view()?.path()?;
             let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(def.file, &path))?;
             let ty = collect::view_like_columns_with_types(db, def.file, &create_view)
                 .into_iter()
@@ -534,7 +534,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         }
         ast_nav::ParentSouce::CreateTableAs(create_table_as) => {
             let column_name = collect::column_name_from_node(def_node)?;
-            let path = create_table_as.path()?;
+            let path = create_table_as.table_name()?.path()?;
             let (schema, table_name) =
                 resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
             let ty = collect::create_table_as_columns_with_types(db, def.file, &create_table_as)
@@ -560,7 +560,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
         }
         ast_nav::ParentSouce::SelectInto(select_into) => {
             let column_name = collect::column_name_from_node(def_node)?;
-            let path = select_into.into_clause()?.path()?;
+            let path = select_into.into_clause()?.table_name()?.path()?;
             let (schema, table_name) =
                 resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
             let ty = collect::select_into_columns_with_types(db, def.file, &select_into)
@@ -588,7 +588,7 @@ fn format_hover_for_column_ptr(db: &dyn Db, def: Location) -> Option<Hover> {
             let column = def_node.ancestors().find_map(ast::Column::cast)?;
             let column_name = column.name()?;
             let ty = column.ty()?;
-            let path = create_table.path()?;
+            let path = create_table.table_name()?.path()?;
             let (schema, table_name) =
                 resolve::resolve_table_info(db, InFile::new(def.file, &path))?;
 
@@ -614,7 +614,7 @@ fn hover_composite_type_field(db: &dyn Db, def: Location) -> Option<Hover> {
         .syntax()
         .ancestors()
         .find_map(ast::CreateType::cast)?;
-    let type_path = create_type.path()?;
+    let type_path = create_type.type_name()?.path()?;
     let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(def.file, &type_path))?;
 
     Some(hover_with_preceding_comment(
@@ -638,7 +638,7 @@ fn hover_column_definition(
     let create_table = create_table.value;
     let column_name = column.name()?.syntax().text().to_string();
     let ty = column.ty()?;
-    let path = create_table.path()?;
+    let path = create_table.table_name()?.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let ty = ty.syntax().text().to_string();
     Some(hover_with_preceding_comment(
@@ -867,7 +867,7 @@ fn hover_qualified_star_columns_from_table(
 ) -> Option<Hover> {
     let file = create_table.file_id;
     let create_table = create_table.value;
-    let path = create_table.path()?;
+    let path = create_table.table_name()?.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let schema = schema.to_string();
     let results: Vec<Hover> = collect::table_columns(db, file, &create_table)
@@ -892,7 +892,7 @@ fn hover_qualified_star_columns_from_table_as(
 ) -> Option<Hover> {
     let file = create_table_as.file_id;
     let create_table_as = create_table_as.value;
-    let path = create_table_as.path()?;
+    let path = create_table_as.table_name()?.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let schema_str = schema.to_string();
 
@@ -925,7 +925,7 @@ fn hover_qualified_star_columns_from_select_into(
 ) -> Option<Hover> {
     let file = select_into.file_id;
     let select_into = select_into.value;
-    let path = select_into.into_clause()?.path()?;
+    let path = select_into.into_clause()?.table_name()?.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let schema_str = schema.to_string();
 
@@ -986,7 +986,7 @@ fn hover_qualified_star_columns_from_view_like(
 ) -> Option<Hover> {
     let file = create_view.file_id;
     let create_view = create_view.value;
-    let path = create_view.path()?;
+    let path = create_view.view()?.path()?;
     let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
 
     let schema_str = schema.to_string();
@@ -1360,7 +1360,7 @@ fn hover_savepoint(db: &dyn Db, def: Location) -> Option<Hover> {
     let savepoint = def
         .to_node(db)?
         .ancestors()
-        .find_map(ast::Savepoint::cast)?;
+        .find_map(ast::SavepointCreate::cast)?;
     format_savepoint(savepoint)
 }
 
@@ -1385,7 +1385,7 @@ fn hover_type(db: &dyn Db, def: Location) -> Option<Hover> {
 }
 
 fn format_declare_cursor(declare: ast::Declare) -> Option<Hover> {
-    let name = declare.name()?;
+    let name = declare.cursor()?.name()?;
     let query = declare.query()?;
     Some(Hover::snippet(format!(
         "cursor {} for {}",
@@ -1395,7 +1395,7 @@ fn format_declare_cursor(declare: ast::Declare) -> Option<Hover> {
 }
 
 fn format_prepare(prepare: ast::Prepare) -> Option<Hover> {
-    let name = prepare.name()?;
+    let name = prepare.prepared_statement()?.name()?;
     let stmt = prepare.preparable_stmt()?;
     Some(Hover::snippet(format!(
         "prepare {} as {}",
@@ -1405,12 +1405,12 @@ fn format_prepare(prepare: ast::Prepare) -> Option<Hover> {
 }
 
 fn format_listen(listen: ast::Listen) -> Option<Hover> {
-    let name = listen.name()?;
+    let name = listen.channel()?.name()?;
     Some(Hover::snippet(format!("listen {}", name.syntax().text())))
 }
 
-fn format_savepoint(savepoint: ast::Savepoint) -> Option<Hover> {
-    let name = savepoint.name()?;
+fn format_savepoint(savepoint: ast::SavepointCreate) -> Option<Hover> {
+    let name = savepoint.savepoint()?.name()?;
     Some(Hover::snippet(format!(
         "savepoint {}",
         name.syntax().text()
@@ -1423,7 +1423,7 @@ fn format_create_table(
 ) -> Option<Hover> {
     let file = create_table.file_id;
     let create_table = create_table.value;
-    let path = create_table.path()?;
+    let path = create_table.table_name()?.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let schema = schema.to_string();
     let args = create_table.table_arg_list()?.syntax().text().to_string();
@@ -1445,7 +1445,7 @@ fn format_create_table_as(
 ) -> Option<Hover> {
     let file = create_table_as.file_id;
     let create_table_as = create_table_as.value;
-    let path = create_table_as.path()?;
+    let path = create_table_as.table_name()?.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     let query = create_table_as.query()?.syntax().text().to_string();
     Some(Hover::snippet(format!(
@@ -1456,7 +1456,7 @@ fn format_create_table_as(
 fn format_select_into(db: &dyn Db, select_into: InFile<ast::SelectInto>) -> Option<Hover> {
     let file = select_into.file_id;
     let select_into = select_into.value;
-    let path = select_into.into_clause()?.path()?;
+    let path = select_into.into_clause()?.table_name()?.path()?;
     let (schema, table_name) = resolve::resolve_table_info(db, InFile::new(file, &path))?;
     Some(Hover::snippet(format!("table {schema}.{table_name}")))
 }
@@ -1469,7 +1469,7 @@ fn format_create_view(db: &dyn Db, def: Location) -> Option<Hover> {
 fn format_create_view_like(db: &dyn Db, create_view: InFile<ast::CreateViewLike>) -> Option<Hover> {
     let file = create_view.file_id;
     let create_view = create_view.value;
-    let path = create_view.path()?;
+    let path = create_view.view()?.path()?;
     // TODO: we use this to infer the schema, we should either rename this or
     // create a different function
     let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
@@ -1500,7 +1500,7 @@ fn format_view_column(
 ) -> Option<Hover> {
     let file = create_view.file_id;
     let create_view = create_view.value;
-    let path = create_view.path()?;
+    let path = create_view.view()?.path()?;
     let (schema, view_name) = resolve::resolve_view_info(db, InFile::new(file, &path))?;
     let column_name = Name::from_string(def_node.to_string());
     let ty = collect::view_like_columns_with_types(db, file, create_view)
@@ -1539,11 +1539,21 @@ fn format_paren_select(paren_select: ast::ParenSelect) -> Option<Hover> {
 fn format_create_index(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> Option<Hover> {
     let file = create_index.file_id;
     let create_index = create_index.value;
-    let index_name = create_index.name()?.syntax().text().to_string();
+    let index_name = create_index
+        .index()?
+        .path()?
+        .segment()?
+        .name()?
+        .syntax()
+        .text()
+        .to_string();
 
     let index_schema = index_schema(db, InFile::new(file, create_index.clone()))?;
 
-    let path = create_index.relation_name()?.path_ref()?;
+    let path = create_index
+        .table_relation_name()?
+        .table_name_ref()?
+        .path_ref()?;
     let (table_schema, table_name) = resolve::resolve_table_ref_info(db, InFile::new(file, &path))?;
 
     let partition_item_list = create_index.partition_item_list()?;
@@ -1560,7 +1570,7 @@ fn format_create_sequence(
 ) -> Option<Hover> {
     let file = create_sequence.file_id;
     let create_sequence = create_sequence.value;
-    let path = create_sequence.path()?;
+    let path = create_sequence.sequence()?.path()?;
     let (schema, sequence_name) = resolve::resolve_sequence_info(db, InFile::new(file, &path))?;
 
     Some(Hover::snippet(format!("sequence {schema}.{sequence_name}")))
@@ -1572,9 +1582,12 @@ fn format_create_statistics(
 ) -> Option<Hover> {
     let file = create_statistics.file_id;
     let create_statistics = create_statistics.value;
-    let path = create_statistics.path()?;
+    let path = create_statistics.statistics()?.path()?;
     let (schema, statistics_name) = resolve::resolve_statistics_info(db, InFile::new(file, &path))?;
-    let table_path = create_statistics.from_table()?.path_ref()?;
+    let table_path = create_statistics
+        .from_table()?
+        .table_name_ref()?
+        .path_ref()?;
     let (table_schema, table_name) =
         resolve::resolve_table_ref_info(db, InFile::new(file, &table_path))?;
 
@@ -1587,8 +1600,16 @@ fn format_create_statistics(
 fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>) -> Option<Hover> {
     let file = create_trigger.file_id;
     let create_trigger = create_trigger.value;
-    let trigger_name = create_trigger.name()?.syntax().text().to_string();
-    let on_table_path = create_trigger.on_table()?.path_ref()?;
+    let trigger_name = create_trigger
+        .trigger()?
+        .name()?
+        .syntax()
+        .text()
+        .to_string();
+    let on_table_path = create_trigger
+        .on_relation()?
+        .relation_name_ref()?
+        .path_ref()?;
 
     let (schema, table_name) =
         resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
@@ -1600,8 +1621,8 @@ fn format_create_trigger(db: &dyn Db, create_trigger: InFile<ast::CreateTrigger>
 fn format_create_policy(db: &dyn Db, create_policy: InFile<ast::CreatePolicy>) -> Option<Hover> {
     let file = create_policy.file_id;
     let create_policy = create_policy.value;
-    let policy_name = create_policy.name()?.syntax().text().to_string();
-    let on_table_path = create_policy.on_table()?.path_ref()?;
+    let policy_name = create_policy.policy()?.name()?.syntax().text().to_string();
+    let on_table_path = create_policy.on_table()?.table_name_ref()?.path_ref()?;
 
     let (schema, table_name) =
         resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
@@ -1613,8 +1634,8 @@ fn format_create_policy(db: &dyn Db, create_policy: InFile<ast::CreatePolicy>) -
 fn format_create_rule(db: &dyn Db, create_rule: InFile<ast::CreateRule>) -> Option<Hover> {
     let file = create_rule.file_id;
     let create_rule = create_rule.value;
-    let rule_name = create_rule.name()?.syntax().text().to_string();
-    let on_table_path = create_rule.rule_on()?.path_ref()?;
+    let rule_name = create_rule.rule()?.name()?.syntax().text().to_string();
+    let on_table_path = create_rule.rule_on()?.relation_name_ref()?.path_ref()?;
 
     let (schema, table_name) =
         resolve::resolve_table_ref_info(db, InFile::new(file, &on_table_path))?;
@@ -1629,18 +1650,28 @@ fn format_create_property_graph(
 ) -> Option<Hover> {
     let file = create_property_graph.file_id;
     let create_property_graph = create_property_graph.value;
-    let path = create_property_graph.path()?;
+    let path = create_property_graph.property_graph()?.path()?;
     let (schema, name) = resolve::resolve_property_graph_info(db, InFile::new(file, &path))?;
     Some(Hover::snippet(format!("property graph {schema}.{name}")))
 }
 
 fn format_create_event_trigger(create_event_trigger: ast::CreateEventTrigger) -> Option<Hover> {
-    let name = create_event_trigger.name()?.syntax().text().to_string();
+    let name = create_event_trigger
+        .event_trigger()?
+        .name()?
+        .syntax()
+        .text()
+        .to_string();
     Some(Hover::snippet(format!("event trigger {name}")))
 }
 
 fn format_create_tablespace(create_tablespace: ast::CreateTablespace) -> Option<Hover> {
-    let name = create_tablespace.name()?.syntax().text().to_string();
+    let name = create_tablespace
+        .tablespace()?
+        .name()?
+        .syntax()
+        .text()
+        .to_string();
     Some(Hover::snippet(format!("tablespace {name}")))
 }
 
@@ -1655,17 +1686,22 @@ fn format_create_database(create_database: ast::CreateDatabase) -> Option<Hover>
 }
 
 fn format_create_server(create_server: ast::CreateServer) -> Option<Hover> {
-    let name = create_server.name()?.syntax().text().to_string();
+    let name = create_server.server()?.name()?.syntax().text().to_string();
     Some(Hover::snippet(format!("server {name}")))
 }
 
 fn format_create_extension(create_extension: ast::CreateExtension) -> Option<Hover> {
-    let name = create_extension.name()?.syntax().text().to_string();
+    let name = create_extension
+        .extension()?
+        .name()?
+        .syntax()
+        .text()
+        .to_string();
     Some(Hover::snippet(format!("extension {name}")))
 }
 
 fn format_create_role(create_role: ast::CreateRole) -> Option<Hover> {
-    let name = create_role.name()?.syntax().text().to_string();
+    let name = create_role.role()?.name()?.syntax().text().to_string();
     Some(Hover::snippet(format!("role {name}")))
 }
 
@@ -1680,7 +1716,7 @@ fn index_schema(db: &dyn Db, create_index: InFile<ast::CreateIndex>) -> Option<S
 fn format_create_type(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Option<Hover> {
     let file = create_type.file_id;
     let create_type = create_type.value;
-    let path = create_type.path()?;
+    let path = create_type.type_name()?.path()?;
     let (schema, type_name) = resolve::resolve_type_info(db, InFile::new(file, &path))?;
 
     let snippet = match create_type.kind() {
@@ -1741,7 +1777,7 @@ fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
 
     for ancestor in def_node.ancestors() {
         if let Some(create_function) = ast::CreateFunction::cast(ancestor.clone()) {
-            let path = create_function.path()?;
+            let path = create_function.name()?.path()?;
             let (schema, function_name) =
                 resolve::resolve_function_info(db, InFile::new(def.file, &path))?;
             return Some(format_param_hover(
@@ -1752,7 +1788,7 @@ fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
             ));
         }
         if let Some(create_procedure) = ast::CreateProcedure::cast(ancestor.clone()) {
-            let path = create_procedure.path()?;
+            let path = create_procedure.name()?.path()?;
             let (schema, procedure_name) =
                 resolve::resolve_procedure_info(db, InFile::new(def.file, &path))?;
             return Some(format_param_hover(
@@ -1799,7 +1835,7 @@ fn format_create_function(
 ) -> Option<Hover> {
     let file = create_function.file_id;
     let create_function = create_function.value;
-    let path = create_function.path()?;
+    let path = create_function.name()?.path()?;
     let (schema, function_name) = resolve::resolve_function_info(db, InFile::new(file, &path))?;
 
     let params = create_function.param_list()?.syntax().text().to_string();
@@ -1851,7 +1887,7 @@ fn format_create_procedure(
 ) -> Option<Hover> {
     let file = create_procedure.file_id;
     let create_procedure = create_procedure.value;
-    let path = create_procedure.path()?;
+    let path = create_procedure.name()?.path()?;
     let (schema, procedure_name) = resolve::resolve_procedure_info(db, InFile::new(file, &path))?;
 
     let param_list = create_procedure.param_list()?;
@@ -1936,10 +1972,16 @@ fn qualified_star_table_ptr(
                 &table_name,
             );
         }
-        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path_ref()?,
-        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path_ref()?,
-        ast_nav::ParentQuery::Insert(insert) => insert.path_ref()?,
-        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path_ref()?,
+        ast_nav::ParentQuery::Update(update) => {
+            update.relation_name()?.relation_name_ref()?.path_ref()?
+        }
+        ast_nav::ParentQuery::Delete(delete) => {
+            delete.relation_name()?.relation_name_ref()?.path_ref()?
+        }
+        ast_nav::ParentQuery::Insert(insert) => insert.relation_name_ref()?.path_ref()?,
+        ast_nav::ParentQuery::Merge(merge) => {
+            merge.table_relation_name()?.table_name_ref()?.path_ref()?
+        }
     };
 
     table_or_view_or_cte_ptrs(db, InFile::new(file, &path), position)?
@@ -1996,10 +2038,16 @@ fn unqualified_star_table_ptrs(
             }
             return Some(results);
         }
-        ast_nav::ParentQuery::Update(update) => update.relation_name()?.path_ref(),
-        ast_nav::ParentQuery::Insert(insert) => insert.path_ref(),
-        ast_nav::ParentQuery::Delete(delete) => delete.relation_name()?.path_ref(),
-        ast_nav::ParentQuery::Merge(merge) => merge.relation_name()?.path_ref(),
+        ast_nav::ParentQuery::Update(update) => {
+            update.relation_name()?.relation_name_ref()?.path_ref()
+        }
+        ast_nav::ParentQuery::Insert(insert) => insert.relation_name_ref()?.path_ref(),
+        ast_nav::ParentQuery::Delete(delete) => {
+            delete.relation_name()?.relation_name_ref()?.path_ref()
+        }
+        ast_nav::ParentQuery::Merge(merge) => {
+            merge.table_relation_name()?.table_name_ref()?.path_ref()
+        }
     }?;
 
     let position = target.syntax().text_range().start();
@@ -4970,7 +5018,7 @@ merged as (
   returning a as x, b as y
 )
 select *$0 from merged;
-"), @r"
+"), @"
         hover: column merged.x int
               column merged.y int
            ╭▸ 
@@ -4988,7 +5036,7 @@ with inserted as (
   returning a as x, b as y
 )
 select x$0 from inserted;
-"), @r"
+"), @"
         hover: column inserted.x int
           ╭▸ 
         7 │ select x from inserted;

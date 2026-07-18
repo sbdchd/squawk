@@ -645,7 +645,11 @@ fn delete_expr_completions(
     let binder = binder::bind(source_file);
     let mut completions = vec![];
 
-    let Some(path) = delete.relation_name().and_then(|r| r.path_ref()) else {
+    let Some(path) = delete
+        .relation_name()
+        .and_then(|relation| relation.relation_name_ref())
+        .and_then(|relation| relation.path_ref())
+    else {
         return completions;
     };
 
@@ -872,7 +876,7 @@ fn function_detail(
         .to_node(source_file.syntax())
         .ancestors()
         .find_map(ast::CreateFunction::cast)?;
-    let path = create_function.path()?;
+    let path = create_function.name()?.path()?;
     let (schema, function_name) = resolve::resolve_function_info(db, InFile::new(file, &path))?;
 
     let param_list = create_function.param_list()?;

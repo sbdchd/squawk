@@ -48,10 +48,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "products"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "products"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -99,10 +100,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "customers"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "customers"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -147,10 +149,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "orders"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "orders"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -190,10 +193,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "order_items"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "order_items"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -228,10 +232,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "orders"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "orders"
           WHITESPACE " "
           L_PAREN "("
           NAME_REF
@@ -252,10 +257,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "products"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "products"
           WHITESPACE " "
           L_PAREN "("
           NAME_REF
@@ -281,10 +287,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "customer_orders"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "customer_orders"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -319,10 +326,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "customers"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "customers"
           WHITESPACE " "
           L_PAREN "("
           NAME_REF
@@ -343,10 +351,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "orders"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "orders"
           WHITESPACE " "
           L_PAREN "("
           NAME_REF
@@ -363,10 +372,11 @@ SOURCE_FILE
     WHITESPACE " "
     GRAPH_KW "GRAPH"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "myshop"
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "myshop"
     WHITESPACE "\n    "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"
@@ -376,24 +386,27 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "products"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "products"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "customers"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "customers"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "orders"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "orders"
       WHITESPACE "\n    "
       R_PAREN ")"
     WHITESPACE "\n    "
@@ -405,41 +418,47 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "order_items"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "order_items"
         WHITESPACE " "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME_REF
-            IDENT "orders"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "orders"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME_REF
-            IDENT "products"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "products"
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "customer_orders"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "customer_orders"
         WHITESPACE " "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME_REF
-            IDENT "customers"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "customers"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME_REF
-            IDENT "orders"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "orders"
       WHITESPACE "\n    "
       R_PAREN ")"
     SEMICOLON ";"
@@ -463,10 +482,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
           L_PAREN "("
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "MATCH"
           WHITESPACE " "
@@ -631,10 +651,11 @@ SOURCE_FILE
     WHITESPACE " "
     GRAPH_KW "GRAPH"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "myshop"
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "myshop"
     WHITESPACE "\n    "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"
@@ -644,10 +665,11 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "products"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "products"
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
@@ -660,10 +682,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "customers"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "customers"
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
@@ -676,10 +699,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "orders"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "orders"
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
@@ -700,10 +724,11 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "order_items"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "order_items"
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
@@ -729,8 +754,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "orders"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "orders"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -754,8 +780,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "products"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "products"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -766,10 +793,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "customer_orders"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "customer_orders"
         WHITESPACE " "
         KEY_KW "KEY"
         WHITESPACE " "
@@ -795,8 +823,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "customers"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "customers"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -820,8 +849,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "orders"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "orders"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -840,10 +870,11 @@ SOURCE_FILE
     WHITESPACE " "
     GRAPH_KW "GRAPH"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "myshop"
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "myshop"
     WHITESPACE "\n    "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"
@@ -853,45 +884,51 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "products"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "products"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "product"
+            LABEL
+              NAME
+                IDENT "product"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "customers"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "customers"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "customer"
+            LABEL
+              NAME
+                IDENT "customer"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "orders"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "orders"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "\"order\""
+            LABEL
+              NAME
+                IDENT "\"order\""
       WHITESPACE "\n    "
       R_PAREN ")"
     WHITESPACE "\n    "
@@ -903,55 +940,63 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "order_items"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "order_items"
         WHITESPACE " "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME_REF
-            IDENT "orders"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "orders"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME_REF
-            IDENT "products"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "products"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "contains"
+            LABEL
+              NAME
+                IDENT "contains"
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "customer_orders"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "customer_orders"
         WHITESPACE " "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
-          NAME_REF
-            IDENT "customers"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "customers"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME_REF
-            IDENT "orders"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "orders"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "has_placed"
+            LABEL
+              NAME
+                IDENT "has_placed"
       WHITESPACE "\n    "
       R_PAREN ")"
     SEMICOLON ";"
@@ -973,10 +1018,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
           L_PAREN "("
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "myshop"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "myshop"
           WHITESPACE " "
           MATCH_KW "MATCH"
           WHITESPACE " "
@@ -1071,10 +1117,11 @@ SOURCE_FILE
           GRAPH_TABLE_KW "GRAPH_TABLE"
           WHITESPACE " "
           L_PAREN "("
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "mygraph"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "mygraph"
           WHITESPACE " "
           MATCH_KW "MATCH"
           WHITESPACE " "
@@ -1179,10 +1226,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "Persons"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "Persons"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1227,10 +1275,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "Companies"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "Companies"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -1240,10 +1289,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "Companies"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "Companies"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1282,10 +1332,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "Accounts"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "Accounts"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1330,10 +1381,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "Persons"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "Persons"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1349,10 +1401,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "Companies"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "Companies"
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
@@ -1362,10 +1415,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "Transactions"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "Transactions"
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -1399,10 +1453,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "Accounts"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "Accounts"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1418,10 +1473,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "Accounts"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "Accounts"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1455,10 +1511,11 @@ SOURCE_FILE
     WHITESPACE " "
     GRAPH_KW "GRAPH"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "financial_transactions"
+    PROPERTY_GRAPH
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "financial_transactions"
     WHITESPACE "\n  "
     VERTEX_TABLES
       VERTEX_KW "VERTEX"
@@ -1470,17 +1527,19 @@ SOURCE_FILE
       COMMENT "-- label that gets used in the query lang below, i.e., IS Person"
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "Persons"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "Persons"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "Person"
+            LABEL
+              NAME
+                IDENT "Person"
             WHITESPACE " "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1496,17 +1555,19 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "Companies"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "Companies"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "Company"
+            LABEL
+              NAME
+                IDENT "Company"
             WHITESPACE " "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1522,17 +1583,19 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       VERTEX_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "Accounts"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "Accounts"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              IDENT "Account"
+            LABEL
+              NAME
+                IDENT "Account"
             WHITESPACE " "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1556,10 +1619,11 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "Transactions"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "Transactions"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
           SOURCE_KW "SOURCE"
@@ -1578,8 +1642,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "Accounts"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1607,8 +1672,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "Accounts"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1623,8 +1689,9 @@ SOURCE_FILE
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              TRANSACTION_KW "transaction"
+            LABEL
+              NAME
+                TRANSACTION_KW "transaction"
             WHITESPACE "\n        "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1640,10 +1707,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "Accounts"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "Accounts"
         WHITESPACE " "
         AS_KW "AS"
         WHITESPACE " "
@@ -1667,8 +1735,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "Accounts"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1682,15 +1751,17 @@ SOURCE_FILE
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME_REF
-            IDENT "Persons"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "Persons"
         WHITESPACE "\n      "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              OWNER_KW "owner"
+            LABEL
+              NAME
+                OWNER_KW "owner"
             WHITESPACE "\n        "
             NO_PROPERTIES
               NO_KW "NO"
@@ -1699,10 +1770,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "Accounts"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "Accounts"
         WHITESPACE " "
         AS_KW "AS"
         WHITESPACE " "
@@ -1726,8 +1798,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "Accounts"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1741,15 +1814,17 @@ SOURCE_FILE
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME_REF
-            IDENT "Companies"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "Companies"
         WHITESPACE "\n      "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
-            NAME
-              OWNER_KW "owner"
+            LABEL
+              NAME
+                OWNER_KW "owner"
             WHITESPACE "\n        "
             NO_PROPERTIES
               NO_KW "NO"
@@ -1758,10 +1833,11 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "Persons"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "Persons"
         WHITESPACE " "
         AS_KW "AS"
         WHITESPACE " "
@@ -1785,8 +1861,9 @@ SOURCE_FILE
           REFERENCES_TABLE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
-            NAME_REF
-              IDENT "Persons"
+            VERTEX_TABLE_REF
+              NAME_REF
+                IDENT "Persons"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1800,8 +1877,9 @@ SOURCE_FILE
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
-          NAME_REF
-            IDENT "Companies"
+          VERTEX_TABLE_REF
+            NAME_REF
+              IDENT "Companies"
         WHITESPACE "\n        "
         NO_PROPERTIES
           NO_KW "NO"
@@ -1847,10 +1925,11 @@ SOURCE_FILE
           WHITESPACE " "
           L_PAREN "("
           WHITESPACE "\n  "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "financial_transactions"
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "financial_transactions"
           WHITESPACE "\n  "
           MATCH_KW "MATCH"
           WHITESPACE " "

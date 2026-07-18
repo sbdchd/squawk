@@ -11,13 +11,14 @@ SOURCE_FILE
     TABLE_KW "table"
     WHITESPACE " "
     TABLE_LIST
-      RELATION_NAME
+      TABLE_RELATION_NAME
         ONLY_KW "only"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE "\n"
     RESTART_KW "restart"
     WHITESPACE " "
@@ -32,29 +33,32 @@ SOURCE_FILE
     TRUNCATE_KW "TRUNCATE"
     WHITESPACE " "
     TABLE_LIST
-      RELATION_NAME
+      TABLE_RELATION_NAME
         ONLY_KW "only"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
       COMMA ","
       WHITESPACE " "
-      RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "b"
+      TABLE_RELATION_NAME
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
         WHITESPACE " "
         STAR "*"
       COMMA ","
       WHITESPACE " "
-      RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+      TABLE_RELATION_NAME
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rest"
@@ -63,22 +67,24 @@ SOURCE_FILE
     TRUNCATE_KW "truncate"
     WHITESPACE " "
     TABLE_LIST
-      RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+      TABLE_RELATION_NAME
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   TRUNCATE
     TRUNCATE_KW "truncate"
     WHITESPACE " "
     TABLE_LIST
-      RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+      TABLE_RELATION_NAME
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
     WHITESPACE " "
     CONTINUE_KW "continue"
     WHITESPACE " "
@@ -89,11 +95,12 @@ SOURCE_FILE
     TRUNCATE_KW "truncate"
     WHITESPACE " "
     TABLE_LIST
-      RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "a"
+      TABLE_RELATION_NAME
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "a"
     WHITESPACE " "
     CONTINUE_KW "continue"
     WHITESPACE " "

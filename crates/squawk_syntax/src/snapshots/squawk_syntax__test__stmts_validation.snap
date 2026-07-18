@@ -8,10 +8,11 @@ SOURCE_FILE@0..97
     WHITESPACE@6..7 " "
     TABLE_KW@7..12 "table"
     WHITESPACE@12..13 " "
-    PATH@13..14
-      PATH_SEGMENT@13..14
-        NAME@13..14
-          IDENT@13..14 "t"
+    TABLE_NAME@13..14
+      PATH@13..14
+        PATH_SEGMENT@13..14
+          NAME@13..14
+            IDENT@13..14 "t"
     WHITESPACE@14..15 " "
     TABLE_ARG_LIST@15..17
       L_PAREN@15..16 "("
@@ -22,10 +23,11 @@ SOURCE_FILE@0..97
     WHITESPACE@24..25 " "
     TABLE_KW@25..30 "table"
     WHITESPACE@30..31 " "
-    PATH@31..32
-      PATH_SEGMENT@31..32
-        NAME@31..32
-          IDENT@31..32 "t"
+    TABLE_NAME@31..32
+      PATH@31..32
+        PATH_SEGMENT@31..32
+          NAME@31..32
+            IDENT@31..32 "t"
     WHITESPACE@32..33 " "
     TABLE_ARG_LIST@33..35
       L_PAREN@33..34 "("
@@ -37,10 +39,11 @@ SOURCE_FILE@0..97
     WHITESPACE@44..45 " "
     TABLE_KW@45..50 "table"
     WHITESPACE@50..51 " "
-    PATH@51..52
-      PATH_SEGMENT@51..52
-        NAME@51..52
-          IDENT@51..52 "u"
+    TABLE_NAME@51..52
+      PATH@51..52
+        PATH_SEGMENT@51..52
+          NAME@51..52
+            IDENT@51..52 "u"
     WHITESPACE@52..53 " "
     TABLE_ARG_LIST@53..55
       L_PAREN@53..54 "("
@@ -52,10 +55,11 @@ SOURCE_FILE@0..97
     WHITESPACE@63..64 " "
     TABLE_KW@64..69 "table"
     WHITESPACE@69..70 " "
-    PATH@70..71
-      PATH_SEGMENT@70..71
-        NAME@70..71
-          IDENT@70..71 "v"
+    TABLE_NAME@70..71
+      PATH@70..71
+        PATH_SEGMENT@70..71
+          NAME@70..71
+            IDENT@70..71 "v"
     WHITESPACE@71..72 " "
     TABLE_ARG_LIST@72..74
       L_PAREN@72..73 "("

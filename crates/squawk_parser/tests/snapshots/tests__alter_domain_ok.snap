@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     SET_DEFAULT
       SET_KW "set"
@@ -31,15 +32,16 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
+    DOMAIN_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+            IDENT "d"
     WHITESPACE "\n  "
     DROP_DEFAULT
       DROP_KW "drop"
@@ -54,10 +56,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     SET_NOT_NULL
       SET_KW "set"
@@ -74,10 +77,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     DROP_NOT_NULL
       DROP_KW "drop"
@@ -94,20 +98,22 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       CHECK_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "c"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "c"
         WHITESPACE " "
         CHECK_KW "check"
         WHITESPACE " "
@@ -128,10 +134,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -161,20 +168,22 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       CHECK_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "a"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "a"
         WHITESPACE " "
         CHECK_KW "check"
         WHITESPACE " "
@@ -197,18 +206,22 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     DROP_CONSTRAINT
       DROP_KW "drop"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -218,10 +231,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     DROP_CONSTRAINT
       DROP_KW "drop"
@@ -233,8 +247,11 @@ SOURCE_FILE
         WHITESPACE " "
         EXISTS_KW "exists"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -246,23 +263,28 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     RENAME_CONSTRAINT
       RENAME_KW "rename"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      CONSTRAINT_NAME
+        NAME
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- validate_constraint"
@@ -272,18 +294,22 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     VALIDATE_CONSTRAINT
       VALIDATE_KW "validate"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
@@ -293,10 +319,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -313,10 +340,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -334,10 +362,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -355,17 +384,19 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    DOMAIN_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

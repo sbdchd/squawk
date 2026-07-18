@@ -10,16 +10,18 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    TRIGGER_REF
+      NAME_REF
+        IDENT "t"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "x"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "x"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -37,16 +39,18 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    TRIGGER_REF
+      NAME_REF
+        IDENT "t"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "x"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "x"
     WHITESPACE " "
     DEPENDS_ON_EXTENSION
       DEPENDS_KW "depends"
@@ -55,8 +59,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      NAME_REF
-        IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -66,21 +71,23 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    TRIGGER_REF
+      NAME_REF
+        IDENT "t"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "s"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "s"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"
@@ -91,7 +98,8 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      NAME_REF
-        IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"

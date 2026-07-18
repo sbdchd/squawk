@@ -10,26 +10,28 @@ SOURCE_FILE@0..470
     WHITESPACE@72..73 " "
     TABLE_KW@73..78 "table"
     WHITESPACE@78..79 " "
-    RELATION_NAME@79..92
-      PATH_REF@79..92
-        PATH_REF@79..85
-          PATH_SEGMENT_REF@79..85
-            NAME_REF@79..85
-              IDENT@79..85 "public"
-        DOT@85..86 "."
-        PATH_SEGMENT_REF@86..92
-          NAME_REF@86..92
-            IDENT@86..92 "widget"
+    TABLE_RELATION_NAME@79..92
+      TABLE_NAME_REF@79..92
+        PATH_REF@79..92
+          PATH_REF@79..85
+            PATH_SEGMENT_REF@79..85
+              NAME_REF@79..85
+                IDENT@79..85 "public"
+          DOT@85..86 "."
+          PATH_SEGMENT_REF@86..92
+            NAME_REF@86..92
+              IDENT@86..92 "widget"
     WHITESPACE@92..95 "\n  "
     ADD_CONSTRAINT@95..243
       ADD_KW@95..98 "add"
       WHITESPACE@98..99 " "
       CHECK_CONSTRAINT@99..233
-        CONSTRAINT_NAME@99..136
+        CONSTRAINT_NAME_CLAUSE@99..136
           CONSTRAINT_KW@99..109 "constraint"
           WHITESPACE@109..110 " "
-          NAME@110..136
-            IDENT@110..136 "widget_config_schema_ ..."
+          CONSTRAINT_NAME@110..136
+            NAME@110..136
+              IDENT@110..136 "widget_config_schema_ ..."
         WHITESPACE@136..137 " "
         CHECK_KW@137..142 "check"
         WHITESPACE@142..143 " "
@@ -81,26 +83,28 @@ SOURCE_FILE@0..470
     WHITESPACE@251..252 " "
     TABLE_KW@252..257 "table"
     WHITESPACE@257..258 " "
-    RELATION_NAME@258..280
-      PATH_REF@258..280
-        PATH_REF@258..264
-          PATH_SEGMENT_REF@258..264
-            NAME_REF@258..264
-              IDENT@258..264 "public"
-        DOT@264..265 "."
-        PATH_SEGMENT_REF@265..280
-          NAME_REF@265..280
-            IDENT@265..280 "widget_instance"
+    TABLE_RELATION_NAME@258..280
+      TABLE_NAME_REF@258..280
+        PATH_REF@258..280
+          PATH_REF@258..264
+            PATH_SEGMENT_REF@258..264
+              NAME_REF@258..264
+                IDENT@258..264 "public"
+          DOT@264..265 "."
+          PATH_SEGMENT_REF@265..280
+            NAME_REF@265..280
+              IDENT@265..280 "widget_instance"
     WHITESPACE@280..283 "\n  "
     ADD_CONSTRAINT@283..469
       ADD_KW@283..286 "add"
       WHITESPACE@286..287 " "
       CHECK_CONSTRAINT@287..459
-        CONSTRAINT_NAME@287..343
+        CONSTRAINT_NAME_CLAUSE@287..343
           CONSTRAINT_KW@287..297 "constraint"
           WHITESPACE@297..298 " "
-          NAME@298..343
-            IDENT@298..343 "widget_instance_confi ..."
+          CONSTRAINT_NAME@298..343
+            NAME@298..343
+              IDENT@298..343 "widget_instance_confi ..."
         WHITESPACE@343..344 " "
         CHECK_KW@344..349 "check"
         WHITESPACE@349..350 " "

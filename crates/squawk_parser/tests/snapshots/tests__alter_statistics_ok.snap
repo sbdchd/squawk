@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -30,15 +31,16 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH_REF
+    STATISTICS_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+            IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -56,10 +58,11 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -77,18 +80,20 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "n"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- statistics_value"
@@ -98,10 +103,11 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     SET_STATISTICS
       SET_KW "set"
@@ -117,10 +123,11 @@ SOURCE_FILE
     WHITESPACE " "
     STATISTICS_KW "statistics"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "s"
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "s"
     WHITESPACE " "
     SET_STATISTICS
       SET_KW "set"

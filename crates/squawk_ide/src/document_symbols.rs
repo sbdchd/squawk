@@ -225,7 +225,7 @@ pub fn document_symbols(db: &dyn Db, file: File) -> Vec<DocumentSymbol> {
                     symbols.push(symbol);
                 }
             }
-            ast::Stmt::Savepoint(savepoint) => {
+            ast::Stmt::SavepointCreate(savepoint) => {
                 if let Some(symbol) = create_savepoint_symbol(savepoint) {
                     symbols.push(symbol);
                 }
@@ -298,7 +298,7 @@ fn create_table_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_table.file_id;
     let create_table = create_table.value;
-    let path = create_table.path()?;
+    let path = create_table.table_name()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
@@ -332,7 +332,7 @@ fn create_table_as_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_table_as.file_id;
     let create_table_as = create_table_as.value;
-    let path = create_table_as.path()?;
+    let path = create_table_as.table_name()?.path()?;
     let name_node = path.segment()?.name()?.syntax().clone();
 
     let (schema, table_name) = resolve_table_info(db, InFile::new(file, &path))?;
@@ -356,7 +356,7 @@ fn create_table_as_symbol(
 fn create_view_symbol(db: &dyn Db, create_view: InFile<ast::CreateView>) -> Option<DocumentSymbol> {
     let file = create_view.file_id;
     let create_view = create_view.value;
-    let path = create_view.path()?;
+    let path = create_view.view()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
@@ -407,7 +407,7 @@ fn create_materialized_view_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_view.file_id;
     let create_view = create_view.value;
-    let path = create_view.path()?;
+    let path = create_view.view()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, view_name) = resolve_view_info(db, InFile::new(file, &path))?;
@@ -431,7 +431,7 @@ fn create_function_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_function.file_id;
     let create_function = create_function.value;
-    let path = create_function.path()?;
+    let path = create_function.name()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, function_name) = resolve_function_info(db, InFile::new(file, &path))?;
@@ -481,7 +481,7 @@ fn create_procedure_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_procedure.file_id;
     let create_procedure = create_procedure.value;
-    let path = create_procedure.path()?;
+    let path = create_procedure.name()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, procedure_name) = resolve_procedure_info(db, InFile::new(file, &path))?;
@@ -501,8 +501,9 @@ fn create_procedure_symbol(
 }
 
 fn create_index_symbol(create_index: ast::CreateIndex) -> Option<DocumentSymbol> {
-    let name_node = create_index.name()?;
-    let name = name_node.syntax().text().to_string();
+    let path = create_index.index()?.path()?;
+    let name_node = path.segment()?.name()?;
+    let name = path.syntax().text().to_string();
 
     let full_range = create_index.syntax().text_range();
     let focus_range = name_node.syntax().text_range();
@@ -523,7 +524,7 @@ fn create_domain_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_domain.file_id;
     let create_domain = create_domain.value;
-    let path = create_domain.path()?;
+    let path = create_domain.domain()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, domain_name) = resolve_type_info(db, InFile::new(file, &path))?;
@@ -548,7 +549,7 @@ fn create_sequence_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_sequence.file_id;
     let create_sequence = create_sequence.value;
-    let path = create_sequence.path()?;
+    let path = create_sequence.sequence()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, sequence_name) = resolve_sequence_info(db, InFile::new(file, &path))?;
@@ -573,7 +574,7 @@ fn create_statistics_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_statistics.file_id;
     let create_statistics = create_statistics.value;
-    let path = create_statistics.path()?;
+    let path = create_statistics.statistics()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, statistics_name) = resolve_statistics_info(db, InFile::new(file, &path))?;
@@ -593,7 +594,7 @@ fn create_statistics_symbol(
 }
 
 fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentSymbol> {
-    let name_node = create_trigger.name()?;
+    let name_node = create_trigger.trigger()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_trigger.syntax().text_range();
@@ -612,7 +613,7 @@ fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentS
 fn create_event_trigger_symbol(
     create_event_trigger: ast::CreateEventTrigger,
 ) -> Option<DocumentSymbol> {
-    let name_node = create_event_trigger.name()?;
+    let name_node = create_event_trigger.event_trigger()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_event_trigger.syntax().text_range();
@@ -629,7 +630,7 @@ fn create_event_trigger_symbol(
 }
 
 fn create_tablespace_symbol(create_tablespace: ast::CreateTablespace) -> Option<DocumentSymbol> {
-    let name_node = create_tablespace.name()?;
+    let name_node = create_tablespace.tablespace()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_tablespace.syntax().text_range();
@@ -663,7 +664,7 @@ fn create_database_symbol(create_database: ast::CreateDatabase) -> Option<Docume
 }
 
 fn create_server_symbol(create_server: ast::CreateServer) -> Option<DocumentSymbol> {
-    let name_node = create_server.name()?;
+    let name_node = create_server.server()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_server.syntax().text_range();
@@ -680,7 +681,7 @@ fn create_server_symbol(create_server: ast::CreateServer) -> Option<DocumentSymb
 }
 
 fn create_extension_symbol(create_extension: ast::CreateExtension) -> Option<DocumentSymbol> {
-    let name_node = create_extension.name()?;
+    let name_node = create_extension.extension()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_extension.syntax().text_range();
@@ -697,7 +698,7 @@ fn create_extension_symbol(create_extension: ast::CreateExtension) -> Option<Doc
 }
 
 fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
-    let name_node = create_role.name()?;
+    let name_node = create_role.role()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_role.syntax().text_range();
@@ -714,7 +715,7 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
 }
 
 fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
-    let name_node = create_rule.name()?;
+    let name_node = create_rule.rule()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_rule.syntax().text_range();
@@ -731,7 +732,7 @@ fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
 }
 
 fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymbol> {
-    let name_node = create_policy.name()?;
+    let name_node = create_policy.policy()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_policy.syntax().text_range();
@@ -750,7 +751,7 @@ fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymb
 fn create_property_graph_symbol(
     create_property_graph: ast::CreatePropertyGraph,
 ) -> Option<DocumentSymbol> {
-    let path = create_property_graph.path()?;
+    let path = create_property_graph.property_graph()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let name = path.syntax().text().to_string();
@@ -771,7 +772,7 @@ fn create_property_graph_symbol(
 fn create_type_symbol(db: &dyn Db, create_type: InFile<ast::CreateType>) -> Option<DocumentSymbol> {
     let file = create_type.file_id;
     let create_type = create_type.value;
-    let path = create_type.path()?;
+    let path = create_type.type_name()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, type_name) = resolve_type_info(db, InFile::new(file, &path))?;
@@ -854,7 +855,7 @@ fn create_variant_symbol(variant: ast::Variant) -> Option<DocumentSymbol> {
 }
 
 fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol> {
-    let name_node = declare.name()?;
+    let name_node = declare.cursor()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = declare.syntax().text_range();
@@ -871,7 +872,7 @@ fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol>
 }
 
 fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
-    let name_node = prepare.name()?;
+    let name_node = prepare.prepared_statement()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = prepare.syntax().text_range();
@@ -888,7 +889,7 @@ fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
 }
 
 fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
-    let name_node = listen.name()?;
+    let name_node = listen.channel()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = listen.syntax().text_range();
@@ -904,8 +905,8 @@ fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
     })
 }
 
-fn create_savepoint_symbol(savepoint: ast::Savepoint) -> Option<DocumentSymbol> {
-    let name_node = savepoint.name()?;
+fn create_savepoint_symbol(savepoint: ast::SavepointCreate) -> Option<DocumentSymbol> {
+    let name_node = savepoint.savepoint()?.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = savepoint.syntax().text_range();
@@ -922,7 +923,7 @@ fn create_savepoint_symbol(savepoint: ast::Savepoint) -> Option<DocumentSymbol> 
 }
 
 fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
-    let name_node = notify.name_ref()?;
+    let name_node = notify.channel_ref()?.name_ref()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = notify.syntax().text_range();
@@ -939,7 +940,7 @@ fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
 }
 
 fn create_unlisten_symbol(unlisten: ast::Unlisten) -> Option<DocumentSymbol> {
-    let name_node = unlisten.name_ref()?;
+    let name_node = unlisten.channel_ref()?.name_ref()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = unlisten.syntax().text_range();

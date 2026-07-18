@@ -296,10 +296,11 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
@@ -307,10 +308,11 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE " "
     UNION_KW "union"
     WHITESPACE " "
@@ -318,10 +320,11 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       RELATION_NAME
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   COMPOUND_SELECT
@@ -345,10 +348,11 @@ SOURCE_FILE
         TABLE_KW "table"
         WHITESPACE " "
         RELATION_NAME
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "t"
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "t"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -375,10 +379,11 @@ SOURCE_FILE
       INTO_CLAUSE
         INTO_KW "into"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME
-              IDENT "t"
+        TABLE_NAME
+          PATH
+            PATH_SEGMENT
+              NAME
+                IDENT "t"
       WHITESPACE " "
       FROM_CLAUSE
         FROM_KW "from"
@@ -607,10 +612,11 @@ SOURCE_FILE
         INTO_CLAUSE
           INTO_KW "into"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME
-                IDENT "t"
+          TABLE_NAME
+            PATH
+              PATH_SEGMENT
+                NAME
+                  IDENT "t"
       WHITESPACE " "
       UNION_KW "union"
       WHITESPACE " "

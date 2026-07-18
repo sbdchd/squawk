@@ -10,6 +10,7 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
+    TABLE_NAME
     TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
@@ -33,10 +34,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -53,10 +55,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -81,10 +84,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -108,10 +112,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -151,10 +156,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -183,10 +189,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
           WHITESPACE " "
           ON_UPDATE_ACTION
             ON_KW "on"
@@ -209,10 +216,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
           WHITESPACE " "
           ON_UPDATE_ACTION
             ON_KW "on"
@@ -238,10 +246,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
           WHITESPACE " "
           ON_UPDATE_ACTION
             ON_KW "on"
@@ -267,10 +276,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "references"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
           WHITESPACE " "
           ON_UPDATE_ACTION
             ON_KW "on"
@@ -312,10 +322,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -491,20 +502,22 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     PARTITION_OF
       PARTITION_KW "partition"
       WHITESPACE " "
       OF_KW "of"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "u"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "u"
     WHITESPACE "\n    "
     COMMENT "-- missing some commas"
     WHITESPACE "\n    "
@@ -539,20 +552,22 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     PARTITION_OF
       PARTITION_KW "partition"
       WHITESPACE " "
       OF_KW "of"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "u"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "u"
     WHITESPACE "\n    "
     COMMENT "-- missing some commas"
     WHITESPACE "\n    "
@@ -582,10 +597,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "t"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -659,10 +675,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "z"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "z"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -723,7 +740,7 @@ SOURCE_FILE
 error[syntax-error]: expected path name
   ╭▸ 
 2 │ create table (
-  ╰╴            ━
+  ╰╴             ━
 error[syntax-error]: unexpected trailing comma
    ╭▸ 
 10 │ create table t (a text,);

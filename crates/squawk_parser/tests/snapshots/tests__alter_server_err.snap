@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     SERVER_KW "server"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_REF
+      NAME_REF
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n"
 ---

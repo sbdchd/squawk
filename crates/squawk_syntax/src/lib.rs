@@ -224,7 +224,7 @@ fn api_walkthrough() {
     // for several kinds of node. In this case, a trait like `ast::NameOwner`
     // usually exists. By convention, all ast types should be used with `ast::`
     // qualifier.
-    let path: Option<ast::Path> = func.path();
+    let path: Option<ast::Path> = func.name().and_then(|name| name.path());
     let name: ast::Name = path.unwrap().segment().unwrap().name().unwrap();
     assert_eq!(name.text(), "foo");
 
@@ -419,7 +419,12 @@ fn create_table() {
 
     for stmt in file.stmts() {
         if let ast::Stmt::CreateTable(create_table) = stmt {
-            let table_name = create_table.path().unwrap().syntax().to_string();
+            let table_name = create_table
+                .table_name()
+                .and_then(|table| table.path())
+                .unwrap()
+                .syntax()
+                .to_string();
             let mut columns = vec![];
             for arg in create_table.table_arg_list().unwrap().args() {
                 match arg {

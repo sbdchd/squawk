@@ -8,10 +8,11 @@ SOURCE_FILE@0..75
     WHITESPACE@6..7 " "
     TABLE_KW@7..12 "table"
     WHITESPACE@12..13 " "
-    PATH@13..14
-      PATH_SEGMENT@13..14
-        NAME@13..14
-          IDENT@13..14 "t"
+    TABLE_NAME@13..14
+      PATH@13..14
+        PATH_SEGMENT@13..14
+          NAME@13..14
+            IDENT@13..14 "t"
     WHITESPACE@14..15 " "
     TABLE_ARG_LIST@15..73
       L_PAREN@15..16 "("

@@ -447,6 +447,8 @@ select $1[10:42];
 select (arrayfunction(a,b))[42];
 
 -- select_with_collate
+select a collate foo;
+
 select a < ('foo' collate "fr_FR") from t;
 
 select a < b collate "de_DE" from t;

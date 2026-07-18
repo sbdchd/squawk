@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "d"
+    DOMAIN
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "d"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "

@@ -427,6 +427,7 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     | ast::Expr::CallExpr(_)
                     | ast::Expr::CaseExpr(_)
                     | ast::Expr::CastExpr(_)
+                    | ast::Expr::Collate(_)
                     | ast::Expr::Literal(_)
                     | ast::Expr::PostfixExpr(_)
                     | ast::Expr::PrefixExpr(_)
@@ -469,6 +470,9 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             if let Some(ty) = cast_expr.ty() {
                 return name_from_type(ty, unknown_column);
             }
+        }
+        ast::Expr::Collate(collate) => {
+            return name_from_expr(collate.expr()?, in_type);
         }
         ast::Expr::FieldExpr(field_expr) => {
             if let Some(name_ref) = field_expr.field() {
@@ -542,6 +546,7 @@ fn examples() {
     assert_snapshot!(name("1 between 0 and 10"), @"?column?");
     assert_snapshot!(name("1 + 2"), @"?column?");
     assert_snapshot!(name("42"), @"?column?");
+    assert_snapshot!(name("a collate foo"), @"a");
     assert_snapshot!(name("'string'"), @"?column?");
     assert_snapshot!(name("n'string'"), @"bpchar");
     assert_snapshot!(name("N'string'"), @"bpchar");
