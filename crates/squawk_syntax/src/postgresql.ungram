@@ -223,8 +223,30 @@ JsonTable =
     ('as' Name)?
     JsonPassingClause?
     JsonTableColumnList
+    JsonTablePlanClause?
     JsonOnErrorClause?
   ')'
+
+JsonTablePlanClause =
+  'plan' 'default'? '(' JsonTablePlan (',' JsonTablePlan)? ')'
+
+JsonTablePlan =
+  JsonTablePlanChoice
+| JsonTablePlanJoin
+| JsonTablePlanPath
+| ParenJsonTablePlan
+
+JsonTablePlanChoice =
+  'cross' | 'inner' | 'outer' | 'union'
+
+JsonTablePlanJoin =
+  lhs:JsonTablePlan ('cross' | 'inner' | 'outer' | 'union') rhs:JsonTablePlan
+
+JsonTablePlanPath =
+  NameRef
+
+ParenJsonTablePlan =
+  '(' JsonTablePlan ')'
 
 JsonSerializeFn =
   'json_serialize' '('
@@ -1183,6 +1205,9 @@ ColumnRefList =
 ConstraintIncludeClause =
   'include' ColumnRefList
 
+IndexIncludeClause =
+  'include' PartitionItemList
+
 WithParams =
   'with' AttributeList
 
@@ -1458,7 +1483,7 @@ CreateIndex =
   'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Index)? 'on' TableRelationName
   UsingMethod?
   PartitionItemList
-  ConstraintIncludeClause?
+  IndexIncludeClause?
   (NullsNotDistinct | NullsDistinct)?
   WithParams?
   TablespaceClause?

@@ -63,6 +63,9 @@ SELECT COUNT(*) FROM guid1 WHERE guid_field > '22222222-2222-2222-2222-222222222
 -- >= operator test
 SELECT COUNT(*) FROM guid1 WHERE guid_field >= '22222222-2222-2222-2222-222222222222';
 
+-- min() and max() aggregate test
+SELECT MIN(guid_field), MAX(guid_field) FROM guid1;
+
 -- btree and hash index creation test
 CREATE INDEX guid1_btree ON guid1 USING BTREE (guid_field);
 CREATE INDEX guid1_hash  ON guid1 USING HASH  (guid_field);
@@ -139,6 +142,19 @@ WITH uuidts AS (
         FROM generate_series(1970 - extract(year from now())::int, 10888 - extract(year from now())::int) y)
 )
 SELECT y, ts, prev_ts FROM uuidts WHERE ts < prev_ts;
+
+-- uuidv7: infinite intervals are rejected
+SELECT uuidv7('infinity'::interval);
+SELECT uuidv7('-infinity'::interval);
+
+-- uuidv7: timestamps before Unix epoch are rejected
+SELECT uuidv7('-1000 years'::interval);
+
+-- uuidv7: timestamps beyond 48-bit ms field (~year 10889) are rejected
+SELECT uuidv7('9000 years'::interval);
+
+-- uuidv7: a large but in-range forward shift is accepted
+SELECT uuid_extract_timestamp(uuidv7('1000 years'::interval)) > now() + '999 years'::interval;
 
 -- extract functions
 

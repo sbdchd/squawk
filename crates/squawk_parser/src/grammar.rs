@@ -623,7 +623,82 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
     }
     opt_json_passing_clause(p);
     json_table_column_list(p);
+    opt_json_table_plan_clause(p);
     opt_json_on_error_clause(p);
+}
+
+const JSON_TABLE_PLAN_JOIN_KINDS: TokenSet =
+    TokenSet::new(&[CROSS_KW, INNER_KW, OUTER_KW, UNION_KW]);
+
+// [ PLAN ( json_table_plan ) ]
+// [ PLAN DEFAULT ( { INNER | OUTER } [, { CROSS | UNION } ]
+//                | { CROSS | UNION } [, { INNER | OUTER } ] ) ]
+fn opt_json_table_plan_clause(p: &mut Parser<'_>) {
+    if !p.at(PLAN_KW) {
+        return;
+    }
+    let m = p.start();
+    p.bump(PLAN_KW);
+    let is_default = p.eat(DEFAULT_KW);
+    p.expect(L_PAREN);
+    if is_default {
+        json_table_plan_choice(p);
+        if p.eat(COMMA) {
+            json_table_plan_choice(p);
+        }
+    } else {
+        json_table_plan(p);
+    }
+    p.expect(R_PAREN);
+    m.complete(p, JSON_TABLE_PLAN_CLAUSE);
+}
+
+fn json_table_plan_choice(p: &mut Parser<'_>) {
+    if p.at_ts(JSON_TABLE_PLAN_JOIN_KINDS) {
+        let m = p.start();
+        p.bump_any();
+        m.complete(p, JSON_TABLE_PLAN_CHOICE);
+    } else {
+        p.error("expected INNER, OUTER, CROSS, or UNION");
+    }
+}
+
+// json_table_plan is:
+//   path_name
+// | path_name { OUTER | INNER } json_table_plan_primary
+// | json_table_plan_primary { UNION | CROSS } json_table_plan_primary [ ... ]
+//
+// json_table_plan_primary is:
+//   path_name | ( json_table_plan )
+fn json_table_plan(p: &mut Parser<'_>) {
+    let Some(mut lhs) = opt_json_table_plan_primary(p) else {
+        p.error("expected json table plan");
+        return;
+    };
+    while p.at_ts(JSON_TABLE_PLAN_JOIN_KINDS) {
+        let m = lhs.precede(p);
+        p.bump_any();
+        if opt_json_table_plan_primary(p).is_none() {
+            p.error("expected json table plan");
+        }
+        lhs = m.complete(p, JSON_TABLE_PLAN_JOIN);
+    }
+}
+
+fn opt_json_table_plan_primary(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if p.at(L_PAREN) {
+        let m = p.start();
+        p.bump(L_PAREN);
+        json_table_plan(p);
+        p.expect(R_PAREN);
+        Some(m.complete(p, PAREN_JSON_TABLE_PLAN))
+    } else if p.at_ts(NAME_REF_FIRST) {
+        let m = p.start();
+        name_ref(p);
+        Some(m.complete(p, JSON_TABLE_PLAN_PATH))
+    } else {
+        None
+    }
 }
 
 // COLUMNS ( json_table_column [, ...] )
@@ -3783,6 +3858,18 @@ fn opt_include_columns(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.bump(INCLUDE_KW);
         column_ref_list(p);
         Some(m.complete(p, CONSTRAINT_INCLUDE_CLAUSE))
+    } else {
+        None
+    }
+}
+
+// [ INCLUDE ( { column_name | ( expression ) } [, ...] ) ]
+fn opt_index_include_columns(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if p.at(INCLUDE_KW) {
+        let m = p.start();
+        p.bump(INCLUDE_KW);
+        partition_items(p, true);
+        Some(m.complete(p, INDEX_INCLUDE_CLAUSE))
     } else {
         None
     }
@@ -15369,7 +15456,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
     //   [, ...]
     // )
     partition_items(p, true);
-    opt_include_columns(p);
+    opt_index_include_columns(p);
     opt_nulls_not_distinct(p);
     opt_with_params(p);
     opt_tablespace(p);

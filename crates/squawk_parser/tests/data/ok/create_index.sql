@@ -65,3 +65,8 @@ create index idx on t using gin (c nulls nulls first);
 
 -- regression, see issue#1187
 CREATE INDEX index_name ON public.table_name USING GIN (column_name public.gin__int_ops);
+
+-- include with expressions
+CREATE INDEX ON tbl (c1) INCLUDE ((c2 + c3));
+CREATE INDEX ON tbl (c1) INCLUDE ((c2));
+CREATE INDEX ON tbl (c1) INCLUDE (c2, (c3 + c4), lower(c5));

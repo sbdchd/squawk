@@ -587,11 +587,11 @@ drop type two_ints cascade;
 
 create type varbitrange as range (subtype = varbit);
 
-set enable_sort = off;  -- try to make it pick a hash setop implementation
+set enable_groupagg = off;  -- try to make it pick a hash setop implementation
 
 select '(01,10)'::varbitrange except select '(10,11)'::varbitrange;
 
-reset enable_sort;
+reset enable_groupagg;
 
 --
 -- OUT/INOUT/TABLE functions

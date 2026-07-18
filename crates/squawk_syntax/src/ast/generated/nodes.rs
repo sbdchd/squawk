@@ -5388,15 +5388,15 @@ pub struct CreateIndex {
 }
 impl CreateIndex {
     #[inline]
-    pub fn constraint_include_clause(&self) -> Option<ConstraintIncludeClause> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn if_not_exists(&self) -> Option<IfNotExists> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn index(&self) -> Option<Index> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn index_include_clause(&self) -> Option<IndexIncludeClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -12035,6 +12035,21 @@ impl IndexExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IndexIncludeClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IndexIncludeClause {
+    #[inline]
+    pub fn partition_item_list(&self) -> Option<PartitionItemList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn include_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INCLUDE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IndexParameters {
     pub(crate) syntax: SyntaxNode,
 }
@@ -13530,6 +13545,10 @@ impl JsonTable {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn json_table_plan_clause(&self) -> Option<JsonTablePlanClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
     }
@@ -13665,6 +13684,94 @@ impl JsonTableFromItem {
     #[inline]
     pub fn lateral_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LATERAL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonTablePlanChoice {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonTablePlanChoice {
+    #[inline]
+    pub fn cross_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CROSS_KW)
+    }
+    #[inline]
+    pub fn inner_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INNER_KW)
+    }
+    #[inline]
+    pub fn outer_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OUTER_KW)
+    }
+    #[inline]
+    pub fn union_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UNION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonTablePlanClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonTablePlanClause {
+    #[inline]
+    pub fn json_table_plan(&self) -> Option<JsonTablePlan> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+    #[inline]
+    pub fn plan_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PLAN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonTablePlanJoin {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonTablePlanJoin {
+    #[inline]
+    pub fn cross_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CROSS_KW)
+    }
+    #[inline]
+    pub fn inner_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INNER_KW)
+    }
+    #[inline]
+    pub fn outer_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OUTER_KW)
+    }
+    #[inline]
+    pub fn union_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UNION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonTablePlanPath {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonTablePlanPath {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
     }
 }
 
@@ -16764,6 +16871,25 @@ impl ParenGraphPattern {
     }
     #[inline]
     pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ParenJsonTablePlan {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ParenJsonTablePlan {
+    #[inline]
+    pub fn json_table_plan(&self) -> Option<JsonTablePlan> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -24518,6 +24644,14 @@ pub enum JsonBehavior {
     JsonBehaviorNull(JsonBehaviorNull),
     JsonBehaviorTrue(JsonBehaviorTrue),
     JsonBehaviorUnknown(JsonBehaviorUnknown),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum JsonTablePlan {
+    JsonTablePlanChoice(JsonTablePlanChoice),
+    JsonTablePlanJoin(JsonTablePlanJoin),
+    JsonTablePlanPath(JsonTablePlanPath),
+    ParenJsonTablePlan(ParenJsonTablePlan),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -32389,6 +32523,24 @@ impl AstNode for IndexExpr {
         &self.syntax
     }
 }
+impl AstNode for IndexIncludeClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INDEX_INCLUDE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for IndexParameters {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -33635,6 +33787,78 @@ impl AstNode for JsonTableFromItem {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JSON_TABLE_FROM_ITEM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonTablePlanChoice {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_TABLE_PLAN_CHOICE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonTablePlanClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_TABLE_PLAN_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonTablePlanJoin {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_TABLE_PLAN_JOIN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonTablePlanPath {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_TABLE_PLAN_PATH
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -36281,6 +36505,24 @@ impl AstNode for ParenGraphPattern {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PAREN_GRAPH_PATTERN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ParenJsonTablePlan {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PAREN_JSON_TABLE_PLAN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -46068,6 +46310,72 @@ impl From<JsonBehaviorUnknown> for JsonBehavior {
     #[inline]
     fn from(node: JsonBehaviorUnknown) -> JsonBehavior {
         JsonBehavior::JsonBehaviorUnknown(node)
+    }
+}
+impl AstNode for JsonTablePlan {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::JSON_TABLE_PLAN_CHOICE
+                | SyntaxKind::JSON_TABLE_PLAN_JOIN
+                | SyntaxKind::JSON_TABLE_PLAN_PATH
+                | SyntaxKind::PAREN_JSON_TABLE_PLAN
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::JSON_TABLE_PLAN_CHOICE => {
+                JsonTablePlan::JsonTablePlanChoice(JsonTablePlanChoice { syntax })
+            }
+            SyntaxKind::JSON_TABLE_PLAN_JOIN => {
+                JsonTablePlan::JsonTablePlanJoin(JsonTablePlanJoin { syntax })
+            }
+            SyntaxKind::JSON_TABLE_PLAN_PATH => {
+                JsonTablePlan::JsonTablePlanPath(JsonTablePlanPath { syntax })
+            }
+            SyntaxKind::PAREN_JSON_TABLE_PLAN => {
+                JsonTablePlan::ParenJsonTablePlan(ParenJsonTablePlan { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            JsonTablePlan::JsonTablePlanChoice(it) => &it.syntax,
+            JsonTablePlan::JsonTablePlanJoin(it) => &it.syntax,
+            JsonTablePlan::JsonTablePlanPath(it) => &it.syntax,
+            JsonTablePlan::ParenJsonTablePlan(it) => &it.syntax,
+        }
+    }
+}
+impl From<JsonTablePlanChoice> for JsonTablePlan {
+    #[inline]
+    fn from(node: JsonTablePlanChoice) -> JsonTablePlan {
+        JsonTablePlan::JsonTablePlanChoice(node)
+    }
+}
+impl From<JsonTablePlanJoin> for JsonTablePlan {
+    #[inline]
+    fn from(node: JsonTablePlanJoin) -> JsonTablePlan {
+        JsonTablePlan::JsonTablePlanJoin(node)
+    }
+}
+impl From<JsonTablePlanPath> for JsonTablePlan {
+    #[inline]
+    fn from(node: JsonTablePlanPath) -> JsonTablePlan {
+        JsonTablePlan::JsonTablePlanPath(node)
+    }
+}
+impl From<ParenJsonTablePlan> for JsonTablePlan {
+    #[inline]
+    fn from(node: ParenJsonTablePlan) -> JsonTablePlan {
+        JsonTablePlan::ParenJsonTablePlan(node)
     }
 }
 impl AstNode for LockMode {

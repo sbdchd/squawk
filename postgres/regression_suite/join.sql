@@ -2432,6 +2432,13 @@ select 1 from parted_b t1
   on t1.id = s.id
 group by ();
 
+-- likewise for a PHV embedded in an OR join clause
+explain (costs off)
+select 1 from parted_b t1
+  join (select t2.id from parted_b t2 left join parted_b t3 on t2.id = t3.id) s
+  on (t1.id = 1 and s.id = 2) or (t1.id = 3 and s.id = 4)
+group by ();
+
 rollback;
 
 create temp table parent (k int primary key, pd int);

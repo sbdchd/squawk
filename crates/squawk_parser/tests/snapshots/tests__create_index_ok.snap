@@ -295,17 +295,17 @@ SOURCE_FILE
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
-    CONSTRAINT_INCLUDE_CLAUSE
+    INDEX_INCLUDE_CLAUSE
       INCLUDE_KW "include"
       WHITESPACE " "
-      COLUMN_REF_LIST
+      PARTITION_ITEM_LIST
         L_PAREN "("
-        COLUMN_REF
+        PARTITION_ITEM
           NAME_REF
             IDENT "a"
         COMMA ","
         WHITESPACE " "
-        COLUMN_REF
+        PARTITION_ITEM
           NAME_REF
             IDENT "b"
         R_PAREN ")"
@@ -493,17 +493,17 @@ SOURCE_FILE
           IDENT "title"
       R_PAREN ")"
     WHITESPACE " "
-    CONSTRAINT_INCLUDE_CLAUSE
+    INDEX_INCLUDE_CLAUSE
       INCLUDE_KW "INCLUDE"
       WHITESPACE " "
-      COLUMN_REF_LIST
+      PARTITION_ITEM_LIST
         L_PAREN "("
-        COLUMN_REF
+        PARTITION_ITEM
           NAME_REF
             IDENT "director"
         COMMA ","
         WHITESPACE " "
-        COLUMN_REF
+        PARTITION_ITEM
           NAME_REF
             IDENT "rating"
         R_PAREN ")"
@@ -1000,5 +1000,141 @@ SOURCE_FILE
               NAME_REF
                 IDENT "gin__int_ops"
       R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- include with expressions"
+  WHITESPACE "\n"
+  CREATE_INDEX
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "tbl"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c1"
+      R_PAREN ")"
+    WHITESPACE " "
+    INDEX_INCLUDE_CLAUSE
+      INCLUDE_KW "INCLUDE"
+      WHITESPACE " "
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        PARTITION_ITEM
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "c2"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "c3"
+            R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "tbl"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c1"
+      R_PAREN ")"
+    WHITESPACE " "
+    INDEX_INCLUDE_CLAUSE
+      INCLUDE_KW "INCLUDE"
+      WHITESPACE " "
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        PARTITION_ITEM
+          PAREN_EXPR
+            L_PAREN "("
+            NAME_REF
+              IDENT "c2"
+            R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "tbl"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c1"
+      R_PAREN ")"
+    WHITESPACE " "
+    INDEX_INCLUDE_CLAUSE
+      INCLUDE_KW "INCLUDE"
+      WHITESPACE " "
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        PARTITION_ITEM
+          NAME_REF
+            IDENT "c2"
+        COMMA ","
+        WHITESPACE " "
+        PARTITION_ITEM
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "c3"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "c4"
+            R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        PARTITION_ITEM
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                NAME_REF
+                  IDENT "c5"
+              R_PAREN ")"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

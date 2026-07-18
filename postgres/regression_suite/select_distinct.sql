@@ -81,7 +81,7 @@ SET enable_hashagg=TRUE;
 
 -- Produce results with hash aggregation.
 
-SET enable_sort=FALSE;
+SET enable_groupagg=FALSE;
 
 SET jit_above_cost=0;
 
@@ -96,7 +96,7 @@ SET jit_above_cost TO DEFAULT;
 CREATE TABLE distinct_hash_2 AS
 SELECT DISTINCT (g%1000)::text FROM generate_series(0,9999) g;
 
-SET enable_sort=TRUE;
+SET enable_groupagg=TRUE;
 
 SET work_mem TO DEFAULT;
 

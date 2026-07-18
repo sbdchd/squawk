@@ -1765,3 +1765,38 @@ create temp table with_test (i int);
 with with_test as (select 42) insert into with_test select * from with_test;
 select * from with_test;
 drop table with_test;
+
+--
+-- Test selectivity estimates for GROUP BY and DISTINCT subqueries/CTEs.
+--
+-- When a subquery or CTE has GROUP BY or DISTINCT, the planner should use
+-- stadistinct from the base table for key columns, rather than falling back
+-- to DEFAULT_NUM_DISTINCT.  With correct estimates, the planner picks Hash
+-- Join; with the old default estimates it would pick Nested Loop.
+--
+
+-- Subquery with GROUP BY (OFFSET 0 prevents qual pushdown)
+EXPLAIN (COSTS OFF)
+SELECT * FROM
+  (SELECT two, thousand, avg(ten) AS avg FROM tenk1 GROUP BY two, thousand OFFSET 0) t1,
+  (SELECT two, thousand, avg(ten) AS avg FROM tenk1 GROUP BY two, thousand OFFSET 0) t2
+WHERE t1.two = 0 AND t2.two = 0 AND t1.avg = t2.avg;
+
+-- Subquery with DISTINCT (OFFSET 0 prevents qual pushdown)
+EXPLAIN (COSTS OFF)
+SELECT * FROM
+  (SELECT DISTINCT two, thousand FROM tenk1 OFFSET 0) t1,
+  (SELECT DISTINCT two, thousand FROM tenk1 OFFSET 0) t2
+WHERE t1.two = 0 AND t2.two = 0 AND t1.thousand = t2.thousand;
+
+-- CTE with GROUP BY
+EXPLAIN (COSTS OFF)
+WITH cte AS (SELECT two, thousand, avg(ten) AS avg FROM tenk1 GROUP BY two, thousand)
+SELECT * FROM cte t1, cte t2
+WHERE t1.two = 0 AND t2.two = 0 AND t1.avg = t2.avg;
+
+-- CTE with DISTINCT
+EXPLAIN (COSTS OFF)
+WITH cte AS (SELECT DISTINCT two, thousand FROM tenk1)
+SELECT * FROM cte t1, cte t2
+WHERE t1.two = 0 AND t2.two = 0 AND t1.thousand = t2.thousand;

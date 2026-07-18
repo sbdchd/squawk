@@ -14,6 +14,13 @@ SELECT backend_type, object, context FROM pg_stat_io
   ORDER BY backend_type COLLATE "C", object COLLATE "C", context COLLATE "C";
 -- \a
 
+-- List of registered statistics kinds.
+SELECT id, name, fixed_amount,
+    accessed_across_databases AS across_db, write_to_file
+  FROM pg_stat_kind_info
+  WHERE builtin
+  ORDER BY id;
+
 -- ensure that both seqscan and indexscan plans are allowed
 SET enable_seqscan TO on;
 SET enable_indexscan TO on;
@@ -998,6 +1005,11 @@ $$;
 
 SELECT fastpath_exceeded AS fastpath_exceeded_before FROM pg_stat_lock WHERE locktype = 'relation' /* \gset */;
 
+-- Test pg_stat_get_backend_lock()
+SELECT fastpath_exceeded AS backend_fastpath_exceeded_before
+  FROM pg_stat_get_backend_lock(pg_backend_pid())
+  WHERE locktype = 'relation' /* \gset */;
+
 -- Needs a lock on each partition
 SELECT count(*) FROM part_test;
 
@@ -1005,6 +1017,10 @@ SELECT count(*) FROM part_test;
 SELECT pg_stat_force_next_flush();
 
 SELECT fastpath_exceeded > 'fastpath_exceeded_before' FROM pg_stat_lock WHERE locktype = 'relation';
+
+SELECT fastpath_exceeded > 'backend_fastpath_exceeded_before'
+  FROM pg_stat_get_backend_lock(pg_backend_pid())
+  WHERE locktype = 'relation';
 
 DROP TABLE part_test;
 
