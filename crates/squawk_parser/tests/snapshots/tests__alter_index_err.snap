@@ -10,13 +10,15 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "idx"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "idx"
     WHITESPACE " "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"
+      EXTENSION_REF
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
@@ -32,7 +34,7 @@ error[syntax-error]: expected EXTENSION_KW
   ╭▸ 
 2 │ alter index idx no;
   ╰╴                  ━
-error[syntax-error]: expected path name
+error[syntax-error]: expected name
   ╭▸ 
 2 │ alter index idx no;
   ╰╴                  ━

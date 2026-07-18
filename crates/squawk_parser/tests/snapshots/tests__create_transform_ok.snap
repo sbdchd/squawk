@@ -20,8 +20,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "l"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -35,10 +36,11 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     COMMA ","
     WHITESPACE "\n  "
     TRANSFORM_TO_FUNC
@@ -51,10 +53,11 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "g"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "g"
     WHITESPACE "\n"
     R_PAREN ")"
     SEMICOLON ";"
@@ -92,8 +95,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "l"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -107,20 +111,21 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
+        FUNCTION_NAME_REF
           PATH_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "bar"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "bar"
+                  IDENT "foo"
             DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "foo"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+                IDENT "f"
         PARAM_LIST
           L_PAREN "("
           PARAM
@@ -145,10 +150,11 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "g"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "g"
     WHITESPACE "\n"
     R_PAREN ")"
     SEMICOLON ";"
@@ -170,8 +176,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "l"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -185,10 +192,11 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE "\n"
     R_PAREN ")"
     SEMICOLON ";"
@@ -210,8 +218,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "l"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -225,10 +234,11 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "g"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "g"
     WHITESPACE "\n"
     R_PAREN ")"
     SEMICOLON ";"
@@ -250,8 +260,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "l"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -265,10 +276,11 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "g"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "g"
     COMMA ","
     WHITESPACE "\n  "
     TRANSFORM_FROM_FUNC
@@ -281,10 +293,11 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     WHITESPACE "\n"
     R_PAREN ")"
     SEMICOLON ";"

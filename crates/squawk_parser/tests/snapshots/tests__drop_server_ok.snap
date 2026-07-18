@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     SERVER_KW "server"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SERVER_REF
+      NAME_REF
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -26,16 +27,19 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    SERVER_REF
+      NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    SERVER_REF
+      NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    SERVER_REF
+      NAME_REF
+        IDENT "c"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -50,16 +54,19 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    SERVER_REF
+      NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    SERVER_REF
+      NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    SERVER_REF
+      NAME_REF
+        IDENT "c"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

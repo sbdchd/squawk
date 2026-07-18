@@ -10,18 +10,20 @@ SOURCE_FILE
     WHITESPACE " "
     COLLATION_KW "collation"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "c"
+    COLLATION
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "c"
     WHITESPACE " "
     COLLATION_FROM
       FROM_KW "from"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+      COLLATION_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from_full"
@@ -38,28 +40,30 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "c"
+    COLLATION
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "c"
     WHITESPACE " "
     COLLATION_FROM
       FROM_KW "from"
       WHITESPACE " "
-      PATH_REF
+      COLLATION_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "bar"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+              IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_options"
@@ -76,15 +80,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "c"
+    COLLATION
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "c"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("

@@ -10,26 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  DROP_TYPE
-    DROP_KW "drop"
-    WHITESPACE " "
-    TYPE_KW "type"
-    WHITESPACE " "
-    PATH_REF
+    TYPE_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_TYPE
@@ -37,22 +22,42 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "a"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TYPE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "a"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "b"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "c"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_TYPE
@@ -65,22 +70,25 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "a"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "a"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "b"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "c"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TYPE
@@ -93,10 +101,11 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "a"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "a"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -106,10 +115,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "a"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -124,9 +134,10 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "foo"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"

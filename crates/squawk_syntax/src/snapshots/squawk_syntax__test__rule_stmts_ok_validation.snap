@@ -8,8 +8,9 @@ SOURCE_FILE@0..209
     WHITESPACE@6..7 " "
     RULE_KW@7..11 "rule"
     WHITESPACE@11..12 " "
-    NAME@12..13
-      IDENT@12..13 "r"
+    RULE@12..13
+      NAME@12..13
+        IDENT@12..13 "r"
     WHITESPACE@13..14 " "
     AS_KW@14..16 "as"
     WHITESPACE@16..17 " "
@@ -21,10 +22,11 @@ SOURCE_FILE@0..209
       WHITESPACE@26..27 " "
       TO_KW@27..29 "to"
       WHITESPACE@29..30 " "
-      PATH_REF@30..31
-        PATH_SEGMENT_REF@30..31
-          NAME_REF@30..31
-            IDENT@30..31 "t"
+      RELATION_NAME_REF@30..31
+        PATH_REF@30..31
+          PATH_SEGMENT_REF@30..31
+            NAME_REF@30..31
+              IDENT@30..31 "t"
     WHITESPACE@31..32 " "
     RULE_DO@32..101
       DO_KW@32..34 "do"
@@ -39,10 +41,11 @@ SOURCE_FILE@0..209
           WHITESPACE@53..54 " "
           INTO_KW@54..58 "into"
           WHITESPACE@58..59 " "
-          PATH_REF@59..60
-            PATH_SEGMENT_REF@59..60
-              NAME_REF@59..60
-                IDENT@59..60 "t"
+          RELATION_NAME_REF@59..60
+            PATH_REF@59..60
+              PATH_SEGMENT_REF@59..60
+                NAME_REF@59..60
+                  IDENT@59..60 "t"
           WHITESPACE@60..61 " "
           VALUES@61..71
             VALUES_KW@61..67 "values"
@@ -60,10 +63,11 @@ SOURCE_FILE@0..209
           WHITESPACE@81..82 " "
           INTO_KW@82..86 "into"
           WHITESPACE@86..87 " "
-          PATH_REF@87..88
-            PATH_SEGMENT_REF@87..88
-              NAME_REF@87..88
-                IDENT@87..88 "t"
+          RELATION_NAME_REF@87..88
+            PATH_REF@87..88
+              PATH_SEGMENT_REF@87..88
+                NAME_REF@87..88
+                  IDENT@87..88 "t"
           WHITESPACE@88..89 " "
           VALUES@89..99
             VALUES_KW@89..95 "values"
@@ -83,8 +87,9 @@ SOURCE_FILE@0..209
     WHITESPACE@110..111 " "
     RULE_KW@111..115 "rule"
     WHITESPACE@115..116 " "
-    NAME@116..118
-      IDENT@116..118 "r2"
+    RULE@116..118
+      NAME@116..118
+        IDENT@116..118 "r2"
     WHITESPACE@118..119 " "
     AS_KW@119..121 "as"
     WHITESPACE@121..122 " "
@@ -96,10 +101,11 @@ SOURCE_FILE@0..209
       WHITESPACE@131..132 " "
       TO_KW@132..134 "to"
       WHITESPACE@134..135 " "
-      PATH_REF@135..136
-        PATH_SEGMENT_REF@135..136
-          NAME_REF@135..136
-            IDENT@135..136 "t"
+      RELATION_NAME_REF@135..136
+        PATH_REF@135..136
+          PATH_SEGMENT_REF@135..136
+            NAME_REF@135..136
+              IDENT@135..136 "t"
     WHITESPACE@136..137 " "
     RULE_DO@137..207
       DO_KW@137..139 "do"
@@ -114,10 +120,11 @@ SOURCE_FILE@0..209
           WHITESPACE@158..159 " "
           INTO_KW@159..163 "into"
           WHITESPACE@163..164 " "
-          PATH_REF@164..165
-            PATH_SEGMENT_REF@164..165
-              NAME_REF@164..165
-                IDENT@164..165 "t"
+          RELATION_NAME_REF@164..165
+            PATH_REF@164..165
+              PATH_SEGMENT_REF@164..165
+                NAME_REF@164..165
+                  IDENT@164..165 "t"
           WHITESPACE@165..166 " "
           VALUES@166..176
             VALUES_KW@166..172 "values"
@@ -135,10 +142,11 @@ SOURCE_FILE@0..209
           WHITESPACE@186..187 " "
           INTO_KW@187..191 "into"
           WHITESPACE@191..192 " "
-          PATH_REF@192..193
-            PATH_SEGMENT_REF@192..193
-              NAME_REF@192..193
-                IDENT@192..193 "t"
+          RELATION_NAME_REF@192..193
+            PATH_REF@192..193
+              PATH_SEGMENT_REF@192..193
+                NAME_REF@192..193
+                  IDENT@192..193 "t"
           WHITESPACE@193..194 " "
           VALUES@194..204
             VALUES_KW@194..200 "values"

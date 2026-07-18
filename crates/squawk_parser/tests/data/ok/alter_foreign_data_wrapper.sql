@@ -1,3 +1,11 @@
+-- connection
+alter foreign data wrapper w
+  connection c;
+
+-- no_connection
+alter foreign data wrapper w
+  no connection;
+
 -- handler
 alter foreign data wrapper w
   handler h;
@@ -20,6 +28,8 @@ alter foreign data wrapper w
 
 -- multiple
 alter foreign data wrapper w
+  connection s.c
+  no connection
   handler s.h
   no handler
   validator s.v

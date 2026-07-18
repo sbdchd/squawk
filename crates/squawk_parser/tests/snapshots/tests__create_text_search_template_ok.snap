@@ -14,10 +14,11 @@ SOURCE_FILE
     WHITESPACE " "
     TEMPLATE_KW "template"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          NAME_KW "name"
+    TEXT_SEARCH_TEMPLATE
+      PATH
+        PATH_SEGMENT
+          NAME
+            NAME_KW "name"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -49,15 +50,16 @@ SOURCE_FILE
     WHITESPACE " "
     TEMPLATE_KW "template"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          NAME_KW "name"
+    TEXT_SEARCH_TEMPLATE
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            NAME_KW "name"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("

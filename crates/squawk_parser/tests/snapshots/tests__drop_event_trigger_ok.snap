@@ -12,8 +12,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    EVENT_TRIGGER_REF
+      NAME_REF
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -30,8 +31,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    EVENT_TRIGGER_REF
+      NAME_REF
+        IDENT "a"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -48,8 +50,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    EVENT_TRIGGER_REF
+      NAME_REF
+        IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

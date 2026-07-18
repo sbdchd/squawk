@@ -23,7 +23,8 @@ pub fn tables_created_in_transaction(
             }
             ast::Stmt::CreateTable(create_table) if inside_transaction => {
                 let Some(table_name) = create_table
-                    .path()
+                    .table_name()
+                    .and_then(|table| table.path())
                     .and_then(|x| x.segment())
                     .and_then(|x| x.name())
                 else {
@@ -50,8 +51,12 @@ fn not_valid_validate_in_transaction(
                 for action in alter_table.actions() {
                     match action {
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
-                            if let Some(constraint_name) =
-                                validate_constraint.name_ref().map(|x| x.text())
+                            if let Some(constraint_name) = validate_constraint
+                                .constraint_name_ref()
+                                .and_then(|constraint| constraint.path_ref())
+                                .and_then(|path| path.segment())
+                                .and_then(|segment| segment.name_ref())
+                                .map(|name| name.text())
                             {
                                 if inside_transaction && not_valid_names.contains(&constraint_name)
                                 {
@@ -103,8 +108,9 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             let Some(table_name) = alter_table
-                .relation_name()
-                .and_then(|x| x.path_ref())
+                .table_relation_name()
+                .and_then(|relation| relation.table_name_ref())
+                .and_then(|table| table.path_ref())
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
                 .map(|x| x.text())

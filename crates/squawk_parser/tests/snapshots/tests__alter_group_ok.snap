@@ -19,8 +19,9 @@ SOURCE_FILE
       WHITESPACE " "
       USER_KW "user"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ROLE_REF
+        NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_multiple"
@@ -39,16 +40,19 @@ SOURCE_FILE
       WHITESPACE " "
       USER_KW "user"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ROLE_REF
+        NAME_REF
+          IDENT "u"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "v"
+      ROLE_REF
+        NAME_REF
+          IDENT "v"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "w"
+      ROLE_REF
+        NAME_REF
+          IDENT "w"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop"
@@ -67,8 +71,9 @@ SOURCE_FILE
       WHITESPACE " "
       USER_KW "user"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ROLE_REF
+        NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_multiple"
@@ -87,16 +92,19 @@ SOURCE_FILE
       WHITESPACE " "
       USER_KW "user"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ROLE_REF
+        NAME_REF
+          IDENT "u"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "v"
+      ROLE_REF
+        NAME_REF
+          IDENT "v"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "w"
+      ROLE_REF
+        NAME_REF
+          IDENT "w"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -134,8 +142,9 @@ SOURCE_FILE
       WHITESPACE " "
       USER_KW "user"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ROLE_REF
+        NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- current_user"
@@ -153,8 +162,9 @@ SOURCE_FILE
       WHITESPACE " "
       USER_KW "user"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ROLE_REF
+        NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- session_user"
@@ -172,7 +182,8 @@ SOURCE_FILE
       WHITESPACE " "
       USER_KW "user"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      ROLE_REF
+        NAME_REF
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"

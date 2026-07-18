@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "my_index"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "my_index"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -21,10 +22,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "my_table"
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "my_table"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -34,10 +36,11 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "CONCURRENTLY"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "my_broken_table"
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "my_broken_table"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complete_syntax"
@@ -57,8 +60,9 @@ SOURCE_FILE
       REINDEX_OPTION
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME
-          IDENT "fooo"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "fooo"
       COMMA ","
       WHITESPACE " "
       REINDEX_OPTION
@@ -97,10 +101,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "foo"
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -118,10 +123,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "foo"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
@@ -129,10 +135,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "foo"
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
@@ -140,9 +147,8 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "foo"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"

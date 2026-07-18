@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "x"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "x"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -29,8 +30,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "x"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "x"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -48,8 +50,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "x"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "x"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -68,8 +71,9 @@ SOURCE_FILE
     WHITESPACE " "
     LANGUAGE_KW "language"
     WHITESPACE " "
-    NAME_REF
-      IDENT "x"
+    LANGUAGE_REF
+      NAME_REF
+        IDENT "x"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"

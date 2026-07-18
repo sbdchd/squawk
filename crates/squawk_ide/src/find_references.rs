@@ -156,7 +156,7 @@ mod test {
         assert_snapshot!(find_refs("
 create table t();
 drop table t$0;
-"), @r"
+"), @"
           ╭▸ 
         2 │ create table t();
           │              ─ 1. reference

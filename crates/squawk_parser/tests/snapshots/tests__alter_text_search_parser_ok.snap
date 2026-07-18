@@ -14,10 +14,11 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "p"
+    TEXT_SEARCH_PARSER_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "p"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -39,18 +40,20 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "p"
+    TEXT_SEARCH_PARSER_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "p"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_PARSER
@@ -62,22 +65,24 @@ SOURCE_FILE
     WHITESPACE " "
     PARSER_KW "parser"
     WHITESPACE " "
-    PATH_REF
+    TEXT_SEARCH_PARSER_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "p"
+            IDENT "p"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

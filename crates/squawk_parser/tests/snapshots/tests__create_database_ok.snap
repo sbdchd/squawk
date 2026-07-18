@@ -129,8 +129,9 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        NAME_REF
-          FULL_KW "full"
+        TABLESPACE_REF
+          NAME_REF
+            FULL_KW "full"
       WHITESPACE "\n  "
       DATABASE_OPTION
         IDENT "allow_connections"

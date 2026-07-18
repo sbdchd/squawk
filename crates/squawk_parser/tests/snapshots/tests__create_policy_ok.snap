@@ -10,16 +10,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- as_"
@@ -29,16 +31,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     AS_POLICY_TYPE
       AS_KW "as"
@@ -51,16 +55,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     AS_POLICY_TYPE
       AS_KW "as"
@@ -75,21 +81,23 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "foo"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
     WHITESPACE "\n  "
     AS_POLICY_TYPE
       AS_KW "as"
@@ -170,16 +178,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -191,16 +201,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -212,16 +224,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -233,16 +247,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -254,16 +270,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME
-      IDENT "p"
+    POLICY
+      NAME
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "

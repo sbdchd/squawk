@@ -10,11 +10,12 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     USING_ON_CLAUSE
       USING_KW "using"

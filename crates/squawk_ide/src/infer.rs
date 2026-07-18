@@ -47,6 +47,7 @@ pub(crate) fn infer_type_from_expr(expr: &ast::Expr) -> Option<Type> {
         // TODO: we need to infer both lhs and rhs, BUT we also need to support
         // looking up the operator since there's operator overloading
         ast::Expr::BinExpr(_bin_expr) => None,
+        ast::Expr::Collate(collate) => infer_type_from_expr(&collate.expr()?),
         ast::Expr::Literal(literal) => infer_type_from_literal(literal),
         ast::Expr::ParenExpr(paren) => paren.expr().and_then(|e| infer_type_from_expr(&e)),
         ast::Expr::TupleExpr(_) => Some(Type::Record),

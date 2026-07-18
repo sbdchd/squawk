@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -30,10 +31,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -51,10 +53,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -72,18 +75,20 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_attribute"
@@ -93,10 +98,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     RENAME_ATTRIBUTE
       RENAME_KW "rename"
@@ -119,15 +125,16 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
+    TYPE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RENAME_ATTRIBUTE
       RENAME_KW "rename"
@@ -150,15 +157,16 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
+    TYPE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     RENAME_ATTRIBUTE
       RENAME_KW "rename"
@@ -183,10 +191,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ADD_VALUE
       ADD_KW "add"
@@ -204,15 +213,16 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
+    TYPE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     ADD_VALUE
       ADD_KW "add"
@@ -241,15 +251,16 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
+    TYPE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     ADD_VALUE
       ADD_KW "add"
@@ -280,10 +291,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     RENAME_VALUE
       RENAME_KW "rename"
@@ -306,10 +318,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -333,10 +346,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -373,10 +387,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ADD_ATTRIBUTE
       ADD_KW "add"
@@ -400,10 +415,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ADD_ATTRIBUTE
       ADD_KW "add"
@@ -422,10 +438,11 @@ SOURCE_FILE
       COLLATE
         COLLATE_KW "collate"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+        COLLATION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute_cascade"
@@ -435,10 +452,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ADD_ATTRIBUTE
       ADD_KW "add"
@@ -462,10 +480,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ADD_ATTRIBUTE
       ADD_KW "add"
@@ -494,10 +513,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     DROP_ATTRIBUTE
       DROP_KW "drop"
@@ -513,10 +533,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     DROP_ATTRIBUTE
       DROP_KW "drop"
@@ -539,10 +560,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     DROP_ATTRIBUTE
       DROP_KW "drop"
@@ -567,10 +589,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ALTER_ATTRIBUTE
       ALTER_KW "alter"
@@ -596,15 +619,16 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
+    TYPE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     ALTER_ATTRIBUTE
       ALTER_KW "alter"
@@ -632,10 +656,11 @@ SOURCE_FILE
       COLLATE
         COLLATE_KW "collate"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+        COLLATION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "c"
       WHITESPACE " "
       CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -645,10 +670,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ALTER_ATTRIBUTE
       ALTER_KW "alter"
@@ -676,10 +702,11 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ADD_ATTRIBUTE
       ADD_KW "add"

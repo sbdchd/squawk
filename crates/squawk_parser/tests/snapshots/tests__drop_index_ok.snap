@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
@@ -21,15 +22,16 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
+    INDEX_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+            IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
@@ -44,22 +46,25 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "a"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "a"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "b"
     COMMA ","
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "c"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "c"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -74,10 +79,11 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -92,10 +98,11 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "\"field_name_idx\""
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "\"field_name_idx\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_INDEX
@@ -110,9 +117,10 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "\"field_name_idx\""
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "\"field_name_idx\""
     SEMICOLON ";"
   WHITESPACE "\n\n"

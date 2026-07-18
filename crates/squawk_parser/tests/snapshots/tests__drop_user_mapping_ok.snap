@@ -19,8 +19,9 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SERVER_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -45,7 +46,8 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "some_server_name"
+      SERVER_REF
+        NAME_REF
+          IDENT "some_server_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"

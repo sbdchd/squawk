@@ -10,16 +10,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    POLICY_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -37,16 +39,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    POLICY_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       TO_KW "to"
@@ -64,16 +68,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    POLICY_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       TO_KW "to"
@@ -100,16 +106,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    POLICY_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       USING_EXPR_CLAUSE
@@ -134,16 +142,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    POLICY_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       WITH_CHECK_EXPR_CLAUSE
@@ -170,16 +180,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    POLICY_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     ALTER_POLICY_TO
       TO_KW "to"

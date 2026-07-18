@@ -21,10 +21,11 @@ SOURCE_FILE@0..858
     INTO_CLAUSE@30..36
       INTO_KW@30..34 "into"
       WHITESPACE@34..35 " "
-      PATH@35..36
-        PATH_SEGMENT@35..36
-          NAME@35..36
-            IDENT@35..36 "t"
+      TABLE_NAME@35..36
+        PATH@35..36
+          PATH_SEGMENT@35..36
+            NAME@35..36
+              IDENT@35..36 "t"
     SEMICOLON@36..37 ";"
   WHITESPACE@37..38 "\n"
   COMPOUND_SELECT@38..73
@@ -44,10 +45,11 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@49..55
         INTO_KW@49..53 "into"
         WHITESPACE@53..54 " "
-        PATH@54..55
-          PATH_SEGMENT@54..55
-            NAME@54..55
-              IDENT@54..55 "t"
+        TABLE_NAME@54..55
+          PATH@54..55
+            PATH_SEGMENT@54..55
+              NAME@54..55
+                IDENT@54..55 "t"
     WHITESPACE@55..56 " "
     UNION_KW@56..61 "union"
     WHITESPACE@61..62 " "
@@ -85,10 +87,11 @@ SOURCE_FILE@0..858
         INTO_CLAUSE@87..93
           INTO_KW@87..91 "into"
           WHITESPACE@91..92 " "
-          PATH@92..93
-            PATH_SEGMENT@92..93
-              NAME@92..93
-                IDENT@92..93 "t"
+          TABLE_NAME@92..93
+            PATH@92..93
+              PATH_SEGMENT@92..93
+                NAME@92..93
+                  IDENT@92..93 "t"
       R_PAREN@93..94 ")"
     R_PAREN@94..95 ")"
     SEMICOLON@95..96 ";"
@@ -108,17 +111,19 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@114..120
         INTO_KW@114..118 "into"
         WHITESPACE@118..119 " "
-        PATH@119..120
-          PATH_SEGMENT@119..120
-            NAME@119..120
-              IDENT@119..120 "x"
+        TABLE_NAME@119..120
+          PATH@119..120
+            PATH_SEGMENT@119..120
+              NAME@119..120
+                IDENT@119..120 "x"
     SEMICOLON@120..121 ";"
   WHITESPACE@121..123 " \n"
   PREPARE@123..152
     PREPARE_KW@123..130 "prepare"
     WHITESPACE@130..131 " "
-    NAME@131..132
-      IDENT@131..132 "p"
+    PREPARED_STATEMENT@131..132
+      NAME@131..132
+        IDENT@131..132 "p"
     WHITESPACE@132..133 " "
     AS_KW@133..135 "as"
     WHITESPACE@135..136 " "
@@ -134,10 +139,11 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@145..151
         INTO_KW@145..149 "into"
         WHITESPACE@149..150 " "
-        PATH@150..151
-          PATH_SEGMENT@150..151
-            NAME@150..151
-              IDENT@150..151 "x"
+        TABLE_NAME@150..151
+          PATH@150..151
+            PATH_SEGMENT@150..151
+              NAME@150..151
+                IDENT@150..151 "x"
     SEMICOLON@151..152 ";"
   WHITESPACE@152..154 "\n\n"
   COMMENT@154..231 "-- error, only the le ..."
@@ -175,10 +181,11 @@ SOURCE_FILE@0..858
         INTO_CLAUSE@260..266
           INTO_KW@260..264 "into"
           WHITESPACE@264..265 " "
-          PATH@265..266
-            PATH_SEGMENT@265..266
-              NAME@265..266
-                IDENT@265..266 "t"
+          TABLE_NAME@265..266
+            PATH@265..266
+              PATH_SEGMENT@265..266
+                NAME@265..266
+                  IDENT@265..266 "t"
       WHITESPACE@266..267 " "
       UNION_KW@267..272 "union"
       WHITESPACE@272..273 " "
@@ -228,10 +235,11 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@313..319
         INTO_KW@313..317 "into"
         WHITESPACE@317..318 " "
-        PATH@318..319
-          PATH_SEGMENT@318..319
-            NAME@318..319
-              IDENT@318..319 "t"
+        TABLE_NAME@318..319
+          PATH@318..319
+            PATH_SEGMENT@318..319
+              NAME@318..319
+                IDENT@318..319 "t"
     SEMICOLON@319..320 ";"
   WHITESPACE@320..321 "\n"
   COMPOUND_SELECT@321..362
@@ -272,10 +280,11 @@ SOURCE_FILE@0..858
             INTO_CLAUSE@352..358
               INTO_KW@352..356 "into"
               WHITESPACE@356..357 " "
-              PATH@357..358
-                PATH_SEGMENT@357..358
-                  NAME@357..358
-                    IDENT@357..358 "t"
+              TABLE_NAME@357..358
+                PATH@357..358
+                  PATH_SEGMENT@357..358
+                    NAME@357..358
+                      IDENT@357..358 "t"
           R_PAREN@358..359 ")"
         R_PAREN@359..360 ")"
       R_PAREN@360..361 ")"
@@ -310,10 +319,11 @@ SOURCE_FILE@0..858
             INTO_CLAUSE@389..395
               INTO_KW@389..393 "into"
               WHITESPACE@393..394 " "
-              PATH@394..395
-                PATH_SEGMENT@394..395
-                  NAME@394..395
-                    IDENT@394..395 "x"
+              TABLE_NAME@394..395
+                PATH@394..395
+                  PATH_SEGMENT@394..395
+                    NAME@394..395
+                      IDENT@394..395 "x"
           R_PAREN@395..396 ")"
         WHITESPACE@396..397 " "
         UNION_KW@397..402 "union"
@@ -358,10 +368,11 @@ SOURCE_FILE@0..858
           INTO_CLAUSE@454..460
             INTO_KW@454..458 "into"
             WHITESPACE@458..459 " "
-            PATH@459..460
-              PATH_SEGMENT@459..460
-                NAME@459..460
-                  IDENT@459..460 "t"
+            TABLE_NAME@459..460
+              PATH@459..460
+                PATH_SEGMENT@459..460
+                  NAME@459..460
+                    IDENT@459..460 "t"
         R_PAREN@460..461 ")"
     WHITESPACE@461..462 " "
     SELECT_CLAUSE@462..470
@@ -403,10 +414,11 @@ SOURCE_FILE@0..858
             INTO_CLAUSE@499..505
               INTO_KW@499..503 "into"
               WHITESPACE@503..504 " "
-              PATH@504..505
-                PATH_SEGMENT@504..505
-                  NAME@504..505
-                    IDENT@504..505 "x"
+              TABLE_NAME@504..505
+                PATH@504..505
+                  PATH_SEGMENT@504..505
+                    NAME@504..505
+                      IDENT@504..505 "x"
           WHITESPACE@505..506 " "
           UNION_KW@506..511 "union"
           WHITESPACE@511..512 " "
@@ -479,10 +491,11 @@ SOURCE_FILE@0..858
             INTO_CLAUSE@598..604
               INTO_KW@598..602 "into"
               WHITESPACE@602..603 " "
-              PATH@603..604
-                PATH_SEGMENT@603..604
-                  NAME@603..604
-                    IDENT@603..604 "t"
+              TABLE_NAME@603..604
+                PATH@603..604
+                  PATH_SEGMENT@603..604
+                    NAME@603..604
+                      IDENT@603..604 "t"
           R_PAREN@604..605 ")"
     SEMICOLON@605..606 ";"
   WHITESPACE@606..607 "\n"
@@ -504,10 +517,11 @@ SOURCE_FILE@0..858
                   INTO_CLAUSE@632..638
                     INTO_KW@632..636 "into"
                     WHITESPACE@636..637 " "
-                    PATH@637..638
-                      PATH_SEGMENT@637..638
-                        NAME@637..638
-                          IDENT@637..638 "t"
+                    TABLE_NAME@637..638
+                      PATH@637..638
+                        PATH_SEGMENT@637..638
+                          NAME@637..638
+                            IDENT@637..638 "t"
                   WHITESPACE@638..639 " "
                   FROM_CLAUSE@639..645
                     FROM_KW@639..643 "from"
@@ -525,10 +539,11 @@ SOURCE_FILE@0..858
     WHITESPACE@672..673 " "
     INTO_KW@673..677 "into"
     WHITESPACE@677..678 " "
-    PATH_REF@678..679
-      PATH_SEGMENT_REF@678..679
-        NAME_REF@678..679
-          IDENT@678..679 "x"
+    RELATION_NAME_REF@678..679
+      PATH_REF@678..679
+        PATH_SEGMENT_REF@678..679
+          NAME_REF@678..679
+            IDENT@678..679 "x"
     WHITESPACE@679..680 " "
     SELECT_INTO@680..695
       SELECT_CLAUSE@680..688
@@ -542,10 +557,11 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@689..695
         INTO_KW@689..693 "into"
         WHITESPACE@693..694 " "
-        PATH@694..695
-          PATH_SEGMENT@694..695
-            NAME@694..695
-              IDENT@694..695 "t"
+        TABLE_NAME@694..695
+          PATH@694..695
+            PATH_SEGMENT@694..695
+              NAME@694..695
+                IDENT@694..695 "t"
     SEMICOLON@695..696 ";"
   WHITESPACE@696..698 "\n\n"
   COMMENT@698..714 "-- error, nested"
@@ -553,8 +569,9 @@ SOURCE_FILE@0..858
   DECLARE@715..752
     DECLARE_KW@715..722 "declare"
     WHITESPACE@722..723 " "
-    NAME@723..724
-      IDENT@723..724 "c"
+    CURSOR@723..724
+      NAME@723..724
+        IDENT@723..724 "c"
     WHITESPACE@724..725 " "
     CURSOR_KW@725..731 "cursor"
     WHITESPACE@731..732 " "
@@ -572,10 +589,11 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@745..751
         INTO_KW@745..749 "into"
         WHITESPACE@749..750 " "
-        PATH@750..751
-          PATH_SEGMENT@750..751
-            NAME@750..751
-              IDENT@750..751 "t"
+        TABLE_NAME@750..751
+          PATH@750..751
+            PATH_SEGMENT@750..751
+              NAME@750..751
+                IDENT@750..751 "t"
     SEMICOLON@751..752 ";"
   WHITESPACE@752..754 "\n\n"
   COMMENT@754..770 "-- error, nested"
@@ -585,10 +603,11 @@ SOURCE_FILE@0..858
     WHITESPACE@777..778 " "
     TABLE_KW@778..783 "table"
     WHITESPACE@783..784 " "
-    PATH@784..785
-      PATH_SEGMENT@784..785
-        NAME@784..785
-          IDENT@784..785 "k"
+    TABLE_NAME@784..785
+      PATH@784..785
+        PATH_SEGMENT@784..785
+          NAME@784..785
+            IDENT@784..785 "k"
     WHITESPACE@785..786 " "
     AS_KW@786..788 "as"
     WHITESPACE@788..789 " "
@@ -604,10 +623,11 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@798..804
         INTO_KW@798..802 "into"
         WHITESPACE@802..803 " "
-        PATH@803..804
-          PATH_SEGMENT@803..804
-            NAME@803..804
-              IDENT@803..804 "t"
+        TABLE_NAME@803..804
+          PATH@803..804
+            PATH_SEGMENT@803..804
+              NAME@803..804
+                IDENT@803..804 "t"
     SEMICOLON@804..805 ";"
   WHITESPACE@805..807 "\n\n"
   COMMENT@807..823 "-- error, nested"
@@ -617,10 +637,11 @@ SOURCE_FILE@0..858
     WHITESPACE@830..831 " "
     VIEW_KW@831..835 "view"
     WHITESPACE@835..836 " "
-    PATH@836..837
-      PATH_SEGMENT@836..837
-        NAME@836..837
-          IDENT@836..837 "k"
+    VIEW@836..837
+      PATH@836..837
+        PATH_SEGMENT@836..837
+          NAME@836..837
+            IDENT@836..837 "k"
     WHITESPACE@837..838 " "
     AS_KW@838..840 "as"
     WHITESPACE@840..841 " "
@@ -636,10 +657,11 @@ SOURCE_FILE@0..858
       INTO_CLAUSE@850..856
         INTO_KW@850..854 "into"
         WHITESPACE@854..855 " "
-        PATH@855..856
-          PATH_SEGMENT@855..856
-            NAME@855..856
-              IDENT@855..856 "t"
+        TABLE_NAME@855..856
+          PATH@855..856
+            PATH_SEGMENT@855..856
+              NAME@855..856
+                IDENT@855..856 "t"
     SEMICOLON@856..857 ";"
   WHITESPACE@857..858 "\n"
 

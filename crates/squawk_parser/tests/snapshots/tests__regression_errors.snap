@@ -14,7 +14,7 @@ error[syntax-error]: expected path name
 error[syntax-error]: expected path name
     ╭▸ 
 134 │ drop index 314159;
-    ╰╴          ━
+    ╰╴           ━
 error[syntax-error]: expected command, found INT_NUMBER
     ╭▸ 
 134 │ drop index 314159;
@@ -106,7 +106,7 @@ error[syntax-error]: expected path name
 error[syntax-error]: expected path name
     ╭▸ 
 182 │ drop type 314159;
-    ╰╴         ━
+    ╰╴          ━
 error[syntax-error]: expected command, found INT_NUMBER
     ╭▸ 
 182 │ drop type 314159;
@@ -250,7 +250,7 @@ error[syntax-error]: expected path name
 error[syntax-error]: expected name
     ╭▸ 
 238 │ drop rule 314159;
-    ╰╴         ━
+    ╰╴          ━
 error[syntax-error]: expected ON_KW
     ╭▸ 
 238 │ drop rule 314159;
@@ -334,7 +334,7 @@ error[syntax-error]: expected command, found IDENT
 error[syntax-error]: expected path name
     ╭▸ 
 283 │ CREATE TABLE ;
-    ╰╴            ━
+    ╰╴             ━
 error[syntax-error]: expected command, found INTO_KW
     ╭▸ 
 288 │ INSERT INTO foo VALUES(123) foo;
@@ -350,11 +350,11 @@ error[syntax-error]: expected command, found IDENT
 error[syntax-error]: expected path name
     ╭▸ 
 290 │ INSERT INTO 123
-    ╰╴           ━
+    ╰╴            ━
 error[syntax-error]: expected select stmt
     ╭▸ 
 290 │ INSERT INTO 123
-    ╰╴           ━
+    ╰╴            ━
 error[syntax-error]: expected command, found INT_NUMBER
     ╭▸ 
 290 │ INSERT INTO 123

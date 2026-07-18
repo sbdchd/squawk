@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_UPDATE
       UPDATE_KW "update"
@@ -22,8 +23,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_UPDATE
       UPDATE_KW "update"
@@ -38,8 +40,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_UPDATE
       UPDATE_KW "update"
@@ -57,16 +60,18 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_access_method"
@@ -76,8 +81,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -97,8 +103,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -120,8 +127,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -178,8 +186,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -206,8 +215,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -238,8 +248,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -275,8 +286,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -284,10 +296,11 @@ SOURCE_FILE
       OBJECT_COLLATION
         COLLATION_KW "collation"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        COLLATION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -295,8 +308,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -304,15 +318,16 @@ SOURCE_FILE
       OBJECT_COLLATION
         COLLATION_KW "collation"
         WHITESPACE " "
-        PATH_REF
+        COLLATION_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -320,8 +335,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -329,10 +345,11 @@ SOURCE_FILE
       OBJECT_COLLATION
         COLLATION_KW "collation"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        COLLATION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -340,8 +357,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -349,15 +367,16 @@ SOURCE_FILE
       OBJECT_COLLATION
         COLLATION_KW "collation"
         WHITESPACE " "
-        PATH_REF
+        COLLATION_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_conversion"
@@ -367,8 +386,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -376,10 +396,11 @@ SOURCE_FILE
       OBJECT_CONVERSION
         CONVERSION_KW "conversion"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        CONVERSION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -387,8 +408,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -396,15 +418,16 @@ SOURCE_FILE
       OBJECT_CONVERSION
         CONVERSION_KW "conversion"
         WHITESPACE " "
-        PATH_REF
+        CONVERSION_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -412,8 +435,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -421,10 +445,11 @@ SOURCE_FILE
       OBJECT_CONVERSION
         CONVERSION_KW "conversion"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        CONVERSION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -432,8 +457,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -441,15 +467,16 @@ SOURCE_FILE
       OBJECT_CONVERSION
         CONVERSION_KW "conversion"
         WHITESPACE " "
-        PATH_REF
+        CONVERSION_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_domain"
@@ -459,8 +486,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -468,10 +496,11 @@ SOURCE_FILE
       OBJECT_DOMAIN
         DOMAIN_KW "domain"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        DOMAIN_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -479,8 +508,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -488,10 +518,11 @@ SOURCE_FILE
       OBJECT_DOMAIN
         DOMAIN_KW "domain"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        DOMAIN_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_event_trigger"
@@ -501,8 +532,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -512,8 +544,9 @@ SOURCE_FILE
         WHITESPACE " "
         TRIGGER_KW "trigger"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        EVENT_TRIGGER_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -521,8 +554,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -532,8 +566,9 @@ SOURCE_FILE
         WHITESPACE " "
         TRIGGER_KW "trigger"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        EVENT_TRIGGER_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_foreign_data_wrapper"
@@ -543,8 +578,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -556,8 +592,9 @@ SOURCE_FILE
         WHITESPACE " "
         WRAPPER_KW "wrapper"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        FOREIGN_DATA_WRAPPER_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -565,8 +602,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -578,8 +616,9 @@ SOURCE_FILE
         WHITESPACE " "
         WRAPPER_KW "wrapper"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        FOREIGN_DATA_WRAPPER_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_foreign_table"
@@ -589,8 +628,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -600,10 +640,11 @@ SOURCE_FILE
         WHITESPACE " "
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -611,8 +652,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -622,15 +664,16 @@ SOURCE_FILE
         WHITESPACE " "
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
+        TABLE_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -638,8 +681,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -649,10 +693,11 @@ SOURCE_FILE
         WHITESPACE " "
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -660,8 +705,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -671,15 +717,16 @@ SOURCE_FILE
         WHITESPACE " "
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
+        TABLE_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_function"
@@ -689,20 +736,22 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+          FUNCTION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -710,25 +759,27 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
+          FUNCTION_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "s"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "s"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+                  IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -759,20 +810,22 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+          FUNCTION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -780,25 +833,27 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_FUNCTION
         FUNCTION_KW "function"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
+          FUNCTION_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "s"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "s"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+                  IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -840,8 +895,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -851,10 +907,11 @@ SOURCE_FILE
         WHITESPACE " "
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        VIEW_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -862,8 +919,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -873,15 +931,16 @@ SOURCE_FILE
         WHITESPACE " "
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
+        VIEW_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -889,8 +948,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -900,10 +960,11 @@ SOURCE_FILE
         WHITESPACE " "
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        VIEW_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -911,8 +972,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -922,15 +984,16 @@ SOURCE_FILE
         WHITESPACE " "
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
+        VIEW_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator"
@@ -940,8 +1003,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -978,8 +1042,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1018,8 +1083,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1048,8 +1114,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1080,8 +1147,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1110,8 +1178,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1142,8 +1211,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1151,8 +1221,9 @@ SOURCE_FILE
       OBJECT_LANGUAGE
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1160,8 +1231,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1171,8 +1243,9 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1180,8 +1253,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1189,8 +1263,9 @@ SOURCE_FILE
       OBJECT_LANGUAGE
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1198,8 +1273,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1209,8 +1285,9 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "o"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_procedure"
@@ -1220,20 +1297,22 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_PROCEDURE
         PROCEDURE_KW "procedure"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1241,25 +1320,27 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_PROCEDURE
         PROCEDURE_KW "procedure"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "s"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "s"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+                  IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1290,20 +1371,22 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_PROCEDURE
         PROCEDURE_KW "procedure"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1311,25 +1394,27 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
       WHITESPACE " "
-      OBJECT_ROUTINE
+      OBJECT_PROCEDURE
         PROCEDURE_KW "procedure"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "s"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "s"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+                  IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1371,8 +1456,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1380,11 +1466,12 @@ SOURCE_FILE
       OBJECT_ROUTINE
         ROUTINE_KW "routine"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+        ROUTINE_SIG
+          ROUTINE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1392,8 +1479,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1401,16 +1489,17 @@ SOURCE_FILE
       OBJECT_ROUTINE
         ROUTINE_KW "routine"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
+        ROUTINE_SIG
+          ROUTINE_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "s"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "s"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+                  IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1441,8 +1530,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1450,11 +1540,12 @@ SOURCE_FILE
       OBJECT_ROUTINE
         ROUTINE_KW "routine"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+        ROUTINE_SIG
+          ROUTINE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1462,8 +1553,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1471,16 +1563,17 @@ SOURCE_FILE
       OBJECT_ROUTINE
         ROUTINE_KW "routine"
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
+        ROUTINE_SIG
+          ROUTINE_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "s"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "s"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "f"
+                  IDENT "f"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1522,8 +1615,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1531,10 +1625,11 @@ SOURCE_FILE
       OBJECT_SEQUENCE
         SEQUENCE_KW "sequence"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SEQUENCE_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1542,8 +1637,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1551,15 +1647,16 @@ SOURCE_FILE
       OBJECT_SEQUENCE
         SEQUENCE_KW "sequence"
         WHITESPACE " "
-        PATH_REF
+        SEQUENCE_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1567,8 +1664,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1576,10 +1674,11 @@ SOURCE_FILE
       OBJECT_SEQUENCE
         SEQUENCE_KW "sequence"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SEQUENCE_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1587,8 +1686,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1596,15 +1696,16 @@ SOURCE_FILE
       OBJECT_SEQUENCE
         SEQUENCE_KW "sequence"
         WHITESPACE " "
-        PATH_REF
+        SEQUENCE_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_table"
@@ -1614,8 +1715,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1623,10 +1725,11 @@ SOURCE_FILE
       OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1634,8 +1737,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1643,10 +1747,11 @@ SOURCE_FILE
       OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1654,8 +1759,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1663,15 +1769,16 @@ SOURCE_FILE
       OBJECT_TABLE
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
+        TABLE_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "public"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "public"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_configuration"
@@ -1681,8 +1788,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1694,10 +1802,11 @@ SOURCE_FILE
         WHITESPACE " "
         CONFIGURATION_KW "configuration"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_CONFIGURATION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1705,8 +1814,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1718,15 +1828,16 @@ SOURCE_FILE
         WHITESPACE " "
         CONFIGURATION_KW "configuration"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_CONFIGURATION_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1734,8 +1845,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1747,10 +1859,11 @@ SOURCE_FILE
         WHITESPACE " "
         CONFIGURATION_KW "configuration"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_CONFIGURATION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1758,8 +1871,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1771,15 +1885,16 @@ SOURCE_FILE
         WHITESPACE " "
         CONFIGURATION_KW "configuration"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_CONFIGURATION_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_dictionary"
@@ -1789,8 +1904,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1802,10 +1918,11 @@ SOURCE_FILE
         WHITESPACE " "
         DICTIONARY_KW "dictionary"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_DICTIONARY_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1813,8 +1930,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1826,15 +1944,16 @@ SOURCE_FILE
         WHITESPACE " "
         DICTIONARY_KW "dictionary"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1842,8 +1961,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1855,10 +1975,11 @@ SOURCE_FILE
         WHITESPACE " "
         DICTIONARY_KW "dictionary"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_DICTIONARY_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1866,8 +1987,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1879,15 +2001,16 @@ SOURCE_FILE
         WHITESPACE " "
         DICTIONARY_KW "dictionary"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_DICTIONARY_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_parser"
@@ -1897,8 +2020,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1910,10 +2034,11 @@ SOURCE_FILE
         WHITESPACE " "
         PARSER_KW "parser"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_PARSER_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1921,8 +2046,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -1934,15 +2060,16 @@ SOURCE_FILE
         WHITESPACE " "
         PARSER_KW "parser"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_PARSER_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1950,8 +2077,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1963,10 +2091,11 @@ SOURCE_FILE
         WHITESPACE " "
         PARSER_KW "parser"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_PARSER_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -1974,8 +2103,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -1987,15 +2117,16 @@ SOURCE_FILE
         WHITESPACE " "
         PARSER_KW "parser"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_PARSER_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_template"
@@ -2005,8 +2136,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2018,10 +2150,11 @@ SOURCE_FILE
         WHITESPACE " "
         TEMPLATE_KW "template"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_TEMPLATE_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2029,8 +2162,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2042,15 +2176,16 @@ SOURCE_FILE
         WHITESPACE " "
         TEMPLATE_KW "template"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_TEMPLATE_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2058,8 +2193,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2071,10 +2207,11 @@ SOURCE_FILE
         WHITESPACE " "
         TEMPLATE_KW "template"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TEXT_SEARCH_TEMPLATE_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2082,8 +2219,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2095,15 +2233,16 @@ SOURCE_FILE
         WHITESPACE " "
         TEMPLATE_KW "template"
         WHITESPACE " "
-        PATH_REF
+        TEXT_SEARCH_TEMPLATE_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_transform"
@@ -2113,8 +2252,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2132,8 +2272,9 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "l"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "l"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2141,8 +2282,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2160,8 +2302,9 @@ SOURCE_FILE
         WHITESPACE " "
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "l"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "l"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_type"
@@ -2171,8 +2314,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2180,10 +2324,11 @@ SOURCE_FILE
       OBJECT_TYPE
         TYPE_KW "type"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TYPE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2191,8 +2336,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2200,10 +2346,11 @@ SOURCE_FILE
       OBJECT_TYPE
         TYPE_KW "type"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TYPE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_view"
@@ -2213,8 +2360,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2222,10 +2370,11 @@ SOURCE_FILE
       OBJECT_VIEW
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        VIEW_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2233,8 +2382,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2242,15 +2392,16 @@ SOURCE_FILE
       OBJECT_VIEW
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
+        VIEW_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2258,8 +2409,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2267,10 +2419,11 @@ SOURCE_FILE
       OBJECT_VIEW
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        VIEW_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2278,8 +2431,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2287,15 +2441,16 @@ SOURCE_FILE
       OBJECT_VIEW
         VIEW_KW "view"
         WHITESPACE " "
-        PATH_REF
+        VIEW_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_extension"
@@ -2305,8 +2460,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2314,10 +2470,9 @@ SOURCE_FILE
       OBJECT_EXTENSION
         EXTENSION_KW "extension"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        EXTENSION_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2325,8 +2480,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2334,10 +2490,9 @@ SOURCE_FILE
       OBJECT_EXTENSION
         EXTENSION_KW "extension"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        EXTENSION_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_publication"
@@ -2347,8 +2502,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2356,10 +2512,9 @@ SOURCE_FILE
       OBJECT_PUBLICATION
         PUBLICATION_KW "publication"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        PUBLICATION_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2367,8 +2522,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2376,10 +2532,9 @@ SOURCE_FILE
       OBJECT_PUBLICATION
         PUBLICATION_KW "publication"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        PUBLICATION_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_schema"
@@ -2389,8 +2544,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2398,10 +2554,9 @@ SOURCE_FILE
       OBJECT_SCHEMA
         SCHEMA_KW "schema"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SCHEMA_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2409,8 +2564,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2418,10 +2574,9 @@ SOURCE_FILE
       OBJECT_SCHEMA
         SCHEMA_KW "schema"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SCHEMA_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_server"
@@ -2431,8 +2586,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2440,10 +2596,9 @@ SOURCE_FILE
       OBJECT_SERVER
         SERVER_KW "server"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SERVER_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2451,8 +2606,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2460,10 +2616,9 @@ SOURCE_FILE
       OBJECT_SERVER
         SERVER_KW "server"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SERVER_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_database"
@@ -2473,8 +2628,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2492,8 +2648,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2513,8 +2670,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2522,10 +2680,11 @@ SOURCE_FILE
       OBJECT_INDEX
         INDEX_KW "index"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        INDEX_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2533,8 +2692,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2542,15 +2702,16 @@ SOURCE_FILE
       OBJECT_INDEX
         INDEX_KW "index"
         WHITESPACE " "
-        PATH_REF
+        INDEX_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2558,8 +2719,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2567,10 +2729,11 @@ SOURCE_FILE
       OBJECT_INDEX
         INDEX_KW "index"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        INDEX_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2578,8 +2741,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2587,15 +2751,16 @@ SOURCE_FILE
       OBJECT_INDEX
         INDEX_KW "index"
         WHITESPACE " "
-        PATH_REF
+        INDEX_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_statistics"
@@ -2605,8 +2770,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2614,10 +2780,11 @@ SOURCE_FILE
       OBJECT_STATISTICS
         STATISTICS_KW "statistics"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        STATISTICS_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2625,8 +2792,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2634,15 +2802,16 @@ SOURCE_FILE
       OBJECT_STATISTICS
         STATISTICS_KW "statistics"
         WHITESPACE " "
-        PATH_REF
+        STATISTICS_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2650,8 +2819,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2659,10 +2829,11 @@ SOURCE_FILE
       OBJECT_STATISTICS
         STATISTICS_KW "statistics"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        STATISTICS_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2670,8 +2841,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2679,15 +2851,16 @@ SOURCE_FILE
       OBJECT_STATISTICS
         STATISTICS_KW "statistics"
         WHITESPACE " "
-        PATH_REF
+        STATISTICS_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "s"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "s"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+                IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_role"
@@ -2697,8 +2870,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2706,10 +2880,9 @@ SOURCE_FILE
       OBJECT_ROLE
         ROLE_KW "role"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        ROLE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2717,8 +2890,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2726,10 +2900,9 @@ SOURCE_FILE
       OBJECT_ROLE
         ROLE_KW "role"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        ROLE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_subscription"
@@ -2739,8 +2912,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2748,10 +2922,9 @@ SOURCE_FILE
       OBJECT_SUBSCRIPTION
         SUBSCRIPTION_KW "subscription"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SUBSCRIPTION_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2759,8 +2932,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2768,10 +2942,9 @@ SOURCE_FILE
       OBJECT_SUBSCRIPTION
         SUBSCRIPTION_KW "subscription"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        SUBSCRIPTION_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_tablespace"
@@ -2781,8 +2954,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -2790,10 +2964,9 @@ SOURCE_FILE
       OBJECT_TABLESPACE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -2801,8 +2974,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "extension"
     WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    EXTENSION_REF
+      NAME_REF
+        IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -2810,9 +2984,8 @@ SOURCE_FILE
       OBJECT_TABLESPACE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "o"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"

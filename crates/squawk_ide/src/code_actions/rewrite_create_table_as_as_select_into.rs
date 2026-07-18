@@ -23,7 +23,7 @@ pub(super) fn rewrite_create_table_as_as_select_into(
     if create_table_as.if_not_exists().is_some()
         || create_table_as.using_method().is_some()
         || create_table_as.on_commit().is_some()
-        || create_table_as.tablespace().is_some()
+        || create_table_as.tablespace_clause().is_some()
         || create_table_as.with_data().is_some()
         || create_table_as.with_no_data().is_some()
         || create_table_as.with_params().is_some()
@@ -59,7 +59,7 @@ pub(super) fn rewrite_create_table_as_as_select_into(
         let into_text = format!(
             " into{} {}",
             persistence_text,
-            create_table_as.path()?.syntax()
+            create_table_as.table_name()?.path()?.syntax()
         );
         let select_end = select.select_clause()?.syntax().text_range().end();
         Edit::insert(into_text, select_end)

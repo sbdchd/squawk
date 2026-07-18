@@ -204,7 +204,7 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::Revoke(_)
         | ast::Stmt::Repack(_)
         | ast::Stmt::Rollback(_)
-        | ast::Stmt::Savepoint(_)
+        | ast::Stmt::SavepointCreate(_)
         | ast::Stmt::SecurityLabel(_)
         | ast::Stmt::Select(_)
         | ast::Stmt::Set(_)

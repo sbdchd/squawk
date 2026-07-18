@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     SERVER_KW "server"
     WHITESPACE " "
-    NAME
-      IDENT "s"
+    SERVER
+      NAME
+        IDENT "s"
     WHITESPACE " "
     FOREIGN_KW "foreign"
     WHITESPACE " "
@@ -19,8 +20,9 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "wrapper"
     WHITESPACE " "
-    NAME_REF
-      IDENT "f"
+    FOREIGN_DATA_WRAPPER_REF
+      NAME_REF
+        IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -37,8 +39,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME
-      IDENT "s"
+    SERVER
+      NAME
+        IDENT "s"
     WHITESPACE " \n  "
     TYPE_KW "type"
     WHITESPACE " "
@@ -56,8 +59,9 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "wrapper"
     WHITESPACE " "
-    NAME_REF
-      IDENT "f"
+    FOREIGN_DATA_WRAPPER_REF
+      NAME_REF
+        IDENT "f"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -87,8 +91,9 @@ SOURCE_FILE
     WHITESPACE " "
     SERVER_KW "SERVER"
     WHITESPACE " "
-    NAME
-      IDENT "myserver"
+    SERVER
+      NAME
+        IDENT "myserver"
     WHITESPACE " "
     FOREIGN_KW "FOREIGN"
     WHITESPACE " "
@@ -96,8 +101,9 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "WRAPPER"
     WHITESPACE " "
-    NAME_REF
-      IDENT "postgres_fdw"
+    FOREIGN_DATA_WRAPPER_REF
+      NAME_REF
+        IDENT "postgres_fdw"
     WHITESPACE " "
     ALTER_OPTION_LIST
       OPTIONS_KW "OPTIONS"

@@ -10,11 +10,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -30,16 +31,17 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "foo"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+              IDENT "p"
       PARAM_LIST
         L_PAREN "("
         PARAM
@@ -74,11 +76,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -95,11 +98,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -117,19 +121,21 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- security"
@@ -139,11 +145,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SECURITY_FUNC_OPTION
@@ -180,11 +187,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SECURITY_FUNC_OPTION
@@ -242,11 +250,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
@@ -269,11 +278,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
@@ -296,11 +306,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
@@ -322,11 +333,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       SET_FUNC_OPTION
@@ -350,11 +362,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       RESET_FUNC_OPTION
@@ -371,11 +384,12 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       RESET_FUNC_OPTION
@@ -391,20 +405,21 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
+    DEPENDS_ON_EXTENSION
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      EXTENSION_REF
         NAME_REF
           IDENT "e"
     SEMICOLON ";"
@@ -414,22 +429,23 @@ SOURCE_FILE
     WHITESPACE " "
     PROCEDURE_KW "procedure"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+    PROCEDURE_SIG
+      PROCEDURE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     WHITESPACE "\n  "
-    NO_KW "no"
-    WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
+    NO_DEPENDS_ON_EXTENSION
+      NO_KW "no"
+      WHITESPACE " "
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      EXTENSION_REF
         NAME_REF
           IDENT "e"
     SEMICOLON ";"

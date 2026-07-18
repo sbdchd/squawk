@@ -14,10 +14,11 @@ SOURCE_FILE
     WHITESPACE " "
     TEMPLATE_KW "template"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    TEXT_SEARCH_TEMPLATE_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -39,22 +40,24 @@ SOURCE_FILE
     WHITESPACE " "
     TEMPLATE_KW "template"
     WHITESPACE " "
-    PATH_REF
+    TEXT_SEARCH_TEMPLATE_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

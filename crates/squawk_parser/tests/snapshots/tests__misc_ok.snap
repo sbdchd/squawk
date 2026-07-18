@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "sensors"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "sensors"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -58,10 +59,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "sensors"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "sensors"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -156,10 +158,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "sensors"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "sensors"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -235,10 +238,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "movies"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "movies"
     WHITESPACE "\n"
     SET_CLAUSE
       SET_KW "SET"
@@ -823,10 +827,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "FUNCTION"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "sum_per_hour"
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "sum_per_hour"
     PARAM_LIST
       L_PAREN "("
       WHITESPACE " "
@@ -892,8 +897,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
-        NAME_REF
-          IDENT "plpgsql"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "AS"
@@ -1219,10 +1225,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "FUNCTION"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "sum_hour_arrays"
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "sum_hour_arrays"
     PARAM_LIST
       L_PAREN "("
       WHITESPACE " "
@@ -1283,8 +1290,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
-        NAME_REF
-          IDENT "plpgsql"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "plpgsql"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/postgres-partitioning-with-a-default-partition"
@@ -1294,15 +1302,16 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH_REF
+    RELATION_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "time_taptest_table"
+            IDENT "time_taptest_table"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1336,30 +1345,32 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "time_taptest_table_default"
+    TABLE_NAME
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "time_taptest_table_default"
     WHITESPACE " "
     PARTITION_OF
       PARTITION_KW "PARTITION"
       WHITESPACE " "
       OF_KW "OF"
       WHITESPACE " "
-      PATH_REF
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "partman_test"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "partman_test"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "time_taptest_table"
+              IDENT "time_taptest_table"
     WHITESPACE " "
     PARTITION_DEFAULT
       DEFAULT_KW "DEFAULT"
@@ -1370,15 +1381,16 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH_REF
+    RELATION_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "time_taptest_table"
+            IDENT "time_taptest_table"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1431,20 +1443,22 @@ SOURCE_FILE
     TABLE_KW "Table"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "\"partman_test.time_taptest_table_p20241124\""
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "\"partman_test.time_taptest_table_p20241124\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   TABLE
     TABLE_KW "Table"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "\"partman_test.time_taptest_table_default\""
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "\"partman_test.time_taptest_table_default\""
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -1452,30 +1466,32 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "time_taptest_table_p20241225"
+    TABLE_NAME
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "time_taptest_table_p20241225"
     WHITESPACE " "
     PARTITION_OF
       PARTITION_KW "PARTITION"
       WHITESPACE " "
       OF_KW "OF"
       WHITESPACE " "
-      PATH_REF
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "partman_test"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "partman_test"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "time_taptest_table"
+              IDENT "time_taptest_table"
     WHITESPACE " "
     PARTITION_FOR_VALUES_FROM
       FOR_KW "FOR"
@@ -1509,25 +1525,27 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "clean_default_temp"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "clean_default_temp"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
       LIKE_CLAUSE
         LIKE_KW "LIKE"
         WHITESPACE " "
-        PATH_REF
+        RELATION_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "partman_test"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "partman_test"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "time_taptest_table_default"
+                IDENT "time_taptest_table_default"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1549,15 +1567,16 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_NAME
-            PATH_REF
+            RELATION_NAME_REF
               PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    NAME_REF
+                      IDENT "partman_test"
+                DOT "."
                 PATH_SEGMENT_REF
                   NAME_REF
-                    IDENT "partman_test"
-              DOT "."
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "time_taptest_table_default"
+                    IDENT "time_taptest_table_default"
           WHITESPACE " "
           RETURNING_CLAUSE
             RETURNING_KW "RETURNING"
@@ -1572,10 +1591,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "clean_default_temp"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "clean_default_temp"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1626,30 +1646,32 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "time_taptest_table_p20241225"
+    TABLE_NAME
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "time_taptest_table_p20241225"
     WHITESPACE " "
     PARTITION_OF
       PARTITION_KW "PARTITION"
       WHITESPACE " "
       OF_KW "OF"
       WHITESPACE " "
-      PATH_REF
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "partman_test"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "partman_test"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "time_taptest_table"
+              IDENT "time_taptest_table"
     WHITESPACE " "
     PARTITION_FOR_VALUES_FROM
       FOR_KW "FOR"
@@ -1689,10 +1711,11 @@ SOURCE_FILE
           FROM_KW "FROM"
           WHITESPACE " "
           RELATION_NAME
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "clean_default_temp"
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "clean_default_temp"
           WHITESPACE " "
           RETURNING_CLAUSE
             RETURNING_KW "RETURNING"
@@ -1707,15 +1730,16 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "INTO"
     WHITESPACE " "
-    PATH_REF
+    RELATION_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "time_taptest_table"
+            IDENT "time_taptest_table"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -1766,10 +1790,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "clean_default_temp"
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "clean_default_temp"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMIT
@@ -1912,15 +1937,16 @@ SOURCE_FILE
   CALL
     CALL_KW "CALL"
     WHITESPACE " "
-    PATH_REF
+    PROCEDURE_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "partman"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "partman"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "partition_data_proc"
+            IDENT "partition_data_proc"
     ARG_LIST
       L_PAREN "("
       ARG
@@ -1936,16 +1962,17 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_AND_COLUMNS_LIST
       TABLE_AND_COLUMNS
-        RELATION_NAME
-          PATH_REF
+        TABLE_RELATION_NAME
+          TABLE_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "partman_test"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "partman_test"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "time_taptest_table"
+                  IDENT "time_taptest_table"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2010,10 +2037,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "tng"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "tng"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -2046,10 +2074,11 @@ SOURCE_FILE
     COPY_KW "COPY"
     WHITESPACE " "
     COPY_TABLE
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "tng"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "tng"
       WHITESPACE " "
       COLUMN_REF_LIST
         L_PAREN "("
@@ -2100,8 +2129,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
-    NAME
-      IDENT "pgvector"
+    EXTENSION
+      NAME
+        IDENT "pgvector"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Add an emedding column to the table"
@@ -2111,11 +2141,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "tng"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "tng"
     WHITESPACE "\n    "
     ADD_COLUMN
       ADD_KW "ADD"
@@ -2138,10 +2169,11 @@ SOURCE_FILE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "tng"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "tng"
     WHITESPACE "\n    "
     SET_CLAUSE
       SET_KW "SET"
@@ -2276,10 +2308,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "FUNCTION"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "trektrivia"
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "trektrivia"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -2342,10 +2375,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "events"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "events"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -2398,10 +2432,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "view_counts"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "view_counts"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -2467,11 +2502,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "events"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "events"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -2495,10 +2531,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "events"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "events"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -2703,10 +2740,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "events_json"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "events_json"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -2752,11 +2790,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "events_json"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "events_json"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -2818,10 +2857,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "user_counts"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "user_counts"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -2871,11 +2911,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "events"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "events"
     WHITESPACE " "
     USING_METHOD
       USING_KW "using"
@@ -2972,10 +3013,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "export_events"
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "export_events"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3013,8 +3055,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "plpgsql"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"
@@ -3109,10 +3152,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "import_events"
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "import_events"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -3139,8 +3183,9 @@ SOURCE_FILE
       LANGUAGE_FUNC_OPTION
         LANGUAGE_KW "language"
         WHITESPACE " "
-        NAME_REF
-          IDENT "plpgsql"
+        LANGUAGE_REF
+          NAME_REF
+            IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"
@@ -3285,25 +3330,28 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "wrapper"
     WHITESPACE " "
-    NAME
-      IDENT "wasm_wrapper"
+    FOREIGN_DATA_WRAPPER
+      NAME
+        IDENT "wasm_wrapper"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
         HANDLER_KW "handler"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "wasm_fdw_handler"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "wasm_fdw_handler"
       WHITESPACE "\n  "
       FDW_OPTION
         VALIDATOR_KW "validator"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "wasm_fdw_validator"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "wasm_fdw_validator"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SERVER
@@ -3311,8 +3359,9 @@ SOURCE_FILE
     WHITESPACE " "
     SERVER_KW "server"
     WHITESPACE " "
-    NAME
-      IDENT "cal_server"
+    SERVER
+      NAME
+        IDENT "cal_server"
     WHITESPACE "\n  "
     FOREIGN_KW "foreign"
     WHITESPACE " "
@@ -3320,8 +3369,9 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "wrapper"
     WHITESPACE " "
-    NAME_REF
-      IDENT "wasm_wrapper"
+    FOREIGN_DATA_WRAPPER_REF
+      NAME_REF
+        IDENT "wasm_wrapper"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -3383,8 +3433,9 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     NAMED_SCHEMA
-      NAME
-        IDENT "cal"
+      SCHEMA
+        NAME
+          IDENT "cal"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -3394,15 +3445,16 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "cal"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "event_types"
+    TABLE_NAME
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "cal"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "event_types"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -3422,8 +3474,9 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "cal_server"
+      SERVER_REF
+        NAME_REF
+          IDENT "cal_server"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -3447,15 +3500,16 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "cal"
-      DOT "."
-      PATH_SEGMENT
-        NAME
-          IDENT "bookings"
+    TABLE_NAME
+      PATH
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "cal"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "bookings"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -3475,8 +3529,9 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "cal_server"
+      SERVER_REF
+        NAME_REF
+          IDENT "cal_server"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -3810,15 +3865,16 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH_REF
+    RELATION_NAME_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "cal"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "cal"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bookings"
+            IDENT "bookings"
     COLUMN_REF_LIST
       L_PAREN "("
       COLUMN_REF
@@ -3857,10 +3913,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "hourly_stats"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "hourly_stats"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n"
@@ -3954,11 +4011,12 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "hourly_stats"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "hourly_stats"
     PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
@@ -3972,10 +4030,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "events"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "events"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4035,10 +4094,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "events"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "events"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4122,10 +4182,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "events_core"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "events_core"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4186,10 +4247,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "events_metadata"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "events_metadata"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4213,10 +4275,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "events_core"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "events_core"
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -4248,10 +4311,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "events_payload"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "events_payload"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4275,10 +4339,11 @@ SOURCE_FILE
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "events_core"
+          TABLE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "events_core"
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -4469,8 +4534,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
-    NAME
-      IDENT "cstore_fdw"
+    EXTENSION
+      NAME
+        IDENT "cstore_fdw"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SERVER
@@ -4478,8 +4544,9 @@ SOURCE_FILE
     WHITESPACE " "
     SERVER_KW "SERVER"
     WHITESPACE " "
-    NAME
-      IDENT "cstore_server"
+    SERVER
+      NAME
+        IDENT "cstore_server"
     WHITESPACE " "
     FOREIGN_KW "FOREIGN"
     WHITESPACE " "
@@ -4487,8 +4554,9 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "WRAPPER"
     WHITESPACE " "
-    NAME_REF
-      IDENT "cstore_fdw"
+    FOREIGN_DATA_WRAPPER_REF
+      NAME_REF
+        IDENT "cstore_fdw"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -4498,10 +4566,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "metrics_columnar"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "metrics_columnar"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4542,8 +4611,9 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
-      NAME_REF
-        IDENT "cstore_server"
+      SERVER_REF
+        NAME_REF
+          IDENT "cstore_server"
     WHITESPACE "\n"
     ALTER_OPTION_LIST
       OPTIONS_KW "OPTIONS"
@@ -4562,8 +4632,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
-    NAME
-      IDENT "pg_analytics"
+    EXTENSION
+      NAME
+        IDENT "pg_analytics"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -4573,10 +4644,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "metrics"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "metrics"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4618,8 +4690,9 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
-      NAME_REF
-        IDENT "parquet_server"
+      SERVER_REF
+        NAME_REF
+          IDENT "parquet_server"
     WHITESPACE "\n"
     ALTER_OPTION_LIST
       OPTIONS_KW "OPTIONS"
@@ -4639,8 +4712,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
-    NAME
-      IDENT "pg_duckdb"
+    EXTENSION
+      NAME
+        IDENT "pg_duckdb"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -4648,10 +4722,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "metrics"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "metrics"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -4703,8 +4778,9 @@ SOURCE_FILE
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
-    NAME
-      IDENT "pg_mooncake"
+    EXTENSION
+      NAME
+        IDENT "pg_mooncake"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -4712,10 +4788,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "metrics"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "metrics"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
@@ -5883,16 +5960,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "idx_events_month"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "idx_events_month"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "events"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "events"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -5921,16 +6002,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "event_logs_ts_brin"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "event_logs_ts_brin"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "event_logs"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "event_logs"
     WHITESPACE "\n"
     USING_METHOD
       USING_KW "USING"
@@ -6036,10 +6121,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "recent_product_sales"
+    VIEW
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "recent_product_sales"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n"
@@ -6204,16 +6290,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "sku_index"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "sku_index"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "recent_product_sales"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "recent_product_sales"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -6230,10 +6320,11 @@ SOURCE_FILE
     WHITESPACE " "
     VIEW_KW "VIEW"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "recent_product_sales"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "recent_product_sales"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -6243,16 +6334,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "unique_idx_recent_product_sales"
+    INDEX
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "unique_idx_recent_product_sales"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "recent_product_sales"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "recent_product_sales"
     PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
@@ -6266,10 +6361,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "sku_index"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "sku_index"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REFRESH
@@ -6281,10 +6377,11 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "CONCURRENTLY"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "recent_product_sales"
+    VIEW_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "recent_product_sales"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
@@ -6296,10 +6393,11 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "solar_panel_metrics"
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "solar_panel_metrics"
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("

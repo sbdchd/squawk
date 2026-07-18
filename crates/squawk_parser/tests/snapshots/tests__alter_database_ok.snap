@@ -78,8 +78,9 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"

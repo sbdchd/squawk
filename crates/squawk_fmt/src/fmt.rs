@@ -50,7 +50,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
         .append(Doc::text("table"))
         .append(Doc::space())
         .append(Doc::text(
-            create_table.path().map(|x| x.syntax().to_string()).unwrap(),
+            create_table.table_name().unwrap().syntax().to_string(),
         ))
         .append(Doc::text("("))
         .append(
@@ -256,6 +256,13 @@ fn build_expr<'a>(expr: ast::Expr) -> Doc<'a> {
             }
             doc
         }
+        ast::Expr::Collate(collate) => build_expr(collate.expr().unwrap())
+            .append(Doc::space())
+            .append(Doc::text("collate"))
+            .append(Doc::space())
+            .append(Doc::text(
+                collate.collation_ref().unwrap().syntax().to_string(),
+            )),
         // ast::Expr::FieldExpr(field_expr) => todo!(),
         // ast::Expr::IndexExpr(index_expr) => todo!(),
         ast::Expr::Literal(literal) => build_literal(literal),
@@ -440,7 +447,6 @@ fn build_op<'a>(op: ast::BinOp) -> Doc<'a> {
         ast::BinOp::And(_) => Doc::text("and"),
         ast::BinOp::AtTimeZone(n) => build_keyword_node(n.syntax()),
         ast::BinOp::Caret(_) => Doc::text("^"),
-        ast::BinOp::Collate(_) => Doc::text("collate"),
         ast::BinOp::ColonColon(_) => Doc::text("::"),
         ast::BinOp::ColonEq(_) => Doc::text(":="),
         ast::BinOp::CustomOp(custom_op) => Doc::text(custom_op.syntax().to_string()),

@@ -2587,10 +2587,11 @@ SOURCE_FILE
                   TABLE_KW "table"
                   WHITESPACE " "
                   RELATION_NAME
-                    PATH_REF
-                      PATH_SEGMENT_REF
-                        NAME_REF
-                          IDENT "t"
+                    RELATION_NAME_REF
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          NAME_REF
+                            IDENT "t"
                 R_PAREN ")"
               R_PAREN ")"
     SEMICOLON ";"
@@ -4017,8 +4018,9 @@ SOURCE_FILE
             OVER_CLAUSE
               OVER_KW "over"
               WHITESPACE " "
-              NAME_REF
-                IDENT "w_name"
+              WINDOW_REF
+                NAME_REF
+                  IDENT "w_name"
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"
@@ -4049,8 +4051,9 @@ SOURCE_FILE
       WINDOW_KW "window"
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          OWNER_KW "owner"
+        WINDOW
+          NAME
+            OWNER_KW "owner"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
@@ -4069,8 +4072,9 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       WINDOW_DEF
-        NAME
-          IDENT "w2"
+        WINDOW
+          NAME
+            IDENT "w2"
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "

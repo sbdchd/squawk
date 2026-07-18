@@ -56,10 +56,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -89,22 +90,25 @@ SOURCE_FILE
     PRIVILEGE_TABLE
       TABLE_KW "table"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "b"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -146,15 +150,16 @@ SOURCE_FILE
     PRIVILEGE_TABLE
       TABLE_KW "table"
       WHITESPACE " "
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "s"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "s"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -194,10 +199,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -223,26 +229,28 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "s"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "s"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "b"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "b"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -278,12 +286,14 @@ SOURCE_FILE
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -323,10 +333,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -364,10 +375,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -405,10 +417,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -444,10 +457,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -473,10 +487,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -500,10 +515,11 @@ SOURCE_FILE
     ON_KW "on"
     WHITESPACE " "
     PRIVILEGE_DEFAULT
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " \n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -527,10 +543,11 @@ SOURCE_FILE
     PRIVILEGE_TABLE
       SEQUENCE_KW "sequence"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
+      SEQUENCE_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -554,22 +571,25 @@ SOURCE_FILE
     PRIVILEGE_TABLE
       SEQUENCE_KW "sequence"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+      SEQUENCE_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "a"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+      SEQUENCE_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "b"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+      SEQUENCE_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -593,10 +613,11 @@ SOURCE_FILE
     PRIVILEGE_TABLE
       SEQUENCE_KW "sequence"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "x"
+      SEQUENCE_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "x"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -622,8 +643,9 @@ SOURCE_FILE
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -651,16 +673,19 @@ SOURCE_FILE
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "a"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "b"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -798,22 +823,25 @@ SOURCE_FILE
     PRIVILEGE_TABLE
       DOMAIN_KW "domain"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+      DOMAIN_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "a"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "b"
+      DOMAIN_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "b"
       COMMA ","
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "c"
+      DOMAIN_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -835,10 +863,11 @@ SOURCE_FILE
     PRIVILEGE_TABLE
       DOMAIN_KW "domain"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "d"
+      DOMAIN_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "d"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -874,16 +903,19 @@ SOURCE_FILE
       WHITESPACE " "
       WRAPPER_KW "wrapper"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      FOREIGN_DATA_WRAPPER_REF
+        NAME_REF
+          IDENT "a"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      FOREIGN_DATA_WRAPPER_REF
+        NAME_REF
+          IDENT "b"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      FOREIGN_DATA_WRAPPER_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -909,8 +941,9 @@ SOURCE_FILE
       WHITESPACE " "
       WRAPPER_KW "wrapper"
       WHITESPACE " "
-      NAME_REF
-        IDENT "d"
+      FOREIGN_DATA_WRAPPER_REF
+        NAME_REF
+          IDENT "d"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -944,16 +977,19 @@ SOURCE_FILE
       WHITESPACE " "
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      SERVER_REF
+        NAME_REF
+          IDENT "a"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SERVER_REF
+        NAME_REF
+          IDENT "b"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      SERVER_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -977,8 +1013,9 @@ SOURCE_FILE
       WHITESPACE " "
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "d"
+      SERVER_REF
+        NAME_REF
+          IDENT "d"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1012,17 +1049,19 @@ SOURCE_FILE
       WHITESPACE " "
       FUNCTION_SIG_LIST
         FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          FUNCTION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
         COMMA ","
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+          FUNCTION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1046,12 +1085,13 @@ SOURCE_FILE
     PRIVILEGE_ROUTINE
       PROCEDURE_KW "procedure"
       WHITESPACE " "
-      FUNCTION_SIG_LIST
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+      PROCEDURE_SIG_LIST
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1091,21 +1131,23 @@ SOURCE_FILE
             R_PAREN ")"
         COMMA ","
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
           PARAM_LIST
             L_PAREN "("
             R_PAREN ")"
         COMMA ","
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "z"
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "z"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1134,12 +1176,13 @@ SOURCE_FILE
     PRIVILEGE_ROUTINE
       ROUTINE_KW "routine"
       WHITESPACE " "
-      FUNCTION_SIG_LIST
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "r"
+      ROUTINE_SIG_LIST
+        ROUTINE_SIG
+          ROUTINE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "r"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1165,16 +1208,19 @@ SOURCE_FILE
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "a"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "b"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1200,8 +1246,9 @@ SOURCE_FILE
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1227,8 +1274,9 @@ SOURCE_FILE
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1250,12 +1298,13 @@ SOURCE_FILE
     PRIVILEGE_ROUTINE
       PROCEDURE_KW "procedure"
       WHITESPACE " "
-      FUNCTION_SIG_LIST
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+      PROCEDURE_SIG_LIST
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -1295,11 +1344,12 @@ SOURCE_FILE
             R_PAREN ")"
         COMMA ","
         WHITESPACE " "
-        FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+        PROCEDURE_SIG
+          PROCEDURE_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1325,16 +1375,19 @@ SOURCE_FILE
     PRIVILEGE_NAME
       LANGUAGE_KW "language"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "buzz"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1354,16 +1407,19 @@ SOURCE_FILE
     PRIVILEGE_NAME
       LANGUAGE_KW "language"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "buzz"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1385,16 +1441,19 @@ SOURCE_FILE
     PRIVILEGE_NAME
       LANGUAGE_KW "language"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "buzz"
+      LANGUAGE_REF
+        NAME_REF
+          IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1647,8 +1706,9 @@ SOURCE_FILE
     PRIVILEGE_NAME
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1676,16 +1736,19 @@ SOURCE_FILE
     PRIVILEGE_NAME
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "a"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "b"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1705,16 +1768,19 @@ SOURCE_FILE
     PRIVILEGE_NAME
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "a"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "b"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1738,16 +1804,19 @@ SOURCE_FILE
     PRIVILEGE_NAME
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "buzz"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1767,16 +1836,19 @@ SOURCE_FILE
     PRIVILEGE_NAME
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "bar"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "buzz"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1802,21 +1874,21 @@ SOURCE_FILE
     PRIVILEGE_TYPE
       TYPE_KW "type"
       WHITESPACE " "
-      PATH_TYPE
+      TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
             NAME_REF
               IDENT "a"
       COMMA ","
       WHITESPACE " "
-      PATH_TYPE
+      TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
             NAME_REF
               IDENT "b"
       COMMA ","
       WHITESPACE " "
-      PATH_TYPE
+      TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
             NAME_REF
@@ -1840,7 +1912,7 @@ SOURCE_FILE
     PRIVILEGE_TYPE
       TYPE_KW "type"
       WHITESPACE " "
-      PATH_TYPE
+      TYPE_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
             NAME_REF
@@ -1864,7 +1936,7 @@ SOURCE_FILE
     PRIVILEGE_TYPE
       TYPE_KW "type"
       WHITESPACE " "
-      PATH_TYPE
+      TYPE_NAME_REF
         PATH_REF
           PATH_REF
             PATH_SEGMENT_REF

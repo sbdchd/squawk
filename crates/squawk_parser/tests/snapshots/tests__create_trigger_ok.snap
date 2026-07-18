@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "TRIGGER"
     WHITESPACE " "
-    NAME
-      IDENT "update_foo_column"
+    TRIGGER
+      NAME
+        IDENT "update_foo_column"
     WHITESPACE "\n"
     TIMING
       BEFORE_KW "BEFORE"
@@ -20,13 +21,14 @@ SOURCE_FILE
       TRIGGER_EVENT
         INSERT_KW "INSERT"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "ON"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "core_recipe"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "core_recipe"
     WHITESPACE "\n"
     FOR_KW "FOR"
     WHITESPACE " "
@@ -58,8 +60,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME
-      IDENT "buzz"
+    TRIGGER
+      NAME
+        IDENT "buzz"
     WHITESPACE " "
     TIMING
       INSTEAD_KW "instead"
@@ -75,23 +78,24 @@ SOURCE_FILE
       TRIGGER_EVENT
         DELETE_KW "delete"
     WHITESPACE " \n"
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "foo"
+                IDENT "bar"
           DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "bar"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "buzz"
+              IDENT "buzz"
     WHITESPACE "\n"
     REFERENCING
       REFERENCING_KW "referencing"
@@ -191,8 +195,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME
-      IDENT "t"
+    TRIGGER
+      NAME
+        IDENT "t"
     WHITESPACE " "
     TIMING
       AFTER_KW "after"
@@ -206,13 +211,14 @@ SOURCE_FILE
       TRIGGER_EVENT
         DELETE_KW "delete"
     WHITESPACE " \n"
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE "\n"
     FOR_KW "for"
     WHITESPACE " "
@@ -239,8 +245,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME
-      IDENT "bar"
+    TRIGGER
+      NAME
+        IDENT "bar"
     WHITESPACE " "
     TIMING
       AFTER_KW "after"
@@ -263,13 +270,14 @@ SOURCE_FILE
           NAME_REF
             IDENT "c"
     WHITESPACE "\n"
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
     WHITESPACE "\n"
     REFERENCING
       REFERENCING_KW "referencing"
@@ -316,8 +324,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME
-      IDENT "bar"
+    TRIGGER
+      NAME
+        IDENT "bar"
     WHITESPACE " "
     TIMING
       BEFORE_KW "before"
@@ -336,13 +345,14 @@ SOURCE_FILE
       TRIGGER_EVENT
         INSERT_KW "insert"
     WHITESPACE "\n"
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "buzz"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "buzz"
     WHITESPACE "\n"
     EXECUTE_KW "execute"
     WHITESPACE " "

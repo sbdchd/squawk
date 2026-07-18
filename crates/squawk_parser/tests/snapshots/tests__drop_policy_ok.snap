@@ -10,16 +10,18 @@ SOURCE_FILE
     WHITESPACE " "
     POLICY_KW "policy"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    POLICY_REF
+      NAME_REF
+        IDENT "s"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -34,21 +36,23 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    POLICY_REF
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
+      TABLE_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "foo"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t_name"
+              IDENT "t_name"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -63,16 +67,18 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    POLICY_REF
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "a"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

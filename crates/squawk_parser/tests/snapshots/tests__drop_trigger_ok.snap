@@ -8,42 +8,42 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "tr"
+    TRIGGER_REF
+      NAME_REF
+        IDENT "tr"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
-    SEMICOLON ";"
-  WHITESPACE "\n\n"
-  DROP_TRIGGER
-    DROP_KW "drop"
-    WHITESPACE " "
-    TRIGGER_KW "trigger"
-    WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "tr"
-    WHITESPACE " "
-    ON_TABLE
-      ON_KW "on"
-      WHITESPACE " "
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "bar"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TRIGGER
+    DROP_KW "drop"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    TRIGGER_REF
+      NAME_REF
+        IDENT "tr"
+    WHITESPACE " "
+    ON_RELATION
+      ON_KW "on"
+      WHITESPACE " "
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
+          DOT "."
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
@@ -56,18 +56,18 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "tr"
+    TRIGGER_REF
+      NAME_REF
+        IDENT "tr"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_TRIGGER
@@ -80,18 +80,18 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "tr"
+    TRIGGER_REF
+      NAME_REF
+        IDENT "tr"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -101,18 +101,18 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "tr"
+    TRIGGER_REF
+      NAME_REF
+        IDENT "tr"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

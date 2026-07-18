@@ -64,7 +64,9 @@ fn columns_from_create_table_impl(
                 }
             }
             ast_nav::CreateTableArg::LikeClause(like_clause) => {
-                if let Some(path) = like_clause.path_ref()
+                if let Some(path) = like_clause
+                    .relation_name_ref()
+                    .and_then(|relation| relation.path_ref())
                     && let Some((schema, table_name)) = name::schema_and_name_path(&path)
                 {
                     let position = path.syntax().text_range().start();
@@ -166,7 +168,9 @@ fn table_columns_impl(
                 }
             }
             ast_nav::CreateTableArg::LikeClause(like_clause) => {
-                if let Some(path) = like_clause.path_ref()
+                if let Some(path) = like_clause
+                    .relation_name_ref()
+                    .and_then(|relation| relation.path_ref())
                     && let Some((schema, table_name)) = name::schema_and_name_path(&path)
                 {
                     let position = path.syntax().text_range().start();
@@ -334,7 +338,11 @@ fn table_query_columns_with_types(
     file: File,
     table: &ast::Table,
 ) -> Vec<(Name, Option<Type>)> {
-    let Some(path) = table.relation_name().and_then(|r| r.path_ref()) else {
+    let Some(path) = table
+        .relation_name()
+        .and_then(|relation| relation.relation_name_ref())
+        .and_then(|relation| relation.path_ref())
+    else {
         return vec![];
     };
     let Some((schema, table_name)) = name::schema_and_name_path(&path) else {
@@ -382,15 +390,19 @@ fn columns_from_returning_clause_with_types(
     let (returning_clause, path) = match query {
         ast::WithQuery::Delete(delete) => (
             delete.returning_clause(),
-            delete.relation_name()?.path_ref()?,
+            delete.relation_name()?.relation_name_ref()?.path_ref()?,
         ),
-        ast::WithQuery::Insert(insert) => (insert.returning_clause(), insert.path_ref()?),
-        ast::WithQuery::Merge(merge) => {
-            (merge.returning_clause(), merge.relation_name()?.path_ref()?)
-        }
+        ast::WithQuery::Insert(insert) => (
+            insert.returning_clause(),
+            insert.relation_name_ref()?.path_ref()?,
+        ),
+        ast::WithQuery::Merge(merge) => (
+            merge.returning_clause(),
+            merge.table_relation_name()?.table_name_ref()?.path_ref()?,
+        ),
         ast::WithQuery::Update(update) => (
             update.returning_clause(),
-            update.relation_name()?.path_ref()?,
+            update.relation_name()?.relation_name_ref()?.path_ref()?,
         ),
         ast::WithQuery::Select(_)
         | ast::WithQuery::CompoundSelect(_)
@@ -569,6 +581,7 @@ fn target_expr_type(db: &dyn Db, file: File, target: &ast::Target) -> Option<Typ
 fn column_ref_type(db: &dyn Db, file: File, expr: &ast::Expr) -> Option<Type> {
     let position = match expr {
         ast::Expr::NameRef(name_ref) => name_ref.syntax().text_range().start(),
+        ast::Expr::Collate(collate) => return column_ref_type(db, file, &collate.expr()?),
         ast::Expr::FieldExpr(field_expr) => field_expr.field()?.syntax().text_range().start(),
         ast::Expr::ParenExpr(paren) => return column_ref_type(db, file, &paren.expr()?),
         _ => return None,

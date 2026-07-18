@@ -9,7 +9,7 @@ pub trait NameLike: AstNode {
 
 pub trait HasCreateTable: AstNode {
     #[inline]
-    fn path(&self) -> Option<ast::Path> {
+    fn table_name(&self) -> Option<ast::TableName> {
         support::child(self.syntax())
     }
 

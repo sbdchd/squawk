@@ -107,15 +107,16 @@ SOURCE_FILE
       FUNCTION_KW "function"
       WHITESPACE " "
       FUNCTION_SIG
-        PATH_REF
+        FUNCTION_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "foo"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+                IDENT "bar"
         PARAM_LIST
           L_PAREN "("
           PARAM

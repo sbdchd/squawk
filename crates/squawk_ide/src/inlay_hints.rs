@@ -93,6 +93,7 @@ fn inlay_hint_insert(
     insert: ast::Insert,
 ) -> Option<()> {
     let name_start = insert
+        .relation_name_ref()?
         .path_ref()?
         .segment()?
         .name_ref()?

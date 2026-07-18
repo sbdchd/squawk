@@ -221,10 +221,11 @@ SOURCE_FILE
           INT_NUMBER "1010"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "foo"
+          FUNCTION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
       COMMA ","
       WHITESPACE "\n    "
       OP_CLASS_OPTION
@@ -244,15 +245,16 @@ SOURCE_FILE
           R_PAREN ")"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
+          FUNCTION_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+                  IDENT "bar"
           PARAM_LIST
             L_PAREN "("
             PARAM
@@ -317,15 +319,16 @@ SOURCE_FILE
           R_PAREN ")"
         WHITESPACE " "
         FUNCTION_SIG
-          PATH_REF
+          FUNCTION_NAME_REF
             PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
               PATH_SEGMENT_REF
                 NAME_REF
-                  IDENT "foo"
-            DOT "."
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "bar"
+                  IDENT "bar"
           PARAM_LIST
             L_PAREN "("
             PARAM

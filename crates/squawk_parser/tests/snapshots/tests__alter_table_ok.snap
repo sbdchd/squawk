@@ -10,11 +10,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_COLUMN
       ADD_KW "add"
@@ -38,11 +39,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -80,19 +82,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_CONSTRAINT
       ALTER_KW "alter"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -100,19 +106,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_CONSTRAINT
       ALTER_KW "alter"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       DEFERRABLE_CONSTRAINT_OPTION
         DEFERRABLE_KW "deferrable"
@@ -123,19 +133,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_CONSTRAINT
       ALTER_KW "alter"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       NOT_DEFERRABLE_CONSTRAINT_OPTION
         NOT_KW "not"
@@ -148,19 +162,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_CONSTRAINT
       ALTER_KW "alter"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       NOT_DEFERRABLE_CONSTRAINT_OPTION
         NOT_KW "not"
@@ -178,19 +196,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_CONSTRAINT
       ALTER_KW "alter"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       DEFERRABLE_CONSTRAINT_OPTION
         DEFERRABLE_KW "deferrable"
@@ -208,19 +230,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     VALIDATE_CONSTRAINT
       VALIDATE_KW "validate"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- change column default"
@@ -230,11 +256,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -260,11 +287,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -287,11 +315,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -315,10 +344,11 @@ SOURCE_FILE
         COLLATE
           COLLATE_KW "collate"
           WHITESPACE " "
-          PATH_REF
-            PATH_SEGMENT_REF
-              NAME_REF
-                IDENT "\"foo\""
+          COLLATION_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "\"foo\""
         WHITESPACE " "
         USING_KW "using"
         WHITESPACE " "
@@ -337,11 +367,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -364,11 +395,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -396,11 +428,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -419,11 +452,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -444,11 +478,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -469,11 +504,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -492,11 +528,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -520,11 +557,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -551,11 +589,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -580,11 +619,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -625,11 +665,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -668,11 +709,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -713,11 +755,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -736,11 +779,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -764,11 +808,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -790,11 +835,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -843,11 +889,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -883,11 +930,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -926,11 +974,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1002,11 +1051,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1028,11 +1078,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1054,11 +1105,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1080,11 +1132,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1106,11 +1159,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1131,11 +1185,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1156,11 +1211,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1182,11 +1238,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1203,11 +1260,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1227,11 +1285,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1255,19 +1314,21 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     INHERIT_TABLE
       INHERIT_KW "inherit"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t1"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1275,21 +1336,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     NO_INHERIT_TABLE
       NO_KW "no"
       WHITESPACE " "
       INHERIT_KW "inherit"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t1"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove constraint"
@@ -1299,19 +1362,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     DROP_CONSTRAINT
       DROP_KW "drop"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "some_name"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "some_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- remove column not null constraint"
@@ -1321,11 +1388,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -1350,11 +1418,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     DROP_CONSTRAINT
       DROP_KW "drop"
@@ -1366,8 +1435,11 @@ SOURCE_FILE
         WHITESPACE " "
         EXISTS_KW "exists"
       WHITESPACE " "
-      NAME_REF
-        IDENT "some_name"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "some_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -1375,11 +1447,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DROP_CONSTRAINT
       DROP_KW "drop"
@@ -1391,8 +1464,11 @@ SOURCE_FILE
         WHITESPACE " "
         EXISTS_KW "exists"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -1402,11 +1478,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DROP_CONSTRAINT
       DROP_KW "drop"
@@ -1418,8 +1495,11 @@ SOURCE_FILE
         WHITESPACE " "
         EXISTS_KW "exists"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "c"
       WHITESPACE " "
       CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -1431,19 +1511,21 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DISABLE_TRIGGER
       DISABLE_KW "disable"
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TRIGGER_REF
+        NAME_REF
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1451,11 +1533,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DISABLE_TRIGGER
       DISABLE_KW "disable"
@@ -1470,11 +1553,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DISABLE_TRIGGER
       DISABLE_KW "disable"
@@ -1491,19 +1575,21 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_TRIGGER
       ENABLE_KW "enable"
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TRIGGER_REF
+        NAME_REF
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1511,11 +1597,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_TRIGGER
       ENABLE_KW "enable"
@@ -1530,11 +1617,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_TRIGGER
       ENABLE_KW "enable"
@@ -1549,11 +1637,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_REPLICA_TRIGGER
       ENABLE_KW "enable"
@@ -1562,8 +1651,9 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      TRIGGER_REF
+        NAME_REF
+          IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1571,11 +1661,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_ALWAYS_TRIGGER
       ENABLE_KW "enable"
@@ -1584,8 +1675,9 @@ SOURCE_FILE
       WHITESPACE " "
       TRIGGER_KW "trigger"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      TRIGGER_REF
+        NAME_REF
+          IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- replica_identity"
@@ -1595,11 +1687,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     REPLICA_IDENTITY
       REPLICA_KW "replica"
@@ -1614,11 +1707,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     REPLICA_IDENTITY
       REPLICA_KW "replica"
@@ -1629,8 +1723,11 @@ SOURCE_FILE
       WHITESPACE " "
       INDEX_KW "index"
       WHITESPACE " "
-      NAME_REF
-        IDENT "i"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1638,11 +1735,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     REPLICA_IDENTITY
       REPLICA_KW "replica"
@@ -1657,11 +1755,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     REPLICA_IDENTITY
       REPLICA_KW "replica"
@@ -1678,19 +1777,21 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DISABLE_RULE
       DISABLE_KW "disable"
       WHITESPACE " "
       RULE_KW "rule"
       WHITESPACE " "
-      NAME_REF
-        IDENT "r"
+      RULE_REF
+        NAME_REF
+          IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1698,19 +1799,21 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_RULE
       ENABLE_KW "enable"
       WHITESPACE " "
       RULE_KW "rule"
       WHITESPACE " "
-      NAME_REF
-        IDENT "r"
+      RULE_REF
+        NAME_REF
+          IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -1718,11 +1821,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_REPLICA_RULE
       ENABLE_KW "enable"
@@ -1731,8 +1835,9 @@ SOURCE_FILE
       WHITESPACE " "
       RULE_KW "rule"
       WHITESPACE " "
-      NAME_REF
-        IDENT "r"
+      RULE_REF
+        NAME_REF
+          IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1740,11 +1845,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_ALWAYS_RULE
       ENABLE_KW "enable"
@@ -1753,8 +1859,9 @@ SOURCE_FILE
       WHITESPACE " "
       RULE_KW "rule"
       WHITESPACE " "
-      NAME_REF
-        IDENT "r"
+      RULE_REF
+        NAME_REF
+          IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- row_level_security"
@@ -1764,11 +1871,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DISABLE_RLS
       DISABLE_KW "disable"
@@ -1785,11 +1893,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ENABLE_RLS
       ENABLE_KW "enable"
@@ -1806,11 +1915,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     FORCE_RLS
       FORCE_KW "force"
@@ -1827,11 +1937,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     NO_FORCE_RLS
       NO_KW "no"
@@ -1852,19 +1963,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     CLUSTER_ON
       CLUSTER_KW "cluster"
       WHITESPACE " "
       ON_KW "on"
       WHITESPACE " "
-      NAME_REF
-        IDENT "i"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -1872,11 +1987,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_WITHOUT_CLUSTER
       SET_KW "set"
@@ -1891,11 +2007,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_WITHOUT_OIDS
       SET_KW "set"
@@ -1912,11 +2029,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_ACCESS_METHOD
       SET_KW "set"
@@ -1935,11 +2053,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_LOGGED
       SET_KW "set"
@@ -1952,11 +2071,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_UNLOGGED
       SET_KW "set"
@@ -1971,11 +2091,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     OF_TYPE
       OF_KW "of"
@@ -1992,11 +2113,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     NOT_OF
       NOT_KW "not"
@@ -2011,11 +2133,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_COLUMN
       ADD_KW "add"
@@ -2053,11 +2176,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -2082,11 +2206,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_COLUMN
       ADD_KW "add"
@@ -2127,11 +2252,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -2174,11 +2300,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     DROP_COLUMN
       DROP_KW "drop"
@@ -2196,11 +2323,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     DROP_COLUMN
       DROP_KW "drop"
@@ -2220,11 +2348,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DROP_COLUMN
       DROP_KW "drop"
@@ -2244,11 +2373,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     DROP_COLUMN
       DROP_KW "drop"
@@ -2264,11 +2394,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     DROP_COLUMN
       DROP_KW "drop"
@@ -2291,11 +2422,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2320,21 +2452,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       UNIQUE_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "some_name"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "some_name"
         WHITESPACE " "
         UNIQUE_KW "unique"
         WHITESPACE " "
@@ -2352,11 +2486,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2422,11 +2557,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2455,11 +2591,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2515,8 +2652,9 @@ SOURCE_FILE
             WHITESPACE " "
             TABLESPACE_KW "tablespace"
             WHITESPACE " "
-            NAME_REF
-              IDENT "foo"
+            TABLESPACE_REF
+              NAME_REF
+                IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -2524,11 +2662,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2580,11 +2719,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2657,11 +2797,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2685,10 +2826,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2696,11 +2838,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2724,10 +2867,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         MATCH_FULL
           MATCH_KW "match"
@@ -2740,11 +2884,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2768,10 +2913,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         MATCH_SIMPLE
           MATCH_KW "match"
@@ -2784,11 +2930,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2812,10 +2959,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         COLUMN_REF_LIST
           L_PAREN "("
           COLUMN_REF
@@ -2859,11 +3007,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2882,10 +3031,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
@@ -2903,11 +3053,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2926,10 +3077,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
@@ -2944,11 +3096,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -2967,10 +3120,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
@@ -2985,11 +3139,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -3008,10 +3163,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
@@ -3029,11 +3185,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -3052,10 +3209,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
@@ -3085,11 +3243,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -3108,10 +3267,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
@@ -3129,11 +3289,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -3152,10 +3313,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         ON_DELETE_ACTION
           ON_KW "on"
@@ -3185,11 +3347,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -3208,10 +3371,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "product_groups"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "product_groups"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_constraint_using_index"
@@ -3221,11 +3385,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -3238,8 +3403,11 @@ SOURCE_FILE
           WHITESPACE " "
           INDEX_KW "index"
           WHITESPACE " "
-          NAME_REF
-            IDENT "foo"
+          INDEX_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -3247,11 +3415,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -3266,8 +3435,11 @@ SOURCE_FILE
           WHITESPACE " "
           INDEX_KW "index"
           WHITESPACE " "
-          NAME_REF
-            IDENT "foo"
+          INDEX_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -3275,21 +3447,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       UNIQUE_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "c"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "c"
         WHITESPACE " "
         UNIQUE_KW "unique"
         WHITESPACE " "
@@ -3298,8 +3472,11 @@ SOURCE_FILE
           WHITESPACE " "
           INDEX_KW "index"
           WHITESPACE " "
-          NAME_REF
-            IDENT "foo"
+          INDEX_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -3307,21 +3484,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       PRIMARY_KEY_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "c"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "c"
         WHITESPACE " "
         PRIMARY_KW "primary"
         WHITESPACE " "
@@ -3332,8 +3511,11 @@ SOURCE_FILE
           WHITESPACE " "
           INDEX_KW "index"
           WHITESPACE " "
-          NAME_REF
-            IDENT "foo"
+          INDEX_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not valid check"
@@ -3343,21 +3525,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       CHECK_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "foo_not_null"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "foo_not_null"
         WHITESPACE "\n  "
         CHECK_KW "check"
         WHITESPACE " "
@@ -3388,11 +3572,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     RENAME_COLUMN
       RENAME_KW "rename"
@@ -3418,13 +3603,14 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    RELATION_NAME
+    TABLE_RELATION_NAME
       ONLY_KW "only"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n"
     RENAME_COLUMN
       RENAME_KW "rename"
@@ -3445,11 +3631,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
       WHITESPACE " "
       STAR "*"
     WHITESPACE " \n"
@@ -3474,11 +3661,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "products"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "products"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -3494,14 +3682,15 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
+    TABLE_RELATION_NAME
       ONLY_KW "only"
       WHITESPACE " "
       L_PAREN "("
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "a"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "a"
       R_PAREN ")"
     WHITESPACE " "
     RENAME_TO
@@ -3520,24 +3709,29 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     RENAME_CONSTRAINT
       RENAME_KW "rename"
       WHITESPACE " "
       CONSTRAINT_KW "constraint"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      CONSTRAINT_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "a"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "b"
+      CONSTRAINT_NAME
+        NAME
+          IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
@@ -3547,19 +3741,21 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set tablespace"
@@ -3576,16 +3772,18 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "foo"
       WHITESPACE " "
       SET_TABLESPACE
         SET_KW "set"
         WHITESPACE " "
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME_REF
-          IDENT "bar"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set tablespace all"
@@ -3602,8 +3800,9 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "foo"
       WHITESPACE " "
       OWNED_BY_ROLES
         OWNED_KW "owned"
@@ -3630,8 +3829,9 @@ SOURCE_FILE
         WHITESPACE " "
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME_REF
-          IDENT "bar"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "bar"
       WHITESPACE " "
       NOWAIT_KW "nowait"
     SEMICOLON ";"
@@ -3650,8 +3850,9 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "foo"
       WHITESPACE " "
       OWNED_BY_ROLES
         OWNED_KW "owned"
@@ -3668,8 +3869,9 @@ SOURCE_FILE
         WHITESPACE " "
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME_REF
-          IDENT "buz"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "buz"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -3677,19 +3879,21 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_TABLESPACE
       SET_KW "set"
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_table_owner"
@@ -3699,11 +3903,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "table_name"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "table_name"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -3722,21 +3927,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ATTACH_PARTITION
       ATTACH_KW "attach"
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
       WHITESPACE " "
       PARTITION_DEFAULT
         DEFAULT_KW "default"
@@ -3749,21 +3956,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ATTACH_PARTITION
       ATTACH_KW "attach"
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
       WHITESPACE " "
       PARTITION_FOR_VALUES_IN
         FOR_KW "for"
@@ -3789,11 +3998,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     NOT_OF
       NOT_KW "not"
@@ -3826,11 +4036,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "transactions"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "transactions"
     WHITESPACE "\n  "
     ADD_COLUMN
       ADD_KW "ADD"
@@ -3880,21 +4091,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DETACH_PARTITION
       DETACH_KW "detach"
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- concurrently"
@@ -3904,21 +4117,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DETACH_PARTITION
       DETACH_KW "detach"
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
       WHITESPACE " "
       CONCURRENTLY_KW "concurrently"
     SEMICOLON ";"
@@ -3930,21 +4145,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     DETACH_PARTITION
       DETACH_KW "detach"
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
       WHITESPACE " "
       FINALIZE_KW "finalize"
     SEMICOLON ";"
@@ -3956,21 +4173,23 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "foo"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
     WHITESPACE "\n  "
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
       FOREIGN_KEY_CONSTRAINT
-        CONSTRAINT_NAME
+        CONSTRAINT_NAME_CLAUSE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
-          NAME
-            IDENT "foo_bar_id_fkey"
+          CONSTRAINT_NAME
+            NAME
+              IDENT "foo_bar_id_fkey"
         WHITESPACE " "
         FOREIGN_KW "foreign"
         WHITESPACE " "
@@ -3985,10 +4204,11 @@ SOURCE_FILE
         WHITESPACE "\n  "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -4017,11 +4237,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ALTER_COLUMN
       ALTER_KW "alter"
@@ -4055,11 +4276,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     SET_ACCESS_METHOD
       SET_KW "set"
@@ -4076,11 +4298,12 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    RELATION_NAME
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     ADD_CONSTRAINT
       ADD_KW "add"
@@ -4104,10 +4327,11 @@ SOURCE_FILE
         WHITESPACE " "
         REFERENCES_KW "references"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
         WHITESPACE " "
         MATCH_PARTIAL
           MATCH_KW "match"

@@ -36,3 +36,13 @@ alter property graph if exists g
       source key (s) references k (id)
       destination key (d) references k (id)
   );
+
+-- alter element tables
+alter property graph g alter vertex table v add label l;
+alter property graph g alter edge table e drop label l;
+alter property graph g alter vertex table v alter label l add properties (id);
+alter property graph g alter relationship table e alter label l drop properties (id);
+
+-- drop element tables
+alter property graph g drop vertex tables (v1, v2);
+alter property graph g drop relationship tables (e1, e2);

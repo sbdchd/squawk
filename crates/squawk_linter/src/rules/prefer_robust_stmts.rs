@@ -36,7 +36,12 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 for action in alter_table.actions() {
                     let (message_type, fix) = match &action {
                         ast::AlterTableAction::DropConstraint(drop_constraint) => {
-                            if let Some(constraint_name) = drop_constraint.name_ref() {
+                            if let Some(constraint_name) = drop_constraint
+                                .constraint_name_ref()
+                                .and_then(|constraint| constraint.path_ref())
+                                .and_then(|path| path.segment())
+                                .and_then(|segment| segment.name_ref())
+                            {
                                 constraint_names
                                     .insert(constraint_name.text(), Constraint::Dropped);
                             }
@@ -65,7 +70,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                             (ActionErrorMessage::IfNotExists, fix)
                         }
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
-                            if let Some(constraint_name) = validate_constraint.name_ref()
+                            if let Some(constraint_name) = validate_constraint
+                                .constraint_name_ref()
+                                .and_then(|constraint| constraint.path_ref())
+                                .and_then(|path| path.segment())
+                                .and_then(|segment| segment.name_ref())
                                 && constraint_names.contains_key(&constraint_name.text())
                             {
                                 continue;
@@ -125,11 +134,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             }
             ast::Stmt::CreateIndex(create_index)
                 if create_index.if_not_exists().is_none()
-                    && create_index.name().is_some()
+                    && create_index.index().is_some()
                     && (create_index.concurrently_token().is_some() || !inside_transaction) =>
             {
-                let fix = create_index.name().map(|name| {
-                    let at = name.syntax().text_range().start();
+                let fix = create_index.index().map(|index| {
+                    let at = index.syntax().text_range().start();
                     let edit = Edit::insert("if not exists ", at);
                     Fix::new("Insert `if not exists`", vec![edit])
                 });
@@ -169,7 +178,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropIndex(drop_index)
                 if drop_index.if_exists().is_none() && !inside_transaction =>
             {
-                let fix = drop_index.path_refs().next().map(|first_index| {
+                let fix = drop_index.index_refs().next().map(|first_index| {
                     let at = first_index.syntax().text_range().start();
                     let edit = Edit::insert("if exists ", at);
                     Fix::new("Insert `if exists`", vec![edit])

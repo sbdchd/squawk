@@ -11,10 +11,11 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE " "
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION
@@ -29,10 +30,11 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -49,15 +51,16 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
+      FUNCTION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "s"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              IDENT "s"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+              IDENT "f"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -76,10 +79,11 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
       PARAM_LIST
         L_PAREN "("
         PARAM
@@ -111,10 +115,11 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -133,18 +138,20 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
@@ -155,10 +162,11 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE " \n  "
     FUNC_OPTION_LIST
       STRICT_FUNC_OPTION
@@ -255,10 +263,11 @@ SOURCE_FILE
       SUPPORT_FUNC_OPTION
         SUPPORT_KW "support"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "f"
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "f"
       WHITESPACE "\n  "
       SET_FUNC_OPTION
         SET_CONFIG_PARAM
@@ -338,19 +347,22 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    DEPENDS_ON_EXTENSION
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_FUNCTION
@@ -359,20 +371,23 @@ SOURCE_FILE
     FUNCTION_KW "function"
     WHITESPACE " "
     FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
     WHITESPACE " "
-    NO_KW "no"
-    WHITESPACE " "
-    DEPENDS_KW "depends"
-    WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    EXTENSION_KW "extension"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "e"
+    NO_DEPENDS_ON_EXTENSION
+      NO_KW "no"
+      WHITESPACE " "
+      DEPENDS_KW "depends"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      EXTENSION_KW "extension"
+      WHITESPACE " "
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -265,7 +265,8 @@ pub(crate) fn create_table_args(
     let inherits_iter = create_table
         .inherits()
         .into_iter()
-        .flat_map(|inherits| inherits.path_refs())
+        .flat_map(|inherits| inherits.table_name_refs())
+        .filter_map(|table| table.path_ref())
         .map(CreateTableArg::Inherits);
 
     let args_iter = create_table

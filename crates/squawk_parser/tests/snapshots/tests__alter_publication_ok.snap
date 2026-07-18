@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -19,10 +20,11 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -30,8 +32,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -39,19 +42,21 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t2"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t2"
         WHITESPACE " "
         WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
@@ -73,19 +78,21 @@ SOURCE_FILE
         WHITESPACE " "
         ONLY_KW "only"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -107,8 +114,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -120,8 +128,9 @@ SOURCE_FILE
         WHITESPACE " "
         SCHEMA_KW "schema"
         WHITESPACE " "
-        NAME_REF
-          IDENT "s"
+        SCHEMA_REF
+          NAME_REF
+            IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -129,8 +138,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -152,8 +162,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     SET_PUBLICATION_OBJECTS
       SET_KW "set"
@@ -161,10 +172,11 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -172,8 +184,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     SET_PUBLICATION_OBJECTS
       SET_KW "set"
@@ -181,19 +194,21 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t2"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t2"
         WHITESPACE " "
         WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
@@ -215,19 +230,21 @@ SOURCE_FILE
         WHITESPACE " "
         ONLY_KW "only"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -249,8 +266,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -284,8 +302,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     DROP_PUBLICATION_OBJECTS
       DROP_KW "drop"
@@ -293,10 +312,11 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -304,8 +324,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     DROP_PUBLICATION_OBJECTS
       DROP_KW "drop"
@@ -313,19 +334,21 @@ SOURCE_FILE
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t1"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t1"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t2"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t2"
         WHITESPACE " "
         WHERE_CONDITION_CLAUSE
           WHERE_KW "where"
@@ -347,19 +370,21 @@ SOURCE_FILE
         WHITESPACE " "
         ONLY_KW "only"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_OBJECT
         TABLE_KW "table"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "t"
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "t"
         WHITESPACE " "
         COLUMN_REF_LIST
           L_PAREN "("
@@ -381,8 +406,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -399,8 +425,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -418,8 +445,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -435,8 +463,9 @@ SOURCE_FILE
     WHITESPACE " "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "p"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "p"
     WHITESPACE " "
     SET_ALL_PUBLICATION_OBJECTS
       SET_KW "set"
@@ -452,29 +481,32 @@ SOURCE_FILE
         EXCEPT_TABLE_NAME
           TABLE_KW "table"
           WHITESPACE " "
-          RELATION_NAME
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "t"
+          TABLE_RELATION_NAME
+            TABLE_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "t"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
-          RELATION_NAME
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "u"
+          TABLE_RELATION_NAME
+            TABLE_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "u"
         COMMA ","
         WHITESPACE " "
         EXCEPT_TABLE_NAME
           TABLE_KW "table"
           WHITESPACE " "
-          RELATION_NAME
-            PATH_REF
-              PATH_SEGMENT_REF
-                NAME_REF
-                  IDENT "k"
+          TABLE_RELATION_NAME
+            TABLE_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  NAME_REF
+                    IDENT "k"
         R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

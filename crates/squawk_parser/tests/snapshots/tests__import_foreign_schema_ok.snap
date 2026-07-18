@@ -12,22 +12,25 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
     SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      SERVER_REF
+        NAME_REF
+          IDENT "a"
     WHITESPACE "\n  "
     INTO_SCHEMA
       INTO_KW "into"
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- except"
@@ -39,8 +42,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "some_schema_name"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "some_schema_name"
     WHITESPACE "\n    "
     EXCEPT_TABLES
       EXCEPT_KW "EXCEPT"
@@ -59,14 +63,16 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
-      NAME_REF
-        IDENT "server_name"
+      SERVER_REF
+        NAME_REF
+          IDENT "server_name"
     WHITESPACE "\n    "
     INTO_SCHEMA
       INTO_KW "INTO"
       WHITESPACE " "
-      NAME_REF
-        IDENT "local_schema"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "local_schema"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
@@ -78,22 +84,25 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "a"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
     SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SERVER_REF
+        NAME_REF
+          IDENT "b"
     WHITESPACE "\n  "
     INTO_SCHEMA
       INTO_KW "into"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -117,22 +126,25 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "a"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
     SERVER_NAME
       SERVER_KW "server"
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      SERVER_REF
+        NAME_REF
+          IDENT "b"
     WHITESPACE "\n  "
     INTO_SCHEMA
       INTO_KW "into"
       WHITESPACE " "
-      NAME_REF
-        IDENT "c"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -164,22 +176,25 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "SCHEMA"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foreign_films"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "foreign_films"
     WHITESPACE "\n    "
     FROM_KW "FROM"
     WHITESPACE " "
     SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
-      NAME_REF
-        IDENT "film_server"
+      SERVER_REF
+        NAME_REF
+          IDENT "film_server"
     WHITESPACE " "
     INTO_SCHEMA
       INTO_KW "INTO"
       WHITESPACE " "
-      NAME_REF
-        IDENT "films"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "films"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
@@ -191,8 +206,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "SCHEMA"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foreign_films"
+    SCHEMA_REF
+      NAME_REF
+        IDENT "foreign_films"
     WHITESPACE " "
     LIMIT_TO_TABLES
       LIMIT_KW "LIMIT"
@@ -213,13 +229,15 @@ SOURCE_FILE
     SERVER_NAME
       SERVER_KW "SERVER"
       WHITESPACE " "
-      NAME_REF
-        IDENT "film_server"
+      SERVER_REF
+        NAME_REF
+          IDENT "film_server"
     WHITESPACE " "
     INTO_SCHEMA
       INTO_KW "INTO"
       WHITESPACE " "
-      NAME_REF
-        IDENT "films"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "films"
     SEMICOLON ";"
   WHITESPACE "\n\n"

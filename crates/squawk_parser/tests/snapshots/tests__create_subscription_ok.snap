@@ -10,8 +10,9 @@ SOURCE_FILE
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
-    NAME
-      IDENT "s"
+    SUBSCRIPTION
+      NAME
+        IDENT "s"
     WHITESPACE "\n  "
     CONNECTION_KW "connection"
     WHITESPACE " "
@@ -20,8 +21,9 @@ SOURCE_FILE
     WHITESPACE "\n  "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -31,8 +33,9 @@ SOURCE_FILE
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
-    NAME
-      IDENT "s"
+    SUBSCRIPTION
+      NAME
+        IDENT "s"
     WHITESPACE "\n  "
     CONNECTION_KW "connection"
     WHITESPACE " "
@@ -41,16 +44,19 @@ SOURCE_FILE
     WHITESPACE "\n  "
     PUBLICATION_KW "publication"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    PUBLICATION_REF
+      NAME_REF
+        IDENT "c"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"

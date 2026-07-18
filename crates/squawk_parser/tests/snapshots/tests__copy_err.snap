@@ -9,10 +9,11 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "x"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "x"
       WHITESPACE " "
       COLUMN_REF_LIST
         L_PAREN "("
@@ -53,10 +54,11 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     COPY_FROM
       FROM_KW "from"
@@ -73,10 +75,11 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     COPY_FROM
       FROM_KW "from"
@@ -95,10 +98,11 @@ SOURCE_FILE
     COPY_KW "copy"
     WHITESPACE " "
     COPY_TABLE
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     COPY_FROM
       FROM_KW "from"

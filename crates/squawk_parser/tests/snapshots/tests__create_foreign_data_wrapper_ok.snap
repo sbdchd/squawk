@@ -14,8 +14,9 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "wrapper"
     WHITESPACE " "
-    NAME
-      IDENT "w"
+    FOREIGN_DATA_WRAPPER
+      NAME
+        IDENT "w"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -29,22 +30,43 @@ SOURCE_FILE
     WHITESPACE " "
     WRAPPER_KW "wrapper"
     WHITESPACE " "
-    NAME
-      IDENT "w"
+    FOREIGN_DATA_WRAPPER
+      NAME
+        IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
-        HANDLER_KW "handler"
+        CONNECTION_KW "connection"
         WHITESPACE " "
-        PATH_REF
+        FUNCTION_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "c"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "foo"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+                IDENT "bar"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        NO_KW "no"
+        WHITESPACE " "
+        CONNECTION_KW "connection"
+      WHITESPACE "\n  "
+      FDW_OPTION
+        HANDLER_KW "handler"
+        WHITESPACE " "
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "bar"
       WHITESPACE "\n  "
       FDW_OPTION
         NO_KW "no"
@@ -54,15 +76,16 @@ SOURCE_FILE
       FDW_OPTION
         VALIDATOR_KW "validator"
         WHITESPACE " "
-        PATH_REF
+        FUNCTION_NAME_REF
           PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                NAME_REF
+                  IDENT "f"
+            DOT "."
             PATH_SEGMENT_REF
               NAME_REF
-                IDENT "f"
-          DOT "."
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "bar"
+                IDENT "bar"
       WHITESPACE "\n  "
       FDW_OPTION
         NO_KW "no"

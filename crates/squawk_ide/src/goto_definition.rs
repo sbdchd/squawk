@@ -1460,11 +1460,11 @@ create table t(c int);
 create policy p on t;
 alter policy p on t
   with check (c$0 > 1);
-"), @r"
+"), @"
           ╭▸ 
-        3 │ create policy p on t;
-          │               ─ 2. destination
-        4 │ alter policy p on t
+        2 │ create table t(c int);
+          │                ─ 2. destination
+          ‡
         5 │   with check (c > 1);
           ╰╴              ─ 1. source
         ");
@@ -3610,14 +3610,15 @@ create table t (
 ) partition by range (inserted_at);
 create table part partition of t
     for values from ('2026-01-02') to ('2026-01-03');
-alter index t attach partition part$0;
-"), @r"
+create index parent_idx on t (inserted_at);
+create index child_idx on part (inserted_at);
+alter index parent_idx attach partition child_$0idx;
+"), @"
           ╭▸ 
-        5 │ create table part partition of t
-          │              ──── 2. destination
-        6 │     for values from ('2026-01-02') to ('2026-01-03');
-        7 │ alter index t attach partition part;
-          ╰╴                                  ─ 1. source
+        8 │ create index child_idx on part (inserted_at);
+          │              ───────── 2. destination
+        9 │ alter index parent_idx attach partition child_idx;
+          ╰╴                                             ─ 1. source
         ");
     }
 
@@ -14193,17 +14194,17 @@ create table e2 (
 );
 
 create property graph g1
-  vertex tables (v1, v2, v3)
+  vertex tables (v1 as source_vertex, v2 as destination_vertex, v3)
   edge tables (
-    e1 source v1$0 destination v2,
-    e2 source v1 destination v3);
+    e1 source source_vertex$0 destination destination_vertex,
+    e2 source source_vertex destination v3);
 "), @"
            ╭▸ 
-         2 │ create table v1 (
-           │              ── 2. destination
-           ‡
-        32 │     e1 source v1 destination v2,
-           ╰╴               ─ 1. source
+        30 │   vertex tables (v1 as source_vertex, v2 as destination_vertex, v3)
+           │                        ───────────── 2. destination
+        31 │   edge tables (
+        32 │     e1 source source_vertex destination destination_vertex,
+           ╰╴                          ─ 1. source
         "
         );
 
@@ -14263,19 +14264,19 @@ create table e1 (
 );
 
 create property graph g1
-  vertex tables (v1, v2)
+  vertex tables (v1 as source_vertex, v2)
   edge tables (
     e1
-      source key (source_id) references v1$0 (id)
+      source key (source_id) references source_vertex$0 (id)
       destination key (destination_id) references v2 (id)
   );
 "), @"
            ╭▸ 
-         2 │ create table v1 (id int8 primary key);
-           │              ── 2. destination
+        11 │   vertex tables (v1 as source_vertex, v2)
+           │                        ───────────── 2. destination
            ‡
-        14 │       source key (source_id) references v1 (id)
-           ╰╴                                         ─ 1. source
+        14 │       source key (source_id) references source_vertex (id)
+           ╰╴                                                    ─ 1. source
         "
         );
     }
@@ -14339,18 +14340,18 @@ create table e1 (
 );
 
 create property graph g1
-  vertex tables (v1, v2)
+  vertex tables (v1 as source_vertex, v2)
   edge tables (
     e1 key (id)
-      source key (source_id) references v1 (id$0)
+      source key (source_id) references source_vertex (id$0)
       destination key (destination_id) references v2 (id));
 "), @"
            ╭▸ 
          2 │ create table v1 (id int8 primary key);
            │                  ── 2. destination
            ‡
-        14 │       source key (source_id) references v1 (id)
-           ╰╴                                             ─ 1. source
+        14 │       source key (source_id) references source_vertex (id)
+           ╰╴                                                        ─ 1. source
         ");
     }
 

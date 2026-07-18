@@ -14,18 +14,18 @@ fn vacuum_full_fix(vacuum: &ast::Vacuum) -> Option<Fix> {
 }
 
 fn cluster_fix(cluster: &ast::Cluster) -> Option<Fix> {
-    let replacement = if let Some(on_path) = cluster.on_path() {
-        let index = cluster.path_ref()?;
-        let table = on_path.path_ref()?;
+    let replacement = if let Some(legacy) = cluster.cluster_legacy() {
+        let index = legacy.index_ref()?;
+        let table = legacy.on_path()?.table_name_ref()?.path_ref()?;
         format!(
             "repack (concurrently) {} using index {}",
             table.syntax(),
             index.syntax()
         )
-    } else if let Some(table) = cluster.path_ref() {
+    } else if let Some(table) = cluster.table_name_ref().and_then(|table| table.path_ref()) {
         if let Some(index_name) = cluster
             .cluster_using_index()
-            .and_then(|using| using.name_ref())
+            .and_then(|using| using.index_ref())
         {
             format!(
                 "repack (concurrently) {} using index {}",

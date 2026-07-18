@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -34,15 +35,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    INDEX_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+            IDENT "i"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -60,20 +62,20 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     WHITESPACE " "
     SET_TABLESPACE
       SET_KW "set"
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -86,25 +88,25 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    INDEX_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+            IDENT "i"
     WHITESPACE " "
     SET_TABLESPACE
       SET_KW "set"
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_params"
@@ -114,10 +116,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -140,15 +143,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    INDEX_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+            IDENT "i"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -181,10 +185,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     WHITESPACE " "
     RESET_OPTIONS
       RESET_KW "reset"
@@ -207,15 +212,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    INDEX_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+            IDENT "i"
     WHITESPACE " "
     RESET_OPTIONS
       RESET_KW "reset"
@@ -240,20 +246,22 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     WHITESPACE " "
-    ATTACH_PARTITION
+    ATTACH_INDEX_PARTITION
       ATTACH_KW "attach"
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "p"
+      INDEX_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -261,21 +269,7 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
-    WHITESPACE " "
-    ATTACH_PARTITION
-      ATTACH_KW "attach"
-      WHITESPACE " "
-      PARTITION_KW "partition"
-      WHITESPACE " "
+    INDEX_REF
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
@@ -284,7 +278,23 @@ SOURCE_FILE
         DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "p"
+            IDENT "i"
+    WHITESPACE " "
+    ATTACH_INDEX_PARTITION
+      ATTACH_KW "attach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      INDEX_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "s"
+          DOT "."
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
@@ -294,10 +304,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     WHITESPACE " "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"
@@ -308,10 +319,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -319,15 +329,16 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
+    INDEX_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+            IDENT "i"
     WHITESPACE " "
     DEPENDS_ON_EXTENSION
       DEPENDS_KW "depends"
@@ -336,10 +347,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_column"
@@ -349,10 +359,11 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
     WHITESPACE " "
     ALTER_SET_STATISTICS
       ALTER_KW "alter"
@@ -378,15 +389,16 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    PATH_REF
+    INDEX_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "s"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "s"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "i"
+            IDENT "i"
     WHITESPACE " "
     ALTER_SET_STATISTICS
       ALTER_KW "alter"
@@ -418,16 +430,18 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "t"
       WHITESPACE " \n  "
       SET_TABLESPACE
         SET_KW "set"
         WHITESPACE " "
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME_REF
-          IDENT "n"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -442,8 +456,9 @@ SOURCE_FILE
       WHITESPACE " "
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      TABLESPACE_REF
+        NAME_REF
+          IDENT "t"
       WHITESPACE " \n  "
       OWNED_BY_ROLES
         OWNED_KW "owned"
@@ -465,8 +480,9 @@ SOURCE_FILE
         WHITESPACE " "
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
-        NAME_REF
-          IDENT "n"
+        TABLESPACE_REF
+          NAME_REF
+            IDENT "n"
       WHITESPACE "\n  "
       NOWAIT_KW "nowait"
     SEMICOLON ";"

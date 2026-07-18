@@ -10,11 +10,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION
@@ -28,11 +29,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     RENAME_TO
       RENAME_KW "rename"
@@ -50,11 +52,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -72,19 +75,21 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
@@ -94,11 +99,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     DEPENDS_ON_EXTENSION
       DEPENDS_KW "depends"
@@ -107,8 +113,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      NAME_REF
-        IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_ROUTINE
@@ -116,11 +123,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"
@@ -131,8 +139,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      NAME_REF
-        IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_depends"
@@ -142,11 +151,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     NO_DEPENDS_ON_EXTENSION
       NO_KW "no"
@@ -157,8 +167,9 @@ SOURCE_FILE
       WHITESPACE " "
       EXTENSION_KW "extension"
       WHITESPACE " "
-      NAME_REF
-        IDENT "e"
+      EXTENSION_REF
+        NAME_REF
+          IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_params"
@@ -168,11 +179,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "f"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "f"
       PARAM_LIST
         L_PAREN "("
         PARAM
@@ -217,11 +229,12 @@ SOURCE_FILE
     WHITESPACE " "
     ROUTINE_KW "routine"
     WHITESPACE " "
-    FUNCTION_SIG
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "r"
+    ROUTINE_SIG
+      ROUTINE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "r"
     WHITESPACE "\n  "
     FUNC_OPTION_LIST
       VOLATILITY_FUNC_OPTION

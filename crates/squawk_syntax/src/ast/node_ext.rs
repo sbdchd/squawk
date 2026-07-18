@@ -86,15 +86,16 @@ impl ast::Literal {
 impl ast::Constraint {
     #[inline]
     pub fn constraint_name(&self) -> Option<ast::ConstraintName> {
-        support::child(self.syntax())
+        support::child::<ast::ConstraintNameClause>(self.syntax())
+            .and_then(|clause| clause.constraint_name())
     }
 }
 
 impl ast::CreateSchema {
     pub fn schema_name(&self) -> Option<ast::Name> {
         match self.create_schema_target()? {
-            ast::CreateSchemaTarget::NamedSchema(named) => named.name(),
             ast::CreateSchemaTarget::AuthorizationSchema(auth) => auth.role()?.name(),
+            ast::CreateSchemaTarget::NamedSchema(named) => named.schema()?.name(),
         }
     }
 }
@@ -127,7 +128,6 @@ pub enum BinOp {
     And(SyntaxToken),
     AtTimeZone(ast::AtTimeZone),
     Caret(SyntaxToken),
-    Collate(SyntaxToken),
     ColonColon(ast::ColonColon),
     ColonEq(SyntaxToken),
     CustomOp(ast::CustomOp),
@@ -200,7 +200,6 @@ impl ast::BinExpr {
                     let op = match token.kind() {
                         SyntaxKind::AND_KW => BinOp::And(token),
                         SyntaxKind::CARET => BinOp::Caret(token),
-                        SyntaxKind::COLLATE_KW => BinOp::Collate(token),
                         SyntaxKind::COLON_EQ => BinOp::ColonEq(token),
                         SyntaxKind::EQ => BinOp::Eq(token),
                         SyntaxKind::ESCAPE_KW => BinOp::Escape(token),
@@ -645,33 +644,39 @@ impl ast::ColumnConstraint {
     #[inline]
     pub fn constraint_name(&self) -> Option<ast::ConstraintName> {
         match self {
-            ast::ColumnConstraint::CheckConstraint(check_constraint) => {
-                check_constraint.constraint_name()
-            }
-            ast::ColumnConstraint::DefaultConstraint(default_constraint) => {
-                default_constraint.constraint_name()
-            }
-            ast::ColumnConstraint::ExcludeConstraint(exclude_constraint) => {
-                exclude_constraint.constraint_name()
-            }
+            ast::ColumnConstraint::CheckConstraint(check_constraint) => check_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
+            ast::ColumnConstraint::DefaultConstraint(default_constraint) => default_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
+            ast::ColumnConstraint::ExcludeConstraint(exclude_constraint) => exclude_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
             ast::ColumnConstraint::GeneratedConstraint(generated_constraint) => {
-                generated_constraint.constraint_name()
+                generated_constraint
+                    .constraint_name_clause()
+                    .and_then(|clause| clause.constraint_name())
             }
-            ast::ColumnConstraint::NotNullConstraint(not_null_constraint) => {
-                not_null_constraint.constraint_name()
-            }
-            ast::ColumnConstraint::NullConstraint(null_constraint) => {
-                null_constraint.constraint_name()
-            }
+            ast::ColumnConstraint::NotNullConstraint(not_null_constraint) => not_null_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
+            ast::ColumnConstraint::NullConstraint(null_constraint) => null_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
             ast::ColumnConstraint::PrimaryKeyConstraint(primary_key_constraint) => {
-                primary_key_constraint.constraint_name()
+                primary_key_constraint
+                    .constraint_name_clause()
+                    .and_then(|clause| clause.constraint_name())
             }
             ast::ColumnConstraint::ReferencesConstraint(references_constraint) => {
-                references_constraint.constraint_name()
+                references_constraint
+                    .constraint_name_clause()
+                    .and_then(|clause| clause.constraint_name())
             }
-            ast::ColumnConstraint::UniqueConstraint(unique_constraint) => {
-                unique_constraint.constraint_name()
-            }
+            ast::ColumnConstraint::UniqueConstraint(unique_constraint) => unique_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
         }
     }
 }
@@ -680,21 +685,25 @@ impl ast::TableConstraint {
     #[inline]
     pub fn constraint_name(&self) -> Option<ast::ConstraintName> {
         match self {
-            ast::TableConstraint::CheckConstraint(check_constraint) => {
-                check_constraint.constraint_name()
-            }
-            ast::TableConstraint::ExcludeConstraint(exclude_constraint) => {
-                exclude_constraint.constraint_name()
-            }
+            ast::TableConstraint::CheckConstraint(check_constraint) => check_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
+            ast::TableConstraint::ExcludeConstraint(exclude_constraint) => exclude_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
             ast::TableConstraint::ForeignKeyConstraint(foreign_key_constraint) => {
-                foreign_key_constraint.constraint_name()
+                foreign_key_constraint
+                    .constraint_name_clause()
+                    .and_then(|clause| clause.constraint_name())
             }
             ast::TableConstraint::PrimaryKeyConstraint(primary_key_constraint) => {
-                primary_key_constraint.constraint_name()
+                primary_key_constraint
+                    .constraint_name_clause()
+                    .and_then(|clause| clause.constraint_name())
             }
-            ast::TableConstraint::UniqueConstraint(unique_constraint) => {
-                unique_constraint.constraint_name()
-            }
+            ast::TableConstraint::UniqueConstraint(unique_constraint) => unique_constraint
+                .constraint_name_clause()
+                .and_then(|clause| clause.constraint_name()),
         }
     }
 }
@@ -756,11 +765,22 @@ impl ast::HasParamList {
     }
     #[inline]
     pub fn path(&self) -> Option<ast::Path> {
-        support::child(self.syntax())
+        match self {
+            ast::HasParamList::CreateFunction(function) => function.name()?.path(),
+            ast::HasParamList::CreateProcedure(procedure) => procedure.name()?.path(),
+            _ => support::child(self.syntax()),
+        }
     }
     #[inline]
     pub fn path_ref(&self) -> Option<ast::PathRef> {
-        support::child(self.syntax())
+        match self {
+            ast::HasParamList::FunctionSig(signature) => signature.function_name_ref()?.path_ref(),
+            ast::HasParamList::ProcedureSig(signature) => {
+                signature.procedure_name_ref()?.path_ref()
+            }
+            ast::HasParamList::RoutineSig(signature) => signature.routine_name_ref()?.path_ref(),
+            _ => support::child(self.syntax()),
+        }
     }
 }
 

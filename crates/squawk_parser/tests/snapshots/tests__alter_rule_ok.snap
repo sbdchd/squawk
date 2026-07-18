@@ -10,16 +10,18 @@ SOURCE_FILE
     WHITESPACE " "
     RULE_KW "rule"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    RULE_REF
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -37,21 +39,23 @@ SOURCE_FILE
     WHITESPACE " "
     RULE_KW "rule"
     WHITESPACE " "
-    NAME_REF
-      IDENT "r"
+    RULE_REF
+      NAME_REF
+        IDENT "r"
     WHITESPACE " "
-    ON_TABLE
+    ON_RELATION
       ON_KW "on"
       WHITESPACE " "
-      PATH_REF
+      RELATION_NAME_REF
         PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                SCHEMA_KW "schema"
+          DOT "."
           PATH_SEGMENT_REF
             NAME_REF
-              SCHEMA_KW "schema"
-        DOT "."
-        PATH_SEGMENT_REF
-          NAME_REF
-            IDENT "t"
+              IDENT "t"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"

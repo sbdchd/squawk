@@ -10,10 +10,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -67,10 +68,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("
@@ -123,10 +125,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     COLUMN_REF_LIST
       L_PAREN "("

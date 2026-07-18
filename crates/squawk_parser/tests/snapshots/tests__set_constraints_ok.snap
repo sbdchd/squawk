@@ -30,27 +30,30 @@ SOURCE_FILE
     WHITESPACE " "
     CONSTRAINTS_KW "constraints"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "foo"
-    COMMA ","
-    WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
-    COMMA ","
-    WHITESPACE " "
-    PATH_REF
+    CONSTRAINT_NAME_REF
       PATH_REF
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "a"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "b"
+            IDENT "foo"
+    COMMA ","
+    WHITESPACE " "
+    CONSTRAINT_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "bar"
+    COMMA ","
+    WHITESPACE " "
+    CONSTRAINT_NAME_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "a"
+        DOT "."
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "b"
     WHITESPACE " "
     IMMEDIATE_KW "immediate"
     SEMICOLON ";"
@@ -60,10 +63,11 @@ SOURCE_FILE
     WHITESPACE " "
     CONSTRAINTS_KW "constraints"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "bar"
+    CONSTRAINT_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "bar"
     WHITESPACE " "
     IMMEDIATE_KW "immediate"
     SEMICOLON ";"

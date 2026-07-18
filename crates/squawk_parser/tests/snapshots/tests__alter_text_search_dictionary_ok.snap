@@ -14,15 +14,16 @@ SOURCE_FILE
     WHITESPACE " "
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
-    PATH_REF
+    TEXT_SEARCH_DICTIONARY_REF
       PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT_REF
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+            IDENT "d"
     WHITESPACE " "
     ATTRIBUTE_LIST
       L_PAREN "("
@@ -56,10 +57,11 @@ SOURCE_FILE
     WHITESPACE " "
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    TEXT_SEARCH_DICTIONARY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     RENAME_TO
       RENAME_KW "rename"
@@ -81,10 +83,11 @@ SOURCE_FILE
     WHITESPACE " "
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    TEXT_SEARCH_DICTIONARY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -105,10 +108,11 @@ SOURCE_FILE
     WHITESPACE " "
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    TEXT_SEARCH_DICTIONARY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -130,17 +134,19 @@ SOURCE_FILE
     WHITESPACE " "
     DICTIONARY_KW "dictionary"
     WHITESPACE " "
-    PATH_REF
-      PATH_SEGMENT_REF
-        NAME_REF
-          IDENT "d"
+    TEXT_SEARCH_DICTIONARY_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "d"
     WHITESPACE " "
     SET_SCHEMA
       SET_KW "set"
       WHITESPACE " "
       SCHEMA_KW "schema"
       WHITESPACE " "
-      NAME_REF
-        IDENT "s"
+      SCHEMA_REF
+        NAME_REF
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

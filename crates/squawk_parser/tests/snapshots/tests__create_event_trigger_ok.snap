@@ -12,8 +12,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME
-      IDENT "t"
+    EVENT_TRIGGER
+      NAME
+        IDENT "t"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -41,8 +42,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "trigger"
     WHITESPACE " "
-    NAME
-      IDENT "t"
+    EVENT_TRIGGER
+      NAME
+        IDENT "t"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -109,8 +111,9 @@ SOURCE_FILE
     WHITESPACE " "
     TRIGGER_KW "TRIGGER"
     WHITESPACE " "
-    NAME
-      IDENT "abort_ddl"
+    EVENT_TRIGGER
+      NAME
+        IDENT "abort_ddl"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
