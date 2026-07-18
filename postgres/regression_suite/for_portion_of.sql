@@ -1448,6 +1448,63 @@ SELECT * FROM fpo_rule ORDER BY f1;
 
 DROP TABLE fpo_rule;
 
+-- UPDATE/DELETE FOR PORTION OF on a GENERATED VIRTUAL range column:
+CREATE TABLE fpo_gen_virtual (
+  a int,
+  b int4range GENERATED ALWAYS AS (int4range(a, a + 1)) VIRTUAL
+);
+INSERT INTO fpo_gen_virtual VALUES (1);
+DELETE FROM fpo_gen_virtual FOR PORTION OF b FROM 1 TO 2; -- fails
+UPDATE fpo_gen_virtual FOR PORTION OF b FROM 1 TO 2 SET a = 5; -- fails
+DROP TABLE fpo_gen_virtual;
+
+-- UPDATE/DELETE FOR PORTION OF on a GENERATED STORED range column:
+CREATE TABLE fpo_gen_stored (
+  a int,
+  b int4range GENERATED ALWAYS AS (int4range(a, a + 1)) STORED
+);
+INSERT INTO fpo_gen_stored VALUES (1);
+DELETE FROM fpo_gen_stored FOR PORTION OF b FROM 1 TO 2; -- fails
+UPDATE fpo_gen_stored FOR PORTION OF b FROM 1 TO 2 SET a = 5; -- fails
+DROP TABLE fpo_gen_stored;
+
+-- FOR PORTION OF a generated column reached through an updatable view.
+-- The view hides that b is generated during parse analysis, so the check
+-- must happen later (in the planner), after the view is rewritten to its
+-- underlying table.
+CREATE TABLE fpo_gen_view (
+  a int,
+  b int4range GENERATED ALWAYS AS (int4range(a, a + 1)) STORED
+);
+INSERT INTO fpo_gen_view VALUES (1);
+CREATE VIEW fpo_gen_view_v AS SELECT * FROM fpo_gen_view;
+DELETE FROM fpo_gen_view_v FOR PORTION OF b FROM 1 TO 2; -- fails
+UPDATE fpo_gen_view_v FOR PORTION OF b FROM 1 TO 2 SET a = 5; -- fails
+DROP VIEW fpo_gen_view_v;
+DROP TABLE fpo_gen_view;
+
+-- A new-style SQL function is parsed at CREATE FUNCTION time, but our
+-- generated-column check is in the planner, so it sees the column's
+-- current attgenerated when the function's plan is built at run time.
+CREATE TABLE fpo_func_test (
+  a int,
+  b int4range GENERATED ALWAYS AS (int4range(a, a + 1)) STORED
+);
+INSERT INTO fpo_func_test VALUES (1);
+-- Definition succeeds even though b is a generated column today.
+CREATE FUNCTION fpo_delete() RETURNS void
+  LANGUAGE SQL
+  BEGIN ATOMIC
+    DELETE FROM fpo_func_test FOR PORTION OF b FROM 1 TO 2;
+  END;
+SELECT fpo_delete(); -- fails: b is generated
+-- Drop the generation expression and the same function now succeeds.
+ALTER TABLE fpo_func_test ALTER COLUMN b DROP EXPRESSION;
+SELECT fpo_delete();
+TABLE fpo_func_test ORDER BY a, b;
+DROP FUNCTION fpo_delete();
+DROP TABLE fpo_func_test;
+
 -- UPDATE/DELETE FOR PORTION OF with table inheritance
 -- Leftover rows must stay in the child table, preserving child-specific columns.
 CREATE TABLE fpo_inh_parent (
@@ -1590,5 +1647,33 @@ UPDATE fpo_update_of_trigger
   FOR PORTION OF valid_at FROM 30 TO 70
   SET id = 2;
 DROP TABLE fpo_update_of_trigger;
+
+-- CURSORs
+CREATE TABLE fpo_cursed (
+  id int,
+  valid_at int4range
+);
+INSERT INTO fpo_cursed (id, valid_at) VALUES (1, '[10,100)');
+
+-- UPDATE FOR PORTION OF is not permitted with a CURSOR:
+BEGIN;
+DECLARE fpo_cur CURSOR FOR SELECT * FROM fpo_cursed;
+FETCH NEXT FROM fpo_cur;
+UPDATE fpo_cursed
+  FOR PORTION OF valid_at FROM 5 TO 6
+  SET id = 2
+  WHERE CURRENT OF fpo_cur;
+ROLLBACK;
+
+-- DELETE FOR PORTION OF is not permitted with a CURSOR:
+BEGIN;
+DECLARE fpo_cur CURSOR FOR SELECT * FROM fpo_cursed;
+FETCH NEXT FROM fpo_cur;
+DELETE FROM fpo_cursed
+  FOR PORTION OF valid_at FROM 8 TO 9
+  WHERE CURRENT OF fpo_cur;
+ROLLBACK;
+SELECT * FROM fpo_cursed;
+DROP TABLE fpo_cursed;
 
 RESET datestyle;

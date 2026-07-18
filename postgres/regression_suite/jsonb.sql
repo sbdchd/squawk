@@ -927,13 +927,13 @@ SELECT count(distinct j) FROM testjsonb;
 SET enable_hashagg = off;
 SELECT count(*) FROM (SELECT j FROM (SELECT * FROM testjsonb UNION ALL SELECT * FROM testjsonb) js GROUP BY j) js2;
 SET enable_hashagg = on;
-SET enable_sort = off;
+SET enable_groupagg = off;
 SELECT count(*) FROM (SELECT j FROM (SELECT * FROM testjsonb UNION ALL SELECT * FROM testjsonb) js GROUP BY j) js2;
 SELECT distinct * FROM (values (jsonb '{}' || ''::text),('{}')) v(j);
-SET enable_sort = on;
+SET enable_groupagg = on;
 
 RESET enable_hashagg;
-RESET enable_sort;
+RESET enable_groupagg;
 
 DROP INDEX jidx;
 DROP INDEX jidx_array;

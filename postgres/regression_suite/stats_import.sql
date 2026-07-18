@@ -885,6 +885,24 @@ AND tablename = 'test'
 AND inherited = false
 AND attname = 'arange';
 
+-- warn: range bounds histogram with unsorted elements
+SELECT pg_catalog.pg_restore_attribute_stats(
+    'schemaname', 'stats_import',
+    'relname', 'test',
+    'attname', 'arange',
+    'inherited', false::boolean,
+    'range_bounds_histogram', '{"[50,60)","[1,2)","[90,100)","[5,6)"}'::text
+    );
+
+-- warn: range bounds histogram with empty range
+SELECT pg_catalog.pg_restore_attribute_stats(
+    'schemaname', 'stats_import',
+    'relname', 'test',
+    'attname', 'arange',
+    'inherited', false::boolean,
+    'range_bounds_histogram', '{empty,"[1,2)","[3,4)"}'::text
+    );
+
 -- warn: cannot set most_common_elems for range type, rest ok
 SELECT pg_catalog.pg_restore_attribute_stats(
     'schemaname', 'stats_import',
@@ -1696,6 +1714,22 @@ SELECT pg_catalog.pg_restore_extended_stats(
   'statistics_name', 'test_mr_stat',
   'inherited', false,
   'exprs', '[{"range_bounds_histogram": "{\"[1,10200)\"}", "range_length_histogram": "{10179}"}]'::jsonb);
+-- warn: range bounds histogram with unsorted elements
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_mr',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_mr_stat',
+  'inherited', false,
+  'exprs', '[{"range_length_histogram": "{10179,10189,10199}", "range_empty_frac": "0", "range_bounds_histogram": "{\"[50,60)\",\"[1,2)\",\"[90,100)\"}"}]'::jsonb);
+-- warn: range bounds histogram with empty range
+SELECT pg_catalog.pg_restore_extended_stats(
+  'schemaname', 'stats_import',
+  'relname', 'test_mr',
+  'statistics_schemaname', 'stats_import',
+  'statistics_name', 'test_mr_stat',
+  'inherited', false,
+  'exprs', '[{"range_length_histogram": "{10179,10189,10199}", "range_empty_frac": "0", "range_bounds_histogram": "{empty,\"[1,2)\",\"[3,4)\"}"}]'::jsonb);
 
 -- ok: multirange stats
 SELECT pg_catalog.pg_restore_extended_stats(

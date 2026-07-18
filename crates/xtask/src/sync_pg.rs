@@ -146,6 +146,9 @@ const VARIABLE_REPLACEMENTS: &[(&str, &str)] = &[
     (":temp_schema_name", "temp_schema_name"),
     (":toastrel", "toastrel"),
     (":newloid", "10101"),
+    (":conflict_log_table", "conflict_log_table"),
+    (":clt1", "clt1"),
+    (":clt", "clt"),
     (r#" :""#, r#" ""#),
 ];
 
@@ -556,6 +559,15 @@ mod tests {
             (
                 "SELECT 'ὀδυσσεύς' WHERE name = :greek_name;",
                 "SELECT 'ὀδυσσεύς' WHERE name = 'greek_name';",
+            ),
+            (
+                "TRUNCATE TABLE :conflict_log_table;",
+                "TRUNCATE TABLE conflict_log_table;",
+            ),
+            ("DROP TABLE :clt1;", "DROP TABLE clt1;"),
+            (
+                "ALTER TABLE :clt ADD COLUMN extra_info text;",
+                "ALTER TABLE clt ADD COLUMN extra_info text;",
             ),
         ];
 

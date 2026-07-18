@@ -706,3 +706,44 @@ SELECT JSON_OBJECT('a': JSON_OBJECTAGG('b': stable_one() RETURNING text) FORMAT 
 EXPLAIN (VERBOSE, COSTS OFF) SELECT JSON_OBJECT('a': JSON_OBJECTAGG('b': 1 RETURNING text) FORMAT JSON);
 SELECT JSON_OBJECT('a': JSON_OBJECTAGG('b': 1 RETURNING text) FORMAT JSON);
 DROP FUNCTION volatile_one, stable_one;
+
+-- Test deparsing of JSON aggregates that are computed below a WindowAgg
+-- node.
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT i % 2 AS g,
+	JSON_ARRAYAGG(i ORDER BY i RETURNING jsonb) AS ja,
+	JSON_ARRAYAGG(i ORDER BY i RETURNING text) AS ja_text,
+	JSON_ARRAYAGG(i ORDER BY i NULL ON NULL RETURNING jsonb) AS ja_null,
+	JSON_OBJECTAGG(i: i ABSENT ON NULL RETURNING jsonb) AS jo_absent,
+	JSON_OBJECTAGG(i: i WITH UNIQUE RETURNING jsonb) AS jo_unique,
+	row_number() OVER (ORDER BY i % 2) AS rn
+FROM generate_series(1, 3) i
+GROUP BY i % 2;
+SELECT i % 2 AS g,
+	JSON_ARRAYAGG(i ORDER BY i RETURNING jsonb) AS ja,
+	JSON_ARRAYAGG(i ORDER BY i RETURNING text) AS ja_text,
+	JSON_ARRAYAGG(i ORDER BY i NULL ON NULL RETURNING jsonb) AS ja_null,
+	JSON_OBJECTAGG(i: i ABSENT ON NULL RETURNING jsonb) AS jo_absent,
+	JSON_OBJECTAGG(i: i WITH UNIQUE RETURNING jsonb) AS jo_unique,
+	row_number() OVER (ORDER BY i % 2) AS rn
+FROM generate_series(1, 3) i
+GROUP BY i % 2;
+
+-- The same, but with the JSON aggregate used as a window function that is
+-- computed below another WindowAgg node.
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT JSON_ARRAYAGG(i NULL ON NULL RETURNING jsonb) OVER (ORDER BY i DESC) AS ja,
+	row_number() OVER (ORDER BY i) AS rn
+FROM generate_series(1, 3) i;
+SELECT JSON_ARRAYAGG(i NULL ON NULL RETURNING jsonb) OVER (ORDER BY i DESC) AS ja,
+	row_number() OVER (ORDER BY i) AS rn
+FROM generate_series(1, 3) i;
+
+-- The same, but with the expression containing the JSON aggregate postponed
+-- to above the final sort due to being volatile.
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT i % 2 AS g,
+	   JSON_ARRAYAGG(i RETURNING text) || random()::text AS ja
+FROM generate_series(1, 3) i
+GROUP BY i % 2
+ORDER BY count(*);

@@ -52,6 +52,11 @@ ALTER PROPERTY GRAPH g3
         ADD LABEL t3l3 PROPERTIES ALL COLUMNS;
 ALTER PROPERTY GRAPH g3 ALTER VERTEX TABLE t3 DROP LABEL t3l3x;  -- error
 ALTER PROPERTY GRAPH g3 ALTER VERTEX TABLE t3 DROP LABEL t3l3;
+-- Test that the last label on an element cannot be dropped
+ALTER PROPERTY GRAPH g3 ALTER VERTEX TABLE t3 DROP LABEL t3l2;
+ALTER PROPERTY GRAPH g3 ALTER VERTEX TABLE t3 DROP LABEL t3l1;  -- error: last label
+-- Restore the dropped label for further tests
+ALTER PROPERTY GRAPH g3 ALTER VERTEX TABLE t3 ADD LABEL t3l2 PROPERTIES ALL COLUMNS;
 ALTER PROPERTY GRAPH g3 DROP VERTEX TABLES (t2);  -- fail
 ALTER PROPERTY GRAPH g3 DROP VERTEX TABLES (t2) CASCADE;
 ALTER PROPERTY GRAPH g3 DROP EDGE TABLES (e2);
@@ -75,6 +80,12 @@ CREATE PROPERTY GRAPH g4
 
 ALTER PROPERTY GRAPH g4 ALTER VERTEX TABLE t2 ALTER LABEL t2 ADD PROPERTIES (k * 2 AS kk);
 ALTER PROPERTY GRAPH g4 ALTER VERTEX TABLE t2 ALTER LABEL t2 DROP PROPERTIES (k);
+ALTER PROPERTY GRAPH g4 ALTER VERTEX TABLE t2 ALTER LABEL t2 DROP PROPERTIES (yy);  -- error
+-- Dropping a label should drop only orphaned properties.  zz is orphaned because
+-- it is only associated with the dropped label t3l2, while x is not orphaned
+-- because it remains associated with t3l1.  We will verify this in the
+-- information schema queries outputs below.
+ALTER PROPERTY GRAPH g4 ALTER VERTEX TABLE t3 DROP LABEL t3l2;
 
 CREATE TABLE t11 (a int PRIMARY KEY);
 CREATE TABLE t12 (b int PRIMARY KEY);
@@ -266,6 +277,11 @@ CREATE PROPERTY GRAPH gt
             SOURCE KEY (k1) REFERENCES v1(a)
             DESTINATION KEY (k2) REFERENCES v2(m)
     );
+
+-- data types of constant property values
+CREATE PROPERTY GRAPH glc VERTEX TABLES (
+    v1 KEY (a) LABEL l1 PROPERTIES ('foo' AS p1, 123 AS p2, 3.14 AS p3, true AS p4)
+);
 
 -- information schema
 

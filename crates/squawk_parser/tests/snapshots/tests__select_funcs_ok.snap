@@ -4673,6 +4673,903 @@ SOURCE_FILE
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- json_table_plan"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "p0"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NAME
+                IDENT "id"
+              WHITESPACE " "
+              FOR_KW "for"
+              WHITESPACE " "
+              ORDINALITY_KW "ordinality"
+            COMMA ","
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "p1"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "mname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.books[*]'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "\"p2 x\""
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "bname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_PATH
+              NAME_REF
+                IDENT "p0"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "p0"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "p1"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "mname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_JOIN
+              JSON_TABLE_PLAN_PATH
+                NAME_REF
+                  IDENT "p0"
+              WHITESPACE " "
+              OUTER_KW "outer"
+              WHITESPACE " "
+              JSON_TABLE_PLAN_PATH
+                NAME_REF
+                  IDENT "p1"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "p0"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "p1"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "mname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.books[*]'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "\"p2 x\""
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "bname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_JOIN
+              JSON_TABLE_PLAN_PATH
+                NAME_REF
+                  IDENT "p0"
+              WHITESPACE " "
+              INNER_KW "inner"
+              WHITESPACE " "
+              PAREN_JSON_TABLE_PLAN
+                L_PAREN "("
+                JSON_TABLE_PLAN_JOIN
+                  JSON_TABLE_PLAN_PATH
+                    NAME_REF
+                      IDENT "p1"
+                  WHITESPACE " "
+                  UNION_KW "union"
+                  WHITESPACE " "
+                  JSON_TABLE_PLAN_PATH
+                    NAME_REF
+                      IDENT "\"p2 x\""
+                R_PAREN ")"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "p0"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "p1"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NESTED_KW "nested"
+                  WHITESPACE " "
+                  PATH_KW "path"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'$.actors[*]'"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "p11"
+                  WHITESPACE " "
+                  JSON_TABLE_COLUMN_LIST
+                    COLUMNS_KW "columns"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    WHITESPACE "\n    "
+                    JSON_TABLE_COLUMN
+                      NAME
+                        IDENT "aname"
+                      WHITESPACE " "
+                      PATH_TYPE
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            NAME_REF
+                              TEXT_KW "text"
+                      WHITESPACE " "
+                      JSON_PATH_CLAUSE
+                        PATH_KW "path"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'$.name'"
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NESTED_KW "nested"
+                  WHITESPACE " "
+                  PATH_KW "path"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'$.directors[*]'"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "p12"
+                  WHITESPACE " "
+                  JSON_TABLE_COLUMN_LIST
+                    COLUMNS_KW "columns"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    WHITESPACE "\n    "
+                    JSON_TABLE_COLUMN
+                      NAME
+                        IDENT "dname"
+                      WHITESPACE " "
+                      PATH_TYPE
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            NAME_REF
+                              TEXT_KW "text"
+                      WHITESPACE " "
+                      JSON_PATH_CLAUSE
+                        PATH_KW "path"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'$.name'"
+                    R_PAREN ")"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.books[*]'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "p2"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "bname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_JOIN
+              JSON_TABLE_PLAN_PATH
+                NAME_REF
+                  IDENT "p0"
+              WHITESPACE " "
+              OUTER_KW "outer"
+              WHITESPACE " "
+              PAREN_JSON_TABLE_PLAN
+                L_PAREN "("
+                JSON_TABLE_PLAN_JOIN
+                  PAREN_JSON_TABLE_PLAN
+                    L_PAREN "("
+                    JSON_TABLE_PLAN_JOIN
+                      JSON_TABLE_PLAN_PATH
+                        NAME_REF
+                          IDENT "p1"
+                      WHITESPACE " "
+                      INNER_KW "inner"
+                      WHITESPACE " "
+                      PAREN_JSON_TABLE_PLAN
+                        L_PAREN "("
+                        JSON_TABLE_PLAN_JOIN
+                          JSON_TABLE_PLAN_PATH
+                            NAME_REF
+                              IDENT "p11"
+                          WHITESPACE " "
+                          CROSS_KW "cross"
+                          WHITESPACE " "
+                          JSON_TABLE_PLAN_PATH
+                            NAME_REF
+                              IDENT "p12"
+                        R_PAREN ")"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  UNION_KW "union"
+                  WHITESPACE " "
+                  JSON_TABLE_PLAN_PATH
+                    NAME_REF
+                      IDENT "p2"
+                R_PAREN ")"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_table_plan_default"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "mname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_CHOICE
+              UNION_KW "union"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "mname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_CHOICE
+              INNER_KW "inner"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "mname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_CHOICE
+              OUTER_KW "outer"
+            COMMA ","
+            WHITESPACE " "
+            JSON_TABLE_PLAN_CHOICE
+              CROSS_KW "cross"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JSON_TABLE_FROM_ITEM
+        JSON_TABLE
+          JSON_TABLE_KW "json_table"
+          L_PAREN "("
+          WHITESPACE "\n "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE "\n "
+          JSON_TABLE_COLUMN_LIST
+            COLUMNS_KW "columns"
+            WHITESPACE " "
+            L_PAREN "("
+            WHITESPACE "\n  "
+            JSON_TABLE_COLUMN
+              NESTED_KW "nested"
+              WHITESPACE " "
+              PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'$.movies[*]'"
+              WHITESPACE " "
+              JSON_TABLE_COLUMN_LIST
+                COLUMNS_KW "columns"
+                WHITESPACE " "
+                L_PAREN "("
+                WHITESPACE "\n   "
+                JSON_TABLE_COLUMN
+                  NAME
+                    IDENT "mname"
+                  WHITESPACE " "
+                  PATH_TYPE
+                    PATH_REF
+                      PATH_SEGMENT_REF
+                        NAME_REF
+                          TEXT_KW "text"
+                  WHITESPACE " "
+                  JSON_PATH_CLAUSE
+                    PATH_KW "path"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                R_PAREN ")"
+            R_PAREN ")"
+          WHITESPACE "\n "
+          JSON_TABLE_PLAN_CLAUSE
+            PLAN_KW "plan"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+            WHITESPACE " "
+            L_PAREN "("
+            JSON_TABLE_PLAN_CHOICE
+              UNION_KW "union"
+            COMMA ","
+            WHITESPACE " "
+            JSON_TABLE_PLAN_CHOICE
+              INNER_KW "inner"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "jt"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- json"
   WHITESPACE "\n"
   SELECT

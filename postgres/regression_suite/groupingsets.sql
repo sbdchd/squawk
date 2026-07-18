@@ -583,7 +583,7 @@ update pg_class set reltuples = 10 where relname='bug_16784';
 insert into bug_16784 select g/10, g from generate_series(1,40) g;
 
 set work_mem='64kB';
-set enable_sort = false;
+set enable_groupagg = false;
 
 select * from
   (values (1),(2)) v(a),
@@ -609,7 +609,7 @@ set work_mem='64kB';
 
 -- Produce results with sorting.
 
-set enable_sort = true;
+set enable_groupagg = true;
 set enable_hashagg = false;
 set jit_above_cost = 0;
 
@@ -624,7 +624,7 @@ from gs_data_1 group by cube (g1000, g100,g10);
 -- Produce results with hash aggregation.
 
 set enable_hashagg = true;
-set enable_sort = false;
+set enable_groupagg = false;
 
 explain (costs off)
 select g100, g10, sum(g::numeric), count(*), max(g::text)
@@ -634,7 +634,7 @@ create table gs_hash_1 as
 select g100, g10, sum(g::numeric), count(*), max(g::text)
 from gs_data_1 group by cube (g1000, g100,g10);
 
-set enable_sort = true;
+set enable_groupagg = true;
 set work_mem to default;
 set hash_mem_multiplier to default;
 

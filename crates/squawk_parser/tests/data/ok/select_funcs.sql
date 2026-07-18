@@ -322,6 +322,74 @@ COLUMNS (
           author_id FOR ORDINALITY,
           author_name text PATH '$.name'))));
 
+-- json_table_plan
+select * from json_table(
+ js, '$.favorites[*]' as p0
+ columns (
+  id for ordinality,
+  nested path '$.movies[*]' as p1 columns (
+   mname text path '$.name'),
+  nested path '$.books[*]' as "p2 x" columns (
+   bname text path '$.name'))
+ plan (p0)) as jt;
+
+select * from json_table(
+ js, '$.favorites[*]' as p0
+ columns (
+  nested path '$.movies[*]' as p1 columns (
+   mname text path '$.name'))
+ plan (p0 outer p1)) as jt;
+
+select * from json_table(
+ js, '$.favorites[*]' as p0
+ columns (
+  nested path '$.movies[*]' as p1 columns (
+   mname text path '$.name'),
+  nested path '$.books[*]' as "p2 x" columns (
+   bname text path '$.name'))
+ plan (p0 inner (p1 union "p2 x"))) as jt;
+
+select * from json_table(
+ js, '$.favorites[*]' as p0
+ columns (
+  nested path '$.movies[*]' as p1 columns (
+   nested path '$.actors[*]' as p11 columns (
+    aname text path '$.name'),
+   nested path '$.directors[*]' as p12 columns (
+    dname text path '$.name')),
+  nested path '$.books[*]' as p2 columns (
+   bname text path '$.name'))
+ plan (p0 outer ((p1 inner (p11 cross p12)) union p2))) as jt;
+
+-- json_table_plan_default
+select * from json_table(
+ js, '$.favorites[*]'
+ columns (
+  nested path '$.movies[*]' columns (
+   mname text path '$.name'))
+ plan default (union)) as jt;
+
+select * from json_table(
+ js, '$.favorites[*]'
+ columns (
+  nested path '$.movies[*]' columns (
+   mname text path '$.name'))
+ plan default (inner)) as jt;
+
+select * from json_table(
+ js, '$.favorites[*]'
+ columns (
+  nested path '$.movies[*]' columns (
+   mname text path '$.name'))
+ plan default (outer, cross)) as jt;
+
+select * from json_table(
+ js, '$.favorites[*]'
+ columns (
+  nested path '$.movies[*]' columns (
+   mname text path '$.name'))
+ plan default (union, inner)) as jt;
+
 -- json
 select json(a format json);
 select json(a format json with unique keys);
