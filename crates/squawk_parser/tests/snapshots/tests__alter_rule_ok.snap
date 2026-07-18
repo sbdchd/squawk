@@ -23,13 +23,14 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    RENAME_TO
+    RULE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      RULE
+        NAME
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_schema"
@@ -57,12 +58,13 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    RENAME_TO
+    RULE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      RULE
+        NAME
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"

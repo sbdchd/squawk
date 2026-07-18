@@ -23,13 +23,14 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE "\n  "
-    RENAME_TO
+    POLICY_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "q"
+      POLICY
+        NAME
+          IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_role"

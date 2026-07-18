@@ -14,13 +14,14 @@ SOURCE_FILE
       NAME_REF
         IDENT "t"
     WHITESPACE " "
-    RENAME_TO
+    TABLESPACE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "u"
+      TABLESPACE
+        NAME
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

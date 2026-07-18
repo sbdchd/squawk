@@ -127,13 +127,32 @@ SOURCE_FILE
       NAME_REF
         IDENT "r"
     WHITESPACE " "
-    RENAME_TO
+    ROLE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "newname"
+      ROLE
+        NAME
+          IDENT "newname"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_ROLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    ROLE_REF
+      NAME_REF
+        IDENT "r"
+    WHITESPACE " "
+    ROLE_RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE
+        CURRENT_USER_KW "current_user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_config"

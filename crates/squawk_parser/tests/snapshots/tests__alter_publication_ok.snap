@@ -449,13 +449,14 @@ SOURCE_FILE
       NAME_REF
         IDENT "p"
     WHITESPACE " "
-    RENAME_TO
+    PUBLICATION_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "q"
+      PUBLICATION
+        NAME
+          IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_PUBLICATION

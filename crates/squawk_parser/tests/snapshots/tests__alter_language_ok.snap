@@ -14,13 +14,14 @@ SOURCE_FILE
       NAME_REF
         IDENT "x"
     WHITESPACE " "
-    RENAME_TO
+    LANGUAGE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "y"
+      LANGUAGE
+        NAME
+          IDENT "y"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_LANGUAGE
@@ -34,13 +35,14 @@ SOURCE_FILE
       NAME_REF
         IDENT "x"
     WHITESPACE " "
-    RENAME_TO
+    LANGUAGE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "y"
+      LANGUAGE
+        NAME
+          IDENT "y"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

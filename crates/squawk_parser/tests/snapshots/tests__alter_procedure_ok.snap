@@ -17,13 +17,16 @@ SOURCE_FILE
             NAME_REF
               IDENT "p"
     WHITESPACE "\n  "
-    RENAME_TO
+    PROCEDURE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "q"
+      PROCEDURE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE
@@ -60,13 +63,16 @@ SOURCE_FILE
                   TEXT_KW "text"
         R_PAREN ")"
     WHITESPACE "\n  "
-    RENAME_TO
+    PROCEDURE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "q"
+      PROCEDURE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

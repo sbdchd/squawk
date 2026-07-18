@@ -342,12 +342,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "w"
     WHITESPACE "\n  "
-    RENAME_TO
+    FOREIGN_DATA_WRAPPER_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      FOREIGN_DATA_WRAPPER
+        NAME
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"

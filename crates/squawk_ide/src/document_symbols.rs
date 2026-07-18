@@ -456,7 +456,7 @@ fn create_aggregate_symbol(
 ) -> Option<DocumentSymbol> {
     let file = create_aggregate.file_id;
     let create_aggregate = create_aggregate.value;
-    let path = create_aggregate.path()?;
+    let path = create_aggregate.aggregate_name()?.path()?;
     let name_node = path.segment()?.name()?;
 
     let (schema, aggregate_name) = resolve_aggregate_info(db, InFile::new(file, &path))?;

@@ -20,13 +20,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "p"
     WHITESPACE " "
-    RENAME_TO
+    TEXT_SEARCH_PARSER_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "q"
+      TEXT_SEARCH_PARSER
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"

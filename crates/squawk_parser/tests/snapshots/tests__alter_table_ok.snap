@@ -3668,13 +3668,16 @@ SOURCE_FILE
             NAME_REF
               IDENT "products"
     WHITESPACE " "
-    RENAME_TO
+    TABLE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "items"
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "items"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -3693,13 +3696,16 @@ SOURCE_FILE
               IDENT "a"
       R_PAREN ")"
     WHITESPACE " "
-    RENAME_TO
+    TABLE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "b"
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename constraint"

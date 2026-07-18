@@ -16,13 +16,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "i"
     WHITESPACE " "
-    RENAME_TO
+    INDEX_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "j"
+      INDEX
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "j"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -46,13 +49,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "i"
     WHITESPACE " "
-    RENAME_TO
+    INDEX_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "j"
+      INDEX
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "j"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"

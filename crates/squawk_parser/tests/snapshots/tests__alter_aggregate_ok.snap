@@ -21,13 +21,16 @@ SOURCE_FILE
         STAR "*"
         R_PAREN ")"
     WHITESPACE " "
-    RENAME_TO
+    AGGREGATE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "b"
+      AGGREGATE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple_args"
@@ -146,13 +149,16 @@ SOURCE_FILE
                   IDENT "y"
         R_PAREN ")"
     WHITESPACE " \n    "
-    RENAME_TO
+    AGGREGATE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "b"
+      AGGREGATE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- qualified_names"

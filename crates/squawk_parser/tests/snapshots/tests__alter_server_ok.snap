@@ -110,12 +110,13 @@ SOURCE_FILE
       NAME_REF
         IDENT "s"
     WHITESPACE "\n  "
-    RENAME_TO
+    SERVER_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "t"
+      SERVER
+        NAME
+          IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"

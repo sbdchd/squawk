@@ -5510,13 +5510,17 @@ fn opt_with_data(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn rename_to(p: &mut Parser<'_>) -> CompletedMarker {
+fn rename_to(
+    p: &mut Parser<'_>,
+    kind: SyntaxKind,
+    name: impl FnOnce(&mut Parser<'_>),
+) -> CompletedMarker {
     assert!(p.at(RENAME_KW));
     let m = p.start();
     p.bump(RENAME_KW);
     p.expect(TO_KW);
     name(p);
-    m.complete(p, RENAME_TO)
+    m.complete(p, kind)
 }
 
 fn owner_to(p: &mut Parser<'_>) -> CompletedMarker {
@@ -5875,10 +5879,22 @@ fn procedure_name_ref(p: &mut Parser<'_>) {
     m.complete(p, PROCEDURE_NAME_REF);
 }
 
+fn routine_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_name(p);
+    m.complete(p, ROUTINE_NAME);
+}
+
 fn routine_name_ref(p: &mut Parser<'_>) {
     let m = p.start();
     path_name_ref(p);
     m.complete(p, ROUTINE_NAME_REF);
+}
+
+fn aggregate_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    path_name(p);
+    m.complete(p, AGGREGATE_NAME);
 }
 
 fn language(p: &mut Parser<'_>) {
@@ -6722,7 +6738,7 @@ fn alter_statistics(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, STATISTICS_RENAME_TO, statistics);
         }
         SET_KW if p.nth_at(1, SCHEMA_KW) => {
             set_schema(p);
@@ -6762,7 +6778,7 @@ fn alter_server(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, SERVER_RENAME_TO, server);
         }
         _ => {
             let mut found_option = false;
@@ -6823,7 +6839,7 @@ fn alter_sequence(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, SEQUENCE_RENAME_TO, sequence);
         }
         _ => {
             let mut found_option = false;
@@ -6852,7 +6868,7 @@ fn alter_schema(p: &mut Parser<'_>) -> CompletedMarker {
     schema_ref(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, SCHEMA_RENAME_TO, schema);
         }
         OWNER_KW => {
             owner_to(p);
@@ -6874,7 +6890,7 @@ fn alter_rule(p: &mut Parser<'_>) -> CompletedMarker {
     rule_ref(p);
     on_relation(p);
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, RULE_RENAME_TO, rule);
     } else {
         p.error("expected RENAME");
     }
@@ -6911,7 +6927,7 @@ fn alter_routine(p: &mut Parser<'_>) -> CompletedMarker {
     routine_sig(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, ROUTINE_RENAME_TO, routine_name);
         }
         OWNER_KW => {
             owner_to(p);
@@ -6963,7 +6979,9 @@ fn alter_role(p: &mut Parser<'_>) -> CompletedMarker {
     }
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, ROLE_RENAME_TO, |p| {
+                role(p);
+            });
         }
         IN_KW | SET_KW | RESET_KW => {
             opt_in_database(p);
@@ -7052,7 +7070,7 @@ fn alter_publication(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, PUBLICATION_RENAME_TO, publication);
         }
         _ => {
             p.error("expected ADD, SET, DROP, OWNER, or RENAME");
@@ -7087,7 +7105,7 @@ fn alter_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     procedure_sig(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, PROCEDURE_RENAME_TO, procedure_name);
         }
         OWNER_KW => {
             owner_to(p);
@@ -7120,7 +7138,7 @@ fn alter_policy(p: &mut Parser<'_>) -> CompletedMarker {
     policy_ref(p);
     on_table(p);
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, POLICY_RENAME_TO, policy);
     } else if p.at(TO_KW) || p.at(USING_KW) || p.at(WITH_KW) {
         let m = p.start();
         if p.eat(TO_KW) {
@@ -7198,7 +7216,7 @@ fn alter_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, DROP_OP_CLASS_OPTIONS);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, OP_FAMILY_RENAME_TO, op_family_name);
         }
         OWNER_KW => {
             owner_to(p);
@@ -7249,7 +7267,7 @@ fn alter_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     using_method(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, OP_CLASS_RENAME_TO, op_class_name);
         }
         OWNER_KW => {
             owner_to(p);
@@ -7340,7 +7358,7 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         view_ref(p);
         match p.current() {
             RENAME_KW if p.nth_at(1, TO_KW) => {
-                rename_to(p);
+                rename_to(p, VIEW_RENAME_TO, view);
             }
             RENAME_KW => {
                 let m = p.start();
@@ -7427,7 +7445,7 @@ fn alter_language(p: &mut Parser<'_>) -> CompletedMarker {
     language_ref(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, LANGUAGE_RENAME_TO, language);
         }
         OWNER_KW => {
             owner_to(p);
@@ -7462,7 +7480,7 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
         index_ref(p);
         match p.current() {
             RENAME_KW => {
-                rename_to(p);
+                rename_to(p, INDEX_RENAME_TO, index);
             }
             SET_KW if p.nth_at(1, L_PAREN) => {
                 set_options(p);
@@ -7548,7 +7566,9 @@ fn alter_group(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, if is_add { ADD_USERS } else { DROP_USERS });
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, ROLE_RENAME_TO, |p| {
+                role(p);
+            });
         }
         _ => {
             p.error("expected ADD, DROP, or RENAME");
@@ -7589,7 +7609,7 @@ fn alter_function(p: &mut Parser<'_>) -> CompletedMarker {
     function_sig(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, FUNCTION_RENAME_TO, function_name);
         }
         OWNER_KW => {
             owner_to(p);
@@ -7652,7 +7672,7 @@ fn alter_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     table_relation_name(p);
     match p.current() {
         RENAME_KW if p.nth_at(1, TO_KW) => {
-            rename_to(p);
+            rename_to(p, TABLE_RENAME_TO, table_name);
         }
         RENAME_KW => {
             let m = p.start();
@@ -7694,7 +7714,7 @@ fn alter_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
             true
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, FOREIGN_DATA_WRAPPER_RENAME_TO, foreign_data_wrapper);
             true
         }
         _ => opt_fdw_option_list(p).is_some(),
@@ -7739,7 +7759,7 @@ fn alter_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, EVENT_TRIGGER_RENAME_TO, event_trigger);
         }
         _ => {
             p.error("expected DISABLE, ENABLE, OWNER, or RENAME");
@@ -8136,7 +8156,7 @@ fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
         RENAME_KW if p.nth_at(1, TO_KW) => {
             m.abandon(p);
-            return Some(rename_to(p));
+            return Some(rename_to(p, DOMAIN_RENAME_TO, domain));
         }
         RENAME_KW => {
             p.bump(RENAME_KW);
@@ -8354,7 +8374,7 @@ fn alter_database(p: &mut Parser<'_>) -> CompletedMarker {
     database_ref(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, DATABASE_RENAME_TO, database);
         }
         OWNER_KW => {
             owner_to(p);
@@ -8419,7 +8439,7 @@ fn alter_conversion(p: &mut Parser<'_>) -> CompletedMarker {
     conversion_ref(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, CONVERSION_RENAME_TO, conversion);
         }
         OWNER_KW => {
             owner_to(p);
@@ -8450,7 +8470,7 @@ fn alter_collation(p: &mut Parser<'_>) -> CompletedMarker {
             refresh_version(p);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, COLLATION_RENAME_TO, collation);
         }
         OWNER_KW => {
             owner_to(p);
@@ -8500,7 +8520,7 @@ fn alter_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
     aggregate(p);
     match p.current() {
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, AGGREGATE_RENAME_TO, aggregate_name);
         }
         OWNER_KW => {
             owner_to(p);
@@ -8603,7 +8623,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(p, SUBSCRIPTION_RENAME_TO, subscription);
         }
         _ => {
             p.error(
@@ -8651,7 +8671,7 @@ fn alter_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(TABLESPACE_KW);
     tablespace_ref(p);
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, TABLESPACE_RENAME_TO, tablespace);
     } else if p.at(OWNER_KW) {
         owner_to(p);
     } else if p.at(SET_KW) {
@@ -8694,7 +8714,7 @@ fn alter_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(PARSER_KW);
     text_search_parser_ref(p);
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, TEXT_SEARCH_PARSER_RENAME_TO, text_search_parser);
     } else if p.at(SET_KW) {
         set_schema(p);
     } else {
@@ -8726,7 +8746,7 @@ fn alter_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(L_PAREN) {
         attribute_list(p);
     } else if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, TEXT_SEARCH_DICTIONARY_RENAME_TO, text_search_dictionary);
     } else if p.at(OWNER_KW) {
         owner_to(p);
     } else if p.at(SET_KW) {
@@ -8816,7 +8836,11 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
             m.complete(p, DROP_MAPPING);
         }
         RENAME_KW => {
-            rename_to(p);
+            rename_to(
+                p,
+                TEXT_SEARCH_CONFIGURATION_RENAME_TO,
+                text_search_configuration,
+            );
         }
         OWNER_KW => {
             owner_to(p);
@@ -9019,7 +9043,7 @@ fn alter_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(TEMPLATE_KW);
     text_search_template_ref(p);
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, TEXT_SEARCH_TEMPLATE_RENAME_TO, text_search_template);
     } else if p.at(SET_KW) {
         set_schema(p);
     } else {
@@ -9039,7 +9063,7 @@ fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     trigger_ref(p);
     on_relation(p);
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, TRIGGER_RENAME_TO, trigger);
     } else {
         if p.at(NO_KW) || p.at(DEPENDS_KW) {
             depends_on_extension(p);
@@ -9118,7 +9142,7 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             set_options(p);
         }
         RENAME_KW if p.nth_at(1, TO_KW) => {
-            rename_to(p);
+            rename_to(p, TYPE_RENAME_TO, type_name_definition);
         }
         RENAME_KW => {
             let m = p.start();
@@ -9207,7 +9231,9 @@ fn alter_user(p: &mut Parser<'_>) -> CompletedMarker {
     }
     // RENAME TO new_name
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, ROLE_RENAME_TO, |p| {
+            role(p);
+        });
         return m.complete(p, ALTER_USER);
     }
     opt_in_database(p);
@@ -9319,7 +9345,7 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
             owner_to(p);
         }
         RENAME_KW if p.nth_at(1, TO_KW) => {
-            rename_to(p);
+            rename_to(p, VIEW_RENAME_TO, view);
         }
         RENAME_KW => {
             let m = p.start();
@@ -9956,7 +9982,7 @@ const VERTEX_OR_EDGE: TokenSet = VERTEX.union(EDGE);
 
 fn alter_property_graph_action(p: &mut Parser<'_>) {
     if p.at(RENAME_KW) {
-        rename_to(p);
+        rename_to(p, PROPERTY_GRAPH_RENAME_TO, property_graph);
     } else if p.at(OWNER_KW) {
         owner_to(p);
     } else if p.at(SET_KW) {
@@ -10369,7 +10395,7 @@ fn create_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     opt_or_replace(p);
     p.expect(AGGREGATE_KW);
-    path_name(p);
+    aggregate_name(p);
     let at_old_syntax = p.at(L_PAREN) && p.nth_at(1, IDENT) && p.nth_at(2, EQ);
     if !at_old_syntax {
         aggregate_arg_list(p);
@@ -16766,7 +16792,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
         RESET_KW => reset_options(p),
         // RENAME TO new_name
-        RENAME_KW if p.nth_at(1, TO_KW) => rename_to(p),
+        RENAME_KW if p.nth_at(1, TO_KW) => rename_to(p, TABLE_RENAME_TO, table_name),
         // RENAME CONSTRAINT constraint_name TO new_constraint_name
         // RENAME [ COLUMN ] column_name TO new_column_name
         RENAME_KW => {

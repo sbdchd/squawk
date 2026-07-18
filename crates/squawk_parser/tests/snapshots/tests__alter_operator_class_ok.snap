@@ -25,13 +25,16 @@ SOURCE_FILE
         NAME_REF
           IDENT "m"
     WHITESPACE "\n  "
-    RENAME_TO
+    OP_CLASS_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      OP_CLASS_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_OPERATOR_CLASS
@@ -59,13 +62,16 @@ SOURCE_FILE
         NAME_REF
           IDENT "m"
     WHITESPACE "\n  "
-    RENAME_TO
+    OP_CLASS_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      OP_CLASS_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

@@ -28,13 +28,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "bar"
     WHITESPACE "\n  "
-    RENAME_TO
+    PROPERTY_GRAPH_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "r"
+      PROPERTY_GRAPH
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set owner"

@@ -35,13 +35,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "c"
     WHITESPACE "\n  "
-    RENAME_TO
+    COLLATION_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "d"
+      COLLATION
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "d"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

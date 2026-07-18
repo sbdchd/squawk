@@ -23,13 +23,14 @@ SOURCE_FILE
             NAME_REF
               IDENT "x"
     WHITESPACE " "
-    RENAME_TO
+    TRIGGER_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "u"
+      TRIGGER
+        NAME
+          IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends_on"

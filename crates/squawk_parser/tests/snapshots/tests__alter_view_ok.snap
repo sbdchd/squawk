@@ -203,13 +203,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "v"
     WHITESPACE " "
-    RENAME_TO
+    VIEW_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      VIEW
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"

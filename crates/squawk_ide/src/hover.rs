@@ -1799,7 +1799,7 @@ fn hover_named_arg_parameter(db: &dyn Db, def: Location) -> Option<Hover> {
             ));
         }
         if let Some(create_aggregate) = ast::CreateAggregate::cast(ancestor) {
-            let path = create_aggregate.path()?;
+            let path = create_aggregate.aggregate_name()?.path()?;
             let (schema, aggregate_name) =
                 resolve::resolve_aggregate_info(db, InFile::new(def.file, &path))?;
             return Some(format_param_hover(
@@ -1862,7 +1862,7 @@ fn format_create_aggregate(
 ) -> Option<Hover> {
     let file = create_aggregate.file_id;
     let create_aggregate = create_aggregate.value;
-    let path = create_aggregate.path()?;
+    let path = create_aggregate.aggregate_name()?.path()?;
     let (schema, aggregate_name) = resolve::resolve_aggregate_info(db, InFile::new(file, &path))?;
 
     let param_list = create_aggregate.param_list()?;
