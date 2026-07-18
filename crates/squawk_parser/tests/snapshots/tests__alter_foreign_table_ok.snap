@@ -19,13 +19,16 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE "\n  "
-    RENAME_TO
+    TABLE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "u"
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only_and_asterisk"
@@ -46,13 +49,16 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE "\n  "
-    RENAME_TO
+    TABLE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "u"
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -71,13 +77,16 @@ SOURCE_FILE
       WHITESPACE " "
       STAR "*"
     WHITESPACE "\n  "
-    RENAME_TO
+    TABLE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "u"
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"

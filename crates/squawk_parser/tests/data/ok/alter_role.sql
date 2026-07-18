@@ -25,6 +25,7 @@ alter role r
 
 -- rename
 alter role r rename to newname;
+alter role r rename to current_user;
 
 -- set_config
 alter role r set param = 'value';

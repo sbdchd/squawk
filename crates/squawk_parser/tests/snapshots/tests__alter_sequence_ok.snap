@@ -228,13 +228,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "s"
     WHITESPACE "\n  "
-    RENAME_TO
+    SEQUENCE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "t"
+      SEQUENCE
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- schema"

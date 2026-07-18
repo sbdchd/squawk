@@ -715,13 +715,16 @@ SOURCE_FILE
         NAME_REF
           IDENT "i"
     WHITESPACE "\n  "
-    RENAME_TO
+    OP_FAMILY_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "n"
+      OP_FAMILY_NAME
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

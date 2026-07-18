@@ -571,7 +571,10 @@ fn bind_create_function(b: &mut Binder, create_function: ast::CreateFunction) {
 }
 
 fn bind_create_aggregate(b: &mut Binder, create_aggregate: ast::CreateAggregate) {
-    let Some(path) = create_aggregate.path() else {
+    let Some(path) = create_aggregate
+        .aggregate_name()
+        .and_then(|name| name.path())
+    else {
         return;
     };
 

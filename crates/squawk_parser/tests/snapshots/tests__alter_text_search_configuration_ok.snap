@@ -456,13 +456,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "n"
     WHITESPACE " "
-    RENAME_TO
+    TEXT_SEARCH_CONFIGURATION_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "m"
+      TEXT_SEARCH_CONFIGURATION
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "m"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TEXT_SEARCH_CONFIGURATION
@@ -485,13 +488,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "n"
     WHITESPACE " "
-    RENAME_TO
+    TEXT_SEARCH_CONFIGURATION_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "m"
+      TEXT_SEARCH_CONFIGURATION
+        PATH
+          PATH_SEGMENT
+            NAME
+              IDENT "m"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"

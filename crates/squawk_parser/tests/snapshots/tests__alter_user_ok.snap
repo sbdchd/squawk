@@ -124,13 +124,14 @@ SOURCE_FILE
       NAME_REF
         IDENT "u"
     WHITESPACE " "
-    RENAME_TO
+    ROLE_RENAME_TO
       RENAME_KW "rename"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
-        IDENT "v"
+      ROLE
+        NAME
+          IDENT "v"
   EMPTY_STMT
     SEMICOLON ";"
   WHITESPACE "\n\n"

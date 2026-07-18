@@ -705,6 +705,9 @@ ProcedureName =
 ProcedureNameRef =
   PathRef
 
+RoutineName =
+  Path
+
 RoutineNameRef =
   PathRef
 
@@ -1029,7 +1032,7 @@ AlterTableAction =
 | SetUnlogged
 | SetOptions
 | ResetOptions
-| RenameTo
+| TableRenameTo
 | RenameConstraint
 | RenameColumn
 | AlterConstraint
@@ -1324,7 +1327,7 @@ Rollback =
 | 'rollback' 'prepared' Literal ';'?
 
 CreateAggregate =
-  'create' OrReplace? 'aggregate' Path ParamList? AttributeList ';'?
+  'create' OrReplace? 'aggregate' AggregateName ParamList? AttributeList ';'?
 
 IfExists =
  'if' 'exists'
@@ -1582,8 +1585,104 @@ ValidateConstraint =
 OwnerTo =
   'owner' 'to' RoleRef
 
-RenameTo =
-  'rename' 'to' Name
+AggregateRenameTo =
+  'rename' 'to' AggregateName
+
+CollationRenameTo =
+  'rename' 'to' Collation
+
+ConversionRenameTo =
+  'rename' 'to' Conversion
+
+DatabaseRenameTo =
+  'rename' 'to' Database
+
+DomainRenameTo =
+  'rename' 'to' Domain
+
+EventTriggerRenameTo =
+  'rename' 'to' EventTrigger
+
+ForeignDataWrapperRenameTo =
+  'rename' 'to' ForeignDataWrapper
+
+FunctionRenameTo =
+  'rename' 'to' FunctionName
+
+IndexRenameTo =
+  'rename' 'to' Index
+
+LanguageRenameTo =
+  'rename' 'to' Language
+
+OpClassRenameTo =
+  'rename' 'to' OpClassName
+
+OpFamilyRenameTo =
+  'rename' 'to' OpFamilyName
+
+PolicyRenameTo =
+  'rename' 'to' Policy
+
+ProcedureRenameTo =
+  'rename' 'to' ProcedureName
+
+PropertyGraphRenameTo =
+  'rename' 'to' PropertyGraph
+
+PublicationRenameTo =
+  'rename' 'to' Publication
+
+RoleRenameTo =
+  'rename' 'to' Role
+
+RoutineRenameTo =
+  'rename' 'to' RoutineName
+
+RuleRenameTo =
+  'rename' 'to' Rule
+
+SchemaRenameTo =
+  'rename' 'to' Schema
+
+SequenceRenameTo =
+  'rename' 'to' Sequence
+
+ServerRenameTo =
+  'rename' 'to' Server
+
+StatisticsRenameTo =
+  'rename' 'to' Statistics
+
+SubscriptionRenameTo =
+  'rename' 'to' Subscription
+
+TableRenameTo =
+  'rename' 'to' TableName
+
+TablespaceRenameTo =
+  'rename' 'to' Tablespace
+
+TextSearchConfigurationRenameTo =
+  'rename' 'to' TextSearchConfiguration
+
+TextSearchDictionaryRenameTo =
+  'rename' 'to' TextSearchDictionary
+
+TextSearchParserRenameTo =
+  'rename' 'to' TextSearchParser
+
+TextSearchTemplateRenameTo =
+  'rename' 'to' TextSearchTemplate
+
+TriggerRenameTo =
+  'rename' 'to' Trigger
+
+TypeRenameTo =
+  'rename' 'to' TypeName
+
+ViewRenameTo =
+  'rename' 'to' View
 
 SetSchema =
   'set' 'schema' SchemaRef
@@ -1598,7 +1697,7 @@ AlterDomainAction =
 | RenameConstraint
 | ValidateConstraint
 | OwnerTo
-| RenameTo
+| DomainRenameTo
 | SetSchema
 
 AlterDomain =
@@ -2302,7 +2401,7 @@ AlterStatistics =
   'alter' 'statistics' StatisticsRef
   (
     OwnerTo
-  | RenameTo
+  | StatisticsRenameTo
   | SetSchema
   | SetStatistics
   ) ';'?
@@ -2311,7 +2410,7 @@ AlterServer =
   'alter' 'server' ServerRef
   (
     OwnerTo
-  | RenameTo
+  | ServerRenameTo
   | SetVersion? AlterOptionList?
   ) ';'?
 
@@ -2332,22 +2431,22 @@ AlterSequence =
   | SetLogged
   | SetUnlogged
   | OwnerTo
-  | RenameTo
+  | SequenceRenameTo
   | SequenceOption SequenceOption*
   ) ';'?
 
 AlterSchema =
   'alter' 'schema' SchemaRef
-  (RenameTo
+  (SchemaRenameTo
   | OwnerTo) ';'?
 
 AlterRule =
-  'alter' 'rule' RuleRef OnRelation RenameTo ';'?
+  'alter' 'rule' RuleRef OnRelation RuleRenameTo ';'?
 
 AlterRoutine =
   'alter' 'routine' RoutineSig
   (
-    RenameTo
+    RoutineRenameTo
   | OwnerTo
   | SetSchema
   | DependsOnExtension
@@ -2359,7 +2458,7 @@ AlterRoutine =
 AlterRole =
   'alter' 'role' ('all' | RoleRef)
   (
-    RenameTo
+    RoleRenameTo
   | InDatabase? SetConfigParam
   | InDatabase? ResetConfigParam
   | RoleOptionList
@@ -2377,7 +2476,7 @@ AlterPublication =
   | SetAllPublicationObjects
   | SetPublicationObjects
   | OwnerTo
-  | RenameTo
+  | PublicationRenameTo
   ) ';'?
 
 AddPublicationObjects =
@@ -2395,7 +2494,7 @@ SetPublicationObjects =
 AlterProcedure =
   'alter' 'procedure' ProcedureSig
   (
-    RenameTo
+    ProcedureRenameTo
   | OwnerTo
   | SetSchema
   | DependsOnExtension
@@ -2406,7 +2505,7 @@ AlterProcedure =
 
 AlterPolicy =
   'alter' 'policy' PolicyRef OnTable
-  (RenameTo | AlterPolicyTo) ';'?
+  (PolicyRenameTo | AlterPolicyTo) ';'?
 
 AlterPolicyTo =
   ('to' RoleRefList)?
@@ -2419,7 +2518,7 @@ AlterOperatorFamily =
   (
     AddOpClassOptions
   | DropOpClassOptions
-  | RenameTo
+  | OpFamilyRenameTo
   | OwnerTo
   | SetSchema
   ) ';'?
@@ -2445,7 +2544,7 @@ OpClassOption =
 AlterOperatorClass =
   'alter' 'operator' 'class' OpClassRef UsingMethod
   (
-    RenameTo
+    OpClassRenameTo
   | OwnerTo
   | SetSchema
   ) ';'?
@@ -2459,7 +2558,7 @@ AlterOperator =
   ) ';'?
 
 AlterMaterializedViewAction =
-  RenameTo
+  ViewRenameTo
 | RenameColumn
 | SetSchema
 | NoDependsOnExtension
@@ -2484,7 +2583,7 @@ AlterLargeObject =
 
 AlterLanguage =
   'alter' 'language' LanguageRef
-  (RenameTo | OwnerTo)? ';'?
+  (LanguageRenameTo | OwnerTo)? ';'?
 
 AlterIndex =
   'alter' 'index' (
@@ -2500,7 +2599,7 @@ AlterIndexAction =
 | DependsOnExtension
 | NoDependsOnExtension
 | ResetOptions
-| RenameTo
+| IndexRenameTo
 | SetTablespace
 | SetOptions
 | AlterSetStatistics
@@ -2510,7 +2609,7 @@ AlterGroup =
   (
     AddUsers
   | DropUsers
-  | RenameTo
+  | RoleRenameTo
   ) ';'?
 
 AddUsers =
@@ -2522,7 +2621,7 @@ DropUsers =
 AlterFunction =
   'alter' 'function' FunctionSig
   (
-    RenameTo
+    FunctionRenameTo
   | OwnerTo
   | SetSchema
   | DependsOnExtension
@@ -2533,7 +2632,7 @@ AlterFunction =
 
 AlterForeignTable =
   'alter' 'foreign' 'table' IfExists? TableRelationName
-  (RenameTo
+  (TableRenameTo
   | RenameColumn
   | SetSchema
   | AlterTableAction*
@@ -2541,7 +2640,7 @@ AlterForeignTable =
 
 AlterForeignDataWrapper =
   'alter' 'foreign' 'data' 'wrapper' ForeignDataWrapperRef
-  (RenameTo
+  (ForeignDataWrapperRenameTo
   | OwnerTo
   | FdwOptionList
   )? ';'?
@@ -2566,7 +2665,7 @@ AlterEventTrigger =
   | EnableAlways
   | EnableReplica
   | OwnerTo
-  | RenameTo
+  | EventTriggerRenameTo
   )? ';'?
 
 Disable =
@@ -2767,7 +2866,7 @@ PrivilegeTarget  =
 AlterDatabase =
   'alter' 'database' DatabaseRef
   (
-    RenameTo
+    DatabaseRenameTo
   | OwnerTo
   | SetTablespace
   | SetConfigParam
@@ -2805,14 +2904,14 @@ RefreshCollationVersion =
 AlterConversion =
   'alter' 'conversion' ConversionRef
   (
-    RenameTo
+    ConversionRenameTo
   | OwnerTo
   | SetSchema
   ) ';'?
 
 AlterCollation =
   'alter' 'collation' CollationRef
-  (RenameTo
+  (CollationRenameTo
   | RefreshVersion
   | OwnerTo
   | SetSchema
@@ -2824,7 +2923,7 @@ RefreshVersion =
 AlterAggregate =
   'alter' 'aggregate' Aggregate
   (
-    RenameTo
+    AggregateRenameTo
   | OwnerTo
   | SetSchema
   ) ';'?
@@ -2844,7 +2943,7 @@ AlterSubscriptionAction =
 | DisableSubscription
 | SkipSubscription
 | OwnerTo
-| RenameTo
+| SubscriptionRenameTo
 
 SetConnection =
   'connection' Literal
@@ -2883,7 +2982,7 @@ AlterSystem =
 AlterTablespace =
   'alter' 'tablespace' TablespaceRef
   (
-    RenameTo
+    TablespaceRenameTo
   | OwnerTo
   | SetOptions
   | ResetOptions
@@ -2891,12 +2990,12 @@ AlterTablespace =
 
 AlterTextSearchParser =
   'alter' 'text' 'search' 'parser' TextSearchParserRef
-  (RenameTo | SetSchema) ';'?
+  (TextSearchParserRenameTo | SetSchema) ';'?
 
 AlterTextSearchDictionary =
   'alter' 'text' 'search' 'dictionary' TextSearchDictionaryRef
   (
-    RenameTo
+    TextSearchDictionaryRenameTo
   | OwnerTo
   | SetSchema
   | AttributeList
@@ -2908,7 +3007,7 @@ AlterTextSearchConfiguration =
     AddMapping
   | AlterMapping
   | DropMapping
-  | RenameTo
+  | TextSearchConfigurationRenameTo
   | OwnerTo
   | SetSchema
   ) ';'?
@@ -2929,12 +3028,12 @@ DropMapping =
 
 AlterTextSearchTemplate =
   'alter' 'text' 'search' 'template' TextSearchTemplateRef
-  (RenameTo | SetSchema) ';'?
+  (TextSearchTemplateRenameTo | SetSchema) ';'?
 
 AlterTrigger =
   'alter' 'trigger' TriggerRef OnRelation
   (
-    RenameTo
+    TriggerRenameTo
   | DependsOnExtension
   | NoDependsOnExtension
   ) ';'?
@@ -2946,7 +3045,7 @@ AlterType =
   | OwnerTo
   | SetSchema
   | SetOptions
-  | RenameTo
+  | TypeRenameTo
   | RenameAttribute
   | RenameValue
   | AddValue
@@ -2989,7 +3088,7 @@ AlterUser =
   'alter' 'user' ('all' | RoleRef)
   (
     RoleOptionList
-  | RenameTo
+  | RoleRenameTo
   | InDatabase? SetConfigParam
   | InDatabase? ResetConfigParam
   )? ';'?
@@ -3002,7 +3101,7 @@ AlterView =
   (
     AlterViewColumn
   | OwnerTo
-  | RenameTo
+  | ViewRenameTo
   | RenameColumn
   | SetSchema
   | SetOptions
@@ -3205,7 +3304,7 @@ AlterPropertyGraph =
   AlterPropertyGraphAction ';'?
 
 AlterPropertyGraphAction =
-  RenameTo
+  PropertyGraphRenameTo
 | SetSchema
 | OwnerTo
 | AddVertexEdgeTables
@@ -3643,6 +3742,9 @@ DropAccessMethod =
 
 Aggregate =
   PathRef ParamList
+
+AggregateName =
+  Path
 
 DropAggregate =
   'drop' 'aggregate' IfExists? (Aggregate (',' Aggregate)*)

@@ -10,10 +10,11 @@ SOURCE_FILE@0..101
     WHITESPACE@45..46 " "
     AGGREGATE_KW@46..55 "aggregate"
     WHITESPACE@55..56 " "
-    PATH@56..57
-      PATH_SEGMENT@56..57
-        NAME@56..57
-          IDENT@56..57 "a"
+    AGGREGATE_NAME@56..57
+      PATH@56..57
+        PATH_SEGMENT@56..57
+          NAME@56..57
+            IDENT@56..57 "a"
     PARAM_LIST@57..70
       L_PAREN@57..58 "("
       PARAM@58..62

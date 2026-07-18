@@ -504,6 +504,36 @@ impl Aggregate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AggregateName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AggregateName {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AggregateRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AggregateRenameTo {
+    #[inline]
+    pub fn aggregate_name(&self) -> Option<AggregateName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Alias {
     pub(crate) syntax: SyntaxNode,
 }
@@ -643,11 +673,11 @@ impl AlterAggregate {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn owner_to(&self) -> Option<OwnerTo> {
+    pub fn aggregate_rename_to(&self) -> Option<AggregateRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -725,15 +755,15 @@ impl AlterCollation {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn collation_rename_to(&self) -> Option<CollationRenameTo> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn refresh_version(&self) -> Option<RefreshVersion> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -826,11 +856,11 @@ impl AlterConversion {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn owner_to(&self) -> Option<OwnerTo> {
+    pub fn conversion_rename_to(&self) -> Option<ConversionRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -865,15 +895,15 @@ impl AlterDatabase {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn database_rename_to(&self) -> Option<DatabaseRenameTo> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn refresh_collation_version(&self) -> Option<RefreshCollationVersion> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1014,11 +1044,11 @@ impl AlterEventTrigger {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn owner_to(&self) -> Option<OwnerTo> {
+    pub fn event_trigger_rename_to(&self) -> Option<EventTriggerRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1145,11 +1175,11 @@ impl AlterForeignDataWrapper {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn owner_to(&self) -> Option<OwnerTo> {
+    pub fn foreign_data_wrapper_rename_to(&self) -> Option<ForeignDataWrapperRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1192,15 +1222,15 @@ impl AlterForeignTable {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn table_relation_name(&self) -> Option<TableRelationName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn table_rename_to(&self) -> Option<TableRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1235,6 +1265,10 @@ impl AlterFunction {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn function_rename_to(&self) -> Option<FunctionRenameTo> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn function_sig(&self) -> Option<FunctionSig> {
         support::child(&self.syntax)
     }
@@ -1244,10 +1278,6 @@ impl AlterFunction {
     }
     #[inline]
     pub fn owner_to(&self) -> Option<OwnerTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1286,11 +1316,11 @@ impl AlterGroup {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn role_ref(&self) -> Option<RoleRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_ref(&self) -> Option<RoleRef> {
+    pub fn role_rename_to(&self) -> Option<RoleRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1352,11 +1382,11 @@ impl AlterLanguage {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn owner_to(&self) -> Option<OwnerTo> {
+    pub fn language_rename_to(&self) -> Option<LanguageRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1535,11 +1565,11 @@ impl AlterOperatorClass {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn owner_to(&self) -> Option<OwnerTo> {
+    pub fn op_class_rename_to(&self) -> Option<OpClassRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1586,11 +1616,11 @@ impl AlterOperatorFamily {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn owner_to(&self) -> Option<OwnerTo> {
+    pub fn op_family_rename_to(&self) -> Option<OpFamilyRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn owner_to(&self) -> Option<OwnerTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1687,7 +1717,7 @@ impl AlterPolicy {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn policy_rename_to(&self) -> Option<PolicyRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1749,11 +1779,11 @@ impl AlterProcedure {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn procedure_sig(&self) -> Option<ProcedureSig> {
+    pub fn procedure_rename_to(&self) -> Option<ProcedureRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn procedure_sig(&self) -> Option<ProcedureSig> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1835,7 +1865,7 @@ impl AlterPublication {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn publication_rename_to(&self) -> Option<PublicationRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1874,10 +1904,6 @@ impl AlterRole {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn reset_config_param(&self) -> Option<ResetConfigParam> {
         support::child(&self.syntax)
     }
@@ -1887,6 +1913,10 @@ impl AlterRole {
     }
     #[inline]
     pub fn role_ref(&self) -> Option<RoleRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn role_rename_to(&self) -> Option<RoleRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1933,7 +1963,7 @@ impl AlterRoutine {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn routine_rename_to(&self) -> Option<RoutineRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1972,11 +2002,11 @@ impl AlterRule {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn rule_ref(&self) -> Option<RuleRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rule_ref(&self) -> Option<RuleRef> {
+    pub fn rule_rename_to(&self) -> Option<RuleRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2003,11 +2033,11 @@ impl AlterSchema {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn schema_ref(&self) -> Option<SchemaRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn schema_ref(&self) -> Option<SchemaRef> {
+    pub fn schema_rename_to(&self) -> Option<SchemaRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2038,10 +2068,6 @@ impl AlterSequence {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn sequence_option(&self) -> Option<SequenceOption> {
         support::child(&self.syntax)
     }
@@ -2051,6 +2077,10 @@ impl AlterSequence {
     }
     #[inline]
     pub fn sequence_ref(&self) -> Option<SequenceRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sequence_rename_to(&self) -> Option<SequenceRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2093,11 +2123,11 @@ impl AlterServer {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn server_ref(&self) -> Option<ServerRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn server_ref(&self) -> Option<ServerRef> {
+    pub fn server_rename_to(&self) -> Option<ServerRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2155,10 +2185,6 @@ impl AlterStatistics {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
     }
@@ -2168,6 +2194,10 @@ impl AlterStatistics {
     }
     #[inline]
     pub fn statistics_ref(&self) -> Option<StatisticsRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn statistics_rename_to(&self) -> Option<StatisticsRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2283,10 +2313,6 @@ impl AlterTablespace {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn reset_options(&self) -> Option<ResetOptions> {
         support::child(&self.syntax)
     }
@@ -2296,6 +2322,10 @@ impl AlterTablespace {
     }
     #[inline]
     pub fn tablespace_ref(&self) -> Option<TablespaceRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn tablespace_rename_to(&self) -> Option<TablespaceRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2334,15 +2364,15 @@ impl AlterTextSearchConfiguration {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn text_search_configuration_ref(&self) -> Option<TextSearchConfigurationRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn text_search_configuration_rename_to(&self) -> Option<TextSearchConfigurationRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2381,15 +2411,15 @@ impl AlterTextSearchDictionary {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn text_search_dictionary_ref(&self) -> Option<TextSearchDictionaryRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn text_search_dictionary_rename_to(&self) -> Option<TextSearchDictionaryRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2420,15 +2450,15 @@ pub struct AlterTextSearchParser {
 }
 impl AlterTextSearchParser {
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn text_search_parser_ref(&self) -> Option<TextSearchParserRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn text_search_parser_rename_to(&self) -> Option<TextSearchParserRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2459,15 +2489,15 @@ pub struct AlterTextSearchTemplate {
 }
 impl AlterTextSearchTemplate {
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_schema(&self) -> Option<SetSchema> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn text_search_template_ref(&self) -> Option<TextSearchTemplateRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn text_search_template_rename_to(&self) -> Option<TextSearchTemplateRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2510,11 +2540,11 @@ impl AlterTrigger {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
+    pub fn trigger_ref(&self) -> Option<TriggerRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn trigger_ref(&self) -> Option<TriggerRef> {
+    pub fn trigger_rename_to(&self) -> Option<TriggerRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2553,10 +2583,6 @@ impl AlterType {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn rename_value(&self) -> Option<RenameValue> {
         support::child(&self.syntax)
     }
@@ -2570,6 +2596,10 @@ impl AlterType {
     }
     #[inline]
     pub fn type_name_ref(&self) -> Option<TypeNameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn type_rename_to(&self) -> Option<TypeRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2596,10 +2626,6 @@ impl AlterUser {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn reset_config_param(&self) -> Option<ResetConfigParam> {
         support::child(&self.syntax)
     }
@@ -2609,6 +2635,10 @@ impl AlterUser {
     }
     #[inline]
     pub fn role_ref(&self) -> Option<RoleRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn role_rename_to(&self) -> Option<RoleRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2737,10 +2767,6 @@ impl AlterView {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn rename_to(&self) -> Option<RenameTo> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn reset_options(&self) -> Option<ResetOptions> {
         support::child(&self.syntax)
     }
@@ -2754,6 +2780,10 @@ impl AlterView {
     }
     #[inline]
     pub fn view_ref(&self) -> Option<ViewRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn view_rename_to(&self) -> Option<ViewRenameTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3957,6 +3987,25 @@ impl CollationRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CollationRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CollationRenameTo {
+    #[inline]
+    pub fn collation(&self) -> Option<Collation> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ColonColon {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4561,6 +4610,25 @@ impl ConversionRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConversionRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConversionRenameTo {
+    #[inline]
+    pub fn conversion(&self) -> Option<Conversion> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Copy {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4888,6 +4956,10 @@ pub struct CreateAggregate {
 }
 impl CreateAggregate {
     #[inline]
+    pub fn aggregate_name(&self) -> Option<AggregateName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn attribute_list(&self) -> Option<AttributeList> {
         support::child(&self.syntax)
     }
@@ -4897,10 +4969,6 @@ impl CreateAggregate {
     }
     #[inline]
     pub fn param_list(&self) -> Option<ParamList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7139,6 +7207,25 @@ impl DatabaseRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DatabaseRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DatabaseRenameTo {
+    #[inline]
+    pub fn database(&self) -> Option<Database> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Deallocate {
     pub(crate) syntax: SyntaxNode,
 }
@@ -7611,6 +7698,25 @@ impl DomainRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DomainRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DomainRenameTo {
+    #[inline]
+    pub fn domain(&self) -> Option<Domain> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -10244,6 +10350,25 @@ impl EventTriggerRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EventTriggerRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EventTriggerRenameTo {
+    #[inline]
+    pub fn event_trigger(&self) -> Option<EventTrigger> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EventTriggerWhen {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11128,6 +11253,25 @@ impl ForeignDataWrapperRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ForeignDataWrapperRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ForeignDataWrapperRenameTo {
+    #[inline]
+    pub fn foreign_data_wrapper(&self) -> Option<ForeignDataWrapper> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ForeignKeyConstraint {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11349,6 +11493,25 @@ impl FunctionNameRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FunctionRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FunctionRenameTo {
+    #[inline]
+    pub fn function_name(&self) -> Option<FunctionName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -12088,6 +12251,25 @@ impl IndexRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IndexRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IndexRenameTo {
+    #[inline]
+    pub fn index(&self) -> Option<Index> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -13962,6 +14144,25 @@ impl LanguageRef {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct LanguageRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl LanguageRenameTo {
+    #[inline]
+    pub fn language(&self) -> Option<Language> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -16398,6 +16599,25 @@ impl OpClassRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpClassRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OpClassRenameTo {
+    #[inline]
+    pub fn op_class_name(&self) -> Option<OpClassName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OpFamilyName {
     pub(crate) syntax: SyntaxNode,
 }
@@ -16416,6 +16636,25 @@ impl OpFamilyRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpFamilyRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OpFamilyRenameTo {
+    #[inline]
+    pub fn op_family_name(&self) -> Option<OpFamilyName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -17398,6 +17637,25 @@ impl PolicyRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PolicyRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PolicyRenameTo {
+    #[inline]
+    pub fn policy(&self) -> Option<Policy> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PositionFn {
     pub(crate) syntax: SyntaxNode,
 }
@@ -17914,6 +18172,25 @@ impl ProcedureNameRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProcedureRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ProcedureRenameTo {
+    #[inline]
+    pub fn procedure_name(&self) -> Option<ProcedureName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ProcedureSig {
     pub(crate) syntax: SyntaxNode,
 }
@@ -17981,6 +18258,25 @@ impl PropertyGraphRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PropertyGraphRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PropertyGraphRenameTo {
+    #[inline]
+    pub fn property_graph(&self) -> Option<PropertyGraph> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -18062,6 +18358,25 @@ impl PublicationRef {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PublicationRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PublicationRenameTo {
+    #[inline]
+    pub fn publication(&self) -> Option<Publication> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -18700,25 +19015,6 @@ impl RenameConstraint {
     #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
-    }
-    #[inline]
-    pub fn rename_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RENAME_KW)
-    }
-    #[inline]
-    pub fn to_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TO_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RenameTo {
-    pub(crate) syntax: SyntaxNode,
-}
-impl RenameTo {
-    #[inline]
-    pub fn name(&self) -> Option<Name> {
-        support::child(&self.syntax)
     }
     #[inline]
     pub fn rename_token(&self) -> Option<SyntaxToken> {
@@ -19537,6 +19833,25 @@ impl RoleRefList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RoleRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RoleRenameTo {
+    #[inline]
+    pub fn role(&self) -> Option<Role> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Rollback {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19596,6 +19911,17 @@ impl Rollback {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RoutineName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RoutineName {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RoutineNameRef {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19603,6 +19929,25 @@ impl RoutineNameRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RoutineRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RoutineRenameTo {
+    #[inline]
+    pub fn routine_name(&self) -> Option<RoutineName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -19842,6 +20187,25 @@ impl RuleRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RuleRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RuleRenameTo {
+    #[inline]
+    pub fn rule(&self) -> Option<Rule> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RuleStmtList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -19920,6 +20284,25 @@ impl SchemaRef {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SchemaRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SchemaRenameTo {
+    #[inline]
+    pub fn schema(&self) -> Option<Schema> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -20328,6 +20711,25 @@ impl SequenceRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SequenceRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SequenceRenameTo {
+    #[inline]
+    pub fn sequence(&self) -> Option<Sequence> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Serializable {
     pub(crate) syntax: SyntaxNode,
 }
@@ -20380,6 +20782,25 @@ impl ServerRef {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ServerRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ServerRenameTo {
+    #[inline]
+    pub fn server(&self) -> Option<Server> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -21730,6 +22151,25 @@ impl StatisticsRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct StatisticsRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl StatisticsRenameTo {
+    #[inline]
+    pub fn statistics(&self) -> Option<Statistics> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Storage {
     pub(crate) syntax: SyntaxNode,
 }
@@ -21802,6 +22242,25 @@ impl SubscriptionRef {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SubscriptionRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SubscriptionRenameTo {
+    #[inline]
+    pub fn subscription(&self) -> Option<Subscription> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -22027,6 +22486,25 @@ impl TableRelationName {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TableRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TableRenameTo {
+    #[inline]
+    pub fn table_name(&self) -> Option<TableName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TablesampleClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -22079,6 +22557,25 @@ impl TablespaceRef {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TablespaceRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TablespaceRenameTo {
+    #[inline]
+    pub fn tablespace(&self) -> Option<Tablespace> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -22158,6 +22655,25 @@ impl TextSearchConfigurationRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TextSearchConfigurationRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TextSearchConfigurationRenameTo {
+    #[inline]
+    pub fn text_search_configuration(&self) -> Option<TextSearchConfiguration> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TextSearchDictionary {
     pub(crate) syntax: SyntaxNode,
 }
@@ -22176,6 +22692,25 @@ impl TextSearchDictionaryRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TextSearchDictionaryRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TextSearchDictionaryRenameTo {
+    #[inline]
+    pub fn text_search_dictionary(&self) -> Option<TextSearchDictionary> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -22202,6 +22737,25 @@ impl TextSearchParserRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TextSearchParserRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TextSearchParserRenameTo {
+    #[inline]
+    pub fn text_search_parser(&self) -> Option<TextSearchParser> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TextSearchTemplate {
     pub(crate) syntax: SyntaxNode,
 }
@@ -22220,6 +22774,25 @@ impl TextSearchTemplateRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TextSearchTemplateRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TextSearchTemplateRenameTo {
+    #[inline]
+    pub fn text_search_template(&self) -> Option<TextSearchTemplate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -22516,6 +23089,25 @@ impl TriggerRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TriggerRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TriggerRenameTo {
+    #[inline]
+    pub fn trigger(&self) -> Option<Trigger> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TrimFn {
     pub(crate) syntax: SyntaxNode,
 }
@@ -22639,6 +23231,25 @@ impl TypeNameRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TypeRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TypeRenameTo {
+    #[inline]
+    pub fn type_name(&self) -> Option<TypeName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -23205,6 +23816,25 @@ impl ViewRef {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ViewRenameTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ViewRenameTo {
+    #[inline]
+    pub fn view(&self) -> Option<View> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rename_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RENAME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
     }
 }
 
@@ -24248,12 +24878,12 @@ pub enum AlterColumnOption {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AlterDomainAction {
     AddConstraint(AddConstraint),
+    DomainRenameTo(DomainRenameTo),
     DropConstraint(DropConstraint),
     DropDefault(DropDefault),
     DropNotNull(DropNotNull),
     OwnerTo(OwnerTo),
     RenameConstraint(RenameConstraint),
-    RenameTo(RenameTo),
     SetDefault(SetDefault),
     SetNotNull(SetNotNull),
     SetSchema(SetSchema),
@@ -24265,8 +24895,8 @@ pub enum AlterIndexAction {
     AlterSetStatistics(AlterSetStatistics),
     AttachIndexPartition(AttachIndexPartition),
     DependsOnExtension(DependsOnExtension),
+    IndexRenameTo(IndexRenameTo),
     NoDependsOnExtension(NoDependsOnExtension),
-    RenameTo(RenameTo),
     ResetOptions(ResetOptions),
     SetOptions(SetOptions),
     SetTablespace(SetTablespace),
@@ -24277,8 +24907,8 @@ pub enum AlterMaterializedViewAction {
     DependsOnExtension(DependsOnExtension),
     NoDependsOnExtension(NoDependsOnExtension),
     RenameColumn(RenameColumn),
-    RenameTo(RenameTo),
     SetSchema(SetSchema),
+    ViewRenameTo(ViewRenameTo),
     AlterTableAction(AlterTableAction),
 }
 
@@ -24292,7 +24922,7 @@ pub enum AlterPropertyGraphAction {
     DropVertexEdgeLabelProperties(DropVertexEdgeLabelProperties),
     DropVertexTables(DropVertexTables),
     OwnerTo(OwnerTo),
-    RenameTo(RenameTo),
+    PropertyGraphRenameTo(PropertyGraphRenameTo),
     SetSchema(SetSchema),
 }
 
@@ -24304,12 +24934,12 @@ pub enum AlterSubscriptionAction {
     EnableSubscription(EnableSubscription),
     OwnerTo(OwnerTo),
     RefreshPublication(RefreshPublication),
-    RenameTo(RenameTo),
     SetConnection(SetConnection),
     SetOptions(SetOptions),
     SetPublication(SetPublication),
     SetServer(SetServer),
     SkipSubscription(SkipSubscription),
+    SubscriptionRenameTo(SubscriptionRenameTo),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -24344,7 +24974,6 @@ pub enum AlterTableAction {
     OwnerTo(OwnerTo),
     RenameColumn(RenameColumn),
     RenameConstraint(RenameConstraint),
-    RenameTo(RenameTo),
     ReplicaIdentity(ReplicaIdentity),
     ResetOptions(ResetOptions),
     SetAccessMethod(SetAccessMethod),
@@ -24356,6 +24985,7 @@ pub enum AlterTableAction {
     SetWithoutCluster(SetWithoutCluster),
     SetWithoutOids(SetWithoutOids),
     SplitPartition(SplitPartition),
+    TableRenameTo(TableRenameTo),
     ValidateConstraint(ValidateConstraint),
 }
 
@@ -25453,6 +26083,42 @@ impl AstNode for Aggregate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::AGGREGATE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AggregateName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::AGGREGATE_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AggregateRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::AGGREGATE_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -27447,6 +28113,24 @@ impl AstNode for CollationRef {
         &self.syntax
     }
 }
+impl AstNode for CollationRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COLLATION_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ColonColon {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -27937,6 +28621,24 @@ impl AstNode for ConversionRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::CONVERSION_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConversionRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONVERSION_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -29139,6 +29841,24 @@ impl AstNode for DatabaseRef {
         &self.syntax
     }
 }
+impl AstNode for DatabaseRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DATABASE_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Deallocate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -29485,6 +30205,24 @@ impl AstNode for DomainRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::DOMAIN_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for DomainRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::DOMAIN_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -31065,6 +31803,24 @@ impl AstNode for EventTriggerRef {
         &self.syntax
     }
 }
+impl AstNode for EventTriggerRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EVENT_TRIGGER_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for EventTriggerWhen {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -31785,6 +32541,24 @@ impl AstNode for ForeignDataWrapperRef {
         &self.syntax
     }
 }
+impl AstNode for ForeignDataWrapperRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FOREIGN_DATA_WRAPPER_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ForeignKeyConstraint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -31969,6 +32743,24 @@ impl AstNode for FunctionNameRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::FUNCTION_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for FunctionRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FUNCTION_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -32563,6 +33355,24 @@ impl AstNode for IndexRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::INDEX_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IndexRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INDEX_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -34039,6 +34849,24 @@ impl AstNode for LanguageRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::LANGUAGE_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for LanguageRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::LANGUAGE_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -36051,6 +36879,24 @@ impl AstNode for OpClassRef {
         &self.syntax
     }
 }
+impl AstNode for OpClassRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OP_CLASS_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for OpFamilyName {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -36073,6 +36919,24 @@ impl AstNode for OpFamilyRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::OP_FAMILY_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OpFamilyRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OP_FAMILY_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -36987,6 +37851,24 @@ impl AstNode for PolicyRef {
         &self.syntax
     }
 }
+impl AstNode for PolicyRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::POLICY_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PositionFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -37419,6 +38301,24 @@ impl AstNode for ProcedureNameRef {
         &self.syntax
     }
 }
+impl AstNode for ProcedureRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PROCEDURE_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ProcedureSig {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -37509,6 +38409,24 @@ impl AstNode for PropertyGraphRef {
         &self.syntax
     }
 }
+impl AstNode for PropertyGraphRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PROPERTY_GRAPH_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Publication {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -37549,6 +38467,24 @@ impl AstNode for PublicationRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PUBLICATION_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PublicationRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PUBLICATION_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -38017,24 +38953,6 @@ impl AstNode for RenameConstraint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::RENAME_CONSTRAINT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for RenameTo {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -38589,6 +39507,24 @@ impl AstNode for RoleRefList {
         &self.syntax
     }
 }
+impl AstNode for RoleRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLE_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Rollback {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -38607,10 +39543,46 @@ impl AstNode for Rollback {
         &self.syntax
     }
 }
+impl AstNode for RoutineName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROUTINE_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for RoutineNameRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ROUTINE_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RoutineRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROUTINE_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -38859,6 +39831,24 @@ impl AstNode for RuleRef {
         &self.syntax
     }
 }
+impl AstNode for RuleRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RULE_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for RuleStmtList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -38953,6 +39943,24 @@ impl AstNode for SchemaRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SCHEMA_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SchemaRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SCHEMA_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -39183,6 +40191,24 @@ impl AstNode for SequenceRef {
         &self.syntax
     }
 }
+impl AstNode for SequenceRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SEQUENCE_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Serializable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -39241,6 +40267,24 @@ impl AstNode for ServerRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SERVER_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ServerRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SERVER_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -40443,6 +41487,24 @@ impl AstNode for StatisticsRef {
         &self.syntax
     }
 }
+impl AstNode for StatisticsRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::STATISTICS_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Storage {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -40501,6 +41563,24 @@ impl AstNode for SubscriptionRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SUBSCRIPTION_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SubscriptionRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SUBSCRIPTION_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -40713,6 +41793,24 @@ impl AstNode for TableRelationName {
         &self.syntax
     }
 }
+impl AstNode for TableRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TABLE_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TablesampleClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -40771,6 +41869,24 @@ impl AstNode for TablespaceRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TABLESPACE_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for TablespaceRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TABLESPACE_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -40875,6 +41991,24 @@ impl AstNode for TextSearchConfigurationRef {
         &self.syntax
     }
 }
+impl AstNode for TextSearchConfigurationRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TEXT_SEARCH_CONFIGURATION_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TextSearchDictionary {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -40897,6 +42031,24 @@ impl AstNode for TextSearchDictionaryRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TEXT_SEARCH_DICTIONARY_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for TextSearchDictionaryRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TEXT_SEARCH_DICTIONARY_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -40947,6 +42099,24 @@ impl AstNode for TextSearchParserRef {
         &self.syntax
     }
 }
+impl AstNode for TextSearchParserRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TEXT_SEARCH_PARSER_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TextSearchTemplate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -40969,6 +42139,24 @@ impl AstNode for TextSearchTemplateRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TEXT_SEARCH_TEMPLATE_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for TextSearchTemplateRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TEXT_SEARCH_TEMPLATE_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -41271,6 +42459,24 @@ impl AstNode for TriggerRef {
         &self.syntax
     }
 }
+impl AstNode for TriggerRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TRIGGER_RENAME_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TrimFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -41347,6 +42553,24 @@ impl AstNode for TypeNameRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TYPE_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for TypeRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TYPE_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -41815,6 +43039,24 @@ impl AstNode for ViewRef {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::VIEW_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ViewRenameTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VIEW_RENAME_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -42852,12 +44094,12 @@ impl AstNode for AlterDomainAction {
         matches!(
             kind,
             SyntaxKind::ADD_CONSTRAINT
+                | SyntaxKind::DOMAIN_RENAME_TO
                 | SyntaxKind::DROP_CONSTRAINT
                 | SyntaxKind::DROP_DEFAULT
                 | SyntaxKind::DROP_NOT_NULL
                 | SyntaxKind::OWNER_TO
                 | SyntaxKind::RENAME_CONSTRAINT
-                | SyntaxKind::RENAME_TO
                 | SyntaxKind::SET_DEFAULT
                 | SyntaxKind::SET_NOT_NULL
                 | SyntaxKind::SET_SCHEMA
@@ -42870,6 +44112,9 @@ impl AstNode for AlterDomainAction {
             SyntaxKind::ADD_CONSTRAINT => {
                 AlterDomainAction::AddConstraint(AddConstraint { syntax })
             }
+            SyntaxKind::DOMAIN_RENAME_TO => {
+                AlterDomainAction::DomainRenameTo(DomainRenameTo { syntax })
+            }
             SyntaxKind::DROP_CONSTRAINT => {
                 AlterDomainAction::DropConstraint(DropConstraint { syntax })
             }
@@ -42879,7 +44124,6 @@ impl AstNode for AlterDomainAction {
             SyntaxKind::RENAME_CONSTRAINT => {
                 AlterDomainAction::RenameConstraint(RenameConstraint { syntax })
             }
-            SyntaxKind::RENAME_TO => AlterDomainAction::RenameTo(RenameTo { syntax }),
             SyntaxKind::SET_DEFAULT => AlterDomainAction::SetDefault(SetDefault { syntax }),
             SyntaxKind::SET_NOT_NULL => AlterDomainAction::SetNotNull(SetNotNull { syntax }),
             SyntaxKind::SET_SCHEMA => AlterDomainAction::SetSchema(SetSchema { syntax }),
@@ -42896,12 +44140,12 @@ impl AstNode for AlterDomainAction {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             AlterDomainAction::AddConstraint(it) => &it.syntax,
+            AlterDomainAction::DomainRenameTo(it) => &it.syntax,
             AlterDomainAction::DropConstraint(it) => &it.syntax,
             AlterDomainAction::DropDefault(it) => &it.syntax,
             AlterDomainAction::DropNotNull(it) => &it.syntax,
             AlterDomainAction::OwnerTo(it) => &it.syntax,
             AlterDomainAction::RenameConstraint(it) => &it.syntax,
-            AlterDomainAction::RenameTo(it) => &it.syntax,
             AlterDomainAction::SetDefault(it) => &it.syntax,
             AlterDomainAction::SetNotNull(it) => &it.syntax,
             AlterDomainAction::SetSchema(it) => &it.syntax,
@@ -42913,6 +44157,12 @@ impl From<AddConstraint> for AlterDomainAction {
     #[inline]
     fn from(node: AddConstraint) -> AlterDomainAction {
         AlterDomainAction::AddConstraint(node)
+    }
+}
+impl From<DomainRenameTo> for AlterDomainAction {
+    #[inline]
+    fn from(node: DomainRenameTo) -> AlterDomainAction {
+        AlterDomainAction::DomainRenameTo(node)
     }
 }
 impl From<DropConstraint> for AlterDomainAction {
@@ -42943,12 +44193,6 @@ impl From<RenameConstraint> for AlterDomainAction {
     #[inline]
     fn from(node: RenameConstraint) -> AlterDomainAction {
         AlterDomainAction::RenameConstraint(node)
-    }
-}
-impl From<RenameTo> for AlterDomainAction {
-    #[inline]
-    fn from(node: RenameTo) -> AlterDomainAction {
-        AlterDomainAction::RenameTo(node)
     }
 }
 impl From<SetDefault> for AlterDomainAction {
@@ -42983,8 +44227,8 @@ impl AstNode for AlterIndexAction {
             SyntaxKind::ALTER_SET_STATISTICS
                 | SyntaxKind::ATTACH_INDEX_PARTITION
                 | SyntaxKind::DEPENDS_ON_EXTENSION
+                | SyntaxKind::INDEX_RENAME_TO
                 | SyntaxKind::NO_DEPENDS_ON_EXTENSION
-                | SyntaxKind::RENAME_TO
                 | SyntaxKind::RESET_OPTIONS
                 | SyntaxKind::SET_OPTIONS
                 | SyntaxKind::SET_TABLESPACE
@@ -43002,10 +44246,12 @@ impl AstNode for AlterIndexAction {
             SyntaxKind::DEPENDS_ON_EXTENSION => {
                 AlterIndexAction::DependsOnExtension(DependsOnExtension { syntax })
             }
+            SyntaxKind::INDEX_RENAME_TO => {
+                AlterIndexAction::IndexRenameTo(IndexRenameTo { syntax })
+            }
             SyntaxKind::NO_DEPENDS_ON_EXTENSION => {
                 AlterIndexAction::NoDependsOnExtension(NoDependsOnExtension { syntax })
             }
-            SyntaxKind::RENAME_TO => AlterIndexAction::RenameTo(RenameTo { syntax }),
             SyntaxKind::RESET_OPTIONS => AlterIndexAction::ResetOptions(ResetOptions { syntax }),
             SyntaxKind::SET_OPTIONS => AlterIndexAction::SetOptions(SetOptions { syntax }),
             SyntaxKind::SET_TABLESPACE => AlterIndexAction::SetTablespace(SetTablespace { syntax }),
@@ -43021,8 +44267,8 @@ impl AstNode for AlterIndexAction {
             AlterIndexAction::AlterSetStatistics(it) => &it.syntax,
             AlterIndexAction::AttachIndexPartition(it) => &it.syntax,
             AlterIndexAction::DependsOnExtension(it) => &it.syntax,
+            AlterIndexAction::IndexRenameTo(it) => &it.syntax,
             AlterIndexAction::NoDependsOnExtension(it) => &it.syntax,
-            AlterIndexAction::RenameTo(it) => &it.syntax,
             AlterIndexAction::ResetOptions(it) => &it.syntax,
             AlterIndexAction::SetOptions(it) => &it.syntax,
             AlterIndexAction::SetTablespace(it) => &it.syntax,
@@ -43047,16 +44293,16 @@ impl From<DependsOnExtension> for AlterIndexAction {
         AlterIndexAction::DependsOnExtension(node)
     }
 }
+impl From<IndexRenameTo> for AlterIndexAction {
+    #[inline]
+    fn from(node: IndexRenameTo) -> AlterIndexAction {
+        AlterIndexAction::IndexRenameTo(node)
+    }
+}
 impl From<NoDependsOnExtension> for AlterIndexAction {
     #[inline]
     fn from(node: NoDependsOnExtension) -> AlterIndexAction {
         AlterIndexAction::NoDependsOnExtension(node)
-    }
-}
-impl From<RenameTo> for AlterIndexAction {
-    #[inline]
-    fn from(node: RenameTo) -> AlterIndexAction {
-        AlterIndexAction::RenameTo(node)
     }
 }
 impl From<ResetOptions> for AlterIndexAction {
@@ -43085,8 +44331,8 @@ impl AstNode for AlterMaterializedViewAction {
             SyntaxKind::DEPENDS_ON_EXTENSION
                 | SyntaxKind::NO_DEPENDS_ON_EXTENSION
                 | SyntaxKind::RENAME_COLUMN
-                | SyntaxKind::RENAME_TO
                 | SyntaxKind::SET_SCHEMA
+                | SyntaxKind::VIEW_RENAME_TO
         )
     }
     #[inline]
@@ -43101,8 +44347,10 @@ impl AstNode for AlterMaterializedViewAction {
             SyntaxKind::RENAME_COLUMN => {
                 AlterMaterializedViewAction::RenameColumn(RenameColumn { syntax })
             }
-            SyntaxKind::RENAME_TO => AlterMaterializedViewAction::RenameTo(RenameTo { syntax }),
             SyntaxKind::SET_SCHEMA => AlterMaterializedViewAction::SetSchema(SetSchema { syntax }),
+            SyntaxKind::VIEW_RENAME_TO => {
+                AlterMaterializedViewAction::ViewRenameTo(ViewRenameTo { syntax })
+            }
             _ => {
                 if let Some(result) = AlterTableAction::cast(syntax) {
                     return Some(AlterMaterializedViewAction::AlterTableAction(result));
@@ -43118,8 +44366,8 @@ impl AstNode for AlterMaterializedViewAction {
             AlterMaterializedViewAction::DependsOnExtension(it) => &it.syntax,
             AlterMaterializedViewAction::NoDependsOnExtension(it) => &it.syntax,
             AlterMaterializedViewAction::RenameColumn(it) => &it.syntax,
-            AlterMaterializedViewAction::RenameTo(it) => &it.syntax,
             AlterMaterializedViewAction::SetSchema(it) => &it.syntax,
+            AlterMaterializedViewAction::ViewRenameTo(it) => &it.syntax,
             AlterMaterializedViewAction::AlterTableAction(it) => it.syntax(),
         }
     }
@@ -43142,16 +44390,16 @@ impl From<RenameColumn> for AlterMaterializedViewAction {
         AlterMaterializedViewAction::RenameColumn(node)
     }
 }
-impl From<RenameTo> for AlterMaterializedViewAction {
-    #[inline]
-    fn from(node: RenameTo) -> AlterMaterializedViewAction {
-        AlterMaterializedViewAction::RenameTo(node)
-    }
-}
 impl From<SetSchema> for AlterMaterializedViewAction {
     #[inline]
     fn from(node: SetSchema) -> AlterMaterializedViewAction {
         AlterMaterializedViewAction::SetSchema(node)
+    }
+}
+impl From<ViewRenameTo> for AlterMaterializedViewAction {
+    #[inline]
+    fn from(node: ViewRenameTo) -> AlterMaterializedViewAction {
+        AlterMaterializedViewAction::ViewRenameTo(node)
     }
 }
 impl AstNode for AlterPropertyGraphAction {
@@ -43167,7 +44415,7 @@ impl AstNode for AlterPropertyGraphAction {
                 | SyntaxKind::DROP_VERTEX_EDGE_LABEL_PROPERTIES
                 | SyntaxKind::DROP_VERTEX_TABLES
                 | SyntaxKind::OWNER_TO
-                | SyntaxKind::RENAME_TO
+                | SyntaxKind::PROPERTY_GRAPH_RENAME_TO
                 | SyntaxKind::SET_SCHEMA
         )
     }
@@ -43200,7 +44448,9 @@ impl AstNode for AlterPropertyGraphAction {
                 AlterPropertyGraphAction::DropVertexTables(DropVertexTables { syntax })
             }
             SyntaxKind::OWNER_TO => AlterPropertyGraphAction::OwnerTo(OwnerTo { syntax }),
-            SyntaxKind::RENAME_TO => AlterPropertyGraphAction::RenameTo(RenameTo { syntax }),
+            SyntaxKind::PROPERTY_GRAPH_RENAME_TO => {
+                AlterPropertyGraphAction::PropertyGraphRenameTo(PropertyGraphRenameTo { syntax })
+            }
             SyntaxKind::SET_SCHEMA => AlterPropertyGraphAction::SetSchema(SetSchema { syntax }),
             _ => {
                 return None;
@@ -43219,7 +44469,7 @@ impl AstNode for AlterPropertyGraphAction {
             AlterPropertyGraphAction::DropVertexEdgeLabelProperties(it) => &it.syntax,
             AlterPropertyGraphAction::DropVertexTables(it) => &it.syntax,
             AlterPropertyGraphAction::OwnerTo(it) => &it.syntax,
-            AlterPropertyGraphAction::RenameTo(it) => &it.syntax,
+            AlterPropertyGraphAction::PropertyGraphRenameTo(it) => &it.syntax,
             AlterPropertyGraphAction::SetSchema(it) => &it.syntax,
         }
     }
@@ -43272,10 +44522,10 @@ impl From<OwnerTo> for AlterPropertyGraphAction {
         AlterPropertyGraphAction::OwnerTo(node)
     }
 }
-impl From<RenameTo> for AlterPropertyGraphAction {
+impl From<PropertyGraphRenameTo> for AlterPropertyGraphAction {
     #[inline]
-    fn from(node: RenameTo) -> AlterPropertyGraphAction {
-        AlterPropertyGraphAction::RenameTo(node)
+    fn from(node: PropertyGraphRenameTo) -> AlterPropertyGraphAction {
+        AlterPropertyGraphAction::PropertyGraphRenameTo(node)
     }
 }
 impl From<SetSchema> for AlterPropertyGraphAction {
@@ -43295,12 +44545,12 @@ impl AstNode for AlterSubscriptionAction {
                 | SyntaxKind::ENABLE_SUBSCRIPTION
                 | SyntaxKind::OWNER_TO
                 | SyntaxKind::REFRESH_PUBLICATION
-                | SyntaxKind::RENAME_TO
                 | SyntaxKind::SET_CONNECTION
                 | SyntaxKind::SET_OPTIONS
                 | SyntaxKind::SET_PUBLICATION
                 | SyntaxKind::SET_SERVER
                 | SyntaxKind::SKIP_SUBSCRIPTION
+                | SyntaxKind::SUBSCRIPTION_RENAME_TO
         )
     }
     #[inline]
@@ -43324,7 +44574,6 @@ impl AstNode for AlterSubscriptionAction {
             SyntaxKind::REFRESH_PUBLICATION => {
                 AlterSubscriptionAction::RefreshPublication(RefreshPublication { syntax })
             }
-            SyntaxKind::RENAME_TO => AlterSubscriptionAction::RenameTo(RenameTo { syntax }),
             SyntaxKind::SET_CONNECTION => {
                 AlterSubscriptionAction::SetConnection(SetConnection { syntax })
             }
@@ -43335,6 +44584,9 @@ impl AstNode for AlterSubscriptionAction {
             SyntaxKind::SET_SERVER => AlterSubscriptionAction::SetServer(SetServer { syntax }),
             SyntaxKind::SKIP_SUBSCRIPTION => {
                 AlterSubscriptionAction::SkipSubscription(SkipSubscription { syntax })
+            }
+            SyntaxKind::SUBSCRIPTION_RENAME_TO => {
+                AlterSubscriptionAction::SubscriptionRenameTo(SubscriptionRenameTo { syntax })
             }
             _ => {
                 return None;
@@ -43351,12 +44603,12 @@ impl AstNode for AlterSubscriptionAction {
             AlterSubscriptionAction::EnableSubscription(it) => &it.syntax,
             AlterSubscriptionAction::OwnerTo(it) => &it.syntax,
             AlterSubscriptionAction::RefreshPublication(it) => &it.syntax,
-            AlterSubscriptionAction::RenameTo(it) => &it.syntax,
             AlterSubscriptionAction::SetConnection(it) => &it.syntax,
             AlterSubscriptionAction::SetOptions(it) => &it.syntax,
             AlterSubscriptionAction::SetPublication(it) => &it.syntax,
             AlterSubscriptionAction::SetServer(it) => &it.syntax,
             AlterSubscriptionAction::SkipSubscription(it) => &it.syntax,
+            AlterSubscriptionAction::SubscriptionRenameTo(it) => &it.syntax,
         }
     }
 }
@@ -43396,12 +44648,6 @@ impl From<RefreshPublication> for AlterSubscriptionAction {
         AlterSubscriptionAction::RefreshPublication(node)
     }
 }
-impl From<RenameTo> for AlterSubscriptionAction {
-    #[inline]
-    fn from(node: RenameTo) -> AlterSubscriptionAction {
-        AlterSubscriptionAction::RenameTo(node)
-    }
-}
 impl From<SetConnection> for AlterSubscriptionAction {
     #[inline]
     fn from(node: SetConnection) -> AlterSubscriptionAction {
@@ -43430,6 +44676,12 @@ impl From<SkipSubscription> for AlterSubscriptionAction {
     #[inline]
     fn from(node: SkipSubscription) -> AlterSubscriptionAction {
         AlterSubscriptionAction::SkipSubscription(node)
+    }
+}
+impl From<SubscriptionRenameTo> for AlterSubscriptionAction {
+    #[inline]
+    fn from(node: SubscriptionRenameTo) -> AlterSubscriptionAction {
+        AlterSubscriptionAction::SubscriptionRenameTo(node)
     }
 }
 impl AstNode for AlterTableAction {
@@ -43467,7 +44719,6 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::OWNER_TO
                 | SyntaxKind::RENAME_COLUMN
                 | SyntaxKind::RENAME_CONSTRAINT
-                | SyntaxKind::RENAME_TO
                 | SyntaxKind::REPLICA_IDENTITY
                 | SyntaxKind::RESET_OPTIONS
                 | SyntaxKind::SET_ACCESS_METHOD
@@ -43479,6 +44730,7 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::SET_WITHOUT_CLUSTER
                 | SyntaxKind::SET_WITHOUT_OIDS
                 | SyntaxKind::SPLIT_PARTITION
+                | SyntaxKind::TABLE_RENAME_TO
                 | SyntaxKind::VALIDATE_CONSTRAINT
         )
     }
@@ -43541,7 +44793,6 @@ impl AstNode for AlterTableAction {
             SyntaxKind::RENAME_CONSTRAINT => {
                 AlterTableAction::RenameConstraint(RenameConstraint { syntax })
             }
-            SyntaxKind::RENAME_TO => AlterTableAction::RenameTo(RenameTo { syntax }),
             SyntaxKind::REPLICA_IDENTITY => {
                 AlterTableAction::ReplicaIdentity(ReplicaIdentity { syntax })
             }
@@ -43562,6 +44813,9 @@ impl AstNode for AlterTableAction {
             }
             SyntaxKind::SPLIT_PARTITION => {
                 AlterTableAction::SplitPartition(SplitPartition { syntax })
+            }
+            SyntaxKind::TABLE_RENAME_TO => {
+                AlterTableAction::TableRenameTo(TableRenameTo { syntax })
             }
             SyntaxKind::VALIDATE_CONSTRAINT => {
                 AlterTableAction::ValidateConstraint(ValidateConstraint { syntax })
@@ -43605,7 +44859,6 @@ impl AstNode for AlterTableAction {
             AlterTableAction::OwnerTo(it) => &it.syntax,
             AlterTableAction::RenameColumn(it) => &it.syntax,
             AlterTableAction::RenameConstraint(it) => &it.syntax,
-            AlterTableAction::RenameTo(it) => &it.syntax,
             AlterTableAction::ReplicaIdentity(it) => &it.syntax,
             AlterTableAction::ResetOptions(it) => &it.syntax,
             AlterTableAction::SetAccessMethod(it) => &it.syntax,
@@ -43617,6 +44870,7 @@ impl AstNode for AlterTableAction {
             AlterTableAction::SetWithoutCluster(it) => &it.syntax,
             AlterTableAction::SetWithoutOids(it) => &it.syntax,
             AlterTableAction::SplitPartition(it) => &it.syntax,
+            AlterTableAction::TableRenameTo(it) => &it.syntax,
             AlterTableAction::ValidateConstraint(it) => &it.syntax,
         }
     }
@@ -43801,12 +45055,6 @@ impl From<RenameConstraint> for AlterTableAction {
         AlterTableAction::RenameConstraint(node)
     }
 }
-impl From<RenameTo> for AlterTableAction {
-    #[inline]
-    fn from(node: RenameTo) -> AlterTableAction {
-        AlterTableAction::RenameTo(node)
-    }
-}
 impl From<ReplicaIdentity> for AlterTableAction {
     #[inline]
     fn from(node: ReplicaIdentity) -> AlterTableAction {
@@ -43871,6 +45119,12 @@ impl From<SplitPartition> for AlterTableAction {
     #[inline]
     fn from(node: SplitPartition) -> AlterTableAction {
         AlterTableAction::SplitPartition(node)
+    }
+}
+impl From<TableRenameTo> for AlterTableAction {
+    #[inline]
+    fn from(node: TableRenameTo) -> AlterTableAction {
+        AlterTableAction::TableRenameTo(node)
     }
 }
 impl From<ValidateConstraint> for AlterTableAction {

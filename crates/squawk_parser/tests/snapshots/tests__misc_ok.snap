@@ -942,10 +942,11 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME
-          IDENT "sum_per_hour"
+    AGGREGATE_NAME
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "sum_per_hour"
     PARAM_LIST
       L_PAREN "("
       WHITESPACE " "

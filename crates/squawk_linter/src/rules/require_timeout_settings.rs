@@ -196,7 +196,7 @@ impl LockKind {
             | ast::AlterTableAction::OwnerTo(_)
             | ast::AlterTableAction::RenameColumn(_)
             | ast::AlterTableAction::RenameConstraint(_)
-            | ast::AlterTableAction::RenameTo(_)
+            | ast::AlterTableAction::TableRenameTo(_)
             | ast::AlterTableAction::ReplicaIdentity(_)
             | ast::AlterTableAction::SetAccessMethod(_)
             | ast::AlterTableAction::SetLogged(_)
