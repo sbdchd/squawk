@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.60.0 - 2026-07-18
+
+### Added
+
+- linter: split require-timeout-settings rule (#1233, #1217). Thanks @zvdy!
+
+  Now there's `require-lock-timeout` and `require-statement-timeout`
+
+- linter: require-timeout-settings explain lock impact in the warning (#1216, #1219). Thanks @edeetee!
+
+  Now instead of saying:
+
+  ```
+  Missing `set lock_timeout` before potentially slow operations
+  ```
+
+  We say:
+
+  ```
+  Missing `set lock_timeout` before potentially slow ACCESS EXCLUSIVE lock operations
+  ```
+
+- parser: add pg19 support for json_table plan & index include columns (#1243)
+
+### Changed
+
+- parser: add type specific rename nodes for alter statements (#1244)
+- parser: add more specific name nodes (#1242)
+- parser: split Path into Path & PathRef (#1241)
+- parser: ast nodes for ColumnRef, FromItem union & more (#1232)
+
+### Fixed
+
+- server: goto def for text search, op class (#1239)
+- server: goto def on collate, type attrs, search path, fn column name (#1238)
+- server: fix goto def with select into, savepoints, paren join exprs (#1237)
+- server: fix goto def with paren join expr (#1236)
+- server: goto def for fn params, fn defaults, pub/sub, & more (#1234)
+- server: add goto def support for constraints + parser improvements (#1229)
+- server: fix various goto def gaps (#1227)
+- server: add goto def support for operators & more (#1240)
+- parser: fix explain/create rule/exists with extra parens (#1225)
+- parser: fix parsing insert/create view/declare with parens (#1224)
+- server: fix more goto def edge cases (#1223)
+- parser: error for invalid legacy copy stmts (#1221)
+- parser: fix option parsing edge cases (#1218)
+
 ## v2.59.0 - 2026-06-27
 
 ### Added
