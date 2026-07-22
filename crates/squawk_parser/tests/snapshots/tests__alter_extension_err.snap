@@ -11,8 +11,7 @@ SOURCE_FILE
     EXTENSION_KW "extension"
     WHITESPACE " "
     EXTENSION_REF
-      NAME_REF
-        IDENT "e"
+      IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_ADD
       ADD_KW "add"
@@ -20,7 +19,6 @@ SOURCE_FILE
       OBJECT_LANGUAGE
         PROCEDURAL_KW "procedural"
         LANGUAGE_REF
-          NAME_REF
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION
@@ -29,8 +27,7 @@ SOURCE_FILE
     EXTENSION_KW "extension"
     WHITESPACE " "
     EXTENSION_REF
-      NAME_REF
-        IDENT "e"
+      IDENT "e"
     WHITESPACE " "
     ALTER_EXTENSION_DROP
       DROP_KW "drop"
@@ -38,7 +35,6 @@ SOURCE_FILE
       OBJECT_LANGUAGE
         PROCEDURAL_KW "procedural"
         LANGUAGE_REF
-          NAME_REF
     SEMICOLON ";"
   WHITESPACE "\n"
 ---
@@ -46,7 +42,7 @@ error[syntax-error]: expected LANGUAGE_KW
   ╭▸ 
 2 │ alter extension e add procedural;
   ╰╴                                ━
-error[syntax-error]: expected language name
+error[syntax-error]: expected name
   ╭▸ 
 2 │ alter extension e add procedural;
   ╰╴                                ━
@@ -54,7 +50,7 @@ error[syntax-error]: expected LANGUAGE_KW
   ╭▸ 
 3 │ alter extension e drop procedural;
   ╰╴                                 ━
-error[syntax-error]: expected language name
+error[syntax-error]: expected name
   ╭▸ 
 3 │ alter extension e drop procedural;
   ╰╴                                 ━

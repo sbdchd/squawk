@@ -58,10 +58,10 @@ SOURCE_FILE
                 R_PAREN ")"
             R_PAREN ")"
           WHITESPACE " "
-          ALIAS
+          FROM_ALIAS
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            TABLE_ALIAS
               IDENT "b"
       WHITESPACE "\n  "
       ORDER_BY_CLAUSE

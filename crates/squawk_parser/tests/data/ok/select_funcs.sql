@@ -100,6 +100,9 @@ select json_object('foo' value 'bar', 'a' value 'b');
 select json_object('foo': 'bar', 'a': 'b');
 
 select json_object('foo': 'bar' format json encoding utf8);
+-- invalid encoding, but accepted by postgres
+select json_object('foo': 'bar' format json encoding before);
+select json_object('foo': 'bar' format json encoding json);
 select json_object('foo': 'bar' format json);
 
 select json_object('foo': 'bar' null on null);

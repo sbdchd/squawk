@@ -194,7 +194,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
-        NAME
+        ELEMENT_TABLE_ALIAS
           IDENT "foo"
         WHITESPACE " "
         KEY_KW "key"
@@ -237,7 +237,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
-        NAME
+        ELEMENT_TABLE_ALIAS
           IDENT "z"
         WHITESPACE " "
         KEY_KW "key"
@@ -275,8 +275,7 @@ SOURCE_FILE
             REFERENCES_KW "references"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "k"
+              IDENT "k"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -311,8 +310,7 @@ SOURCE_FILE
             REFERENCES_KW "references"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "a"
+              IDENT "a"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -365,15 +363,13 @@ SOURCE_FILE
           SOURCE_KW "source"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         WHITESPACE "\n    "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
         WHITESPACE "\n    "
         NO_PROPERTIES
           NO_KW "no"
@@ -412,15 +408,13 @@ SOURCE_FILE
           SOURCE_KW "source"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
         WHITESPACE "\n    "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "d"
+            IDENT "d"
         WHITESPACE "\n    "
         PROPERTIES
           PROPERTIES_KW "properties"
@@ -501,15 +495,13 @@ SOURCE_FILE
           SOURCE_KW "source"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "z"
+            IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "y"
+            IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
     SEMICOLON ";"
@@ -547,15 +539,13 @@ SOURCE_FILE
           SOURCE_KW "source"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "z"
+            IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "y"
+            IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
     SEMICOLON ";"
@@ -593,15 +583,13 @@ SOURCE_FILE
           SOURCE_KW "source"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "z"
+            IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "y"
+            IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
     SEMICOLON ";"
@@ -666,15 +654,13 @@ SOURCE_FILE
           SOURCE_KW "source"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "z"
+            IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "y"
+            IDENT "y"
       COMMA ","
       WHITESPACE "\n    "
       EDGE_TABLE_DEF
@@ -688,15 +674,13 @@ SOURCE_FILE
           SOURCE_KW "source"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "z"
+            IDENT "z"
         WHITESPACE "\n      "
         DEST_VERTEX_TABLE
           DESTINATION_KW "destination"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "y"
+            IDENT "y"
       WHITESPACE "\n  "
       R_PAREN ")"
     SEMICOLON ";"

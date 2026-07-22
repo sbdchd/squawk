@@ -32,8 +32,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -85,8 +84,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     OPERATOR_FAMILY_CLAUSE
       FAMILY_KW "family"
@@ -261,7 +259,7 @@ SOURCE_FILE
               PARAM_IN
                 IN_KW "in"
               WHITESPACE " "
-              NAME
+              PARAM_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -275,7 +273,7 @@ SOURCE_FILE
               PARAM_OUT
                 OUT_KW "out"
               WHITESPACE " "
-              NAME
+              PARAM_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE

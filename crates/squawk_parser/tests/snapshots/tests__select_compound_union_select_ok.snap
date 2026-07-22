@@ -586,10 +586,10 @@ SOURCE_FILE
               INT_NUMBER "1"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"

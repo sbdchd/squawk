@@ -67,8 +67,7 @@ SOURCE_FILE
         CONSTRAINT_KW "constraint"
         WHITESPACE " "
         CONSTRAINT_NAME
-          NAME
-            IDENT "c"
+          IDENT "c"
       WHITESPACE " "
       CHECK_KW "check"
       WHITESPACE " "

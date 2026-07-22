@@ -55,7 +55,7 @@ SOURCE_FILE
             COLUMNS_KW "columns"
             WHITESPACE "\n        "
             XML_TABLE_COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "row_num"
               WHITESPACE " "
               FOR_KW "for"
@@ -64,7 +64,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n        "
             XML_TABLE_COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "book_id"
               WHITESPACE " "
               PATH_TYPE
@@ -82,7 +82,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n        "
             XML_TABLE_COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "title"
               WHITESPACE " "
               PATH_TYPE
@@ -100,7 +100,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n        "
             XML_TABLE_COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "author"
               WHITESPACE " "
               PATH_TYPE
@@ -118,7 +118,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n        "
             XML_TABLE_COLUMN
-              NAME
+              COLUMN_NAME
                 YEAR_KW "year"
               WHITESPACE " "
               PATH_TYPE
@@ -136,7 +136,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n        "
             XML_TABLE_COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "price"
               WHITESPACE " "
               PATH_TYPE
@@ -170,7 +170,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE "\n        "
             XML_TABLE_COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "discount"
               WHITESPACE " "
               PATH_TYPE

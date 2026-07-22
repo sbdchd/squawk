@@ -11,8 +11,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -33,8 +32,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -115,8 +113,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -129,8 +126,7 @@ SOURCE_FILE
         SCHEMA_KW "schema"
         WHITESPACE " "
         SCHEMA_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -139,8 +135,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ADD_PUBLICATION_OBJECTS
       ADD_KW "add"
@@ -163,8 +158,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     SET_PUBLICATION_OBJECTS
       SET_KW "set"
@@ -185,8 +179,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     SET_PUBLICATION_OBJECTS
       SET_KW "set"
@@ -267,8 +260,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -303,8 +295,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     DROP_PUBLICATION_OBJECTS
       DROP_KW "drop"
@@ -325,8 +316,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     DROP_PUBLICATION_OBJECTS
       DROP_KW "drop"
@@ -407,8 +397,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -416,8 +405,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PUBLICATION
@@ -426,8 +414,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -446,8 +433,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     PUBLICATION_RENAME_TO
       RENAME_KW "rename"
@@ -455,8 +441,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       PUBLICATION
-        NAME
-          IDENT "q"
+        IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_PUBLICATION
@@ -465,8 +450,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     SET_ALL_PUBLICATION_OBJECTS
       SET_KW "set"

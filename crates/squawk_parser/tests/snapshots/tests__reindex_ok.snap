@@ -61,8 +61,7 @@ SOURCE_FILE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
-          NAME_REF
-            IDENT "fooo"
+          IDENT "fooo"
       COMMA ","
       WHITESPACE " "
       REINDEX_OPTION
@@ -77,8 +76,7 @@ SOURCE_FILE
     CONCURRENTLY_KW "concurrently"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
@@ -114,8 +112,7 @@ SOURCE_FILE
     SYSTEM_KW "system"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -148,7 +145,6 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"

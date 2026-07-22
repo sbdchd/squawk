@@ -482,7 +482,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "in"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -788,7 +788,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "in"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "p1"
         WHITESPACE " "
         PATH_TYPE
@@ -804,7 +804,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "in"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "value2"
         WHITESPACE " "
         TIME_TYPE
@@ -823,7 +823,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       PARAM
-        NAME
+        PARAM_NAME
           IDENT "result"
         WHITESPACE " "
         PATH_TYPE

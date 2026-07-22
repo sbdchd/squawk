@@ -68,8 +68,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -345,8 +344,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "space"
+        IDENT "space"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -725,8 +723,7 @@ SOURCE_FILE
       USING_KW "USING"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "GIN"
+        IDENT "GIN"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -783,8 +780,7 @@ SOURCE_FILE
       TABLESPACE_KW "TABLESPACE"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "indexspace"
+        IDENT "indexspace"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -811,8 +807,7 @@ SOURCE_FILE
       USING_KW "USING"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "gist"
+        IDENT "gist"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -887,8 +882,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "gin"
+        IDENT "gin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -927,8 +921,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "gin"
+        IDENT "gin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -980,8 +973,7 @@ SOURCE_FILE
       USING_KW "USING"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "GIN"
+        IDENT "GIN"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("

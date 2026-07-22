@@ -15,8 +15,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -41,8 +40,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -63,8 +61,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -89,8 +86,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -111,8 +107,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -137,8 +132,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -159,8 +153,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -208,8 +201,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -314,8 +306,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -323,8 +314,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -339,8 +329,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FOREIGN_DATA_WRAPPER_RENAME_TO
       RENAME_KW "rename"
@@ -348,7 +337,6 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       FOREIGN_DATA_WRAPPER
-        NAME
-          IDENT "n"
+        IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"

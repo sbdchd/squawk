@@ -470,8 +470,7 @@ SOURCE_FILE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "query"
+      IDENT "query"
     PARAM_LIST
       L_PAREN "("
       PARAM
@@ -559,8 +558,7 @@ SOURCE_FILE
       EXECUTE_KW "EXECUTE"
       WHITESPACE " "
       PREPARED_STATEMENT_REF
-        NAME_REF
-          IDENT "query"
+        IDENT "query"
       ARG_LIST
         L_PAREN "("
         ARG
@@ -1352,8 +1350,7 @@ SOURCE_FILE
       EXECUTE_KW "execute"
       WHITESPACE " "
       PREPARED_STATEMENT_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
       SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- declare"
@@ -1365,8 +1362,7 @@ SOURCE_FILE
       DECLARE_KW "declare"
       WHITESPACE " "
       CURSOR
-        NAME
-          IDENT "c"
+        IDENT "c"
       WHITESPACE " "
       CURSOR_KW "cursor"
       WHITESPACE " "

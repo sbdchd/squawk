@@ -25,8 +25,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -113,8 +112,7 @@ SOURCE_FILE
             CONSTRAINT_KW "constraint"
             WHITESPACE " "
             CONSTRAINT_NAME
-              NAME
-                IDENT "c"
+              IDENT "c"
           WHITESPACE "\n    "
           NOT_KW "not"
           WHITESPACE " "
@@ -181,8 +179,7 @@ SOURCE_FILE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
           CONSTRAINT_NAME
-            NAME
-              IDENT "fooo"
+            IDENT "fooo"
         WHITESPACE "\n    "
         CHECK_KW "check"
         WHITESPACE " "
@@ -226,8 +223,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -282,8 +278,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned"
@@ -391,8 +386,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n    "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -477,8 +471,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_from"
@@ -562,8 +555,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_with"
@@ -628,8 +620,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with schema"
@@ -671,8 +662,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "cal_server"
+        IDENT "cal_server"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -722,8 +712,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- like clause is >=pg18"
@@ -784,7 +773,6 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "remote_server"
+        IDENT "remote_server"
     SEMICOLON ";"
   WHITESPACE "\n\n"

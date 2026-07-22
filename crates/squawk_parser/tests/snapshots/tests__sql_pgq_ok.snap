@@ -239,7 +239,7 @@ SOURCE_FILE
                   IDENT "orders"
           WHITESPACE " "
           L_PAREN "("
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "order_id"
           R_PAREN ")"
       COMMA ","
@@ -264,7 +264,7 @@ SOURCE_FILE
                   IDENT "products"
           WHITESPACE " "
           L_PAREN "("
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "product_no"
           R_PAREN ")"
       COMMA ","
@@ -333,7 +333,7 @@ SOURCE_FILE
                   IDENT "customers"
           WHITESPACE " "
           L_PAREN "("
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "customer_id"
           R_PAREN ")"
       COMMA ","
@@ -358,7 +358,7 @@ SOURCE_FILE
                   IDENT "orders"
           WHITESPACE " "
           L_PAREN "("
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "order_id"
           R_PAREN ")"
       WHITESPACE "\n"
@@ -428,15 +428,13 @@ SOURCE_FILE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "orders"
+            IDENT "orders"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "products"
+            IDENT "products"
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
@@ -450,15 +448,13 @@ SOURCE_FILE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "customers"
+            IDENT "customers"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "orders"
+            IDENT "orders"
       WHITESPACE "\n    "
       R_PAREN ")"
     SEMICOLON ";"
@@ -495,7 +491,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "c"
                   WHITESPACE " "
                   IS_LABEL
@@ -519,7 +515,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "o"
                   WHITESPACE " "
                   IS_LABEL
@@ -755,8 +751,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "orders"
+              IDENT "orders"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -781,8 +776,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "products"
+              IDENT "products"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -824,8 +818,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "customers"
+              IDENT "customers"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -850,8 +843,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "orders"
+              IDENT "orders"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -895,8 +887,7 @@ SOURCE_FILE
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "product"
+              IDENT "product"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
@@ -911,8 +902,7 @@ SOURCE_FILE
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "customer"
+              IDENT "customer"
       COMMA ","
       WHITESPACE "\n        "
       VERTEX_TABLE_DEF
@@ -927,8 +917,7 @@ SOURCE_FILE
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "\"order\""
+              IDENT "\"order\""
       WHITESPACE "\n    "
       R_PAREN ")"
     WHITESPACE "\n    "
@@ -950,23 +939,20 @@ SOURCE_FILE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "orders"
+            IDENT "orders"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "products"
+            IDENT "products"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "contains"
+              IDENT "contains"
       COMMA ","
       WHITESPACE "\n        "
       EDGE_TABLE_DEF
@@ -980,23 +966,20 @@ SOURCE_FILE
           SOURCE_KW "SOURCE"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "customers"
+            IDENT "customers"
         WHITESPACE " "
         DEST_VERTEX_TABLE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "orders"
+            IDENT "orders"
         WHITESPACE " "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "has_placed"
+              IDENT "has_placed"
       WHITESPACE "\n    "
       R_PAREN ")"
     SEMICOLON ";"
@@ -1031,7 +1014,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "c"
                   WHITESPACE " "
                   IS_LABEL
@@ -1055,7 +1038,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "o"
                   WHITESPACE " "
                   IS_LABEL
@@ -1130,7 +1113,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "p"
                   WHITESPACE " "
                   IS_LABEL
@@ -1143,7 +1126,7 @@ SOURCE_FILE
                 EDGE_RIGHT
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "h"
                   WHITESPACE " "
                   IS_LABEL
@@ -1157,7 +1140,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "a"
                   WHITESPACE " "
                   IS_LABEL
@@ -1538,8 +1521,7 @@ SOURCE_FILE
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "Person"
+              IDENT "Person"
             WHITESPACE " "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1566,8 +1548,7 @@ SOURCE_FILE
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "Company"
+              IDENT "Company"
             WHITESPACE " "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1594,8 +1575,7 @@ SOURCE_FILE
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                IDENT "Account"
+              IDENT "Account"
             WHITESPACE " "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1643,8 +1623,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "Accounts"
+              IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1673,8 +1652,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "Accounts"
+              IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1690,8 +1668,7 @@ SOURCE_FILE
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                TRANSACTION_KW "transaction"
+              TRANSACTION_KW "transaction"
             WHITESPACE "\n        "
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
@@ -1715,7 +1692,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "AS"
         WHITESPACE " "
-        NAME
+        ELEMENT_TABLE_ALIAS
           IDENT "PersonOwner"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
@@ -1736,8 +1713,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "Accounts"
+              IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1752,16 +1728,14 @@ SOURCE_FILE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "Persons"
+            IDENT "Persons"
         WHITESPACE "\n      "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                OWNER_KW "owner"
+              OWNER_KW "owner"
             WHITESPACE "\n        "
             NO_PROPERTIES
               NO_KW "NO"
@@ -1778,7 +1752,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "AS"
         WHITESPACE " "
-        NAME
+        ELEMENT_TABLE_ALIAS
           IDENT "CompanyOwner"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
@@ -1799,8 +1773,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "Accounts"
+              IDENT "Accounts"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1815,16 +1788,14 @@ SOURCE_FILE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "Companies"
+            IDENT "Companies"
         WHITESPACE "\n      "
         LABEL_AND_PROPERTIES_LIST
           LABEL_AND_PROPERTIES
             LABEL_KW "LABEL"
             WHITESPACE " "
             LABEL
-              NAME
-                OWNER_KW "owner"
+              OWNER_KW "owner"
             WHITESPACE "\n        "
             NO_PROPERTIES
               NO_KW "NO"
@@ -1841,7 +1812,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "AS"
         WHITESPACE " "
-        NAME
+        ELEMENT_TABLE_ALIAS
           IDENT "worksFor"
         WHITESPACE "\n      "
         SOURCE_VERTEX_TABLE
@@ -1862,8 +1833,7 @@ SOURCE_FILE
             REFERENCES_KW "REFERENCES"
             WHITESPACE " "
             VERTEX_TABLE_REF
-              NAME_REF
-                IDENT "Persons"
+              IDENT "Persons"
             WHITESPACE " "
             COLUMN_REF_LIST
               L_PAREN "("
@@ -1878,8 +1848,7 @@ SOURCE_FILE
           DESTINATION_KW "DESTINATION"
           WHITESPACE " "
           VERTEX_TABLE_REF
-            NAME_REF
-              IDENT "Companies"
+            IDENT "Companies"
         WHITESPACE "\n        "
         NO_PROPERTIES
           NO_KW "NO"
@@ -1938,7 +1907,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "p"
                   WHITESPACE " "
                   IS_LABEL
@@ -1964,7 +1933,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "account1"
                   WHITESPACE " "
                   IS_LABEL
@@ -1979,7 +1948,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "account1"
                   R_PAREN ")"
               WHITESPACE " "
@@ -1987,7 +1956,7 @@ SOURCE_FILE
                 EDGE_ANY
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "t"
                   WHITESPACE " "
                   IS_LABEL
@@ -2001,7 +1970,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "account2"
                   R_PAREN ")"
             COMMA ","
@@ -2012,7 +1981,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "account2"
                   WHITESPACE " "
                   IS_LABEL
@@ -2038,7 +2007,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     OWNER_KW "owner"
                   WHITESPACE " "
                   IS_LABEL

@@ -14,8 +14,7 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -27,8 +26,7 @@ SOURCE_FILE
     FROM_KW "from"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -40,8 +38,7 @@ SOURCE_FILE
     IN_KW "in"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -51,8 +48,7 @@ SOURCE_FILE
       PRIOR_KW "prior"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   MOVE
@@ -64,8 +60,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -77,8 +72,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -90,8 +84,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -103,8 +96,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -119,8 +111,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -135,8 +126,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -148,8 +138,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -163,8 +152,7 @@ SOURCE_FILE
     IN_KW "IN"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -176,8 +164,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -189,8 +176,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -205,8 +191,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -223,8 +208,7 @@ SOURCE_FILE
     IN_KW "IN"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -238,8 +222,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -251,8 +234,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -267,8 +249,7 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n"
   MOVE
@@ -282,7 +263,6 @@ SOURCE_FILE
     FROM_KW "FROM"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "cursor_name"
+      IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"

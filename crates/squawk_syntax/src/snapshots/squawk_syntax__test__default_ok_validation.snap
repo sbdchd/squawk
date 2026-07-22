@@ -102,8 +102,8 @@ SOURCE_FILE@0..492
             NAME_REF@109..115
               TARGET_KW@109..115 "target"
     WHITESPACE@115..116 " "
-    ALIAS@116..117
-      NAME@116..117
+    OPTIONAL_AS_ALIAS@116..117
+      TABLE_ALIAS@116..117
         IDENT@116..117 "t"
     WHITESPACE@117..120 "\n  "
     USING_ON_CLAUSE@120..154
@@ -113,8 +113,8 @@ SOURCE_FILE@0..492
         NAME_REF@126..132
           SOURCE_KW@126..132 "source"
         WHITESPACE@132..133 " "
-        ALIAS@133..134
-          NAME@133..134
+        FROM_ALIAS@133..134
+          TABLE_ALIAS@133..134
             IDENT@133..134 "s"
       WHITESPACE@134..140 "\n     "
       ON_CLAUSE@140..154
@@ -201,8 +201,8 @@ SOURCE_FILE@0..492
             NAME_REF@253..259
               TARGET_KW@253..259 "target"
     WHITESPACE@259..260 " "
-    ALIAS@260..261
-      NAME@260..261
+    OPTIONAL_AS_ALIAS@260..261
+      TABLE_ALIAS@260..261
         IDENT@260..261 "t"
     WHITESPACE@261..264 "\n  "
     USING_ON_CLAUSE@264..298
@@ -212,8 +212,8 @@ SOURCE_FILE@0..492
         NAME_REF@270..276
           SOURCE_KW@270..276 "source"
         WHITESPACE@276..277 " "
-        ALIAS@277..278
-          NAME@277..278
+        FROM_ALIAS@277..278
+          TABLE_ALIAS@277..278
             IDENT@277..278 "s"
       WHITESPACE@278..284 "\n     "
       ON_CLAUSE@284..298

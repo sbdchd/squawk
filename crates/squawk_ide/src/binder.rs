@@ -415,18 +415,14 @@ fn bind_create_table_constraints(
         match arg {
             ast::TableArg::Column(column) => {
                 for constraint in column.constraints() {
-                    if let Some(constraint_name) = constraint.constraint_name()
-                        && let Some(name) = constraint_name.name()
-                    {
-                        bind_constraint_name_node(b, name, schema, table_name);
+                    if let Some(constraint_name) = constraint.constraint_name() {
+                        bind_constraint_name_node(b, constraint_name, schema, table_name);
                     }
                 }
             }
             ast::TableArg::TableConstraint(constraint) => {
-                if let Some(constraint_name) = constraint.constraint_name()
-                    && let Some(name) = constraint_name.name()
-                {
-                    bind_constraint_name_node(b, name, schema, table_name);
+                if let Some(constraint_name) = constraint.constraint_name() {
+                    bind_constraint_name_node(b, constraint_name, schema, table_name);
                 }
             }
             ast::TableArg::LikeClause(_) => (),
@@ -635,8 +631,8 @@ fn bind_create_schema(b: &mut Binder, create_schema: ast::CreateSchema) {
     let Some(schema_name_node) = create_schema.schema_name() else {
         return;
     };
-    let schema_name = Name::from_node(&schema_name_node);
-    let name_ptr = SyntaxNodePtr::new(schema_name_node.syntax());
+    let schema_name = Name::from_string(schema_name_node.text().to_string());
+    let name_ptr = SyntaxNodePtr::new(&schema_name_node);
 
     let schema = Schema(schema_name.clone());
 
@@ -743,10 +739,8 @@ fn bind_create_domain(b: &mut Binder, create_domain: ast::CreateDomain) {
     b.scope.insert(domain_name.clone(), type_id);
 
     for constraint in create_domain.constraints() {
-        if let Some(constraint_name) = constraint.constraint_name()
-            && let Some(name) = constraint_name.name()
-        {
-            bind_constraint_name_node(b, name, &schema, &domain_name);
+        if let Some(constraint_name) = constraint.constraint_name() {
+            bind_constraint_name_node(b, constraint_name, &schema, &domain_name);
         }
     }
 }
@@ -770,27 +764,21 @@ fn bind_alter_table(b: &mut Binder, alter_table: ast::AlterTable) {
         match action {
             ast::AlterTableAction::AddColumn(add_column) => {
                 for constraint in add_column.constraints() {
-                    if let Some(constraint_name) = constraint.constraint_name()
-                        && let Some(name) = constraint_name.name()
-                    {
-                        bind_constraint_name_node(b, name, &schema, &table_name);
+                    if let Some(constraint_name) = constraint.constraint_name() {
+                        bind_constraint_name_node(b, constraint_name, &schema, &table_name);
                     }
                 }
             }
             ast::AlterTableAction::AddConstraint(add_constraint) => {
                 if let Some(constraint) = add_constraint.constraint()
                     && let Some(constraint_name) = constraint.constraint_name()
-                    && let Some(name) = constraint_name.name()
                 {
-                    bind_constraint_name_node(b, name, &schema, &table_name);
+                    bind_constraint_name_node(b, constraint_name, &schema, &table_name);
                 }
             }
             ast::AlterTableAction::RenameConstraint(rename_constraint) => {
-                if let Some(name) = rename_constraint
-                    .constraint_name()
-                    .and_then(|constraint| constraint.name())
-                {
-                    bind_constraint_name_node(b, name, &schema, &table_name);
+                if let Some(constraint_name) = rename_constraint.constraint_name() {
+                    bind_constraint_name_node(b, constraint_name, &schema, &table_name);
                 }
             }
             _ => (),
@@ -816,26 +804,27 @@ fn bind_alter_domain(b: &mut Binder, alter_domain: ast::AlterDomain) {
         Some(ast::AlterDomainAction::AddConstraint(add_constraint)) => {
             if let Some(constraint) = add_constraint.constraint()
                 && let Some(constraint_name) = constraint.constraint_name()
-                && let Some(name) = constraint_name.name()
             {
-                bind_constraint_name_node(b, name, &schema, &domain_name);
+                bind_constraint_name_node(b, constraint_name, &schema, &domain_name);
             }
         }
         Some(ast::AlterDomainAction::RenameConstraint(rename_constraint)) => {
-            if let Some(name) = rename_constraint
-                .constraint_name()
-                .and_then(|constraint| constraint.name())
-            {
-                bind_constraint_name_node(b, name, &schema, &domain_name);
+            if let Some(constraint_name) = rename_constraint.constraint_name() {
+                bind_constraint_name_node(b, constraint_name, &schema, &domain_name);
             }
         }
         _ => (),
     }
 }
 
-fn bind_constraint_name_node(b: &mut Binder, name: ast::Name, schema: &Schema, owner_name: &Name) {
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
-    let constraint_name = Name::from_node(&name);
+fn bind_constraint_name_node(
+    b: &mut Binder,
+    constraint_name: ast::ConstraintName,
+    schema: &Schema,
+    owner_name: &Name,
+) {
+    let name_ptr = SyntaxNodePtr::new(constraint_name.syntax());
+    let constraint_name = Name::from_node(&constraint_name);
     let constraint_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Constraint,
         ptr: name_ptr,
@@ -1022,12 +1011,12 @@ fn bind_create_statistics(b: &mut Binder, create_statistics: ast::CreateStatisti
 }
 
 fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
-    let Some(name) = create_trigger.trigger().and_then(|trigger| trigger.name()) else {
+    let Some(trigger) = create_trigger.trigger() else {
         return;
     };
 
-    let trigger_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let trigger_name = Name::from_node(&trigger);
+    let name_ptr = SyntaxNodePtr::new(trigger.syntax());
 
     let Some(table_path) = create_trigger
         .on_relation()
@@ -1057,12 +1046,12 @@ fn bind_create_trigger(b: &mut Binder, create_trigger: ast::CreateTrigger) {
 }
 
 fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
-    let Some(name) = create_policy.policy().and_then(|policy| policy.name()) else {
+    let Some(policy) = create_policy.policy() else {
         return;
     };
 
-    let policy_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let policy_name = Name::from_node(&policy);
+    let name_ptr = SyntaxNodePtr::new(policy.syntax());
 
     let Some(table_path) = create_policy
         .on_table()
@@ -1092,12 +1081,12 @@ fn bind_create_policy(b: &mut Binder, create_policy: ast::CreatePolicy) {
 }
 
 fn bind_create_rule(b: &mut Binder, create_rule: ast::CreateRule) {
-    let Some(name) = create_rule.rule().and_then(|rule| rule.name()) else {
+    let Some(rule) = create_rule.rule() else {
         return;
     };
 
-    let rule_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let rule_name = Name::from_node(&rule);
+    let name_ptr = SyntaxNodePtr::new(rule.syntax());
 
     let Some(table_path) = create_rule
         .rule_on()
@@ -1153,15 +1142,12 @@ fn bind_create_property_graph(b: &mut Binder, create_property_graph: ast::Create
 }
 
 fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEventTrigger) {
-    let Some(name) = create_event_trigger
-        .event_trigger()
-        .and_then(|event_trigger| event_trigger.name())
-    else {
+    let Some(event_trigger) = create_event_trigger.event_trigger() else {
         return;
     };
 
-    let event_trigger_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let event_trigger_name = Name::from_node(&event_trigger);
+    let name_ptr = SyntaxNodePtr::new(event_trigger.syntax());
 
     let event_trigger_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::EventTrigger,
@@ -1175,15 +1161,12 @@ fn bind_create_event_trigger(b: &mut Binder, create_event_trigger: ast::CreateEv
 }
 
 fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespace) {
-    let Some(name) = create_tablespace
-        .tablespace()
-        .and_then(|tablespace| tablespace.name())
-    else {
+    let Some(tablespace) = create_tablespace.tablespace() else {
         return;
     };
 
-    let tablespace_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let tablespace_name = Name::from_node(&tablespace);
+    let name_ptr = SyntaxNodePtr::new(tablespace.syntax());
 
     let tablespace_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Tablespace,
@@ -1197,15 +1180,12 @@ fn bind_create_tablespace(b: &mut Binder, create_tablespace: ast::CreateTablespa
 }
 
 fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
-    let Some(name) = create_database
-        .database()
-        .and_then(|database| database.name())
-    else {
+    let Some(database) = create_database.database() else {
         return;
     };
 
-    let database_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let database_name = Name::from_node(&database);
+    let name_ptr = SyntaxNodePtr::new(database.syntax());
 
     let database_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Database,
@@ -1219,12 +1199,12 @@ fn bind_create_database(b: &mut Binder, create_database: ast::CreateDatabase) {
 }
 
 fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
-    let Some(name) = create_server.server().and_then(|server| server.name()) else {
+    let Some(server) = create_server.server() else {
         return;
     };
 
-    let server_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let server_name = Name::from_node(&server);
+    let name_ptr = SyntaxNodePtr::new(server.syntax());
 
     let server_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Server,
@@ -1238,15 +1218,12 @@ fn bind_create_server(b: &mut Binder, create_server: ast::CreateServer) {
 }
 
 fn bind_create_foreign_data_wrapper(b: &mut Binder, create_fdw: ast::CreateForeignDataWrapper) {
-    let Some(name) = create_fdw
-        .foreign_data_wrapper()
-        .and_then(|foreign_data_wrapper| foreign_data_wrapper.name())
-    else {
+    let Some(foreign_data_wrapper) = create_fdw.foreign_data_wrapper() else {
         return;
     };
 
-    let fdw_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let fdw_name = Name::from_node(&foreign_data_wrapper);
+    let name_ptr = SyntaxNodePtr::new(foreign_data_wrapper.syntax());
 
     let fdw_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::ForeignDataWrapper,
@@ -1260,15 +1237,12 @@ fn bind_create_foreign_data_wrapper(b: &mut Binder, create_fdw: ast::CreateForei
 }
 
 fn bind_create_publication(b: &mut Binder, create_publication: ast::CreatePublication) {
-    let Some(name) = create_publication
-        .publication()
-        .and_then(|publication| publication.name())
-    else {
+    let Some(publication) = create_publication.publication() else {
         return;
     };
 
-    let publication_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let publication_name = Name::from_node(&publication);
+    let name_ptr = SyntaxNodePtr::new(publication.syntax());
 
     let publication_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Publication,
@@ -1282,15 +1256,12 @@ fn bind_create_publication(b: &mut Binder, create_publication: ast::CreatePublic
 }
 
 fn bind_create_subscription(b: &mut Binder, create_subscription: ast::CreateSubscription) {
-    let Some(name) = create_subscription
-        .subscription()
-        .and_then(|subscription| subscription.name())
-    else {
+    let Some(subscription) = create_subscription.subscription() else {
         return;
     };
 
-    let subscription_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let subscription_name = Name::from_node(&subscription);
+    let name_ptr = SyntaxNodePtr::new(subscription.syntax());
 
     let subscription_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Subscription,
@@ -1304,15 +1275,12 @@ fn bind_create_subscription(b: &mut Binder, create_subscription: ast::CreateSubs
 }
 
 fn bind_create_language(b: &mut Binder, create_language: ast::CreateLanguage) {
-    let Some(name) = create_language
-        .language()
-        .and_then(|language| language.name())
-    else {
+    let Some(language) = create_language.language() else {
         return;
     };
 
-    let language_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let language_name = Name::from_node(&language);
+    let name_ptr = SyntaxNodePtr::new(language.syntax());
 
     let language_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Language,
@@ -1380,15 +1348,12 @@ fn bind_create_conversion(b: &mut Binder, create_conversion: ast::CreateConversi
 }
 
 fn bind_create_access_method(b: &mut Binder, create_access_method: ast::CreateAccessMethod) {
-    let Some(name) = create_access_method
-        .access_method()
-        .and_then(|name| name.name())
-    else {
+    let Some(access_method) = create_access_method.access_method() else {
         return;
     };
 
-    let access_method_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let access_method_name = Name::from_node(&access_method);
+    let name_ptr = SyntaxNodePtr::new(access_method.syntax());
 
     let access_method_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::AccessMethod,
@@ -1604,15 +1569,12 @@ fn bind_create_operator_class(b: &mut Binder, create_operator_class: ast::Create
 }
 
 fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension) {
-    let Some(name) = create_extension
-        .extension()
-        .and_then(|extension| extension.name())
-    else {
+    let Some(extension) = create_extension.extension() else {
         return;
     };
 
-    let extension_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let extension_name = Name::from_node(&extension);
+    let name_ptr = SyntaxNodePtr::new(extension.syntax());
 
     let extension_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Extension,
@@ -1626,12 +1588,12 @@ fn bind_create_extension(b: &mut Binder, create_extension: ast::CreateExtension)
 }
 
 fn bind_create_role(b: &mut Binder, role: Option<ast::Role>) {
-    let Some(name) = role.and_then(|role| role.name()) else {
+    let Some(role) = role else {
         return;
     };
 
-    let role_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let role_name = Name::from_node(&role);
+    let name_ptr = SyntaxNodePtr::new(role.syntax());
 
     let role_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Role,
@@ -1645,12 +1607,12 @@ fn bind_create_role(b: &mut Binder, role: Option<ast::Role>) {
 }
 
 fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
-    let Some(name) = declare.cursor().and_then(|cursor| cursor.name()) else {
+    let Some(cursor) = declare.cursor() else {
         return;
     };
 
-    let cursor_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let cursor_name = Name::from_node(&cursor);
+    let name_ptr = SyntaxNodePtr::new(cursor.syntax());
 
     let cursor_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Cursor,
@@ -1664,15 +1626,12 @@ fn bind_declare_cursor(b: &mut Binder, declare: ast::Declare) {
 }
 
 fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
-    let Some(name) = prepare
-        .prepared_statement()
-        .and_then(|statement| statement.name())
-    else {
+    let Some(statement) = prepare.name() else {
         return;
     };
 
-    let statement_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let statement_name = Name::from_node(&statement);
+    let name_ptr = SyntaxNodePtr::new(statement.syntax());
 
     let statement_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::PreparedStatement,
@@ -1686,12 +1645,12 @@ fn bind_prepare(b: &mut Binder, prepare: ast::Prepare) {
 }
 
 fn bind_listen(b: &mut Binder, listen: ast::Listen) {
-    let Some(name) = listen.channel().and_then(|channel| channel.name()) else {
+    let Some(channel) = listen.channel() else {
         return;
     };
 
-    let channel_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let channel_name = Name::from_node(&channel);
+    let name_ptr = SyntaxNodePtr::new(channel.syntax());
 
     let channel_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Channel,
@@ -1705,12 +1664,12 @@ fn bind_listen(b: &mut Binder, listen: ast::Listen) {
 }
 
 fn bind_savepoint(b: &mut Binder, savepoint: ast::SavepointCreate) {
-    let Some(name) = savepoint.savepoint().and_then(|savepoint| savepoint.name()) else {
+    let Some(savepoint) = savepoint.savepoint() else {
         return;
     };
 
-    let savepoint_name = Name::from_node(&name);
-    let name_ptr = SyntaxNodePtr::new(name.syntax());
+    let savepoint_name = Name::from_node(&savepoint);
+    let name_ptr = SyntaxNodePtr::new(savepoint.syntax());
 
     let savepoint_id = b.symbols.alloc(Symbol {
         kind: SymbolKind::Savepoint,

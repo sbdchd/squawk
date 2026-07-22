@@ -11,8 +11,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -37,8 +36,7 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -68,8 +66,7 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"

@@ -7,6 +7,7 @@
 // Stmt =
 //   'ident'                // Alphabetic identifier
 // | 'token_ident'          // Single quoted string
+// | '#name'                // Identifier node included in AnyName
 // | Stmt*                  // Concatenation
 // | Stmt ('|' Stmt)*       // Alternation
 // | Stmt '?'               // Zero or one repetition
@@ -15,10 +16,10 @@
 // | label:'ident' ':' Stmt // Labeled rule
 
 NameRef =
-  '#ident'?
+  '#name'?
 
 Name =
-  '#ident'?
+  '#name'?
 
 PathSegment =
   Name
@@ -61,7 +62,10 @@ ParamDefault =
  ('default' | '=') Expr
 
 Param =
-  mode:ParamMode? Name? Type ParamDefault?
+  mode:ParamMode? name:ParamName? Type ParamDefault?
+
+ParamName =
+  '#name'?
 
 ParamList =
   (Param (',' Param)*)?
@@ -122,8 +126,11 @@ JsonSelectFormat =
 JsonExprFormat =
   Expr JsonFormatClause?
 
+JsonEncoding =
+  '#ident'?
+
 JsonEncodingClause =
-  'encoding' NameRef
+  'encoding' JsonEncoding
 
 SomeFn =
   'some' '(' SelectVariant | Expr ')'
@@ -214,13 +221,19 @@ XmlPassingMech =
   'by' 'ref'
 | 'by' 'value'
 
+JsonPathName =
+  '#name'?
+
+JsonPathNameRef =
+  '#name'?
+
 JsonTable =
   'json_table' '('
     Expr
     JsonFormatClause?
     ','
     Expr
-    ('as' Name)?
+    ('as' JsonPathName)?
     JsonPassingClause?
     JsonTableColumnList
     JsonTablePlanClause?
@@ -231,9 +244,9 @@ JsonTablePlanClause =
   'plan' 'default'? '(' JsonTablePlan (',' JsonTablePlan)? ')'
 
 JsonTablePlan =
-  JsonTablePlanChoice
+  JsonPathNameRef
+| JsonTablePlanChoice
 | JsonTablePlanJoin
-| JsonTablePlanPath
 | ParenJsonTablePlan
 
 JsonTablePlanChoice =
@@ -241,9 +254,6 @@ JsonTablePlanChoice =
 
 JsonTablePlanJoin =
   lhs:JsonTablePlan ('cross' | 'inner' | 'outer' | 'union') rhs:JsonTablePlan
-
-JsonTablePlanPath =
-  NameRef
 
 ParenJsonTablePlan =
   '(' JsonTablePlan ')'
@@ -676,22 +686,28 @@ ExprType =
   Expr
 
 EventTrigger =
-  Name
+  '#name'?
+
+EventTriggerEvent =
+  '#ident'?
+
+EventTriggerFilterVariable =
+  '#ident'?
 
 EventTriggerRef =
-  NameRef
+  '#name'?
 
 Extension =
-  Name
+  '#name'?
 
 ExtensionRef =
-  NameRef
+  '#name'?
 
 ForeignDataWrapper =
-  Name
+  '#name'?
 
 ForeignDataWrapperRef =
-  NameRef
+  '#name'?
 
 FunctionName =
   Path
@@ -712,49 +728,52 @@ RoutineNameRef =
   PathRef
 
 Language =
-  Name
+  '#name'?
 
 LanguageRef =
-  NameRef
+  '#name'?
 
 Publication =
-  Name
+  '#name'?
 
 PublicationRef =
-  NameRef
+  '#name'?
 
 RoleRef =
-  'group'? NameRef
+  'group'? '#name'?
 | 'current_role'
 | 'current_user'
 | 'session_user'
 
 Role =
-  'group'? Name
+  'group'? '#name'?
 | 'current_role'
 | 'current_user'
 | 'session_user'
 
 Schema =
-  Name
+  '#name'?
 
 SchemaRef =
-  NameRef
+  '#name'?
 
 Server =
-  Name
+  '#name'?
 
 ServerRef =
-  NameRef
+  '#name'?
 
 Subscription =
-  Name
+  '#name'?
 
 SubscriptionRef =
-  NameRef
+  '#name'?
 
 RelationNameRef =
   PathRef
+
+RemoteTableNameRef =
+  '#name'?
 
 TableName =
   Path
@@ -766,10 +785,10 @@ TableNameRefList =
   '(' (TableNameRef (',' TableNameRef)*) ')'
 
 Tablespace =
-  Name
+  '#name'?
 
 TablespaceRef =
-  NameRef
+  '#name'?
 
 Sequence =
   Path
@@ -779,6 +798,9 @@ SequenceRef =
 
 Statistics =
   Path
+
+StatisticsKind =
+  '#ident'?
 
 StatisticsRef =
   PathRef
@@ -813,6 +835,9 @@ TextSearchTemplate =
 TextSearchTemplateRef =
   PathRef
 
+TextSearchTokenKind =
+  '#ident'?
+
 RoleRefList =
   RoleRef (',' RoleRef)*
 
@@ -820,7 +845,7 @@ ConstraintNameClause =
   'constraint' ConstraintName
 
 ConstraintName =
-  Name
+  '#name'?
 
 ConstraintNameRef =
   PathRef
@@ -837,10 +862,22 @@ WithOptions =
   'with' 'options'
 
 Storage =
-  'storage' ('default' | 'external' | '#ident')
+  'storage' StorageMode
+
+StorageMode =
+  'default' | 'external' | '#ident'?
 
 CompressionMethod =
-  'compression' ('#ident' | 'default')
+  'compression' CompressionMethodName
+
+CompressionMethodName =
+  'default' | '#ident'?
+
+ColumnName =
+  '#name'?
+
+ColumnNameRef =
+  '#name'?
 
 Column =
   Name
@@ -966,6 +1003,7 @@ Enforced =
 NotNullConstraint =
   ConstraintNameClause?
   'not' 'null'
+  ColumnNameRef?
   NoInherit?
 
 NullConstraint =
@@ -989,7 +1027,7 @@ GeneratedStored =
 
 ReferencesConstraint =
   ConstraintNameClause?
-  'references' table:TableNameRef ('(' column:NameRef ')')?
+  'references' table:TableNameRef ('(' column:ColumnNameRef ')')?
   MatchType?
   OnDeleteAction?
   OnUpdateAction?
@@ -1176,8 +1214,17 @@ UsingOnClause =
   'using' FromItem
   OnClause
 
-Alias =
-  'as'? Name ColumnList?
+TableAlias =
+  '#name'?
+
+FromAlias =
+  'as'? TableAlias ColumnList?
+
+OptionalAsAlias =
+  'as'? TableAlias
+
+RequiredAsAlias =
+  'as' TableAlias
 
 SequenceOptionList =
   '(' (SequenceOption (',' SequenceOption)*) ')'
@@ -1186,7 +1233,7 @@ SequenceOption =
   'as' Type
 | 'cache' Literal
 | 'increment' 'by'? Literal
-| 'sequence' 'name' NameRef
+| 'sequence' 'name' Sequence
 | 'restart' ('with'? Literal)?
 | 'logged'
 | 'unlogged'
@@ -1243,7 +1290,7 @@ OnClause =
   'on' Expr
 
 JoinUsingClause =
-  'using' ColumnRefList Alias?
+  'using' ColumnRefList alias:RequiredAsAlias?
 
 Join =
   'natural'? JoinType FromItem (using_clause:JoinUsingClause | OnClause)?
@@ -1383,10 +1430,10 @@ UsingMethod =
   'using' AccessMethodRef
 
 AccessMethod =
-  Name
+  '#name'?
 
 AccessMethodRef =
-  NameRef
+  '#name'?
 
 Index =
   Path
@@ -1395,22 +1442,22 @@ IndexRef =
   PathRef
 
 Policy =
-  Name
+  '#name'?
 
 PolicyRef =
-  NameRef
+  '#name'?
 
 Rule =
-  Name
+  '#name'?
 
 RuleRef =
-  NameRef
+  '#name'?
 
 Trigger =
-  Name
+  '#name'?
 
 TriggerRef =
-  NameRef
+  '#name'?
 
 View =
   Path
@@ -1431,34 +1478,34 @@ ConversionRef =
   PathRef
 
 Channel =
-  Name
+  '#name'?
 
 ChannelRef =
-  NameRef
+  '#name'?
 
 Cursor =
-  Name
+  '#name'?
 
 CursorRef =
-  NameRef
+  '#name'?
 
 PreparedStatement =
-  Name
+  '#name'?
 
 PreparedStatementRef =
-  NameRef
+  '#name'?
 
 Savepoint =
-  Name
+  '#name'?
 
 SavepointRef =
-  NameRef
+  '#name'?
 
 Window =
-  Name
+  '#name'?
 
 WindowRef =
-  NameRef
+  '#name'?
 
 PartitionBy =
   'partition' 'by' PartitionStrategy PartitionItemList
@@ -1746,7 +1793,7 @@ Table =
 
 Insert =
   WithClause?
-  'insert' 'into' RelationNameRef Alias? ColumnRefList?
+  'insert' 'into' RelationNameRef alias:RequiredAsAlias? ColumnRefList?
   ('overriding' ('system' | 'user') 'value')?
   ('default' 'values' | SelectVariant)
   OnConflictClause?
@@ -1817,14 +1864,14 @@ Update =
   'update'
   RelationName
   ForPortionOf?
-  Alias?
+  alias:OptionalAsAlias?
   SetClause
   FromClause?
   (WhereClause | WhereCurrentOf)?
   ReturningClause? ';'?
 
 ForPortionOf =
-  'for' 'portion' 'of' NameRef
+  'for' 'portion' 'of' ColumnNameRef
   ('from' Expr 'to' Expr | '(' Expr ')')
 
 ReturningClause =
@@ -1838,13 +1885,13 @@ ReturningOptionList =
 ReturningOption =
   ('old' | 'new')
   'as'
-  Name
+  TableAlias
 
 Delete =
   WithClause?
   'delete' 'from' RelationName
   ForPortionOf?
-  Alias?
+  alias:OptionalAsAlias?
   UsingClause?
   (WhereClause | WhereCurrentOf)?
   ReturningClause? ';'?
@@ -1894,7 +1941,7 @@ MergeAction =
 
 Merge =
   WithClause?
-  'merge' 'into' TableRelationName Alias?
+  'merge' 'into' TableRelationName alias:OptionalAsAlias?
   UsingOnClause
   MergeWhenClause*
   ReturningClause? ';'?
@@ -1981,18 +2028,18 @@ BetweenExpr =
   target:Expr 'not'? 'between' ('symmetric' | 'asymmetric')? start:Expr 'and' end:Expr
 
 JsonTableColumn =
-  Name 'for' 'ordinality'
-| Name Type
+  ColumnName 'for' 'ordinality'
+| ColumnName Type
     JsonFormatClause?
     JsonPathClause?
     JsonWrapperBehaviorClause?
     JsonQuotesClause?
     (JsonOnErrorClause | JsonOnEmptyClause)?
-| Name Type
+| ColumnName Type
     'exists'
     JsonPathClause?
     JsonOnErrorClause?
-| 'nested' 'path'? Expr ('as' Name)? JsonTableColumnList
+| 'nested' 'path'? Expr ('as' JsonPathName)? JsonTableColumnList
 
 JsonPathClause =
   'path' Expr
@@ -2122,8 +2169,11 @@ WithQuery =
 | ParenSelect
 | Table
 
+CteName =
+  '#name'?
+
 WithTable =
-  Name ColumnList? 'as'? (Materialized | NotMaterialized)? '(' query:WithQuery ')'
+  name:CteName ColumnList? 'as'? (Materialized | NotMaterialized)? '(' query:WithQuery ')'
   SearchClause?
   CycleClause?
 
@@ -2136,11 +2186,11 @@ SearchClause =
   set_column:SearchSetColumn
 
 SearchColumns =
-  (NameRef (',' NameRef)*)
+  (ColumnNameRef (',' ColumnNameRef)*)
 
 SearchSetColumn =
   'set'
-  NameRef
+  ColumnNameRef
 
 CycleClause =
   'cycle'
@@ -2149,11 +2199,11 @@ CycleClause =
   path:CyclePath
 
 CycleColumns =
-  (NameRef (',' NameRef)*)
+  (ColumnNameRef (',' ColumnNameRef)*)
 
 CycleSetColumn = 
   'set'
-  NameRef
+  ColumnNameRef
   column_to:CycleColumnTo?
 
 CycleColumnTo =
@@ -2166,7 +2216,7 @@ CycleDefault =
 
 CyclePath =
   'using'
-  NameRef
+  ColumnNameRef
 
 WithClause =
   'with' 'recursive'? (WithTable (',' WithTable)*)
@@ -2278,28 +2328,28 @@ FromItem =
 | XmlTableFromItem
 
 RelationFromItem =
-  'only'? (NameRef | FieldExpr) '*'? Alias? TablesampleClause?
+  'only'? (NameRef | FieldExpr) '*'? alias:FromAlias? TablesampleClause?
 
 FunctionFromItem =
-  'lateral'? CallExpr ('with' 'ordinality')? Alias?
+  'lateral'? CallExpr ('with' 'ordinality')? alias:FromAlias?
 
 ParenFromItem =
-  'lateral'? (ParenSelect | ParenExpr) Alias?
+  'lateral'? (ParenSelect | ParenExpr) alias:FromAlias?
 
 JsonTableFromItem =
-  'lateral'? JsonTable Alias?
+  'lateral'? JsonTable alias:FromAlias?
 
 GraphTableFromItem =
-  'lateral'? GraphTableFn Alias?
+  'lateral'? GraphTableFn alias:FromAlias?
 
 XmlTableFromItem =
-  'lateral'? XmlTable Alias?
+  'lateral'? XmlTable alias:FromAlias?
 
 ExprFromItem =
-  'lateral'? (CastExpr | CollationForFn) Alias?
+  'lateral'? (CastExpr | CollationForFn) alias:FromAlias?
 
 RowsFromItem =
-  'lateral'? 'rows' 'from' '(' (CallExpr (',' CallExpr)*) ')' ('with' 'ordinality')? Alias?
+  'lateral'? 'rows' 'from' '(' (CallExpr (',' CallExpr)*) ')' ('with' 'ordinality')? alias:FromAlias?
 
 FromClause =
   'from'
@@ -2310,8 +2360,8 @@ XmlTableColumnList =
   'columns' (XmlTableColumn (',' XmlTableColumn)*)
 
 XmlTableColumn =
-  Name Type XmlColumnOptionList?
-| Name 'for' 'ordinality'
+  ColumnName Type XmlColumnOptionList?
+| ColumnName 'for' 'ordinality'
 
 XmlColumnOptionList =
   (XmlColumnOption (XmlColumnOption*))
@@ -3013,18 +3063,18 @@ AlterTextSearchConfiguration =
   ) ';'?
 
 AddMapping =
-  'add' 'mapping' 'for' (NameRef (',' NameRef)*) 'with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*)
+  'add' 'mapping' 'for' (TextSearchTokenKind (',' TextSearchTokenKind)*) 'with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*)
 
 AlterMapping =
   'alter' 'mapping'
   (
-    'for' (NameRef (',' NameRef)*)
+    'for' (TextSearchTokenKind (',' TextSearchTokenKind)*)
       ('with' (TextSearchDictionaryRef (',' TextSearchDictionaryRef)*) | 'replace' TextSearchDictionaryRef 'with' TextSearchDictionaryRef)
   | 'replace' TextSearchDictionaryRef 'with' TextSearchDictionaryRef
   )
 
 DropMapping =
-  'drop' 'mapping' IfExists? 'for' (NameRef (',' NameRef)*)
+  'drop' 'mapping' IfExists? 'for' (TextSearchTokenKind (',' TextSearchTokenKind)*)
 
 AlterTextSearchTemplate =
   'alter' 'text' 'search' 'template' TextSearchTemplateRef
@@ -3052,7 +3102,7 @@ AlterType =
   ) ';'?
 
 RenameAttribute =
-  'rename' 'attribute' NameRef 'to' Name (Cascade | Restrict)?
+  'rename' 'attribute' ColumnNameRef 'to' ColumnName (Cascade | Restrict)?
 
 RenameValue =
   'rename' 'value' from:Literal 'to' to:Literal
@@ -3063,13 +3113,13 @@ AlterTypeAction =
 | AlterAttribute
 
 AddAttribute =
-  'add' 'attribute' Name Type Collate? (Cascade | Restrict)?
+  'add' 'attribute' ColumnName Type Collate? (Cascade | Restrict)?
 
 DropAttribute =
-  'drop' 'attribute' IfExists? NameRef (Cascade | Restrict)?
+  'drop' 'attribute' IfExists? ColumnNameRef (Cascade | Restrict)?
 
 AlterAttribute =
-  'alter' 'attribute' NameRef ('set' 'data'?)? 'type' Type Collate? (Cascade | Restrict)?
+  'alter' 'attribute' ColumnNameRef ('set' 'data'?)? 'type' Type Collate? (Cascade | Restrict)?
 
 AddValue =
   'add' 'value' IfNotExists? Literal ValuePosition?
@@ -3232,7 +3282,7 @@ VertexTables =
 
 VertexTableDef =
   TableNameRef
-  ('as' Name)?
+  ('as' ElementTableAlias)?
   ('key' ColumnRefList)?
   ElementTableLabelAndProperties?
 
@@ -3258,10 +3308,10 @@ LabelAndPropertiesList =
   (LabelAndProperties (',' LabelAndProperties)*)
 
 Label =
-  Name
+  '#ident'?
 
 LabelRef =
-  NameRef
+  '#ident'?
 
 LabelAndProperties = 
   (
@@ -3275,7 +3325,7 @@ EdgeTables =
 
 EdgeTableDef =
   TableNameRef
-  ('as' Name)?
+  ('as' ElementTableAlias)?
   ('key' ColumnRefList)?
   SourceVertexTable
   DestVertexTable
@@ -3294,10 +3344,19 @@ DestVertexTable =
 | 'destination' 'key' ColumnRefList ReferencesTable
 
 VertexTableRef =
-  NameRef
+  '#name'?
 
 ElementTableRef =
-  NameRef
+  '#ident'?
+
+ElementTableAlias =
+  '#name'?
+
+ElementVariable =
+  '#ident'?
+
+PropertyRef =
+  '#ident'?
 
 AlterPropertyGraph =
   'alter' 'property' 'graph' IfExists? PropertyGraphRef
@@ -3347,7 +3406,7 @@ AddVertexEdgeLabelProperties =
 DropVertexEdgeLabelProperties =
   'alter' ('vertex' | 'node' | 'edge' | 'relationship') 'table' ElementTableRef
     'alter' 'label' LabelRef
-    'drop' 'properties' '(' (Name (',' Name)*) ')' ('cascade' | 'restrict')?
+    'drop' 'properties' '(' (PropertyRef (',' PropertyRef)*) ')' ('cascade' | 'restrict')?
 
 DropPropertyGraph =
   'drop' 'property' 'graph' IfExists? PropertyGraphRef ('cascade' | 'restrict')? ';'?
@@ -3373,18 +3432,18 @@ PathPrimary =
 | ParenGraphPattern
 
 VertexPattern =
-  '(' Name? IsLabel? WhereClause? ')'
+  '(' ElementVariable? IsLabel? WhereClause? ')'
 
 EdgeLeft =
-  '<' '-' '[' Name? IsLabel? WhereClause? ']' '-'
+  '<' '-' '[' ElementVariable? IsLabel? WhereClause? ']' '-'
 | '<' '-'
 
 EdgeRight =
-  '-' '[' Name? IsLabel? WhereClause? ']' '-' '>'
+  '-' '[' ElementVariable? IsLabel? WhereClause? ']' '-' '>'
 | '-' '>'
 
 EdgeAny =
-  '-' '[' Name? IsLabel? WhereClause? ']' '-'
+  '-' '[' ElementVariable? IsLabel? WhereClause? ']' '-'
 | '-'
 
 ParenGraphPattern =
@@ -3439,10 +3498,10 @@ CreateDatabase =
   'create' 'database' Database DatabaseOptionList ';'?
 
 Database =
-  Name
+  '#name'?
 
 DatabaseRef =
-  NameRef
+  '#name'?
 
 Domain =
   Path
@@ -3454,7 +3513,7 @@ CreateDomain =
   'create' 'domain' Domain 'as'? Type Collate? Constraint* ';'?
 
 CreateEventTrigger =
-  'create' 'event' 'trigger' EventTrigger 'on' NameRef
+  'create' 'event' 'trigger' EventTrigger 'on' event:EventTriggerEvent
   EventTriggerWhenClause?
   'execute'
   ('function' | 'procedure')
@@ -3464,7 +3523,7 @@ EventTriggerWhenClause =
   'when' (EventTriggerWhen ('and' EventTriggerWhen)*)
 
 EventTriggerWhen =
-  NameRef 'in' '(' (Literal (',' Literal)*) ')'
+  var:EventTriggerFilterVariable 'in' '(' (Literal (',' Literal)*) ')'
 
 CreateForeignDataWrapper =
   'create' 'foreign' 'data' 'wrapper' ForeignDataWrapper
@@ -3644,7 +3703,7 @@ CreateStatistics =
   FromTable ';'?
 
 StatTypes =
-  '(' (NameRef (',' NameRef)*) ')'
+  '(' (StatisticsKind (',' StatisticsKind)*) ')'
 
 CreateSubscription =
   'create' 'subscription' Subscription
@@ -3921,10 +3980,10 @@ ImportForeignSchema =
   AlterOptionList? ';'?
 
 LimitToTables =
-  'limit' 'to' (NameRef (',' NameRef)*)
+  'limit' 'to' (RemoteTableNameRef (',' RemoteTableNameRef)*)
 
 ExceptTables =
-  'except' (NameRef (',' NameRef)*)
+  'except' (RemoteTableNameRef (',' RemoteTableNameRef)*)
 
 IntoSchema =
   'into' SchemaRef
@@ -4094,7 +4153,10 @@ SecurityLabelObject =
 | ObjectLargeObject
 
 ForProvider =
-  'for' (Literal | NameRef)
+  'for' (Literal | SecurityLabelProvider)
+
+SecurityLabelProvider =
+  '#ident'?
 
 SetConstraints =
   'set' 'constraints'
@@ -4153,7 +4215,7 @@ CreateView =
   ('with' ('cascaded' | 'local')? 'check' 'option')? ';'?
 
 Prepare =
-  'prepare' PreparedStatement ParamList? 'as' PreparableStmt ';'?
+  'prepare' name:PreparedStatement ParamList? 'as' stmt:PreparableStmt ';'?
 
 PreparableStmt =
   Select
@@ -4176,7 +4238,10 @@ CheckpointOptionList =
   '(' (CheckpointOption (',' CheckpointOption)*) ')'
 
 CheckpointOption =
-  Name Expr?
+  CheckpointOptionName Expr?
+
+CheckpointOptionName =
+  '#ident'?
 
 Deallocate =
   'deallocate' 'prepare'? (PreparedStatementRef | 'all') ';'?
@@ -4329,14 +4394,14 @@ CopyLegacyOption =
 | 'json'
 | ('delimiter' | 'null' | 'quote' | 'escape') 'as'? Literal
 | 'encoding' Literal
-| 'force' ('not' 'null' | 'quote' | 'null') ('*' | (NameRef (',' NameRef)*))
+| 'force' ('not' 'null' | 'quote' | 'null') ('*' | (ColumnNameRef (',' ColumnNameRef)*))
 
 Call =
   'call' ProcedureNameRef ArgList ';'?
 
 TriggerEventUpdate =
   'update'
-  ('of' (NameRef (',' NameRef)*))?
+  ('of' (ColumnNameRef (',' ColumnNameRef)*))?
 
 TriggerEvent =
   'insert'
@@ -4349,8 +4414,11 @@ Timing =
 | 'after'
 | 'instead' 'of'
 
+TransitionRelationName =
+  '#name'?
+
 ReferencingTable =
-  ('old' | 'new') 'table' 'as'? NameRef
+  ('old' | 'new') 'table' 'as'? TransitionRelationName
 
 Referencing =
   'referencing' ReferencingTable*
@@ -4644,11 +4712,11 @@ Partition =
   PartitionType
 
 DropColumn =
- 'drop' 'column'? IfExists? NameRef
+ 'drop' 'column'? IfExists? ColumnNameRef
  ('restrict' | 'cascade')?
 
 AddColumn =
-  'add' 'column'? IfNotExists? Name Type Collate? (Constraint (',' Constraint)*)?
+  'add' 'column'? IfNotExists? ColumnName Type Collate? (Constraint (',' Constraint)*)?
 
 PartitionForValuesWith =
   'for' 'values' 'with' '(' '#ident' Literal ',' '#ident' Literal ')'
@@ -4693,7 +4761,7 @@ SetUnlogged =
   'set' 'unlogged'
 
 RenameColumn =
-  'rename' 'column'? from:NameRef 'to' to:Name
+  'rename' 'column'? ColumnNameRef 'to' ColumnName
 
 AlterColumnOption =
   DropDefault
@@ -4726,7 +4794,7 @@ AlterConstraint =
   InitiallyImmediateConstraintOption?
 
 AlterColumn =
-  'alter' 'column'? NameRef option:AlterColumnOption
+  'alter' 'column'? ColumnNameRef option:AlterColumnOption
 
 Restart =
   'restart' ('with'? Literal)?
@@ -4759,7 +4827,7 @@ SetOptionsList =
   'set' 'options' AlterOptionList
 
 AlterSetStatistics =
-  'set' 'column'? (Literal | NameRef)
+  'set' 'column'? (Literal | ColumnNameRef)
   'set' 'statistics' Literal
 
 SetExpression =
@@ -4772,10 +4840,10 @@ SetOptions =
   'set' AttributeList
 
 SetStorage =
-  'set' 'storage' ('default' | NameRef)
+  'set' 'storage' StorageMode
 
 SetCompression =
-  'set' 'compression' ('default' | NameRef)
+  'set' 'compression' CompressionMethodName
 
 Collate =
   Expr? 'collate' CollationRef

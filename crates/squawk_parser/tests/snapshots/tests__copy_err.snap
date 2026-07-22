@@ -132,10 +132,6 @@ error[syntax-error]: expected NOT, QUOTE, or NULL
   ╭▸ 
 5 │ copy t from 's' with force;
   ╰╴                          ━
-error[syntax-error]: expected name
-  ╭▸ 
-6 │ copy t from 's' with force null;
-  ╰╴                               ━
 error[syntax-error]: expected NOT, QUOTE, or NULL
   ╭▸ 
 7 │ copy t from 's' with force zzz;

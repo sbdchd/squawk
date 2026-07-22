@@ -11,8 +11,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE_REF
-      NAME_REF
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"
@@ -29,8 +28,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       RULE
-        NAME
-          IDENT "n"
+        IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_schema"
@@ -41,8 +39,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE_REF
-      NAME_REF
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"
@@ -64,7 +61,6 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       RULE
-        NAME
-          IDENT "n"
+        IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"

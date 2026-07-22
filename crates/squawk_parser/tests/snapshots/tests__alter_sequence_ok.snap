@@ -191,8 +191,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_SEQUENCE
@@ -259,7 +258,6 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "x"
+        IDENT "x"
     SEMICOLON ";"
   WHITESPACE "\n\n"

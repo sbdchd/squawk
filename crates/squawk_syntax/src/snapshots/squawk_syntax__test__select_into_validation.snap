@@ -122,8 +122,7 @@ SOURCE_FILE@0..858
     PREPARE_KW@123..130 "prepare"
     WHITESPACE@130..131 " "
     PREPARED_STATEMENT@131..132
-      NAME@131..132
-        IDENT@131..132 "p"
+      IDENT@131..132 "p"
     WHITESPACE@132..133 " "
     AS_KW@133..135 "as"
     WHITESPACE@135..136 " "
@@ -346,7 +345,7 @@ SOURCE_FILE@0..858
       WITH_KW@432..436 "with"
       WHITESPACE@436..437 " "
       WITH_TABLE@437..461
-        NAME@437..438
+        CTE_NAME@437..438
           IDENT@437..438 "t"
         WHITESPACE@438..439 " "
         AS_KW@439..441 "as"
@@ -395,7 +394,7 @@ SOURCE_FILE@0..858
       WITH_KW@479..483 "with"
       WHITESPACE@483..484 " "
       WITH_TABLE@484..521
-        NAME@484..485
+        CTE_NAME@484..485
           IDENT@484..485 "t"
         WHITESPACE@485..486 " "
         AS_KW@486..488 "as"
@@ -570,8 +569,7 @@ SOURCE_FILE@0..858
     DECLARE_KW@715..722 "declare"
     WHITESPACE@722..723 " "
     CURSOR@723..724
-      NAME@723..724
-        IDENT@723..724 "c"
+      IDENT@723..724 "c"
     WHITESPACE@724..725 " "
     CURSOR_KW@725..731 "cursor"
     WHITESPACE@731..732 " "

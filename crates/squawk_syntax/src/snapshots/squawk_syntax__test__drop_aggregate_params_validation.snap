@@ -60,7 +60,7 @@ SOURCE_FILE@0..389
           PARAM_IN@87..89
             IN_KW@87..89 "in"
           WHITESPACE@89..90 " "
-          NAME@90..93
+          PARAM_NAME@90..93
             IDENT@90..93 "foo"
           WHITESPACE@93..94 " "
           PATH_TYPE@94..101
@@ -74,7 +74,7 @@ SOURCE_FILE@0..389
           PARAM_OUT@111..114
             OUT_KW@111..114 "out"
           WHITESPACE@114..115 " "
-          NAME@115..118
+          PARAM_NAME@115..118
             IDENT@115..118 "bar"
           WHITESPACE@118..119 " "
           PATH_TYPE@119..126
@@ -153,7 +153,7 @@ SOURCE_FILE@0..389
           PARAM_IN@245..247
             IN_KW@245..247 "in"
           WHITESPACE@247..248 " "
-          NAME@248..249
+          PARAM_NAME@248..249
             IDENT@248..249 "a"
           WHITESPACE@249..250 " "
           TIME_TYPE@250..259
@@ -164,7 +164,7 @@ SOURCE_FILE@0..389
           PARAM_OUT@265..268
             OUT_KW@265..268 "out"
           WHITESPACE@268..269 " "
-          NAME@269..270
+          PARAM_NAME@269..270
             IDENT@269..270 "b"
           WHITESPACE@270..271 " "
           PATH_TYPE@271..278
@@ -212,7 +212,7 @@ SOURCE_FILE@0..389
           PARAM_IN@341..343
             IN_KW@341..343 "in"
           WHITESPACE@343..344 " "
-          NAME@344..345
+          PARAM_NAME@344..345
             IDENT@344..345 "a"
           WHITESPACE@345..346 " "
           TIME_TYPE@346..355
@@ -223,7 +223,7 @@ SOURCE_FILE@0..389
           PARAM_OUT@361..364
             OUT_KW@361..364 "out"
           WHITESPACE@364..365 " "
-          NAME@365..366
+          PARAM_NAME@365..366
             IDENT@365..366 "b"
           WHITESPACE@366..367 " "
           PATH_TYPE@367..374

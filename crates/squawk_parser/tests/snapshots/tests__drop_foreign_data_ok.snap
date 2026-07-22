@@ -15,8 +15,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -36,18 +35,15 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "a"
+      IDENT "a"
     COMMA ","
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "b"
+      IDENT "b"
     COMMA ","
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "c"
+      IDENT "c"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -67,18 +63,15 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "a"
+      IDENT "a"
     COMMA ","
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "b"
+      IDENT "b"
     COMMA ","
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "c"
+      IDENT "c"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

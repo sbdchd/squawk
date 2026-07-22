@@ -13,8 +13,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     DISABLE
       DISABLE_KW "disable"
@@ -30,8 +29,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ENABLE
       ENABLE_KW "enable"
@@ -47,8 +45,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ENABLE_REPLICA
       ENABLE_KW "enable"
@@ -66,8 +63,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ENABLE_ALWAYS
       ENABLE_KW "enable"
@@ -85,8 +81,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -94,8 +89,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_current_role"
@@ -108,8 +102,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -130,8 +123,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     EVENT_TRIGGER_RENAME_TO
       RENAME_KW "rename"
@@ -139,7 +131,6 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       EVENT_TRIGGER
-        NAME
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"

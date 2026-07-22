@@ -62,8 +62,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complex_args"
@@ -85,7 +84,7 @@ SOURCE_FILE
           PARAM_IN
             IN_KW "in"
           WHITESPACE " "
-          NAME
+          PARAM_NAME
             IDENT "x"
           WHITESPACE " "
           PATH_TYPE
@@ -96,7 +95,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         PARAM
-          NAME
+          PARAM_NAME
             IDENT "y"
           WHITESPACE " "
           PATH_TYPE
@@ -206,7 +205,6 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "new_schema"
+        IDENT "new_schema"
     SEMICOLON ";"
   WHITESPACE "\n\n"

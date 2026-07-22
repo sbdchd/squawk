@@ -2,7 +2,7 @@ use rustc_hash::FxHashSet;
 
 use squawk_syntax::{
     Parse, SourceFile,
-    ast::{self, AstNode},
+    ast::{self, AstNode, NameLike},
 };
 
 use crate::{Linter, Rule, Violation};
@@ -72,8 +72,7 @@ fn not_valid_validate_in_transaction(
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
                             if add_constraint.not_valid().is_some()
                                 && let Some(constraint) = add_constraint.constraint()
-                                && let Some(constraint_name) =
-                                    constraint.constraint_name().and_then(|c| c.name())
+                                && let Some(constraint_name) = constraint.constraint_name()
                             {
                                 not_valid_names.insert(constraint_name.text());
                             }

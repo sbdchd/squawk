@@ -112,8 +112,7 @@ SOURCE_FILE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
           CONSTRAINT_NAME
-            NAME
-              IDENT "c"
+            IDENT "c"
         WHITESPACE " "
         CHECK_KW "check"
         WHITESPACE " "
@@ -182,8 +181,7 @@ SOURCE_FILE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
           CONSTRAINT_NAME
-            NAME
-              IDENT "a"
+            IDENT "a"
         WHITESPACE " "
         CHECK_KW "check"
         WHITESPACE " "
@@ -283,8 +281,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       CONSTRAINT_NAME
-        NAME
-          IDENT "n"
+        IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- validate_constraint"
@@ -331,8 +328,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DOMAIN
@@ -399,7 +395,6 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

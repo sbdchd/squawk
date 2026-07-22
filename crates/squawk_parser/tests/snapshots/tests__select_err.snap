@@ -77,10 +77,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "u"
           COLUMN_LIST
             L_PAREN "("
@@ -783,8 +783,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- where with missing expr"
@@ -995,7 +994,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -1107,7 +1106,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"

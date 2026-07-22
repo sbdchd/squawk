@@ -16,8 +16,7 @@ SOURCE_FILE
       METHOD_KW "method"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "m"
+        IDENT "m"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -101,7 +100,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
@@ -349,8 +348,7 @@ SOURCE_FILE
       DATABASE_KW "database"
       WHITESPACE " "
       DATABASE_REF
-        NAME_REF
-          IDENT "d"
+        IDENT "d"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -391,8 +389,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -413,8 +410,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       EVENT_TRIGGER_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -437,8 +433,7 @@ SOURCE_FILE
       WRAPPER_KW "wrapper"
       WHITESPACE " "
       FOREIGN_DATA_WRAPPER_REF
-        NAME_REF
-          IDENT "f"
+        IDENT "f"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -518,7 +513,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
@@ -529,7 +524,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           PARAM
-            NAME
+            PARAM_NAME
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE
@@ -716,8 +711,7 @@ SOURCE_FILE
         USING_KW "using"
         WHITESPACE " "
         ACCESS_METHOD_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -747,8 +741,7 @@ SOURCE_FILE
         USING_KW "using"
         WHITESPACE " "
         ACCESS_METHOD_REF
-          NAME_REF
-            IDENT "i"
+          IDENT "i"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -767,8 +760,7 @@ SOURCE_FILE
       POLICY_KW "policy"
       WHITESPACE " "
       POLICY_REF
-        NAME_REF
-          IDENT "p"
+        IDENT "p"
       WHITESPACE " "
       ON_KW "on"
       WHITESPACE " "
@@ -795,8 +787,7 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "l"
+        IDENT "l"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -817,8 +808,7 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "l"
+        IDENT "l"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -874,7 +864,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
@@ -885,7 +875,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           PARAM
-            NAME
+            PARAM_NAME
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE
@@ -920,8 +910,7 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "p"
+        IDENT "p"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -940,8 +929,7 @@ SOURCE_FILE
       ROLE_KW "role"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "r"
+        IDENT "r"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -997,7 +985,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
@@ -1011,7 +999,7 @@ SOURCE_FILE
             PARAM_OUT
               OUT_KW "out"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE
@@ -1046,8 +1034,7 @@ SOURCE_FILE
       RULE_KW "rule"
       WHITESPACE " "
       RULE_REF
-        NAME_REF
-          IDENT "r"
+        IDENT "r"
       WHITESPACE " "
       ON_KW "on"
       WHITESPACE " "
@@ -1074,8 +1061,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1116,8 +1102,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1158,8 +1143,7 @@ SOURCE_FILE
       SUBSCRIPTION_KW "subscription"
       WHITESPACE " "
       SUBSCRIPTION_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1221,8 +1205,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1355,8 +1338,7 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "l"
+        IDENT "l"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1375,8 +1357,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       TRIGGER_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
       WHITESPACE " "
       ON_KW "on"
       WHITESPACE " "

@@ -11,8 +11,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "x"
+      IDENT "x"
     WHITESPACE " "
     LANGUAGE_RENAME_TO
       RENAME_KW "rename"
@@ -20,8 +19,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       LANGUAGE
-        NAME
-          IDENT "y"
+        IDENT "y"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_LANGUAGE
@@ -32,8 +30,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "x"
+      IDENT "x"
     WHITESPACE " "
     LANGUAGE_RENAME_TO
       RENAME_KW "rename"
@@ -41,8 +38,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       LANGUAGE
-        NAME
-          IDENT "y"
+        IDENT "y"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -53,8 +49,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "x"
+      IDENT "x"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -62,8 +57,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_LANGUAGE
@@ -74,8 +68,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "x"
+      IDENT "x"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"

@@ -277,8 +277,7 @@ SOURCE_FILE
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     SAVEPOINT
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   RELEASE_SAVEPOINT
@@ -287,16 +286,14 @@ SOURCE_FILE
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   RELEASE_SAVEPOINT
     RELEASE_KW "release"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ROLLBACK
@@ -307,8 +304,7 @@ SOURCE_FILE
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
@@ -321,8 +317,7 @@ SOURCE_FILE
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
@@ -335,8 +330,7 @@ SOURCE_FILE
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
@@ -345,8 +339,7 @@ SOURCE_FILE
     TO_KW "to"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
@@ -357,8 +350,7 @@ SOURCE_FILE
     TO_KW "to"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   ROLLBACK
@@ -369,8 +361,7 @@ SOURCE_FILE
     TO_KW "to"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMIT

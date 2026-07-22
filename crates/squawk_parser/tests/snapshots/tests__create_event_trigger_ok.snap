@@ -13,12 +13,11 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER
-      NAME
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
+    EVENT_TRIGGER_EVENT
       IDENT "e"
     WHITESPACE "\n  "
     EXECUTE_KW "execute"
@@ -43,19 +42,18 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     EVENT_TRIGGER
-      NAME
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
+    EVENT_TRIGGER_EVENT
       IDENT "e"
     WHITESPACE "\n  "
     EVENT_TRIGGER_WHEN_CLAUSE
       WHEN_KW "when"
       WHITESPACE " "
       EVENT_TRIGGER_WHEN
-        NAME_REF
+        EVENT_TRIGGER_FILTER_VARIABLE
           IDENT "x"
         WHITESPACE " "
         IN_KW "in"
@@ -76,7 +74,7 @@ SOURCE_FILE
       AND_KW "and"
       WHITESPACE " "
       EVENT_TRIGGER_WHEN
-        NAME_REF
+        EVENT_TRIGGER_FILTER_VARIABLE
           REAL_KW "real"
         WHITESPACE " "
         IN_KW "in"
@@ -112,12 +110,11 @@ SOURCE_FILE
     TRIGGER_KW "TRIGGER"
     WHITESPACE " "
     EVENT_TRIGGER
-      NAME
-        IDENT "abort_ddl"
+      IDENT "abort_ddl"
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    NAME_REF
+    EVENT_TRIGGER_EVENT
       IDENT "ddl_command_start"
     WHITESPACE "\n   "
     EXECUTE_KW "EXECUTE"

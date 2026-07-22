@@ -34,6 +34,7 @@ pub(crate) enum NameRefClass {
     InsertQualifiedColumnTable,
     InsertTable,
     JoinUsingColumn,
+    JsonPath,
     Language,
     MergeColumn,
     MergeQualifiedColumnTable,
@@ -98,6 +99,7 @@ fn classify_object_definition(kind: SyntaxKind) -> Option<LocationKind> {
         SyntaxKind::COLLATION => LocationKind::Collation,
         SyntaxKind::CONSTRAINT_NAME => LocationKind::Constraint,
         SyntaxKind::CONVERSION => LocationKind::Conversion,
+        SyntaxKind::CTE_NAME => LocationKind::Table,
         SyntaxKind::CURSOR => LocationKind::Cursor,
         SyntaxKind::DATABASE => LocationKind::Database,
         SyntaxKind::DOMAIN => LocationKind::Type,
@@ -106,6 +108,7 @@ fn classify_object_definition(kind: SyntaxKind) -> Option<LocationKind> {
         SyntaxKind::FOREIGN_DATA_WRAPPER => LocationKind::ForeignDataWrapper,
         SyntaxKind::FUNCTION_NAME => LocationKind::Function,
         SyntaxKind::INDEX => LocationKind::Index,
+        SyntaxKind::JSON_PATH_NAME => LocationKind::JsonPath,
         SyntaxKind::LANGUAGE => LocationKind::Language,
         SyntaxKind::OP_CLASS_NAME => LocationKind::OperatorClass,
         SyntaxKind::OP_FAMILY_NAME => LocationKind::OperatorFamily,
@@ -121,7 +124,7 @@ fn classify_object_definition(kind: SyntaxKind) -> Option<LocationKind> {
         SyntaxKind::SERVER => LocationKind::Server,
         SyntaxKind::STATISTICS => LocationKind::Statistics,
         SyntaxKind::SUBSCRIPTION => LocationKind::Subscription,
-        SyntaxKind::TABLE_NAME => LocationKind::Table,
+        SyntaxKind::TABLE_ALIAS | SyntaxKind::TABLE_NAME => LocationKind::Table,
         SyntaxKind::TABLESPACE => LocationKind::Tablespace,
         SyntaxKind::TEXT_SEARCH_CONFIGURATION => LocationKind::TextSearchConfiguration,
         SyntaxKind::TEXT_SEARCH_DICTIONARY => LocationKind::TextSearchDictionary,
@@ -150,6 +153,7 @@ fn classify_object_ref(kind: SyntaxKind) -> Option<NameRefClass> {
         SyntaxKind::FOREIGN_DATA_WRAPPER_REF => NameRefClass::ForeignDataWrapper,
         SyntaxKind::FUNCTION_NAME_REF => NameRefClass::Function,
         SyntaxKind::INDEX_REF => NameRefClass::Index,
+        SyntaxKind::JSON_PATH_NAME_REF => NameRefClass::JsonPath,
         SyntaxKind::LANGUAGE_REF => NameRefClass::Language,
         SyntaxKind::OP_CLASS_REF => NameRefClass::OperatorClass,
         SyntaxKind::OP_FAMILY_REF => NameRefClass::OperatorFamily,
@@ -1128,7 +1132,10 @@ pub(crate) fn classify_def_node(def_node: &SyntaxNode) -> Option<LocationKind> {
         {
             return Some(LocationKind::Column);
         }
-        if ast::Alias::can_cast(ancestor.kind()) {
+        if ast::FromAlias::can_cast(ancestor.kind())
+            || ast::OptionalAsAlias::can_cast(ancestor.kind())
+            || ast::RequiredAsAlias::can_cast(ancestor.kind())
+        {
             if in_column {
                 return Some(LocationKind::Column);
             }

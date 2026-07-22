@@ -16,26 +16,22 @@ SOURCE_FILE
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              INSERT_KW "insert"
+            INSERT_KW "insert"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              UPDATE_KW "update"
+            UPDATE_KW "update"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              DELETE_KW "delete"
+            DELETE_KW "delete"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              TRUNCATE_KW "truncate"
+            TRUNCATE_KW "truncate"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
@@ -44,14 +40,12 @@ SOURCE_FILE
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              TRIGGER_KW "trigger"
+            TRIGGER_KW "trigger"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "maintain"
+            IDENT "maintain"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -125,8 +119,7 @@ SOURCE_FILE
     BY_KW "by"
     WHITESPACE " "
     ROLE_REF
-      NAME_REF
-        IDENT "public"
+      IDENT "public"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -176,8 +169,7 @@ SOURCE_FILE
     BY_KW "by"
     WHITESPACE " "
     ROLE_REF
-      NAME_REF
-        IDENT "public"
+      IDENT "public"
     WHITESPACE "\n  "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -287,13 +279,11 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -353,8 +343,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              INSERT_KW "insert"
+            INSERT_KW "insert"
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
@@ -395,8 +384,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              UPDATE_KW "update"
+            UPDATE_KW "update"
           COLUMN_REF_LIST
             L_PAREN "("
             COLUMN_REF
@@ -563,8 +551,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "usage"
+            IDENT "usage"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -605,8 +592,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              UPDATE_KW "update"
+            UPDATE_KW "update"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
@@ -644,8 +630,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -674,18 +659,15 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -716,18 +698,15 @@ SOURCE_FILE
       DATABASE_KW "database"
       WHITESPACE " "
       DATABASE_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       DATABASE_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       DATABASE_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -747,20 +726,17 @@ SOURCE_FILE
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "connect"
+            IDENT "connect"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              TEMPORARY_KW "temporary"
+            TEMPORARY_KW "temporary"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              TEMP_KW "temp"
+            TEMP_KW "temp"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -768,8 +744,7 @@ SOURCE_FILE
       DATABASE_KW "database"
       WHITESPACE " "
       DATABASE_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -790,8 +765,7 @@ SOURCE_FILE
       DATABASE_KW "database"
       WHITESPACE " "
       DATABASE_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -815,8 +789,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "usage"
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -891,8 +864,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "usage"
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -904,18 +876,15 @@ SOURCE_FILE
       WRAPPER_KW "wrapper"
       WHITESPACE " "
       FOREIGN_DATA_WRAPPER_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       FOREIGN_DATA_WRAPPER_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       FOREIGN_DATA_WRAPPER_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -942,8 +911,7 @@ SOURCE_FILE
       WRAPPER_KW "wrapper"
       WHITESPACE " "
       FOREIGN_DATA_WRAPPER_REF
-        NAME_REF
-          IDENT "d"
+        IDENT "d"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -967,8 +935,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "usage"
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -978,18 +945,15 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1014,8 +978,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "d"
+        IDENT "d"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1039,8 +1002,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              EXECUTE_KW "execute"
+            EXECUTE_KW "execute"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1077,8 +1039,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              EXECUTE_KW "execute"
+            EXECUTE_KW "execute"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1098,7 +1059,7 @@ SOURCE_FILE
               PARAM_IN
                 IN_KW "in"
               WHITESPACE " "
-              NAME
+              PARAM_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -1112,7 +1073,7 @@ SOURCE_FILE
               PARAM_OUT
                 OUT_KW "out"
               WHITESPACE " "
-              NAME
+              PARAM_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -1209,18 +1170,15 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1247,8 +1205,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1275,8 +1232,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1311,7 +1267,7 @@ SOURCE_FILE
               PARAM_IN
                 IN_KW "in"
               WHITESPACE " "
-              NAME
+              PARAM_NAME
                 IDENT "a"
               WHITESPACE " "
               PATH_TYPE
@@ -1325,7 +1281,7 @@ SOURCE_FILE
               PARAM_OUT
                 OUT_KW "out"
               WHITESPACE " "
-              NAME
+              PARAM_NAME
                 IDENT "b"
               WHITESPACE " "
               PATH_TYPE
@@ -1367,8 +1323,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "usage"
+            IDENT "usage"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1376,18 +1331,15 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
       COMMA ","
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
       COMMA ","
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "buzz"
+        IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1408,18 +1360,15 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
       COMMA ","
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
       COMMA ","
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "buzz"
+        IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1442,18 +1391,15 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
       COMMA ","
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
       COMMA ","
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "buzz"
+        IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1475,8 +1421,7 @@ SOURCE_FILE
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              UPDATE_KW "update"
+            UPDATE_KW "update"
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1537,8 +1482,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              SET_KW "set"
+            SET_KW "set"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
@@ -1640,20 +1584,17 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              SET_KW "set"
+            SET_KW "set"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              SET_KW "set"
+            SET_KW "set"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              SET_KW "set"
+            SET_KW "set"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
@@ -1669,20 +1610,17 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              SET_KW "set"
+            SET_KW "set"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              SET_KW "set"
+            SET_KW "set"
         COMMA ","
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              SET_KW "set"
+            SET_KW "set"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
@@ -1707,8 +1645,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1728,8 +1665,7 @@ SOURCE_FILE
         WHITESPACE " "
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "usage"
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1737,18 +1673,15 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1769,18 +1702,15 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1805,18 +1735,15 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
       COMMA ","
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
       COMMA ","
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "buzz"
+        IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1837,18 +1764,15 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
       COMMA ","
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
       COMMA ","
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "buzz"
+        IDENT "buzz"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1866,8 +1790,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "usage"
+            IDENT "usage"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -1969,8 +1892,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "public"
+            IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -1992,8 +1914,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "public"
+            IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -2015,8 +1936,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "public"
+            IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -2032,8 +1952,7 @@ SOURCE_FILE
       REVOKE_COMMAND_LIST
         REVOKE_COMMAND
           ROLE_REF
-            NAME_REF
-              IDENT "public"
+            IDENT "public"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "

@@ -242,7 +242,7 @@ fn api_walkthrough() {
     let param_list: ast::ParamList = func.param_list().unwrap();
     let param: ast::Param = param_list.params().next().unwrap();
 
-    let param_name: ast::Name = param.name().unwrap();
+    let param_name: ast::ParamName = param.name().unwrap();
     assert_eq!(param_name.syntax().to_string(), "p");
 
     let param_ty: ast::Type = param.ty().unwrap();

@@ -21,8 +21,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n    "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"

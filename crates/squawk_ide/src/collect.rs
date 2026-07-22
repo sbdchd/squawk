@@ -701,7 +701,7 @@ pub(crate) fn columns_for_star_from_alias(
     db: &dyn Db,
     file: File,
     from_item: &ast::FromItem,
-    alias: &ast::Alias,
+    alias: &ast::FromAlias,
 ) -> Vec<(Name, Option<Type>)> {
     let alias_columns: Vec<Name> = alias
         .column_list()

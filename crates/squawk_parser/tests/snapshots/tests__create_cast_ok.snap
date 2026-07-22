@@ -123,7 +123,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
@@ -137,7 +137,7 @@ SOURCE_FILE
             PARAM_OUT
               OUT_KW "out"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE

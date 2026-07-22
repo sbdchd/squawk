@@ -470,7 +470,7 @@ fn alias_base_columns_with_types(
     db: &dyn Db,
     file: File,
     syntax_root: &SyntaxNode,
-    alias: &ast::Alias,
+    alias: &ast::FromAlias,
 ) -> Vec<(Name, Option<String>)> {
     let Some(from_item) = alias.syntax().ancestors().find_map(ast::FromItem::cast) else {
         return vec![];
@@ -719,9 +719,7 @@ fn delete_expr_completions(
 }
 
 fn table_name_from_from_item(from_item: &ast::FromItem) -> Option<Name> {
-    if let Some(alias) = from_item.alias()
-        && let Some(alias_name) = alias.name()
-    {
+    if let Some(alias_name) = from_item.alias().and_then(|alias| alias.table_alias()) {
         return Some(Name::from_node(&alias_name));
     }
     if let ast::FromItem::RelationFromItem(relation) = from_item

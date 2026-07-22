@@ -8,7 +8,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -52,7 +52,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -78,20 +78,20 @@ SOURCE_FILE
           BY_KW "by"
           WHITESPACE " "
           SEARCH_COLUMNS
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
             COMMA ","
             WHITESPACE " "
             ERROR
               COMMA ","
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "c"
           WHITESPACE " "
           SEARCH_SET_COLUMN
             SET_KW "set"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
@@ -126,7 +126,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -152,20 +152,20 @@ SOURCE_FILE
           BY_KW "by"
           WHITESPACE " "
           SEARCH_COLUMNS
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "a"
             COMMA ","
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "b"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "c"
           WHITESPACE " "
           SEARCH_SET_COLUMN
             SET_KW "set"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
@@ -200,7 +200,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -221,7 +221,7 @@ SOURCE_FILE
         WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "f"
         WHITESPACE " "
         AS_KW "as"
@@ -257,7 +257,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " \n   "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "a"
         WHITESPACE " "
         AS_KW "as"
@@ -278,7 +278,7 @@ SOURCE_FILE
       COMMENT "-- <-- missing a comma"
       WHITESPACE "\n   "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "b"
         WHITESPACE " "
         AS_KW "as"
@@ -312,7 +312,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " \n   "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "a"
         WHITESPACE " "
         AS_KW "as"
@@ -333,7 +333,7 @@ SOURCE_FILE
       COMMENT "-- <-- missing a comma"
       WHITESPACE "\n   "
       WITH_TABLE
-        NAME
+        CTE_NAME
           ROW_KW "row"
         WHITESPACE " "
         AS_KW "as"
@@ -365,7 +365,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " \n   "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "a"
         WHITESPACE " "
         AS_KW "as"

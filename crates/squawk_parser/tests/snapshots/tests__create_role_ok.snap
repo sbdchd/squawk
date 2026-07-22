@@ -11,8 +11,7 @@ SOURCE_FILE
     ROLE_KW "role"
     WHITESPACE " "
     ROLE
-      NAME
-        IDENT "u"
+      IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -23,8 +22,7 @@ SOURCE_FILE
     ROLE_KW "role"
     WHITESPACE " "
     ROLE
-      NAME
-        IDENT "u"
+      IDENT "u"
     WHITESPACE "\n   "
     ROLE_OPTION_LIST
       WITH_KW "with"
@@ -116,18 +114,15 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            NAME_REF
-              IDENT "bar"
+            IDENT "bar"
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            NAME_REF
-              IDENT "buzz"
+            IDENT "buzz"
       WHITESPACE "\n   "
       ROLE_OPTION
         IN_KW "in"
@@ -136,16 +131,14 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE "\n   "
       ROLE_OPTION
         ADMIN_KW "admin"
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
       WHITESPACE "\n   "
       ROLE_OPTION
         SYSID_KW "sysid"

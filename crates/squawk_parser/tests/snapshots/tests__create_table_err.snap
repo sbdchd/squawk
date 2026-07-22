@@ -409,8 +409,11 @@ SOURCE_FILE
                 WHITESPACE " "
                 NAME_KW "name"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "foo"
+                SEQUENCE
+                  PATH
+                    PATH_SEGMENT
+                      NAME
+                        IDENT "foo"
               WHITESPACE "\n    "
               SEQUENCE_OPTION
                 RESTART_KW "restart"
@@ -635,8 +638,7 @@ SOURCE_FILE
           USING_KW "using"
           WHITESPACE " "
           ACCESS_METHOD_REF
-            NAME_REF
-              IDENT "btree"
+            IDENT "btree"
         WHITESPACE " "
         CONSTRAINT_EXCLUSION_LIST
           L_PAREN "("
@@ -703,7 +705,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"

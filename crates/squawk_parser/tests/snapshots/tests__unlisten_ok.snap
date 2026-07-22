@@ -9,8 +9,7 @@ SOURCE_FILE
     UNLISTEN_KW "unlisten"
     WHITESPACE " "
     CHANNEL_REF
-      NAME_REF
-        VIRTUAL_KW "virtual"
+      VIRTUAL_KW "virtual"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   UNLISTEN

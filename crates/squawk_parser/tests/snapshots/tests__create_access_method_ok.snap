@@ -13,8 +13,7 @@ SOURCE_FILE
     METHOD_KW "method"
     WHITESPACE " "
     ACCESS_METHOD
-      NAME
-        IDENT "m"
+      IDENT "m"
     WHITESPACE "\n  "
     TYPE_KW "type"
     WHITESPACE " "
@@ -40,8 +39,7 @@ SOURCE_FILE
     METHOD_KW "method"
     WHITESPACE " "
     ACCESS_METHOD
-      NAME
-        IDENT "m"
+      IDENT "m"
     WHITESPACE "\n  "
     TYPE_KW "type"
     WHITESPACE " "
