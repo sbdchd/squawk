@@ -11,8 +11,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE
-      NAME
-        IDENT "d"
+      IDENT "d"
     DATABASE_OPTION_LIST
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -24,8 +23,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE
-      NAME
-        IDENT "d"
+      IDENT "d"
     WHITESPACE "\n  "
     DATABASE_OPTION_LIST
       WITH_KW "with"
@@ -130,8 +128,7 @@ SOURCE_FILE
         EQ "="
         WHITESPACE " "
         TABLESPACE_REF
-          NAME_REF
-            FULL_KW "full"
+          FULL_KW "full"
       WHITESPACE "\n  "
       DATABASE_OPTION
         IDENT "allow_connections"

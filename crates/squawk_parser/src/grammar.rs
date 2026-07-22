@@ -408,11 +408,17 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, CALL_EXPR)
 }
 
+fn json_encoding(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, JSON_ENCODING);
+}
+
 fn opt_json_encoding_clause(p: &mut Parser<'_>) {
     if p.at(ENCODING_KW) {
         let m = p.start();
         p.bump(ENCODING_KW);
-        name_ref(p);
+        json_encoding(p);
         m.complete(p, JSON_ENCODING_CLAUSE);
     }
 }
@@ -619,7 +625,7 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
     }
     // [ AS json_path_name ]
     if p.eat(AS_KW) {
-        name(p);
+        json_path_name(p);
     }
     opt_json_passing_clause(p);
     json_table_column_list(p);
@@ -693,9 +699,7 @@ fn opt_json_table_plan_primary(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.expect(R_PAREN);
         Some(m.complete(p, PAREN_JSON_TABLE_PLAN))
     } else if p.at_ts(NAME_REF_FIRST) {
-        let m = p.start();
-        name_ref(p);
-        Some(m.complete(p, JSON_TABLE_PLAN_PATH))
+        Some(json_path_name_ref(p))
     } else {
         None
     }
@@ -749,11 +753,11 @@ fn opt_json_table_column(p: &mut Parser<'_>) -> bool {
         }
         // [ AS json_path_name ]
         if p.eat(AS_KW) {
-            name(p);
+            json_path_name(p);
         }
         json_table_column_list(p);
     } else {
-        name(p);
+        column_name(p);
         // FOR ORDINALITY
         if p.eat(FOR_KW) {
             p.expect(ORDINALITY_KW);
@@ -1737,9 +1741,7 @@ fn opt_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    if !opt_ident(p) {
-        p.bump_any();
-    }
+    pg_name(p);
     Some(m.complete(p, NAME))
 }
 
@@ -1762,9 +1764,7 @@ fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
         // skip
     } else if p.at_ts(COL_LABEL_FIRST) {
         let m = p.start();
-        if !opt_ident(p) {
-            p.bump_any();
-        }
+        pg_name(p);
         let kind = if p.at(DOT) { NAME_REF } else { kind };
         m.complete(p, kind);
     } else {
@@ -2187,9 +2187,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             INTERVAL_TYPE
         }
         _ => {
-            if !opt_ident(p) {
-                p.bump_any();
-            }
+            pg_name(p);
             NAME_REF
         }
     };
@@ -2360,9 +2358,7 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 fn field_name(p: &mut Parser<'_>) {
     assert!(p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at_ts(ALL_KEYWORDS));
     let m = p.start();
-    if !opt_ident(p) {
-        p.bump_any();
-    }
+    pg_name(p);
     m.complete(p, NAME_REF);
 }
 
@@ -2667,7 +2663,7 @@ fn with_query(p: &mut Parser<'_>) -> CompletedMarker {
         p.err_and_bump("unexpected WITH");
     }
     let m = p.start();
-    name(p);
+    cte_name(p);
     opt_column_list_with(p, ColumnDefKind::Name);
     p.expect(AS_KW);
     opt_materialized(p);
@@ -2704,7 +2700,7 @@ fn search_columns(p: &mut Parser<'_>) {
         || "unexpected comma, expected a column name".to_string(),
         NAME_REF_FIRST,
         TokenSet::new(&[SET_KW]),
-        |p| opt_name_ref(p).is_some(),
+        |p| opt_column_name_ref(p).is_some(),
     );
     m.complete(p, SEARCH_COLUMNS);
 }
@@ -2712,7 +2708,7 @@ fn search_columns(p: &mut Parser<'_>) {
 fn search_set_column(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(SET_KW);
-    name_ref(p);
+    column_name_ref(p);
     m.complete(p, SEARCH_SET_COLUMN);
 }
 
@@ -2733,14 +2729,14 @@ fn cycle_path(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(USING_KW);
     // cycle path
-    name_ref(p);
+    column_name_ref(p);
     m.complete(p, CYCLE_PATH);
 }
 
 fn cycle_set_column(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(SET_KW);
-    name_ref(p);
+    column_name_ref(p);
     opt_cycle_column_to(p);
     m.complete(p, CYCLE_SET_COLUMN);
 }
@@ -2771,7 +2767,7 @@ fn cycle_columns(p: &mut Parser<'_>) {
         || "unexpected comma, expected a column name".to_string(),
         NAME_REF_FIRST,
         TokenSet::new(&[SET_KW]),
-        |p| opt_name_ref(p).is_some(),
+        |p| opt_column_name_ref(p).is_some(),
     );
     m.complete(p, CYCLE_COLUMNS);
 }
@@ -3248,7 +3244,7 @@ fn from_item_name(p: &mut Parser<'_>) -> SyntaxKind {
                 if p.eat(WITH_KW) {
                     p.expect(ORDINALITY_KW);
                 }
-                opt_alias(p);
+                opt_from_alias(p);
                 FUNCTION_FROM_ITEM
             }
             NAME_REF | FIELD_EXPR => {
@@ -3258,7 +3254,7 @@ fn from_item_name(p: &mut Parser<'_>) -> SyntaxKind {
                 //  [ [ AS ] alias [ ( column_alias [, ...] ) ] ]
                 // we're at a table_name
                 p.eat(STAR);
-                opt_alias(p);
+                opt_from_alias(p);
                 opt_tablesample_clause(p);
                 RELATION_FROM_ITEM
             }
@@ -3280,22 +3276,22 @@ fn data_source(p: &mut Parser<'_>) -> SyntaxKind {
     match p.current() {
         L_PAREN => {
             paren_data_source(p);
-            opt_alias(p);
+            opt_from_alias(p);
             PAREN_FROM_ITEM
         }
         JSON_TABLE_KW => {
             json_table_fn(p);
-            opt_alias(p);
+            opt_from_alias(p);
             JSON_TABLE_FROM_ITEM
         }
         GRAPH_TABLE_KW => {
             graph_table_fn(p);
-            opt_alias(p);
+            opt_from_alias(p);
             GRAPH_TABLE_FROM_ITEM
         }
         XMLTABLE_KW => {
             xml_table_fn(p);
-            opt_alias(p);
+            opt_from_alias(p);
             XML_TABLE_FROM_ITEM
         }
         ROWS_KW if p.nth_at(1, FROM_KW) => {
@@ -3314,7 +3310,7 @@ fn data_source(p: &mut Parser<'_>) -> SyntaxKind {
             if p.eat(WITH_KW) {
                 p.expect(ORDINALITY_KW);
             }
-            opt_alias(p);
+            opt_from_alias(p);
             ROWS_FROM_ITEM
         }
         IDENT => from_item_name(p),
@@ -3322,12 +3318,12 @@ fn data_source(p: &mut Parser<'_>) -> SyntaxKind {
             if expr(p).is_none() {
                 p.error("expected expression");
             }
-            opt_alias(p);
+            opt_from_alias(p);
             EXPR_FROM_ITEM
         }
         COLLATION_KW if p.nth_at(1, FOR_KW) => {
             collation_for_fn(p);
-            opt_alias(p);
+            opt_from_alias(p);
             EXPR_FROM_ITEM
         }
         _ if p.at_ts(FROM_ITEM_KEYWORDS_FIRST) => from_item_name(p),
@@ -3373,7 +3369,7 @@ fn opt_row_from_expr(p: &mut Parser<'_>) -> bool {
         return false;
     }
     call_expr(p);
-    opt_alias(p);
+    opt_from_alias(p);
     true
 }
 
@@ -3389,7 +3385,7 @@ fn xmltable_column_list(p: &mut Parser<'_>) {
 
 fn xmltable_column_el(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    column_name(p);
     if p.eat(FOR_KW) {
         p.expect(ORDINALITY_KW);
     } else {
@@ -3620,10 +3616,10 @@ fn on_clause(p: &mut Parser<'_>) {
 fn join_using_clause(p: &mut Parser<'_>) {
     assert!(p.at(USING_KW));
     let m = p.start();
-    // USING ( join_column [, ...] )
+    // USING ( join_column [, ...] ) [ AS join_using_alias ]
     p.expect(USING_KW);
     column_ref_list(p);
-    opt_alias(p);
+    opt_required_as_alias(p);
     m.complete(p, JOIN_USING_CLAUSE);
 }
 
@@ -3689,7 +3685,7 @@ fn opt_sequence_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         SEQUENCE_KW => {
             p.bump(SEQUENCE_KW);
             p.expect(NAME_KW);
-            name_ref(p);
+            sequence(p);
         }
         RESTART_KW => {
             p.bump(RESTART_KW);
@@ -4102,7 +4098,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             p.bump(REFERENCES_KW);
             table_name_ref(p);
             if p.eat(L_PAREN) {
-                name_ref(p);
+                column_name_ref(p);
                 p.expect(R_PAREN);
             }
             opt_match_type(p);
@@ -4348,7 +4344,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
         NOT_KW => {
             p.bump(NOT_KW);
             p.expect(NULL_KW);
-            name_ref(p);
+            column_name_ref(p);
             NOT_NULL_CONSTRAINT
         }
         // FOREIGN KEY ( column_name [, ... ] ) REFERENCES reftable [ ( refcolumn [, ... ] ) ]
@@ -4534,32 +4530,42 @@ fn opt_col_def(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, COLUMN))
 }
 
+fn compression_method_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    if !p.eat(DEFAULT_KW) {
+        pg_name(p);
+    }
+    m.complete(p, COMPRESSION_METHOD_NAME);
+}
+
 fn opt_compression_method(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at(COMPRESSION_KW) {
+        return None;
+    }
     let m = p.start();
     // [ COMPRESSION compression_method ]
-    if p.eat(COMPRESSION_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
-        if !opt_ident(p) && !p.eat(DEFAULT_KW) {
-            p.error("expected default or identifier");
-        }
-        Some(m.complete(p, COMPRESSION_METHOD))
-    } else {
-        m.abandon(p);
-        None
+    p.bump(COMPRESSION_KW);
+    compression_method_name(p);
+    Some(m.complete(p, COMPRESSION_METHOD))
+}
+
+fn storage_mode(p: &mut Parser<'_>) {
+    let m = p.start();
+    if !p.eat(DEFAULT_KW) {
+        pg_name(p);
     }
+    m.complete(p, STORAGE_MODE);
 }
 
 fn opt_storage(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at(STORAGE_KW) {
+        return None;
+    }
     let m = p.start();
     // [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ]
-    if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(EXTERNAL_KW) || p.at(IDENT)) {
-        if !opt_ident(p) {
-            p.bump_any();
-        }
-        Some(m.complete(p, STORAGE))
-    } else {
-        m.abandon(p);
-        None
-    }
+    p.bump(STORAGE_KW);
+    storage_mode(p);
+    Some(m.complete(p, STORAGE))
 }
 
 fn like_clause(p: &mut Parser<'_>) -> CompletedMarker {
@@ -4578,7 +4584,7 @@ fn like_clause(p: &mut Parser<'_>) -> CompletedMarker {
 // [ AS ] alias [ ( column_alias [, ...] ) ]
 // [ AS ] alias ( column_definition [, ...] )
 // AS ( column_definition [, ...] )
-fn opt_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn opt_from_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // TODO: we should split this into opt_col_def and opt_col_alias
     if !(p.at(AS_KW) || p.at_ts(NAME_FIRST) || p.at(L_PAREN)) {
         return None;
@@ -4586,13 +4592,15 @@ fn opt_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     p.eat(AS_KW);
     // table_name(col1, col2, col3)
-    opt_name(p);
+    if p.at_ts(NAME_FIRST) {
+        table_alias(p);
+    }
     if p.at(L_PAREN) {
         if !opt_column_list_with(p, ColumnDefKind::WithData) {
             p.error("expected column list");
         }
     }
-    Some(m.complete(p, ALIAS))
+    Some(m.complete(p, FROM_ALIAS))
 }
 
 // [ TABLESAMPLE sampling_method ( argument [, ...] ) [ REPEATABLE ( seed ) ] ]
@@ -5510,6 +5518,17 @@ fn opt_with_data(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
+fn rename_column(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(RENAME_KW));
+    let m = p.start();
+    p.bump(RENAME_KW);
+    p.eat(COLUMN_KW);
+    column_name_ref(p);
+    p.expect(TO_KW);
+    column_name(p);
+    m.complete(p, RENAME_COLUMN)
+}
+
 fn rename_to(
     p: &mut Parser<'_>,
     kind: SyntaxKind,
@@ -5557,19 +5576,47 @@ fn opt_without_oids(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 fn access_method(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, ACCESS_METHOD);
 }
 
 fn access_method_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, ACCESS_METHOD_REF);
+}
+
+fn column_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, COLUMN_NAME);
+}
+
+fn column_name_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, COLUMN_NAME_REF);
+}
+
+fn opt_column_name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(COL_LABEL_FIRST) {
+        return None;
+    }
+    let m = p.start();
+    pg_name(p);
+    Some(m.complete(p, COLUMN_NAME_REF))
+}
+
+fn column_name_ref_list(p: &mut Parser<'_>) {
+    column_name_ref(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        column_name_ref(p);
+    }
 }
 
 fn constraint_name(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, CONSTRAINT_NAME);
 }
 
@@ -5579,10 +5626,28 @@ fn constraint_name_ref(p: &mut Parser<'_>) {
     m.complete(p, CONSTRAINT_NAME_REF);
 }
 
+fn cte_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, CTE_NAME);
+}
+
 fn index(p: &mut Parser<'_>) {
     let m = p.start();
     path_name(p);
     m.complete(p, INDEX);
+}
+
+fn json_path_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, JSON_PATH_NAME);
+}
+
+fn json_path_name_ref(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, JSON_PATH_NAME_REF)
 }
 
 fn index_ref(p: &mut Parser<'_>) {
@@ -5601,15 +5666,21 @@ fn opt_index_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
+fn param_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, PARAM_NAME);
+}
+
 fn policy(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, POLICY);
 }
 
 fn policy_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, POLICY_REF);
 }
 
@@ -5617,6 +5688,18 @@ fn relation_name_ref(p: &mut Parser<'_>) {
     let m = p.start();
     path_name_ref(p);
     m.complete(p, RELATION_NAME_REF);
+}
+
+fn remote_table_name_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, REMOTE_TABLE_NAME_REF);
+}
+
+fn table_alias(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, TABLE_ALIAS);
 }
 
 fn table_name(p: &mut Parser<'_>) {
@@ -5631,38 +5714,88 @@ fn table_name_ref(p: &mut Parser<'_>) {
     m.complete(p, TABLE_NAME_REF);
 }
 
+fn transition_relation_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, TRANSITION_RELATION_NAME);
+}
+
 fn vertex_table_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, VERTEX_TABLE_REF);
 }
 
 fn opt_element_table_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    let m = p.start();
-    if opt_name_ref(p).is_some() {
-        Some(m.complete(p, ELEMENT_TABLE_REF))
-    } else {
-        m.abandon(p);
-        None
+    if !p.at_ts(NAME_REF_FIRST) {
+        return None;
     }
+    let m = p.start();
+    pg_name(p);
+    Some(m.complete(p, ELEMENT_TABLE_REF))
 }
 
 fn element_table_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, ELEMENT_TABLE_REF);
 }
 
 fn label(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, LABEL);
+}
+
+fn element_table_alias(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, ELEMENT_TABLE_ALIAS);
+}
+
+fn opt_element_variable(p: &mut Parser<'_>) {
+    if !p.at_ts(NAME_FIRST) {
+        return;
+    }
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, ELEMENT_VARIABLE);
 }
 
 fn label_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, LABEL_REF);
+}
+
+fn property_ref(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, PROPERTY_REF);
+}
+
+fn opt_property_ref(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(NAME_REF_FIRST) {
+        return false;
+    }
+    property_ref(p);
+    true
+}
+
+fn opt_paren_property_ref_list(p: &mut Parser<'_>) -> bool {
+    if !p.at(L_PAREN) {
+        return false;
+    }
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        NAME_REF_FIRST,
+        opt_property_ref,
+    );
+    true
 }
 
 fn opt_table_name_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -5689,25 +5822,25 @@ fn view_ref(p: &mut Parser<'_>) {
 
 fn rule(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, RULE);
 }
 
 fn rule_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, RULE_REF);
 }
 
 fn trigger(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, TRIGGER);
 }
 
 fn trigger_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, TRIGGER_REF);
 }
 
@@ -5761,97 +5894,109 @@ fn type_name_ref(p: &mut Parser<'_>) {
 
 fn channel(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, CHANNEL);
 }
 
 fn channel_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, CHANNEL_REF);
 }
 
 fn cursor(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, CURSOR);
 }
 
 fn cursor_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, CURSOR_REF);
 }
 
 fn prepared_statement(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, PREPARED_STATEMENT);
 }
 
 fn prepared_statement_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, PREPARED_STATEMENT_REF);
 }
 
 fn savepoint(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, SAVEPOINT);
 }
 
 fn savepoint_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, SAVEPOINT_REF);
 }
 
 fn window(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, WINDOW);
 }
 
 fn window_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, WINDOW_REF);
 }
 
 fn event_trigger(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, EVENT_TRIGGER);
+}
+
+fn event_trigger_event(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, EVENT_TRIGGER_EVENT);
+}
+
+fn event_trigger_filter_variable(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, EVENT_TRIGGER_FILTER_VARIABLE);
 }
 
 fn event_trigger_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, EVENT_TRIGGER_REF);
 }
 
 fn extension(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, EXTENSION);
 }
 
 fn extension_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, EXTENSION_REF);
 }
 
 fn foreign_data_wrapper(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, FOREIGN_DATA_WRAPPER);
 }
 
 fn foreign_data_wrapper_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, FOREIGN_DATA_WRAPPER_REF);
 }
 
@@ -5899,81 +6044,73 @@ fn aggregate_name(p: &mut Parser<'_>) {
 
 fn language(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, LANGUAGE);
 }
 
 fn language_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    let name_ref = p.start();
-    if p.at_ts(NAME_REF_FIRST) {
-        if !opt_ident(p) {
-            p.bump_any();
-        }
-    } else {
-        p.error("expected language name");
-    }
-    name_ref.complete(p, NAME_REF);
+    pg_name(p);
     m.complete(p, LANGUAGE_REF);
 }
 
 fn publication(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, PUBLICATION);
 }
 
 fn publication_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, PUBLICATION_REF);
 }
 
 fn schema(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, SCHEMA);
 }
 
 fn schema_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, SCHEMA_REF);
 }
 
 fn server(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, SERVER);
 }
 
 fn server_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, SERVER_REF);
 }
 
 fn subscription(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, SUBSCRIPTION);
 }
 
 fn subscription_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, SUBSCRIPTION_REF);
 }
 
 fn tablespace(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, TABLESPACE);
 }
 
 fn tablespace_ref(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    pg_name(p);
     m.complete(p, TABLESPACE_REF);
 }
 
@@ -5993,6 +6130,20 @@ fn statistics(p: &mut Parser<'_>) {
     let m = p.start();
     path_name(p);
     m.complete(p, STATISTICS);
+}
+
+fn statistics_kind(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, STATISTICS_KIND);
+}
+
+fn opt_statistics_kind(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(NAME_REF_FIRST) {
+        return false;
+    }
+    statistics_kind(p);
+    true
 }
 
 fn statistics_ref(p: &mut Parser<'_>) {
@@ -6061,20 +6212,25 @@ fn text_search_template_ref(p: &mut Parser<'_>) {
     m.complete(p, TEXT_SEARCH_TEMPLATE_REF);
 }
 
+fn text_search_token_kind(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, TEXT_SEARCH_TOKEN_KIND);
+}
+
 fn database(p: &mut Parser<'_>) {
     let m = p.start();
-    name(p);
+    pg_name(p);
     m.complete(p, DATABASE);
 }
 
 fn opt_database_ref(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    let m = p.start();
-    if opt_name_ref(p).is_some() {
-        Some(m.complete(p, DATABASE_REF))
-    } else {
-        m.abandon(p);
-        None
+    if !p.at_ts(COL_LABEL_FIRST) {
+        return None;
     }
+    let m = p.start();
+    pg_name(p);
+    Some(m.complete(p, DATABASE_REF))
 }
 
 fn database_ref(p: &mut Parser<'_>) {
@@ -6150,13 +6306,9 @@ fn opt_partition_by(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.eat(PARTITION_KW) {
         p.expect(BY_KW);
         // name
-        if p.at_ts(TYPE_KEYWORDS) || p.at(IDENT) {
-            let m = p.start();
-            if !opt_ident(p) {
-                p.bump_any();
-            }
-            m.complete(p, PARTITION_STRATEGY);
-        }
+        let strategy = p.start();
+        pg_name(p);
+        strategy.complete(p, PARTITION_STRATEGY);
         // (
         //   { column_name | ( expression ) }
         //   [ COLLATE collation ]
@@ -7361,13 +7513,7 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
                 rename_to(p, VIEW_RENAME_TO, view);
             }
             RENAME_KW => {
-                let m = p.start();
-                p.bump(RENAME_KW);
-                p.eat(COLUMN_KW);
-                name_ref(p);
-                p.expect(TO_KW);
-                name(p);
-                m.complete(p, RENAME_COLUMN);
+                rename_column(p);
             }
             SET_KW if p.nth_at(1, SCHEMA_KW) => {
                 set_schema(p);
@@ -7519,7 +7665,7 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
                 let m = p.start();
                 p.bump(ALTER_KW);
                 p.eat(COLUMN_KW);
-                if opt_numeric_literal(p).is_none() && opt_name_ref(p).is_none() {
+                if opt_numeric_literal(p).is_none() && opt_column_name_ref(p).is_none() {
                     p.error("expected numeric literal or name");
                 }
                 if p.at(SET_KW) && p.nth_at(1, L_PAREN) {
@@ -7675,13 +7821,7 @@ fn alter_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
             rename_to(p, TABLE_RENAME_TO, table_name);
         }
         RENAME_KW => {
-            let m = p.start();
-            p.bump(RENAME_KW);
-            p.eat(COLUMN_KW);
-            name_ref(p);
-            p.expect(TO_KW);
-            name(p);
-            m.complete(p, RENAME_COLUMN);
+            rename_column(p);
         }
         SET_KW if p.nth_at(1, SCHEMA_KW) => {
             set_schema(p);
@@ -8794,7 +8934,7 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
             p.bump(ADD_KW);
             p.expect(MAPPING_KW);
             p.expect(FOR_KW);
-            name_ref_list(p);
+            text_search_token_kind_list(p);
             p.expect(WITH_KW);
             text_search_dictionary_ref_list(p);
             m.complete(p, ADD_MAPPING);
@@ -8807,7 +8947,7 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
             p.bump(ALTER_KW);
             p.expect(MAPPING_KW);
             if p.eat(FOR_KW) {
-                name_ref_list(p);
+                text_search_token_kind_list(p);
                 if p.eat(WITH_KW) {
                     text_search_dictionary_ref_list(p);
                 } else if p.eat(REPLACE_KW) {
@@ -8832,7 +8972,7 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
             p.expect(MAPPING_KW);
             opt_if_exists(p);
             p.expect(FOR_KW);
-            name_ref_list(p);
+            text_search_token_kind_list(p);
             m.complete(p, DROP_MAPPING);
         }
         RENAME_KW => {
@@ -8856,10 +8996,10 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, ALTER_TEXT_SEARCH_CONFIGURATION)
 }
 
-fn name_ref_list(p: &mut Parser<'_>) {
-    name_ref(p);
+fn remote_table_name_ref_list(p: &mut Parser<'_>) {
+    remote_table_name_ref(p);
     while !p.at(EOF) && p.eat(COMMA) {
-        name_ref(p);
+        remote_table_name_ref(p);
     }
 }
 
@@ -9010,6 +9150,13 @@ fn text_search_dictionary_ref_list(p: &mut Parser<'_>) {
     }
 }
 
+fn text_search_token_kind_list(p: &mut Parser<'_>) {
+    text_search_token_kind(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        text_search_token_kind(p);
+    }
+}
+
 fn table_name_ref_list(p: &mut Parser<'_>) {
     let m = p.start();
     delimited(
@@ -9079,7 +9226,7 @@ fn alter_type_action(p: &mut Parser<'_>) {
     let m = p.start();
     let kind = if p.eat(ADD_KW) {
         p.expect(ATTRIBUTE_KW);
-        name(p);
+        column_name(p);
         type_name(p);
         opt_collate(p);
         opt_cascade_or_restrict(p);
@@ -9087,13 +9234,13 @@ fn alter_type_action(p: &mut Parser<'_>) {
     } else if p.eat(DROP_KW) {
         p.expect(ATTRIBUTE_KW);
         opt_if_exists(p);
-        name_ref(p);
+        column_name_ref(p);
         opt_cascade_or_restrict(p);
         DROP_ATTRIBUTE
     } else {
         p.expect(ALTER_KW);
         p.expect(ATTRIBUTE_KW);
-        name_ref(p);
+        column_name_ref(p);
         if p.eat(SET_KW) {
             p.eat(DATA_KW);
         }
@@ -9148,9 +9295,9 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             let m = p.start();
             p.bump(RENAME_KW);
             if p.eat(ATTRIBUTE_KW) {
-                name_ref(p);
+                column_name_ref(p);
                 p.expect(TO_KW);
-                name(p);
+                column_name(p);
                 opt_cascade_or_restrict(p);
                 m.complete(p, RENAME_ATTRIBUTE);
             } else if p.eat(VALUE_KW) {
@@ -9322,7 +9469,7 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
             let m = p.start();
             p.bump(ALTER_KW);
             p.eat(COLUMN_KW);
-            name_ref(p);
+            column_name_ref(p);
             if p.at(SET_KW) {
                 let m = p.start();
                 p.bump(SET_KW);
@@ -9348,13 +9495,7 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
             rename_to(p, VIEW_RENAME_TO, view);
         }
         RENAME_KW => {
-            let m = p.start();
-            p.bump(RENAME_KW);
-            p.eat(COLUMN_KW);
-            name_ref(p);
-            p.expect(TO_KW);
-            name(p);
-            m.complete(p, RENAME_COLUMN);
+            rename_column(p);
         }
         SET_KW if p.nth_at(1, SCHEMA_KW) => {
             set_schema(p);
@@ -9820,7 +9961,7 @@ fn opt_vertex_table_def(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     table_name_ref(p);
     if p.eat(AS_KW) {
-        name(p);
+        element_table_alias(p);
     }
     opt_key_columns(p);
     opt_element_table_label_and_properties(p);
@@ -9917,7 +10058,7 @@ fn opt_edge_table_def(p: &mut Parser<'_>) -> bool {
     let m = p.start();
     table_name_ref(p);
     if p.eat(AS_KW) {
-        name(p);
+        element_table_alias(p);
     }
     opt_key_columns(p);
     source_vertex_table(p);
@@ -10074,7 +10215,7 @@ fn alter_element_table_actions(p: &mut Parser<'_>) -> SyntaxKind {
             DROP_VERTEX_EDGE_LABEL
         } else {
             p.expect(PROPERTIES_KW);
-            if !opt_paren_name_ref_list(p) {
+            if !opt_paren_property_ref_list(p) {
                 p.error("expected name ref list")
             }
             DROP_VERTEX_EDGE_LABEL_PROPERTIES
@@ -10090,7 +10231,7 @@ fn alter_element_table_actions(p: &mut Parser<'_>) -> SyntaxKind {
         } else {
             p.expect(DROP_KW);
             p.expect(PROPERTIES_KW);
-            if !opt_paren_name_ref_list(p) {
+            if !opt_paren_property_ref_list(p) {
                 p.error("expected name ref list")
             }
             opt_cascade_or_restrict(p);
@@ -10199,7 +10340,7 @@ fn path_primary(p: &mut Parser<'_>) {
 fn vertex_pattern(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(L_PAREN);
-    opt_name(p);
+    opt_element_variable(p);
     opt_is_label(p);
     opt_where_clause(p);
     p.expect(R_PAREN);
@@ -10247,7 +10388,7 @@ fn edge_with_bracket(p: &mut Parser<'_>) {
 }
 
 fn opt_edge_pattern_inner(p: &mut Parser<'_>) {
-    opt_name(p);
+    opt_element_variable(p);
     opt_is_label(p);
     opt_where_clause(p);
 }
@@ -10627,7 +10768,7 @@ fn create_domain(p: &mut Parser<'_>) -> CompletedMarker {
 // filter_variable IN (filter_value [, ... ])
 fn event_trigger_when(p: &mut Parser<'_>) {
     let m = p.start();
-    name_ref(p);
+    event_trigger_filter_variable(p);
     p.expect(IN_KW);
     p.expect(L_PAREN);
     string_literal(p);
@@ -10650,7 +10791,7 @@ fn create_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(TRIGGER_KW);
     event_trigger(p);
     p.expect(ON_KW);
-    name_ref(p);
+    event_trigger_event(p);
     opt_event_trigger_when_clause(p);
     p.expect(EXECUTE_KW);
     if !p.eat(FUNCTION_KW) && !p.eat(PROCEDURE_KW) {
@@ -11418,14 +11559,6 @@ fn opt_stat_types(p: &mut Parser<'_>) {
         return;
     }
     let m = p.start();
-    opt_paren_name_ref_list(p);
-    m.complete(p, STAT_TYPES);
-}
-
-fn opt_paren_name_ref_list(p: &mut Parser<'_>) -> bool {
-    if !p.at(L_PAREN) {
-        return false;
-    }
     delimited(
         p,
         L_PAREN,
@@ -11433,9 +11566,9 @@ fn opt_paren_name_ref_list(p: &mut Parser<'_>) -> bool {
         COMMA,
         || "unexpected comma".to_string(),
         NAME_REF_FIRST,
-        |p| name_ref(p).is_some(),
+        opt_statistics_kind,
     );
-    true
+    m.complete(p, STAT_TYPES);
 }
 
 // CREATE SUBSCRIPTION subscription_name
@@ -12548,7 +12681,7 @@ fn import_foreign_schema(p: &mut Parser<'_>) -> CompletedMarker {
         };
         // ( table_name [, ...] )
         p.expect(L_PAREN);
-        name_ref_list(p);
+        remote_table_name_ref_list(p);
         p.expect(R_PAREN);
         m.complete(p, kind);
     }
@@ -12690,7 +12823,7 @@ fn merge(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Completed
     // [ ONLY ] target_table_name [ * ]
     table_relation_name(p);
     // [ [ AS ] target_alias ]
-    opt_as_alias(p);
+    opt_optional_as_alias(p);
     // USING data_source ON join_condition
     merge_using_clause(p);
     merge_when_clause(p);
@@ -13195,32 +13328,25 @@ fn role(p: &mut Parser<'_>) -> bool {
 
 fn opt_role_(p: &mut Parser<'_>, kind: SyntaxKind) -> bool {
     assert!(matches!(kind, ROLE | ROLE_REF));
-    let func = |p: &mut Parser<'_>| {
-        if kind == ROLE_REF {
-            name_ref(p);
-        } else {
-            name(p);
-        }
-    };
     let m = p.start();
     match p.current() {
         GROUP_KW => {
             p.bump(GROUP_KW);
-            func(p);
+            pg_name(p);
         }
         CURRENT_ROLE_KW | CURRENT_USER_KW | SESSION_USER_KW => {
             p.bump_any();
         }
         ALTER_KW => {
             if !p.nth_at(1, SYSTEM_KW) {
-                p.bump_any();
+                pg_name(p);
             } else {
                 m.abandon(p);
                 return false;
             }
         }
         _ if p.at_ts(NON_RESERVED_WORD) => {
-            func(p);
+            pg_name(p);
         }
         _ => {
             m.abandon(p);
@@ -13401,10 +13527,16 @@ fn opt_for_provider(p: &mut Parser<'_>) {
         if p.at_ts(STRING_FIRST) {
             string_literal(p);
         } else {
-            name_ref(p);
+            security_label_provider(p);
         }
         m.complete(p, FOR_PROVIDER);
     }
+}
+
+fn security_label_provider(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, SECURITY_LABEL_PROVIDER);
 }
 
 fn agg_args(p: &mut Parser<'_>) {
@@ -13838,10 +13970,16 @@ fn opt_checkpoint_option(p: &mut Parser<'_>) -> bool {
         return false;
     }
     let m = p.start();
-    name(p);
+    checkpoint_option_name(p);
     opt_expr(p);
     m.complete(p, CHECKPOINT_OPTION);
     true
+}
+
+fn checkpoint_option_name(p: &mut Parser<'_>) {
+    let m = p.start();
+    pg_name(p);
+    m.complete(p, CHECKPOINT_OPTION_NAME);
 }
 
 // DEALLOCATE [ PREPARE ] { name | ALL }
@@ -14349,11 +14487,11 @@ fn opt_copy_force_target(p: &mut Parser<'_>) -> bool {
     if p.eat(STAR) {
         return true;
     }
-    if name_ref(p).is_none() {
+    if opt_column_name_ref(p).is_none() {
         return false;
     }
     while !p.at(EOF) && p.eat(COMMA) {
-        name_ref(p);
+        column_name_ref(p);
     }
     true
 }
@@ -14675,7 +14813,7 @@ fn trigger_event(p: &mut Parser<'_>) {
         p.bump(UPDATE_KW);
         // [ OF column_name [, ... ] ]
         if p.eat(OF_KW) {
-            name_ref_list(p);
+            column_name_ref_list(p);
         }
         m.complete(p, TRIGGER_EVENT_UPDATE);
     } else if !(p.eat(INSERT_KW) || p.eat(DELETE_KW) || p.eat(TRUNCATE_KW)) {
@@ -14712,7 +14850,7 @@ fn opt_referencing_table(p: &mut Parser<'_>) -> bool {
     p.expect(TABLE_KW);
     p.eat(AS_KW);
     // transition_relation_name
-    name_ref(p);
+    transition_relation_name(p);
     m.complete(p, REFERENCING_TABLE);
     true
 }
@@ -14889,7 +15027,7 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Complete
     p.bump(INSERT_KW);
     p.expect(INTO_KW);
     relation_name_ref(p);
-    opt_as_alias_with_as(p);
+    opt_required_as_alias(p);
     // [ ( column_name [, ...] ) ]
     // a leading `(` may open a parenthesized query instead of a column list
     if !(p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST)) {
@@ -15110,32 +15248,24 @@ fn set_expr(p: &mut Parser<'_>) {
     m.complete(p, SET_EXPR);
 }
 
-/// Like [`opt_as_alias`] but the `as` is required
-fn opt_as_alias_with_as(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at(AS_KW) {
-        let m = p.start();
-        p.bump(AS_KW);
-        if p.at_ts(NAME_FIRST) {
-            name(p);
-        } else {
-            p.error("col id")
-        }
-        Some(m.complete(p, ALIAS))
-    } else {
-        None
+fn opt_required_as_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at(AS_KW) {
+        return None;
     }
+    let m = p.start();
+    p.bump(AS_KW);
+    table_alias(p);
+    Some(m.complete(p, REQUIRED_AS_ALIAS))
 }
 
-fn opt_as_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at(AS_KW) {
-        opt_as_alias_with_as(p)
-    } else if p.at_ts(NAME_FIRST) {
-        let m = p.start();
-        opt_name(p);
-        Some(m.complete(p, ALIAS))
-    } else {
-        None
+fn opt_optional_as_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !(p.at(AS_KW) || p.at_ts(NAME_FIRST)) {
+        return None;
     }
+    let m = p.start();
+    p.eat(AS_KW);
+    table_alias(p);
+    Some(m.complete(p, OPTIONAL_AS_ALIAS))
 }
 
 // [ WITH [ RECURSIVE ] with_query [, ...] ]
@@ -15159,7 +15289,7 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Complete
     // named `SET`
     if !p.at(SET_KW) {
         // [ [ AS ] alias ]
-        opt_as_alias(p);
+        opt_optional_as_alias(p);
     }
     set_clause(p);
     // [ FROM from_item [, ...] ]
@@ -15184,7 +15314,7 @@ fn opt_for_portion_of(p: &mut Parser<'_>) {
     p.expect(FOR_KW);
     p.expect(PORTION_KW);
     p.expect(OF_KW);
-    name_ref(p);
+    column_name_ref(p);
     for_portion_of_target(p);
     m.complete(p, FOR_PORTION_OF);
 }
@@ -15254,7 +15384,7 @@ fn delete(p: &mut Parser<'_>, m: Option<Marker>, semi_allowed: bool) -> Complete
     relation_name(p);
     opt_for_portion_of(p);
     if !p.at(FOR_KW) {
-        opt_as_alias(p);
+        opt_optional_as_alias(p);
     }
     opt_using_clause(p);
     // [ WHERE condition | WHERE CURRENT OF cursor_name ]
@@ -15333,7 +15463,7 @@ fn opt_returning_option(p: &mut Parser<'_>) -> bool {
     // OLD | NEW
     p.bump_any();
     p.expect(AS_KW);
-    name(p);
+    table_alias(p);
     m.complete(p, RETURNING_OPTION);
     true
 }
@@ -15624,7 +15754,7 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
                 if at_type {
                     type_name(p);
                 } else {
-                    name(p);
+                    param_name(p);
                     if !param_mode_seen {
                         opt_param_mode(p);
                     }
@@ -16128,6 +16258,16 @@ fn opt_ident(p: &mut Parser<'_>) -> bool {
         true
     } else {
         false
+    }
+}
+
+fn pg_name(p: &mut Parser<'_>) {
+    if !p.at_ts(COL_LABEL_FIRST) {
+        p.error("expected name");
+        return;
+    }
+    if !opt_ident(p) {
+        p.bump_any();
     }
 }
 
@@ -16686,7 +16826,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             } else {
                 p.eat(COLUMN_KW);
                 opt_if_exists(p);
-                name_ref(p);
+                column_name_ref(p);
                 DROP_COLUMN
             };
             opt_cascade_or_restrict(p);
@@ -16726,7 +16866,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 p.eat(COLUMN_KW);
                 opt_if_not_exists(p);
                 // column_name
-                name(p);
+                column_name(p);
                 type_name(p);
                 opt_alter_option_list(p);
                 opt_collate(p);
@@ -16794,32 +16934,17 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         // RENAME TO new_name
         RENAME_KW if p.nth_at(1, TO_KW) => rename_to(p, TABLE_RENAME_TO, table_name),
         // RENAME CONSTRAINT constraint_name TO new_constraint_name
-        // RENAME [ COLUMN ] column_name TO new_column_name
-        RENAME_KW => {
+        RENAME_KW if p.nth_at(1, CONSTRAINT_KW) => {
             let m = p.start();
-            p.expect(RENAME_KW);
-            // TO new_name
-            let kind = if p.eat(CONSTRAINT_KW) {
-                // name
-                constraint_name_ref(p);
-                // TO
-                p.expect(TO_KW);
-                // name
-                constraint_name(p);
-                RENAME_CONSTRAINT
-            // [ COLUMN ]
-            } else {
-                p.eat(COLUMN_KW);
-                // name
-                name_ref(p);
-                // TO
-                p.expect(TO_KW);
-                // name
-                name(p);
-                RENAME_COLUMN
-            };
-            m.complete(p, kind)
+            p.bump(RENAME_KW);
+            p.bump(CONSTRAINT_KW);
+            constraint_name_ref(p);
+            p.expect(TO_KW);
+            constraint_name(p);
+            m.complete(p, RENAME_CONSTRAINT)
         }
+        // RENAME [ COLUMN ] column_name TO new_column_name
+        RENAME_KW => rename_column(p),
         // ALTER [ COLUMN ] column_name [ SET DATA ] TYPE data_type [ COLLATE collation ] [ USING expression ]
         // ALTER [ COLUMN ] column_name SET DEFAULT expression
         // ALTER [ COLUMN ] column_name DROP DEFAULT
@@ -16846,7 +16971,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             } else {
                 p.eat(COLUMN_KW);
                 if p.at_ts(COLUMN_FIRST) {
-                    name_ref(p);
+                    column_name_ref(p);
                 } else {
                     p.error("expected column_name");
                 }
@@ -16897,9 +17022,7 @@ fn partition_list(p: &mut Parser<'_>) {
 fn opt_col_label(p: &mut Parser<'_>) -> bool {
     if p.at_ts(COL_LABEL_FIRST) {
         let m = p.start();
-        if !opt_ident(p) {
-            p.bump_any();
-        }
+        pg_name(p);
         m.complete(p, NAME);
         true
     } else {
@@ -17144,18 +17267,14 @@ fn alter_column_option(p: &mut Parser<'_>) {
         SET_KW if p.nth_at(1, STORAGE_KW) => {
             p.bump(SET_KW);
             p.bump(STORAGE_KW);
-            if !p.eat(DEFAULT_KW) {
-                name_ref(p);
-            }
+            storage_mode(p);
             SET_STORAGE
         }
         // SET COMPRESSION { ColId | DEFAULT }
         SET_KW if p.nth_at(1, COMPRESSION_KW) => {
             p.bump(SET_KW);
             p.bump(COMPRESSION_KW);
-            if !p.eat(DEFAULT_KW) {
-                name_ref(p);
-            }
+            compression_method_name(p);
             SET_COMPRESSION
         }
         // SET NOT NULL

@@ -281,8 +281,8 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "user_ratings"
                     WHITESPACE " "
-                    ALIAS
-                      NAME
+                    FROM_ALIAS
+                      TABLE_ALIAS
                         IDENT "r"
                 WHITESPACE "\n            "
                 WHERE_CLAUSE
@@ -319,8 +319,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "f"
       WHITESPACE "\n    "
       WHERE_CLAUSE
@@ -835,7 +835,7 @@ SOURCE_FILE
           WITH_KW "with"
           WHITESPACE " "
           WITH_TABLE
-            NAME
+            CTE_NAME
               IDENT "x"
             WHITESPACE " "
             AS_KW "as"

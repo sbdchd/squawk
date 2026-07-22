@@ -11,8 +11,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     SCHEMA_RENAME_TO
       RENAME_KW "rename"
@@ -20,8 +19,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       SCHEMA
-        NAME
-          IDENT "n"
+        IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -32,8 +30,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -41,8 +38,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SCHEMA
@@ -51,8 +47,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"

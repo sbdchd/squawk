@@ -21,8 +21,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -48,8 +47,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "l"
+      IDENT "l"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -75,8 +73,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "l"
+      IDENT "l"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"

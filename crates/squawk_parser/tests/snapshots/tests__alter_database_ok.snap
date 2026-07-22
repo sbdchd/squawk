@@ -11,8 +11,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     DATABASE_RENAME_TO
       RENAME_KW "rename"
@@ -20,8 +19,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       DATABASE
-        NAME
-          IDENT "n"
+        IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -32,8 +30,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -41,8 +38,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_DATABASE
@@ -51,8 +47,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -71,8 +66,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     SET_TABLESPACE
       SET_KW "set"
@@ -80,8 +74,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
@@ -92,8 +85,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     REFRESH_COLLATION_VERSION
       REFRESH_KW "refresh"
@@ -111,8 +103,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -134,8 +125,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -157,8 +147,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -179,8 +168,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     SET_CONFIG_PARAM
       SET_KW "set"
@@ -203,8 +191,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     RESET_CONFIG_PARAM
       RESET_KW "reset"
@@ -221,8 +208,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     RESET_CONFIG_PARAM
       RESET_KW "reset"
@@ -238,8 +224,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     DATABASE_OPTION_LIST
       WITH_KW "with"
@@ -259,8 +244,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     DATABASE_OPTION_LIST
       DATABASE_OPTION
@@ -280,8 +264,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     DATABASE_OPTION_LIST
       DATABASE_OPTION
@@ -299,8 +282,7 @@ SOURCE_FILE
     DATABASE_KW "database"
     WHITESPACE " "
     DATABASE_REF
-      NAME_REF
-        IDENT "d"
+      IDENT "d"
     WHITESPACE " "
     DATABASE_OPTION_LIST
       WITH_KW "with"

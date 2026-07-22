@@ -424,3 +424,8 @@ CREATE TABLE t (
 CREATE TABLE t (id varchar COLLATE "C" PRIMARY KEY);
 CREATE TABLE t (id VARCHAR PRIMARY KEY COLLATE "C");
 CREATE TABLE t (id varchar NOT NULL COLLATE "C" UNIQUE);
+
+-- schema-qualified identity sequence name
+CREATE TABLE foo (
+    id int GENERATED ALWAYS AS IDENTITY (SEQUENCE NAME public.myseq START 1)
+);

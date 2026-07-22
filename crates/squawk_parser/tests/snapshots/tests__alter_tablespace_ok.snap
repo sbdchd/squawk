@@ -11,8 +11,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     TABLESPACE_RENAME_TO
       RENAME_KW "rename"
@@ -20,8 +19,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       TABLESPACE
-        NAME
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
@@ -32,8 +30,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -41,8 +38,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLESPACE
@@ -51,8 +47,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -71,8 +66,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -102,8 +96,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -147,8 +140,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     RESET_OPTIONS
       RESET_KW "reset"
@@ -169,8 +161,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     RESET_OPTIONS
       RESET_KW "reset"

@@ -82,7 +82,7 @@ SOURCE_FILE
                   MINUS "-"
                   L_BRACK "["
                   WHITESPACE " "
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "foo"
                   WHITESPACE " "
                   IS_LABEL
@@ -218,7 +218,7 @@ SOURCE_FILE
                   MINUS "-"
                   L_BRACK "["
                   WHITESPACE " "
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "foo"
                   WHITESPACE " "
                   IS_LABEL
@@ -355,7 +355,7 @@ SOURCE_FILE
                   MINUS "-"
                   L_BRACK "["
                   WHITESPACE " "
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "foo"
                   WHITESPACE " "
                   IS_LABEL
@@ -474,7 +474,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "o"
                   WHITESPACE " "
                   IS_LABEL
@@ -545,7 +545,7 @@ SOURCE_FILE
                           PATH_FACTOR
                             VERTEX_PATTERN
                               L_PAREN "("
-                              NAME
+                              ELEMENT_VARIABLE
                                 IDENT "o"
                               WHITESPACE " "
                               IS_LABEL
@@ -813,7 +813,7 @@ SOURCE_FILE
                   MINUS "-"
                   L_BRACK "["
                   WHITESPACE " "
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "foo"
                   WHITESPACE " "
                   IS_LABEL
@@ -878,7 +878,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "c"
                   WHITESPACE " "
                   IS_LABEL
@@ -891,7 +891,7 @@ SOURCE_FILE
                 EDGE_RIGHT
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "co"
                   WHITESPACE " "
                   IS_LABEL
@@ -905,7 +905,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "o"
                   WHITESPACE " "
                   IS_LABEL
@@ -994,7 +994,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "a"
                   WHITESPACE " "
                   IS_LABEL
@@ -1024,7 +1024,7 @@ SOURCE_FILE
                 EDGE_RIGHT
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "e1"
                   WHITESPACE " "
                   IS_LABEL
@@ -1039,7 +1039,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "b"
                   WHITESPACE " "
                   IS_LABEL
@@ -1076,7 +1076,7 @@ SOURCE_FILE
                 EDGE_ANY
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "e2"
                   WHITESPACE " "
                   IS_LABEL
@@ -1090,7 +1090,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "c"
                   WHITESPACE " "
                   IS_LABEL
@@ -1121,7 +1121,7 @@ SOURCE_FILE
                   L_ANGLE "<"
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "e3"
                   WHITESPACE " "
                   IS_LABEL
@@ -1135,7 +1135,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "d"
                   WHITESPACE " "
                   IS_LABEL
@@ -1217,7 +1217,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "a"
                   WHITESPACE " "
                   IS_LABEL
@@ -1241,7 +1241,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "b"
                   WHITESPACE " "
                   IS_LABEL
@@ -1256,7 +1256,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "b"
                   WHITESPACE " "
                   IS_LABEL
@@ -1280,7 +1280,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "c"
                   WHITESPACE " "
                   IS_LABEL
@@ -1295,7 +1295,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "a"
                   WHITESPACE " "
                   IS_LABEL
@@ -1319,7 +1319,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "w"
                   WHITESPACE " "
                   IS_LABEL
@@ -1401,7 +1401,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "a"
                   WHITESPACE " "
                   IS_LABEL
@@ -1439,7 +1439,7 @@ SOURCE_FILE
                     PATH_FACTOR
                       VERTEX_PATTERN
                         L_PAREN "("
-                        NAME
+                        ELEMENT_VARIABLE
                           IDENT "b"
                         WHITESPACE " "
                         IS_LABEL
@@ -1476,7 +1476,7 @@ SOURCE_FILE
                       EDGE_RIGHT
                         MINUS "-"
                         L_BRACK "["
-                        NAME
+                        ELEMENT_VARIABLE
                           IDENT "e"
                         WHITESPACE " "
                         IS_LABEL
@@ -1491,7 +1491,7 @@ SOURCE_FILE
                     PATH_FACTOR
                       VERTEX_PATTERN
                         L_PAREN "("
-                        NAME
+                        ELEMENT_VARIABLE
                           IDENT "c"
                         WHITESPACE " "
                         IS_LABEL
@@ -1589,7 +1589,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "a"
                   WHITESPACE " "
                   IS_LABEL
@@ -1614,7 +1614,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "b"
                   WHITESPACE " "
                   IS_LABEL
@@ -1639,7 +1639,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "c"
                   WHITESPACE " "
                   IS_LABEL
@@ -1668,7 +1668,7 @@ SOURCE_FILE
                     PATH_FACTOR
                       VERTEX_PATTERN
                         L_PAREN "("
-                        NAME
+                        ELEMENT_VARIABLE
                           IDENT "d"
                         WHITESPACE " "
                         IS_LABEL
@@ -1687,7 +1687,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "e"
                   WHITESPACE " "
                   IS_LABEL
@@ -1798,7 +1798,7 @@ SOURCE_FILE
                     PATH_FACTOR
                       VERTEX_PATTERN
                         L_PAREN "("
-                        NAME
+                        ELEMENT_VARIABLE
                           IDENT "a"
                         WHITESPACE " "
                         IS_LABEL
@@ -1812,7 +1812,7 @@ SOURCE_FILE
                       EDGE_RIGHT
                         MINUS "-"
                         L_BRACK "["
-                        NAME
+                        ELEMENT_VARIABLE
                           IDENT "e1"
                         WHITESPACE " "
                         IS_LABEL
@@ -1831,7 +1831,7 @@ SOURCE_FILE
                           PATH_FACTOR
                             VERTEX_PATTERN
                               L_PAREN "("
-                              NAME
+                              ELEMENT_VARIABLE
                                 IDENT "b"
                               WHITESPACE " "
                               IS_LABEL
@@ -1845,7 +1845,7 @@ SOURCE_FILE
                             EDGE_RIGHT
                               MINUS "-"
                               L_BRACK "["
-                              NAME
+                              ELEMENT_VARIABLE
                                 IDENT "e2"
                               WHITESPACE " "
                               IS_LABEL
@@ -1860,7 +1860,7 @@ SOURCE_FILE
                           PATH_FACTOR
                             VERTEX_PATTERN
                               L_PAREN "("
-                              NAME
+                              ELEMENT_VARIABLE
                                 IDENT "c"
                               WHITESPACE " "
                               IS_LABEL
@@ -1967,7 +1967,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "a"
                   WHITESPACE " "
                   IS_LABEL
@@ -1985,7 +1985,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "b"
                   WHITESPACE " "
                   IS_LABEL
@@ -2003,7 +2003,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "c"
                   WHITESPACE " "
                   IS_LABEL
@@ -2020,7 +2020,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "d"
                   WHITESPACE " "
                   IS_LABEL
@@ -2034,7 +2034,7 @@ SOURCE_FILE
                 EDGE_RIGHT
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "e"
                   WHITESPACE " "
                   IS_LABEL
@@ -2049,7 +2049,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "f"
                   WHITESPACE " "
                   IS_LABEL
@@ -2064,7 +2064,7 @@ SOURCE_FILE
                   L_ANGLE "<"
                   MINUS "-"
                   L_BRACK "["
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "g"
                   WHITESPACE " "
                   IS_LABEL
@@ -2078,7 +2078,7 @@ SOURCE_FILE
               PATH_FACTOR
                 VERTEX_PATTERN
                   L_PAREN "("
-                  NAME
+                  ELEMENT_VARIABLE
                     IDENT "h"
                   WHITESPACE " "
                   IS_LABEL

@@ -22,8 +22,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TYPE
@@ -90,8 +89,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename_attribute"
@@ -112,12 +110,12 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -144,12 +142,12 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "b"
       WHITESPACE " "
       CASCADE_KW "cascade"
@@ -176,12 +174,12 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "b"
       WHITESPACE " "
       RESTRICT_KW "restrict"
@@ -401,7 +399,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
@@ -429,7 +427,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
@@ -466,7 +464,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
@@ -494,7 +492,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "a"
       WHITESPACE " "
       CHAR_TYPE
@@ -527,7 +525,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -552,7 +550,7 @@ SOURCE_FILE
         WHITESPACE " "
         EXISTS_KW "exists"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       CASCADE_KW "cascade"
@@ -579,7 +577,7 @@ SOURCE_FILE
         WHITESPACE " "
         EXISTS_KW "exists"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       RESTRICT_KW "restrict"
@@ -603,7 +601,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       TYPE_KW "type"
@@ -638,7 +636,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       SET_KW "set"
@@ -684,7 +682,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       TYPE_KW "type"
@@ -716,7 +714,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "a"
       WHITESPACE " "
       PATH_TYPE
@@ -731,7 +729,7 @@ SOURCE_FILE
       WHITESPACE " "
       ATTRIBUTE_KW "attribute"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"

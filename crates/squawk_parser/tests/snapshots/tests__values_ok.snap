@@ -201,8 +201,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "films"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "f"
       COMMA ","
       WHITESPACE " "
@@ -234,10 +234,10 @@ SOURCE_FILE
                 R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "t"
           WHITESPACE " "
           COLUMN_LIST
@@ -369,10 +369,10 @@ SOURCE_FILE
                 R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "v"
           WHITESPACE " "
           COLUMN_LIST

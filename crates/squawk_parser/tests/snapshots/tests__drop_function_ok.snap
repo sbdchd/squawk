@@ -74,7 +74,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "f"
             WHITESPACE " "
             PATH_TYPE

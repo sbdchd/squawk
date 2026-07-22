@@ -24,8 +24,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            SQL_KW "sql"
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -52,7 +51,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "in"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -72,7 +71,7 @@ SOURCE_FILE
         PARAM_OUT
           OUT_KW "out"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -108,8 +107,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            SQL_KW "sql"
+          SQL_KW "sql"
       WHITESPACE "\n"
       TRANSFORM_FUNC_OPTION
         TRANSFORM_KW "transform"
@@ -260,8 +258,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            SQL_KW "sql"
+          SQL_KW "sql"
       WHITESPACE "\n"
       BEGIN_FUNC_OPTION_LIST
         BEGIN_KW "begin"

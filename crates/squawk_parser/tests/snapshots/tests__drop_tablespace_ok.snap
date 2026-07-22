@@ -11,8 +11,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -28,7 +27,6 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     TABLESPACE_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"

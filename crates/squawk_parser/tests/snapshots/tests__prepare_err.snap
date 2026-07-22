@@ -9,8 +9,7 @@ SOURCE_FILE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "fooplan"
+      IDENT "fooplan"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("

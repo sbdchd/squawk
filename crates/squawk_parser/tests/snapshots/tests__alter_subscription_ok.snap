@@ -11,8 +11,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     SET_CONNECTION
       CONNECTION_KW "connection"
@@ -29,8 +28,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     SET_PUBLICATION
       SET_KW "set"
@@ -38,8 +36,7 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "p"
+        IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -48,8 +45,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     SET_PUBLICATION
       SET_KW "set"
@@ -57,18 +53,15 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "p"
+        IDENT "p"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "q"
+        IDENT "q"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "r"
+        IDENT "r"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
@@ -99,8 +92,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     ADD_PUBLICATION
       ADD_KW "add"
@@ -108,8 +100,7 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "p"
+        IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -118,8 +109,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     ADD_PUBLICATION
       ADD_KW "add"
@@ -127,18 +117,15 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
@@ -169,8 +156,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     DROP_SUBSCRIPTION_PUBLICATION
       DROP_KW "drop"
@@ -178,8 +164,7 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "p"
+        IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -188,8 +173,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     DROP_SUBSCRIPTION_PUBLICATION
       DROP_KW "drop"
@@ -197,18 +181,15 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
       COMMA ","
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
       WHITESPACE " "
       WITH_KW "with"
       WHITESPACE " "
@@ -239,8 +220,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     REFRESH_PUBLICATION
       REFRESH_KW "refresh"
@@ -271,8 +251,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     ENABLE_SUBSCRIPTION
       ENABLE_KW "enable"
@@ -286,8 +265,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     DISABLE_SUBSCRIPTION
       DISABLE_KW "disable"
@@ -301,8 +279,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     SET_OPTIONS
       SET_KW "set"
@@ -340,8 +317,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     SKIP_SUBSCRIPTION
       SKIP_KW "skip"
@@ -368,8 +344,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -377,8 +352,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SUBSCRIPTION
@@ -387,8 +361,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     OWNER_TO
       OWNER_KW "owner"
@@ -407,8 +380,7 @@ SOURCE_FILE
     SUBSCRIPTION_KW "subscription"
     WHITESPACE " "
     SUBSCRIPTION_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     SUBSCRIPTION_RENAME_TO
       RENAME_KW "rename"
@@ -416,7 +388,6 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       SUBSCRIPTION
-        NAME
-          IDENT "t"
+        IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"

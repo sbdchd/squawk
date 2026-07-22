@@ -22,8 +22,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "m"
+        IDENT "m"
     WHITESPACE "\n  "
     OP_CLASS_RENAME_TO
       RENAME_KW "rename"
@@ -59,8 +58,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "m"
+        IDENT "m"
     WHITESPACE "\n  "
     OP_CLASS_RENAME_TO
       RENAME_KW "rename"
@@ -93,8 +91,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "m"
+        IDENT "m"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -102,8 +99,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_OPERATOR_CLASS
@@ -123,8 +119,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "m"
+        IDENT "m"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -154,8 +149,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "m"
+        IDENT "m"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"
@@ -163,7 +157,6 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

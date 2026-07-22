@@ -2,7 +2,7 @@ use rustc_hash::FxHashMap;
 
 use squawk_syntax::{
     Parse, SourceFile,
-    ast::{self, AstNode},
+    ast::{self, AstNode, NameLike},
 };
 
 use crate::{Edit, Fix, Linter, Rule, Violation};
@@ -83,9 +83,8 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         }
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
                             let constraint = add_constraint.constraint();
-                            if let Some(constraint_name) = constraint
-                                .and_then(|x| x.constraint_name())
-                                .and_then(|x| x.name())
+                            if let Some(constraint_name) =
+                                constraint.and_then(|constraint| constraint.constraint_name())
                                 && let Some(constraint) =
                                     constraint_names.get_mut(&constraint_name.text())
                                 && *constraint == Constraint::Dropped

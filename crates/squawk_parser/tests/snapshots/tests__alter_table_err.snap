@@ -120,14 +120,13 @@ SOURCE_FILE
           CONSTRAINT_KW "constraint"
           WHITESPACE " "
           CONSTRAINT_NAME
-            NAME
-              IDENT "id_not_null"
+            IDENT "id_not_null"
         WHITESPACE " "
         NOT_KW "not"
         WHITESPACE " "
         NULL_KW "null"
         WHITESPACE " "
-        NAME_REF
+        COLUMN_NAME_REF
           IDENT "id"
       WHITESPACE " "
       NOT_VALID
@@ -155,7 +154,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_OPTIONS
@@ -198,7 +197,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_OPTIONS

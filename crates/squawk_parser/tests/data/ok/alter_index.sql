@@ -25,6 +25,7 @@ alter index s.i depends on extension e;
 -- alter_column
 alter index i alter 1 set statistics 100;
 alter index if exists s.i alter column 1 set statistics 100;
+alter index i alter column id set (n_distinct = 100);
 
 -- all_tablespace
 alter index all in tablespace t 

@@ -11,8 +11,7 @@ SOURCE_FILE
     EXTENSION_KW "extension"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_EXTENSION
@@ -28,8 +27,7 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -38,14 +36,12 @@ SOURCE_FILE
     EXTENSION_KW "extension"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "hstore"
+      IDENT "hstore"
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "addons"
+      IDENT "addons"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -54,16 +50,14 @@ SOURCE_FILE
     EXTENSION_KW "extension"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "bar"
+      IDENT "bar"
     WHITESPACE "\n  "
     VERSION_KW "version"
     WHITESPACE " "
@@ -78,14 +72,12 @@ SOURCE_FILE
     EXTENSION_KW "extension"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     WHITESPACE "\n  "
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "bar"
+      IDENT "bar"
     WHITESPACE "\n  "
     VERSION_KW "version"
     WHITESPACE " "

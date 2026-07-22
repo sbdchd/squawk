@@ -30,8 +30,7 @@ SOURCE_FILE@0..470
           CONSTRAINT_KW@99..109 "constraint"
           WHITESPACE@109..110 " "
           CONSTRAINT_NAME@110..136
-            NAME@110..136
-              IDENT@110..136 "widget_config_schema_ ..."
+            IDENT@110..136 "widget_config_schema_ ..."
         WHITESPACE@136..137 " "
         CHECK_KW@137..142 "check"
         WHITESPACE@142..143 " "
@@ -103,8 +102,7 @@ SOURCE_FILE@0..470
           CONSTRAINT_KW@287..297 "constraint"
           WHITESPACE@297..298 " "
           CONSTRAINT_NAME@298..343
-            NAME@298..343
-              IDENT@298..343 "widget_instance_confi ..."
+            IDENT@298..343 "widget_instance_confi ..."
         WHITESPACE@343..344 " "
         CHECK_KW@344..349 "check"
         WHITESPACE@349..350 " "

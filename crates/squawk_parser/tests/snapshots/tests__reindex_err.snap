@@ -19,8 +19,7 @@ SOURCE_FILE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
-          NAME_REF
-            IDENT "t"
+          IDENT "t"
       R_PAREN ")"
     WHITESPACE " "
     INDEX_KW "index"

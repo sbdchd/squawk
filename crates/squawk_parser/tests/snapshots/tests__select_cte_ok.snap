@@ -10,7 +10,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -78,7 +78,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -121,7 +121,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -161,7 +161,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         COLUMN_LIST
           L_PAREN "("
@@ -217,7 +217,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -297,7 +297,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -340,7 +340,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -399,7 +399,7 @@ SOURCE_FILE
                 WITH_KW "with"
                 WHITESPACE " "
                 WITH_TABLE
-                  NAME
+                  CTE_NAME
                     IDENT "t"
                   WHITESPACE " "
                   AS_KW "as"
@@ -459,7 +459,7 @@ SOURCE_FILE
       RECURSIVE_KW "RECURSIVE"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "search_tree"
         COLUMN_LIST
           L_PAREN "("
@@ -521,8 +521,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "t"
           WHITESPACE "\n  "
           UNION_KW "UNION"
@@ -567,8 +567,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "t"
               COMMA ","
               WHITESPACE " "
@@ -576,8 +576,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "search_tree"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "st"
             WHITESPACE "\n    "
             WHERE_CLAUSE
@@ -612,13 +612,13 @@ SOURCE_FILE
           BY_KW "BY"
           WHITESPACE " "
           SEARCH_COLUMNS
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "id"
           WHITESPACE " "
           SEARCH_SET_COLUMN
             SET_KW "SET"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
@@ -655,7 +655,7 @@ SOURCE_FILE
       RECURSIVE_KW "RECURSIVE"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "search_tree"
         COLUMN_LIST
           L_PAREN "("
@@ -717,8 +717,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "t"
           WHITESPACE "\n  "
           UNION_KW "UNION"
@@ -763,8 +763,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "tree"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "t"
               COMMA ","
               WHITESPACE " "
@@ -772,8 +772,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "search_tree"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "st"
             WHITESPACE "\n    "
             WHERE_CLAUSE
@@ -808,13 +808,13 @@ SOURCE_FILE
           BY_KW "BY"
           WHITESPACE " "
           SEARCH_COLUMNS
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "id"
           WHITESPACE " "
           SEARCH_SET_COLUMN
             SET_KW "SET"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "ordercol"
     WHITESPACE "\n"
     SELECT_CLAUSE
@@ -851,7 +851,7 @@ SOURCE_FILE
       RECURSIVE_KW "RECURSIVE"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "search_graph"
         COLUMN_LIST
           L_PAREN "("
@@ -923,8 +923,8 @@ SOURCE_FILE
                 NAME_REF
                   GRAPH_KW "graph"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "g"
           WHITESPACE "\n  "
           UNION_KW "UNION"
@@ -984,8 +984,8 @@ SOURCE_FILE
                 NAME_REF
                   GRAPH_KW "graph"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "g"
               COMMA ","
               WHITESPACE " "
@@ -993,8 +993,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "search_graph"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "sg"
             WHITESPACE "\n    "
             WHERE_CLAUSE
@@ -1023,19 +1023,19 @@ SOURCE_FILE
           CYCLE_KW "CYCLE"
           WHITESPACE " "
           CYCLE_COLUMNS
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "id"
           WHITESPACE " "
           CYCLE_SET_COLUMN
             SET_KW "SET"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "is_cycle"
           WHITESPACE " "
           CYCLE_PATH
             USING_KW "USING"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               PATH_KW "path"
     WHITESPACE "\n"
     SELECT_CLAUSE
@@ -1062,7 +1062,7 @@ SOURCE_FILE
       RECURSIVE_KW "RECURSIVE"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "search_graph"
         COLUMN_LIST
           L_PAREN "("
@@ -1110,13 +1110,13 @@ SOURCE_FILE
           CYCLE_KW "CYCLE"
           WHITESPACE " "
           CYCLE_COLUMNS
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "id"
           WHITESPACE " "
           CYCLE_SET_COLUMN
             SET_KW "SET"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               IDENT "is_cycle"
             WHITESPACE " "
             CYCLE_COLUMN_TO
@@ -1134,7 +1134,7 @@ SOURCE_FILE
           CYCLE_PATH
             USING_KW "USING"
             WHITESPACE " "
-            NAME_REF
+            COLUMN_NAME_REF
               PATH_KW "path"
     WHITESPACE "\n"
     SELECT_CLAUSE
@@ -1159,7 +1159,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -1179,7 +1179,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n"
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "b"
         WHITESPACE " "
         AS_KW "as"
@@ -1226,7 +1226,7 @@ SOURCE_FILE
       RECURSIVE_KW "recursive"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -1264,7 +1264,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t2"
         WHITESPACE " "
         AS_KW "as"
@@ -1276,7 +1276,7 @@ SOURCE_FILE
             WITH_KW "with"
             WHITESPACE " "
             WITH_TABLE
-              NAME
+              CTE_NAME
                 IDENT "t"
               WHITESPACE " "
               AS_KW "as"
@@ -1332,7 +1332,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         COLUMN_LIST
           L_PAREN "("
@@ -1375,7 +1375,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         COLUMN_LIST
           L_PAREN "("
@@ -1420,7 +1420,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "ranked_notifications"
         WHITESPACE " "
         AS_KW "AS"
@@ -1582,7 +1582,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -1617,7 +1617,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "x"
         WHITESPACE " "
         AS_KW "as"

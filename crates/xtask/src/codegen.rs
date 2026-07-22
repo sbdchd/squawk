@@ -116,6 +116,7 @@ pub(crate) struct KindsSrc {
 const TOKENS: &[&str] = &["ERROR", "WHITESPACE", "COMMENT"];
 
 const EOF: &str = "EOF";
+const NAME_TOKEN: &str = "#name";
 
 /// The punctuations of the language.
 const PUNCT: &[(&str, &str)] = &[
@@ -171,6 +172,7 @@ fn generate_kind_src(
             ("@", lit) if !lit.is_empty() => {
                 literals.push(String::leak(lit.to_case(Case::UpperSnake)));
             }
+            ("#", "name") => tokens.push("IDENT"),
             ("#", token) if !token.is_empty() => {
                 tokens.push(String::leak(token.to_case(Case::UpperSnake)));
             }
@@ -215,8 +217,9 @@ fn generate_kind_src(
     let keywords = Vec::leak(keywords);
     let literals = Vec::leak(literals);
     literals.sort();
-    let tokens = Vec::leak(tokens);
     tokens.sort();
+    tokens.dedup();
+    let tokens = Vec::leak(tokens);
 
     KindsSrc {
         punct: PUNCT,
@@ -571,9 +574,13 @@ fn lower(grammar: &Grammar) -> AstSrc {
     };
 
     let grammar_nodes = grammar.iter().collect::<Vec<_>>();
+    let mut name_like_nodes = Vec::new();
     for node in grammar_nodes {
         let name = grammar[node].name.clone();
         let rule = &grammar[node].rule;
+        if contains_token(grammar, rule, NAME_TOKEN) {
+            name_like_nodes.push(name.clone());
+        }
         match lower_enum(grammar, rule) {
             Some(variants) => {
                 let enum_src = AstEnumSrc { name, variants };
@@ -586,6 +593,11 @@ fn lower(grammar: &Grammar) -> AstSrc {
             }
         }
     }
+
+    res.enums.push(AstEnumSrc {
+        name: "AnyName".to_owned(),
+        variants: name_like_nodes,
+    });
 
     deduplicate_fields(&mut res);
     res.nodes.sort_by_key(|it| it.name.clone());
@@ -711,7 +723,24 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
     }
 }
 
+fn contains_token(grammar: &Grammar, rule: &Rule, expected: &str) -> bool {
+    match rule {
+        Rule::Labeled { rule, .. } | Rule::Opt(rule) | Rule::Rep(rule) => {
+            contains_token(grammar, rule, expected)
+        }
+        Rule::Seq(rules) | Rule::Alt(rules) => rules
+            .iter()
+            .any(|rule| contains_token(grammar, rule, expected)),
+        Rule::Token(token) => grammar[*token].name == expected,
+        Rule::Node(_) => false,
+    }
+}
+
 fn clean_token_name(name: &str) -> String {
+    if name == NAME_TOKEN {
+        return "ident".to_owned();
+    }
+
     let cleaned = name.trim_start_matches(['@', '#', '?']);
     if cleaned.is_empty() {
         name.to_owned()

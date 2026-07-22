@@ -11,8 +11,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -29,8 +28,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       POLICY
-        NAME
-          IDENT "q"
+        IDENT "q"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_role"
@@ -41,8 +39,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -58,8 +55,7 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF_LIST
         ROLE_REF
-          NAME_REF
-            IDENT "r"
+          IDENT "r"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- to_multiple_roles"
@@ -70,8 +66,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -87,13 +82,11 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF_LIST
         ROLE_REF
-          NAME_REF
-            IDENT "r"
+          IDENT "r"
         COMMA ","
         WHITESPACE " "
         ROLE_REF
-          NAME_REF
-            IDENT "public"
+          IDENT "public"
         COMMA ","
         WHITESPACE " "
         ROLE_REF
@@ -108,8 +101,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -144,8 +136,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -182,8 +173,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY_REF
-      NAME_REF
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -199,13 +189,11 @@ SOURCE_FILE
       WHITESPACE " "
       ROLE_REF_LIST
         ROLE_REF
-          NAME_REF
-            IDENT "r"
+          IDENT "r"
         COMMA ","
         WHITESPACE " "
         ROLE_REF
-          NAME_REF
-            IDENT "s"
+          IDENT "s"
       WHITESPACE "\n  "
       USING_EXPR_CLAUSE
         USING_KW "using"

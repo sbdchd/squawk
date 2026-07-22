@@ -13,7 +13,7 @@ SOURCE_FILE
     FOR_PROVIDER
       FOR_KW "FOR"
       WHITESPACE " "
-      NAME_REF
+      SECURITY_LABEL_PROVIDER
         IDENT "selinux"
     WHITESPACE " "
     ON_KW "ON"
@@ -41,7 +41,7 @@ SOURCE_FILE
     FOR_PROVIDER
       FOR_KW "FOR"
       WHITESPACE " "
-      NAME_REF
+      SECURITY_LABEL_PROVIDER
         IDENT "selinux"
     WHITESPACE " "
     ON_KW "ON"
@@ -149,7 +149,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "foo"
             WHITESPACE " "
             PATH_TYPE
@@ -160,7 +160,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE "\n  "
           PARAM
-            NAME
+            PARAM_NAME
               IDENT "bar"
             WHITESPACE " "
             PATH_TYPE
@@ -241,7 +241,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             TIME_TYPE
@@ -249,7 +249,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE "\n    "
           PARAM
-            NAME
+            PARAM_NAME
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE
@@ -305,7 +305,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             TIME_TYPE
@@ -313,7 +313,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE "\n    "
           PARAM
-            NAME
+            PARAM_NAME
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE
@@ -351,8 +351,7 @@ SOURCE_FILE
       DATABASE_KW "database"
       WHITESPACE " "
       DATABASE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -423,8 +422,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       EVENT_TRIGGER_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -540,7 +538,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
@@ -554,7 +552,7 @@ SOURCE_FILE
             PARAM_OUT
               OUT_KW "out"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "b"
             WHITESPACE " "
             PATH_TYPE
@@ -645,8 +643,7 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -664,8 +661,7 @@ SOURCE_FILE
       LANGUAGE_KW "language"
       WHITESPACE " "
       LANGUAGE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -754,7 +750,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "foo"
             WHITESPACE " "
             PATH_TYPE
@@ -791,8 +787,7 @@ SOURCE_FILE
       PUBLICATION_KW "publication"
       WHITESPACE " "
       PUBLICATION_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -812,8 +807,7 @@ SOURCE_FILE
       ROLE_KW "role"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -907,7 +901,7 @@ SOURCE_FILE
             PARAM_IN
               IN_KW "in"
             WHITESPACE " "
-            NAME
+            PARAM_NAME
               IDENT "foo"
             WHITESPACE " "
             PATH_TYPE
@@ -944,8 +938,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -993,8 +986,7 @@ SOURCE_FILE
       SUBSCRIPTION_KW "subscription"
       WHITESPACE " "
       SUBSCRIPTION_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -1014,8 +1006,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "

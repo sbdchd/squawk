@@ -78,8 +78,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -117,8 +116,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "

@@ -54,6 +54,36 @@ SOURCE_FILE
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_OBJECT_FN
+              JSON_OBJECT_KW "json_object"
+              L_PAREN "("
+              JSON_KEY_VALUE
+                LITERAL
+                  STRING "'foo'"
+                COLON ":"
+                WHITESPACE " "
+                JSON_VALUE_EXPR
+                  LITERAL
+                    STRING "'bar'"
+                  WHITESPACE " "
+                  JSON_FORMAT_CLAUSE
+                    FORMAT_KW "format"
+                    WHITESPACE " "
+                    JSON_KW "json"
+                    WHITESPACE " "
+                    JSON_ENCODING_CLAUSE
+                      ENCODING_KW "encoding"
+                      JSON_ENCODING
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
 ---
 error[syntax-error]: expected an expression, found R_BRACK
   ╭▸ 
@@ -91,3 +121,7 @@ error[syntax-error]: expected a comma
   ╭▸ 
 4 │ select json_object(1, ]);
   ╰╴                      ━
+error[syntax-error]: expected name
+  ╭▸ 
+5 │ select json_object('foo': 'bar' format json encoding);
+  ╰╴                                                    ━

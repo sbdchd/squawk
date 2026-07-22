@@ -11,8 +11,7 @@ SOURCE_FILE
     TRIGGER_KW "TRIGGER"
     WHITESPACE " "
     TRIGGER
-      NAME
-        IDENT "update_foo_column"
+      IDENT "update_foo_column"
     WHITESPACE "\n"
     TIMING
       BEFORE_KW "BEFORE"
@@ -61,8 +60,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     TRIGGER
-      NAME
-        IDENT "buzz"
+      IDENT "buzz"
     WHITESPACE " "
     TIMING
       INSTEAD_KW "instead"
@@ -107,7 +105,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
-        NAME_REF
+        TRANSITION_RELATION_NAME
           IDENT "foo"
       WHITESPACE "\n  "
       REFERENCING_TABLE
@@ -117,7 +115,7 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
-        NAME_REF
+        TRANSITION_RELATION_NAME
           IDENT "bar"
     WHITESPACE "\n"
     FOR_KW "for"
@@ -196,8 +194,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     TRIGGER
-      NAME
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     TIMING
       AFTER_KW "after"
@@ -246,8 +243,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     TRIGGER
-      NAME
-        IDENT "bar"
+      IDENT "bar"
     WHITESPACE " "
     TIMING
       AFTER_KW "after"
@@ -259,15 +255,15 @@ SOURCE_FILE
           WHITESPACE " "
           OF_KW "of"
           WHITESPACE " "
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "a"
           COMMA ","
           WHITESPACE " "
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "b"
           COMMA ","
           WHITESPACE " "
-          NAME_REF
+          COLUMN_NAME_REF
             IDENT "c"
     WHITESPACE "\n"
     ON_RELATION
@@ -287,7 +283,7 @@ SOURCE_FILE
         WHITESPACE " "
         TABLE_KW "table"
         WHITESPACE " "
-        NAME_REF
+        TRANSITION_RELATION_NAME
           IDENT "bar"
       WHITESPACE "\n  "
       REFERENCING_TABLE
@@ -295,7 +291,7 @@ SOURCE_FILE
         WHITESPACE " "
         TABLE_KW "table"
         WHITESPACE " "
-        NAME_REF
+        TRANSITION_RELATION_NAME
           IDENT "foo"
     WHITESPACE "\n"
     FOR_KW "for"
@@ -325,8 +321,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     TRIGGER
-      NAME
-        IDENT "bar"
+      IDENT "bar"
     WHITESPACE " "
     TIMING
       BEFORE_KW "before"

@@ -11,8 +11,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"
@@ -29,8 +28,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       TRIGGER
-        NAME
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends_on"
@@ -41,8 +39,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"
@@ -61,8 +58,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -73,8 +69,7 @@ SOURCE_FILE
     TRIGGER_KW "trigger"
     WHITESPACE " "
     TRIGGER_REF
-      NAME_REF
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"
@@ -100,7 +95,6 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"

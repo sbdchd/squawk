@@ -71,8 +71,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "o"
+        IDENT "o"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set schema"
@@ -106,8 +105,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add vertex/edge tables"
@@ -241,8 +239,7 @@ SOURCE_FILE
               REFERENCES_KW "references"
               WHITESPACE " "
               VERTEX_TABLE_REF
-                NAME_REF
-                  IDENT "k"
+                IDENT "k"
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
@@ -267,8 +264,7 @@ SOURCE_FILE
               REFERENCES_KW "references"
               WHITESPACE " "
               VERTEX_TABLE_REF
-                NAME_REF
-                  IDENT "k"
+                IDENT "k"
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
@@ -282,8 +278,7 @@ SOURCE_FILE
               LABEL_KW "label"
               WHITESPACE " "
               LABEL
-                NAME
-                  IDENT "q"
+                IDENT "q"
               WHITESPACE " "
               PROPERTIES
                 PROPERTIES_KW "properties"
@@ -315,8 +310,7 @@ SOURCE_FILE
               LABEL_KW "label"
               WHITESPACE " "
               LABEL
-                NAME
-                  IDENT "q"
+                IDENT "q"
               WHITESPACE " "
               PROPERTIES
                 PROPERTIES_KW "properties"
@@ -437,8 +431,7 @@ SOURCE_FILE
               REFERENCES_KW "references"
               WHITESPACE " "
               VERTEX_TABLE_REF
-                NAME_REF
-                  IDENT "k"
+                IDENT "k"
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
@@ -463,8 +456,7 @@ SOURCE_FILE
               REFERENCES_KW "references"
               WHITESPACE " "
               VERTEX_TABLE_REF
-                NAME_REF
-                  IDENT "k"
+                IDENT "k"
               WHITESPACE " "
               COLUMN_REF_LIST
                 L_PAREN "("
@@ -499,8 +491,7 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "v"
+        IDENT "v"
       WHITESPACE " "
       ADD_LABEL
         ADD_KW "add"
@@ -508,8 +499,7 @@ SOURCE_FILE
         LABEL_KW "label"
         WHITESPACE " "
         LABEL
-          NAME
-            IDENT "l"
+          IDENT "l"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROPERTY_GRAPH
@@ -533,16 +523,14 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
       WHITESPACE " "
       DROP_KW "drop"
       WHITESPACE " "
       LABEL_KW "label"
       WHITESPACE " "
       LABEL_REF
-        NAME_REF
-          IDENT "l"
+        IDENT "l"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROPERTY_GRAPH
@@ -566,16 +554,14 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "v"
+        IDENT "v"
       WHITESPACE " "
       ALTER_KW "alter"
       WHITESPACE " "
       LABEL_KW "label"
       WHITESPACE " "
       LABEL_REF
-        NAME_REF
-          IDENT "l"
+        IDENT "l"
       WHITESPACE " "
       ADD_KW "add"
       WHITESPACE " "
@@ -610,23 +596,21 @@ SOURCE_FILE
       TABLE_KW "table"
       WHITESPACE " "
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
       WHITESPACE " "
       ALTER_KW "alter"
       WHITESPACE " "
       LABEL_KW "label"
       WHITESPACE " "
       LABEL_REF
-        NAME_REF
-          IDENT "l"
+        IDENT "l"
       WHITESPACE " "
       DROP_KW "drop"
       WHITESPACE " "
       PROPERTIES_KW "properties"
       WHITESPACE " "
       L_PAREN "("
-      NAME_REF
+      PROPERTY_REF
         IDENT "id"
       R_PAREN ")"
     SEMICOLON ";"
@@ -655,13 +639,11 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "v1"
+        IDENT "v1"
       COMMA ","
       WHITESPACE " "
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "v2"
+        IDENT "v2"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -687,13 +669,11 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "e1"
+        IDENT "e1"
       COMMA ","
       WHITESPACE " "
       ELEMENT_TABLE_REF
-        NAME_REF
-          IDENT "e2"
+        IDENT "e2"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

@@ -12,12 +12,13 @@ const NAMEDATALEN: usize = 64;
 const MAX_IDENT_BYTES: usize = NAMEDATALEN - 1;
 
 pub(crate) fn identifier_too_long(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for node in parse.tree().syntax().descendants() {
-        if let Some(name) = ast::Name::cast(node.clone()) {
-            check_name(ctx, &name);
-        } else if let Some(name_ref) = ast::NameRef::cast(node) {
-            check_name(ctx, &name_ref);
-        }
+    for name in parse
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(ast::AnyName::cast)
+    {
+        check_name(ctx, &name);
     }
 }
 

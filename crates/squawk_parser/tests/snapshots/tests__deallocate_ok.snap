@@ -25,15 +25,13 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     PREPARED_STATEMENT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
     PREPARED_STATEMENT_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"

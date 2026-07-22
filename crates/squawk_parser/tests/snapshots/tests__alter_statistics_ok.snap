@@ -22,8 +22,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_STATISTICS
@@ -95,8 +94,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "n"
+        IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- statistics_value"

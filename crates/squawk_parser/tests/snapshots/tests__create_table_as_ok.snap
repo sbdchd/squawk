@@ -33,8 +33,7 @@ SOURCE_FILE
       EXECUTE_KW "execute"
       WHITESPACE " "
       PREPARED_STATEMENT_REF
-        NAME_REF
-          IDENT "f"
+        IDENT "f"
       ARG_LIST
         L_PAREN "("
         ARG
@@ -151,8 +150,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -189,8 +187,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
@@ -243,8 +240,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
     WHITESPACE "\n  "
     WITHOUT_OIDS
       WITHOUT_KW "without"
@@ -265,8 +261,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "

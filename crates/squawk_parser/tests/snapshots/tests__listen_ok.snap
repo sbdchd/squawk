@@ -9,15 +9,13 @@ SOURCE_FILE
     LISTEN_KW "listen"
     WHITESPACE " "
     CHANNEL
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   LISTEN
     LISTEN_KW "LISTEN"
     WHITESPACE " "
     CHANNEL
-      NAME
-        VIRTUAL_KW "virtual"
+      VIRTUAL_KW "virtual"
     SEMICOLON ";"
   WHITESPACE "\n\n"

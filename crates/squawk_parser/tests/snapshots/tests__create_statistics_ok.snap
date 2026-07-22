@@ -54,15 +54,15 @@ SOURCE_FILE
             IDENT "s"
     STAT_TYPES
       L_PAREN "("
-      NAME_REF
+      STATISTICS_KIND
         IDENT "mcv"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
+      STATISTICS_KIND
         IDENT "ndistinct"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
+      STATISTICS_KIND
         IDENT "dependencies"
       R_PAREN ")"
     WHITESPACE "\n"
@@ -125,7 +125,7 @@ SOURCE_FILE
     WHITESPACE " "
     STAT_TYPES
       L_PAREN "("
-      NAME_REF
+      STATISTICS_KIND
         IDENT "dependencies"
       R_PAREN ")"
     WHITESPACE " "
@@ -163,7 +163,7 @@ SOURCE_FILE
     WHITESPACE " "
     STAT_TYPES
       L_PAREN "("
-      NAME_REF
+      STATISTICS_KIND
         IDENT "mcv"
       R_PAREN ")"
     WHITESPACE " "
@@ -201,7 +201,7 @@ SOURCE_FILE
     WHITESPACE " "
     STAT_TYPES
       L_PAREN "("
-      NAME_REF
+      STATISTICS_KIND
         IDENT "ndistinct"
       R_PAREN ")"
     WHITESPACE " "

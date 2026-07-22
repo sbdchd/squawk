@@ -91,8 +91,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"
@@ -117,8 +116,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_ROUTINE
@@ -143,8 +141,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- no_depends"
@@ -171,8 +168,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_params"
@@ -194,7 +190,7 @@ SOURCE_FILE
           PARAM_IN
             IN_KW "in"
           WHITESPACE " "
-          NAME
+          PARAM_NAME
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -208,7 +204,7 @@ SOURCE_FILE
           PARAM_OUT
             OUT_KW "out"
           WHITESPACE " "
-          NAME
+          PARAM_NAME
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE

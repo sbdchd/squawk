@@ -298,7 +298,7 @@ SOURCE_FILE
       RECURSIVE_KW "recursive"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -325,10 +325,10 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    ALIAS
+    REQUIRED_AS_ALIAS
       AS_KW "as"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "foo"
     COLUMN_REF_LIST
       L_PAREN "("
@@ -869,7 +869,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "upd"
         WHITESPACE " "
         AS_KW "AS"
@@ -1323,10 +1323,10 @@ SOURCE_FILE
           NAME_REF
             IDENT "distributors"
     WHITESPACE " "
-    ALIAS
+    REQUIRED_AS_ALIAS
       AS_KW "AS"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "d"
     WHITESPACE " "
     COLUMN_REF_LIST

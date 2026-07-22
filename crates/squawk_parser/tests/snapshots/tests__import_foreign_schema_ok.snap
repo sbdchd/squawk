@@ -13,8 +13,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -22,15 +21,13 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
     WHITESPACE "\n  "
     INTO_SCHEMA
       INTO_KW "into"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- except"
@@ -43,18 +40,17 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "some_schema_name"
+      IDENT "some_schema_name"
     WHITESPACE "\n    "
     EXCEPT_TABLES
       EXCEPT_KW "EXCEPT"
       WHITESPACE " "
       L_PAREN "("
-      NAME_REF
+      REMOTE_TABLE_NAME_REF
         IDENT "t1"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
+      REMOTE_TABLE_NAME_REF
         IDENT "t2"
       R_PAREN ")"
     WHITESPACE "\n    "
@@ -64,15 +60,13 @@ SOURCE_FILE
       SERVER_KW "SERVER"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "server_name"
+        IDENT "server_name"
     WHITESPACE "\n    "
     INTO_SCHEMA
       INTO_KW "INTO"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "local_schema"
+        IDENT "local_schema"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options"
@@ -85,8 +79,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "a"
+      IDENT "a"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -94,15 +87,13 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
     WHITESPACE "\n  "
     INTO_SCHEMA
       INTO_KW "into"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -127,8 +118,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "a"
+      IDENT "a"
     WHITESPACE "\n  "
     FROM_KW "from"
     WHITESPACE " "
@@ -136,15 +126,13 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "b"
+        IDENT "b"
     WHITESPACE "\n  "
     INTO_SCHEMA
       INTO_KW "into"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "c"
+        IDENT "c"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -177,8 +165,7 @@ SOURCE_FILE
     SCHEMA_KW "SCHEMA"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "foreign_films"
+      IDENT "foreign_films"
     WHITESPACE "\n    "
     FROM_KW "FROM"
     WHITESPACE " "
@@ -186,15 +173,13 @@ SOURCE_FILE
       SERVER_KW "SERVER"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "film_server"
+        IDENT "film_server"
     WHITESPACE " "
     INTO_SCHEMA
       INTO_KW "INTO"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "films"
+        IDENT "films"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
@@ -207,8 +192,7 @@ SOURCE_FILE
     SCHEMA_KW "SCHEMA"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "foreign_films"
+      IDENT "foreign_films"
     WHITESPACE " "
     LIMIT_TO_TABLES
       LIMIT_KW "LIMIT"
@@ -216,11 +200,11 @@ SOURCE_FILE
       TO_KW "TO"
       WHITESPACE " "
       L_PAREN "("
-      NAME_REF
+      REMOTE_TABLE_NAME_REF
         IDENT "actors"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
+      REMOTE_TABLE_NAME_REF
         IDENT "directors"
       R_PAREN ")"
     WHITESPACE "\n    "
@@ -230,14 +214,12 @@ SOURCE_FILE
       SERVER_KW "SERVER"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "film_server"
+        IDENT "film_server"
     WHITESPACE " "
     INTO_SCHEMA
       INTO_KW "INTO"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "films"
+        IDENT "films"
     SEMICOLON ";"
   WHITESPACE "\n\n"

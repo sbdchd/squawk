@@ -9,8 +9,7 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -35,8 +34,7 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -84,8 +82,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "btree"
+        IDENT "btree"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -137,8 +134,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "btree"
+        IDENT "btree"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -191,8 +187,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "btree"
+        IDENT "btree"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"

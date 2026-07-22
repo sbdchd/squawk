@@ -92,16 +92,18 @@ impl ast::Constraint {
 }
 
 impl ast::CreateSchema {
-    pub fn schema_name(&self) -> Option<ast::Name> {
+    pub fn schema_name(&self) -> Option<SyntaxNode> {
         match self.create_schema_target()? {
-            ast::CreateSchemaTarget::AuthorizationSchema(auth) => auth.role()?.name(),
-            ast::CreateSchemaTarget::NamedSchema(named) => named.schema()?.name(),
+            ast::CreateSchemaTarget::AuthorizationSchema(auth) => {
+                Some(auth.role()?.syntax().clone())
+            }
+            ast::CreateSchemaTarget::NamedSchema(named) => Some(named.schema()?.syntax().clone()),
         }
     }
 }
 
 impl ast::FromItem {
-    pub fn alias(&self) -> Option<ast::Alias> {
+    pub fn alias(&self) -> Option<ast::FromAlias> {
         match self {
             ast::FromItem::ExprFromItem(it) => it.alias(),
             ast::FromItem::FunctionFromItem(it) => it.alias(),
@@ -377,17 +379,6 @@ impl ast::SliceExpr {
     }
 }
 
-impl ast::RenameColumn {
-    #[inline]
-    pub fn from(&self) -> Option<ast::NameRef> {
-        support::children(&self.syntax).nth(0)
-    }
-    #[inline]
-    pub fn to(&self) -> Option<ast::NameRef> {
-        support::children(&self.syntax).nth(1)
-    }
-}
-
 impl ast::RenameValue {
     #[inline]
     pub fn from(&self) -> Option<ast::Literal> {
@@ -499,9 +490,19 @@ fn normalize_name_node(node: &SyntaxNode) -> String {
         .filter_map(|el| el.into_token())
         .filter(|t| !t.kind().is_trivia());
 
-    let Some(ident_token) = tokens.next() else {
+    let Some(mut ident_token) = tokens.next() else {
         return String::new();
     };
+    // Support some deprecated syntax where you can plop a `group` keyword
+    // before a role name.
+    if matches!(node.kind(), SyntaxKind::ROLE | SyntaxKind::ROLE_REF)
+        && ident_token.kind() == SyntaxKind::GROUP_KW
+    {
+        let Some(role_name) = tokens.next() else {
+            return String::new();
+        };
+        ident_token = role_name;
+    }
     let raw = ident_token.text();
 
     let unicode_inner = raw
@@ -784,16 +785,14 @@ impl ast::HasParamList {
     }
 }
 
-impl ast::NameLike for ast::Name {
+impl<T> ast::NameLike for T
+where
+    T: AstNode,
+    ast::AnyName: From<T>,
+{
     #[inline]
     fn text(&self) -> String {
-        self.text()
-    }
-}
-impl ast::NameLike for ast::NameRef {
-    #[inline]
-    fn text(&self) -> String {
-        self.text()
+        normalize_name_node(self.syntax())
     }
 }
 

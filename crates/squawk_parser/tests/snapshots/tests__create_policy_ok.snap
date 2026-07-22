@@ -11,8 +11,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -32,8 +31,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -56,8 +54,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -82,8 +79,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -112,8 +108,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        NAME_REF
-          IDENT "public"
+        IDENT "public"
       COMMA ","
       WHITESPACE " "
       ROLE_REF
@@ -179,8 +174,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -202,8 +196,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -225,8 +218,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -248,8 +240,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"
@@ -271,8 +262,7 @@ SOURCE_FILE
     POLICY_KW "policy"
     WHITESPACE " "
     POLICY
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     ON_TABLE
       ON_KW "on"

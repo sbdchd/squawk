@@ -15,8 +15,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER
-      NAME
-        IDENT "w"
+      IDENT "w"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -31,8 +30,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER
-      NAME
-        IDENT "w"
+      IDENT "w"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION

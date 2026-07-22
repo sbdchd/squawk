@@ -156,8 +156,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
@@ -367,8 +366,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_FUNCTION
@@ -393,7 +391,6 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"

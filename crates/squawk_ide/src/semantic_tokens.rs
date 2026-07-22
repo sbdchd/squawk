@@ -189,6 +189,7 @@ impl TryFrom<LocationKind> for SemanticTokenType {
                 Ok(SemanticTokenType::Function)
             }
             LocationKind::Column => Ok(SemanticTokenType::Column),
+            LocationKind::JsonPath => Ok(SemanticTokenType::Name),
             LocationKind::NamedArgParameter => Ok(SemanticTokenType::Parameter),
             LocationKind::Schema => Ok(SemanticTokenType::Schema),
             LocationKind::PropertyGraph => Ok(SemanticTokenType::PropertyGraph),
@@ -325,6 +326,74 @@ pub fn semantic_tokens(
                     && let Some(token_type) = token_type_for_node(db, InFile::new(file, &name_ref))
                 {
                     out.push_token(name_ref.syntax().clone().into(), token_type);
+                }
+
+                if let Some(column_name) = ast::ColumnName::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &column_name))
+                {
+                    out.push_token(column_name.syntax().clone().into(), token_type);
+                }
+
+                if let Some(column_name_ref) = ast::ColumnNameRef::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &column_name_ref))
+                {
+                    out.push_token(column_name_ref.syntax().clone().into(), token_type);
+                }
+
+                if let Some(cte_name) = ast::CteName::cast(node.clone())
+                    && let Some(token_type) = token_type_for_node(db, InFile::new(file, &cte_name))
+                {
+                    out.push_token(cte_name.syntax().clone().into(), token_type);
+                }
+
+                if let Some(json_path_name) = ast::JsonPathName::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &json_path_name))
+                {
+                    out.push_token(json_path_name.syntax().clone().into(), token_type);
+                }
+
+                if let Some(param_name) = ast::ParamName::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &param_name))
+                {
+                    out.push_token(param_name.syntax().clone().into(), token_type);
+                }
+
+                if let Some(json_path_name_ref) = ast::JsonPathNameRef::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &json_path_name_ref))
+                {
+                    out.push_token(json_path_name_ref.syntax().clone().into(), token_type);
+                }
+
+                if let Some(schema) = ast::Schema::cast(node.clone())
+                    && let Some(token_type) = token_type_for_node(db, InFile::new(file, &schema))
+                {
+                    out.push_token(schema.syntax().clone().into(), token_type);
+                }
+
+                if let Some(schema_ref) = ast::SchemaRef::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &schema_ref))
+                {
+                    out.push_token(schema_ref.syntax().clone().into(), token_type);
+                }
+
+                if let Some(table_alias) = ast::TableAlias::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &table_alias))
+                {
+                    out.push_token(table_alias.syntax().clone().into(), token_type);
+                }
+
+                if let Some(vertex_table_ref) = ast::VertexTableRef::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &vertex_table_ref))
+                {
+                    out.push_token(vertex_table_ref.syntax().clone().into(), token_type);
                 }
 
                 if let Some(ty) = ast::Type::cast(node.clone()) {

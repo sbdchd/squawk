@@ -11,8 +11,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE
-      NAME
-        IDENT "l"
+      IDENT "l"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -32,8 +31,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE
-      NAME
-        IDENT "l"
+      IDENT "l"
     WHITESPACE "\n  "
     HANDLER_KW "handler"
     WHITESPACE " "

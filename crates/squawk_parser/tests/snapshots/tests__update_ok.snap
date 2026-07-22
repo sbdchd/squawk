@@ -189,7 +189,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t1"
         WHITESPACE " "
         AS_KW "as"
@@ -274,10 +274,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    ALIAS
+    OPTIONAL_AS_ALIAS
       AS_KW "as"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "t2"
     WHITESPACE " \n"
     SET_CLAUSE
@@ -1029,8 +1029,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "summary"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "s"
     WHITESPACE " "
     SET_CLAUSE
@@ -1123,8 +1123,8 @@ SOURCE_FILE
                   NAME_REF
                     DATA_KW "data"
                   WHITESPACE " "
-                  ALIAS
-                    NAME
+                  FROM_ALIAS
+                    TABLE_ALIAS
                       IDENT "d"
               WHITESPACE "\n     "
               WHERE_CLAUSE
@@ -1159,8 +1159,7 @@ SOURCE_FILE
     SAVEPOINT_KW "SAVEPOINT"
     WHITESPACE " "
     SAVEPOINT
-      NAME
-        IDENT "sp1"
+      IDENT "sp1"
     SEMICOLON ";"
   WHITESPACE "\n"
   INSERT
@@ -1198,8 +1197,7 @@ SOURCE_FILE
     TO_KW "TO"
     WHITESPACE " "
     SAVEPOINT_REF
-      NAME_REF
-        IDENT "sp1"
+      IDENT "sp1"
     SEMICOLON ";"
   WHITESPACE "\n"
   UPDATE
@@ -1285,8 +1283,7 @@ SOURCE_FILE
       OF_KW "OF"
       WHITESPACE " "
       CURSOR_REF
-        NAME_REF
-          IDENT "c_films"
+        IDENT "c_films"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE
@@ -1294,7 +1291,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "exceeded_max_retries"
         WHITESPACE " "
         AS_KW "AS"
@@ -1321,10 +1318,10 @@ SOURCE_FILE
               NAME_REF
                 IDENT "work_item"
               WHITESPACE " "
-              ALIAS
+              FROM_ALIAS
                 AS_KW "AS"
                 WHITESPACE " "
-                NAME
+                TABLE_ALIAS
                   IDENT "w"
           WHITESPACE "\n    "
           WHERE_CLAUSE
@@ -1418,10 +1415,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "exceeded_max_retries"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "emr"
     WHITESPACE "\n  "
     WHERE_CLAUSE
@@ -1502,7 +1499,7 @@ SOURCE_FILE
           WHITESPACE " "
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             BEFORE_KW "before"
         COMMA ","
         WHITESPACE " "
@@ -1511,7 +1508,7 @@ SOURCE_FILE
           WHITESPACE " "
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             AFTER_KW "after"
         R_PAREN ")"
       WHITESPACE "\n    "
@@ -1608,7 +1605,7 @@ SOURCE_FILE
           WHITESPACE " "
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "o"
         COMMA ","
         WHITESPACE " "
@@ -1617,7 +1614,7 @@ SOURCE_FILE
           WHITESPACE " "
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "n"
         R_PAREN ")"
       WHITESPACE " "

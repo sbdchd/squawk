@@ -19,7 +19,7 @@ SOURCE_FILE
     ALTER_VIEW_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_DEFAULT
@@ -52,7 +52,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_DEFAULT
@@ -82,7 +82,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       DROP_DEFAULT
@@ -110,8 +110,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_current_role"
@@ -233,12 +232,12 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -256,12 +255,12 @@ SOURCE_FILE
     RENAME_COLUMN
       RENAME_KW "rename"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "a"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "b"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -284,8 +283,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_options"

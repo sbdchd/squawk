@@ -83,12 +83,12 @@ SOURCE_FILE
     RENAME_COLUMN
       RENAME_KW "rename"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -120,12 +120,12 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -150,8 +150,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -178,8 +177,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends_extension"
@@ -205,8 +203,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -232,8 +229,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"
@@ -253,8 +249,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
       WHITESPACE "\n  "
       SET_TABLESPACE
         SET_KW "set"
@@ -262,8 +257,7 @@ SOURCE_FILE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -281,8 +275,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
       WHITESPACE "\n  "
       OWNED_BY_ROLES
         OWNED_KW "owned"
@@ -295,8 +288,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            NAME_REF
-              IDENT "u"
+            IDENT "u"
       WHITESPACE "\n  "
       SET_TABLESPACE
         SET_KW "set"
@@ -304,8 +296,7 @@ SOURCE_FILE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
       WHITESPACE " "
       NOWAIT_KW "nowait"
     SEMICOLON ";"
@@ -328,7 +319,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
@@ -358,7 +349,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
@@ -390,7 +381,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
@@ -421,7 +412,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_OPTIONS
@@ -457,7 +448,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_OPTIONS
@@ -506,7 +497,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       RESET_OPTIONS
@@ -538,7 +529,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       RESET_OPTIONS
@@ -575,7 +566,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STORAGE
@@ -583,7 +574,7 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        NAME_REF
+        STORAGE_MODE
           IDENT "plain"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -603,7 +594,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STORAGE
@@ -611,7 +602,7 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        NAME_REF
+        STORAGE_MODE
           EXTERNAL_KW "external"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -631,7 +622,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STORAGE
@@ -639,7 +630,7 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        NAME_REF
+        STORAGE_MODE
           IDENT "extended"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -659,7 +650,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STORAGE
@@ -667,7 +658,7 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        NAME_REF
+        STORAGE_MODE
           IDENT "main"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -692,7 +683,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_STORAGE
@@ -700,7 +691,8 @@ SOURCE_FILE
         WHITESPACE " "
         STORAGE_KW "storage"
         WHITESPACE " "
-        DEFAULT_KW "default"
+        STORAGE_MODE
+          DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_compression"
@@ -721,7 +713,7 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_COMPRESSION
@@ -729,7 +721,7 @@ SOURCE_FILE
         WHITESPACE " "
         COMPRESSION_KW "compression"
         WHITESPACE " "
-        NAME_REF
+        COMPRESSION_METHOD_NAME
           IDENT "pglz"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -751,7 +743,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      NAME_REF
+      COLUMN_NAME_REF
         IDENT "c"
       WHITESPACE " "
       SET_COMPRESSION
@@ -759,7 +751,7 @@ SOURCE_FILE
         WHITESPACE " "
         COMPRESSION_KW "compression"
         WHITESPACE " "
-        NAME_REF
+        COMPRESSION_METHOD_NAME
           IDENT "pglz"
     SEMICOLON ";"
   WHITESPACE "\n\n"

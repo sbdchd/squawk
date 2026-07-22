@@ -14,8 +14,7 @@ SOURCE_FILE
     WHITESPACE " "
     ROLE_REF_LIST
       ROLE_REF
-        NAME_REF
-          SET_KW "set"
+        SET_KW "set"
       COMMA ","
       WHITESPACE " "
       ROLE_REF
@@ -27,8 +26,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "

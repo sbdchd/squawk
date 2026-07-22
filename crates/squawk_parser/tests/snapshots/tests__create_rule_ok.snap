@@ -11,8 +11,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -50,8 +49,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -214,8 +212,7 @@ SOURCE_FILE
           NOTIFY_KW "notify"
           WHITESPACE " "
           CHANNEL_REF
-            NAME_REF
-              IDENT "f"
+            IDENT "f"
           SEMICOLON ";"
         WHITESPACE "\n  "
         R_PAREN ")"
@@ -229,8 +226,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -275,8 +271,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -321,8 +316,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -351,8 +345,7 @@ SOURCE_FILE
           NOTIFY_KW "notify"
           WHITESPACE " "
           CHANNEL_REF
-            NAME_REF
-              IDENT "foo"
+            IDENT "foo"
           SEMICOLON ";"
         WHITESPACE " "
         PAREN_SELECT
@@ -376,8 +369,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -438,8 +430,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -490,8 +481,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -546,8 +536,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -587,8 +576,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -634,8 +622,7 @@ SOURCE_FILE
     RULE_KW "RULE"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "\"_RETURN\""
+      IDENT "\"_RETURN\""
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -680,8 +667,7 @@ SOURCE_FILE
     RULE_KW "RULE"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "\"_RETURN\""
+      IDENT "\"_RETURN\""
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -744,8 +730,7 @@ SOURCE_FILE
     RULE_KW "RULE"
     WHITESPACE " "
     RULE
-      NAME
-        IDENT "notify_me"
+      IDENT "notify_me"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE " "
@@ -772,8 +757,7 @@ SOURCE_FILE
         NOTIFY_KW "NOTIFY"
         WHITESPACE " "
         CHANNEL_REF
-          NAME_REF
-            IDENT "mytable"
+          IDENT "mytable"
         SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE

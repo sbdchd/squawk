@@ -11,8 +11,7 @@ SOURCE_FILE
     RULE_KW "rule"
     WHITESPACE " "
     RULE_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"
@@ -39,8 +38,7 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     RULE_REF
-      NAME_REF
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"
@@ -70,8 +68,7 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     RULE_REF
-      NAME_REF
-        IDENT "r"
+      IDENT "r"
     WHITESPACE " "
     ON_RELATION
       ON_KW "on"

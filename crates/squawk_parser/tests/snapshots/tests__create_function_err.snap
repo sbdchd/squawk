@@ -58,8 +58,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            SQL_KW "sql"
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -75,7 +74,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        NAME
+        PARAM_NAME
           IDENT "arg"
         WHITESPACE " "
         PATH_TYPE
@@ -126,8 +125,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            SQL_KW "sql"
+          SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- regression partial definition"

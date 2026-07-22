@@ -65,6 +65,262 @@ pub fn goto_definition(db: &dyn Db, position: InFile<TextSize>) -> SmallVec<[Loc
         return smallvec![location];
     }
 
+    if (ast::AccessMethod::can_cast(parent.kind())
+        || ast::Channel::can_cast(parent.kind())
+        || ast::ColumnName::can_cast(parent.kind())
+        || ast::ConstraintName::can_cast(parent.kind())
+        || ast::CteName::can_cast(parent.kind())
+        || ast::Cursor::can_cast(parent.kind())
+        || ast::Database::can_cast(parent.kind())
+        || ast::EventTrigger::can_cast(parent.kind())
+        || ast::Extension::can_cast(parent.kind())
+        || ast::ForeignDataWrapper::can_cast(parent.kind())
+        || ast::JsonPathName::can_cast(parent.kind())
+        || ast::Language::can_cast(parent.kind())
+        || ast::ParamName::can_cast(parent.kind())
+        || ast::Policy::can_cast(parent.kind())
+        || ast::PreparedStatement::can_cast(parent.kind())
+        || ast::Publication::can_cast(parent.kind())
+        || ast::Role::can_cast(parent.kind())
+        || ast::Rule::can_cast(parent.kind())
+        || ast::Savepoint::can_cast(parent.kind())
+        || ast::Schema::can_cast(parent.kind())
+        || ast::Server::can_cast(parent.kind())
+        || ast::Subscription::can_cast(parent.kind())
+        || ast::TableAlias::can_cast(parent.kind())
+        || ast::Tablespace::can_cast(parent.kind())
+        || ast::TransitionRelationName::can_cast(parent.kind())
+        || ast::Trigger::can_cast(parent.kind())
+        || ast::Window::can_cast(parent.kind()))
+        && let Some(location) = Location::from_node(file, &parent)
+    {
+        return smallvec![location];
+    }
+
+    if let Some(access_method_ref) = ast::AccessMethodRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) = resolve::resolve_access_method_ref(
+                db,
+                InFile::new(definition_file, &access_method_ref),
+            ) {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(channel_ref) = ast::ChannelRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_channel_ref(db, InFile::new(definition_file, &channel_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(cursor_ref) = ast::CursorRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_cursor_ref(db, InFile::new(definition_file, &cursor_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(event_trigger_ref) = ast::EventTriggerRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) = resolve::resolve_event_trigger_ref(
+                db,
+                InFile::new(definition_file, &event_trigger_ref),
+            ) {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(extension_ref) = ast::ExtensionRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_extension_ref(db, InFile::new(definition_file, &extension_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(foreign_data_wrapper_ref) = ast::ForeignDataWrapperRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) = resolve::resolve_foreign_data_wrapper_ref(
+                db,
+                InFile::new(definition_file, &foreign_data_wrapper_ref),
+            ) {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(json_path_name_ref) = ast::JsonPathNameRef::cast(parent.clone()) {
+        return resolve::resolve_json_path_name_ref(file, &json_path_name_ref).unwrap_or_default();
+    }
+
+    if let Some(column_name_ref) = ast::ColumnNameRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_column_name_ref(db, InFile::new(definition_file, &column_name_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(database_ref) = ast::DatabaseRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_database_ref(db, InFile::new(definition_file, &database_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(language_ref) = ast::LanguageRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_language_ref(db, InFile::new(definition_file, &language_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(policy_ref) = ast::PolicyRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_policy_ref(db, InFile::new(definition_file, &policy_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(publication_ref) = ast::PublicationRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_publication_ref(db, InFile::new(definition_file, &publication_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(role_ref) = ast::RoleRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_role_ref(db, InFile::new(definition_file, &role_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(rule_ref) = ast::RuleRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_rule_ref(db, InFile::new(definition_file, &rule_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(schema_ref) = ast::SchemaRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_schema_ref(db, InFile::new(definition_file, &schema_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(server_ref) = ast::ServerRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_server_ref(db, InFile::new(definition_file, &server_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(statement_ref) = ast::PreparedStatementRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) = resolve::resolve_prepared_statement_ref(
+                db,
+                InFile::new(definition_file, &statement_ref),
+            ) {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(savepoint_ref) = ast::SavepointRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_savepoint_ref(db, InFile::new(definition_file, &savepoint_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(subscription_ref) = ast::SubscriptionRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) = resolve::resolve_subscription_ref(
+                db,
+                InFile::new(definition_file, &subscription_ref),
+            ) {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(tablespace_ref) = ast::TablespaceRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_tablespace_ref(db, InFile::new(definition_file, &tablespace_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(trigger_ref) = ast::TriggerRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) =
+                resolve::resolve_trigger_ref(db, InFile::new(definition_file, &trigger_ref))
+            {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(vertex_table_ref) = ast::VertexTableRef::cast(parent.clone()) {
+        for definition_file in list_files(db, file) {
+            if let Some(locations) = resolve::resolve_vertex_table_ref(
+                db,
+                InFile::new(definition_file, &vertex_table_ref),
+            ) {
+                return locations;
+            }
+        }
+    }
+
+    if let Some(window_ref) = ast::WindowRef::cast(parent.clone()) {
+        return resolve::resolve_window_ref(file, &window_ref).unwrap_or_default();
+    }
+
     if let Some(name_ref) = ast::NameRef::cast(parent.clone()) {
         for definition_file in list_files(db, file) {
             if let Some(locations) =
@@ -6746,6 +7002,50 @@ select 1 from t, json_table(
     }
 
     #[test]
+    fn goto_json_table_plan_root_path() {
+        assert_snapshot!(goto("
+select * from json_table(
+  '{}'::jsonb, '$' as root
+  columns (
+    nested path '$.items[*]' as items columns (
+      value text path '$'
+    )
+  )
+  plan (ro$0ot outer items)
+);
+"), @"
+          ╭▸ 
+        3 │   '{}'::jsonb, '$' as root
+          │                       ──── 2. destination
+          ‡
+        9 │   plan (root outer items)
+          ╰╴         ─ 1. source
+        ");
+    }
+
+    #[test]
+    fn goto_json_table_plan_nested_path() {
+        assert_snapshot!(goto("
+select * from json_table(
+  '{}'::jsonb, '$' as root
+  columns (
+    nested path '$.items[*]' as items columns (
+      value text path '$'
+    )
+  )
+  plan (root outer ite$0ms)
+);
+"), @"
+          ╭▸ 
+        5 │     nested path '$.items[*]' as items columns (
+          │                                 ───── 2. destination
+          ‡
+        9 │   plan (root outer items)
+          ╰╴                     ─ 1. source
+        ");
+    }
+
+    #[test]
     fn goto_fn_call_column_from_cte() {
         assert_snapshot!(goto("
 with cte as (select 1 as a)
@@ -7357,6 +7657,16 @@ update t as u set a = t$0.a;
     }
 
     #[test]
+    fn goto_update_alias_hides_table_name_qualified_column() {
+        goto_not_found(
+            "
+create table t(a int);
+update t as u set a = t.a$0;
+",
+        );
+    }
+
+    #[test]
     fn goto_insert_alias_hides_table_name() {
         goto_not_found(
             "
@@ -7372,6 +7682,16 @@ insert into t as u values (1) returning t$0.a;
             "
 create table t(a int);
 delete from t as u where t$0.a = 1;
+",
+        );
+    }
+
+    #[test]
+    fn goto_delete_alias_hides_table_name_qualified_column() {
+        goto_not_found(
+            "
+create table t(a int);
+delete from t as u where t.a$0 = 1;
 ",
         );
     }

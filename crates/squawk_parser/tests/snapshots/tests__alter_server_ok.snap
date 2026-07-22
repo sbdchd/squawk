@@ -11,8 +11,7 @@ SOURCE_FILE
     SERVER_KW "server"
     WHITESPACE " "
     SERVER_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE "\n  "
     SET_VERSION
       VERSION_KW "version"
@@ -29,8 +28,7 @@ SOURCE_FILE
     SERVER_KW "server"
     WHITESPACE " "
     SERVER_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE "\n  "
     SET_VERSION
       VERSION_KW "version"
@@ -68,8 +66,7 @@ SOURCE_FILE
     SERVER_KW "server"
     WHITESPACE " "
     SERVER_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -77,8 +74,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_SERVER
@@ -87,8 +83,7 @@ SOURCE_FILE
     SERVER_KW "server"
     WHITESPACE " "
     SERVER_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -107,8 +102,7 @@ SOURCE_FILE
     SERVER_KW "server"
     WHITESPACE " "
     SERVER_REF
-      NAME_REF
-        IDENT "s"
+      IDENT "s"
     WHITESPACE "\n  "
     SERVER_RENAME_TO
       RENAME_KW "rename"
@@ -116,7 +110,6 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       SERVER
-        NAME
-          IDENT "t"
+        IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -95,10 +95,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    ALIAS
+    OPTIONAL_AS_ALIAS
       AS_KW "as"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -114,8 +114,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -135,10 +135,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    ALIAS
+    OPTIONAL_AS_ALIAS
       AS_KW "as"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "a"
     WHITESPACE "\n  "
     USING_CLAUSE
@@ -194,8 +194,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "foo"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "f"
       COMMA ","
       WHITESPACE " "
@@ -203,8 +203,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "b"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "a"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -228,8 +228,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "order_items"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "oi"
         WHITESPACE "\n  "
         JOIN
@@ -242,8 +242,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "orders"
             WHITESPACE " "
-            ALIAS
-              NAME
+            FROM_ALIAS
+              TABLE_ALIAS
                 IDENT "o"
           WHITESPACE " "
           ON_CLAUSE
@@ -279,8 +279,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "user_sessions"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "us"
     WHITESPACE "\n"
     USING_CLAUSE
@@ -290,8 +290,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "users"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "u"
       COMMA ","
       WHITESPACE "\n  "
@@ -343,8 +343,8 @@ SOURCE_FILE
                     IDENT "user_id"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "lh"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -396,8 +396,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "employees"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "e"
     WHITESPACE "\n"
     WHERE_CLAUSE
@@ -499,8 +499,7 @@ SOURCE_FILE
       OF_KW "of"
       WHITESPACE " "
       CURSOR_REF
-        NAME_REF
-          IDENT "invoice_cursor"
+        IDENT "invoice_cursor"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning"
@@ -551,7 +550,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "q"
         WHITESPACE " "
         AS_KW "as"
@@ -580,10 +579,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    ALIAS
+    OPTIONAL_AS_ALIAS
       AS_KW "as"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "a"
     WHITESPACE "\n  "
     USING_CLAUSE
@@ -593,10 +592,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "q"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "d"
     WHITESPACE "\n  "
     WHERE_CLAUSE
@@ -627,7 +626,7 @@ SOURCE_FILE
       RECURSIVE_KW "recursive"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "q"
         WHITESPACE " "
         AS_KW "as"
@@ -656,10 +655,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "t"
     WHITESPACE " "
-    ALIAS
+    OPTIONAL_AS_ALIAS
       AS_KW "as"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "a"
     WHITESPACE "\n  "
     USING_CLAUSE
@@ -669,10 +668,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "q"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "d"
     WHITESPACE "\n  "
     WHERE_CLAUSE
@@ -703,7 +702,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t2"
         WHITESPACE " "
         AS_KW "as"
@@ -715,7 +714,7 @@ SOURCE_FILE
             WITH_KW "with"
             WHITESPACE " "
             WITH_TABLE
-              NAME
+              CTE_NAME
                 IDENT "t"
               WHITESPACE " "
               AS_KW "as"
@@ -773,7 +772,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -998,8 +997,7 @@ SOURCE_FILE
       OF_KW "OF"
       WHITESPACE " "
       CURSOR_REF
-        NAME_REF
-          IDENT "c_tasks"
+        IDENT "c_tasks"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
@@ -1007,7 +1005,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "delete_batch"
         WHITESPACE " "
         AS_KW "AS"
@@ -1034,10 +1032,10 @@ SOURCE_FILE
               NAME_REF
                 IDENT "user_logs"
               WHITESPACE " "
-              ALIAS
+              FROM_ALIAS
                 AS_KW "AS"
                 WHITESPACE " "
-                NAME
+                TABLE_ALIAS
                   IDENT "l"
           WHITESPACE "\n    "
           WHERE_CLAUSE
@@ -1095,10 +1093,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "user_logs"
     WHITESPACE " "
-    ALIAS
+    OPTIONAL_AS_ALIAS
       AS_KW "AS"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "dl"
     WHITESPACE "\n  "
     USING_CLAUSE
@@ -1108,10 +1106,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "delete_batch"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "del"
     WHITESPACE "\n  "
     WHERE_CLAUSE

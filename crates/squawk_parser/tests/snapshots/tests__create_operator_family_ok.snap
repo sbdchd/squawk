@@ -22,8 +22,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -50,7 +49,6 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     SEMICOLON ";"
   WHITESPACE "\n\n"

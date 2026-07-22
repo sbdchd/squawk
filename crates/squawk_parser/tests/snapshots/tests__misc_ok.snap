@@ -381,8 +381,8 @@ SOURCE_FILE
                 POSITIONAL_PARAM "$1"
             R_PAREN ")"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "query"
     WHITESPACE "\n"
     WHERE_CLAUSE
@@ -516,7 +516,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "query_embedding"
         WHITESPACE " "
         AS_KW "AS"
@@ -760,10 +760,10 @@ SOURCE_FILE
             WHITESPACE "\n"
             R_PAREN ")"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "x"
           COLUMN_LIST
             L_PAREN "("
@@ -839,7 +839,7 @@ SOURCE_FILE
         PARAM_IN_OUT
           INOUT_KW "INOUT"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "p_state"
         WHITESPACE " "
         ARRAY_TYPE
@@ -856,7 +856,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "IN"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "p_hour"
         WHITESPACE " "
         PATH_TYPE
@@ -870,7 +870,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "IN"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "p_count"
         WHITESPACE " "
         PATH_TYPE
@@ -898,8 +898,7 @@ SOURCE_FILE
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            IDENT "plpgsql"
+          IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "AS"
@@ -1238,7 +1237,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "IN"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "p_left"
         WHITESPACE " "
         ARRAY_TYPE
@@ -1255,7 +1254,7 @@ SOURCE_FILE
         PARAM_IN
           IN_KW "IN"
         WHITESPACE " "
-        NAME
+        PARAM_NAME
           IDENT "p_right"
         WHITESPACE " "
         ARRAY_TYPE
@@ -1292,8 +1291,7 @@ SOURCE_FILE
         LANGUAGE_KW "LANGUAGE"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            IDENT "plpgsql"
+          IDENT "plpgsql"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/postgres-partitioning-with-a-default-partition"
@@ -1555,7 +1553,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "partition_data"
         WHITESPACE " "
         AS_KW "AS"
@@ -1699,7 +1697,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "partition_data"
         WHITESPACE " "
         AS_KW "AS"
@@ -2131,8 +2129,7 @@ SOURCE_FILE
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "pgvector"
+      IDENT "pgvector"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Add an emedding column to the table"
@@ -2154,7 +2151,7 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "COLUMN"
       WHITESPACE " "
-      NAME
+      COLUMN_NAME
         IDENT "vec"
       WHITESPACE " "
       PATH_TYPE
@@ -2317,7 +2314,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        NAME
+        PARAM_NAME
           IDENT "query_text"
         WHITESPACE " "
         PATH_TYPE
@@ -2514,8 +2511,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "brin"
+        IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -2610,8 +2606,8 @@ SOURCE_FILE
                   INT_NUMBER "1000000"
               R_PAREN ")"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2802,8 +2798,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "brin"
+        IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -2923,8 +2918,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "brin"
+        IDENT "brin"
     WHITESPACE " "
     PARTITION_ITEM_LIST
       L_PAREN "("
@@ -3022,7 +3016,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        NAME
+        PARAM_NAME
           IDENT "start_time"
         WHITESPACE " "
         PATH_TYPE
@@ -3033,7 +3027,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       PARAM
-        NAME
+        PARAM_NAME
           IDENT "end_time"
         WHITESPACE " "
         PATH_TYPE
@@ -3057,8 +3051,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            IDENT "plpgsql"
+          IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"
@@ -3161,7 +3154,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        NAME
+        PARAM_NAME
           PATH_KW "path"
         WHITESPACE " "
         PATH_TYPE
@@ -3185,8 +3178,7 @@ SOURCE_FILE
         LANGUAGE_KW "language"
         WHITESPACE " "
         LANGUAGE_REF
-          NAME_REF
-            IDENT "plpgsql"
+          IDENT "plpgsql"
       WHITESPACE " "
       AS_FUNC_OPTION
         AS_KW "as"
@@ -3332,8 +3324,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER
-      NAME
-        IDENT "wasm_wrapper"
+      IDENT "wasm_wrapper"
     WHITESPACE "\n  "
     FDW_OPTION_LIST
       FDW_OPTION
@@ -3361,8 +3352,7 @@ SOURCE_FILE
     SERVER_KW "server"
     WHITESPACE " "
     SERVER
-      NAME
-        IDENT "cal_server"
+      IDENT "cal_server"
     WHITESPACE "\n  "
     FOREIGN_KW "foreign"
     WHITESPACE " "
@@ -3371,8 +3361,7 @@ SOURCE_FILE
     WRAPPER_KW "wrapper"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "wasm_wrapper"
+      IDENT "wasm_wrapper"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -3435,8 +3424,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "cal"
+        IDENT "cal"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -3476,8 +3464,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "cal_server"
+        IDENT "cal_server"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -3531,8 +3518,7 @@ SOURCE_FILE
       SERVER_KW "server"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "cal_server"
+        IDENT "cal_server"
     WHITESPACE "\n  "
     ALTER_OPTION_LIST
       OPTIONS_KW "options"
@@ -3635,8 +3621,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "event_types"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "t"
         WHITESPACE "\n  "
         JOIN
@@ -3675,8 +3661,8 @@ SOURCE_FILE
                               JSON_KW "json"
                   R_PAREN ")"
               WHITESPACE " "
-              ALIAS
-                NAME
+              FROM_ALIAS
+                TABLE_ALIAS
                   IDENT "etg"
             WHITESPACE "\n  "
             JOIN
@@ -3714,8 +3700,8 @@ SOURCE_FILE
                                 JSON_KW "json"
                     R_PAREN ")"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "et"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3815,8 +3801,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "bookings"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "t"
         WHITESPACE "\n  "
         JOIN
@@ -3854,8 +3840,8 @@ SOURCE_FILE
                             JSON_KW "json"
                 R_PAREN ")"
             WHITESPACE " "
-            ALIAS
-              NAME
+            FROM_ALIAS
+              TABLE_ALIAS
                 IDENT "bk"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -4427,8 +4413,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "events_core"
             WHITESPACE " "
-            ALIAS
-              NAME
+            FROM_ALIAS
+              TABLE_ALIAS
                 IDENT "e"
           WHITESPACE "\n"
           JOIN
@@ -4441,8 +4427,8 @@ SOURCE_FILE
               NAME_REF
                 IDENT "events_metadata"
               WHITESPACE " "
-              ALIAS
-                NAME
+              FROM_ALIAS
+                TABLE_ALIAS
                   IDENT "m"
             WHITESPACE "\n  "
             ON_CLAUSE
@@ -4475,8 +4461,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "events_payload"
             WHITESPACE " "
-            ALIAS
-              NAME
+            FROM_ALIAS
+              TABLE_ALIAS
                 IDENT "p"
           WHITESPACE "\n  "
           ON_CLAUSE
@@ -4536,8 +4522,7 @@ SOURCE_FILE
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "cstore_fdw"
+      IDENT "cstore_fdw"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SERVER
@@ -4546,8 +4531,7 @@ SOURCE_FILE
     SERVER_KW "SERVER"
     WHITESPACE " "
     SERVER
-      NAME
-        IDENT "cstore_server"
+      IDENT "cstore_server"
     WHITESPACE " "
     FOREIGN_KW "FOREIGN"
     WHITESPACE " "
@@ -4556,8 +4540,7 @@ SOURCE_FILE
     WRAPPER_KW "WRAPPER"
     WHITESPACE " "
     FOREIGN_DATA_WRAPPER_REF
-      NAME_REF
-        IDENT "cstore_fdw"
+      IDENT "cstore_fdw"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -4613,8 +4596,7 @@ SOURCE_FILE
       SERVER_KW "SERVER"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "cstore_server"
+        IDENT "cstore_server"
     WHITESPACE "\n"
     ALTER_OPTION_LIST
       OPTIONS_KW "OPTIONS"
@@ -4634,8 +4616,7 @@ SOURCE_FILE
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "pg_analytics"
+      IDENT "pg_analytics"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -4692,8 +4673,7 @@ SOURCE_FILE
       SERVER_KW "SERVER"
       WHITESPACE " "
       SERVER_REF
-        NAME_REF
-          IDENT "parquet_server"
+        IDENT "parquet_server"
     WHITESPACE "\n"
     ALTER_OPTION_LIST
       OPTIONS_KW "OPTIONS"
@@ -4714,8 +4694,7 @@ SOURCE_FILE
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "pg_duckdb"
+      IDENT "pg_duckdb"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -4770,8 +4749,7 @@ SOURCE_FILE
       USING_KW "USING"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "duckdb"
+        IDENT "duckdb"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -4780,8 +4758,7 @@ SOURCE_FILE
     EXTENSION_KW "EXTENSION"
     WHITESPACE " "
     EXTENSION
-      NAME
-        IDENT "pg_mooncake"
+      IDENT "pg_mooncake"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -4836,8 +4813,7 @@ SOURCE_FILE
       USING_KW "USING"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "columnstore"
+        IDENT "columnstore"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Instead of this complex self-join"
@@ -4884,8 +4860,8 @@ SOURCE_FILE
                   NAME_REF
                     IDENT "monthly_revenues"
                   WHITESPACE " "
-                  ALIAS
-                    NAME
+                  FROM_ALIAS
+                    TABLE_ALIAS
                       IDENT "m2"
               WHITESPACE " \n    "
               WHERE_CLAUSE
@@ -4953,8 +4929,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "monthly_revenues"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "m1"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5180,7 +5156,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "monthly_stats"
         WHITESPACE " "
         AS_KW "AS"
@@ -5299,7 +5275,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n"
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "user_segments"
         WHITESPACE " "
         AS_KW "AS"
@@ -5441,8 +5417,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "events"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "e"
         WHITESPACE "\n"
         JOIN
@@ -5453,8 +5429,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "user_segments"
             WHITESPACE " "
-            ALIAS
-              NAME
+            FROM_ALIAS
+              TABLE_ALIAS
                 IDENT "s"
           WHITESPACE "\n  "
           ON_CLAUSE
@@ -5742,8 +5718,8 @@ SOURCE_FILE
           WHITESPACE "\n"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "t"
     WHITESPACE "\n"
     GROUP_BY_CLAUSE
@@ -5806,8 +5782,8 @@ SOURCE_FILE
           WHITESPACE "\n"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "t"
     WHITESPACE "\n"
     GROUP_BY_CLAUSE
@@ -6022,8 +5998,7 @@ SOURCE_FILE
       USING_KW "USING"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "brin"
+        IDENT "brin"
     PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
@@ -6174,8 +6149,8 @@ SOURCE_FILE
               NAME_REF
                 IDENT "products"
               WHITESPACE " "
-              ALIAS
-                NAME
+              FROM_ALIAS
+                TABLE_ALIAS
                   IDENT "p"
             WHITESPACE "\n    "
             JOIN
@@ -6186,8 +6161,8 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "product_orders"
                 WHITESPACE " "
-                ALIAS
-                  NAME
+                FROM_ALIAS
+                  TABLE_ALIAS
                     IDENT "po"
               WHITESPACE " "
               ON_CLAUSE
@@ -6218,8 +6193,8 @@ SOURCE_FILE
               NAME_REF
                 IDENT "orders"
               WHITESPACE " "
-              ALIAS
-                NAME
+              FROM_ALIAS
+                TABLE_ALIAS
                   IDENT "o"
             WHITESPACE " "
             ON_CLAUSE
@@ -6695,7 +6670,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "baseline_stats"
         WHITESPACE " "
         AS_KW "AS"
@@ -6862,8 +6837,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "turbine_metrics"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "t"
         WHITESPACE "\n"
         JOIN
@@ -6874,8 +6849,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "baseline_stats"
             WHITESPACE " "
-            ALIAS
-              NAME
+            FROM_ALIAS
+              TABLE_ALIAS
                 IDENT "b"
           WHITESPACE " "
           JOIN_USING_CLAUSE
@@ -7088,7 +7063,7 @@ SOURCE_FILE
       WITH_KW "WITH"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "price_analysis"
         WHITESPACE " "
         AS_KW "AS"

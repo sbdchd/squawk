@@ -2,7 +2,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use squawk_syntax::{
     Parse, SourceFile,
-    ast::{self, AstNode},
+    ast::{self, AstNode, NameLike},
 };
 
 use crate::{Linter, Rule, Version, Violation};
@@ -72,7 +72,6 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             && let Some(constraint_name) = check
                                 .constraint_name_clause()
                                 .and_then(|clause| clause.constraint_name())
-                                .and_then(|name| name.name())
                             && let Some(expr) = check.expr()
                             && let Some(column) = is_not_null_check(&expr)
                         {
@@ -117,7 +116,8 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         };
 
                         if is_pg12_plus
-                            && let Some(column) = alter_column.name_ref().map(|x| x.text())
+                            && let Some(column) =
+                                alter_column.column_name_ref().map(|column| column.text())
                         {
                             let table_column = TableColumn {
                                 table: table.clone(),

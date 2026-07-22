@@ -71,10 +71,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "foo"
     WHITESPACE " "
-    ALIAS
+    OPTIONAL_AS_ALIAS
       AS_KW "as"
       WHITESPACE " "
-      NAME
+      TABLE_ALIAS
         IDENT "f"
     WHITESPACE "\n  "
     USING_ON_CLAUSE
@@ -84,10 +84,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "bar"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "b"
       WHITESPACE "\n    "
       ON_CLAUSE
@@ -195,8 +195,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "foo"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "f"
     WHITESPACE "\n  "
     USING_ON_CLAUSE
@@ -206,8 +206,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "bar"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "b"
       WHITESPACE "\n    "
       ON_CLAUSE
@@ -472,10 +472,10 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "foo"
                     WHITESPACE " "
-                    ALIAS
+                    FROM_ALIAS
                       AS_KW "as"
                       WHITESPACE " "
-                      NAME
+                      TABLE_ALIAS
                         IDENT "f"
                   WHITESPACE " "
                   ON_CLAUSE
@@ -499,10 +499,10 @@ SOURCE_FILE
                           IDENT "id"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "as"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "u"
       WHITESPACE "\n    "
       ON_CLAUSE
@@ -575,8 +575,8 @@ SOURCE_FILE
                   IDENT "bar"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "u"
       WHITESPACE "\n    "
       ON_CLAUSE
@@ -1561,7 +1561,7 @@ SOURCE_FILE
       WITH_KW "with"
       WHITESPACE " "
       WITH_TABLE
-        NAME
+        CTE_NAME
           IDENT "t"
         WHITESPACE " "
         AS_KW "as"
@@ -1652,8 +1652,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "customer_account"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "ca"
     WHITESPACE "\n"
     USING_ON_CLAUSE
@@ -1663,8 +1663,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "recent_transactions"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "t"
       WHITESPACE "\n"
       ON_CLAUSE
@@ -1779,8 +1779,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "customer_account"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "ca"
     WHITESPACE "\n"
     USING_ON_CLAUSE
@@ -1811,10 +1811,10 @@ SOURCE_FILE
                   IDENT "recent_transactions"
           R_PAREN ")"
         WHITESPACE " "
-        ALIAS
+        FROM_ALIAS
           AS_KW "AS"
           WHITESPACE " "
-          NAME
+          TABLE_ALIAS
             IDENT "t"
       WHITESPACE "\n"
       ON_CLAUSE
@@ -1929,8 +1929,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "wines"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "w"
     WHITESPACE "\n"
     USING_ON_CLAUSE
@@ -1940,8 +1940,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "wine_stock_changes"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "s"
       WHITESPACE "\n"
       ON_CLAUSE
@@ -2121,8 +2121,8 @@ SOURCE_FILE
             NAME_REF
               IDENT "wines"
     WHITESPACE " "
-    ALIAS
-      NAME
+    OPTIONAL_AS_ALIAS
+      TABLE_ALIAS
         IDENT "w"
     WHITESPACE "\n"
     USING_ON_CLAUSE
@@ -2132,8 +2132,8 @@ SOURCE_FILE
         NAME_REF
           IDENT "new_wine_list"
         WHITESPACE " "
-        ALIAS
-          NAME
+        FROM_ALIAS
+          TABLE_ALIAS
             IDENT "s"
       WHITESPACE "\n"
       ON_CLAUSE

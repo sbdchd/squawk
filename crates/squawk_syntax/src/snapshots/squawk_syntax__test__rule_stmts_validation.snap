@@ -9,8 +9,7 @@ SOURCE_FILE@0..103
     RULE_KW@7..11 "rule"
     WHITESPACE@11..12 " "
     RULE@12..13
-      NAME@12..13
-        IDENT@12..13 "r"
+      IDENT@12..13 "r"
     WHITESPACE@13..14 " "
     AS_KW@14..16 "as"
     WHITESPACE@16..17 " "

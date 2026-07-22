@@ -27,6 +27,7 @@ pub enum LocationKind {
     ForeignDataWrapper,
     Function,
     Index,
+    JsonPath,
     Language,
     NamedArgParameter,
     Operator,

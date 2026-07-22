@@ -12,8 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "myschema"
+        IDENT "myschema"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -23,14 +22,12 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
       WHITESPACE " "
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "foo"
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -40,8 +37,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
       WHITESPACE " "
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
@@ -56,8 +52,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
       WHITESPACE " "
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
@@ -72,8 +67,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
       WHITESPACE " "
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
@@ -90,8 +84,7 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE
-        NAME
-          IDENT "foo"
+        IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -108,8 +101,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -126,14 +118,12 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
       WHITESPACE " "
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "bar"
+        IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_SCHEMA
@@ -152,8 +142,7 @@ SOURCE_FILE
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE
-        NAME
-          IDENT "bar"
+        IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -163,8 +152,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     CREATE_TABLE
       CREATE_KW "create"
@@ -269,8 +257,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "myschema"
+      IDENT "myschema"
     SEMICOLON ";"
   WHITESPACE "\n"
   DROP_SCHEMA
@@ -279,8 +266,7 @@ SOURCE_FILE
     SCHEMA_KW "schema"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "myschema"
+      IDENT "myschema"
     WHITESPACE " "
     CASCADE_KW "cascade"
     SEMICOLON ";"
@@ -296,8 +282,7 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "myschema"
+      IDENT "myschema"
     WHITESPACE " "
     RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -313,18 +298,15 @@ SOURCE_FILE
       EXISTS_KW "exists"
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "a"
+      IDENT "a"
     COMMA ","
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "b"
+      IDENT "b"
     COMMA ","
     WHITESPACE " "
     SCHEMA_REF
-      NAME_REF
-        IDENT "c"
+      IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -334,14 +316,12 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "schema_name"
+        IDENT "schema_name"
       WHITESPACE " "
       AUTHORIZATION_KW "authorization"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "user_name"
+        IDENT "user_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_schema_with_sequence"
@@ -353,8 +333,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     CREATE_SEQUENCE
       CREATE_KW "create"
@@ -377,8 +356,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAMED_SCHEMA
       SCHEMA
-        NAME
-          IDENT "s"
+        IDENT "s"
     WHITESPACE "\n  "
     CREATE_TRIGGER
       CREATE_KW "create"
@@ -386,8 +364,7 @@ SOURCE_FILE
       TRIGGER_KW "trigger"
       WHITESPACE " "
       TRIGGER
-        NAME
-          IDENT "t"
+        IDENT "t"
       WHITESPACE " "
       TIMING
         AFTER_KW "after"
@@ -514,8 +491,7 @@ SOURCE_FILE
     ROLE_KW "role"
     WHITESPACE " "
     ROLE_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   SET

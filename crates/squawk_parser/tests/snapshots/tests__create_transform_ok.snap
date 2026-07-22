@@ -21,8 +21,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "l"
+      IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -96,8 +95,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "l"
+      IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -129,7 +127,7 @@ SOURCE_FILE
         PARAM_LIST
           L_PAREN "("
           PARAM
-            NAME
+            PARAM_NAME
               IDENT "a"
             WHITESPACE " "
             PATH_TYPE
@@ -177,8 +175,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "l"
+      IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -219,8 +216,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "l"
+      IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "
@@ -261,8 +257,7 @@ SOURCE_FILE
     LANGUAGE_KW "language"
     WHITESPACE " "
     LANGUAGE_REF
-      NAME_REF
-        IDENT "l"
+      IDENT "l"
     WHITESPACE " "
     L_PAREN "("
     WHITESPACE "\n  "

@@ -22,8 +22,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -73,8 +72,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -149,7 +147,7 @@ SOURCE_FILE
                 PARAM_IN
                   IN_KW "in"
                 WHITESPACE " "
-                NAME
+                PARAM_NAME
                   IDENT "a"
                 WHITESPACE " "
                 PATH_TYPE
@@ -214,8 +212,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -269,8 +266,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -332,8 +328,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -381,8 +376,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     ADD_OP_CLASS_OPTIONS
       ADD_KW "add"
@@ -456,8 +450,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -507,8 +500,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -550,8 +542,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -601,8 +592,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -644,8 +634,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE " "
     DROP_OP_CLASS_OPTIONS
       DROP_KW "drop"
@@ -712,8 +701,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE "\n  "
     OP_FAMILY_RENAME_TO
       RENAME_KW "rename"
@@ -746,8 +734,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -755,8 +742,7 @@ SOURCE_FILE
       TO_KW "to"
       WHITESPACE " "
       ROLE_REF
-        NAME_REF
-          IDENT "u"
+        IDENT "u"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_OPERATOR_FAMILY
@@ -776,8 +762,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE "\n  "
     OWNER_TO
       OWNER_KW "owner"
@@ -812,8 +797,7 @@ SOURCE_FILE
       USING_KW "using"
       WHITESPACE " "
       ACCESS_METHOD_REF
-        NAME_REF
-          IDENT "i"
+        IDENT "i"
     WHITESPACE "\n  "
     SET_SCHEMA
       SET_KW "set"
@@ -821,7 +805,6 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "s"
+        IDENT "s"
     SEMICOLON ";"
   WHITESPACE "\n\n"

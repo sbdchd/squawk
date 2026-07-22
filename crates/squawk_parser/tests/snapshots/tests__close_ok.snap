@@ -9,8 +9,7 @@ SOURCE_FILE
     CLOSE_KW "close"
     WHITESPACE " "
     CURSOR_REF
-      NAME_REF
-        IDENT "foo"
+      IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n"
   CLOSE

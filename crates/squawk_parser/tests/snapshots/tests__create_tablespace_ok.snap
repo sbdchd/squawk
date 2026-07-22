@@ -11,8 +11,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE
-      NAME
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " "
     LOCATION_KW "location"
     WHITESPACE " "
@@ -28,8 +27,7 @@ SOURCE_FILE
     TABLESPACE_KW "tablespace"
     WHITESPACE " "
     TABLESPACE
-      NAME
-        IDENT "t"
+      IDENT "t"
     WHITESPACE " \n  "
     OWNER_KW "owner"
     WHITESPACE " "

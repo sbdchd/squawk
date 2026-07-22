@@ -11,8 +11,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION
-      NAME
-        IDENT "p"
+      IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_tables"
@@ -23,8 +22,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -66,8 +64,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " \n  "
@@ -218,8 +215,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE "\n  "
     FOR_KW "for"
     WHITESPACE " "
@@ -231,8 +227,7 @@ SOURCE_FILE
       SCHEMA_KW "schema"
       WHITESPACE " "
       SCHEMA_REF
-        NAME_REF
-          IDENT "a"
+        IDENT "a"
     COMMA ","
     WHITESPACE " "
     PUBLICATION_OBJECT
@@ -263,8 +258,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION
-      NAME
-        IDENT "pub"
+      IDENT "pub"
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
@@ -292,8 +286,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "
@@ -326,8 +319,7 @@ SOURCE_FILE
     PUBLICATION_KW "publication"
     WHITESPACE " "
     PUBLICATION
-      NAME
-        IDENT "p"
+      IDENT "p"
     WHITESPACE " "
     FOR_KW "for"
     WHITESPACE " "

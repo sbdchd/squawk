@@ -35,7 +35,7 @@ SOURCE_FILE@0..64
       WITH_KW@28..32 "with"
       WHITESPACE@32..33 " "
       WITH_TABLE@33..46
-        NAME@33..34
+        CTE_NAME@33..34
           IDENT@33..34 "t"
         WHITESPACE@34..35 " "
         AS_KW@35..37 "as"

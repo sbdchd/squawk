@@ -9,8 +9,7 @@ SOURCE_FILE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "fooplan"
+      IDENT "fooplan"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -87,8 +86,7 @@ SOURCE_FILE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "usrrptplan"
+      IDENT "usrrptplan"
     WHITESPACE " "
     PARAM_LIST
       L_PAREN "("
@@ -117,8 +115,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "users"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "u"
         COMMA ","
         WHITESPACE " "
@@ -126,8 +124,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "logs"
           WHITESPACE " "
-          ALIAS
-            NAME
+          FROM_ALIAS
+            TABLE_ALIAS
               IDENT "l"
       WHITESPACE " "
       WHERE_CLAUSE
@@ -183,8 +181,7 @@ SOURCE_FILE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
@@ -193,7 +190,7 @@ SOURCE_FILE
         WITH_KW "with"
         WHITESPACE " "
         WITH_TABLE
-          NAME
+          CTE_NAME
             IDENT "t"
           WHITESPACE " "
           AS_KW "as"
@@ -230,8 +227,7 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -279,8 +275,7 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -315,8 +310,7 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -410,8 +404,7 @@ SOURCE_FILE
     PREPARE_KW "prepare"
     WHITESPACE " "
     PREPARED_STATEMENT
-      NAME
-        IDENT "foo"
+      IDENT "foo"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "

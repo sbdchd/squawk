@@ -277,8 +277,8 @@ fn create_cte_table_symbol(with_table: ast::WithTable) -> Option<DocumentSymbol>
 
 fn create_schema_symbol(create_schema: ast::CreateSchema) -> Option<DocumentSymbol> {
     let name_node = create_schema.schema_name()?;
-    let name = name_node.syntax().text().to_string();
-    let focus_range = name_node.syntax().text_range();
+    let name = name_node.text().to_string();
+    let focus_range = name_node.text_range();
 
     let full_range = create_schema.syntax().text_range();
 
@@ -594,7 +594,7 @@ fn create_statistics_symbol(
 }
 
 fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentSymbol> {
-    let name_node = create_trigger.trigger()?.name()?;
+    let name_node = create_trigger.trigger()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_trigger.syntax().text_range();
@@ -613,7 +613,7 @@ fn create_trigger_symbol(create_trigger: ast::CreateTrigger) -> Option<DocumentS
 fn create_event_trigger_symbol(
     create_event_trigger: ast::CreateEventTrigger,
 ) -> Option<DocumentSymbol> {
-    let name_node = create_event_trigger.event_trigger()?.name()?;
+    let name_node = create_event_trigger.event_trigger()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_event_trigger.syntax().text_range();
@@ -630,7 +630,7 @@ fn create_event_trigger_symbol(
 }
 
 fn create_tablespace_symbol(create_tablespace: ast::CreateTablespace) -> Option<DocumentSymbol> {
-    let name_node = create_tablespace.tablespace()?.name()?;
+    let name_node = create_tablespace.tablespace()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_tablespace.syntax().text_range();
@@ -647,7 +647,7 @@ fn create_tablespace_symbol(create_tablespace: ast::CreateTablespace) -> Option<
 }
 
 fn create_database_symbol(create_database: ast::CreateDatabase) -> Option<DocumentSymbol> {
-    let name_node = create_database.database()?.name()?;
+    let name_node = create_database.database()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_database.syntax().text_range();
@@ -664,7 +664,7 @@ fn create_database_symbol(create_database: ast::CreateDatabase) -> Option<Docume
 }
 
 fn create_server_symbol(create_server: ast::CreateServer) -> Option<DocumentSymbol> {
-    let name_node = create_server.server()?.name()?;
+    let name_node = create_server.server()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_server.syntax().text_range();
@@ -681,7 +681,7 @@ fn create_server_symbol(create_server: ast::CreateServer) -> Option<DocumentSymb
 }
 
 fn create_extension_symbol(create_extension: ast::CreateExtension) -> Option<DocumentSymbol> {
-    let name_node = create_extension.extension()?.name()?;
+    let name_node = create_extension.extension()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_extension.syntax().text_range();
@@ -698,11 +698,11 @@ fn create_extension_symbol(create_extension: ast::CreateExtension) -> Option<Doc
 }
 
 fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
-    let name_node = create_role.role()?.name()?;
-    let name = name_node.syntax().text().to_string();
+    let role = create_role.role()?;
+    let name = role.syntax().text().to_string();
 
     let full_range = create_role.syntax().text_range();
-    let focus_range = name_node.syntax().text_range();
+    let focus_range = role.syntax().text_range();
 
     Some(DocumentSymbol {
         name,
@@ -715,7 +715,7 @@ fn create_role_symbol(create_role: ast::CreateRole) -> Option<DocumentSymbol> {
 }
 
 fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
-    let name_node = create_rule.rule()?.name()?;
+    let name_node = create_rule.rule()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_rule.syntax().text_range();
@@ -732,7 +732,7 @@ fn create_rule_symbol(create_rule: ast::CreateRule) -> Option<DocumentSymbol> {
 }
 
 fn create_policy_symbol(create_policy: ast::CreatePolicy) -> Option<DocumentSymbol> {
-    let name_node = create_policy.policy()?.name()?;
+    let name_node = create_policy.policy()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = create_policy.syntax().text_range();
@@ -855,7 +855,7 @@ fn create_variant_symbol(variant: ast::Variant) -> Option<DocumentSymbol> {
 }
 
 fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol> {
-    let name_node = declare.cursor()?.name()?;
+    let name_node = declare.cursor()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = declare.syntax().text_range();
@@ -872,7 +872,7 @@ fn create_declare_cursor_symbol(declare: ast::Declare) -> Option<DocumentSymbol>
 }
 
 fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
-    let name_node = prepare.prepared_statement()?.name()?;
+    let name_node = prepare.name()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = prepare.syntax().text_range();
@@ -889,7 +889,7 @@ fn create_prepare_symbol(prepare: ast::Prepare) -> Option<DocumentSymbol> {
 }
 
 fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
-    let name_node = listen.channel()?.name()?;
+    let name_node = listen.channel()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = listen.syntax().text_range();
@@ -906,7 +906,7 @@ fn create_listen_symbol(listen: ast::Listen) -> Option<DocumentSymbol> {
 }
 
 fn create_savepoint_symbol(savepoint: ast::SavepointCreate) -> Option<DocumentSymbol> {
-    let name_node = savepoint.savepoint()?.name()?;
+    let name_node = savepoint.savepoint()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = savepoint.syntax().text_range();
@@ -923,7 +923,7 @@ fn create_savepoint_symbol(savepoint: ast::SavepointCreate) -> Option<DocumentSy
 }
 
 fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
-    let name_node = notify.channel_ref()?.name_ref()?;
+    let name_node = notify.channel_ref()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = notify.syntax().text_range();
@@ -940,7 +940,7 @@ fn create_notify_symbol(notify: ast::Notify) -> Option<DocumentSymbol> {
 }
 
 fn create_unlisten_symbol(unlisten: ast::Unlisten) -> Option<DocumentSymbol> {
-    let name_node = unlisten.channel_ref()?.name_ref()?;
+    let name_node = unlisten.channel_ref()?;
     let name = name_node.syntax().text().to_string();
 
     let full_range = unlisten.syntax().text_range();

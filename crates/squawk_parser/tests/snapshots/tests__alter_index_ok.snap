@@ -80,8 +80,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -111,8 +110,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_params"
@@ -326,8 +324,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -354,8 +351,7 @@ SOURCE_FILE
       EXTENSION_KW "extension"
       WHITESPACE " "
       EXTENSION_REF
-        NAME_REF
-          IDENT "e"
+        IDENT "e"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alter_column"
@@ -421,6 +417,42 @@ SOURCE_FILE
       LITERAL
         INT_NUMBER "100"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_INDEX
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    INDEX_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          NAME_REF
+            IDENT "i"
+    WHITESPACE " "
+    ALTER_SET_STATISTICS
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "id"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "n_distinct"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            ATTRIBUTE_VALUE
+              LITERAL
+                INT_NUMBER "100"
+          R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_tablespace"
   WHITESPACE "\n"
@@ -437,8 +469,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
       WHITESPACE " \n  "
       SET_TABLESPACE
         SET_KW "set"
@@ -446,8 +477,7 @@ SOURCE_FILE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -463,8 +493,7 @@ SOURCE_FILE
       TABLESPACE_KW "tablespace"
       WHITESPACE " "
       TABLESPACE_REF
-        NAME_REF
-          IDENT "t"
+        IDENT "t"
       WHITESPACE " \n  "
       OWNED_BY_ROLES
         OWNED_KW "owned"
@@ -473,13 +502,11 @@ SOURCE_FILE
         WHITESPACE " "
         ROLE_REF_LIST
           ROLE_REF
-            NAME_REF
-              IDENT "r"
+            IDENT "r"
           COMMA ","
           WHITESPACE " "
           ROLE_REF
-            NAME_REF
-              IDENT "s"
+            IDENT "s"
       WHITESPACE "\n  "
       SET_TABLESPACE
         SET_KW "set"
@@ -487,8 +514,7 @@ SOURCE_FILE
         TABLESPACE_KW "tablespace"
         WHITESPACE " "
         TABLESPACE_REF
-          NAME_REF
-            IDENT "n"
+          IDENT "n"
       WHITESPACE "\n  "
       NOWAIT_KW "nowait"
     SEMICOLON ";"
