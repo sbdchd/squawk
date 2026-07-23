@@ -6,7 +6,7 @@ create database d
   with owner 'foo'
   template = 'foo'
   encoding = 'utf-8'
-  strategy = 10
+  strategy = wal_log
   locale = 'fr_FR'
   lc_collate = 'fr_FR'
   lc_ctyep = 10

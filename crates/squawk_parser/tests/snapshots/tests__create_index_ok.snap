@@ -181,7 +181,7 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "strength"
             WHITESPACE " "
             EQ "="
@@ -191,7 +191,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "variant"
             WHITESPACE " "
             EQ "="
@@ -214,7 +214,7 @@ SOURCE_FILE
         ATTRIBUTE_LIST
           L_PAREN "("
           ATTRIBUTE_OPTION
-            NAME
+            ATTRIBUTE_NAME
               IDENT "strength"
             WHITESPACE " "
             EQ "="
@@ -322,7 +322,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "foo"
           WHITESPACE " "
           EQ "="
@@ -336,7 +336,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "buzz"
         R_PAREN ")"
     WHITESPACE "\n  "
@@ -540,7 +540,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "deduplicate_items"
           WHITESPACE " "
           EQ "="
@@ -688,7 +688,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "fillfactor"
           WHITESPACE " "
           EQ "="
@@ -738,7 +738,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "fastupdate"
           WHITESPACE " "
           EQ "="

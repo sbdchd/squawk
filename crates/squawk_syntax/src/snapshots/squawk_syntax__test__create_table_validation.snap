@@ -18,7 +18,7 @@ SOURCE_FILE@0..75
       L_PAREN@15..16 "("
       WHITESPACE@16..19 "\n  "
       COLUMN@19..24
-        NAME@19..20
+        COLUMN_NAME@19..20
           IDENT@19..20 "x"
         WHITESPACE@20..21 " "
         PATH_TYPE@21..24
@@ -29,7 +29,7 @@ SOURCE_FILE@0..75
       COMMA@24..25 ","
       WHITESPACE@25..28 "\n  "
       COLUMN@28..39
-        NAME@28..39
+        COLUMN_NAME@28..39
           IDENT@28..39 "description"
       WHITESPACE@39..42 "\n  "
       COMMENT@42..71 "--          ^^^^ miss ..."

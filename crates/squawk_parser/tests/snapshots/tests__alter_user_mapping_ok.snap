@@ -30,7 +30,7 @@ SOURCE_FILE
       ALTER_OPTION
         ADD_KW "add"
         WHITESPACE " "
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "a"
         WHITESPACE " "
         LITERAL
@@ -40,7 +40,7 @@ SOURCE_FILE
       ALTER_OPTION
         SET_KW "set"
         WHITESPACE " "
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "b"
         WHITESPACE " "
         LITERAL
@@ -50,7 +50,7 @@ SOURCE_FILE
       ALTER_OPTION
         DROP_KW "drop"
         WHITESPACE " "
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "c"
       R_PAREN ")"
     SEMICOLON ";"

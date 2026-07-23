@@ -35,13 +35,13 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "columns"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "a"
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               NAME_REF
                 IDENT "b"
             R_PAREN ")"

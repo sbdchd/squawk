@@ -401,7 +401,7 @@ impl AddVertexEdgeLabelProperties {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+    pub fn expr_as_property_name_list(&self) -> Option<ExprAsPropertyNameList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1636,11 +1636,11 @@ pub struct AlterOption {
 }
 impl AlterOption {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn foreign_option_name(&self) -> Option<ForeignOptionName> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2791,7 +2791,7 @@ impl AlterViewColumn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn name(&self) -> Option<ColumnNameRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -2965,10 +2965,6 @@ impl ArrayType {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
     }
@@ -3019,7 +3015,7 @@ pub struct AsName {
 }
 impl AsName {
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn name(&self) -> Option<ColumnName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3139,6 +3135,28 @@ impl AttributeList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AttributeName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AttributeName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AttributeNamespace {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AttributeNamespace {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AttributeOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3148,7 +3166,11 @@ impl AttributeOption {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn name(&self) -> Option<AttributeName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn namespace(&self) -> Option<AttributeNamespace> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3342,6 +3364,17 @@ pub struct BinExpr {
     pub(crate) syntax: SyntaxNode,
 }
 impl BinExpr {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BindParamNameRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl BindParamNameRef {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BitType {
@@ -4061,7 +4094,7 @@ impl Column {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn name(&self) -> Option<ColumnName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4345,6 +4378,28 @@ impl CompressionMethodName {
     pub fn default_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
     }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConfigParameterRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConfigParameterRef {
+    #[inline]
+    pub fn path_ref(&self) -> Option<PathRef> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConfigValueName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConfigValueName {
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
@@ -4808,11 +4863,11 @@ impl CopyOption {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn copy_option_name(&self) -> Option<CopyOptionName> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4853,6 +4908,17 @@ impl CopyOptionList {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CopyOptionName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CopyOptionName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -7159,15 +7225,15 @@ pub struct DatabaseOption {
 }
 impl DatabaseOption {
     #[inline]
+    pub fn config_value_name(&self) -> Option<ConfigValueName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn database_ref(&self) -> Option<DatabaseRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9777,7 +9843,7 @@ impl DropVertexEdgeLabelProperties {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn property_refs(&self) -> AstChildren<PropertyRef> {
+    pub fn property_name_refs(&self) -> AstChildren<PropertyNameRef> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -10099,6 +10165,17 @@ pub struct ElementTableRef {
     pub(crate) syntax: SyntaxNode,
 }
 impl ElementTableRef {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ElementTag {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ElementTag {
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
@@ -10684,11 +10761,11 @@ pub struct ExplainOption {
 }
 impl ExplainOption {
     #[inline]
-    pub fn explain_option_value(&self) -> Option<ExplainOptionValue> {
+    pub fn explain_option_name(&self) -> Option<ExplainOptionName> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn explain_option_value(&self) -> Option<ExplainOptionValue> {
         support::child(&self.syntax)
     }
 }
@@ -10709,6 +10786,17 @@ impl ExplainOptionList {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExplainOptionName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExplainOptionName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -10756,27 +10844,121 @@ impl ExplainOptionValue {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ExprAsName {
+pub struct ExprAsColumnName {
     pub(crate) syntax: SyntaxNode,
 }
-impl ExprAsName {
+impl ExprAsColumnName {
     #[inline]
-    pub fn as_name(&self) -> Option<AsName> {
+    pub fn column_name(&self) -> Option<ColumnName> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ExprAsNameList {
+pub struct ExprAsColumnNameList {
     pub(crate) syntax: SyntaxNode,
 }
-impl ExprAsNameList {
+impl ExprAsColumnNameList {
     #[inline]
-    pub fn expr_as_names(&self) -> AstChildren<ExprAsName> {
+    pub fn expr_as_column_names(&self) -> AstChildren<ExprAsColumnName> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprAsElementTag {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprAsElementTag {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn tag(&self) -> Option<ElementTag> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprAsElementTagList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprAsElementTagList {
+    #[inline]
+    pub fn expr_as_element_tags(&self) -> AstChildren<ExprAsElementTag> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprAsPropertyName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprAsPropertyName {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn property_name(&self) -> Option<PropertyName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprAsPropertyNameList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprAsPropertyNameList {
+    #[inline]
+    pub fn expr_as_property_names(&self) -> AstChildren<ExprAsPropertyName> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprAsXmlAttr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprAsXmlAttr {
+    #[inline]
+    pub fn attr(&self) -> Option<XmlAttr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprAsXmlAttrList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprAsXmlAttrList {
+    #[inline]
+    pub fn expr_as_xml_attrs(&self) -> AstChildren<ExprAsXmlAttr> {
         support::children(&self.syntax)
     }
 }
@@ -11391,6 +11573,17 @@ impl ForeignKeyConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ForeignOptionName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ForeignOptionName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Forward {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11837,7 +12030,7 @@ pub struct GrantRoleOption {
 }
 impl GrantRoleOption {
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn grant_role_option_name(&self) -> Option<GrantRoleOptionName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11862,6 +12055,17 @@ impl GrantRoleOptionList {
     #[inline]
     pub fn grant_role_options(&self) -> AstChildren<GrantRoleOption> {
         support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GrantRoleOptionName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GrantRoleOptionName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -11917,7 +12121,7 @@ pub struct GraphTableFn {
 }
 impl GraphTableFn {
     #[inline]
-    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+    pub fn expr_as_column_name_list(&self) -> Option<ExprAsColumnNameList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -13602,7 +13806,7 @@ impl JsonPassingArg {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn name(&self) -> Option<JsonVariableName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14141,6 +14345,17 @@ impl JsonValueFn {
     #[inline]
     pub fn json_value_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::JSON_VALUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonVariableName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonVariableName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -15008,7 +15223,7 @@ impl NamedArg {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn name(&self) -> Option<ParamNameRef> {
         support::child(&self.syntax)
     }
 }
@@ -15212,7 +15427,7 @@ pub struct NonStandardParam {
 }
 impl NonStandardParam {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn name(&self) -> Option<BindParamNameRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17179,6 +17394,17 @@ impl ParamName {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ParamNameRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ParamNameRef {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ParamOut {
     pub(crate) syntax: SyntaxNode,
 }
@@ -18377,7 +18603,7 @@ pub struct Properties {
 }
 impl Properties {
     #[inline]
-    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+    pub fn expr_as_property_name_list(&self) -> Option<ExprAsPropertyNameList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18436,10 +18662,21 @@ impl PropertyGraphRenameTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PropertyRef {
+pub struct PropertyName {
     pub(crate) syntax: SyntaxNode,
 }
-impl PropertyRef {
+impl PropertyName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PropertyNameRef {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PropertyNameRef {
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
@@ -19409,8 +19646,12 @@ pub struct ResetFuncOption {
 }
 impl ResetFuncOption {
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn config_parameter_ref(&self) -> Option<ConfigParameterRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
     #[inline]
     pub fn reset_token(&self) -> Option<SyntaxToken> {
@@ -21235,11 +21476,11 @@ pub struct SetConfigParam {
 }
 impl SetConfigParam {
     #[inline]
-    pub fn literals(&self) -> AstChildren<Literal> {
+    pub fn config_value_names(&self) -> AstChildren<ConfigValueName> {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn name_refs(&self) -> AstChildren<NameRef> {
+    pub fn literals(&self) -> AstChildren<Literal> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -23812,7 +24053,7 @@ pub struct VacuumOption {
 }
 impl VacuumOption {
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn vacuum_option_name(&self) -> Option<VacuumOptionName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -23841,6 +24082,17 @@ impl VacuumOptionList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VacuumOptionName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VacuumOptionName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct VacuumOptionValue {
     pub(crate) syntax: SyntaxNode,
 }
@@ -23850,12 +24102,8 @@ impl VacuumOptionValue {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn vacuum_option_value_name(&self) -> Option<VacuumOptionValueName> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
     }
     #[inline]
     pub fn no_token(&self) -> Option<SyntaxToken> {
@@ -23864,6 +24112,17 @@ impl VacuumOptionValue {
     #[inline]
     pub fn yes_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::YES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VacuumOptionValueName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VacuumOptionValueName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -24614,6 +24873,17 @@ impl WithoutTimezone {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct XmlAttr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl XmlAttr {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct XmlColumnOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -24665,7 +24935,7 @@ pub struct XmlElementFn {
 }
 impl XmlElementFn {
     #[inline]
-    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+    pub fn expr_as_xml_attr_list(&self) -> Option<ExprAsXmlAttrList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -24673,7 +24943,7 @@ impl XmlElementFn {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn tag(&self) -> Option<ElementTag> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -24739,7 +25009,7 @@ pub struct XmlForestFn {
 }
 impl XmlForestFn {
     #[inline]
-    pub fn expr_as_name_list(&self) -> Option<ExprAsNameList> {
+    pub fn expr_as_element_tag_list(&self) -> Option<ExprAsElementTagList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -24766,7 +25036,7 @@ impl XmlNamespace {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn prefix(&self) -> Option<XmlNamespacePrefix> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -24795,6 +25065,17 @@ impl XmlNamespaceList {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct XmlNamespacePrefix {
+    pub(crate) syntax: SyntaxNode,
+}
+impl XmlNamespacePrefix {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -24870,10 +25151,6 @@ impl XmlPiFn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -24892,6 +25169,17 @@ impl XmlPiFn {
     #[inline]
     pub fn xmlpi_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::XMLPI_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct XmlPiTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl XmlPiTarget {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
     }
 }
 
@@ -25258,34 +25546,46 @@ pub enum AlterTypeAction {
 pub enum AnyName {
     AccessMethod(AccessMethod),
     AccessMethodRef(AccessMethodRef),
+    AttributeName(AttributeName),
+    AttributeNamespace(AttributeNamespace),
+    BindParamNameRef(BindParamNameRef),
     Channel(Channel),
     ChannelRef(ChannelRef),
     ColumnName(ColumnName),
     ColumnNameRef(ColumnNameRef),
+    ConfigValueName(ConfigValueName),
     ConstraintName(ConstraintName),
+    CopyOptionName(CopyOptionName),
     CteName(CteName),
     Cursor(Cursor),
     CursorRef(CursorRef),
     Database(Database),
     DatabaseRef(DatabaseRef),
     ElementTableAlias(ElementTableAlias),
+    ElementTag(ElementTag),
     EventTrigger(EventTrigger),
     EventTriggerRef(EventTriggerRef),
+    ExplainOptionName(ExplainOptionName),
     Extension(Extension),
     ExtensionRef(ExtensionRef),
     ForeignDataWrapper(ForeignDataWrapper),
     ForeignDataWrapperRef(ForeignDataWrapperRef),
+    ForeignOptionName(ForeignOptionName),
+    GrantRoleOptionName(GrantRoleOptionName),
     JsonPathName(JsonPathName),
     JsonPathNameRef(JsonPathNameRef),
+    JsonVariableName(JsonVariableName),
     Language(Language),
     LanguageRef(LanguageRef),
     Name(Name),
     NameRef(NameRef),
     ParamName(ParamName),
+    ParamNameRef(ParamNameRef),
     Policy(Policy),
     PolicyRef(PolicyRef),
     PreparedStatement(PreparedStatement),
     PreparedStatementRef(PreparedStatementRef),
+    PropertyName(PropertyName),
     Publication(Publication),
     PublicationRef(PublicationRef),
     RemoteTableNameRef(RemoteTableNameRef),
@@ -25307,9 +25607,14 @@ pub enum AnyName {
     TransitionRelationName(TransitionRelationName),
     Trigger(Trigger),
     TriggerRef(TriggerRef),
+    VacuumOptionName(VacuumOptionName),
+    VacuumOptionValueName(VacuumOptionValueName),
     VertexTableRef(VertexTableRef),
     Window(Window),
     WindowRef(WindowRef),
+    XmlAttr(XmlAttr),
+    XmlNamespacePrefix(XmlNamespacePrefix),
+    XmlPiTarget(XmlPiTarget),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -25375,8 +25680,8 @@ pub enum CommentObject {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigValue {
+    ConfigValueName(ConfigValueName),
     Literal(Literal),
-    NameRef(NameRef),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -27799,6 +28104,42 @@ impl AstNode for AttributeList {
         &self.syntax
     }
 }
+impl AstNode for AttributeName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ATTRIBUTE_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AttributeNamespace {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ATTRIBUTE_NAMESPACE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for AttributeOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -27965,6 +28306,24 @@ impl AstNode for BinExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::BIN_EXPR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for BindParamNameRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::BIND_PARAM_NAME_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -28699,6 +29058,42 @@ impl AstNode for CompressionMethodName {
         &self.syntax
     }
 }
+impl AstNode for ConfigParameterRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFIG_PARAMETER_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConfigValueName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFIG_VALUE_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ConflictDoNothing {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -29099,6 +29494,24 @@ impl AstNode for CopyOptionList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::COPY_OPTION_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for CopyOptionName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::COPY_OPTION_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -31903,6 +32316,24 @@ impl AstNode for ElementTableRef {
         &self.syntax
     }
 }
+impl AstNode for ElementTag {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ELEMENT_TAG
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ElementVariable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -32497,6 +32928,24 @@ impl AstNode for ExplainOptionList {
         &self.syntax
     }
 }
+impl AstNode for ExplainOptionName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPLAIN_OPTION_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ExplainOptionValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -32515,10 +32964,10 @@ impl AstNode for ExplainOptionValue {
         &self.syntax
     }
 }
-impl AstNode for ExprAsName {
+impl AstNode for ExprAsColumnName {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EXPR_AS_NAME
+        kind == SyntaxKind::EXPR_AS_COLUMN_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -32533,10 +32982,118 @@ impl AstNode for ExprAsName {
         &self.syntax
     }
 }
-impl AstNode for ExprAsNameList {
+impl AstNode for ExprAsColumnNameList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EXPR_AS_NAME_LIST
+        kind == SyntaxKind::EXPR_AS_COLUMN_NAME_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprAsElementTag {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_AS_ELEMENT_TAG
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprAsElementTagList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_AS_ELEMENT_TAG_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprAsPropertyName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_AS_PROPERTY_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprAsPropertyNameList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_AS_PROPERTY_NAME_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprAsXmlAttr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_AS_XML_ATTR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprAsXmlAttrList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_AS_XML_ATTR_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -33037,6 +33594,24 @@ impl AstNode for ForeignKeyConstraint {
         &self.syntax
     }
 }
+impl AstNode for ForeignOptionName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FOREIGN_OPTION_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Forward {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -33401,6 +33976,24 @@ impl AstNode for GrantRoleOptionList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::GRANT_ROLE_OPTION_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for GrantRoleOptionName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GRANT_ROLE_OPTION_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -35219,6 +35812,24 @@ impl AstNode for JsonValueFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JSON_VALUE_FN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonVariableName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_VARIABLE_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -37843,6 +38454,24 @@ impl AstNode for ParamName {
         &self.syntax
     }
 }
+impl AstNode for ParamNameRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARAM_NAME_REF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ParamOut {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -38977,10 +39606,28 @@ impl AstNode for PropertyGraphRenameTo {
         &self.syntax
     }
 }
-impl AstNode for PropertyRef {
+impl AstNode for PropertyName {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PROPERTY_REF
+        kind == SyntaxKind::PROPERTY_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PropertyNameRef {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PROPERTY_NAME_REF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -43567,10 +44214,46 @@ impl AstNode for VacuumOptionList {
         &self.syntax
     }
 }
+impl AstNode for VacuumOptionName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VACUUM_OPTION_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for VacuumOptionValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::VACUUM_OPTION_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for VacuumOptionValueName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VACUUM_OPTION_VALUE_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -44269,6 +44952,24 @@ impl AstNode for WithoutTimezone {
         &self.syntax
     }
 }
+impl AstNode for XmlAttr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::XML_ATTR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for XmlColumnOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -44395,6 +45096,24 @@ impl AstNode for XmlNamespaceList {
         &self.syntax
     }
 }
+impl AstNode for XmlNamespacePrefix {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::XML_NAMESPACE_PREFIX
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for XmlParseFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -44435,6 +45154,24 @@ impl AstNode for XmlPiFn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::XML_PI_FN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for XmlPiTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::XML_PI_TARGET
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -45901,34 +46638,46 @@ impl AstNode for AnyName {
             kind,
             SyntaxKind::ACCESS_METHOD
                 | SyntaxKind::ACCESS_METHOD_REF
+                | SyntaxKind::ATTRIBUTE_NAME
+                | SyntaxKind::ATTRIBUTE_NAMESPACE
+                | SyntaxKind::BIND_PARAM_NAME_REF
                 | SyntaxKind::CHANNEL
                 | SyntaxKind::CHANNEL_REF
                 | SyntaxKind::COLUMN_NAME
                 | SyntaxKind::COLUMN_NAME_REF
+                | SyntaxKind::CONFIG_VALUE_NAME
                 | SyntaxKind::CONSTRAINT_NAME
+                | SyntaxKind::COPY_OPTION_NAME
                 | SyntaxKind::CTE_NAME
                 | SyntaxKind::CURSOR
                 | SyntaxKind::CURSOR_REF
                 | SyntaxKind::DATABASE
                 | SyntaxKind::DATABASE_REF
                 | SyntaxKind::ELEMENT_TABLE_ALIAS
+                | SyntaxKind::ELEMENT_TAG
                 | SyntaxKind::EVENT_TRIGGER
                 | SyntaxKind::EVENT_TRIGGER_REF
+                | SyntaxKind::EXPLAIN_OPTION_NAME
                 | SyntaxKind::EXTENSION
                 | SyntaxKind::EXTENSION_REF
                 | SyntaxKind::FOREIGN_DATA_WRAPPER
                 | SyntaxKind::FOREIGN_DATA_WRAPPER_REF
+                | SyntaxKind::FOREIGN_OPTION_NAME
+                | SyntaxKind::GRANT_ROLE_OPTION_NAME
                 | SyntaxKind::JSON_PATH_NAME
                 | SyntaxKind::JSON_PATH_NAME_REF
+                | SyntaxKind::JSON_VARIABLE_NAME
                 | SyntaxKind::LANGUAGE
                 | SyntaxKind::LANGUAGE_REF
                 | SyntaxKind::NAME
                 | SyntaxKind::NAME_REF
                 | SyntaxKind::PARAM_NAME
+                | SyntaxKind::PARAM_NAME_REF
                 | SyntaxKind::POLICY
                 | SyntaxKind::POLICY_REF
                 | SyntaxKind::PREPARED_STATEMENT
                 | SyntaxKind::PREPARED_STATEMENT_REF
+                | SyntaxKind::PROPERTY_NAME
                 | SyntaxKind::PUBLICATION
                 | SyntaxKind::PUBLICATION_REF
                 | SyntaxKind::REMOTE_TABLE_NAME_REF
@@ -45950,9 +46699,14 @@ impl AstNode for AnyName {
                 | SyntaxKind::TRANSITION_RELATION_NAME
                 | SyntaxKind::TRIGGER
                 | SyntaxKind::TRIGGER_REF
+                | SyntaxKind::VACUUM_OPTION_NAME
+                | SyntaxKind::VACUUM_OPTION_VALUE_NAME
                 | SyntaxKind::VERTEX_TABLE_REF
                 | SyntaxKind::WINDOW
                 | SyntaxKind::WINDOW_REF
+                | SyntaxKind::XML_ATTR
+                | SyntaxKind::XML_NAMESPACE_PREFIX
+                | SyntaxKind::XML_PI_TARGET
         )
     }
     #[inline]
@@ -45960,11 +46714,20 @@ impl AstNode for AnyName {
         let res = match syntax.kind() {
             SyntaxKind::ACCESS_METHOD => AnyName::AccessMethod(AccessMethod { syntax }),
             SyntaxKind::ACCESS_METHOD_REF => AnyName::AccessMethodRef(AccessMethodRef { syntax }),
+            SyntaxKind::ATTRIBUTE_NAME => AnyName::AttributeName(AttributeName { syntax }),
+            SyntaxKind::ATTRIBUTE_NAMESPACE => {
+                AnyName::AttributeNamespace(AttributeNamespace { syntax })
+            }
+            SyntaxKind::BIND_PARAM_NAME_REF => {
+                AnyName::BindParamNameRef(BindParamNameRef { syntax })
+            }
             SyntaxKind::CHANNEL => AnyName::Channel(Channel { syntax }),
             SyntaxKind::CHANNEL_REF => AnyName::ChannelRef(ChannelRef { syntax }),
             SyntaxKind::COLUMN_NAME => AnyName::ColumnName(ColumnName { syntax }),
             SyntaxKind::COLUMN_NAME_REF => AnyName::ColumnNameRef(ColumnNameRef { syntax }),
+            SyntaxKind::CONFIG_VALUE_NAME => AnyName::ConfigValueName(ConfigValueName { syntax }),
             SyntaxKind::CONSTRAINT_NAME => AnyName::ConstraintName(ConstraintName { syntax }),
+            SyntaxKind::COPY_OPTION_NAME => AnyName::CopyOptionName(CopyOptionName { syntax }),
             SyntaxKind::CTE_NAME => AnyName::CteName(CteName { syntax }),
             SyntaxKind::CURSOR => AnyName::Cursor(Cursor { syntax }),
             SyntaxKind::CURSOR_REF => AnyName::CursorRef(CursorRef { syntax }),
@@ -45973,8 +46736,12 @@ impl AstNode for AnyName {
             SyntaxKind::ELEMENT_TABLE_ALIAS => {
                 AnyName::ElementTableAlias(ElementTableAlias { syntax })
             }
+            SyntaxKind::ELEMENT_TAG => AnyName::ElementTag(ElementTag { syntax }),
             SyntaxKind::EVENT_TRIGGER => AnyName::EventTrigger(EventTrigger { syntax }),
             SyntaxKind::EVENT_TRIGGER_REF => AnyName::EventTriggerRef(EventTriggerRef { syntax }),
+            SyntaxKind::EXPLAIN_OPTION_NAME => {
+                AnyName::ExplainOptionName(ExplainOptionName { syntax })
+            }
             SyntaxKind::EXTENSION => AnyName::Extension(Extension { syntax }),
             SyntaxKind::EXTENSION_REF => AnyName::ExtensionRef(ExtensionRef { syntax }),
             SyntaxKind::FOREIGN_DATA_WRAPPER => {
@@ -45983,13 +46750,23 @@ impl AstNode for AnyName {
             SyntaxKind::FOREIGN_DATA_WRAPPER_REF => {
                 AnyName::ForeignDataWrapperRef(ForeignDataWrapperRef { syntax })
             }
+            SyntaxKind::FOREIGN_OPTION_NAME => {
+                AnyName::ForeignOptionName(ForeignOptionName { syntax })
+            }
+            SyntaxKind::GRANT_ROLE_OPTION_NAME => {
+                AnyName::GrantRoleOptionName(GrantRoleOptionName { syntax })
+            }
             SyntaxKind::JSON_PATH_NAME => AnyName::JsonPathName(JsonPathName { syntax }),
             SyntaxKind::JSON_PATH_NAME_REF => AnyName::JsonPathNameRef(JsonPathNameRef { syntax }),
+            SyntaxKind::JSON_VARIABLE_NAME => {
+                AnyName::JsonVariableName(JsonVariableName { syntax })
+            }
             SyntaxKind::LANGUAGE => AnyName::Language(Language { syntax }),
             SyntaxKind::LANGUAGE_REF => AnyName::LanguageRef(LanguageRef { syntax }),
             SyntaxKind::NAME => AnyName::Name(Name { syntax }),
             SyntaxKind::NAME_REF => AnyName::NameRef(NameRef { syntax }),
             SyntaxKind::PARAM_NAME => AnyName::ParamName(ParamName { syntax }),
+            SyntaxKind::PARAM_NAME_REF => AnyName::ParamNameRef(ParamNameRef { syntax }),
             SyntaxKind::POLICY => AnyName::Policy(Policy { syntax }),
             SyntaxKind::POLICY_REF => AnyName::PolicyRef(PolicyRef { syntax }),
             SyntaxKind::PREPARED_STATEMENT => {
@@ -45998,6 +46775,7 @@ impl AstNode for AnyName {
             SyntaxKind::PREPARED_STATEMENT_REF => {
                 AnyName::PreparedStatementRef(PreparedStatementRef { syntax })
             }
+            SyntaxKind::PROPERTY_NAME => AnyName::PropertyName(PropertyName { syntax }),
             SyntaxKind::PUBLICATION => AnyName::Publication(Publication { syntax }),
             SyntaxKind::PUBLICATION_REF => AnyName::PublicationRef(PublicationRef { syntax }),
             SyntaxKind::REMOTE_TABLE_NAME_REF => {
@@ -46023,9 +46801,20 @@ impl AstNode for AnyName {
             }
             SyntaxKind::TRIGGER => AnyName::Trigger(Trigger { syntax }),
             SyntaxKind::TRIGGER_REF => AnyName::TriggerRef(TriggerRef { syntax }),
+            SyntaxKind::VACUUM_OPTION_NAME => {
+                AnyName::VacuumOptionName(VacuumOptionName { syntax })
+            }
+            SyntaxKind::VACUUM_OPTION_VALUE_NAME => {
+                AnyName::VacuumOptionValueName(VacuumOptionValueName { syntax })
+            }
             SyntaxKind::VERTEX_TABLE_REF => AnyName::VertexTableRef(VertexTableRef { syntax }),
             SyntaxKind::WINDOW => AnyName::Window(Window { syntax }),
             SyntaxKind::WINDOW_REF => AnyName::WindowRef(WindowRef { syntax }),
+            SyntaxKind::XML_ATTR => AnyName::XmlAttr(XmlAttr { syntax }),
+            SyntaxKind::XML_NAMESPACE_PREFIX => {
+                AnyName::XmlNamespacePrefix(XmlNamespacePrefix { syntax })
+            }
+            SyntaxKind::XML_PI_TARGET => AnyName::XmlPiTarget(XmlPiTarget { syntax }),
             _ => {
                 return None;
             }
@@ -46037,34 +46826,46 @@ impl AstNode for AnyName {
         match self {
             AnyName::AccessMethod(it) => &it.syntax,
             AnyName::AccessMethodRef(it) => &it.syntax,
+            AnyName::AttributeName(it) => &it.syntax,
+            AnyName::AttributeNamespace(it) => &it.syntax,
+            AnyName::BindParamNameRef(it) => &it.syntax,
             AnyName::Channel(it) => &it.syntax,
             AnyName::ChannelRef(it) => &it.syntax,
             AnyName::ColumnName(it) => &it.syntax,
             AnyName::ColumnNameRef(it) => &it.syntax,
+            AnyName::ConfigValueName(it) => &it.syntax,
             AnyName::ConstraintName(it) => &it.syntax,
+            AnyName::CopyOptionName(it) => &it.syntax,
             AnyName::CteName(it) => &it.syntax,
             AnyName::Cursor(it) => &it.syntax,
             AnyName::CursorRef(it) => &it.syntax,
             AnyName::Database(it) => &it.syntax,
             AnyName::DatabaseRef(it) => &it.syntax,
             AnyName::ElementTableAlias(it) => &it.syntax,
+            AnyName::ElementTag(it) => &it.syntax,
             AnyName::EventTrigger(it) => &it.syntax,
             AnyName::EventTriggerRef(it) => &it.syntax,
+            AnyName::ExplainOptionName(it) => &it.syntax,
             AnyName::Extension(it) => &it.syntax,
             AnyName::ExtensionRef(it) => &it.syntax,
             AnyName::ForeignDataWrapper(it) => &it.syntax,
             AnyName::ForeignDataWrapperRef(it) => &it.syntax,
+            AnyName::ForeignOptionName(it) => &it.syntax,
+            AnyName::GrantRoleOptionName(it) => &it.syntax,
             AnyName::JsonPathName(it) => &it.syntax,
             AnyName::JsonPathNameRef(it) => &it.syntax,
+            AnyName::JsonVariableName(it) => &it.syntax,
             AnyName::Language(it) => &it.syntax,
             AnyName::LanguageRef(it) => &it.syntax,
             AnyName::Name(it) => &it.syntax,
             AnyName::NameRef(it) => &it.syntax,
             AnyName::ParamName(it) => &it.syntax,
+            AnyName::ParamNameRef(it) => &it.syntax,
             AnyName::Policy(it) => &it.syntax,
             AnyName::PolicyRef(it) => &it.syntax,
             AnyName::PreparedStatement(it) => &it.syntax,
             AnyName::PreparedStatementRef(it) => &it.syntax,
+            AnyName::PropertyName(it) => &it.syntax,
             AnyName::Publication(it) => &it.syntax,
             AnyName::PublicationRef(it) => &it.syntax,
             AnyName::RemoteTableNameRef(it) => &it.syntax,
@@ -46086,9 +46887,14 @@ impl AstNode for AnyName {
             AnyName::TransitionRelationName(it) => &it.syntax,
             AnyName::Trigger(it) => &it.syntax,
             AnyName::TriggerRef(it) => &it.syntax,
+            AnyName::VacuumOptionName(it) => &it.syntax,
+            AnyName::VacuumOptionValueName(it) => &it.syntax,
             AnyName::VertexTableRef(it) => &it.syntax,
             AnyName::Window(it) => &it.syntax,
             AnyName::WindowRef(it) => &it.syntax,
+            AnyName::XmlAttr(it) => &it.syntax,
+            AnyName::XmlNamespacePrefix(it) => &it.syntax,
+            AnyName::XmlPiTarget(it) => &it.syntax,
         }
     }
 }
@@ -46102,6 +46908,24 @@ impl From<AccessMethodRef> for AnyName {
     #[inline]
     fn from(node: AccessMethodRef) -> AnyName {
         AnyName::AccessMethodRef(node)
+    }
+}
+impl From<AttributeName> for AnyName {
+    #[inline]
+    fn from(node: AttributeName) -> AnyName {
+        AnyName::AttributeName(node)
+    }
+}
+impl From<AttributeNamespace> for AnyName {
+    #[inline]
+    fn from(node: AttributeNamespace) -> AnyName {
+        AnyName::AttributeNamespace(node)
+    }
+}
+impl From<BindParamNameRef> for AnyName {
+    #[inline]
+    fn from(node: BindParamNameRef) -> AnyName {
+        AnyName::BindParamNameRef(node)
     }
 }
 impl From<Channel> for AnyName {
@@ -46128,10 +46952,22 @@ impl From<ColumnNameRef> for AnyName {
         AnyName::ColumnNameRef(node)
     }
 }
+impl From<ConfigValueName> for AnyName {
+    #[inline]
+    fn from(node: ConfigValueName) -> AnyName {
+        AnyName::ConfigValueName(node)
+    }
+}
 impl From<ConstraintName> for AnyName {
     #[inline]
     fn from(node: ConstraintName) -> AnyName {
         AnyName::ConstraintName(node)
+    }
+}
+impl From<CopyOptionName> for AnyName {
+    #[inline]
+    fn from(node: CopyOptionName) -> AnyName {
+        AnyName::CopyOptionName(node)
     }
 }
 impl From<CteName> for AnyName {
@@ -46170,6 +47006,12 @@ impl From<ElementTableAlias> for AnyName {
         AnyName::ElementTableAlias(node)
     }
 }
+impl From<ElementTag> for AnyName {
+    #[inline]
+    fn from(node: ElementTag) -> AnyName {
+        AnyName::ElementTag(node)
+    }
+}
 impl From<EventTrigger> for AnyName {
     #[inline]
     fn from(node: EventTrigger) -> AnyName {
@@ -46180,6 +47022,12 @@ impl From<EventTriggerRef> for AnyName {
     #[inline]
     fn from(node: EventTriggerRef) -> AnyName {
         AnyName::EventTriggerRef(node)
+    }
+}
+impl From<ExplainOptionName> for AnyName {
+    #[inline]
+    fn from(node: ExplainOptionName) -> AnyName {
+        AnyName::ExplainOptionName(node)
     }
 }
 impl From<Extension> for AnyName {
@@ -46206,6 +47054,18 @@ impl From<ForeignDataWrapperRef> for AnyName {
         AnyName::ForeignDataWrapperRef(node)
     }
 }
+impl From<ForeignOptionName> for AnyName {
+    #[inline]
+    fn from(node: ForeignOptionName) -> AnyName {
+        AnyName::ForeignOptionName(node)
+    }
+}
+impl From<GrantRoleOptionName> for AnyName {
+    #[inline]
+    fn from(node: GrantRoleOptionName) -> AnyName {
+        AnyName::GrantRoleOptionName(node)
+    }
+}
 impl From<JsonPathName> for AnyName {
     #[inline]
     fn from(node: JsonPathName) -> AnyName {
@@ -46216,6 +47076,12 @@ impl From<JsonPathNameRef> for AnyName {
     #[inline]
     fn from(node: JsonPathNameRef) -> AnyName {
         AnyName::JsonPathNameRef(node)
+    }
+}
+impl From<JsonVariableName> for AnyName {
+    #[inline]
+    fn from(node: JsonVariableName) -> AnyName {
+        AnyName::JsonVariableName(node)
     }
 }
 impl From<Language> for AnyName {
@@ -46248,6 +47114,12 @@ impl From<ParamName> for AnyName {
         AnyName::ParamName(node)
     }
 }
+impl From<ParamNameRef> for AnyName {
+    #[inline]
+    fn from(node: ParamNameRef) -> AnyName {
+        AnyName::ParamNameRef(node)
+    }
+}
 impl From<Policy> for AnyName {
     #[inline]
     fn from(node: Policy) -> AnyName {
@@ -46270,6 +47142,12 @@ impl From<PreparedStatementRef> for AnyName {
     #[inline]
     fn from(node: PreparedStatementRef) -> AnyName {
         AnyName::PreparedStatementRef(node)
+    }
+}
+impl From<PropertyName> for AnyName {
+    #[inline]
+    fn from(node: PropertyName) -> AnyName {
+        AnyName::PropertyName(node)
     }
 }
 impl From<Publication> for AnyName {
@@ -46398,6 +47276,18 @@ impl From<TriggerRef> for AnyName {
         AnyName::TriggerRef(node)
     }
 }
+impl From<VacuumOptionName> for AnyName {
+    #[inline]
+    fn from(node: VacuumOptionName) -> AnyName {
+        AnyName::VacuumOptionName(node)
+    }
+}
+impl From<VacuumOptionValueName> for AnyName {
+    #[inline]
+    fn from(node: VacuumOptionValueName) -> AnyName {
+        AnyName::VacuumOptionValueName(node)
+    }
+}
 impl From<VertexTableRef> for AnyName {
     #[inline]
     fn from(node: VertexTableRef) -> AnyName {
@@ -46414,6 +47304,24 @@ impl From<WindowRef> for AnyName {
     #[inline]
     fn from(node: WindowRef) -> AnyName {
         AnyName::WindowRef(node)
+    }
+}
+impl From<XmlAttr> for AnyName {
+    #[inline]
+    fn from(node: XmlAttr) -> AnyName {
+        AnyName::XmlAttr(node)
+    }
+}
+impl From<XmlNamespacePrefix> for AnyName {
+    #[inline]
+    fn from(node: XmlNamespacePrefix) -> AnyName {
+        AnyName::XmlNamespacePrefix(node)
+    }
+}
+impl From<XmlPiTarget> for AnyName {
+    #[inline]
+    fn from(node: XmlPiTarget) -> AnyName {
+        AnyName::XmlPiTarget(node)
     }
 }
 impl AstNode for BeginFuncOption {
@@ -46976,13 +47884,15 @@ impl From<ObjectView> for CommentObject {
 impl AstNode for ConfigValue {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, SyntaxKind::LITERAL | SyntaxKind::NAME_REF)
+        matches!(kind, SyntaxKind::CONFIG_VALUE_NAME | SyntaxKind::LITERAL)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
+            SyntaxKind::CONFIG_VALUE_NAME => {
+                ConfigValue::ConfigValueName(ConfigValueName { syntax })
+            }
             SyntaxKind::LITERAL => ConfigValue::Literal(Literal { syntax }),
-            SyntaxKind::NAME_REF => ConfigValue::NameRef(NameRef { syntax }),
             _ => {
                 return None;
             }
@@ -46992,21 +47902,21 @@ impl AstNode for ConfigValue {
     #[inline]
     fn syntax(&self) -> &SyntaxNode {
         match self {
+            ConfigValue::ConfigValueName(it) => &it.syntax,
             ConfigValue::Literal(it) => &it.syntax,
-            ConfigValue::NameRef(it) => &it.syntax,
         }
+    }
+}
+impl From<ConfigValueName> for ConfigValue {
+    #[inline]
+    fn from(node: ConfigValueName) -> ConfigValue {
+        ConfigValue::ConfigValueName(node)
     }
 }
 impl From<Literal> for ConfigValue {
     #[inline]
     fn from(node: Literal) -> ConfigValue {
         ConfigValue::Literal(node)
-    }
-}
-impl From<NameRef> for ConfigValue {
-    #[inline]
-    fn from(node: NameRef) -> ConfigValue {
-        ConfigValue::NameRef(node)
     }
 }
 impl AstNode for ConflictAction {

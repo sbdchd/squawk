@@ -20,7 +20,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "sensorid"
         WHITESPACE " "
         PATH_TYPE
@@ -31,7 +31,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "ts"
         WHITESPACE " "
         PATH_TYPE
@@ -42,7 +42,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -310,7 +310,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 ARG
                   NAMED_ARG
-                    NAME_REF
+                    PARAM_NAME_REF
                       IDENT "input_type"
                     FAT_ARROW "=>"
                     LITERAL
@@ -322,7 +322,7 @@ SOURCE_FILE
                 WHITESPACE " "
                 ARG
                   NAMED_ARG
-                    NAME_REF
+                    PARAM_NAME_REF
                       IDENT "api_key"
                     FAT_ARROW "=>"
                     LITERAL
@@ -549,7 +549,7 @@ SOURCE_FILE
                     WHITESPACE " "
                     ARG
                       NAMED_ARG
-                        NAME_REF
+                        PARAM_NAME_REF
                           IDENT "_input_type"
                         FAT_ARROW "=>"
                         LITERAL
@@ -561,7 +561,7 @@ SOURCE_FILE
                     WHITESPACE " "
                     ARG
                       NAMED_ARG
-                        NAME_REF
+                        PARAM_NAME_REF
                           IDENT "_api_key"
                         FAT_ARROW "=>"
                         LITERAL
@@ -572,7 +572,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "AS"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "embedding"
         WHITESPACE "\n"
         R_PAREN ")"
@@ -668,7 +668,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "\"text\""
         COMMA ","
         WHITESPACE "\n    "
@@ -732,7 +732,7 @@ SOURCE_FILE
                     WHITESPACE "\n        "
                     ARG
                       NAMED_ARG
-                        NAME_REF
+                        PARAM_NAME_REF
                           IDENT "return_documents"
                         WHITESPACE " "
                         FAT_ARROW "=>"
@@ -745,7 +745,7 @@ SOURCE_FILE
                     WHITESPACE "\n        "
                     ARG
                       NAMED_ARG
-                        NAME_REF
+                        PARAM_NAME_REF
                           IDENT "api_key"
                         FAT_ARROW "=>"
                         LITERAL
@@ -768,7 +768,7 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "\"index\""
               WHITESPACE " "
               PATH_TYPE
@@ -779,7 +779,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "\"document\""
               WHITESPACE " "
               PATH_TYPE
@@ -790,7 +790,7 @@ SOURCE_FILE
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "relevance_score"
               WHITESPACE " "
               PATH_TYPE
@@ -970,7 +970,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "sfunc"
         WHITESPACE " "
         EQ "="
@@ -984,7 +984,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "stype"
         WHITESPACE " "
         EQ "="
@@ -1001,7 +1001,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       ATTRIBUTE_OPTION
-        NAME
+        ATTRIBUTE_NAME
           IDENT "initcond"
         WHITESPACE " "
         EQ "="
@@ -1049,7 +1049,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "interaction_date"
         COMMA ","
         WHITESPACE "\n    "
@@ -1109,7 +1109,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "a_counts"
         COMMA ","
         WHITESPACE "\n    "
@@ -1169,7 +1169,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "b_counts"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -2046,7 +2046,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "title"
         WHITESPACE " "
         PATH_TYPE
@@ -2057,7 +2057,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "plot"
         WHITESPACE " "
         PATH_TYPE
@@ -2105,14 +2105,14 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n        "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           FORMAT_KW "FORMAT"
         WHITESPACE " "
         CSV_KW "csv"
       COMMA ","
       WHITESPACE "\n        "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           DELIMITER_KW "DELIMITER"
         WHITESPACE " "
         LITERAL
@@ -2382,7 +2382,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -2393,7 +2393,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -2404,7 +2404,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -2415,7 +2415,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "response_time"
         WHITESPACE " "
         DOUBLE_TYPE
@@ -2439,7 +2439,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -2450,7 +2450,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -2461,7 +2461,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "count"
         WHITESPACE " "
         PATH_TYPE
@@ -2746,7 +2746,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -2769,7 +2769,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "payload"
         WHITESPACE " "
         PATH_TYPE
@@ -2862,7 +2862,7 @@ SOURCE_FILE
     TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           HOUR_KW "hour"
         WHITESPACE " "
         PATH_TYPE
@@ -2873,7 +2873,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_count"
         WHITESPACE " "
         PATH_TYPE
@@ -3095,7 +3095,7 @@ SOURCE_FILE
               WHITESPACE "\n\n  "
               ARG
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "source_table_name"
                   WHITESPACE " "
                   COLON_EQ ":="
@@ -3108,7 +3108,7 @@ SOURCE_FILE
               WHITESPACE "\n  "
               ARG
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "batched"
                   WHITESPACE " "
                   COLON_EQ ":="
@@ -3121,7 +3121,7 @@ SOURCE_FILE
               WHITESPACE "\n  "
               ARG
                 NAMED_ARG
-                  NAME_REF
+                  PARAM_NAME_REF
                     IDENT "start_time"
                   WHITESPACE " "
                   COLON_EQ ":="
@@ -3369,7 +3369,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "fdw_package_url"
         WHITESPACE " "
         LITERAL
@@ -3377,7 +3377,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "fdw_package_name"
         WHITESPACE " "
         LITERAL
@@ -3385,7 +3385,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "fdw_package_version"
         WHITESPACE " "
         LITERAL
@@ -3393,7 +3393,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "fdw_package_checksum"
         WHITESPACE " "
         LITERAL
@@ -3401,7 +3401,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "api_key"
         WHITESPACE " "
         LITERAL
@@ -3449,7 +3449,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "attrs"
         WHITESPACE " "
         PATH_TYPE
@@ -3472,7 +3472,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           OBJECT_KW "object"
         WHITESPACE " "
         LITERAL
@@ -3503,7 +3503,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "attrs"
         WHITESPACE " "
         PATH_TYPE
@@ -3526,7 +3526,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           OBJECT_KW "object"
         WHITESPACE " "
         LITERAL
@@ -3534,7 +3534,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "rowid_column"
         WHITESPACE " "
         LITERAL
@@ -3570,7 +3570,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "profile"
         COMMA ","
         WHITESPACE "\n  "
@@ -3588,7 +3588,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "id"
         COMMA ","
         WHITESPACE "\n  "
@@ -3606,7 +3606,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "title"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -3726,7 +3726,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "id"
         COMMA ","
         WHITESPACE "\n  "
@@ -3744,7 +3744,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "title"
         COMMA ","
         WHITESPACE "\n  "
@@ -3768,7 +3768,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               NAME_KW "name"
         COMMA ","
         WHITESPACE "\n  "
@@ -3786,7 +3786,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "start_time"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -3932,7 +3932,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 HOUR_KW "hour"
           COMMA ","
           WHITESPACE "\n    "
@@ -3948,7 +3948,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "events"
           COMMA ","
           WHITESPACE "\n    "
@@ -3968,7 +3968,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "users"
       WHITESPACE "\n"
       FROM_CLAUSE
@@ -4027,7 +4027,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -4038,7 +4038,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -4049,7 +4049,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
@@ -4093,7 +4093,7 @@ SOURCE_FILE
       COMMENT "-- Frequently queried columns"
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -4104,7 +4104,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -4115,7 +4115,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
@@ -4128,7 +4128,7 @@ SOURCE_FILE
       COMMENT "-- Rarely queried metadata"
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_agent"
         WHITESPACE " "
         PATH_TYPE
@@ -4139,7 +4139,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "ip_address"
         WHITESPACE " "
         PATH_TYPE
@@ -4152,7 +4152,7 @@ SOURCE_FILE
       COMMENT "-- Large payload rarely used in aggregations"
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_data"
         WHITESPACE " "
         PATH_TYPE
@@ -4179,7 +4179,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -4196,7 +4196,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -4207,7 +4207,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -4218,7 +4218,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
@@ -4244,7 +4244,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -4270,7 +4270,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "user_agent"
         WHITESPACE " "
         PATH_TYPE
@@ -4281,7 +4281,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "ip_address"
         WHITESPACE " "
         PATH_TYPE
@@ -4308,7 +4308,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -4334,7 +4334,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "event_data"
         WHITESPACE " "
         PATH_TYPE
@@ -4560,7 +4560,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -4571,7 +4571,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
@@ -4582,7 +4582,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -4602,7 +4602,7 @@ SOURCE_FILE
       OPTIONS_KW "OPTIONS"
       L_PAREN "("
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           COMPRESSION_KW "compression"
         WHITESPACE " "
         LITERAL
@@ -4636,7 +4636,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -4647,7 +4647,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
@@ -4658,7 +4658,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -4680,7 +4680,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "files"
         WHITESPACE " "
         LITERAL
@@ -4712,7 +4712,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE " \n   "
       COLUMN
-        NAME
+        COLUMN_NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -4723,7 +4723,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
@@ -4734,7 +4734,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -4776,7 +4776,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -4787,7 +4787,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
@@ -4798,7 +4798,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -4919,7 +4919,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "rolling_avg"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -5002,7 +5002,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "rolling_avg"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -5037,7 +5037,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               MONTH_KW "month"
         COMMA ","
         WHITESPACE "\n  "
@@ -5060,7 +5060,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "revenue"
         COMMA ","
         WHITESPACE "\n  "
@@ -5123,7 +5123,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "running_total"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -5187,7 +5187,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     MONTH_KW "month"
               COMMA ","
               WHITESPACE "\n    "
@@ -5207,7 +5207,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "users"
               COMMA ","
               WHITESPACE "\n    "
@@ -5225,7 +5225,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "revenue"
           WHITESPACE "\n  "
           FROM_CLAUSE
@@ -5342,7 +5342,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "segment"
           WHITESPACE "\n  "
           FROM_CLAUSE
@@ -5388,7 +5388,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "users"
         COMMA ","
         WHITESPACE "\n  "
@@ -5406,7 +5406,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "revenue"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -5498,7 +5498,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 MONTH_KW "month"
           COMMA ","
           WHITESPACE "\n  "
@@ -5514,7 +5514,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "events"
           COMMA ","
           WHITESPACE "\n  "
@@ -5534,7 +5534,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "as"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "users"
       WHITESPACE "\n"
       FROM_CLAUSE
@@ -5633,12 +5633,12 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           ANALYZE_KW "ANALYZE"
       COMMA ","
       WHITESPACE " "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "BUFFERS"
       R_PAREN ")"
     WHITESPACE " \n"
@@ -6012,7 +6012,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "pages_per_range"
           WHITESPACE " "
           EQ "="
@@ -6137,7 +6137,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "total_quantity"
       WHITESPACE "\n"
       FROM_CLAUSE
@@ -6379,7 +6379,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           TIME_KW "time"
         WHITESPACE "        "
         PATH_TYPE
@@ -6395,7 +6395,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "panel_id"
         WHITESPACE "    "
         PATH_TYPE
@@ -6406,7 +6406,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "voltage"
         WHITESPACE "     "
         DOUBLE_TYPE
@@ -6416,7 +6416,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           CURRENT_KW "current"
         WHITESPACE "     "
         DOUBLE_TYPE
@@ -6426,7 +6426,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "temperature"
         WHITESPACE " "
         DOUBLE_TYPE
@@ -6436,7 +6436,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "irradiance"
         WHITESPACE "  "
         DOUBLE_TYPE
@@ -6497,7 +6497,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               DAY_KW "day"
         COMMA ","
         WHITESPACE "\n    "
@@ -6526,7 +6526,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "actual_power"
         COMMA ","
         WHITESPACE "\n    "
@@ -6573,7 +6573,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "performance_ratio"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -6701,7 +6701,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "avg_vibration"
               COMMA ","
               WHITESPACE "\n    "
@@ -6719,7 +6719,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "as"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "stddev_vibration"
           WHITESPACE "\n  "
           FROM_CLAUSE
@@ -6790,7 +6790,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "bucket"
         COMMA ","
         WHITESPACE "\n    "
@@ -6826,7 +6826,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "z_score"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -6950,7 +6950,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               INTERVAL_KW "interval"
         COMMA ","
         WHITESPACE "\n    "
@@ -6973,7 +6973,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "total_power"
         COMMA ","
         WHITESPACE "\n    "
@@ -6991,7 +6991,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "total_storage"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -7094,7 +7094,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "AS"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     HOUR_KW "hour"
               COMMA ","
               WHITESPACE "\n    "
@@ -7112,7 +7112,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "AS"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "avg_price"
               COMMA ","
               WHITESPACE "\n    "
@@ -7147,7 +7147,7 @@ SOURCE_FILE
                 AS_NAME
                   AS_KW "AS"
                   WHITESPACE " "
-                  NAME
+                  COLUMN_NAME
                     IDENT "price_75th"
           WHITESPACE "\n  "
           FROM_CLAUSE
@@ -7264,7 +7264,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "trading_signal"
     WHITESPACE "\n"
     FROM_CLAUSE

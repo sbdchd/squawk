@@ -80,11 +80,11 @@ fn is_values_row_column_name(target: &ast::Target, idx: usize) -> bool {
     let Some(as_name) = target.as_name() else {
         return false;
     };
-    let Some(name) = as_name.name() else {
+    let Some(column_name) = as_name.name() else {
         return false;
     };
     let expected = format!("column{}", idx + 1);
-    if Name::from_node(&name) != Name::from_string(expected) {
+    if Name::from_node(&column_name) != Name::from_string(expected) {
         return false;
     }
     true

@@ -168,7 +168,7 @@ SOURCE_FILE
       TABLE_ARG_LIST
         L_PAREN "("
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -179,7 +179,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
@@ -203,7 +203,7 @@ SOURCE_FILE
       TABLE_ARG_LIST
         L_PAREN "("
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "z"
           WHITESPACE " "
           PATH_TYPE
@@ -416,10 +416,10 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      CONFIG_VALUE_NAME
         IDENT "myschema"
       COMMA ","
-      NAME_REF
+      CONFIG_VALUE_NAME
         IDENT "public"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -434,7 +434,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      CONFIG_VALUE_NAME
         IDENT "myschema"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -449,7 +449,7 @@ SOURCE_FILE
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
-      NAME_REF
+      CONFIG_VALUE_NAME
         IDENT "bar"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -586,7 +586,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      CONFIG_VALUE_NAME
         IDENT "a"
       COMMA ","
       WHITESPACE " "

@@ -10,7 +10,10 @@ use squawk_syntax::{
 };
 
 fn is_reference_node(node: &SyntaxNode) -> bool {
-    if ast::NameRef::can_cast(node.kind()) {
+    if ast::ConfigValueName::can_cast(node.kind())
+        || ast::NameRef::can_cast(node.kind())
+        || ast::ParamNameRef::can_cast(node.kind())
+    {
         return true;
     }
 

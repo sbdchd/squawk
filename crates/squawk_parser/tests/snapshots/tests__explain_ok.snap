@@ -82,12 +82,12 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           ANALYZE_KW "analyze"
       COMMA ","
       WHITESPACE " "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "buffers"
       R_PAREN ")"
     WHITESPACE " "
@@ -110,22 +110,22 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           ANALYZE_KW "analyze"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           VERBOSE_KW "verbose"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "costs"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "costs"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -134,7 +134,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "costs"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -143,27 +143,27 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "settings"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "generic_plan"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "buffers"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "serialize"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "serialize"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -171,7 +171,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "serialize"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -179,7 +179,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "serialize"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -187,27 +187,27 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "wal"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "timing"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "summary"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "memory"
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           FORMAT_KW "format"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -215,7 +215,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           FORMAT_KW "format"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -223,7 +223,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           FORMAT_KW "format"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -231,7 +231,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           FORMAT_KW "format"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -239,7 +239,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           VERBOSE_KW "verbose"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -248,7 +248,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "costs"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -256,7 +256,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "settings"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -282,7 +282,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           FORMAT_KW "FORMAT"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -346,7 +346,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           FORMAT_KW "FORMAT"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -387,7 +387,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "COSTS"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -580,7 +580,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "GENERIC_PLAN"
       R_PAREN ")"
     WHITESPACE "\n  "
@@ -650,7 +650,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "GENERIC_PLAN"
       R_PAREN ")"
     WHITESPACE "\n  "
@@ -876,7 +876,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "COSTS"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -920,7 +920,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "COSTS"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -964,7 +964,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "COSTS"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE
@@ -1008,7 +1008,7 @@ SOURCE_FILE
     EXPLAIN_OPTION_LIST
       L_PAREN "("
       EXPLAIN_OPTION
-        NAME
+        EXPLAIN_OPTION_NAME
           IDENT "COSTS"
         WHITESPACE " "
         EXPLAIN_OPTION_VALUE

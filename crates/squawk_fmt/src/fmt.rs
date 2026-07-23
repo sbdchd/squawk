@@ -79,7 +79,7 @@ fn build_create_table<'a>(create_table: &ast::CreateTable) -> Doc<'a> {
 
 fn build_table_arg<'a>(create_table: ast::TableArg) -> Doc<'a> {
     match create_table {
-        ast::TableArg::Column(column) => build_name(column.name().unwrap())
+        ast::TableArg::Column(column) => build_column_name(column.name().unwrap())
             .append(Doc::space())
             .append(Doc::text(column.ty().unwrap().syntax().to_string())),
         ast::TableArg::LikeClause(_like_clause) => todo!(),
@@ -538,7 +538,7 @@ fn format_string_token(t: &SyntaxToken) -> String {
     }
 }
 
-fn build_name<'a>(name: ast::Name) -> Doc<'a> {
+fn build_column_name<'a>(name: ast::ColumnName) -> Doc<'a> {
     Doc::text(quote_column_alias(&name.text()))
 }
 
@@ -634,8 +634,10 @@ fn build_target<'a>(target: ast::Target) -> Option<Doc<'a>> {
             doc = doc.append(Doc::space()).append(Doc::text("as"))
         }
 
-        if let Some(name) = as_name.name() {
-            doc = doc.append(Doc::space()).append(build_name(name));
+        if let Some(column_name) = as_name.name() {
+            doc = doc
+                .append(Doc::space())
+                .append(build_column_name(column_name));
         }
     }
 

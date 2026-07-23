@@ -17,7 +17,9 @@ pub(super) fn unquote_identifier(
     let token = token_from_offset(db, position)?;
     let parent = token.parent()?;
 
-    let name_node = if let Some(name) = ast::Name::cast(parent.clone()) {
+    let name_node = if let Some(column_name) = ast::ColumnName::cast(parent.clone()) {
+        column_name.syntax().clone()
+    } else if let Some(name) = ast::Name::cast(parent.clone()) {
         name.syntax().clone()
     } else if let Some(name_ref) = ast::NameRef::cast(parent) {
         name_ref.syntax().clone()

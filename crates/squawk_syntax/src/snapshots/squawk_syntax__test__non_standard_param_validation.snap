@@ -13,7 +13,7 @@ SOURCE_FILE@0..47
         TARGET@29..31
           NON_STANDARD_PARAM@29..31
             COLON@29..30 ":"
-            NAME_REF@30..31
+            BIND_PARAM_NAME_REF@30..31
               IDENT@30..31 "x"
     SEMICOLON@31..32 ";"
   WHITESPACE@32..33 "\n"
@@ -26,7 +26,7 @@ SOURCE_FILE@0..47
           NON_STANDARD_PARAM@40..45
             COLON@40..41 ":"
             WHITESPACE@41..42 " "
-            NAME_REF@42..45
+            BIND_PARAM_NAME_REF@42..45
               IDENT@42..45 "foo"
     SEMICOLON@45..46 ";"
   WHITESPACE@46..47 "\n"

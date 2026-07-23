@@ -55,8 +55,8 @@ SOURCE_FILE
         WHITESPACE " "
         EQ "="
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "10"
+        CONFIG_VALUE_NAME
+          IDENT "wal_log"
       WHITESPACE "\n  "
       DATABASE_OPTION
         IDENT "locale"

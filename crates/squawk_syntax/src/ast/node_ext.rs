@@ -401,6 +401,13 @@ impl ast::ForeignKeyConstraint {
     }
 }
 
+impl ast::XmlPiFn {
+    #[inline]
+    pub fn target(&self) -> Option<ast::XmlPiTarget> {
+        support::child(&self.syntax)
+    }
+}
+
 impl ast::BetweenExpr {
     #[inline]
     pub fn target(&self) -> Option<ast::Expr> {
@@ -450,6 +457,18 @@ impl ast::CompoundSelect {
 }
 
 impl ast::NameRef {
+    #[inline]
+    pub fn text(&self) -> String {
+        normalize_name_node(self.syntax())
+    }
+
+    #[inline]
+    pub fn is_quoted(&self) -> bool {
+        is_quoted(self.syntax())
+    }
+}
+
+impl ast::ColumnName {
     #[inline]
     pub fn text(&self) -> String {
         normalize_name_node(self.syntax())
@@ -605,7 +624,7 @@ impl ast::Vacuum {
             // TODO: we need a better way of handling option lists
             || self.vacuum_option_list().is_some_and(|opt_list| {
                 opt_list.vacuum_options().any(|opt| {
-                    opt.name().is_some_and(|name| {
+                    opt.vacuum_option_name().is_some_and(|name| {
                         name.syntax()
                             .first_token()
                             .is_some_and(|token| token.text().eq_ignore_ascii_case("full"))

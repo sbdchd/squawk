@@ -35,13 +35,13 @@ SOURCE_FILE
     COPY_OPTION_LIST
       L_PAREN "("
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "on_error"
         WHITESPACE " "
         IGNORE_KW "ignore"
       WHITESPACE "  "
       COPY_OPTION
-        NAME
+        COPY_OPTION_NAME
           IDENT "log_verbosity"
         WHITESPACE " "
         VERBOSE_KW "verbose"

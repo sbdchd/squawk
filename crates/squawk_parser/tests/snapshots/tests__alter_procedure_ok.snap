@@ -234,10 +234,11 @@ SOURCE_FILE
       RESET_FUNC_OPTION
         RESET_KW "reset"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "z"
+        CONFIG_PARAMETER_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "z"
       WHITESPACE "\n  "
       RESET_FUNC_OPTION
         RESET_KW "reset"
@@ -273,7 +274,7 @@ SOURCE_FILE
           WHITESPACE " "
           TO_KW "to"
           WHITESPACE " "
-          NAME_REF
+          CONFIG_VALUE_NAME
             IDENT "v"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -301,7 +302,7 @@ SOURCE_FILE
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          NAME_REF
+          CONFIG_VALUE_NAME
             IDENT "v"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -377,10 +378,11 @@ SOURCE_FILE
       RESET_FUNC_OPTION
         RESET_KW "reset"
         WHITESPACE " "
-        PATH_REF
-          PATH_SEGMENT_REF
-            NAME_REF
-              IDENT "c"
+        CONFIG_PARAMETER_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAME_REF
+                IDENT "c"
     SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_PROCEDURE

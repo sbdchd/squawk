@@ -110,7 +110,7 @@ SOURCE_FILE
         L_PAREN "("
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             RESTRICT_KW "restrict"
           WHITESPACE " "
           EQ "="
@@ -124,7 +124,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             JOIN_KW "join"
           WHITESPACE " "
           EQ "="
@@ -138,7 +138,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "commutator"
           WHITESPACE " "
           EQ "="
@@ -152,7 +152,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "negator"
           WHITESPACE " "
           EQ "="
@@ -166,7 +166,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "hashes"
           WHITESPACE " "
           EQ "="
@@ -180,7 +180,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE "\n    "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "merges"
           WHITESPACE " "
           EQ "="
@@ -227,7 +227,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             RESTRICT_KW "restrict"
           WHITESPACE " "
           EQ "="
@@ -237,7 +237,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             JOIN_KW "join"
           WHITESPACE " "
           EQ "="

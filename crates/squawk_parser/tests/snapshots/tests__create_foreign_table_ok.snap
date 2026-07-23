@@ -53,7 +53,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -64,7 +64,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -83,7 +83,7 @@ SOURCE_FILE
           WHITESPACE " "
           L_PAREN "("
           ALTER_OPTION
-            NAME
+            FOREIGN_OPTION_NAME
               IDENT "a"
             WHITESPACE " "
             LITERAL
@@ -91,7 +91,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           ALTER_OPTION
-            NAME
+            FOREIGN_OPTION_NAME
               IDENT "c"
             WHITESPACE " "
             LITERAL
@@ -230,7 +230,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "a"
         WHITESPACE " "
         LITERAL
@@ -238,7 +238,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "c"
         WHITESPACE " "
         LITERAL
@@ -321,7 +321,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
         WHITESPACE " "
         WITH_OPTIONS
@@ -350,7 +350,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
         WHITESPACE " "
         NULL_CONSTRAINT
@@ -393,7 +393,7 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "a"
         WHITESPACE " "
         LITERAL
@@ -401,7 +401,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           IDENT "c"
         WHITESPACE " "
         LITERAL
@@ -444,7 +444,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
       WHITESPACE "\n  "
       R_PAREN ")"
@@ -509,7 +509,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
       WHITESPACE "\n  "
       R_PAREN ")"
@@ -593,7 +593,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
       WHITESPACE "\n  "
       R_PAREN ")"
@@ -647,7 +647,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "attrs"
         WHITESPACE " "
         PATH_TYPE
@@ -670,7 +670,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       ALTER_OPTION
-        NAME
+        FOREIGN_OPTION_NAME
           OBJECT_KW "object"
         WHITESPACE " "
         LITERAL

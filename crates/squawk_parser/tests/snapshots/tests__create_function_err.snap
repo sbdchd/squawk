@@ -27,7 +27,7 @@ SOURCE_FILE
       TABLE_ARG_LIST
         L_PAREN "("
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -37,7 +37,7 @@ SOURCE_FILE
                   TEXT_KW "text"
         WHITESPACE "  "
         COLUMN
-          NAME
+          COLUMN_NAME
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE

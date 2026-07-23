@@ -322,7 +322,7 @@ SOURCE_FILE
                   AS_NAME
                     AS_KW "as"
                     WHITESPACE " "
-                    NAME
+                    COLUMN_NAME
                       IDENT "last_login"
             WHITESPACE "\n  "
             FROM_CLAUSE

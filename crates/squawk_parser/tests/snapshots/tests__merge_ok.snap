@@ -1062,7 +1062,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "as"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "bar"
         COMMA ","
         WHITESPACE " "
@@ -1071,7 +1071,7 @@ SOURCE_FILE
             IDENT "t"
           WHITESPACE " "
           AS_NAME
-            NAME
+            COLUMN_NAME
               IDENT "b"
         COMMA ","
         WHITESPACE " "

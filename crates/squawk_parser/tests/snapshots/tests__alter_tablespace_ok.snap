@@ -74,7 +74,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "o"
           WHITESPACE " "
           EQ "="
@@ -104,7 +104,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "o1"
           WHITESPACE " "
           EQ "="
@@ -118,7 +118,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "o2"
           WHITESPACE " "
           EQ "="
@@ -148,7 +148,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "o"
         R_PAREN ")"
     SEMICOLON ";"
@@ -169,12 +169,12 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "o1"
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "o2"
         R_PAREN ")"
     SEMICOLON ";"

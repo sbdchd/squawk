@@ -43,7 +43,7 @@ SOURCE_FILE@0..101
       L_PAREN@71..72 "("
       WHITESPACE@72..75 "\n  "
       ATTRIBUTE_OPTION@75..84
-        NAME@75..80
+        ATTRIBUTE_NAME@75..80
           IDENT@75..80 "sfunc"
         WHITESPACE@80..81 " "
         EQ@81..82 "="
@@ -57,7 +57,7 @@ SOURCE_FILE@0..101
       COMMA@84..85 ","
       WHITESPACE@85..88 "\n  "
       ATTRIBUTE_OPTION@88..97
-        NAME@88..93
+        ATTRIBUTE_NAME@88..93
           IDENT@88..93 "stype"
         WHITESPACE@93..94 " "
         EQ@94..95 "="

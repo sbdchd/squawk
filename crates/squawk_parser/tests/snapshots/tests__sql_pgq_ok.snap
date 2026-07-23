@@ -58,7 +58,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "product_no"
         WHITESPACE " "
         PATH_TYPE
@@ -75,7 +75,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           NAME_KW "name"
         WHITESPACE " "
         CHAR_TYPE
@@ -83,7 +83,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "price"
         WHITESPACE " "
         PATH_TYPE
@@ -110,7 +110,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "customer_id"
         WHITESPACE " "
         PATH_TYPE
@@ -127,7 +127,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           NAME_KW "name"
         WHITESPACE " "
         CHAR_TYPE
@@ -135,7 +135,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "address"
         WHITESPACE " "
         CHAR_TYPE
@@ -159,7 +159,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "order_id"
         WHITESPACE " "
         PATH_TYPE
@@ -176,7 +176,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "ordered_when"
         WHITESPACE " "
         PATH_TYPE
@@ -203,7 +203,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "order_items_id"
         WHITESPACE " "
         PATH_TYPE
@@ -220,7 +220,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "order_id"
         WHITESPACE " "
         PATH_TYPE
@@ -245,7 +245,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "product_no"
         WHITESPACE " "
         PATH_TYPE
@@ -270,7 +270,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "quantity"
         WHITESPACE " "
         PATH_TYPE
@@ -297,7 +297,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "customer_orders_id"
         WHITESPACE " "
         PATH_TYPE
@@ -314,7 +314,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "customer_id"
         WHITESPACE " "
         PATH_TYPE
@@ -339,7 +339,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "order_id"
         WHITESPACE " "
         PATH_TYPE
@@ -543,9 +543,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -555,7 +555,7 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "customer_name"
             R_PAREN ")"
           R_PAREN ")"
@@ -1066,9 +1066,9 @@ SOURCE_FILE
           WHITESPACE " "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "c"
@@ -1078,7 +1078,7 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "customer_name"
             R_PAREN ")"
           R_PAREN ")"
@@ -1152,9 +1152,9 @@ SOURCE_FILE
           WHITESPACE "\n             "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "p"
@@ -1164,11 +1164,11 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "person_name"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "h"
@@ -1178,11 +1178,11 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "has_account_since"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "a"
@@ -1192,7 +1192,7 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "account_number"
             R_PAREN ")"
           R_PAREN ")"
@@ -1218,7 +1218,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -1235,7 +1235,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           NAME_KW "name"
         WHITESPACE " "
         PATH_TYPE
@@ -1246,7 +1246,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "company_id"
         WHITESPACE " "
         PATH_TYPE
@@ -1281,7 +1281,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -1298,7 +1298,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           NAME_KW "name"
         WHITESPACE " "
         PATH_TYPE
@@ -1324,7 +1324,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "number"
         WHITESPACE " "
         PATH_TYPE
@@ -1341,7 +1341,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "account_type"
         WHITESPACE " "
         PATH_TYPE
@@ -1352,7 +1352,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "person_id"
         WHITESPACE " "
         PATH_TYPE
@@ -1372,7 +1372,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "company_id"
         WHITESPACE " "
         PATH_TYPE
@@ -1407,7 +1407,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -1424,7 +1424,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "from_account"
         WHITESPACE " "
         PATH_TYPE
@@ -1444,7 +1444,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "to_account"
         WHITESPACE " "
         PATH_TYPE
@@ -1464,7 +1464,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "date"
         WHITESPACE " "
         PATH_TYPE
@@ -1475,7 +1475,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "amount"
         WHITESPACE " "
         PATH_TYPE
@@ -1526,10 +1526,10 @@ SOURCE_FILE
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              EXPR_AS_NAME_LIST
+              EXPR_AS_PROPERTY_NAME_LIST
                 L_PAREN "("
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_PROPERTY_NAME
                   NAME_REF
                     NAME_KW "name"
                 WHITESPACE " "
@@ -1553,10 +1553,10 @@ SOURCE_FILE
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              EXPR_AS_NAME_LIST
+              EXPR_AS_PROPERTY_NAME_LIST
                 L_PAREN "("
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_PROPERTY_NAME
                   NAME_REF
                     NAME_KW "name"
                 WHITESPACE " "
@@ -1580,10 +1580,10 @@ SOURCE_FILE
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              EXPR_AS_NAME_LIST
+              EXPR_AS_PROPERTY_NAME_LIST
                 L_PAREN "("
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_PROPERTY_NAME
                   NAME_REF
                     IDENT "number"
                 WHITESPACE " "
@@ -1673,10 +1673,10 @@ SOURCE_FILE
             PROPERTIES
               PROPERTIES_KW "PROPERTIES"
               WHITESPACE " "
-              EXPR_AS_NAME_LIST
+              EXPR_AS_PROPERTY_NAME_LIST
                 L_PAREN "("
                 WHITESPACE " "
-                EXPR_AS_NAME
+                EXPR_AS_PROPERTY_NAME
                   NAME_REF
                     IDENT "amount"
                 WHITESPACE " "
@@ -1882,7 +1882,7 @@ SOURCE_FILE
           AS_NAME
             AS_KW "AS"
             WHITESPACE " "
-            NAME
+            COLUMN_NAME
               IDENT "total_transacted_with_Nikita"
     WHITESPACE "\n"
     FROM_CLAUSE
@@ -2040,9 +2040,9 @@ SOURCE_FILE
           WHITESPACE "\n  "
           COLUMNS_KW "COLUMNS"
           WHITESPACE " "
-          EXPR_AS_NAME_LIST
+          EXPR_AS_COLUMN_NAME_LIST
             L_PAREN "("
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   OWNER_KW "owner"
@@ -2052,11 +2052,11 @@ SOURCE_FILE
               WHITESPACE " "
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "account_holder"
             COMMA ","
             WHITESPACE " "
-            EXPR_AS_NAME
+            EXPR_AS_COLUMN_NAME
               FIELD_EXPR
                 NAME_REF
                   IDENT "t"

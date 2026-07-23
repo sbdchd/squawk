@@ -606,7 +606,7 @@ SOURCE_FILE
                 INT_NUMBER "1"
               WHITESPACE " "
               AS_NAME
-                NAME
+                COLUMN_NAME
                   IDENT "a"
         WHITESPACE " "
         INTO_CLAUSE
@@ -630,7 +630,7 @@ SOURCE_FILE
                 INT_NUMBER "1"
               WHITESPACE " "
               AS_NAME
-                NAME
+                COLUMN_NAME
                   IDENT "b"
     R_PAREN ")"
     SEMICOLON ";"

@@ -71,6 +71,7 @@ select xmlexists('foo' passing by ref foo by value);
 
 -- xmlforest
 select xmlforest(foo, bar, buzz);
+select xmlforest(foo as bar);
 
 -- xmlparse
 select xmlparse(document x preserve whitespace);

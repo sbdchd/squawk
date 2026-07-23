@@ -60,7 +60,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "hello"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -247,7 +247,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "country"
           COMMA ","
           WHITESPACE "\n           "
@@ -309,7 +309,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "avg_rating"
       WHITESPACE "\n    "
       FROM_CLAUSE
@@ -361,7 +361,7 @@ SOURCE_FILE
     COLUMN_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "n"
       R_PAREN ")"
     WHITESPACE " "
@@ -441,17 +441,17 @@ SOURCE_FILE
     COLUMN_LIST
       L_PAREN "("
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "a"
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "b"
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME
+        COLUMN_NAME
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n"
@@ -461,7 +461,7 @@ SOURCE_FILE
       ATTRIBUTE_LIST
         L_PAREN "("
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "foo"
           WHITESPACE " "
           EQ "="
@@ -475,7 +475,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         ATTRIBUTE_OPTION
-          NAME
+          ATTRIBUTE_NAME
             IDENT "buzz"
         R_PAREN ")"
     WHITESPACE "\n"

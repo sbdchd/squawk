@@ -335,6 +335,13 @@ pub fn semantic_tokens(
                     out.push_token(column_name.syntax().clone().into(), token_type);
                 }
 
+                if let Some(config_value_name) = ast::ConfigValueName::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &config_value_name))
+                {
+                    out.push_token(config_value_name.syntax().clone().into(), token_type);
+                }
+
                 if let Some(column_name_ref) = ast::ColumnNameRef::cast(node.clone())
                     && let Some(token_type) =
                         token_type_for_node(db, InFile::new(file, &column_name_ref))
@@ -360,6 +367,13 @@ pub fn semantic_tokens(
                         token_type_for_node(db, InFile::new(file, &param_name))
                 {
                     out.push_token(param_name.syntax().clone().into(), token_type);
+                }
+
+                if let Some(param_name_ref) = ast::ParamNameRef::cast(node.clone())
+                    && let Some(token_type) =
+                        token_type_for_node(db, InFile::new(file, &param_name_ref))
+                {
+                    out.push_token(param_name_ref.syntax().clone().into(), token_type);
                 }
 
                 if let Some(json_path_name_ref) = ast::JsonPathNameRef::cast(node.clone())

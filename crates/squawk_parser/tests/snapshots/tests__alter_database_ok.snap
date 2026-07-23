@@ -115,7 +115,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
+      CONFIG_VALUE_NAME
         IDENT "v"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -137,7 +137,7 @@ SOURCE_FILE
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
-      NAME_REF
+      CONFIG_VALUE_NAME
         IDENT "v"
     SEMICOLON ";"
   WHITESPACE "\n"

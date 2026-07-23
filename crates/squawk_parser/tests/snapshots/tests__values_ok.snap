@@ -57,7 +57,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "column1"
           COMMA ","
           WHITESPACE " "
@@ -68,7 +68,7 @@ SOURCE_FILE
             AS_NAME
               AS_KW "AS"
               WHITESPACE " "
-              NAME
+              COLUMN_NAME
                 IDENT "column2"
     WHITESPACE "\n"
     UNION_KW "UNION"
@@ -243,12 +243,12 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "studio"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "kind"
             R_PAREN ")"
     WHITESPACE "\n  "
@@ -378,17 +378,17 @@ SOURCE_FILE
           COLUMN_LIST
             L_PAREN "("
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "depno"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 TARGET_KW "target"
             COMMA ","
             WHITESPACE " "
             COLUMN
-              NAME
+              COLUMN_NAME
                 IDENT "increase"
             R_PAREN ")"
     WHITESPACE "\n"

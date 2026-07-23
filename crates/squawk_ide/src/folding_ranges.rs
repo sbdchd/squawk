@@ -166,7 +166,10 @@ fn fold_kind(kind: SyntaxKind) -> Option<FoldKind> {
         | SyntaxKind::TRIGGER_EVENT_LIST
         | SyntaxKind::VACUUM_OPTION_LIST
         | SyntaxKind::VARIANT_LIST
-        | SyntaxKind::EXPR_AS_NAME_LIST
+        | SyntaxKind::EXPR_AS_COLUMN_NAME_LIST
+        | SyntaxKind::EXPR_AS_ELEMENT_TAG_LIST
+        | SyntaxKind::EXPR_AS_PROPERTY_NAME_LIST
+        | SyntaxKind::EXPR_AS_XML_ATTR_LIST
         | SyntaxKind::XML_COLUMN_OPTION_LIST
         | SyntaxKind::XML_NAMESPACE_LIST
         | SyntaxKind::XML_TABLE_COLUMN_LIST
